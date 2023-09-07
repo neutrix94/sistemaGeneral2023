@@ -1,0 +1,108 @@
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 1762
+                    AND pd.id_pedido_detalle = 1476085
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 1762
+                    AND pd.id_pedido_detalle = 1476084
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 125
+                    AND pd.id_pedido_detalle = 1476086
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 1728
+                    AND pd.id_pedido_detalle = 1476083
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 213
+                    AND pd.id_pedido_detalle = 1476082
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 161
+                    AND pd.id_pedido_detalle = 1476081
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 1762
+                    AND pd.id_pedido_detalle = 1476084
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 1762
+                    AND pd.id_pedido_detalle = 1476085
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 125
+                    AND pd.id_pedido_detalle = 1476086
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 1728
+                    AND pd.id_pedido_detalle = 1476083
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 213
+                    AND pd.id_pedido_detalle = 1476082
+SELECT 
+                        pv.id_pedido_validacion,
+                        pv.piezas_validadas
+                    FROM ec_pedidos_validacion_usuarios pv
+                    LEFT JOIN ec_pedidos_detalle pd
+                    ON pd.id_pedido_detalle = pv.id_pedido_detalle
+                    WHERE pd.id_pedido = 341328
+                    AND pv.id_proveedor_producto = 161
+                    AND pd.id_pedido_detalle = 1476081

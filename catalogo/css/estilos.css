@@ -1,0 +1,1184 @@
+@font-face{
+	font-family: 'Roboto';
+	src: url(../fonts/Roboto-Regular.ttf);
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	font-family: 'Roboto';
+	font-size: 16px;
+}
+
+*:focus { 
+	outline: none; 
+} 
+
+
+header {
+	width: 100%;
+	height: 55px;
+	background-color: #000;
+}
+
+ #menubar {
+	--display: none;
+}
+
+.menubar {
+	font-size: 30px;
+	cursor: pointer;
+	color: white;
+	display: none;
+
+}
+
+.despliega {
+	display: none;
+}
+
+body {
+	background-color: #848484;
+	background-image: url("../img/copos1.jpg");
+	background-size: 100%;
+}
+
+.prueba {
+	
+	width: 100%;
+	height: 92%;
+	position: fixed;
+	overflow-y: scroll;
+}
+
+h1 {
+	font-family: 'Roboto';
+	font-size: 40px;
+	text-align: center;
+	padding-top: 30px;
+	padding-bottom: 50px;
+}
+
+/*boton y caja de texto de busqueda*/
+
+input [type=cheked]{
+			position: relative;	
+
+		}
+
+		.botones {
+			display: flex;
+			position: fixed;
+			top: 12.5px;
+			left: 15px;
+			z-index: 1002;
+			/*border: solid black;*/
+		}
+
+		.icono {
+			font-size: 21px;
+			padding: 4px;
+			color: #fff;
+		}
+
+		.buscar {
+			position: relative;
+			width: 200px;
+			height: 30px;
+			border: none;
+			outline: none;
+			padding: 0 25px;
+			border-radius: 5px 0 0 5px;
+			font-size: 16px;
+		}
+		
+		.btnbuscar {
+			position: relative;
+			left: -5px;
+			border-radius: 0 5px 5px 0;
+			width: 50px;
+			height: 30px;
+			border: none;
+			outline: none;
+			background-color: #000000;
+			text-align: center;
+		}
+
+/* menu y submenus*/
+
+.menu  ul {
+	position: fixed;
+	width: 100%;
+	list-style: none;
+	justify-content: center;
+	background-color: #FE2E2E;
+	z-index: 1000;
+
+}
+
+.menu > ul {
+	display: flex;
+	height: 55px;
+}
+
+.menu li {
+	text-align: center;
+	flex-grow: 0.03;
+}
+
+.menu li a:hover {
+	background: rgba(0,0,0,0.3);
+}
+
+.menu ul li a {
+	display: block;
+	padding: 18px 30px;
+	color: white;
+	text-decoration: none;
+
+}
+
+.menu ul li .verde {
+	color: green;
+	font-size: 20px;
+}
+
+.menu ul li .azul {
+	color: blue;
+}
+
+#submenu {
+	position: relative;
+	z-index: 10;
+	background-color: #FE2E2E;
+
+}
+
+#submenu > li a {
+	padding: 10px 5px;
+
+}
+
+
+.menu li ul  {
+	display: none;
+	position: absolute;
+	opacity: 0.9;
+
+}
+
+.menu li:hover > ul {
+	display: block;
+
+}
+
+/*contenedor logotipo y direccion*/
+/*
+#logo {
+	margin: 0;
+	padding: 0;
+	position: relative;
+	left: 20%;
+	top: 55px;
+	width: 200px;
+	height: 200px;
+    /*border: 1px solid #000;
+}
+
+#direccion {
+	display: table;
+	position: absolute;
+	border-radius: 10px;
+	left: 42%;
+	top: 125px;
+	width: 45%;
+	height: 30%;
+	background-color: #6E6E6E;
+	text-align: center;
+
+}
+
+#direccion p {
+	display: table-cell;
+	margin: 0;
+	padding: 0;
+	color: #fff;
+	vertical-align: middle;
+}
+*/
+/*slider en principal*/
+
+.btnverProductos {
+	position:fixed;
+	top:60%;
+	right:2%;
+	z-index:1001;
+	padding:15px;
+	border-radius:50%;
+	width: 9%;
+	height: 19%; 
+	font-size:16px;
+	background:rgba(0,0,0,.8);
+	color:white; 
+	cursor:pointer;
+}
+
+.btnverProductos img {
+	width: 50px;
+	height: 40px;
+}
+
+.ver {
+	position: relative;
+	bottom: 15px;
+}
+
+.slider {
+	position: relative;
+	width: 100%;
+	height: 70%;
+	top: 75px;
+	overflow: hidden;
+	--border-top: solid;
+	--border-bottom: solid #000;
+	--border-top-color: #135013;
+	--border-bottom-color: #135013;
+	--border-top-width: 15px;
+	--border-bottom-width: 15px;
+	list-style: none;
+
+}
+
+.slider ul {
+	display: flex;
+	padding: 0;
+	width: 300%;
+	animation: cambio 15s infinite;
+	animation-direction: alternate;
+	animation-timing-function: ease-in;
+
+	
+}
+
+.slider img {
+	-webkit-user-select: none;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+.slider li {
+	width: 100%;
+	list-style: none;
+}
+
+@keyframes cambio {
+	0% { margin-left: 0;}
+	30% {margin-left: 0;}
+
+	35% {margin-left: -100%;}
+	65% {margin-left: -100%;}
+
+	70% {margin-left: -200%;}
+	100% {margin-left: -200%;}
+}
+
+
+/*DISPLAY GRID para las familias*/
+
+.grid h1 {
+	grid-column-start: 1;
+	grid-column-end: 5;
+}
+
+.grid{
+	display: grid;
+	grid-template-columns: 300px 300px 300px 300px;
+	grid-template-rows: 100px 400px;
+	justify-content: center;
+	grid-column-gap: 2.5rem;
+	grid-row-gap: 2.5rem;
+
+}
+
+.grid {
+	padding: 1rem;
+	position: relative;
+	top: 75px;
+}
+
+
+/*diseño contenedor familias*/
+
+.familias {
+	display: grid;
+	grid-template-columns: 200px;
+	grid-template-rows: 200px 50px;
+	justify-content: center;
+	align-content: center;
+	width: 300px;
+	height: 400px;
+	grid-row-gap: 50px;
+	border-style: double;
+	border-radius: 10px;
+
+}
+
+.familias .p img {
+	width: 100%;
+	height: 75%;
+}
+
+.indexfam {
+	cursor: pointer;
+	text-decoration: none;
+	color: white;
+	font-family: 'Roboto';
+}
+
+/*circulo contenedor img*/
+.p {
+	display: grid;
+	border-radius: 50%;
+	justify-items: center;
+	align-items: center;
+}
+
+/*rectangulo contenedor nombre familias*/
+.d {
+	display: grid;
+	border-radius: .25rem;
+	background-color: red;
+	color: white;
+	justify-content: center;
+	align-content: center;
+	cursor: pointer;
+}
+
+.footer {
+	display: flex;
+	position: relative;
+	justify-content: space-around;
+	align-items: center;
+	top: 100px;
+	width: 100%;
+	height: 75px;
+	background-color: black;
+	color: white;
+	text-align: center;
+	font-size: 14px;
+}
+
+/*Estilos para checkbox y catalogo*/
+/*
+.catalogo {
+	display: grid;
+	background-color: brown;
+	grid-template-columns: 400px 1fr 1fr 1fr;
+	grid-template-rows:200px 200px;
+	grid-column-gap: 1rem;
+	grid-row-gap: 2.5rem;
+	justify-content: center;
+}
+
+.checkbox {
+	display: grid;
+	background-color: grey;
+	justify-content: center;
+	grid-template-columns: 1fr;
+	grid-template-rows: 100px auto;
+	align-items: center;
+	justify-items: start;
+
+
+}*/
+.principal {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	position: fixed;
+}
+
+.principal .sidebar,
+.principal .catalogo {
+	color: black;
+}
+
+.sidebar {
+	position: relative;
+	width: 22%;
+	height: 92%;
+	overflow-y: scroll;
+	background-color: transparent;
+}
+
+.principal .sidebar h3 {
+	text-align: center;
+	position: relative;
+	font-size: 20px;
+	padding-bottom: 15px;
+	padding-top: 15px;
+}
+
+.principal .sidebar .check {
+	padding-bottom: 10px;
+	padding-left: 20px;
+}
+
+.principal .sidebar .check label {
+	padding-left: 10px;
+}
+ 
+.principal .catalogo {
+	position: relative;
+	display: grid;
+	width: 78%;
+	height: 92%;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: 40px 1fr;
+	overflow-y: scroll;
+	justify-items: center;
+	border-bottom-width: 15px;
+}	
+
+.principal .catalogo h3 {
+	grid-column-start: 1;
+	grid-column-end: 4;
+	font-size: 20px;
+	padding-top: 15px;
+}
+
+.principal .catalogo .galeria {
+	position: relative;
+	top: 15px;
+	display: grid;
+	width: 280px;
+	border-style: double;
+	border-radius: 10px;
+	margin-bottom: 15px;
+	text-align: center;
+	align-content: center;
+	justify-items: center;
+	color: black;
+}
+
+.principal .catalogo .posicion {
+	height: 350px;
+	padding: 1rem 0;
+
+}
+
+.principal .catalogo .posicion img {
+	cursor: pointer;
+	width: 75%;
+	height: 285px;
+}
+
+.posicion > img {
+	position: relative;
+	bottom: 15px;
+}
+
+.posicion > p {
+	position: relative;
+	padding: 0 10px;
+	vertical-align: middle;
+	bottom: 10px;
+}
+
+.principal .catalogo .galeria1 {
+	position: relative;
+	top: 15px;
+	display: grid;
+	width: 280px;
+	border-style: double;
+	border-radius: 10px;
+	margin-bottom: 15px;
+	text-align: center;
+	align-content: center;
+	justify-items: center;
+	color: black;
+	
+}
+
+.principal .catalogo .posicion1 {
+	height: 300px;
+}
+
+.principal .catalogo .posicion1 img {
+	width: 75%;
+	height: 200px;
+}
+
+.posicion1 > img {
+	cursor: pointer;
+	position: relative;
+	bottom: 15px;
+}
+
+.posicion1 > p {
+	position: relative;
+	bottom: 5px;
+	padding: 0 10px;
+	vertical-align: middle;
+}
+
+/*  PAGINADOR GALERIA  */
+
+.fondo {
+	display: none;
+	position: absolute;
+	justify-content: center;
+	width: 100%;
+	height: 92%;
+	background-color: rgba(0,0,0,0.6);
+
+}
+
+.galery{
+	display: inline-grid;
+	position: absolute;
+	left: 28%;
+	top: 4.5%;
+	justify-items: center;
+	align-items: center;
+	width: 600px;
+	height: 525px;
+	background-color: rgba(255,255,255,0.9);
+	border-radius: 10px ;
+
+}
+
+.flechas{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 60%;
+	height: 600px;
+}
+
+
+.next {
+	cursor: pointer;
+	font-size: 40px;
+	color: green;
+}
+
+.prev {
+	cursor: pointer;
+	font-size: 40px;
+	color: green;
+}
+
+
+.cerrar {
+	cursor: pointer;
+	background: rgba(225,0,0,.5);
+	color:white;
+	padding:15px;
+	right:1%;
+	position: absolute;
+	top:1%;
+
+}
+
+.mover {
+	display: flex;
+	position: absolute;
+	justify-content: space-between;
+	align-items: center;
+	width: 96%;
+	left: 2%;
+	height: 433px;
+	top: 75px;
+	z-index: 10;
+}
+
+
+/*====================DISEÑO FORMULARIO REGISTRO CLIENTE=====================*/
+
+.formRegistro {
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgb(180,180,180,0.5);
+}
+
+.form1 {
+	position: relative;
+	float: left;
+	top: 12%;
+	left: 2%;
+	width: 45%;
+	height: 70%;
+	background-color: rgba(189,189,189,0.5);
+	border: solid 1px #848484;
+}
+
+.form2 {
+	position: relative;
+	float: right;
+	top: 12%;
+	right: 2%;
+	width: 45%;
+	height: 70%;
+	background-color: rgba(189,189,189,0.5);
+	border: solid 1px #848484;
+}
+
+.form3 {
+	display: flex;
+	position: absolute;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 10%;
+	background-color: rgba(189,189,189,0.5);
+	top: 90%;
+	border-top: solid 0.1px #848484;
+}
+
+.regTitulo {
+	width: 100%;
+}
+
+.titulo {
+	font-weight: bold;
+	font-size: 19px;
+	position: absolute;
+	float: left;
+	top: 6%;
+	left: 3%;
+}
+
+.linea {
+	position: absolute;
+	width: 100%;
+	height: 1%;
+	font-size: 22px;
+}
+
+.linea::before {
+	content: "_______";
+	color: red;
+	float: left;
+	margin-left: 3%;
+	margin-top: 0.9%;
+}
+
+.info {
+	display: flex;
+	position: absolute;
+	align-items: center;
+	width: 90%;
+	left: 5%;
+	right: 5%;
+	height: 8%;
+	top: 4%;
+	border-bottom: solid 1px #848484;
+}
+
+.datosClientesLinea {
+	margin-top: 12%;
+}
+
+.infoPersonal {
+	width: 42%;
+	height: 35px;
+	margin-top: 5%;
+	padding-left: 1%;
+}
+
+.infoPersonal:nth-child(2n) {
+	float: right;
+	margin-right: 3%;
+
+}
+
+.infoPersonal:nth-child(2n+1) {
+	float: left;
+	margin-left: 3%;
+
+}
+
+.datosSesion {
+	margin-top: 12%;
+}
+
+.infoSesion {
+	width: 80%;
+	height: 35px;
+	margin-top: 5%;
+	margin-left: 9%;
+	padding-left: 1%;
+	
+}
+
+.btncreaCuenta {
+	color: white;
+	background-color: #B40404;
+	width: 200px;
+	height: 40px;
+	border: none;
+}
+
+.btncreaCuenta:hover {
+	cursor: pointer;
+	background-color: #DF0101;
+}
+
+/*======================AJUSTA PARA TABLETA================================*/
+@media (max-width: 768px){/*768*/
+	header {
+		position: relative;
+		background-color: brown;
+		width: 1fr;
+	}
+	header .menubar {
+		display: flex;
+	}
+
+	.menu {
+		position: absolute;
+		top: 55px;
+		width: 100%;
+	}
+
+	.menu ul li a {
+		padding: 18px 19px;
+	}
+
+	.botones {
+		position: absolute;
+		width: 275px;
+		left: 150px;
+	}
+
+	.buscar {
+		width: 175px;
+	}
+
+	.despliega {
+		position: relative;
+		top: 110px;
+		height: 600px;
+		overflow-y: scroll;
+	}
+
+	.slider {
+		height: 300px;
+	}
+
+	.grid h1 {
+		grid-column-start: 1;
+		grid-column-end: 4;
+	}
+
+	.grid {
+		width: 91%;
+		grid-template-columns: 150px 150px 150px;
+		grid-template-rows: 50px;
+	}
+
+	.familias {
+		grid-template-columns: 130px;
+		grid-template-rows: 140px 40px;
+		width: 160px;
+		height: 240px;
+		grid-row-gap: 10px;
+	}
+
+	.btnverProductos {
+		position:fixed;
+		top:49%;
+		right:2%;
+		width: 24%;
+		height: 14%;
+		font-size: 14px; 
+	}
+
+	.btnverProductos img {
+		position: relative;
+		top: -10px;
+		width: 45px;
+		height: 35px;
+	}
+
+	.ver {
+	bottom: 30px;
+	font-size: 14px;
+	}
+
+	.sidebar {
+		position: absolute;
+		top:55px;
+		left: 0;
+		background-color: #A4AEA4;
+		width: 70%;
+		transform: translateX(-100%);
+		transition: all 0.3s;
+		z-index: 10;
+	}
+
+
+	.principal .catalogo {
+		top: 50px;
+		width: 100%;
+		height: 86%;
+		grid-template-columns: repeat(3, 200px);
+	}
+	
+	.principal .catalogo .galeria1 {
+		width: 150px;
+		height: 190px;
+	}
+
+	.principal .catalogo .galeria {
+		width: 175px;
+		height: 250px;
+	}
+
+	.principal .catalogo h3 {
+		grid-column-start: 1;
+		grid-column-end: 4;
+	}
+
+	.principal .catalogo .galeria1 p {
+		font-size: 11px;
+		bottom: 5px;
+	}
+
+	.principal .catalogo .galeria p {
+		font-size: 11px;
+		bottom: 5px;
+	}
+
+	.principal .catalogo .posicion1 img {
+		width: 70%;
+		height: 100px;
+		bottom: 15px;
+	}
+
+	.principal .catalogo .posicion img {
+		height: 235px;
+		bottom: 15px;
+	}
+
+	.principal {
+		display: grid;
+		justify-content: center;
+	}
+
+	.prueba {
+		width: 100%;
+	}
+
+	/*  PAGINADOR GALERIA  */
+.fondo {
+	height: 100%;
+}
+
+.galery{
+	display: inline-grid;
+	position: absolute;
+	left: 0%;
+	top: 20%;
+	justify-items: center;
+	align-items: center;
+	width: 100%;
+	height: 65%;
+	background-color: rgba(255,255,255,0.9);
+	border-radius: 10px ;
+
+}
+
+.flechas{
+	width: 200px;
+	height: 100%;
+	z-index: 999;
+}
+
+.cerrar {
+	top: 10%;
+	z-index: 1000;
+}
+
+.mover {
+	top: -10px;
+	left: 2%;
+	width: 96%;
+}
+
+/*========================CHECKBOX=============================*/
+
+.dropbtn {
+	position: relative;
+	top: 4px;
+	left: 15px;
+	padding: 0 5px;
+  	background-color: transparent;
+  	font-size: 35px;
+  	color: white;
+  	border: none;
+  	cursor: pointer;
+}
+
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
+
+
+.linea::before {
+	margin-top: 4.5%;
+}
+
+
+.form1 {
+	width: 90%;
+	height: 42%;
+	left: 5%;
+}
+
+.form2 {
+	width: 90%;
+	height: 32%;
+	top: 14%;
+	right: 5%;
+}
+
+.datosSesion {
+	margin-top: 10%;
+}
+
+
+
+/*=============AJUSTE PARA SMARTPHONE==============*/
+@media (max-width: 480px){
+	header {
+		position: relative;
+		background-color: brown;
+		width: 1fr;
+	}
+	header .menubar {
+		display: flex;
+	}
+
+	.menu {
+		position: absolute;
+		top: 55px;
+		width: 100%;
+	}
+
+	.menu ul li a {
+		padding: 18px 19px;
+	}
+
+	.botones {
+		position: absolute;
+		width: 275px;
+		left: 105px;
+	}
+
+	.buscar {
+		width: 175px;
+	}
+
+	.despliega {
+		position: relative;
+		top: 110px;
+		height: 600px;
+		overflow-y: scroll;
+	}
+
+	.slider {
+		height: 175px;
+	}
+
+	.grid h1 {
+		grid-column-start: 1;
+		grid-column-end: 3;
+	}
+
+	.grid {
+		width: 91%;
+		grid-template-columns: 150px 150px;
+		grid-template-rows: 50px;
+	}
+
+	.familias {
+		grid-template-columns: 130px;
+		grid-template-rows: 140px 40px;
+		width: 160px;
+		height: 240px;
+		grid-row-gap: 10px;
+	}
+
+	.btnverProductos {
+		position:fixed;
+		top:49%;
+		right:2%;
+		width: 24%;
+		height: 14%;
+		font-size: 14px; 
+	}
+
+	.btnverProductos img {
+		position: relative;
+		top: -10px;
+		width: 45px;
+		height: 35px;
+	}
+
+	.ver {
+		bottom: 30px;
+		font-size: 14px;
+	}
+
+	.principal .catalogo {
+		top: 50px;
+		width: 100%;
+		height: 86%;
+		grid-template-columns: repeat(2, 200px);
+	}
+	
+	.principal .catalogo .galeria1 {
+		width: 150px;
+		height: 190px;
+	}
+
+	.principal .catalogo .galeria {
+		width: 175px;
+		height: 250px;
+	}
+
+	.principal .catalogo h3 {
+		grid-column-start: 1;
+		grid-column-end: 3;
+	}
+
+	.principal .catalogo .galeria1 p {
+		font-size: 11px;
+		bottom: 5px;
+	}
+
+	.principal .catalogo .galeria p {
+		font-size: 11px;
+		bottom: 5px;
+	}
+
+	.principal .catalogo .posicion1 img {
+		width: 70%;
+		height: 100px;
+		bottom: 15px;
+	}
+
+	.principal .catalogo .posicion img {
+		height: 235px;
+		bottom: 15px;
+	}
+
+	.principal {
+		display: grid;
+		justify-content: center;
+	}
+
+	.prueba {
+		width: 100%;
+	}
+
+	.sub {
+		font-size: 9px;
+	}
+
+
+	/*  PAGINADOR GALERIA  */
+.fondo {
+	height: 100%;
+}
+
+.galery{
+	display: inline-grid;
+	position: absolute;
+	left: 0%;
+	top: 20%;
+	justify-items: center;
+	align-items: center;
+	width: 100%;
+	height: 65%;
+	background-color: rgba(255,255,255,0.9);
+	border-radius: 10px ;
+
+}
+
+.flechas{
+	width: 380px;
+	height: 100%;
+	z-index: 999;
+}
+
+.cerrar {
+	top: 10%;
+	z-index: 1000;
+}
+
+.mover {
+	top: -60px;
+	left: 6px;
+	width: 97%;
+}
+
+.dir p {
+	font-size: 10px;
+}
+
+@media (max-width: 380px) {
+	header {
+		position: relative;
+		background-color: brown;
+		width: 1fr;
+	}
+	.menu-bar {
+		display: block;
+	}
+
+	.menu {
+		position: absolute;
+		top: 55px;
+		width: 100%;
+	}
+
+	.menu ul li a {
+		padding: 18px 14px;
+	}
+
+	.botones {
+		position: absolute;
+		width: 250px;
+		left: 65px;
+	}
+
+	.buscar {
+		width: 150px;
+	}
+
+
+}
+
+

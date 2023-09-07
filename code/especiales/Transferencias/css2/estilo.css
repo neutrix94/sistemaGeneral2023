@@ -1,0 +1,156 @@
+*{
+	margin:0;
+	padding:0;
+	font-color:black;
+	}
+thead{
+	background: rgba(280, 0, 0, 0.5);
+	z-index:1;
+	height: 20px;
+	color:white;
+}
+.filas{
+	height:35px;
+}
+.buscador{
+	font:menu;
+	/*font-weight:bold;*/
+	font-size: 17px;
+}
+.resultado{
+	font:menu;
+	font-weight:bold;
+	font-size: 17px;
+}
+.info{
+	width:100px;
+	border-radius:5px; 
+	padding:10px;
+	background:rgba(255,0,0,.4);
+	border: 1px solid white;
+	color: white;
+}
+#encabezado{
+	border:0;
+	border-radius: 5px;
+}
+#contenidoTabla{
+	overflow:scroll;
+	z-index:2;
+	}
+/*estilos de la ventana emergente*/
+	.emergent{
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		top : 0;
+		left: 0;
+		background-color: rgba( 0,0,0,.3);
+		z-index: 10;
+		display: none;
+	}
+	.emergent_content{
+		position: relative;
+		width: 90%;
+		left: 5%;
+		min-height: 100px;
+		background-color: white;
+		box-shadow: 2px 2px 15px rgba( 0, 0, 0, .6);
+		top : 10%;
+		padding: 10px;
+	}
+	.emergent_btn_close{
+		position: fixed;
+		left : 94%;
+		top : 8%;
+		background-color: red;
+		color: white;
+		padding: 8px;
+		z-index: 11;
+		border: none;
+	}
+	.no_visible{
+		display: none;
+	}
+	.text-right{
+		text-align: right !important;
+	}
+/*
+#contenidoTabla tr:hover{
+	background:rgba(0,0,255,.3);
+}
+*
+::-webkit-scrollbar {
+
+}*/
+.lectura{
+	width:90%;
+	border:0;
+	background:transparent;
+	color:black;
+	}
+.inventarios{
+	text-align:right;
+	width:90%;
+	border:0;
+	background:transparent;
+	color:black;
+	}
+.pedir{
+	width:90%; 
+	border:0; 
+	border-radius: 4px;	
+	background:transparent;
+	font-size: 20px;
+	text-align: right;
+	font-weight:bold;
+}
+/*
+.pedir:hover{
+	background:#FFF;
+	font-size:18px;
+	}
+*/
+#confirma{
+	padding:5px; 
+	font-size:15px;
+	border-radius: 8px;
+}
+.regresar{
+	background:transparent;
+}
+.regresar:hover{
+	background:rgba(0,255,0,.3);
+	border:1px solid blue;
+}
+.opcion:hover{
+	background:rgba(0,255,0,.3);
+}
+@media only screen and (max-width: 700px){
+.rellenar tr,.pedir{
+	font-size:10px;
+	}
+.buscador{
+	font-size: 12px;
+}
+::-webkit-scrollbar {
+      width: 3px;
+}
+#confirma{
+	padding:10px; 
+	font-size:9px;
+	}	
+}
+.botEme{
+	padding:10px;
+	border-radius: 5px;
+	margin:15px;
+}
+@media only screen and (max-width:400px){
+*{
+	margin:0;
+	padding:0;
+	font-size: 6px;
+	font color: black;
+	}
+}

@@ -1,0 +1,125 @@
+DROP PROCEDURE IF EXISTS comparar_listas;
+	
+	DELIMITER $$
+	CREATE PROCEDURE comparar_listas ( id_import INT ) 
+	BEGIN
+		DECLARE done INT DEFAULT FALSE;
+		DECLARE id_registro INT(11);
+		DECLARE id_registro_lista INT(11);
+		DECLARE parametro_1 VARCHAR(40);
+		DECLARE parametro_2 VARCHAR(40);
+		DECLARE parametro_3 VARCHAR(40);
+		DECLARE parametro_4 VARCHAR(40);
+		DECLARE parametro_5 VARCHAR(40);
+		DECLARE parametro_6 VARCHAR(40);
+		DECLARE parametro_7 VARCHAR(40);
+		DECLARE parametro_8 VARCHAR(40);
+		DECLARE parametro_9 VARCHAR(40);
+		DECLARE parametro_10 VARCHAR(40);
+		DECLARE parametro_11 VARCHAR(40);
+		DECLARE parametro_12 VARCHAR(40);
+		DECLARE parametro_13 VARCHAR(40);
+		DECLARE parametro_14 VARCHAR(40);
+		DECLARE parametro_15 VARCHAR(40);
+
+		DECLARE recorre CURSOR FOR
+		SELECT 
+			id_importacion_detalle, 
+			palabra_1,
+			palabra_2,
+			palabra_3,
+			palabra_4, 
+			palabra_5,
+			palabra_6,
+			palabra_7,
+			palabra_8,
+			palabra_9,
+			palabra_10,
+			palabra_11,
+			palabra_12,
+			palabra_13,
+			palabra_14,
+			palabra_15
+		FROM importaciones_detalle 
+		WHERE id_importacion = id_import;
+	        
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+        OPEN recorre;
+        	SET id_registro = 0; 
+        	SET id_registro_lista = 0; 
+   			SET parametro_1 = ''; 
+   			SET parametro_2 = ''; 
+   			SET parametro_3 = ''; 
+   			SET parametro_4 = '';
+   			SET parametro_5 = ''; 
+   			SET parametro_6 = ''; 
+   			SET parametro_7 = ''; 
+   			SET parametro_8 = '';
+   			SET parametro_9 = ''; 
+   			SET parametro_10 = '';  
+   			SET parametro_11 = ''; 
+   			SET parametro_12 = '';  
+   			SET parametro_13 = '';  
+   			SET parametro_14 = ''; 
+   			SET parametro_15 = ''; 
+        	loop_recorre: LOOP      
+       			FETCH recorre 
+       			INTO 
+	       			id_registro, 
+	       			parametro_1, 
+	       			parametro_2, 
+	       			parametro_3, 
+	       			parametro_4,
+	       			parametro_5, 
+	       			parametro_6, 
+	       			parametro_7, 
+	       			parametro_8,
+	       			parametro_9, 
+	       			parametro_10, 
+	       			parametro_11,
+	       			parametro_12, 
+	       			parametro_13, 
+	       			parametro_14,
+	       			parametro_15;
+       			
+       			IF done THEN
+               		LEAVE loop_recorre;
+           		END IF;
+           	/*compara registro por registro INTO id_registro_lista*/
+				
+				/*LIMIT 1;*/
+				/*IF( id_registro_lista IS NOT NULL AND id_registro_lista <> '' )
+				THEN INTO id_registro_lista 
+					VALUES( NULL, id_import, 325419, id_registro, 0 )
+				*/
+					INSERT INTO coincidencias_encontradas ( id_coincidencia_encontrada, id_importacion,
+					dato_lista, dato_csv, reportado )
+					SELECT 
+						NULL,
+						id_import,
+						l.id,
+						/*IF(l.id IS NULL, 325419, l.id),*/
+						id_registro,
+						0
+					FROM lista l
+					WHERE IF( parametro_1 <> '', INSTR( l.NOMBRE, parametro_1 ) > 0, 1 = 1 )
+					AND IF( parametro_2 <> '', INSTR( l.NOMBRE, parametro_2 ) > 0, 1 = 1 )
+					AND IF( parametro_3 <> '', INSTR( l.NOMBRE, parametro_3 ) > 0, 1 = 1 )
+					AND IF( parametro_4 <> '', INSTR( l.NOMBRE, parametro_4 ) > 0, 1 = 1 )
+					AND IF( parametro_5 <> '', INSTR( l.NOMBRE, parametro_5 ) > 0, 1 = 1 )
+					AND IF( parametro_6 <> '', INSTR( l.NOMBRE, parametro_6 ) > 0, 1 = 1 )
+					AND IF( parametro_7 <> '', INSTR( l.NOMBRE, parametro_7 ) > 0, 1 = 1 )
+					AND IF( parametro_8 <> '', INSTR( l.NOMBRE, parametro_8 ) > 0, 1 = 1 )
+					AND IF( parametro_9 <> '', INSTR( l.NOMBRE, parametro_9 ) > 0, 1 = 1 )
+					AND IF( parametro_10 <> '', INSTR( l.NOMBRE, parametro_10 ) > 0, 1 = 1 )
+					AND IF( parametro_11 <> '', INSTR( l.NOMBRE, parametro_11 ) > 0, 1 = 1 )
+					AND IF( parametro_12 <> '', INSTR( l.NOMBRE, parametro_12 ) > 0, 1 = 1 )
+					AND IF( parametro_13 <> '', INSTR( l.NOMBRE, parametro_13 ) > 0, 1 = 1 )
+					AND IF( parametro_14 <> '', INSTR( l.NOMBRE, parametro_14 ) > 0, 1 = 1 )
+					AND IF( parametro_15 <> '', INSTR( l.NOMBRE, parametro_15 ) > 0, 1 = 1 )
+					LIMIT 1;
+				/*END IF;*/
+
+        	END LOOP;
+		CLOSE recorre;
+	END $$

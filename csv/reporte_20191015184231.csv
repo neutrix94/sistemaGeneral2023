@@ -1,0 +1,80 @@
+ID,Fecha,Hora,Monto,Folio,Estatus,nombre,Exportado,Forma
+45808,2018-10-30,19:40:56,210,18CS45736,Sin pagar,Mostrador,SI,1
+45869,2018-11-01,20:44:40,400,18CS45763,Sin pagar,Mostrador,SI,1
+46075,2018-11-04,17:41:51,772.3300170898438,18CS45836,Sin pagar,Mostrador,SI,1
+46681,2018-11-10,11:29:49,690,18CS46022,Sin pagar,Mostrador,SI,1
+47343,2018-11-13,19:17:06,400,18CS46282,Sin pagar,Mostrador,SI,1
+99526,2019-01-07,14:36:10,199,18CS56023,Pagado,Mostrador,SI,1
+99527,2019-01-08,16:34:27,180,18CS56024,Pagado,Mostrador,SI,1
+99528,2019-02-07,14:00:57,1,18CS99528,Pagado,Mostrador,SI,1
+99529,2019-02-12,15:33:26,1,18CS99529,Pagado,Mostrador,SI,1
+99530,2019-03-09,11:20:34,960,18CS99530,Pagado,Mostrador,SI,1
+99918,2018-10-04,11:25:53,764,agrupacion,Pagado,Mostrador,SI,1
+99919,2018-10-17,11:25:56,2041,agrupacion,Pagado,Mostrador,SI,1
+99922,2018-10-20,11:26:06,530,agrupacion,Pagado,Mostrador,SI,1
+99923,2018-10-24,11:26:09,8440,agrupacion,Pagado,Mostrador,SI,1
+99924,2018-10-25,11:26:12,19263,agrupacion,Pagado,Mostrador,SI,1
+99927,2018-10-26,11:26:15,6585,agrupacion,Pagado,Mostrador,SI,1
+99930,2018-10-27,11:26:19,21989,agrupacion,Pagado,Mostrador,SI,1
+99933,2018-10-28,11:26:22,13450,agrupacion,Pagado,Mostrador,SI,1
+99935,2018-10-29,11:26:25,1632.5,agrupacion,Pagado,Mostrador,SI,1
+99937,2018-10-30,11:26:29,6404,agrupacion,Pagado,Mostrador,SI,1
+99939,2018-10-31,11:26:32,10605.5,agrupacion,Pagado,Mostrador,SI,1
+99942,2018-11-01,11:26:35,23262.5,agrupacion,Pagado,Mostrador,SI,1
+99946,2018-11-02,11:26:39,11014,agrupacion,Pagado,Mostrador,SI,1
+99950,2018-11-03,11:26:42,17099,agrupacion,Pagado,Mostrador,SI,1
+99954,2018-11-04,11:26:46,21755.00048828125,agrupacion,Pagado,Mostrador,SI,1
+99958,2018-11-05,11:26:49,26901.5,agrupacion,Pagado,Mostrador,SI,1
+99962,2018-11-06,11:26:53,17343,agrupacion,Pagado,Mostrador,SI,1
+99966,2018-11-07,11:26:57,27635.010009765625,agrupacion,Pagado,Mostrador,SI,1
+99970,2018-11-08,11:27:00,12372.5,agrupacion,Pagado,Mostrador,SI,1
+99975,2018-11-09,11:27:04,27484,agrupacion,Pagado,Mostrador,SI,1
+99980,2018-11-10,11:27:07,47935.69921875,agrupacion,Pagado,Mostrador,SI,1
+99985,2018-11-11,11:27:12,78787.30078125,agrupacion,Pagado,Mostrador,SI,1
+99990,2018-11-12,11:27:16,32215.5,agrupacion,Pagado,Mostrador,SI,1
+99995,2018-11-13,11:27:19,48151.5,agrupacion,Pagado,Mostrador,SI,1
+100000,2018-11-14,11:27:23,20695.9599609375,agrupacion,Pagado,Mostrador,SI,1
+100005,2018-11-15,11:27:27,31755,agrupacion,Pagado,Mostrador,SI,1
+100010,2018-11-16,11:27:31,45750.9580078125,agrupacion,Pagado,Mostrador,SI,1
+100015,2018-11-17,11:27:36,154210.99609375,agrupacion,Pagado,Mostrador,SI,1
+100020,2018-11-18,11:27:41,130374.69921875,agrupacion,Pagado,Mostrador,SI,1
+100025,2018-11-19,11:27:48,139752,agrupacion,Pagado,Mostrador,SI,1
+100030,2018-11-20,11:27:55,67707,agrupacion,Pagado,Mostrador,SI,1
+100035,2018-11-21,11:28:00,72751,agrupacion,Pagado,Mostrador,SI,1
+100040,2018-11-22,11:28:06,102369.998046875,agrupacion,Pagado,Mostrador,SI,1
+100045,2018-11-23,11:28:10,80088,agrupacion,Pagado,Mostrador,SI,1
+100050,2018-11-24,11:28:16,179613.19921875,agrupacion,Pagado,Mostrador,SI,1
+100055,2018-11-25,11:28:23,302620.8984375,agrupacion,Pagado,Mostrador,SI,1
+100060,2018-11-26,11:28:31,131488.5,agrupacion,Pagado,Mostrador,SI,1
+100065,2018-11-27,11:28:36,142663.8984375,agrupacion,Pagado,Mostrador,SI,1
+100070,2018-11-28,11:28:41,143346.30078125,agrupacion,Pagado,Mostrador,SI,1
+100075,2018-11-29,11:28:47,161767,agrupacion,Pagado,Mostrador,SI,1
+100080,2018-11-30,11:28:53,217632,agrupacion,Pagado,Mostrador,SI,1
+100087,2018-12-01,11:29:01,398019.5,agrupacion,Pagado,Mostrador,SI,1
+100094,2018-12-02,11:29:14,464235.6015625,agrupacion,Pagado,Mostrador,SI,1
+100101,2018-12-03,11:29:26,197787.3984375,agrupacion,Pagado,Mostrador,SI,1
+100108,2018-12-04,11:29:36,176462.80078125,agrupacion,Pagado,Mostrador,SI,1
+100115,2018-12-05,11:29:43,200276.30078125,agrupacion,Pagado,Mostrador,SI,1
+100122,2018-12-06,11:29:50,143435.69921875,agrupacion,Pagado,Mostrador,SI,1
+100129,2018-12-07,11:29:58,155703,agrupacion,Pagado,Mostrador,SI,1
+100136,2018-12-08,11:30:05,276172.1015625,agrupacion,Pagado,Mostrador,SI,1
+100143,2018-12-09,11:30:16,332402.703125,agrupacion,Pagado,Mostrador,SI,1
+100150,2018-12-10,11:30:26,125416.599609375,agrupacion,Pagado,Mostrador,SI,1
+100157,2018-12-11,11:30:32,128909.400390625,agrupacion,Pagado,Mostrador,SI,1
+100164,2018-12-12,11:30:39,158042.3984375,agrupacion,Pagado,Mostrador,SI,1
+100171,2018-12-13,11:30:44,81676,agrupacion,Pagado,Mostrador,SI,1
+100178,2018-12-14,11:30:49,103083,agrupacion,Pagado,Mostrador,SI,1
+100185,2018-12-15,11:30:52,123669.099609375,agrupacion,Pagado,Mostrador,SI,1
+100192,2018-12-16,11:30:56,121984,agrupacion,Pagado,Mostrador,SI,1
+100199,2018-12-17,11:31:00,72415.998046875,agrupacion,Pagado,Mostrador,SI,1
+100206,2018-12-18,11:31:04,62534.988525390625,agrupacion,Pagado,Mostrador,SI,1
+100213,2018-12-19,11:31:06,33241,agrupacion,Pagado,Mostrador,SI,1
+100220,2018-12-20,11:31:09,49806.0087890625,agrupacion,Pagado,Mostrador,SI,1
+100227,2018-12-21,11:31:11,39549.98046875,agrupacion,Pagado,Mostrador,SI,1
+100234,2018-12-22,11:31:13,56954.98828125,agrupacion,Pagado,Mostrador,SI,1
+100241,2018-12-23,11:31:15,49582,agrupacion,Pagado,Mostrador,SI,1
+100248,2018-12-24,11:31:16,15297,agrupacion,Pagado,Mostrador,SI,1
+100253,2018-12-26,11:31:17,7169,agrupacion,Pagado,Mostrador,SI,1
+100263,2019-10-08,20:37:29,30,18CS100263,Sin pagar,Oscar,SI,1
+100264,2019-10-08,22:24:59,596,18CS100264,Pagado,Mostrador,SI,1
+100265,2019-10-11,14:13:47,80,18CS100265,Sin pagar,OScar,SI,1

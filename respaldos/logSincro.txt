@@ -1,0 +1,2071 @@
+
+
+
+Sincronizacion detectada: 2017-09-02 14:19:15
+Se marco en proceso la operacion 2017-09-02 14:19:15
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:19:15
+Se inicia con la conexion de la base datos local 2017-09-02 14:19:15
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:19:15
+Error al conectar con el servidor foranea 2017-09-02 14:19:15
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:19:15
+
+
+Sincronizacion detectada: 2017-09-02 14:19:16
+Se marco en proceso la operacion 2017-09-02 14:19:16
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:19:17
+Se inicia con la conexion de la base datos local 2017-09-02 14:19:17
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:19:17
+Error al conectar con el servidor foranea 2017-09-02 14:19:17
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:19:17
+
+
+Sincronizacion detectada: 2017-09-02 14:19:17
+Se marco en proceso la operacion 2017-09-02 14:19:18
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:19:18
+Se inicia con la conexion de la base datos local 2017-09-02 14:19:18
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:19:18
+Error al conectar con el servidor foranea 2017-09-02 14:19:18
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:19:18
+
+
+Sincronizacion detectada: 2017-09-02 14:19:18
+Se marco en proceso la operacion 2017-09-02 14:19:19
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:19:19
+Se inicia con la conexion de la base datos local 2017-09-02 14:19:19
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:19:19
+Error al conectar con el servidor foranea 2017-09-02 14:19:19
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:19:19
+
+
+Sincronizacion detectada: 2017-09-02 14:19:26
+Se marco en proceso la operacion 2017-09-02 14:19:26
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:19:27
+Se inicia con la conexion de la base datos local 2017-09-02 14:19:27
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:19:27
+Error al conectar con el servidor foranea 2017-09-02 14:19:27
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:19:27
+
+
+Sincronizacion detectada: 2017-09-02 14:19:29
+Se marco en proceso la operacion 2017-09-02 14:19:29
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:19:29
+Se inicia con la conexion de la base datos local 2017-09-02 14:19:29
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:19:29
+Error al conectar con el servidor foranea 2017-09-02 14:19:29
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:19:29
+
+
+Sincronizacion detectada: 2017-09-02 14:19:30
+Se marco en proceso la operacion 2017-09-02 14:19:30
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:19:30
+Se inicia con la conexion de la base datos local 2017-09-02 14:19:30
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:19:30
+Error al conectar con el servidor foranea 2017-09-02 14:19:31
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:19:31
+
+
+Sincronizacion detectada: 2017-09-02 14:19:31
+Se marco en proceso la operacion 2017-09-02 14:19:31
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:19:31
+Se inicia con la conexion de la base datos local 2017-09-02 14:19:31
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:19:31
+Error al conectar con el servidor foranea 2017-09-02 14:19:31
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:19:32
+
+
+Sincronizacion detectada: 2017-09-02 14:19:32
+Se marco en proceso la operacion 2017-09-02 14:19:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:19:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:19:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:19:32
+Error al conectar con el servidor foranea 2017-09-02 14:19:32
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:19:32
+
+
+Sincronizacion detectada: 2017-09-02 14:19:37
+Se marco en proceso la operacion 2017-09-02 14:19:37
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:19:38
+Se inicia con la conexion de la base datos local 2017-09-02 14:19:38
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:19:38
+Error al conectar con el servidor foranea 2017-09-02 14:19:38
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:19:38
+
+
+Sincronizacion detectada: 2017-09-02 14:19:48
+Se marco en proceso la operacion 2017-09-02 14:19:48
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:19:48
+Se inicia con la conexion de la base datos local 2017-09-02 14:19:48
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:19:48
+Error al conectar con el servidor foranea 2017-09-02 14:19:49
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:19:49
+
+
+Sincronizacion detectada: 2017-09-02 14:20:27
+Se marco en proceso la operacion 2017-09-02 14:20:27
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:20:28
+Se inicia con la conexion de la base datos local 2017-09-02 14:20:28
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:20:28
+Error al conectar con el servidor foranea 2017-09-02 14:20:28
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:20:28
+
+
+Sincronizacion detectada: 2017-09-02 14:20:28
+Se marco en proceso la operacion 2017-09-02 14:20:28
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:20:28
+Se inicia con la conexion de la base datos local 2017-09-02 14:20:28
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:20:28
+Error al conectar con el servidor foranea 2017-09-02 14:20:29
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:20:29
+
+
+Sincronizacion detectada: 2017-09-02 14:20:29
+Se marco en proceso la operacion 2017-09-02 14:20:30
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:20:30
+Se inicia con la conexion de la base datos local 2017-09-02 14:20:30
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:20:30
+Error al conectar con el servidor foranea 2017-09-02 14:20:30
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:20:30
+
+
+Sincronizacion detectada: 2017-09-02 14:20:31
+Se marco en proceso la operacion 2017-09-02 14:20:31
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:20:31
+Se inicia con la conexion de la base datos local 2017-09-02 14:20:31
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:20:31
+Error al conectar con el servidor foranea 2017-09-02 14:20:31
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:20:32
+
+
+Sincronizacion detectada: 2017-09-02 14:20:32
+Se marco en proceso la operacion 2017-09-02 14:20:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:20:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:20:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:20:32
+Error al conectar con el servidor foranea 2017-09-02 14:20:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:20:35
+
+
+Sincronizacion detectada: 2017-09-02 14:20:41
+Se marco en proceso la operacion 2017-09-02 14:20:41
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:20:41
+Se inicia con la conexion de la base datos local 2017-09-02 14:20:41
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:20:41
+Error al conectar con el servidor foranea 2017-09-02 14:20:41
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:20:41
+
+
+Sincronizacion detectada: 2017-09-02 14:20:42
+Se marco en proceso la operacion 2017-09-02 14:20:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:20:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:20:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:20:42
+Error al conectar con el servidor foranea 2017-09-02 14:20:43
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:20:43
+
+
+Sincronizacion detectada: 2017-09-02 14:20:43
+Se marco en proceso la operacion 2017-09-02 14:20:43
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:20:44
+Se inicia con la conexion de la base datos local 2017-09-02 14:20:44
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:20:44
+Error al conectar con el servidor foranea 2017-09-02 14:20:44
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:20:44
+
+
+Sincronizacion detectada: 2017-09-02 14:20:44
+Se marco en proceso la operacion 2017-09-02 14:20:44
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:20:44
+Se inicia con la conexion de la base datos local 2017-09-02 14:20:44
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:20:44
+Error al conectar con el servidor foranea 2017-09-02 14:20:45
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:20:45
+
+
+Sincronizacion detectada: 2017-09-02 14:20:45
+Se marco en proceso la operacion 2017-09-02 14:20:45
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:20:45
+Se inicia con la conexion de la base datos local 2017-09-02 14:20:45
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:20:45
+Error al conectar con el servidor foranea 2017-09-02 14:20:45
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:20:46
+
+
+Sincronizacion detectada: 2017-09-02 14:20:51
+Se marco en proceso la operacion 2017-09-02 14:20:51
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:20:51
+Se inicia con la conexion de la base datos local 2017-09-02 14:20:51
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:20:51
+Error al conectar con el servidor foranea 2017-09-02 14:20:51
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:20:52
+
+
+Sincronizacion detectada: 2017-09-02 14:21:02
+Se marco en proceso la operacion 2017-09-02 14:21:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:21:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:21:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:21:02
+Error al conectar con el servidor foranea 2017-09-02 14:21:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:21:02
+
+
+Sincronizacion detectada: 2017-09-02 14:21:08
+Se marco en proceso la operacion 2017-09-02 14:21:08
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:21:08
+Se inicia con la conexion de la base datos local 2017-09-02 14:21:08
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:21:08
+Error al conectar con el servidor foranea 2017-09-02 14:21:11
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:21:12
+
+
+Sincronizacion detectada: 2017-09-02 14:21:32
+Se marco en proceso la operacion 2017-09-02 14:21:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:21:33
+Se inicia con la conexion de la base datos local 2017-09-02 14:21:33
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:21:33
+Error al conectar con el servidor foranea 2017-09-02 14:21:33
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:21:33
+
+
+Sincronizacion detectada: 2017-09-02 14:21:33
+Se marco en proceso la operacion 2017-09-02 14:21:33
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:21:34
+Se inicia con la conexion de la base datos local 2017-09-02 14:21:34
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:21:34
+Error al conectar con el servidor foranea 2017-09-02 14:21:34
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:21:34
+
+
+Sincronizacion detectada: 2017-09-02 14:21:35
+Se marco en proceso la operacion 2017-09-02 14:21:35
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:21:35
+Se inicia con la conexion de la base datos local 2017-09-02 14:21:35
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:21:35
+Error al conectar con el servidor foranea 2017-09-02 14:21:38
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:21:38
+
+
+Sincronizacion detectada: 2017-09-02 14:21:40
+Se marco en proceso la operacion 2017-09-02 14:21:40
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:21:40
+Se inicia con la conexion de la base datos local 2017-09-02 14:21:40
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:21:40
+Error al conectar con el servidor foranea 2017-09-02 14:21:41
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:21:41
+
+
+Sincronizacion detectada: 2017-09-02 14:21:51
+Se marco en proceso la operacion 2017-09-02 14:21:51
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:21:51
+Se inicia con la conexion de la base datos local 2017-09-02 14:21:51
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:21:51
+Error al conectar con el servidor foranea 2017-09-02 14:21:51
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:21:52
+
+
+Sincronizacion detectada: 2017-09-02 14:23:40
+Se marco en proceso la operacion 2017-09-02 14:23:40
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:23:41
+Se inicia con la conexion de la base datos local 2017-09-02 14:23:41
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:23:41
+Error al conectar con el servidor foranea 2017-09-02 14:23:41
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:23:41
+
+
+Sincronizacion detectada: 2017-09-02 14:23:42
+Se marco en proceso la operacion 2017-09-02 14:23:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:23:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:23:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:23:42
+Error al conectar con el servidor foranea 2017-09-02 14:23:42
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:23:42
+
+
+Sincronizacion detectada: 2017-09-02 14:23:43
+Se marco en proceso la operacion 2017-09-02 14:23:43
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:23:43
+Se inicia con la conexion de la base datos local 2017-09-02 14:23:43
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:23:43
+Error al conectar con el servidor foranea 2017-09-02 14:23:46
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:23:46
+
+
+Sincronizacion detectada: 2017-09-02 14:23:47
+Se marco en proceso la operacion 2017-09-02 14:23:47
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:23:47
+Se inicia con la conexion de la base datos local 2017-09-02 14:23:47
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:23:47
+Error al conectar con el servidor foranea 2017-09-02 14:23:47
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:23:47
+
+
+Sincronizacion detectada: 2017-09-02 14:23:48
+Se marco en proceso la operacion 2017-09-02 14:23:48
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:23:48
+Se inicia con la conexion de la base datos local 2017-09-02 14:23:48
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:23:48
+Error al conectar con el servidor foranea 2017-09-02 14:23:51
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:23:51
+
+
+Sincronizacion detectada: 2017-09-02 14:23:54
+Se marco en proceso la operacion 2017-09-02 14:23:54
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:23:55
+Se inicia con la conexion de la base datos local 2017-09-02 14:23:55
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:23:55
+Error al conectar con el servidor foranea 2017-09-02 14:23:55
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:23:55
+
+
+Sincronizacion detectada: 2017-09-02 14:24:05
+Se marco en proceso la operacion 2017-09-02 14:24:05
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:06
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:06
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:06
+Error al conectar con el servidor foranea 2017-09-02 14:24:06
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:06
+
+
+Sincronizacion detectada: 2017-09-02 14:24:24
+Se marco en proceso la operacion 2017-09-02 14:24:24
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:24
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:24
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:24
+Error al conectar con el servidor foranea 2017-09-02 14:24:27
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:28
+
+
+Sincronizacion detectada: 2017-09-02 14:24:28
+Se marco en proceso la operacion 2017-09-02 14:24:28
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:28
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:28
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:28
+
+
+Sincronizacion detectada: 2017-09-02 14:24:29
+Se marco en proceso la operacion 2017-09-02 14:24:29
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:30
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:30
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:30
+Error al conectar con el servidor foranea 2017-09-02 14:24:30
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:30
+
+
+Sincronizacion detectada: 2017-09-02 14:24:31
+Se marco en proceso la operacion 2017-09-02 14:24:31
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:31
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:31
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:31
+Error al conectar con el servidor foranea 2017-09-02 14:24:31
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:31
+Error al conectar con el servidor foranea 2017-09-02 14:24:31
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:31
+
+
+Sincronizacion detectada: 2017-09-02 14:24:32
+Se marco en proceso la operacion 2017-09-02 14:24:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:32
+Error al conectar con el servidor foranea 2017-09-02 14:24:32
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:32
+
+
+Sincronizacion detectada: 2017-09-02 14:24:32
+Se marco en proceso la operacion 2017-09-02 14:24:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:33
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:33
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:33
+Error al conectar con el servidor foranea 2017-09-02 14:24:36
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:36
+
+
+Sincronizacion detectada: 2017-09-02 14:24:42
+Se marco en proceso la operacion 2017-09-02 14:24:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:42
+Error al conectar con el servidor foranea 2017-09-02 14:24:42
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:42
+
+
+Sincronizacion detectada: 2017-09-02 14:24:46
+Se marco en proceso la operacion 2017-09-02 14:24:46
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:46
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:46
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:46
+Error al conectar con el servidor foranea 2017-09-02 14:24:46
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:47
+
+
+Sincronizacion detectada: 2017-09-02 14:24:47
+Se marco en proceso la operacion 2017-09-02 14:24:47
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:48
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:48
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:48
+Error al conectar con el servidor foranea 2017-09-02 14:24:51
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:51
+
+
+Sincronizacion detectada: 2017-09-02 14:24:51
+Se marco en proceso la operacion 2017-09-02 14:24:51
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:51
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:51
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:51
+Error al conectar con el servidor foranea 2017-09-02 14:24:52
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:52
+
+
+Sincronizacion detectada: 2017-09-02 14:24:52
+Se marco en proceso la operacion 2017-09-02 14:24:52
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:52
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:52
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:52
+Error al conectar con el servidor foranea 2017-09-02 14:24:52
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:52
+
+
+Sincronizacion detectada: 2017-09-02 14:24:58
+Se marco en proceso la operacion 2017-09-02 14:24:58
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:24:58
+Se inicia con la conexion de la base datos local 2017-09-02 14:24:58
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:24:58
+Error al conectar con el servidor foranea 2017-09-02 14:24:59
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:24:59
+
+
+Sincronizacion detectada: 2017-09-02 14:25:09
+Se marco en proceso la operacion 2017-09-02 14:25:09
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:09
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:09
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:09
+Error al conectar con el servidor foranea 2017-09-02 14:25:09
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:09
+
+
+Sincronizacion detectada: 2017-09-02 14:25:11
+Se marco en proceso la operacion 2017-09-02 14:25:11
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:11
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:11
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:11
+Error al conectar con el servidor foranea 2017-09-02 14:25:12
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:12
+
+
+Sincronizacion detectada: 2017-09-02 14:25:12
+Se marco en proceso la operacion 2017-09-02 14:25:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:12
+Error al conectar con el servidor foranea 2017-09-02 14:25:13
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:13
+
+
+Sincronizacion detectada: 2017-09-02 14:25:13
+Se marco en proceso la operacion 2017-09-02 14:25:13
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:13
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:13
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:13
+Error al conectar con el servidor foranea 2017-09-02 14:25:14
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:14
+
+
+Sincronizacion detectada: 2017-09-02 14:25:14
+Se marco en proceso la operacion 2017-09-02 14:25:14
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:14
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:14
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:14
+Error al conectar con el servidor foranea 2017-09-02 14:25:14
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:14
+
+
+Sincronizacion detectada: 2017-09-02 14:25:27
+Se marco en proceso la operacion 2017-09-02 14:25:27
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:27
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:27
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:27
+Error al conectar con el servidor foranea 2017-09-02 14:25:30
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:30
+
+
+Sincronizacion detectada: 2017-09-02 14:25:31
+Se marco en proceso la operacion 2017-09-02 14:25:31
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:31
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:31
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:31
+Error al conectar con el servidor foranea 2017-09-02 14:25:34
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:34
+
+
+Sincronizacion detectada: 2017-09-02 14:25:35
+Se marco en proceso la operacion 2017-09-02 14:25:35
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:35
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:35
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:35
+Error al conectar con el servidor foranea 2017-09-02 14:25:36
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:36
+
+
+Sincronizacion detectada: 2017-09-02 14:25:36
+Se marco en proceso la operacion 2017-09-02 14:25:36
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:36
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:36
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:36
+Error al conectar con el servidor foranea 2017-09-02 14:25:37
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:37
+
+
+Sincronizacion detectada: 2017-09-02 14:25:37
+Se marco en proceso la operacion 2017-09-02 14:25:37
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:37
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:37
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:37
+Error al conectar con el servidor foranea 2017-09-02 14:25:37
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:37
+
+
+Sincronizacion detectada: 2017-09-02 14:25:40
+Se marco en proceso la operacion 2017-09-02 14:25:40
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:40
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:40
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:40
+Error al conectar con el servidor foranea 2017-09-02 14:25:40
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:41
+
+
+Sincronizacion detectada: 2017-09-02 14:25:43
+Se marco en proceso la operacion 2017-09-02 14:25:43
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:44
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:44
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:44
+Error al conectar con el servidor foranea 2017-09-02 14:25:44
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:44
+
+
+Sincronizacion detectada: 2017-09-02 14:25:45
+Se marco en proceso la operacion 2017-09-02 14:25:45
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:45
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:45
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:45
+Error al conectar con el servidor foranea 2017-09-02 14:25:45
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:45
+
+
+Sincronizacion detectada: 2017-09-02 14:25:46
+Se marco en proceso la operacion 2017-09-02 14:25:46
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:46
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:46
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:46
+Error al conectar con el servidor foranea 2017-09-02 14:25:46
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:46
+
+
+Sincronizacion detectada: 2017-09-02 14:25:47
+Se marco en proceso la operacion 2017-09-02 14:25:47
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:47
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:47
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:47
+Error al conectar con el servidor foranea 2017-09-02 14:25:50
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:50
+
+
+Sincronizacion detectada: 2017-09-02 14:25:53
+Se marco en proceso la operacion 2017-09-02 14:25:53
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:25:53
+Se inicia con la conexion de la base datos local 2017-09-02 14:25:53
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:25:53
+Error al conectar con el servidor foranea 2017-09-02 14:25:53
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:25:54
+
+
+Sincronizacion detectada: 2017-09-02 14:26:04
+Se marco en proceso la operacion 2017-09-02 14:26:04
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:26:04
+Se inicia con la conexion de la base datos local 2017-09-02 14:26:04
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:26:04
+Error al conectar con el servidor foranea 2017-09-02 14:26:04
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:26:04
+
+
+Sincronizacion detectada: 2017-09-02 14:27:50
+Se marco en proceso la operacion 2017-09-02 14:27:50
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:27:50
+Se inicia con la conexion de la base datos local 2017-09-02 14:27:50
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:27:50
+Error al conectar con el servidor foranea 2017-09-02 14:27:53
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:27:53
+
+
+Sincronizacion detectada: 2017-09-02 14:28:00
+Se marco en proceso la operacion 2017-09-02 14:28:00
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:00
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:00
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:00
+Error al conectar con el servidor foranea 2017-09-02 14:28:03
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:03
+
+
+Sincronizacion detectada: 2017-09-02 14:28:12
+Se marco en proceso la operacion 2017-09-02 14:28:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:12
+Error al conectar con el servidor foranea 2017-09-02 14:28:13
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:13
+
+
+Sincronizacion detectada: 2017-09-02 14:28:17
+Se marco en proceso la operacion 2017-09-02 14:28:17
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:17
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:17
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:17
+Error al conectar con el servidor foranea 2017-09-02 14:28:17
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:17
+
+
+Sincronizacion detectada: 2017-09-02 14:28:18
+Se marco en proceso la operacion 2017-09-02 14:28:18
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:18
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:18
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:18
+Error al conectar con el servidor foranea 2017-09-02 14:28:18
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:18
+
+
+Sincronizacion detectada: 2017-09-02 14:28:19
+Se marco en proceso la operacion 2017-09-02 14:28:19
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:19
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:19
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:19
+Error al conectar con el servidor foranea 2017-09-02 14:28:19
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:19
+
+
+Sincronizacion detectada: 2017-09-02 14:28:19
+Se marco en proceso la operacion 2017-09-02 14:28:20
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:20
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:20
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:20
+Error al conectar con el servidor foranea 2017-09-02 14:28:23
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:23
+
+
+Sincronizacion detectada: 2017-09-02 14:28:40
+Se marco en proceso la operacion 2017-09-02 14:28:40
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:40
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:40
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:40
+Error al conectar con el servidor foranea 2017-09-02 14:28:40
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:40
+
+
+Sincronizacion detectada: 2017-09-02 14:28:45
+Se marco en proceso la operacion 2017-09-02 14:28:45
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:46
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:46
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:46
+Error al conectar con el servidor foranea 2017-09-02 14:28:46
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:46
+
+
+Sincronizacion detectada: 2017-09-02 14:28:46
+Se marco en proceso la operacion 2017-09-02 14:28:47
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:47
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:47
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:47
+Error al conectar con el servidor foranea 2017-09-02 14:28:47
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:47
+
+
+Sincronizacion detectada: 2017-09-02 14:28:47
+Se marco en proceso la operacion 2017-09-02 14:28:47
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:48
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:48
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:48
+Error al conectar con el servidor foranea 2017-09-02 14:28:48
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:48
+
+
+Sincronizacion detectada: 2017-09-02 14:28:48
+Se marco en proceso la operacion 2017-09-02 14:28:48
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:49
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:49
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:49
+Error al conectar con el servidor foranea 2017-09-02 14:28:49
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:49
+
+
+Sincronizacion detectada: 2017-09-02 14:28:54
+Se marco en proceso la operacion 2017-09-02 14:28:54
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:54
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:54
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:54
+Error al conectar con el servidor foranea 2017-09-02 14:28:55
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:55
+
+
+Sincronizacion detectada: 2017-09-02 14:28:55
+Se marco en proceso la operacion 2017-09-02 14:28:55
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:56
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:56
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:56
+Error al conectar con el servidor foranea 2017-09-02 14:28:56
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:56
+
+
+Sincronizacion detectada: 2017-09-02 14:28:56
+Se marco en proceso la operacion 2017-09-02 14:28:57
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:57
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:57
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:57
+Error al conectar con el servidor foranea 2017-09-02 14:28:57
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:57
+
+
+Sincronizacion detectada: 2017-09-02 14:28:58
+Se marco en proceso la operacion 2017-09-02 14:28:58
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:58
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:58
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:58
+Error al conectar con el servidor foranea 2017-09-02 14:28:58
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:28:58
+
+
+Sincronizacion detectada: 2017-09-02 14:28:58
+Se marco en proceso la operacion 2017-09-02 14:28:58
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:28:59
+Se inicia con la conexion de la base datos local 2017-09-02 14:28:59
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:28:59
+Error al conectar con el servidor foranea 2017-09-02 14:29:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:29:02
+
+
+Sincronizacion detectada: 2017-09-02 14:29:04
+Se marco en proceso la operacion 2017-09-02 14:29:04
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:29:04
+Se inicia con la conexion de la base datos local 2017-09-02 14:29:04
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:29:04
+Error al conectar con el servidor foranea 2017-09-02 14:29:04
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:29:04
+
+
+Sincronizacion detectada: 2017-09-02 14:29:15
+Se marco en proceso la operacion 2017-09-02 14:29:15
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:29:15
+Se inicia con la conexion de la base datos local 2017-09-02 14:29:15
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:29:15
+Error al conectar con el servidor foranea 2017-09-02 14:29:15
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:29:15
+
+
+Sincronizacion detectada: 2017-09-02 14:29:34
+Se marco en proceso la operacion 2017-09-02 14:29:34
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:29:34
+Se inicia con la conexion de la base datos local 2017-09-02 14:29:34
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:29:34
+Error al conectar con el servidor foranea 2017-09-02 14:29:37
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:29:37
+
+
+Sincronizacion detectada: 2017-09-02 14:29:42
+Se marco en proceso la operacion 2017-09-02 14:29:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:29:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:29:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:29:42
+
+
+Sincronizacion detectada: 2017-09-02 14:29:44
+Se marco en proceso la operacion 2017-09-02 14:29:44
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:29:44
+Se inicia con la conexion de la base datos local 2017-09-02 14:29:44
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:29:44
+Error al conectar con el servidor foranea 2017-09-02 14:29:45
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:29:45
+Error al conectar con el servidor foranea 2017-09-02 14:29:47
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:29:47
+
+
+Sincronizacion detectada: 2017-09-02 14:29:48
+Se marco en proceso la operacion 2017-09-02 14:29:48
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:29:48
+Se inicia con la conexion de la base datos local 2017-09-02 14:29:48
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:29:48
+Error al conectar con el servidor foranea 2017-09-02 14:29:48
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:29:48
+
+
+Sincronizacion detectada: 2017-09-02 14:29:49
+Se marco en proceso la operacion 2017-09-02 14:29:49
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:29:49
+Se inicia con la conexion de la base datos local 2017-09-02 14:29:49
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:29:49
+Error al conectar con el servidor foranea 2017-09-02 14:29:49
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:29:49
+
+
+Sincronizacion detectada: 2017-09-02 14:29:50
+Se marco en proceso la operacion 2017-09-02 14:29:50
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:29:50
+Se inicia con la conexion de la base datos local 2017-09-02 14:29:50
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:29:50
+Error al conectar con el servidor foranea 2017-09-02 14:29:50
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:29:50
+
+
+Sincronizacion detectada: 2017-09-02 14:29:51
+Se marco en proceso la operacion 2017-09-02 14:29:51
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:29:51
+Se inicia con la conexion de la base datos local 2017-09-02 14:29:51
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:29:51
+Error al conectar con el servidor foranea 2017-09-02 14:29:52
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:29:52
+
+
+Sincronizacion detectada: 2017-09-02 14:30:02
+Se marco en proceso la operacion 2017-09-02 14:30:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:30:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:30:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:30:02
+Error al conectar con el servidor foranea 2017-09-02 14:30:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:30:03
+
+
+Sincronizacion detectada: 2017-09-02 14:30:13
+Se marco en proceso la operacion 2017-09-02 14:30:13
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:30:14
+Se inicia con la conexion de la base datos local 2017-09-02 14:30:14
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:30:14
+Error al conectar con el servidor foranea 2017-09-02 14:30:17
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:30:17
+
+
+Sincronizacion detectada: 2017-09-02 14:30:22
+Se marco en proceso la operacion 2017-09-02 14:30:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:30:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:30:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:30:22
+Error al conectar con el servidor foranea 2017-09-02 14:30:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:30:22
+
+
+Sincronizacion detectada: 2017-09-02 14:30:32
+Se marco en proceso la operacion 2017-09-02 14:30:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:30:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:30:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:30:32
+Error al conectar con el servidor foranea 2017-09-02 14:30:33
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:30:33
+
+
+Sincronizacion detectada: 2017-09-02 14:30:42
+Se marco en proceso la operacion 2017-09-02 14:30:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:30:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:30:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:30:42
+Error al conectar con el servidor foranea 2017-09-02 14:30:42
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:30:42
+
+
+Sincronizacion detectada: 2017-09-02 14:30:54
+Se marco en proceso la operacion 2017-09-02 14:30:54
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:30:54
+Se inicia con la conexion de la base datos local 2017-09-02 14:30:54
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:30:55
+Error al conectar con el servidor foranea 2017-09-02 14:30:55
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:30:55
+
+
+Sincronizacion detectada: 2017-09-02 14:31:02
+Se marco en proceso la operacion 2017-09-02 14:31:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:31:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:31:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:31:02
+Error al conectar con el servidor foranea 2017-09-02 14:31:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:31:03
+
+
+Sincronizacion detectada: 2017-09-02 14:31:12
+Se marco en proceso la operacion 2017-09-02 14:31:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:31:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:31:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:31:12
+Error al conectar con el servidor foranea 2017-09-02 14:31:12
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:31:13
+
+
+Sincronizacion detectada: 2017-09-02 14:31:22
+Se marco en proceso la operacion 2017-09-02 14:31:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:31:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:31:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:31:22
+Error al conectar con el servidor foranea 2017-09-02 14:31:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:31:23
+
+
+Sincronizacion detectada: 2017-09-02 14:31:34
+Se marco en proceso la operacion 2017-09-02 14:31:34
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:31:34
+Se inicia con la conexion de la base datos local 2017-09-02 14:31:34
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:31:34
+Error al conectar con el servidor foranea 2017-09-02 14:31:37
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:31:38
+
+
+Sincronizacion detectada: 2017-09-02 14:31:42
+Se marco en proceso la operacion 2017-09-02 14:31:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:31:43
+Se inicia con la conexion de la base datos local 2017-09-02 14:31:43
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:31:43
+Error al conectar con el servidor foranea 2017-09-02 14:31:43
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:31:43
+
+
+Sincronizacion detectada: 2017-09-02 14:31:52
+Se marco en proceso la operacion 2017-09-02 14:31:53
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:31:53
+Se inicia con la conexion de la base datos local 2017-09-02 14:31:53
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:31:53
+Error al conectar con el servidor foranea 2017-09-02 14:31:56
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:31:57
+
+
+Sincronizacion detectada: 2017-09-02 14:32:02
+Se marco en proceso la operacion 2017-09-02 14:32:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:32:03
+Se inicia con la conexion de la base datos local 2017-09-02 14:32:03
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:32:03
+Error al conectar con el servidor foranea 2017-09-02 14:32:03
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:32:03
+
+
+Sincronizacion detectada: 2017-09-02 14:32:12
+Se marco en proceso la operacion 2017-09-02 14:32:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:32:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:32:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:32:12
+Error al conectar con el servidor foranea 2017-09-02 14:32:15
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:32:16
+
+
+Sincronizacion detectada: 2017-09-02 14:32:22
+Se marco en proceso la operacion 2017-09-02 14:32:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:32:24
+Se inicia con la conexion de la base datos local 2017-09-02 14:32:24
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:32:24
+Error al conectar con el servidor foranea 2017-09-02 14:32:24
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:32:25
+
+
+Sincronizacion detectada: 2017-09-02 14:32:32
+Se marco en proceso la operacion 2017-09-02 14:32:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:32:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:32:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:32:32
+Error al conectar con el servidor foranea 2017-09-02 14:32:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:32:35
+
+
+Sincronizacion detectada: 2017-09-02 14:32:42
+Se marco en proceso la operacion 2017-09-02 14:32:43
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:32:44
+Se inicia con la conexion de la base datos local 2017-09-02 14:32:44
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:32:44
+Error al conectar con el servidor foranea 2017-09-02 14:32:45
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:32:45
+
+
+Sincronizacion detectada: 2017-09-02 14:32:52
+Se marco en proceso la operacion 2017-09-02 14:32:52
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:32:53
+Se inicia con la conexion de la base datos local 2017-09-02 14:32:53
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:32:53
+Error al conectar con el servidor foranea 2017-09-02 14:32:56
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:32:56
+
+
+Sincronizacion detectada: 2017-09-02 14:33:02
+Se marco en proceso la operacion 2017-09-02 14:33:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:33:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:33:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:33:02
+Error al conectar con el servidor foranea 2017-09-02 14:33:05
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:33:05
+
+
+Sincronizacion detectada: 2017-09-02 14:33:12
+Se marco en proceso la operacion 2017-09-02 14:33:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:33:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:33:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:33:12
+Error al conectar con el servidor foranea 2017-09-02 14:33:12
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:33:13
+
+
+Sincronizacion detectada: 2017-09-02 14:33:22
+Se marco en proceso la operacion 2017-09-02 14:33:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:33:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:33:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:33:22
+Error al conectar con el servidor foranea 2017-09-02 14:33:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:33:22
+
+
+Sincronizacion detectada: 2017-09-02 14:33:32
+Se marco en proceso la operacion 2017-09-02 14:33:33
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:33:34
+Se inicia con la conexion de la base datos local 2017-09-02 14:33:34
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:33:34
+Error al conectar con el servidor foranea 2017-09-02 14:33:34
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:33:35
+
+
+Sincronizacion detectada: 2017-09-02 14:33:42
+Se marco en proceso la operacion 2017-09-02 14:33:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:33:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:33:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:33:42
+Error al conectar con el servidor foranea 2017-09-02 14:33:43
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:33:43
+
+
+Sincronizacion detectada: 2017-09-02 14:33:52
+Se marco en proceso la operacion 2017-09-02 14:33:52
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:33:52
+Se inicia con la conexion de la base datos local 2017-09-02 14:33:52
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:33:52
+Error al conectar con el servidor foranea 2017-09-02 14:33:55
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:33:55
+
+
+Sincronizacion detectada: 2017-09-02 14:34:02
+Se marco en proceso la operacion 2017-09-02 14:34:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:34:03
+Se inicia con la conexion de la base datos local 2017-09-02 14:34:03
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:34:03
+Error al conectar con el servidor foranea 2017-09-02 14:34:03
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:34:04
+
+
+Sincronizacion detectada: 2017-09-02 14:34:12
+Se marco en proceso la operacion 2017-09-02 14:34:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:34:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:34:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:34:12
+Error al conectar con el servidor foranea 2017-09-02 14:34:15
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:34:15
+
+
+Sincronizacion detectada: 2017-09-02 14:34:22
+Se marco en proceso la operacion 2017-09-02 14:34:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:34:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:34:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:34:22
+Error al conectar con el servidor foranea 2017-09-02 14:34:25
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:34:25
+
+
+Sincronizacion detectada: 2017-09-02 14:34:32
+Se marco en proceso la operacion 2017-09-02 14:34:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:34:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:34:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:34:32
+Error al conectar con el servidor foranea 2017-09-02 14:34:33
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:34:33
+
+
+Sincronizacion detectada: 2017-09-02 14:34:43
+Se marco en proceso la operacion 2017-09-02 14:34:43
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:34:44
+Se inicia con la conexion de la base datos local 2017-09-02 14:34:44
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:34:44
+Error al conectar con el servidor foranea 2017-09-02 14:34:47
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:34:47
+
+
+Sincronizacion detectada: 2017-09-02 14:34:52
+Se marco en proceso la operacion 2017-09-02 14:34:52
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:34:52
+Se inicia con la conexion de la base datos local 2017-09-02 14:34:52
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:34:52
+Error al conectar con el servidor foranea 2017-09-02 14:34:52
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:34:52
+
+
+Sincronizacion detectada: 2017-09-02 14:35:02
+Se marco en proceso la operacion 2017-09-02 14:35:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:35:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:35:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:35:02
+Error al conectar con el servidor foranea 2017-09-02 14:35:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:35:02
+
+
+Sincronizacion detectada: 2017-09-02 14:35:14
+Se marco en proceso la operacion 2017-09-02 14:35:14
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:35:15
+Se inicia con la conexion de la base datos local 2017-09-02 14:35:15
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:35:15
+Error al conectar con el servidor foranea 2017-09-02 14:35:15
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:35:15
+
+
+Sincronizacion detectada: 2017-09-02 14:35:22
+Se marco en proceso la operacion 2017-09-02 14:35:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:35:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:35:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:35:22
+Error al conectar con el servidor foranea 2017-09-02 14:35:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:35:22
+
+
+Sincronizacion detectada: 2017-09-02 14:35:32
+Se marco en proceso la operacion 2017-09-02 14:35:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:35:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:35:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:35:32
+Error al conectar con el servidor foranea 2017-09-02 14:35:32
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:35:33
+
+
+Sincronizacion detectada: 2017-09-02 14:35:42
+Se marco en proceso la operacion 2017-09-02 14:35:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:35:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:35:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:35:42
+Error al conectar con el servidor foranea 2017-09-02 14:35:42
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:35:43
+
+
+Sincronizacion detectada: 2017-09-02 14:35:54
+Se marco en proceso la operacion 2017-09-02 14:35:54
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:35:54
+Se inicia con la conexion de la base datos local 2017-09-02 14:35:54
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:35:54
+Error al conectar con el servidor foranea 2017-09-02 14:35:55
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:35:55
+
+
+Sincronizacion detectada: 2017-09-02 14:36:02
+Se marco en proceso la operacion 2017-09-02 14:36:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:36:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:36:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:36:02
+Error al conectar con el servidor foranea 2017-09-02 14:36:03
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:36:03
+
+
+Sincronizacion detectada: 2017-09-02 14:36:12
+Se marco en proceso la operacion 2017-09-02 14:36:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:36:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:36:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:36:12
+Error al conectar con el servidor foranea 2017-09-02 14:36:12
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:36:12
+
+
+Sincronizacion detectada: 2017-09-02 14:36:22
+Se marco en proceso la operacion 2017-09-02 14:36:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:36:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:36:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:36:22
+Error al conectar con el servidor foranea 2017-09-02 14:36:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:36:22
+
+
+Sincronizacion detectada: 2017-09-02 14:36:33
+Se marco en proceso la operacion 2017-09-02 14:36:33
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:36:34
+Se inicia con la conexion de la base datos local 2017-09-02 14:36:34
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:36:34
+Error al conectar con el servidor foranea 2017-09-02 14:36:34
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:36:34
+
+
+Sincronizacion detectada: 2017-09-02 14:36:42
+Se marco en proceso la operacion 2017-09-02 14:36:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:36:43
+Se inicia con la conexion de la base datos local 2017-09-02 14:36:43
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:36:43
+Error al conectar con el servidor foranea 2017-09-02 14:36:43
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:36:43
+
+
+Sincronizacion detectada: 2017-09-02 14:36:52
+Se marco en proceso la operacion 2017-09-02 14:36:52
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:36:52
+Se inicia con la conexion de la base datos local 2017-09-02 14:36:52
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:36:53
+Error al conectar con el servidor foranea 2017-09-02 14:36:53
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:36:53
+
+
+Sincronizacion detectada: 2017-09-02 14:37:02
+Se marco en proceso la operacion 2017-09-02 14:37:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:37:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:37:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:37:02
+Error al conectar con el servidor foranea 2017-09-02 14:37:03
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:37:03
+
+
+Sincronizacion detectada: 2017-09-02 14:37:12
+Se marco en proceso la operacion 2017-09-02 14:37:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:37:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:37:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:37:12
+Error al conectar con el servidor foranea 2017-09-02 14:37:12
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:37:13
+
+
+Sincronizacion detectada: 2017-09-02 14:37:22
+Se marco en proceso la operacion 2017-09-02 14:37:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:37:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:37:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:37:22
+Error al conectar con el servidor foranea 2017-09-02 14:37:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:37:22
+
+
+Sincronizacion detectada: 2017-09-02 14:37:32
+Se marco en proceso la operacion 2017-09-02 14:37:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:37:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:37:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:37:32
+Error al conectar con el servidor foranea 2017-09-02 14:37:32
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:37:32
+
+
+Sincronizacion detectada: 2017-09-02 14:37:42
+Se marco en proceso la operacion 2017-09-02 14:37:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:37:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:37:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:37:42
+Error al conectar con el servidor foranea 2017-09-02 14:37:45
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:37:45
+
+
+Sincronizacion detectada: 2017-09-02 14:37:52
+Se marco en proceso la operacion 2017-09-02 14:37:52
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:37:52
+Se inicia con la conexion de la base datos local 2017-09-02 14:37:52
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:37:52
+Error al conectar con el servidor foranea 2017-09-02 14:37:52
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:37:53
+
+
+Sincronizacion detectada: 2017-09-02 14:38:02
+Se marco en proceso la operacion 2017-09-02 14:38:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:38:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:38:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:38:02
+Error al conectar con el servidor foranea 2017-09-02 14:38:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:38:02
+
+
+Sincronizacion detectada: 2017-09-02 14:38:12
+Se marco en proceso la operacion 2017-09-02 14:38:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:38:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:38:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:38:12
+Error al conectar con el servidor foranea 2017-09-02 14:38:12
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:38:12
+
+
+Sincronizacion detectada: 2017-09-02 14:38:22
+Se marco en proceso la operacion 2017-09-02 14:38:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:38:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:38:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:38:22
+Error al conectar con el servidor foranea 2017-09-02 14:38:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:38:22
+
+
+Sincronizacion detectada: 2017-09-02 14:38:32
+Se marco en proceso la operacion 2017-09-02 14:38:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:38:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:38:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:38:32
+Error al conectar con el servidor foranea 2017-09-02 14:38:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:38:35
+
+
+Sincronizacion detectada: 2017-09-02 14:38:42
+Se marco en proceso la operacion 2017-09-02 14:38:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:38:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:38:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:38:42
+Error al conectar con el servidor foranea 2017-09-02 14:38:45
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:38:45
+
+
+Sincronizacion detectada: 2017-09-02 14:38:52
+Se marco en proceso la operacion 2017-09-02 14:38:52
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:38:52
+Se inicia con la conexion de la base datos local 2017-09-02 14:38:52
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:38:52
+Error al conectar con el servidor foranea 2017-09-02 14:38:52
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:38:52
+
+
+Sincronizacion detectada: 2017-09-02 14:39:02
+Se marco en proceso la operacion 2017-09-02 14:39:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:39:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:39:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:39:02
+Error al conectar con el servidor foranea 2017-09-02 14:39:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:39:02
+
+
+Sincronizacion detectada: 2017-09-02 14:39:12
+Se marco en proceso la operacion 2017-09-02 14:39:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:39:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:39:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:39:12
+Error al conectar con el servidor foranea 2017-09-02 14:39:12
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:39:12
+
+
+Sincronizacion detectada: 2017-09-02 14:39:22
+Se marco en proceso la operacion 2017-09-02 14:39:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:39:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:39:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:39:22
+Error al conectar con el servidor foranea 2017-09-02 14:39:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:39:22
+
+
+Sincronizacion detectada: 2017-09-02 14:39:34
+Se marco en proceso la operacion 2017-09-02 14:39:34
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:39:34
+Se inicia con la conexion de la base datos local 2017-09-02 14:39:34
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:39:34
+Error al conectar con el servidor foranea 2017-09-02 14:39:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:39:35
+
+
+Sincronizacion detectada: 2017-09-02 14:39:42
+Se marco en proceso la operacion 2017-09-02 14:39:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:39:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:39:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:39:42
+Error al conectar con el servidor foranea 2017-09-02 14:39:43
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:39:43
+
+
+Sincronizacion detectada: 2017-09-02 14:39:52
+Se marco en proceso la operacion 2017-09-02 14:39:52
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:39:52
+Se inicia con la conexion de la base datos local 2017-09-02 14:39:52
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:39:52
+Error al conectar con el servidor foranea 2017-09-02 14:39:53
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:39:53
+
+
+Sincronizacion detectada: 2017-09-02 14:40:02
+Se marco en proceso la operacion 2017-09-02 14:40:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:40:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:40:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:40:02
+Error al conectar con el servidor foranea 2017-09-02 14:40:03
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:40:03
+
+
+Sincronizacion detectada: 2017-09-02 14:40:14
+Se marco en proceso la operacion 2017-09-02 14:40:14
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:40:14
+Se inicia con la conexion de la base datos local 2017-09-02 14:40:14
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:40:14
+Error al conectar con el servidor foranea 2017-09-02 14:40:15
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:40:15
+
+
+Sincronizacion detectada: 2017-09-02 14:40:22
+Se marco en proceso la operacion 2017-09-02 14:40:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:40:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:40:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:40:22
+Error al conectar con el servidor foranea 2017-09-02 14:40:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:40:22
+
+
+Sincronizacion detectada: 2017-09-02 14:40:32
+Se marco en proceso la operacion 2017-09-02 14:40:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:40:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:40:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:40:32
+Error al conectar con el servidor foranea 2017-09-02 14:40:32
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:40:32
+
+
+Sincronizacion detectada: 2017-09-02 14:40:42
+Se marco en proceso la operacion 2017-09-02 14:40:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:40:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:40:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:40:42
+Error al conectar con el servidor foranea 2017-09-02 14:40:42
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:40:42
+
+
+Sincronizacion detectada: 2017-09-02 14:40:54
+Se marco en proceso la operacion 2017-09-02 14:40:54
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:40:54
+Se inicia con la conexion de la base datos local 2017-09-02 14:40:54
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:40:54
+Error al conectar con el servidor foranea 2017-09-02 14:40:55
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:40:55
+
+
+Sincronizacion detectada: 2017-09-02 14:41:02
+Se marco en proceso la operacion 2017-09-02 14:41:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:41:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:41:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:41:02
+Error al conectar con el servidor foranea 2017-09-02 14:41:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:41:02
+
+
+Sincronizacion detectada: 2017-09-02 14:41:12
+Se marco en proceso la operacion 2017-09-02 14:41:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:41:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:41:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:41:12
+Error al conectar con el servidor foranea 2017-09-02 14:41:12
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:41:12
+
+
+Sincronizacion detectada: 2017-09-02 14:41:22
+Se marco en proceso la operacion 2017-09-02 14:41:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:41:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:41:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:41:22
+Error al conectar con el servidor foranea 2017-09-02 14:41:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:41:22
+
+
+Sincronizacion detectada: 2017-09-02 14:41:34
+Se marco en proceso la operacion 2017-09-02 14:41:34
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:41:34
+Se inicia con la conexion de la base datos local 2017-09-02 14:41:34
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:41:34
+Error al conectar con el servidor foranea 2017-09-02 14:41:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:41:35
+
+
+Sincronizacion detectada: 2017-09-02 14:41:42
+Se marco en proceso la operacion 2017-09-02 14:41:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:41:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:41:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:41:42
+Error al conectar con el servidor foranea 2017-09-02 14:41:42
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:41:42
+
+
+Sincronizacion detectada: 2017-09-02 14:41:54
+Se marco en proceso la operacion 2017-09-02 14:41:54
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:41:54
+Se inicia con la conexion de la base datos local 2017-09-02 14:41:54
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:41:54
+Error al conectar con el servidor foranea 2017-09-02 14:41:55
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:41:55
+
+
+Sincronizacion detectada: 2017-09-02 14:42:02
+Se marco en proceso la operacion 2017-09-02 14:42:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:42:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:42:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:42:02
+Error al conectar con el servidor foranea 2017-09-02 14:42:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:42:02
+
+
+Sincronizacion detectada: 2017-09-02 14:42:12
+Se marco en proceso la operacion 2017-09-02 14:42:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:42:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:42:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:42:12
+Error al conectar con el servidor foranea 2017-09-02 14:42:12
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:42:12
+
+
+Sincronizacion detectada: 2017-09-02 14:42:22
+Se marco en proceso la operacion 2017-09-02 14:42:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:42:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:42:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:42:22
+Error al conectar con el servidor foranea 2017-09-02 14:42:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:42:22
+
+
+Sincronizacion detectada: 2017-09-02 14:42:34
+Se marco en proceso la operacion 2017-09-02 14:42:34
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:42:34
+Se inicia con la conexion de la base datos local 2017-09-02 14:42:34
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:42:34
+Error al conectar con el servidor foranea 2017-09-02 14:42:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:42:35
+
+
+Sincronizacion detectada: 2017-09-02 14:42:42
+Se marco en proceso la operacion 2017-09-02 14:42:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:42:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:42:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:42:42
+Error al conectar con el servidor foranea 2017-09-02 14:42:42
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:42:42
+
+
+Sincronizacion detectada: 2017-09-02 14:42:52
+Se marco en proceso la operacion 2017-09-02 14:42:52
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:42:52
+Se inicia con la conexion de la base datos local 2017-09-02 14:42:52
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:42:52
+Error al conectar con el servidor foranea 2017-09-02 14:42:52
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:42:52
+
+
+Sincronizacion detectada: 2017-09-02 14:43:02
+Se marco en proceso la operacion 2017-09-02 14:43:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:43:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:43:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:43:02
+Error al conectar con el servidor foranea 2017-09-02 14:43:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:43:02
+
+
+Sincronizacion detectada: 2017-09-02 14:43:12
+Se marco en proceso la operacion 2017-09-02 14:43:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:43:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:43:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:43:12
+Error al conectar con el servidor foranea 2017-09-02 14:43:15
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:43:15
+
+
+Sincronizacion detectada: 2017-09-02 14:43:22
+Se marco en proceso la operacion 2017-09-02 14:43:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:43:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:43:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:43:22
+Error al conectar con el servidor foranea 2017-09-02 14:43:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:43:22
+
+
+Sincronizacion detectada: 2017-09-02 14:43:34
+Se marco en proceso la operacion 2017-09-02 14:43:34
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:43:34
+Se inicia con la conexion de la base datos local 2017-09-02 14:43:34
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:43:34
+Error al conectar con el servidor foranea 2017-09-02 14:43:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:43:35
+
+
+Sincronizacion detectada: 2017-09-02 14:43:42
+Se marco en proceso la operacion 2017-09-02 14:43:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:43:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:43:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:43:42
+Error al conectar con el servidor foranea 2017-09-02 14:43:42
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:43:42
+
+
+Sincronizacion detectada: 2017-09-02 14:43:52
+Se marco en proceso la operacion 2017-09-02 14:43:52
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:43:52
+Se inicia con la conexion de la base datos local 2017-09-02 14:43:52
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:43:52
+Error al conectar con el servidor foranea 2017-09-02 14:43:52
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:43:52
+
+
+Sincronizacion detectada: 2017-09-02 14:44:02
+Se marco en proceso la operacion 2017-09-02 14:44:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:44:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:44:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:44:02
+Error al conectar con el servidor foranea 2017-09-02 14:44:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:44:02
+
+
+Sincronizacion detectada: 2017-09-02 14:44:14
+Se marco en proceso la operacion 2017-09-02 14:44:14
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:44:14
+Se inicia con la conexion de la base datos local 2017-09-02 14:44:14
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:44:14
+Error al conectar con el servidor foranea 2017-09-02 14:44:15
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:44:15
+
+
+Sincronizacion detectada: 2017-09-02 14:44:22
+Se marco en proceso la operacion 2017-09-02 14:44:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:44:22
+Se inicia con la conexion de la base datos local 2017-09-02 14:44:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:44:22
+Error al conectar con el servidor foranea 2017-09-02 14:44:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:44:22
+
+
+Sincronizacion detectada: 2017-09-02 14:44:32
+Se marco en proceso la operacion 2017-09-02 14:44:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:44:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:44:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:44:32
+Error al conectar con el servidor foranea 2017-09-02 14:44:32
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:44:32
+
+
+Sincronizacion detectada: 2017-09-02 14:44:42
+Se marco en proceso la operacion 2017-09-02 14:44:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:44:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:44:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:44:42
+Error al conectar con el servidor foranea 2017-09-02 14:44:42
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:44:43
+
+
+Sincronizacion detectada: 2017-09-02 14:44:54
+Se marco en proceso la operacion 2017-09-02 14:44:54
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:44:54
+Se inicia con la conexion de la base datos local 2017-09-02 14:44:54
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:44:54
+Error al conectar con el servidor foranea 2017-09-02 14:44:55
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:44:55
+
+
+Sincronizacion detectada: 2017-09-02 14:45:02
+Se marco en proceso la operacion 2017-09-02 14:45:02
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:45:02
+Se inicia con la conexion de la base datos local 2017-09-02 14:45:02
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:45:02
+Error al conectar con el servidor foranea 2017-09-02 14:45:02
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:45:02
+
+
+Sincronizacion detectada: 2017-09-02 14:45:12
+Se marco en proceso la operacion 2017-09-02 14:45:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:45:12
+Se inicia con la conexion de la base datos local 2017-09-02 14:45:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:45:12
+Error al conectar con el servidor foranea 2017-09-02 14:45:13
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:45:13
+
+
+Sincronizacion detectada: 2017-09-02 14:45:22
+Se marco en proceso la operacion 2017-09-02 14:45:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:45:23
+Se inicia con la conexion de la base datos local 2017-09-02 14:45:23
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:45:23
+Error al conectar con el servidor foranea 2017-09-02 14:45:23
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:45:23
+
+
+Sincronizacion detectada: 2017-09-02 14:45:33
+Se marco en proceso la operacion 2017-09-02 14:45:33
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:45:33
+Se inicia con la conexion de la base datos local 2017-09-02 14:45:33
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:45:33
+Error al conectar con el servidor foranea 2017-09-02 14:45:33
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:45:34
+
+
+Sincronizacion detectada: 2017-09-02 14:45:43
+Se marco en proceso la operacion 2017-09-02 14:45:43
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:45:43
+Se inicia con la conexion de la base datos local 2017-09-02 14:45:43
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:45:43
+Error al conectar con el servidor foranea 2017-09-02 14:45:43
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:45:43
+
+
+Sincronizacion detectada: 2017-09-02 14:46:56
+Se marco en proceso la operacion 2017-09-02 14:46:56
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:46:56
+Se inicia con la conexion de la base datos local 2017-09-02 14:46:56
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:46:56
+Error al conectar con el servidor foranea 2017-09-02 14:46:59
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:46:59
+
+
+Sincronizacion detectada: 2017-09-02 14:48:41
+Se marco en proceso la operacion 2017-09-02 14:48:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:48:42
+Se inicia con la conexion de la base datos local 2017-09-02 14:48:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:48:42
+Error al conectar con el servidor foranea 2017-09-02 14:48:42
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:48:42
+
+
+Sincronizacion detectada: 2017-09-02 14:50:27
+Se marco en proceso la operacion 2017-09-02 14:50:27
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:50:27
+Se inicia con la conexion de la base datos local 2017-09-02 14:50:27
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:50:27
+Error al conectar con el servidor foranea 2017-09-02 14:50:27
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:50:27
+
+
+Sincronizacion detectada: 2017-09-02 14:52:32
+Se marco en proceso la operacion 2017-09-02 14:52:32
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:52:32
+Se inicia con la conexion de la base datos local 2017-09-02 14:52:32
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:52:32
+Error al conectar con el servidor foranea 2017-09-02 14:52:32
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:52:32
+
+
+Sincronizacion detectada: 2017-09-02 14:54:16
+Se marco en proceso la operacion 2017-09-02 14:54:16
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:54:16
+Se inicia con la conexion de la base datos local 2017-09-02 14:54:16
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:54:16
+Error al conectar con el servidor foranea 2017-09-02 14:54:16
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:54:16
+
+
+Sincronizacion detectada: 2017-09-02 14:55:59
+Se marco en proceso la operacion 2017-09-02 14:55:59
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:55:59
+Se inicia con la conexion de la base datos local 2017-09-02 14:55:59
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:55:59
+Error al conectar con el servidor foranea 2017-09-02 14:55:59
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:55:59
+
+
+Sincronizacion detectada: 2017-09-02 14:58:04
+Se marco en proceso la operacion 2017-09-02 14:58:04
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:58:04
+Se inicia con la conexion de la base datos local 2017-09-02 14:58:04
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:58:04
+Error al conectar con el servidor foranea 2017-09-02 14:58:07
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:58:07
+
+
+Sincronizacion detectada: 2017-09-02 14:59:48
+Se marco en proceso la operacion 2017-09-02 14:59:48
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 14:59:49
+Se inicia con la conexion de la base datos local 2017-09-02 14:59:49
+Se inicia con la conexion de la base datos foranea 2017-09-02 14:59:49
+Error al conectar con el servidor foranea 2017-09-02 14:59:49
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 14:59:49
+
+
+Sincronizacion detectada: 2017-09-02 15:01:32
+Se marco en proceso la operacion 2017-09-02 15:01:33
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:01:33
+Se inicia con la conexion de la base datos local 2017-09-02 15:01:33
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:01:33
+Error al conectar con el servidor foranea 2017-09-02 15:01:33
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:01:33
+
+
+Sincronizacion detectada: 2017-09-02 15:03:17
+Se marco en proceso la operacion 2017-09-02 15:03:17
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:03:17
+Se inicia con la conexion de la base datos local 2017-09-02 15:03:17
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:03:17
+Error al conectar con el servidor foranea 2017-09-02 15:03:17
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:03:17
+
+
+Sincronizacion detectada: 2017-09-02 15:05:12
+Se marco en proceso la operacion 2017-09-02 15:05:12
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:05:12
+Se inicia con la conexion de la base datos local 2017-09-02 15:05:12
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:05:12
+Error al conectar con el servidor foranea 2017-09-02 15:05:12
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:05:13
+
+
+Sincronizacion detectada: 2017-09-02 15:06:57
+Se marco en proceso la operacion 2017-09-02 15:06:57
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:06:57
+Se inicia con la conexion de la base datos local 2017-09-02 15:06:57
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:06:57
+Error al conectar con el servidor foranea 2017-09-02 15:06:57
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:06:57
+
+
+Sincronizacion detectada: 2017-09-02 15:08:46
+Se marco en proceso la operacion 2017-09-02 15:08:46
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:08:46
+Se inicia con la conexion de la base datos local 2017-09-02 15:08:46
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:08:46
+Error al conectar con el servidor foranea 2017-09-02 15:08:46
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:08:46
+
+
+Sincronizacion detectada: 2017-09-02 15:10:34
+Se marco en proceso la operacion 2017-09-02 15:10:34
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:10:34
+Se inicia con la conexion de la base datos local 2017-09-02 15:10:34
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:10:34
+Error al conectar con el servidor foranea 2017-09-02 15:10:34
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:10:34
+
+
+Sincronizacion detectada: 2017-09-02 15:12:17
+Se marco en proceso la operacion 2017-09-02 15:12:17
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:12:17
+Se inicia con la conexion de la base datos local 2017-09-02 15:12:17
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:12:17
+Error al conectar con el servidor foranea 2017-09-02 15:12:17
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:12:17
+
+
+Sincronizacion detectada: 2017-09-02 15:14:22
+Se marco en proceso la operacion 2017-09-02 15:14:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:14:22
+Se inicia con la conexion de la base datos local 2017-09-02 15:14:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:14:22
+Error al conectar con el servidor foranea 2017-09-02 15:14:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:14:22
+
+
+Sincronizacion detectada: 2017-09-02 15:16:07
+Se marco en proceso la operacion 2017-09-02 15:16:07
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:16:07
+Se inicia con la conexion de la base datos local 2017-09-02 15:16:07
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:16:07
+Error al conectar con el servidor foranea 2017-09-02 15:16:10
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:16:10
+
+
+Sincronizacion detectada: 2017-09-02 15:17:55
+Se marco en proceso la operacion 2017-09-02 15:17:55
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:17:55
+Se inicia con la conexion de la base datos local 2017-09-02 15:17:55
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:17:55
+Error al conectar con el servidor foranea 2017-09-02 15:17:55
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:17:55
+
+
+Sincronizacion detectada: 2017-09-02 15:20:00
+Se marco en proceso la operacion 2017-09-02 15:20:00
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:20:00
+Se inicia con la conexion de la base datos local 2017-09-02 15:20:00
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:20:00
+Error al conectar con el servidor foranea 2017-09-02 15:20:00
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:20:00
+
+
+Sincronizacion detectada: 2017-09-02 15:22:05
+Se marco en proceso la operacion 2017-09-02 15:22:05
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:22:05
+Se inicia con la conexion de la base datos local 2017-09-02 15:22:05
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:22:05
+Error al conectar con el servidor foranea 2017-09-02 15:22:05
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:22:05
+
+
+Sincronizacion detectada: 2017-09-02 15:23:49
+Se marco en proceso la operacion 2017-09-02 15:23:50
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:23:50
+Se inicia con la conexion de la base datos local 2017-09-02 15:23:50
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:23:50
+Error al conectar con el servidor foranea 2017-09-02 15:23:50
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:23:50
+
+
+Sincronizacion detectada: 2017-09-02 15:25:35
+Se marco en proceso la operacion 2017-09-02 15:25:35
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:25:35
+Se inicia con la conexion de la base datos local 2017-09-02 15:25:35
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:25:35
+Error al conectar con el servidor foranea 2017-09-02 15:25:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:25:35
+
+
+Sincronizacion detectada: 2017-09-02 15:27:40
+Se marco en proceso la operacion 2017-09-02 15:27:40
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:27:40
+Se inicia con la conexion de la base datos local 2017-09-02 15:27:40
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:27:40
+Error al conectar con el servidor foranea 2017-09-02 15:27:40
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:27:40
+
+
+Sincronizacion detectada: 2017-09-02 15:29:35
+Se marco en proceso la operacion 2017-09-02 15:29:35
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:29:35
+Se inicia con la conexion de la base datos local 2017-09-02 15:29:35
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:29:35
+Error al conectar con el servidor foranea 2017-09-02 15:29:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:29:35
+
+
+Sincronizacion detectada: 2017-09-02 15:31:40
+Se marco en proceso la operacion 2017-09-02 15:31:40
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:31:40
+Se inicia con la conexion de la base datos local 2017-09-02 15:31:40
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:31:40
+Error al conectar con el servidor foranea 2017-09-02 15:31:43
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:31:43
+
+
+Sincronizacion detectada: 2017-09-02 15:33:35
+Se marco en proceso la operacion 2017-09-02 15:33:35
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:33:35
+Se inicia con la conexion de la base datos local 2017-09-02 15:33:35
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:33:35
+Error al conectar con el servidor foranea 2017-09-02 15:33:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:33:35
+
+
+Sincronizacion detectada: 2017-09-02 15:35:20
+Se marco en proceso la operacion 2017-09-02 15:35:20
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:35:20
+Se inicia con la conexion de la base datos local 2017-09-02 15:35:20
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:35:20
+Error al conectar con el servidor foranea 2017-09-02 15:35:20
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:35:21
+
+
+Sincronizacion detectada: 2017-09-02 15:37:07
+Se marco en proceso la operacion 2017-09-02 15:37:07
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:37:07
+Se inicia con la conexion de la base datos local 2017-09-02 15:37:07
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:37:07
+Error al conectar con el servidor foranea 2017-09-02 15:37:07
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:37:08
+
+
+Sincronizacion detectada: 2017-09-02 15:39:08
+Se marco en proceso la operacion 2017-09-02 15:39:08
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:39:09
+Se inicia con la conexion de la base datos local 2017-09-02 15:39:09
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:39:09
+Error al conectar con el servidor foranea 2017-09-02 15:39:09
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:39:10
+
+
+Sincronizacion detectada: 2017-09-02 15:41:11
+Se marco en proceso la operacion 2017-09-02 15:41:11
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:41:11
+Se inicia con la conexion de la base datos local 2017-09-02 15:41:11
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:41:12
+Error al conectar con el servidor foranea 2017-09-02 15:41:15
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:41:15
+
+
+Sincronizacion detectada: 2017-09-02 15:43:21
+Se marco en proceso la operacion 2017-09-02 15:43:21
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:43:21
+Se inicia con la conexion de la base datos local 2017-09-02 15:43:21
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:43:21
+Error al conectar con el servidor foranea 2017-09-02 15:43:24
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:43:25
+
+
+Sincronizacion detectada: 2017-09-02 15:45:31
+Se marco en proceso la operacion 2017-09-02 15:45:31
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:45:33
+Se inicia con la conexion de la base datos local 2017-09-02 15:45:33
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:45:33
+Error al conectar con el servidor foranea 2017-09-02 15:45:33
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:45:34
+
+
+Sincronizacion detectada: 2017-09-02 15:47:37
+Se marco en proceso la operacion 2017-09-02 15:47:37
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:47:38
+Se inicia con la conexion de la base datos local 2017-09-02 15:47:38
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:47:38
+Error al conectar con el servidor foranea 2017-09-02 15:47:41
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:47:43
+
+
+Sincronizacion detectada: 2017-09-02 15:49:43
+Se marco en proceso la operacion 2017-09-02 15:49:43
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:49:44
+Se inicia con la conexion de la base datos local 2017-09-02 15:49:44
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:49:44
+Error al conectar con el servidor foranea 2017-09-02 15:49:44
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:49:44
+
+
+Sincronizacion detectada: 2017-09-02 15:51:50
+Se marco en proceso la operacion 2017-09-02 15:51:50
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:51:50
+Se inicia con la conexion de la base datos local 2017-09-02 15:51:50
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:51:50
+Error al conectar con el servidor foranea 2017-09-02 15:51:50
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:51:50
+
+
+Sincronizacion detectada: 2017-09-02 15:53:39
+Se marco en proceso la operacion 2017-09-02 15:53:39
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:53:39
+Se inicia con la conexion de la base datos local 2017-09-02 15:53:39
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:53:39
+Error al conectar con el servidor foranea 2017-09-02 15:53:42
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:53:42
+
+
+Sincronizacion detectada: 2017-09-02 15:55:34
+Se marco en proceso la operacion 2017-09-02 15:55:35
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:55:35
+Se inicia con la conexion de la base datos local 2017-09-02 15:55:35
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:55:35
+Error al conectar con el servidor foranea 2017-09-02 15:55:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:55:35
+
+
+Sincronizacion detectada: 2017-09-02 15:57:21
+Se marco en proceso la operacion 2017-09-02 15:57:22
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:57:22
+Se inicia con la conexion de la base datos local 2017-09-02 15:57:22
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:57:22
+Error al conectar con el servidor foranea 2017-09-02 15:57:22
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:57:22
+
+
+Sincronizacion detectada: 2017-09-02 15:59:27
+Se marco en proceso la operacion 2017-09-02 15:59:27
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 15:59:27
+Se inicia con la conexion de la base datos local 2017-09-02 15:59:27
+Se inicia con la conexion de la base datos foranea 2017-09-02 15:59:27
+Error al conectar con el servidor foranea 2017-09-02 15:59:30
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 15:59:30
+
+
+Sincronizacion detectada: 2017-09-02 16:01:35
+Se marco en proceso la operacion 2017-09-02 16:01:35
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 16:01:35
+Se inicia con la conexion de la base datos local 2017-09-02 16:01:35
+Se inicia con la conexion de la base datos foranea 2017-09-02 16:01:35
+Error al conectar con el servidor foranea 2017-09-02 16:01:35
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 16:01:35
+
+
+Sincronizacion detectada: 2017-09-02 16:03:30
+Se marco en proceso la operacion 2017-09-02 16:03:30
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 16:03:31
+Se inicia con la conexion de la base datos local 2017-09-02 16:03:31
+Se inicia con la conexion de la base datos foranea 2017-09-02 16:03:31
+Error al conectar con el servidor foranea 2017-09-02 16:03:32
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 16:03:32
+
+
+Sincronizacion detectada: 2017-09-02 16:05:37
+Se marco en proceso la operacion 2017-09-02 16:05:37
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 16:05:37
+Se inicia con la conexion de la base datos local 2017-09-02 16:05:37
+Se inicia con la conexion de la base datos foranea 2017-09-02 16:05:37
+Error al conectar con el servidor foranea 2017-09-02 16:05:40
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 16:05:40
+
+
+Sincronizacion detectada: 2017-09-02 16:07:42
+Se marco en proceso la operacion 2017-09-02 16:07:43
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 16:07:44
+Se inicia con la conexion de la base datos local 2017-09-02 16:07:44
+Se inicia con la conexion de la base datos foranea 2017-09-02 16:07:44
+Error al conectar con el servidor foranea 2017-09-02 16:07:47
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 16:07:47
+
+
+Sincronizacion detectada: 2017-09-02 16:09:42
+Se marco en proceso la operacion 2017-09-02 16:09:42
+Se inicio el archivo de Cron(sincroniza.php): 2017-09-02 16:09:42
+Se inicia con la conexion de la base datos local 2017-09-02 16:09:42
+Se inicia con la conexion de la base datos foranea 2017-09-02 16:09:42
+Error al conectar con el servidor foranea 2017-09-02 16:09:45
+Se mando a llamar exitosamente el cron en Linux 2017-09-02 16:09:45

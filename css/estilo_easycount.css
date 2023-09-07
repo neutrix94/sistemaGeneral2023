@@ -1,0 +1,230 @@
+/*Reset*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+a{ text-decoration: none;}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+body{
+  font-family: Verdana;
+  font-size: 16px;
+  padding: 0;
+  margin: 0;
+  color: #115bd5;
+  background: url(http://192.168.100.100/telsida/img/iconos_sistema/bg8.png) repeat;
+}
+/*Estilos generales de los formulario inputs*/
+
+input[type="text"], input[type="password"],
+textarea{
+  margin: 5px;
+padding: 0 10px;
+/*width: 100%;*/
+height: 34px;
+color: #404040;
+background: white;
+border: 1px solid;
+border-color: #c4c4c4 #d1d1d1 #d4d4d4;
+border-radius: 2px;
+outline: 5px solid #eff4f7;
+-moz-outline-radius: 3px;
+-webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+font-size: 1em;
+}
+
+button{
+  padding: 12px;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 6px;
+ background: rgb(109,179,242); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(109,179,242,1) 0%, rgba(84,163,238,1) 50%, rgba(54,144,240,1) 51%, rgba(30,105,222,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(109,179,242,1)), color-stop(50%,rgba(84,163,238,1)), color-stop(51%,rgba(54,144,240,1)), color-stop(100%,rgba(30,105,222,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, rgba(109,179,242,1) 0%,rgba(84,163,238,1) 50%,rgba(54,144,240,1) 51%,rgba(30,105,222,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, rgba(109,179,242,1) 0%,rgba(84,163,238,1) 50%,rgba(54,144,240,1) 51%,rgba(30,105,222,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, rgba(109,179,242,1) 0%,rgba(84,163,238,1) 50%,rgba(54,144,240,1) 51%,rgba(30,105,222,1) 100%); /* IE10+ */
+background: linear-gradient(to bottom, rgba(109,179,242,1) 0%,rgba(84,163,238,1) 50%,rgba(54,144,240,1) 51%,rgba(30,105,222,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6db3f2', endColorstr='#1e69de',GradientType=0 ); /* IE6-9 */
+
+}
+label{
+  font-size: 1.2em;
+  font-weight: bold;
+}
+.input-login{ width: 88%;}
+
+.select {
+  background-color: #FFF;
+}
+.select {
+  display: block !important;
+  position: relative !important;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #d2e2e7;
+  border-bottom-color: #c5d4d9;
+  border-radius: 2px !important;
+  background-image: -webkit-linear-gradient(top, #fcfdff, #f2f7f7) !important;
+  background-image: -moz-linear-gradient(top, #fcfdff, #f2f7f7);
+  background-image: -o-linear-gradient(top, #fcfdff, #f2f7f7);
+  background-image: linear-gradient(to bottom, #fcfdff, #f2f7f7);
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  padding: 0px !important;
+}
+.select:before, .select:after {
+  content: '';
+  position: absolute;
+  right: 11px;
+  width: 0;
+  height: 0;
+  border-left: 3px outset transparent;
+  border-right: 3px outset transparent;
+}
+.select:before {
+  top: 10px;
+  border-bottom: 3px solid #7f9298;
+}
+.select:after {
+  top: 16px;
+  border-top: 3px solid #7f9298;
+}
+.select > select {
+  position: relative;
+  z-index: 2;
+  width: 112%;
+  height: 29px;
+  line-height: 17px;
+  padding: 5px 9px !important;
+  padding-right: 0 !important;
+  color: #80989f;
+  background: transparent;
+  background: rgba(0, 0, 0, 0);
+  border: 0;
+  -webkit-appearance: none;
+}
+.select > select:focus {
+  color: #4d5a5e;
+  outline: 0;
+}
+
+/*Estilo del área de logue comienzan aquí*/
+#contenedor_form{
+  width: 25%;
+  margin: 0 auto;
+  margin-top: 12em;
+}
+.error_form{
+  color: #f61c1f;
+}
+#formula{
+  position: relative;
+margin: 0 auto;
+padding: 20px 20px 20px;
+width: 310px;
+background: white;
+border-radius: 3px;
+-webkit-box-shadow: 0 0 200px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+box-shadow: 0 0 200px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+margin-top:12px; 
+
+}
+#formula section{
+  padding: 2px;
+}
+footer{
+  text-align: center;
+  margin-top: 3px;
+}
+
+
+/**Tooltip de los inputs y demas elementos que lo necesiten**/
+ .ui-tooltip, .arrow:after {
+    background: black;
+    border: 2px solid white;
+  }
+  .ui-tooltip {
+    padding: 10px 20px;
+    color: white;
+    border-radius: 20px;
+    font: bold 14px "Helvetica Neue", Sans-Serif;
+  /*  text-transform: uppercase;*/
+    box-shadow: 0 0 7px black;
+  }
+  .arrow {
+    width: 70px;
+    height: 16px;
+    overflow: hidden;
+    position: absolute;
+    left: 50%;
+    margin-left: -35px;
+    bottom: -16px;
+  }
+  .arrow.top {
+    top: -16px;
+    bottom: auto;
+  }
+  .arrow.left {
+    left: 20%;
+  }
+  .arrow:after {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: -20px;
+    width: 25px;
+    height: 25px;
+    box-shadow: 6px 5px 9px -9px black;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    tranform: rotate(45deg);
+  }
+  .arrow.top:after {
+    bottom: -20px;
+    top: auto;
+  }

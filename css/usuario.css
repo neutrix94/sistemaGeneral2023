@@ -1,0 +1,204 @@
+body{color: #333333;
+    font-family: monospace;}
+a{text-decoration:none;color:inherit;}
+.fondousuarioEYE{}
+#fondoprincipalEYE{background-color:#f9f6e8;width:900px;height:576px;border:1px solid #853f1b;margin:auto;padding:5px;top:20;left:25%;position:fixed;}
+.logoescuelaEYE{margin-left:39px;width:210px;}
+.nombreEscuelaEYE{ color: #006837;    float: left;
+    font-size: 21px;
+    font-weight: bold;
+    height: 51px;
+    margin: 31px 0 0 33px;
+    text-align: center;
+    width: 410px;}
+	
+#botonesesionEYE{width:200px; float:right;}
+
+#carpetaEYE{ background: url("../img/carpeta.png") no-repeat;
+    height: 460px;
+    margin: 100px auto auto;
+    width: 825px;}
+.botonEYE{float: right; background-color: #589F7C;
+    border: medium none;
+    border-radius: 6px 6px 6px 6px;
+    color: #FFFFFF;
+    font-size: 18px;
+    width: auto;
+    margin: 1px 3px 2px -3px;
+    padding: 5px 1px 2px 5px;}
+.calificacionesEYE{width326px;height:400px;float:left;margin:30px; width: 337px;}
+.datosinicialesEYE,.datosdesplegablesEYE{height:312px;}
+.fotoEYE{width:73px;height:88px;border:1px solid #C1272D;border-radius:3px;float:left;}
+.datosiniciales2EYE{ float: right;
+    margin-left: 8px;
+    width: 254px;}
+.nombrealumnoEYE{height:59px;
+   
+    width: 246px;}
+.nombrealumnoEYE span{font-size:14pt;font-weight:bold;}
+.tuscalificacionesEYE{font-size: 14pt;
+    line-height: 15px;}
+.ultimascalificacionesEYE{
+    margin-left: -83px;
+    margin-top: 23px;
+    width: 329px;}
+.datostablaEYE{ background-color: #C1272D;color: white;font-size: 12pt;;text-align: left;}
+#pestanastablaEYE,#pestanastabla2EYE{background-color: #C1272D;color: white;font-size: 12pt;text-align: left; width:auto; border-radius: 10px 10px 0 0; height: 28px;}
+#pestanastablaEYE{font-size: 12pt;}
+.promedioEYE{text-align:center;}
+#pestanastabla2EYE,#datostabla2EYE,.promedio2EYE{font-size: 9pt;border-radius: 7px 7px 0 0;}
+
+tdEYE{border-bottom:1px dashed #C1272D;}
+thEYE{border:none;}
+#columnaUS2EYE{text-align:center;border-left:1px dashed #C1272D;}
+#columnaUS1EYE{width:210px;}
+#columnaUS1EYE,#columnaUS2EYE{height:22px;}
+#columnaUS1EYE:hover{background:#ccc;}
+.mensajeurgenteEYE{color: #006837;background-color:#ccffcc;border:1px dashed #006837;border-radius:3px;font-size:11pt;font-weight:bold;float:left;margin:10px 0 0 -81px;padding: 1px 6px 3px 4px;}
+.mensajeurgenteEYE img{margin:3px 5px -3px 0;}
+.PDFEYE {width:50px;height:50px;float:right;margin-right:5px;}
+.datosdesplegablesEYE{ float:right;clear: left;
+   
+    width: 310px;}
+#historialEYE{ margin:-435px 33px 0 0;}
+#mensajesEYE,#perfilEYE{margin: -444px 33px;}
+
+#responderEYE{}
+.tablahistorialEYE{margin-top: -1px;
+    width: 312px;}
+.promediogeneralEYE{color: #C1272D;border-radius:3px;font-size:11pt;font-weight:bold;float:left;margin:10px 0 0 0;padding: 1px 6px 3px 4px}
+.datosUSEYE p{color: #C1272D;
+    font-size: 12pt;
+    font-weight: bold;
+    margin-left: 10px;}
+.barraEYE{ background: none repeat scroll 0 0 #888888;
+    border: medium none;
+    box-shadow: -1px 1px 2px #333333 inset;
+    color: white;
+    height: 20px;}
+#barraanterioresEYE{display:inline;float:left;width:180px;}
+#anterioresEYE,#barraanterioresEYE{margin-top:5px;}
+#botonBEYE,#botonCEYE,#botonDEYE,#botonEEYE,#botonFEYE{cursor:pointer;}
+#botonBEYE,#botonCEYE,#botonDEYE,#botonEEYE,#botonFEYE{float:right;font-size:10pt;}
+#botonCEYE{font-size:10pt;margin: -22px 0;}
+#botonDEYE{margin:10px 7px;}
+#botonEEYE{margin:10px 23px;}
+#botonFEYE{margin: -1px 25px;}
+ul {list-style: none;}
+.menuvEYE{width:62px;height:119px;float:right; margin: 9px 22px 0;list-style:decimal;}
+.historialtabEYE a{  background:url(../img/historial2.png);
+        display: block;margin-left: 6px;
+        width:62px;height:119px;}
+.historialtabEYE a:active{
+        background:url(../img/historial1.png) no-repeat;
+		width:62px;height:119px;}
+.perfiltabEYE a{  background:url(../img/perfil2.png);
+        display: block;margin-left: 6px;
+        width:62px;height:119px;}
+.perfiltabEYE a:active{
+        background:url(../img/perfil1.png) no-repeat;
+		width:62px;height:119px;}
+.mensajestabEYE a{  background:url(../img/mensajes2.png);
+        display: block;margin-left: 6px;
+        width:62px;height:119px;}
+.mensajestabEYE a:active{
+        background:url(../img/mensajes1.png) no-repeat;
+		width:62px;height:119px;}
+#barradatosAEYE{float:none;}
+#barradatosBEYE{margin-left:47px;}
+#barradatosCEYE{width:80px;margin-left: 38px;}
+#barradatosAEYE,#barradatosBEYE,#barradatosCEYE{margin-bottom:5px;}
+#barradatosAEYE,#barradatosBEYE{width:210px;}
+#barradatosDEYE{width:230px;}
+#barradatosEEYE{}
+#barradatosFEYE{height: 100px;
+    margin-left: 15px;
+    width: 295px;}
+#barradatosGEYE{    border: 1px solid #853F1B;
+    float: right;
+    margin-right: 25px;
+    margin-top: -29px;
+    width: 134px}
+#barradatosGEYE1{    border: 1px solid #853F1B;
+    float: right;
+    margin-right: 25px;
+    margin-top: -29px;
+    width: 134px}    
+#datoformEYE{display:inline;margin-right: 16px;}
+/*border punteadorojo*/
+.promediogeneralEYE,#accesoEYE,#mensajeadminEYE,#chatEYE{border: 1px dashed #C1272D;border-radius:3px;}
+.promediogeneralEYE span{color:black;}
+#accesoEYE,#mensajeadminEYE{padding:0px 6px 11px 10px;margin-top: 12px;}
+#mensajeadminEYE span,#chatnombreEYE{color: #006837;font-size:11pt;font-weight:bold;}
+#mensajeadminEYE{ height: auto;}
+#chatnombreEYE{border-bottom:none;}
+#bandejaentradaEYE,#chatEYE{ margin: 56px 0 0 -12px;
+    width: 313px;}
+#bandejaentradaEYE{/*border: 1px solid #C1272D;*/}
+#actualesEYE{  margin: 10px -86px;
+    width: 340px;}
+#chatEYE{ border: medium none;
+    margin-left: 12px;
+    margin-top: -9px;
+    text-align: justify;
+    width: 299px;}
+#desarrolloEYE a{text-decoration:none:}
+#desarrolloEYE{margin-bottom:12px;}
+#creditos2EYE a{text-decoration:none;color: #006837;font-size:12pt;}
+#creditos2EYE{float: right; margin-right: 10px;}
+.barEYE,.errorEYE{color:#C1272D; box-shadow: 1px 3px 2px gray;
+    background: #F9F6E8 url(../img/bar_back.jpg);
+    border: 1px solid #853F1B;
+	border-radius:7px;
+    height: 30px;padding:5px;
+    position:fixed;
+bottom:19px;right:15px;
+    width: 295px;}
+	
+#bar2EYE span{color: #C1272D;
+    font-size: 12pt;
+    font-weight: bold;
+    letter-spacing: -1.1px;}
+#bar1EYE{ float: left;width: 80px;margin-left: -2px;}
+#bar2EYE p{color: #006837;font-size:11pt;
+}
+#bar2EYE{  border-left: 1px dashed;padding-left: 6px;
+    float: left;
+    height: 38px;
+    line-height: 0;
+    margin-top: -4px;
+    width: 200px;}
+#bar2EYE img{ float: right;
+    margin-top: -16px;}
+#bar2EYE a{text-decoration:none;}
+.accesoUSEYE{  background:#F9F6E8 url(../img/ingreso_back.jpg);margin-bottom: -90px;
+    border: 1px solid #853F1B;
+    border-radius: 7px 7px 7px 7px;
+    bottom: 160px;
+    box-shadow: 1px 3px 2px gray;
+    color: #853F1B;
+    font-size: 10.5pt;
+    font-weight: bold;
+    height: 111px;
+    letter-spacing: 0;
+    padding: 4px 4px 13px 15px;
+    position: fixed;
+    right: 15px;
+    width: 287px;
+    word-spacing: -6px;}
+.accesoUSEYE span{font-weight:normal;font-size:9pt;}
+.accesoUSEYE img{float:right;}
+#separadorEYE{background:#853F1B;
+    height: 11px;   position: fixed;
+bottom: 60px;right:60;
+    width: 216px;}
+.errorEYE img{float:left;}
+.errorEYE div{   border-left: 1px dashed #C1272D;
+    float: right;font-size:12px;
+    height: 33px;
+    margin-top: -6px;
+    padding-left: 3px;
+    padding-top: 8px;
+    width: 179px;}
+
+

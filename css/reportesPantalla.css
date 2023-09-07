@@ -1,0 +1,260 @@
+/* CSS Document */
+/*CSS para los reportes generados en pantalla para Impulsora*/
+/*Estilo para definir las celdas que estÃ¡n en el encabezado del documento o reporte*/
+
+.HEADER{
+	font-family		:	Gafata, Arial, Helvetica, sans-serif;
+	font-size		: 	11px;				
+	table-layout	:	fixed;	
+	color			:   #333;
+	background      :   #F6FFD8;
+		
+	
+}
+.LOGO{ 
+    /*border-radius: 25px;
+    box-shadow: 1px 1px 1px #C4A23E;*/
+    padding: 5px;
+	
+}
+.LOGO IMG{width:200px;}
+.ENCABEZADO{background: transparent url(../img/bg4__.png)repeat;
+    border-radius: 0 0 25px 25px;
+    display: block;
+    min-height: 50px;}
+.HEADERODD{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	9px;
+	table-layout	:	fixed;
+	color			:	#000000;
+	background		:	#CCCC99;
+	border-color	:	#CCCCCC;
+	border			:	solid;
+	border-width	:	1px;
+}
+.HEADEREVEN{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	9px;
+	table-layout	:	fixed;
+	color			:	#000000;
+	background		:	#FFFACD;
+	border-color	:	#CCCCCC;
+	border			:	solid;
+	border-width	:	1px;
+}
+.HEADTABLA{border: 1px solid #1B93D2;}
+.SUBHEADERODD{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	9px;
+	table-layout	:	fixed;
+	color			:	#000000;
+	background		:	#FFFFCC;
+	border-color	:	#CCCCCC;
+	border			:	solid;
+	border-width	:	1px;
+}
+.SUBHEADEREVEN{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	9px;
+	table-layout	:	fixed;
+	color			:	#000000;
+	background		:	#FFFFCC;
+	border-color	:	#CCCCCC;
+	border			:	solid;
+	border-width	:	1px;
+}
+.SUBSUBHEADER{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	18px;
+	table-layout	:	fixed;
+	background: #440000;
+    border: 0 none;
+    color: #FFF;
+	text-align:center;
+	
+}
+
+/*Estilo para definir las celdas que estï¿½n en el footer del documento o reporte*/
+.FOOTER{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		:	9px;
+	table-layout	:	fixed;
+	color			:	#FFFFFF;
+	background		:	#0397D;
+	
+}
+/*Estilo para las celdas que tienen datos dinamicos, como el detalle de la factura*/
+.FIELDS{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	9px;
+	table-layout	:	fixed;
+	color			:	#000000;
+	background		:	#FEFEFE;
+	border-color	:	#CCCCCC;
+	border			:	solid;
+	border-width	:	1px;
+}
+/*Estilo para definir las filas que sirven de espaciado entre filas*/
+.ESPACIO{
+	background		:	#FFFFFF;
+	visibility		:	hidden;
+}
+/*Los siguientes dos estilos son para mostrar las filas de la tabla con colores alternados de fondo*/
+.ODD{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		:	11px;
+	color			:	#06364F;
+	table-layout	:	fixed;
+	background: #F9B6AE;
+	
+	
+}
+
+.EVEN{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		:	11px;
+	color			:	#06364F;
+	table-layout	:	fixed;
+	background		:	#FCF3AE;
+	
+}
+/*Estilo para texto en negritas*/
+.BOLD{
+	font-weight		:	bold;
+	table-layout	:	fixed;
+	background      :  none;
+}
+/*Estilo para el nï¿½mero de pï¿½gina*/
+.NUMPAG{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		:	9px;
+	color			:	#000000;
+	table-layout	:	fixed;
+}
+/*Estilo para la mayorï¿½a de las celdas de los documentos como facturas, notas de credito, etc*/
+.CELDAGENERICA{
+/*	font-family		:	Verdana, Arial, Helvetica, sans-serif;
+	font-size		: 	10px;*/
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	10px;
+	color			:	#000000;
+	border-color	:	#000000;
+	border			:	solid;
+	border-width	:	1px;
+	table-layout	:	fixed;
+}
+
+.CELDADETALLES{
+	font-size		: 	9px;
+	font-family		:	Arial, Helvetica, sans-serif;
+	color			:	#000000;
+	border-color	:	#000000;
+	border			:	solid;
+	border-width	:	1px;
+	table-layout	:	fixed;
+}
+
+.CELDATOTAL{
+	font-size		: 	10px;
+	font-family		:	Arial, Helvetica, sans-serif;
+	table-layout	:	fixed;
+}
+
+.CELDAGRANTOTAL{
+	 color: #444444;
+	font-size		: 	15px;
+	font-family		:	Arial, Helvetica, sans-serif;
+	table-layout	:	fixed;
+			
+}
+
+.GRANTOTAL{
+	font-size		: 	13px;
+	font-family		:	Arial, Helvetica, sans-serif;
+	table-layout	:	fixed;
+}
+
+.CELDALOGO{
+	font-size		: 	15px;
+	font-family		:	Arial, Helvetica, sans-serif;
+	color			:	#000000;
+	table-layout	:	fixed;
+	font-style		:	italic;
+}
+
+
+.botonImprimir{
+	background:#D5230E;
+    border: 1px solid #241200;
+    border-radius: 6px 6px 6px 6px;
+    color: #fff;
+    font-family: 'Gafata',sans-serif;
+    font-size: 15px;
+    height: 28px;
+    margin-top: -9px;
+    text-decoration: none;
+}
+.botonImprimir:hover{
+	background:#841B0F;
+
+}
+.TITSUBTOTAL{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	9px;
+	table-layout	:	fixed;
+	color			:	#000000;
+	background		:	#BBBBBB;
+	border-color	:	#CCCCCC;
+	border			:	solid;
+	border-width	:	1px;
+}
+.SUBTOTAL{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	9px;
+	table-layout	:	fixed;
+	color			:	#000000;
+	background		:	#DDDDDD;
+	border-color	:	#CCCCCC;
+	border			:	solid;
+	border-width	:	1px;
+}
+.TOTALPARCIAL{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	10px;
+	table-layout	:	fixed;
+	color			:	#000000;
+	background		:	#B0E0E6;
+	border-color	:	#CCCCCC;
+	border			:	solid;
+	border-width	:	1px;
+}
+.TITTOTALPARCIAL{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	10px;
+	table-layout	:	fixed;
+	color			:	#000000;
+	background		:	#87CEFA;
+	border-color	:	#CCCCCC;
+	border			:	solid;
+	border-width	:	1px;
+}
+.CELDATITULO{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	10px;
+	table-layout	:	fixed;
+	color			:	#000000;
+	background		:	#FFDEAD;
+	border-color	:	#CCCCCC;
+	border			:	solid;
+	border-width	:	1px;
+}
+.CELDADATO{
+	font-family		:	Arial, Helvetica, sans-serif;
+	font-size		: 	10px;
+	table-layout	:	fixed;
+	color			:	#000000;
+	background		:	#FAEBD7;
+	border-color	:	#CCCCCC;
+	border			:	solid;
+	border-width	:	1px;
+}

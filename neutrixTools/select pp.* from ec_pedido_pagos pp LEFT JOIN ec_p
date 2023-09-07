@@ -1,0 +1,25 @@
+select pp.* from ec_pedido_pagos pp LEFT JOIN ec_pedidos p On p.id_pedido = pp.id_pedido WHERE pp.fecha = '2022-11-27' AND p.id_sucursal = 3;
+select SUM( pp.monto ) from ec_pedido_pagos pp LEFT JOIN ec_pedidos p On p.id_pedido = pp.id_pedido WHERE pp.fecha = '2022-11-27' AND p.id_sucursal = 3;
+
+select dp.* from ec_devolucion_pagos dp 
+LEFT JOIN ec_devolucion d 
+On d.id_devolucion = dp.id_devolucion 
+WHERE dp.fecha = '2022-11-27' 
+AND d.id_sucursal = 3;
+
+select SUM( dp.monto ) 
+from ec_devolucion_pagos dp 
+LEFT JOIN ec_devolucion d 
+On dp.id_devolucion = d.id_devolucion 
+WHERE dp.fecha = '2022-11-27' 
+AND d.id_sucursal = 3;
+
+
+
+/*Error de trojes*/
+DELETE FROM `ec_pedido_pagos` WHERE `ec_pedido_pagos`.`id_pedido_pago` = 393328;
+DELETE FROM `ec_pedidos_detalle` WHERE id_pedido = 361963;
+DELETE FROM `ec_pedidos` WHERE id_pedido = 361963;
+
+
+

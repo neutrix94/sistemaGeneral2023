@@ -1,0 +1,8 @@
+DROP TRIGGER IF EXISTS insertaMovimientoAlmacenDetalle|
+DROP TRIGGER IF EXISTS insertaMovimientoDetalleProveedorProducto|
+DROP TRIGGER IF EXISTS actualizaMovimientoAlmacen|
+DROP TRIGGER IF EXISTS actualizaMovimientoAlmacenDetalle|
+DROP TRIGGER IF EXISTS actualizaMovimientoDetalleProveedorProducto|
+DROP TRIGGER IF EXISTS eliminaMovimientoAlmacen|
+DROP TRIGGER IF EXISTS eliminaMovimientoAlmacenDetalle|
+DROP TRIGGER IF EXISTS eliminaMovimientoDetalleProveedorProducto

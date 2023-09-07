@@ -1,0 +1,1 @@
+Nombre 1,Nombre 2,Código de pieza,Cantidad de etiquetas

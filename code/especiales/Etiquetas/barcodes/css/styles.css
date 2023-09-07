@@ -1,0 +1,88 @@
+
+	.header{
+		background-color: #718B1E;
+		height: 80px;
+		margin-bottom: 10px;
+	}
+	#seeker_response{
+		position: relative;
+		/*height: 250px;*/
+		max-height: 350px;
+		overflow-y : auto;
+		box-shadow: 2px 2px 10px rgba( 0, 0, 0, .5 );
+		display: none;
+	}
+
+	#reset_seeker_btn{
+		display: none;
+	}
+
+	.option_result{
+		padding: 20px;
+		box-shadow: 1px 1px 10px rgba( 0, 0, 0, .5 );
+	}
+	#type_container,
+	#quantity_container,
+	#confirm_button_container{
+		/*display: none;*/
+		vertical-align: middle !important;
+		text-align: center;
+	}
+	.barcodes_resume{
+		position: relative;
+		height: 300px;
+		max-height: 300px;
+		min-height: 300px;
+		overflow-y : auto;
+		/*border: 1px solid;*/
+	}
+	.head_resume_fixed{
+		text-align: center;
+		background-color: rgba( 225, 0, 0, .7 );
+		color: white;
+		position: sticky;
+		top : 0;
+	}
+	.no_visible{
+		display: none;
+	}
+	input[type=checkbox]
+{
+  /* Doble-tamaño Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari y Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
+
+/*estilos de la ventana emergente*/
+	.emergent{
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		left : 0;
+		top : 0;
+		background-color: rgba( 0, 0, 0, .3);
+		z-index: 3;
+		display: none;
+	}
+	.emergent_content{
+		position: relative;
+		top : 100px;
+		width: 95%;
+		left: 2.5%;
+		background-color: white;
+		box-shadow: 1px 1px 15px rgba( 0, 0, 0, .5 );
+		padding: 15px;
+	}
+
+	.orange{
+		color: orange;
+	}
+	.red{
+		color: red;
+	}
+	/*#confirm_button_container{
+		padding-top: 25px;
+	}*/

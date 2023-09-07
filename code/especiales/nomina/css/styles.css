@@ -1,0 +1,40 @@
+	.global{
+			padding: 20px;
+		}
+	.users_results{
+		height: 300px;
+		border: 1px solid;
+		width: 23.5%;
+		position: absolute;
+		background: white;
+		border-radius: 0px 0px 10px 10px;
+		display: none;
+		z-index: 10;
+	}
+	.table_container{
+		height: 500px;
+		/*border : 1px solid;*/
+		overflow: auto;
+	}
+	.table_container thead{
+		position: sticky;
+		top:0;
+		background-color : rgba( 225,0,0,.7);
+		color: white;
+		text-align: center;
+	}
+	.checks{
+		font-size: 10px;
+		/*text-align: center;*/
+	}
+	#users_list{
+		height : 500px;
+		max-height : 500px;
+		overflow-y : auto; 
+	}
+	.accordion-body{
+		font-size: 10px;
+	}
+	.label_check{
+		font-size: 14px;
+	}

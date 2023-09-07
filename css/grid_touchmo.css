@@ -1,0 +1,151 @@
+/*Combobox o listas*/
+.combos{
+  background-color:rgba(108,152,49,0.5);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 7pt;
+ /* border: 1px solid #589f7c;*/
+}
+
+/*Textbox de texto editable*/
+.celdaTexto{
+  background-color:#FFFFFF;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size:8pt;
+  /*border-bottom-width:1px;
+  border-bottom-color:#000000;
+  border-top-width:1px;
+  border-top-color:#6c9831;
+  border-left-width:1px;
+  border-left-color:#FFFFFF;
+  border-right-width:1px;
+  border-right-color:#000000;
+  color: #333333;
+  border-top-style: solid;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-left-style: solid;*/
+  
+}
+
+/*Textbox de texto no editable*/
+.celdaTextoD{
+  background-color:#FFFFFF;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size:8pt;
+  color: #333333;
+}
+
+/*Checkbox*/
+.check{
+  font-family :Arial, Helvetica, sans-serif;
+  font-size:8pt;
+  color: #333333;
+}
+
+/*Botonoes de cabecera*/
+.buttonHeader{
+  background:#6c9831;
+  font-size:8pt;
+  border:none;
+  font-weight: bold;
+  font-family: Helvetica;
+  
+  color:#fff;
+  
+}
+
+#celda_permisos_Cabecera,#celda_permisos_Datos,#celda_permisos_paginador{border:none;}
+#permisos{margin-top:15px;}
+
+/*Botonoes de pie de pagina*/
+.buttonFooter{  
+  border:none;
+ font-family:Arial, Helvetica, sans-serif;
+  font-size:8pt;
+  background:#6c9831;
+  text-align:right;
+}
+
+/*Filas normales en una tabla*/
+.NormalCell{
+  color:#333;
+  font-size:13px;
+  font-weight:normal;
+  text-align: center;
+/*  border:1px solid #333;*/
+  background:#fff;
+}
+
+tr{ }
+
+/*Celda de la izquierda que enumera los registros*/
+.Contador{
+
+  font-family:Arial, Helvetica, sans-serif;
+  font-size:8pt;
+  font-weight:bold;
+ background-repeat: repeat;
+  color:#FFF;
+  background:#6c9831;
+  width:36px !important;
+  text-align:center;
+  
+}
+
+/*tr{border:none;}*/
+
+/*Filas donde pasa el mouse*/
+.cellMouse{
+  color:#fff;
+  font-size:13px;
+  font-weight:normal;
+  background-color:rgba(108,152,49,0.5) !important;
+  margin-left:30px;
+  text-align: center !important;
+  
+  
+}
+
+/***Tablas en el grid**/
+.tabla_Grid_RC{
+  background:#fff; 
+
+}
+/*********Encabezado de titulo*******************/
+.encabezado_grid{
+  font-size:16px;
+  color:#A90100;
+  font-family: Arial, Helvetica, sans-serif;
+
+}
+
+
+
+/*Botonoes de cabecera*/
+.buttoncheckfalse{
+  border:none;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:8pt;
+    font-weight: bold;
+    color: #fff;
+    background:  #007389 url(../img/checksup.jpg)no-repeat left top;
+  
+}
+
+.buttonchecktrue{
+border:none;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:8pt;
+    font-weight: bold;
+    color: #white;
+    background: #007389 url(../img/checksup.jpg)no-repeat left bottom;
+   
+}
+.
+ .cab{background:#6C9831 !important;}
+     table{ border: 1px solid rgba(102,156,211,0.5); background:#6C9831;}
+   /*.sin table{border: 1px solid rgba(73,50,2,0.5);}*/
+   .grid_touch{ border:none !important; }
+   .grid_tocuh { border:none;}
+
+   

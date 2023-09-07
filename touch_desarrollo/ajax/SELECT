@@ -1,0 +1,52 @@
+SELECT
+  p.id_productos AS 'ID PRODUCTO',
+  p.nombre AS 'PRODUCTO',
+  p.inventarioInicial AS 'INVENTARIO INICIAL',
+  SUM(
+  IF( dv.id_detalle_venta IS NULL, 
+      0, 
+      dv.cantidad
+    )
+  ) AS 'VENTAS',
+  p.Movimientos AS 'MOVIMIENTOS',
+  p.InvFin AS 'INVENTARIO FINAL'
+FROM
+(
+SELECT
+p.orden_lista,
+p.id_productos,
+p.nombre,
+SUM(
+  IF(m.fecha <= '$_INV_INICIAL',
+    IF(md.cantidad IS NULL, 0, tm.afecta*md.cantidad),
+    0
+  )
+) AS inventarioInicial,
+SUM(
+  IF(m.id_venta <> -1 AND m.fecha >= '$_FECHA_INICIAL' AND m.fecha <= '$_FECHA_FINAL',
+    IF(md.cantidad IS NULL, 0, tm.afecta*md.cantidad),
+    0
+  )
+) AS Movimientos,
+SUM(
+  IF(m.fecha <= '$_INV_FINAL',
+    IF(md.cantidad IS NULL, 0, md.cantidad*tm.afecta),
+    0
+  )
+) AS InvFin
+FROM ec_productos p
+LEFT JOIN ec_detalle_movimiento md ON p.id_productos = md.id_producto
+LEFT JOIN ec_movimiento_inventario m ON md.id_movimiento_inventario = m.id_movimiento_inventario
+LEFT JOIN ec_tipos_movimiento tm ON m.id_tipo_movimiento = tm.id_movimiento
+LEFT JOIN ec_ventas pdo ON m.id_venta = pdo.id_venta
+WHERE 1
+GROUP BY p.id_productos
+) p
+LEFT JOIN ec_detalle_venta dv
+ON dv.id_producto = id_productos
+LEFT JOIN ec_ventas v
+ON dv.id_venta = v.id_venta
+AND ( v.fecha BETWEEN '$_FECHA_INICIAL' AND '$_FECHA_FINAL' )
+WHERE 1
+GROUP BY p.id_productos
+ORDER BY orden_lista

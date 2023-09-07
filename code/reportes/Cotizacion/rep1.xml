@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<REPORT MARGINWIDTH="1" MARGINHEIGHT="1" TITLE="inventario">
+	<TITLE>Reporte de Clientes</TITLE>
+	<BACKGROUND_COLOR>#ffe2e4</BACKGROUND_COLOR>
+	
+	<CSS MEDIA="screen">../../css/reportesPantalla.css</CSS>
+	<CSS MEDIA="print">../../css/reportesImpresion.css</CSS>
+	
+	<NO_DATA_MSG>No se encontraron datos que cumplan los criterios, intente nuevamente. Verifique el estado del documento antes de mandar a impresión.</NO_DATA_MSG>
+
+	<DOCUMENT>
+		<FOOTER>
+			<ROW>
+				
+			</ROW>
+		</FOOTER>
+	</DOCUMENT>
+
+	<PAGE BORDER="0" SIZE="6666666666" CELLSPACING="1" CELLPADDING="1" ALIGN="CENTER">
+		<HEADER>
+			<ROW>
+				<COL CELLCLASS="HEADER" COLSPAN="21" WIDTH="750">
+					<XHTML>
+						<TABLE BORDER="0" CELLPADDING="2" CELLSPACING="1" WIDTH="100%">
+							<TR CLASS="ENCABEZADO">
+								<TD ROWSPAN="2" CLASS="HEADER LOGO" ALIGN="CENTER" WIDTH="40%">
+									<IMG SRC="../../img/img_floreria/logo.png"/>
+								</TD>
+								<TD CLASS="HEADER" WIDTH="60%" ALIGN="CENTER">									
+									<font size="+2"><b>REPORTE DE VENTAS POR CLIENTE</b></font>
+								</TD>
+							</TR>
+						</TABLE>
+					</XHTML>
+				</COL>
+			</ROW>
+			<ROW>
+				<COL ALIGN="LEFT" COLSPAN="1" TYPE="EXPRESSION" CELLCLASS="HEADER">
+					insert_date()
+				</COL>
+				<COL ALIGN="RIGHT" COLSPAN="2" TYPE="EXPRESSION" CELLCLASS="HEADER">
+					" ".$this->getParameter("rango_fechas")
+				</COL>
+			</ROW>			
+			<ROW>
+				<COL ALIGN="RIGHT" COLSPAN="21" WIDTH="750" TYPE="EXPRESSION" CELLCLASS="HEADER">
+					"Filtro utilizado: ".$this->getParameter("filtro")
+				</COL>
+			</ROW>
+			<ROW>
+				<COL ALIGN="CENTER" CELLCLASS="ESPACIO" TYPE="EXPRESSION" COLSPAN="21" HEIGHT="10" WIDTH="650"></COL>
+			</ROW>
+			<ROW>
+				<COL ALIGN="RIGHT" HEIGHT="10" COLSPAN="21" WIDTH="650">
+					<XHTML>
+						<BUTTON onClick="window.print();" class="botonImprimir">IMPRIMIR</BUTTON>
+					</XHTML>
+				</COL>
+			</ROW>
+			<ROW>
+				<COL ALIGN="CENTER" CELLCLASS="ESPACIO" TYPE="EXPRESSION" COLSPAN="21" HEIGHT="10" WIDTH="650"></COL>
+			</ROW>
+			<ROW>
+				<COL TYPE="EXPRESSION" ALIGN="LEFT" CELLCLASS="CELDAGRANTOTAL" TEXTCLASS="BOLD" >
+					"NUMERO TOTAL DE REGISTROS: ".$this->getParameter("totalReg")
+				</COL>
+				<COL TYPE="EXPRESSION" ALIGN="RIGHT" CELLCLASS="CELDAGRANTOTAL" TEXTCLASS="BOLD"  >
+					"CANTIDAD TOTAL: ".$this->getParameter("total1")
+				</COL>
+				<COL TYPE="EXPRESSION" ALIGN="RIGHT" CELLCLASS="CELDAGRANTOTAL" TEXTCLASS="BOLD"  >
+					"MONTO TOTAL: ".$this->getParameter("total2")
+				</COL>
+			</ROW>	
+			<ROW>
+				<COL ALIGN="CENTER" CELLCLASS="ESPACIO" TYPE="EXPRESSION" COLSPAN="21" HEIGHT="10" WIDTH="650"></COL>
+			</ROW>
+			<ROW CLASS="HEADTABLA">
+				<COL TYPE="EXPRESSION" ALIGN="LEFT" CELLCLASS="SUBSUBHEADER" TEXTCLASS="BOLD">"CLIENTE"</COL>				
+				<COL TYPE="EXPRESSION" ALIGN="LEFT" CELLCLASS="SUBSUBHEADER" TEXTCLASS="BOLD">"CANTIDAD VENDIDA"</COL>				
+				<COL TYPE="EXPRESSION" ALIGN="LEFT" CELLCLASS="SUBSUBHEADER" TEXTCLASS="BOLD">"MONTO VENDIDO"</COL>				
+			</ROW>			
+		</HEADER>
+		<FOOTER>
+			<ROW>
+				<COL ALIGN="CENTER" COLSPAN="21" TYPE="EXPRESSION" CELLCLASS="NUMPAG">"Página ".$this->getPageNum()</COL>
+			</ROW>		
+		</FOOTER>
+	</PAGE>
+
+	<GROUPS>
+		<GROUP NAME="id_tipo_cliente">			
+			<FOOTER>
+				<ROW>
+					<COL TYPE="EXPRESSION" ALIGN="RIGHT" CELLCLASS="FOOTER" TEXTCLASS="BOLD">"TOTAL"</COL>
+					<COL TYPE="EXPRESSION" ALIGN="RIGHT" CELLCLASS="FOOTER" TEXTCLASS="BOLD" NUMBERFORMATEX="0">$this->getSum("cantidad")</COL>
+					<COL TYPE="EXPRESSION" ALIGN="RIGHT" CELLCLASS="FOOTER" TEXTCLASS="BOLD" NUMBERFORMATEX="2">$this->getParameter("total2")</COL>
+				</ROW>					
+			</FOOTER>
+			
+			<FIELDS>
+				<ROW>					
+					<COL TYPE="FIELD" ALIGN="LEFT" CELLCLASSEVEN="EVEN" CELLCLASSODD="ODD" >cliente</COL>
+					<COL TYPE="FIELD" ALIGN="RIGHT" CELLCLASSEVEN="EVEN" CELLCLASSODD="ODD" NUMBERFORMATEX="0">cantidad</COL>
+					<COL TYPE="FIELD" ALIGN="RIGHT" CELLCLASSEVEN="EVEN" CELLCLASSODD="ODD" >totalf</COL>
+				</ROW>
+			</FIELDS>			
+			
+			
+		</GROUP>
+	</GROUPS>
+
+</REPORT>

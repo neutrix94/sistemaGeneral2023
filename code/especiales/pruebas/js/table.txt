@@ -1,0 +1,33 @@
+<div class="col-4">
+						<div class="row">
+							<div class="col-12 text-center border">Inventario Local</div>
+							<div class="col-6 text-center border">Producto</div>
+							<div class="col-6 text-center border">Proveedor Producto</div>
+							<div class="col-3 text-center border">Calc</div>
+							<div class="col-3 text-center border">Acum</div>
+							<div class="col-3 text-center border">Calc</div>
+							<div class="col-3 text-center border">Acum</div>
+							<div class="col-3 text-center border">5</div>
+							<div class="col-3 text-center border">5</div>
+							<div class="col-3 text-center border">15</div>
+							<div class="col-3 text-center border">15</div>
+						</div>
+					</div>
+					<div class="col-4">
+						<div class="row">
+							<div class="col-12 text-center border">Inventario Linea</div>
+							<div class="col-6 text-center border">Inventario Producto</div>
+							<div class="col-6 text-center border">Proveedor Producto</div>
+							<div class="col-3 text-center border">Calc</div>
+							<div class="col-3 text-center border">Acum</div>
+							<div class="col-3 text-center border">Calc</div>
+							<div class="col-3 text-center border">Acum</div>
+							<div class="col-3 text-center border">5</div>
+							<div class="col-3 text-center border">5</div>
+							<div class="col-3 text-center border">15</div>
+							<div class="col-3 text-center border">15</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="product_row_container_${position}" class="no_visible">

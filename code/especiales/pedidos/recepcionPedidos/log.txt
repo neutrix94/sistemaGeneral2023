@@ -1,0 +1,770 @@
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=135.00,
+									pp.presentacion_caja=30,
+									pp.precio=4050,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=571
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=164.00,
+									pp.presentacion_caja=20,
+									pp.precio=3280,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1627
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=115.00,
+									pp.presentacion_caja=20,
+									pp.precio=2300,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=832
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=115.00,
+									pp.presentacion_caja=20,
+									pp.precio=2300,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=832
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=29.00,
+									pp.presentacion_caja=50,
+									pp.precio=1450,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1448
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=115.00,
+									pp.presentacion_caja=20,
+									pp.precio=2300,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=832
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=115.00,
+									pp.presentacion_caja=20,
+									pp.precio=2300,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=832
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=115.00,
+									pp.presentacion_caja=20,
+									pp.precio=2300,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=832
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=18.50,
+									pp.presentacion_caja=24,
+									pp.precio=444,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=915
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=36,
+									pp.precio=1008,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1857
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=36,
+									pp.precio=1008,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1857
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=36,
+									pp.precio=1008,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1857
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=36,
+									pp.precio=1008,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1857
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=24,
+									pp.precio=672,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=923
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=36,
+									pp.precio=1008,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1857
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=24,
+									pp.precio=672,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=923
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=36,
+									pp.precio=1008,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1857
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=24,
+									pp.precio=672,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=923
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=36,
+									pp.precio=1008,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1857
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=24,
+									pp.precio=672,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=923
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=36,
+									pp.precio=1008,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1857
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=24,
+									pp.precio=672,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=923
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=36,
+									pp.precio=1008,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1857
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=24,
+									pp.precio=672,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=923
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=28.00,
+									pp.presentacion_caja=36,
+									pp.precio=1008,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1857
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=0.00,
+									pp.presentacion_caja=48,
+									pp.precio=0,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=2004
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=32.00,
+									pp.presentacion_caja=36,
+									pp.precio=1152,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=920
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1785
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1814
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1785
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1814
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1785
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1814
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1785
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1814
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1785
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1814
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1785
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1814
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1785
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1814
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1785
+
+
+
+
+log del txt archivo ( recPedBD.php ( linea 407 aproximadamente ) ) : UPDATE ec_proveedor_producto pp 
+								SET pp.precio_pieza=19.50,
+									pp.presentacion_caja=24,
+									pp.precio=468,
+									pp.fecha_ultima_compra = NOW()
+						WHERE pp.id_proveedor_producto=1814
+
+

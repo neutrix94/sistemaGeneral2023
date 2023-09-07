@@ -1,0 +1,158 @@
+
+	*{
+		margin: 0;
+	}
+	input[type=number]::-webkit-inner-spin-button, 
+	input[type=number]::-webkit-outer-spin-button { 
+	 	-webkit-appearance: none; 
+		margin: 0; 
+	}
+
+	#global{
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		background-image: url('../../../../../img/img_casadelasluces/bg8.jpg');
+		/*border: 2px solid green;*/
+	}
+	#contenido{
+		width:80%;
+		height: 65%;
+		/*border:2px solid red;*/
+	}
+	.ex{
+		width:100px;
+		height:30px;
+		vertical-align:middle;
+		border-radius:5px;
+		color:red;
+		border: 1px solid white;
+		background:transparennt;top:10px;
+	}
+	.ex:hover{
+		background:green;
+		/*color:green;*/
+	}
+	.titulo{
+		color:white;
+		font-size:16px;
+	}
+	a{
+		text-decoration: none;
+		color:white;
+	}
+	.informa{
+		background: transparent;
+		text-align: right;
+		border:0;
+		width: 100%;
+		height: 100%;
+		color:black;
+		padding: 8px;
+	}
+	.guarda{
+		padding: 10px;
+		border:2px solid gray;
+		border-radius: 15px;
+		background: #A59D95;
+		color: white;
+	}
+	.guarda:hover{
+		background: white;
+		color:green;
+	}
+	.fi{
+		height: 40px;
+	}
+	.footer{
+		background: #900C3F;
+		width: 100%;
+		bottom: 0;
+		height: 50px;
+		position: fixed;
+	}
+	.emerge{
+		background:rgba(0,0,0,.8);
+		width:100%;
+		height:100%;
+		position:absolute;
+		display: block;
+		z-index: 100;
+	}
+	.invisible{
+		display: none;
+	}
+	.product_resumen{
+		position: relative !important;
+		width: 100% !important;
+		text-align: right !important;
+	}
+
+/*estilos de emeregente*/
+	.emergent{
+		position: fixed;
+		top : 0;
+		left: 0;
+		width: 100% !important;
+		height: 100%;
+		background: rgba( 0,0,0,.7);
+		z-index: 5;
+		vertical-align: middle !important;
+		display: none;
+	}
+	
+	.emergent_content{
+		max-height: 100%;
+		overflow: auto;
+		background-color: white;
+	}
+	#header{
+		position: sticky;
+		padding: 10px;
+		width:100%;
+		top:0;
+		max-width: 100%;
+		left: 0;
+		height:80px;background:#900C3F;
+		z-index: 10;
+	}
+	.header_sticky_top{
+		position: sticky;
+		top : -20px;
+		background-color: #900C3F;
+		z-index: 5;
+	}
+
+/*emergente*/
+	.emergent{
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		left : 0;
+		top : 0;
+		background-color: rgba( 0, 0, 0, .3);
+		z-index: 30000;
+		display: ;
+	}
+	.emergent_content{
+		position: relative;
+		top : 100px;
+		width: 95%;
+		left: 2.5%;
+		background-color: white;
+		box-shadow: 1px 1px 15px rgba( 0, 0, 0, .5 );
+		padding: 10px;
+		max-height: 80%;
+		overflow-y : auto;
+	}
+/**/
+
+	@media (max-width: 600px) {
+		*, th{
+			font-size: 95% !important;
+		}
+		#listado{
+			height: 650px !important;
+			max-height: 800px !important;
+		}
+	}

@@ -1,0 +1,66 @@
+
+	#global{
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background-image: url('../../../../../img/img_casadelasluces/bg8.jpg');
+		margin:0;
+		padding:0;
+		top:0;
+		left:0;
+	}
+	#log_caja{
+		position:relative;
+		border: 1px solid gray;
+		align-items: center;
+		top:-5%; 
+		border-radius: 10px;
+		color:white;
+	}
+	.entrada_txt{
+		padding: 15px;width: 80%;}
+	#icono{
+		border: 1px solid orange;
+		position: absolute;
+		width: 10%;
+		border-radius: 50%;
+		left: 45%;
+		top:15%;
+		z-index:2;/*background:gray;*/
+	}
+	#bot_abre:hover{
+		background: #1DE94C;
+		color: white;
+	}
+	#emergente{
+		position: absolute; 
+		z-index:10000; 
+		background: rgba(0,0,0,.7); 
+		width: 100%; 
+		height: 100%; 
+		top:0; 
+		left: 0; 
+		display: none;
+	}
+	#contenido_emergente{
+		max-height: 600px;
+		overflow: auto;
+	}
+	
+/*responsive*/
+	@media only screen and (max-width: 600px) {
+  		.logo_img{
+  			width : 20% !important;
+		}
+		td{
+			font-size: 80% !important;
+		}
+		#log_caja{
+		position:relative;
+		/*width: 40%;*/
+		border: 1px solid gray;
+		/*background: #33C7FF;*/
+		align-items: center;
+		top: 2%; 
+		}
+	}

@@ -1,0 +1,44 @@
+
+	.text-right{
+		text-align: right !important;
+		border: 1px solid;
+	}
+	.emergent_close_btn{
+		position: relative !important;
+		right: -10% !important;
+		top: 5%;
+	}
+	.invisible{
+		display : none;
+	}
+	.footer{
+		background:#83B141;
+		position: fixed;
+		top: 92%;
+		width: 100%;
+		text-align: center;
+	}
+	.header_sticky{
+		position: sticky;
+		top : 0;
+		background-color : red;
+		color : white;
+	}
+
+	.emergent{
+		position: fixed;
+		top : 0;
+		left: 0;
+		width: 100% !important;
+		height: 100%;
+		background: rgba( 0,0,0,.7);
+		z-index: 5;
+		vertical-align: middle !important;
+		display: none;
+	}
+	
+	.emergent_content{
+		max-height: 100%;
+		overflow: auto;
+		background-color: white;
+	}

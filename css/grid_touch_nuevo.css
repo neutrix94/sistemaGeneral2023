@@ -1,0 +1,230 @@
+/*implementaciones Oscar 31.05.2018 para dar estilos a paginadores de pantallas touch*/
+.paginas_paginador_GridRC,#texto_paginador_notasDev,#texto_paginador_notasVenta{
+  color:white;
+  font-size:15px;
+}
+.paginador_GridRC{
+}
+.combo_mostrar_paginador_GridRC{
+  position:relative;
+  right:0;
+}
+/*fin de cambios 31.05.2018*/
+table{ background:#fff; width:600px; }
+.cabecera{background: #6c9831;
+	color: #fff; height:22px; }
+	td input[type=button]{border-radius:none;background: #6c9831 !important;border:none; color:#fff; padding:6px;font-size:12px;}
+	td span{ background: none;
+border: none;
+width: 48px !important;
+font-size: 14px;
+display: block;
+position: relative;
+left: -14px;}
+	td div{ margin:0px !important; background:none !important; border-radius:0px !important; text-shadow:none !important; border:0px !important; box-shadow:none !important; color:#fff !important ;}
+
+	td{ border:1px solid #6c9831; height:10px;}
+.move:hover {
+	background: rgba(108,152,49,0.5);
+	color: #fff;
+	cursor: pointer;
+	
+}
+.cabecera p {
+	padding-left: 6px;
+	padding-top:4px;
+	color: #fff;
+	text-align:center;
+	font-size:12px;
+	
+}
+#celda_notasPagos_Footer{ height:23px !important;}
+tr{ border:none;}
+#celda_notasPagos_Footer td{ background: #6c9831;}
+#Head_notasPagos,#Head_notasVenta{ background: #6c9831;}
+#celda_notasPagos_Cabecera tr td{ background: #6c9831;}
+#celda_notasVenta_Cabecera tr td{ background: #6c9831;}
+#celda_notasPagos_Footer tr{ background: #6c9831;}
+#celda_notasPagos_Cabecera,
+#celda_notasDev_Cabecera,
+#celda_notasVenta_Cabecera ,
+#celda_notasPagos_Footer,
+#Head_pagosDev,
+#Head_notasDev {background: #6c9831;}
+.celdaTexto{
+  background-color:#FFFFFF;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size:8pt;
+}
+.celdaTextoD{
+  background-color:#FFFFFF;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size:8pt;
+  color: #333333;
+}
+.buttonHeader{
+  font-size:8pt;
+  border:none;
+  font-weight: bold;
+  font-family: Helvetica;
+  color:#fff;
+  
+}
+/*Botonoes de pie de pagina*/
+.buttonFooter{  
+  border:none;
+ font-family:Arial, Helvetica, sans-serif;
+  font-size:8pt;
+  text-align:right;
+}
+
+/*Filas normales en una tabla*/
+.NormalCell{
+  color:#333;
+  font-size:13px;
+  font-weight:normal;
+  text-align: center;
+/*  border:1px solid #333;*/
+  background:#fff;
+}
+
+/*Celda de la izquierda que enumera los registros*/
+.Contador{
+
+  font-family:Arial, Helvetica, sans-serif;
+  font-size:8pt;
+  font-weight:bold;
+ background-repeat: repeat;
+  color:#FFF;
+  background:#6c9831;
+  width:36px !important;
+  text-align:center;
+  
+}
+.cellMouse{
+  color:#fff;
+  font-size:13px;
+  font-weight:normal;
+  background-color:rgba(108,152,49,0.5) !important;
+  margin-left:30px;
+  text-align: center !important;
+  
+  
+}
+
+/***Tablas en el grid**/
+.tabla_Grid_RC{
+  background:#fff; 
+
+}
+/*********Encabezado de titulo*******************/
+.encabezado_grid{
+  font-size:16px;
+  color:#A90100;
+  font-family: Arial, Helvetica, sans-serif;
+
+}
+
+/*contien el grid completo */
+.contenedorGrid{ width:90%; margin:0 auto; overflow-y:scroll;height: 280px;}/*cambiado el ancho de 235 a 280 px Oscar 31.05.2018*/
+
+
+.espera_ctn{ display: block;width: 600px; margin: 0 auto; margin-top:5%; text-align: center; color: #fff; }
+.espera_ctn p{ font-size: 23px; padding-bottom: 4px;}
+/*.espera_ctn button{ margin-top: 16px; padding: 9px; opacity: 1; filter:alpha(=100); background: #F4BC00; color: #fff;}*/
+/*.espera_ctn button:hover{ background:#718b1e; }*/
+.espera_ctn_form{ width:45%; margin:0 auto; background:#fff; overflow:hidden; padding:23px; margin-top:5%;border-radius:10px; border:1px solid #505050;}
+.espera_ctn_form input{display: inline-block; font-size:22px; background:#CFCFCF;
+width: 46%;
+padding: 20px;
+margin: 5px;}
+.espera_ctn_form label{padding: 10px;
+display: inline-block;
+width: 30%;
+text-align: right;
+vertical-align: MIDDLE;}
+.espera_ctn_form button{ margin-top:12px; margin-right:3px; }
+.espera_ctn_form h3{ padding-bottom:12px; text-align:center; font-size:22px; font-weight:600;}
+.exe{position: relative;
+display: block;
+width: 54px;
+margin-left: 93%;
+margin-top: -40px;
+font-size: 2em;
+font-weight: bold;
+padding: 2px;
+height: 54px;}
+.exe_mas{position:relative; display:block; width:22px; margin-left:95%;top:29px; font-size:2em; font-weight:bold;  padding:2px; text-align:center;}
+.lista_producto{ background:#F5F5F5; padding:7px; border:1px solid #C3C3C3;}
+.lista_producto div:hover{ background:#90C90B; color:#fff; cursor:pointer;}
+.lista_productos2{ background:#90C90B !important; color:#fff !important; cursor:pointer !important;padding:7px !important;}
+
+.bas{ background:none; border:none;}
+.bas td{ border:0px;}
+button:hover, .buscar:hover, .finalizar:hover, .eliminar:hover, .btn:hover, .btn1:hover {
+	opacity: 0.5;
+}
+.eliminar {
+	background:url(../touch/img/iconos_03.png) no-repeat -9px -32px;
+	display: block;
+	width: 21px;
+	height: 21px;
+	padding:8px;
+}
+.eliminar span {
+	display: none;
+	text-indent: -9999px;
+}
+.total{ padding:3em;; background:#6C9831; color:#fff; font-size:1.2em;}
+.txtNegrita{background:#6C9831 !important;/* font-weight:bold !important;*/font: condensed 120% mono;font-style:italic;font-weight: -10px; color:#fff; padding:4px;}
+.txtVerde{ background:#F22C2F !important; /*font-weight:bold !important;*/font: condensed 120% mono;font-size: italic; color:#fff;font-weight:  -10px; padding:4px;}
+.objetoLista{ padding:3px;}
+
+
+/*Estilos especiales*/
+#cuadros{ display:block; width:400px; float:left; position:relative;margin-left: 106px;
+margin-top: -90px;}
+.check_boxs{ width:80px; float:left; text-align:center;}
+.check_boxs span{ font-size:12px; color:#415B04;} 
+   .cuadro{ background: #E3E3E3; border:1px solid #ACACAC; display:block; width:60px; height:60px;
+   float:left; padding:3px; margin-left:3px; border-radius:4px;
+    }
+	.cuadro_seleccionado{ background: #E3E3E3 url(img/check.png) no-repeat -1px 3px;}
+	.cuadro:hover,	.cuadro:focus{background:#AFEE70;}
+.check_boxs input[type=checkbox]{ transform:scale(2,2) !important; position:relative; margin-top:-12px; display:block; width:40px; zoom:2;}
+.contenedorGrid input[type=checkbox]{-webkit-transform:scale(2,2); transform:scale(2,2) ;  zoom:3 !important;}
+
+.btn_ss{
+	background:rgba(217,30,33,1.00);
+	color:#333;
+	position: absolute;
+top: 0 !important;
+left: 0 !important;
+width: 60% !important;
+height: 100% !important;
+-webkit-appearance:;
+cursor: pointer;
+background: #e6f0a3; /* Old browsers */
+background: -moz-linear-gradient(top, #e6f0a3 0%, #d2e638 50%, #c3d825 51%, #dbf043 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e6f0a3), color-stop(50%,#d2e638), color-stop(51%,#c3d825), color-stop(100%,#dbf043)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #e6f0a3 0%,#d2e638 50%,#c3d825 51%,#dbf043 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #e6f0a3 0%,#d2e638 50%,#c3d825 51%,#dbf043 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #e6f0a3 0%,#d2e638 50%,#c3d825 51%,#dbf043 100%); /* IE10+ */
+background: linear-gradient(to bottom, #e6f0a3 0%,#d2e638 50%,#c3d825 51%,#dbf043 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e6f0a3', endColorstr='#dbf043',GradientType=0 ); /* IE6-9 */
+filter: Alpha(Opacity=1)!important;
+opacity: 1!important;
+font-size: 16px !important;
+border: 0 !important;
+text-indent: 1px!important;
+}
+
+.btn_sss{
+	border:2px solid rgba(172,221,49,1.00) !important;
+  width: 9% !important;
+  border-radius:6px !important;
+display: !important;
+padding: 8px !important;
+margin:7px !important;
+background:#ededed;
+outline: 0!important; }

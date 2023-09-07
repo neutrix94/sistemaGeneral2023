@@ -1,0 +1,16 @@
+UPDATE `ec_transferencia_productos`
+SET `cantidad_cajas_validacion` = 0,
+`cantidad_paquetes_validacion` = 0,
+`cantidad_piezas_validacion` = 0,
+`total_piezas_validacion` = 0
+WHERE id_transferencia IN( 7100, 7101, 7102, 7103 );
+
+DELETE FROM `ec_transferencias_validacion_usuarios` WHERE id_transferencia_producto IN( SELECT id_transferencia_producto FROM ec_transferencia_productos WHERE id_transferencia IN( 7100, 7101, 7102, 7103) );
+
+DELETE FROM `ec_transferencia_codigos_unicos`;
+DELETE FROM ec_bloques_transferencias_validacion WHERE id_bloque_transferencia_validacion != 78;
+DELETE FROM ec_bloques_transferencias_validacion_detalle WHERE id_transferencia IN( 7100, 7101, 7102, 7103 );
+
+
+
+SELECT SUM( total_piezas_validacion ) from ec_transferencia_productos;

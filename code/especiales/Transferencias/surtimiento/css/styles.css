@@ -1,0 +1,316 @@
+/*estilos del menu*/
+	.mnu_item{
+		text-align: center;
+		color: white;
+		font-size: 90%;
+		width: 33.33% !important;
+		display: inline-block !important;
+		padding: 5px;
+		border-left: 1px solid white;
+	}
+
+	.supply_container{
+		padding: 10px;
+
+	}
+	.product_description{
+		text-align: center;
+		padding: -5px;
+		margin: 5px;
+	}
+/*estilos de las tarjetas*/
+	.group_card{
+		box-shadow:1px 1px 10px rgba(0,0,0,.3); 
+		padding : 10px; 
+		margin-bottom : 20px;
+		margin: 10px;
+	}
+
+	.group_card.card{
+		width: calc( 100% - 20px );
+	}
+	.group_card.gray{
+		background:rgba(0,0,0,.05);
+	}
+	.card_item{
+		padding: 10px;
+	}
+	.readonly{
+		background-color: white !important;
+	}
+
+
+
+	.global_container{
+		position: absolute !important;
+		width: 100% !important;
+		left: 0;
+		top: 0;
+	}
+	.header, .footer{
+		background-color: #718B1E;
+		vertical-align: middle !important;
+		width: 100% !important;
+		left: 0 !important;
+		position: fixed !important;
+		z-index: 4;
+	}
+	.footer{
+		bottom: 0;
+	}
+
+	.content_container{
+		position: relative !important;
+		height: 700px !important;
+		max-height: 700px !important;
+		overflow-y : auto !important;
+		margin-top: 60px;
+	}
+
+	.no_visible{
+		display : none;
+	}
+
+
+	.mnu_item > i{
+		border-radius: 50%;
+		background-color: rgba(0,0,0,.2);
+		padding: 5px;
+	}
+	.mnu_item.active{
+		background-color: rgba(0,0,0,.3);
+	}
+	.invoices_form, .current_invoices_list, 
+	.product_invoices_form{
+		padding: 5%;
+	}
+
+/*estilos de botones de configuracion inicial*/
+	#invoices_initial_config_edit{
+		display : none;
+	}
+/*estilos de buscador*/
+	.search_results_invoice,
+	.productResBusc,
+	.product_location_seeker_response{
+		position: relative;
+		max-width: 100%;
+		width: 100%;
+		box-shadow: 1px 1px 10px rgba( 0, 0, 0, .2);
+	}
+/*estilos de los formularios*/
+	label{
+		font-weight: bold;
+	}
+	.product_description{
+		text-align: center !important;
+	}
+	.hidden{
+		display: none;
+	}
+	input[type="checkbox"] {
+		margin: 5px;
+		transform: scale(1.5);
+	}
+	.product_name,
+	.product_model{
+		font-weight: bold;
+		font-size: 110%;
+		padding: 0;
+		margin : 0;
+	}
+
+/*estilos del pie de página*/
+	.footer{
+		position: fixed !important;
+		top : 92% !important;
+	}
+	.footer>.row{
+		padding: 10px;
+	}
+	.txt_alg_left{
+		text-align: left;
+	}
+	.txt_alg_right{
+		text-align: right;
+	}
+	.txt_alg_center{
+		text-align: center;
+	}
+/*estilos de la tabla*/
+	.table_list>thead>tr>th, 
+	.table_list>tbody>tr>td{
+		font-size: 10px;
+	}
+/**/
+	#product_reset_btn{
+		display: none;
+	}
+
+
+/*estilos del formulario de ubicación*/
+	.new_location_form{
+		height: 0;
+		overflow: hidden;
+	}
+	.product_name_location_form{
+		position: relative !important;
+		width: 100% !important;
+		color: green !important;
+		text-align: center;
+	}
+
+/*estilos de la ventana emergente*/
+	.emergent,
+	.emergent_2{
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		left : 0;
+		top : 0;
+		background-color: rgba( 0, 0, 0, .3);
+		z-index: 100;
+		display: none;
+	}
+	.emergent_2{
+		z-index: 200;
+	}
+	.emergent_content,
+	.emergent_content_2{
+		position: relative;
+		top : 100px;
+		width: 95%;
+		left: 2.5%;
+		max-height: 80%;
+		overflow: auto;
+		background-color: white;
+		box-shadow: 1px 1px 15px rgba( 0, 0, 0, .5 );
+		padding: 20px;
+	}
+	.btn_close_container{
+		position: relative;
+		top: 120px;
+		margin : 0;
+		padding: 0;
+		text-align: right;
+		z-index: 3;
+		display: none;
+	}
+
+	.btn_close_container > button{
+		margin-right: 10px;
+	}
+	.text-center{
+		text-align: center;
+	}
+	.pieces_required{
+		position: relative;
+		top: -10px;
+	}
+	/*#supply_btn_continue,
+	#supply_btn_other_presentation,*/
+	#supply_btn_delete{
+		display: none;
+	}
+	#supply_btn_continue,
+	#supply_btn_other_presentation,
+	#supply_btn_delete{
+		margin-left: 10px;
+	}
+/*password de encargado*/
+	.mng_pss.no{
+		border: 1px solid red;
+	}
+/*instrucciones de surtimiento*/
+	.supply_instructions{
+		font-size: 80%;
+	}
+	.product_boxes_quantity_txt,
+	.product_packs_quantity_txt,
+	.product_pieces_quantity_txt{
+		color: orange;
+	}
+
+	#product_location{
+		color: orange;
+	}
+	.form-control.readonly.text-center{
+		box-shadow: 1px 1px 5px #718B1E;
+	}
+
+	.complete_label,
+	.incomplete_label{
+		font-size: 90%;
+	}
+	/*.supply_instructions{
+		display: none;
+	}*/
+/**/
+	.reasignation_title{
+		font-size: 200%;
+		color: orange;
+		position: relative;
+		width: 100%;
+		text-align: center;
+		font-weight: bold;
+		padding-top: 10%;
+	}
+
+	.reasignation_text{
+		font-size: 150%;
+		color: black;
+		font-weight: bold;
+		text-align: center;
+	}
+
+	.reasignation_icon{
+		position: relative;
+		width: 50%;
+		left: 25%;
+		top : 10%;
+		padding-bottom: 10%;
+	}
+
+	.orange{
+		color: orange;
+	}
+	.red{
+		color: red;
+	}
+	.green{
+		color: green;
+	}
+	/*.form_continue{
+		display : none;
+	}*/
+	.txt_80{
+		font-size: 80% !important;
+	}
+
+	.txt_70{
+		font-size: 70% !important;
+	}
+
+	.manager_password_response{
+		color: red;
+		padding: 3px !important;
+		border: 2px !important;
+		display: none;
+	}
+
+	.header_sticky-0{
+		position: sticky !important;
+		top: 0px;
+		background-color: white;
+	}
+/*radios del surtimiento*/
+	.supply_instructions{
+		display: none;
+	}
+
+	@media screen AND ( max-width: 1000px  ){
+		.content_container{
+			height: 700px !important;
+			max-height: 700px !important;
+		}
+	}

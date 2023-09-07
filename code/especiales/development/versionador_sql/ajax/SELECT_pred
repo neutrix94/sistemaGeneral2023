@@ -1,0 +1,37 @@
+SELECT 
+    ax.PRIMARY_KEY_FIELD,
+    ax.ID_CORTE,
+    ax.FOLIO_CORTE,
+    ax.FECHA_CORTE,
+    ax.CAJERO,
+    SUM( IF( ped.id_pedido IS NOT NULL AND ped.pagado = 1 AND ( ped.fecha_alta BETWEEN CONCAT( ax.FECHA_CORTE, ' ', ax.hora_inicio ) AND CONCAT( ax.FECHA_CORTE, ' ', ax.hora_fin ) ), ped.total, 0 ) ) AS total_ventas,
+    SUM( IF( ped.id_pedido IS NOT NULL AND ped.pagado = 0 AND ( ped.fecha_alta BETWEEN CONCAT( ax.FECHA_CORTE, ' ', ax.hora_inicio ) AND CONCAT( ax.FECHA_CORTE, ' ', ax.hora_fin ) ), ped.total, 0 ) ) AS total_apartados,
+    ax.hora_inicio,
+    ax.hora_fin,
+    ax.id_cajero
+FROM(
+    SELECT
+        sc.folio_unico AS PRIMARY_KEY_FIELD,
+        sc.id_sesion_caja AS ID_CORTE,
+        sc.folio AS FOLIO_CORTE,
+        sc.fecha AS FECHA_CORTE,
+        sc.hora_inicio,
+        sc.hora_fin,
+        CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS CAJERO,
+        sc.id_cajero,
+        sc.id_sucursal
+    FROM ec_sesion_caja sc
+    LEFT JOIN ec_sesion_caja_detalle scd
+    ON scd.id_corte_caja = sc.id_sesion_caja
+    LEFT JOIN sys_users u 
+    ON u.id_usuario = sc.id_cajero
+    WHERE sc.id_sucursal = '4'
+    AND CONCAT( sc.fecha BETWEEN '2022-01-01' AND '2023-01-01' ) 
+)ax
+LEFT JOIN ec_pedidos ped
+ON ped.id_cajero = ax.id_cajero
+AND ped.id_sucursal = ax.id_sucursal
+AND ( ped.fecha_alta BETWEEN CONCAT( ax.FECHA_CORTE, ' ', ax.hora_inicio ) AND CONCAT( ax.FECHA_CORTE, ' ', ax.hora_fin ) )
+LEFT JOIN ec_pedidos_pagos pp
+ON pp.id_pedido = ped.id_pedido
+GROUP BY ax.ID_CORTE

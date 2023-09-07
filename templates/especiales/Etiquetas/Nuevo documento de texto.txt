@@ -1,0 +1,6 @@
+//Se agrega campo buscador (bit 1;0 default) en la tabla sys_grid
+ALTER TABLE `sys_grid` ADD `buscador` BIT(1) NOT NULL DEFAULT b'0' AFTER `funcion_despues_eliminar`;
+//Se agregan campos para búsqueda de precisión y enfoque al insertar
+ALTER TABLE `sys_grid` ADD `campo_coinc` TEXT NULL DEFAULT NULL AFTER `buscador`, ADD `campo_enfoque` TEXT NULL DEFAULT NULL AFTER `campo_coinc`;
+Se agrega campo para generar buscador desordenado
+ALTER TABLE `sys_grid` ADD `consulta_coinc` TEXT NULL DEFAULT NULL AFTER `campo_enfoque`;

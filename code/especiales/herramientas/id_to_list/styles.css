@@ -1,0 +1,18 @@
+.row{
+		width: 100%;
+		max-width: 100% !important;
+		position: relative;
+	}
+	#results{
+		height: 300px;
+		max-height: 300px;
+		overflow-y :auto; 
+		width: 65%;
+		left: 16.5%;
+		position: relative;
+		border : 1px solid;
+	}
+	thead{
+		position: stickly;
+		top : 0;
+	}

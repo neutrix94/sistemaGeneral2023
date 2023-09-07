@@ -1,0 +1,229 @@
+
+	*{
+		margin:0;
+	}
+	.no_visible{
+		display : none;
+	}
+	.global{
+		background-image:url("../../../../img/img_casadelasluces/bg8.jpg");
+		height: 635px;
+		width: 100%;
+	}
+	.enc{
+		padding: 10px; 	 
+		height:80px;
+		background: #718B1E;
+		font-size: 90% !important;
+	}
+	.enc_grid{
+		background: rgba(225,0,0,.5);
+		color: white;
+		padding: 5px;
+		font-size: 80%;
+		text-align: center;
+	}
+	#entrada_temporal{
+		width:96%;
+		height:30px;
+		text-align: right;
+	}
+	.check{
+  		/*-webkit-transform: scale(2); /* Safari and Chrome */
+  		display:none;
+	}
+/*botones*/
+	.clean_remission{
+		display: none;
+	}
+/*estilos de la ventana emergente*/
+	.emergent_content{
+		max-height: 100%;
+		overflow: auto;
+		background-color: white;
+	}
+
+	.emergent_content_2,
+	.emergent_content_3{
+		position: relative;
+		top : 100px;
+		width: 95%;
+		left: 2.5%;
+		background-color: white;
+		padding-top: 20px !important;
+		padding-bottom: 20px !important;
+		max-height: 80%;
+		overflow-y: auto;
+	}
+
+	.remission_option{
+		box-shadow: 1px 1px 5px silver;
+		margin : 10px !important;
+		padding: 10px !important;
+	}
+	/*#input_buscador{padding:10px;width: 250px;border-radius: 15px;}*/
+	#res_busc{
+		background: white;
+		width:375px;
+		max-height: 300px;
+		z-index:2;
+		position:absolute;
+		overflow: auto;
+		display:none;
+		box-shadow: 2px 2px 10px rgba( 0, 0, 0, .4);
+	}
+	.subtitulo{
+		font-size:25px;
+		padding: 10px;
+	}
+	.footer{
+		position:absolute;
+		bottom: 0;
+		height:70px;
+		width: 100%;
+		background:  #718B1E;
+	}
+	.btn_footer{
+		border-radius: 10px;
+		padding: 10px;
+		border:1px solid white;
+		background: silver;
+		text-decoration: none;
+		color: black;
+	}
+	.btn_footer:hover{
+		background: rgba(0,0,0,.6);
+		color: white;
+	}
+	.info_inicial{
+		width:120px;
+		padding: 10px;
+		border-radius: 10px;
+		font-size:16px;
+		text-align: right;
+		color: black;
+	}
+	.contenido_tabla{
+		height: 350px;
+		overflow: scroll;
+		width: 90%;
+		background-color: white;
+	}
+	.opc_busc{
+		height: 30px;
+		color : black;
+		box-shadow: 1px 1px 10px rgba( 0, 0, 0, .5);
+	}
+	.opc_busc:hover{
+		background:rgba(92, 124, 14,.7);
+		color:white;
+	}
+	#receptions_response,
+	#remissions_response{
+		position: relative;
+		overflow: auto;
+		width: 200%;
+		height: 250px;
+		z-index: 2;
+		background: white;
+		left: 0;
+		display: none;
+		color: black;
+	}
+/*Estilos de ventanas emergente*/
+	.emergente,
+	.emergent_2,
+	.emergent_3{
+		position: fixed;
+		top : 0;
+		left: 0;
+		width: 100% !important;
+		height: 100%;
+		background: rgba( 0,0,0,.7);
+		z-index: 5;
+		vertical-align: middle !important;
+		display: none;
+	}
+	.emergent_2{
+		background-color: rgba( 0,0,225,.7 );
+		z-index: 30;
+	}
+	.emergent_3{
+		background-color: rgba( 0,0,0,.7 );
+		z-index: 40;
+	}
+	.emergente>.row{
+		position: relative;
+		top: 10%;
+		height: 80%;
+	}
+
+	.emergente>.row>.col-12{
+		text-align: center;
+		background-color: white;
+		overflow: scroll;
+	}
+	.emrgent_btn_close{
+		background-color: rgba( 225,0,0,.9);
+		color: white;
+		font-size: 20px;
+		position: absolute;
+		right: 7px;
+		top : -36px;
+		width: 5%;
+	}
+/*información de la pantalla*/
+	.helper_txt{
+		position: relative;
+		display: inline-block;
+		height: 50%;
+		width: 100%;
+		text-align: center;
+		vertical-align: middle;
+		margin-top: 10%;
+		font-size: 200%;
+		font-weight: bold;
+	}
+	.prod_prov_tmp_row{
+		background-color: red;
+		color: white;
+	}
+	.product_provider_detail{
+		border: 1px solid black !important;
+	}
+	.label_for_models{
+		margin-left: 20px;
+	}
+
+	#global_seeker_response{
+		width: 30%;
+		position: absolute;
+		height: 250px;
+		max-height: 250px;
+		overflow-y : auto;
+		box-shadow: 1px 1px 10px rgba( 0, 0, 0, .5 );
+		display: none;
+		background-color: white;
+		z-index: 100;
+	}
+
+	.group_card{
+		padding: 10px;
+		box-shadow: 1px 1px 10px rgba( 0, 0, 0, .5 );
+		margin : 3px;
+	}
+
+	.video_container{
+		top : -15%;
+	}
+/*	#frame>img{
+		top : -50% !important;
+	}*/
+
+/*2023*/
+	.header_sticky{
+		position : sticky;
+		top : 0;
+	}
+
+

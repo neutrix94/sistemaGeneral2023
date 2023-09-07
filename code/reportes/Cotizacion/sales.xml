@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<REPORT>
+   <TITLE>Sales Report</TITLE>
+   <BACKGROUND_COLOR>#FFFFFF</BACKGROUND_COLOR>
+   <PAGE BORDER="1" SIZE="25" CELLSPACING="0" CELLPADDING="5" WIDTH="500">
+      <HEADER>
+         <ROW>
+            <COL COLSPAN="5">John Doe Enterprises</COL>
+         </ROW>
+         <ROW>
+            <COL COLSPAN="5">Sales Report</COL>
+         </ROW>
+      </HEADER>        
+   </PAGE>
+     <GROUPS>
+      <GROUP NAME="maingroup">
+         <FIELDS>
+            <ROW>
+               <COL TYPE="FIELD">nombre</COL>
+               <COL TYPE="FIELD">cantidad</COL>
+               <COL TYPE="FIELD" NUMBERFORMATEX="2">precio</COL>
+            </ROW>
+         </FIELDS>
+      </GROUP>
+   </GROUPS>
+</REPORT>

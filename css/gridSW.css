@@ -1,0 +1,424 @@
+/* CSS Document */
+
+/*Combobox o listas*/
+.combos{
+	background-color:#FFFFFF;
+	font-family:  sans-serif;
+	font-size: 12pt;
+	color:#444;
+	border: 1px solid #ccc;
+	padding-left:3px;
+}
+
+/*Textbox de texto editable*/
+.celdaTexto{
+	background-color:#FFFFFF;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:9pt;
+	border-bottom-width:1px;
+	border-bottom-color:#000000;
+	border-top-width:1px;
+	border-top-color:#FFFFFF;
+	border-left-width:1px;
+	border-left-color:#FFFFFF;
+	border-right-width:1px;
+	border-right-color:#000000;
+	color: #333333;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+}
+
+/*Textbox de texto no editable*/
+.celdaTextoD{
+	background-color:#FFFFFF;
+	font-family:"Tahoma", Arial, Helvetica, sans-serif;
+	font-size:9pt;
+	color: #333333;
+}
+
+/*Checkbox*/
+.check{
+	font-family:"Tahoma", Arial, Helvetica, sans-serif;
+	font-size:9pt;
+	color: #333333;
+}
+
+/*Botonoes de cabecera*/
+.buttonHeader{
+	border:none;
+	font-family:  sans-serif;
+	font-size:9pt;
+	
+	background-color:#0098DD;
+	font-weight: bold;
+	color: #fff;
+	
+}
+
+.buttonchecktrue{
+	border-bottom-style:solid;
+	border-left-style:solid;
+	border-right-style:solid;
+	border-top-style:solid;
+	border-bottom-width:1px;
+	border-left-width:1px;
+	border-right-width:1px;
+	border-top-width:1px;
+	border-bottom-color:#000000;
+	border-right-color:#000000;
+	border-top-color:#FFFFFF;
+	border-left-color:#FFFFFF;
+	font-family:"Tahoma", Arial, Helvetica, sans-serif;
+	font-size:8pt;
+	background-color:#E3E6D0;
+	font-weight: bold;
+	color: #333333;
+	background-image: url(../imagenes/general/checkboxfalse.png);
+	background-repeat: no-repeat;
+}
+
+.buttoncheckfalse{
+	border-bottom-style:solid;
+	border-left-style:solid;
+	border-right-style:solid;
+	border-top-style:solid;
+	border-bottom-width:1px;
+	border-left-width:1px;
+	border-right-width:1px;
+	border-top-width:1px;
+	border-bottom-color:#000000;
+	border-right-color:#000000;
+	border-top-color:#FFFFFF;
+	border-left-color:#FFFFFF;
+	font-family:"Tahoma", Arial, Helvetica, sans-serif;
+	font-size:8pt;
+	background-color:#E3E6D0;
+	font-weight: bold;
+	color: #333333;
+	background-image: url(../imagenes/general/checkboxtrue.png);
+	background-repeat: no-repeat;
+}
+
+/*Botonoes de pie de pagina*/
+.buttonFooter{	
+	
+	border-bottom-style:none;
+	border-left-style:none;
+	border-right-style:none;
+	border-top-style:none;
+
+	border-bottom-width:0px;
+	border-left-width:0px;
+	border-right-width:0px;
+	border-top-width:0px;
+		
+	font-family:"Tahoma", Arial, Helvetica, sans-serif;
+	font-size:8pt;
+	background:#1FB6FB;
+	text-align:right;
+}
+
+/*Filas normales en una tabla*/
+.NormalCell{
+	color:#333333;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:9pt;
+	font-weight:normal;
+	text-align: center;
+	background: none repeat scroll 0 0 #fff;
+}
+
+/*Celda de la izquierda que enumera los registros*/
+.Contador{
+	color:#333333;
+	font-family:"Tahoma", Arial, Helvetica, sans-serif;
+	font-size:7pt;
+	font-weight:bold;
+	background-color:#E0E2D6;
+	background-image: url(../imagenes/general/botonB.jpg);
+	background-repeat: repeat;
+}
+.Contador:hover{background-image: url(../imagenes/general/boton.jpg);}
+
+
+/*Filas donde pasa el mouse*/
+.cellMouse{
+	color:#333333;
+	font-family:"Tahoma", Arial, Helvetica, sans-serif;
+	font-size:9pt;
+	font-weight:normal;
+	background-color: #CEFAFF;
+	
+	background-repeat: repeat;
+	text-align: center;
+}
+
+/***Tablas en el grid**/
+.tabla_Grid_RC{
+	border: 1px solid #A8E1E5;
+	background-color: #E6F8FA;
+	/*background-image: url(../imagenes/general/tabla.jpg);*/
+	border-radius:10px;
+}
+
+
+/*********Encabezado de titulo*******************/
+.encabezado_grid{
+	font-size:20px;
+
+	font-family:  sans-serif;
+}
+
+
+/*calendario para los datos tipo fecha*/
+
+/* The main calendar widget.  DIV containing a table. */
+
+div.calendar { position: relative; }
+
+.calendar, .calendar table {
+  border: 1px solid #555;
+  border-radius:2px;
+  font-size: 9pt;
+  color: #000;
+  cursor: default;
+  background: #FFFFFF;
+  font-family:"Tahoma", Arial, Helvetica, sans-serif;
+}
+
+/* Header part -- contains navigation buttons and day names. */
+
+.calendar .button { /* "<<", "<", ">", ">>" buttons have this class */
+  text-align: center;    /* They are the navigation buttons */
+  padding: 2px;          /* Make the buttons seem like they're pressing */
+}
+
+.calendar .nav {
+  background: #778 url(../imagenes/general/menuarrow.gif) no-repeat 100% 100%;
+  background:#CCCCCC;
+}
+
+.calendar thead .title { /* This holds the current "month, year" */
+  font-weight: bold;      /* Pressing it will take you to the current date */
+  text-align: center;
+  background: #F5BB00; font-family:  sans-serif;
+font-size:12pt; 
+  color: #002866;  
+  padding: 2px;
+}
+
+.calendar thead .headrow { /* Row <TR> containing navigation buttons */
+  /*background: #778;*/
+  background:#EEEEEE;
+  color: #000000;
+}
+
+.calendar thead .daynames { /* Row <TR> containing the day names */
+  background: #777;font-size:11pt;
+}
+
+.calendar thead .name { /* Cells <TD> containing the day names */
+  border-bottom: 1px solid #556;
+  padding: 2px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.calendar thead .weekend { /* How a weekend day name shows in header */
+  color: #FFFFFF;
+  
+}
+
+.calendar thead .hilite { /* hover fecha*/
+  background-color: #FFFFFF;
+  color: #002866;
+  border: 1px solid #04f;
+  padding: 1px;
+}
+
+.calendar thead .active { /* Active (pressed) buttons in header */
+  background-color: #003366;
+  padding: 2px 0px 0px 2px;
+}
+
+/* The body part -- contains all the days in month. */
+
+.calendar tbody .day { /* Cells <TD> containing month days dates */
+  width: 2em;
+  color: #013567;
+  text-align: right;
+  padding: 2px 4px 2px 2px;
+}
+.calendar tbody .day.othermonth {
+  font-size: 80%;
+  color: #bbb;
+}
+.calendar tbody .day.othermonth.oweekend {
+  color: #fbb;
+}
+
+.calendar table .wn {
+  padding: 2px 3px 2px 2px;
+  border-right: 1px solid #000;
+  background: #0098DD;
+  color:#FFFFFF;
+}
+
+.calendar tbody .rowhilite td {
+  background: #EEEEEE;
+}
+
+.calendar tbody .rowhilite td.wn {
+  background: #d8e0e4;
+}
+
+.calendar tbody td.hilite { /* Hovered cells <TD> */
+  background: #d8e0e4;
+  padding: 1px 3px 1px 1px;
+  border: 1px solid #bbb;
+}
+
+.calendar tbody td.active { /* Active (pressed) cells <TD> */
+  background: #cde;
+  padding: 2px 2px 0px 2px;
+}
+
+.calendar tbody td.selected { /* Cell showing today date */
+  font-weight: bold;
+  border: 1px solid #000;
+  padding: 1px 3px 1px 1px;
+  background: #fff;  
+}
+
+.calendar tbody td.weekend { /* Cells showing weekend days */
+  color:#03A6BF;
+}
+
+.calendar tbody td.today { /* Cell showing selected date */
+  font-weight: bold;
+  color: #FFF;border-radius: 4px;border:none;
+  background:#555;
+}
+
+.calendar tbody .disabled { color: #999; }
+
+.calendar tbody .emptycell { /* Empty cells (the best is to hide them) */
+  visibility: hidden;
+}
+
+.calendar tbody .emptyrow { /* Empty row (some months need less than 6 rows) */
+  display: none;
+}
+
+/* The footer part -- status bar and "Close" button */
+
+.calendar tfoot .footrow { /* The <TR> in footer (only one right now) */
+  text-align: center;
+  background: #556;
+  color: #fff;
+}
+
+.calendar tfoot .ttip { /* Tooltip (status bar) cell <TD> */
+  background: #fff;
+  color: #445;
+  border-top: 1px solid #556;
+  padding: 1px;
+}
+
+.calendar tfoot .hilite { /* Hover style for buttons in footer */
+  background: #d8e0e4;
+  border: 1px solid #003399;
+  color: #000;
+  padding: 1px;
+}
+
+.calendar tfoot .active { /* Active (pressed) style for buttons in footer */
+  background: #77c;
+  padding: 2px 0px 0px 2px;
+}
+
+/* Combo boxes (menus that display months/years for direct selection) */
+
+.calendar .combo {
+  position: absolute;
+  display: none;
+  top: 0px;
+  left: 0px;
+  width: 4em;
+  cursor: default;
+  border: 1px solid #655;
+  background: #def;
+  color: #000;
+  font-size: 90%;
+  z-index: 100;
+}
+
+.calendar .combo .label,
+.calendar .combo .label-IEfix {
+  text-align: center;
+  padding: 1px;
+}
+
+.calendar .combo .label-IEfix {
+  width: 4em;
+}
+
+.calendar .combo .hilite {
+  background: #d8e0e4;  
+}
+
+.calendar .combo .active {
+  border-top: 1px solid #46a;
+  border-bottom: 1px solid #46a;
+  background: #d8e0e4;
+  font-weight: bold;
+}
+
+.calendar td.time {
+  border-top: 1px solid #000;
+  padding: 1px 0px;
+  text-align: center;
+  background-color: #f4f0e8;
+}
+
+.calendar td.time .hour,
+.calendar td.time .minute,
+.calendar td.time .ampm {
+  padding: 0px 3px 0px 4px;
+  border: 1px solid #889;
+  font-weight: bold;
+  background-color: #fff;
+}
+
+.calendar td.time .ampm {
+  text-align: center;
+}
+
+.calendar td.time .colon {
+  padding: 0px 2px 0px 3px;
+  font-weight: bold;
+}
+
+.calendar td.time span.hilite {
+  border-color: #000;
+  background-color: #d8e0e4;
+  color: #fff;
+}
+
+.calendar td.time span.active {
+  border-color: #f00;
+  background-color: #000;
+  color: #0f0;
+}
+
+.paginador_GridRC {
+	font-family:"Tahoma", Arial, Helvetica, sans-serif;
+	font-size: 15px;
+	color:#fff;font-family:  sans-serif;
+}
+#celda_listado_paginador{background:#1FB6FB;}
+#Body_listado{background:rgba(255,255,255,0.3);}
+#detallepedido{box-shadow:1px 1px 1px #333;}
+#celda_comisiones_paginador,#celda_prospectos_paginador{background:#1FB6FB; border-radius:0 0 3px 3px;}
