@@ -9,9 +9,11 @@
 		}*/
 		if( type == 0 ){
 			assign_has_changed = 1;
-			$( obj ).parent('td').parent('tr').css( 'background-color', ( $( obj ).prop( 'checked' ) ?  '' : 'rgba(225, 0, 0, .3)' ) );			
-		//IMPLEMENTACION OSCAR 2023 PARA EMERGENTE DE ASIGNACION DE PARTIDAS
-			getReasignationDetailView( counter );
+			if( $( obj ).prop( 'checked' ) == false ){
+				$( obj ).parent('td').parent('tr').css( 'background-color', ( $( obj ).prop( 'checked' ) ?  '' : 'rgba(225, 0, 0, .3)' ) );			
+			//IMPLEMENTACION OSCAR 2023 PARA EMERGENTE DE ASIGNACION DE PARTIDAS
+				getReasignationDetailView( counter );
+			}
 		}
 	}
 
