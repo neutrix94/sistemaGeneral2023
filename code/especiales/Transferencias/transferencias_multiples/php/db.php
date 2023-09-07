@@ -547,7 +547,7 @@
 		while( $count = $getCounts->fetch_row() ){
 		//actualiza cabeceras de surtimiento
 			$sql = "UPDATE ec_transferencias_surtimiento
-						SET id_status_asignacion = 1/*IF( id_status_asignacion = 5, 5, 1 ),*/
+						SET id_status_asignacion = 1,/*IF( id_status_asignacion = 5, 5, 1 )*/
 						total_partidas = ({$count[1]}) /*impelemntacion Oscar 2023 para actualizar el numero de partidas*/ 
 					WHERE id_transferencia_surtimiento = {$count[0]}";
 			$link->query( $sql ) or die( "Error al actualizar cabeceras de surtimiento : " . $link->error );
