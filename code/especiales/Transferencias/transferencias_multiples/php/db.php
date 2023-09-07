@@ -530,6 +530,10 @@
 			
 			}
 		}
+		$condition = "";
+		if( $invalids != '' ){
+			$condition = "AND ts.id_transferencia_surtimiento NOT IN( {$invalids} )";
+		}
 		$sql = "SELECT 
 					ts.id_transferencia_surtimiento,
 					COUNT( tsd.id_surtimiento_detalle ) 
@@ -537,12 +541,13 @@
 				LEFT JOIN ec_transferencias_surtimiento_detalle tsd
 				ON ts.id_transferencia_surtimiento = tsd.id_transferencia_surtimiento
 				WHERE ts.id_transferencia = {$transfer_id}
-				GROUP BY id_transferencia_surtimiento";
+				{$condition}
+				GROUP BY ts.id_transferencia_surtimiento";
 		$getCounts = $link->query( $sql ) or die( "Error al consultar los contadores : {$link->error}" );
 		while( $count = $getCounts->fetch_row() ){
 		//actualiza cabeceras de surtimiento
 			$sql = "UPDATE ec_transferencias_surtimiento
-						SET id_status_asignacion = IF( id_status_asignacion = 5, 5, 1 ),
+						SET id_status_asignacion = 1,/*IF( id_status_asignacion = 5, 5, 1 )*/
 						total_partidas = ({$count[1]}) /*impelemntacion Oscar 2023 para actualizar el numero de partidas*/ 
 					WHERE id_transferencia_surtimiento = {$count[0]}";
 			$link->query( $sql ) or die( "Error al actualizar cabeceras de surtimiento : " . $link->error );
