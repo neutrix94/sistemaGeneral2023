@@ -13,10 +13,11 @@
 	eventSource.onmessage = function(event) {
 	    const messageContainer = document.getElementById('message-container');
 	    if ( event.data != '' && event.data != null ) {
-	    	messageContainer.innerHTML += '<p>' + event.data + '</p>';
+	    	//messageContainer.innerHTML += '<p>' + event.data + '</p>';
+        	$( '.emergent_content' ).html( `<h2 class="text-success text-center">${event.data}</h2> );
         	eventSource.close(); // Cierra la conexión SSE
         	//console.log('Conexión SSE detenida.');
-        	alert( "Cobro exitoso!" );
+        	//alert( "Cobro exitoso!" );
         	setTimeout( function(){
         		$( '.emergent_content' ).html( '' );
         		$( '.emergent' ).css( 'display', 'none' );
