@@ -47,6 +47,8 @@
 				refresh_token, expires_in, scope, jti ) VALUES ( NULL, '{$terminal_id}', '{$result->access_token}', '{$result->token_type}', 
 				'{$result->refresh_token}', '{$result->expires_in}', '{$result->scope}', '{$result->jti}' )";
 			$this->link->query( $sql ) or die( "Error al insertar el token en la base de datos : {$this->link->error}" );
+			
+			$response = $this->getToken( $terminal_id );
 			return $response;
 		}
 
@@ -105,6 +107,9 @@
 	//peticion de venta
 		public function salePetition(  $apiUrl, $amount = 0.01, $terminal_id = '1494113052' ){
 			$token = $this->getToken( $terminal_id );
+			if( sizeof($token) == 0 || $token == null ){
+				$token = $this->requireToken( $terminal_id = '1494113052', $grantType = 'password', $user = 'Nacional', $password = 'netpay' );
+			}
 			$petition_id = $this->insertNetPetitionRow();
 		//arreglo de prueba
 			$data = array( "traceability"=>array(  "idProducto"=>"1800", "idTienda"=>"1" ),

@@ -42,11 +42,6 @@
 			    // Flushea el búfer de salida para asegurarse de que el mensaje se envíe inmediatamente
 			    ob_flush();
 			    flush();
-			}else{
-			    echo "data: Sin respuesta\n\n";
-			    // Flushea el búfer de salida para asegurarse de que el mensaje se envíe inmediatamente
-			    ob_flush();
-			    flush();
 			}
 		}
 		$c ++;
