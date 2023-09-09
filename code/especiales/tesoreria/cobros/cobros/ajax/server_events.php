@@ -27,7 +27,7 @@
 	set_time_limit(0);
 
 	// Puedes ajustar el intervalo de retransmisión como desees
-	$retryInterval = 2000;
+	$retryInterval = 5000;
 	$c = 0;
 
 	while (true) {
