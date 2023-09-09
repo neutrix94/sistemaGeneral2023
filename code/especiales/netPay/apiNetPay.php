@@ -98,7 +98,7 @@
 		}
 		public function insertNetPetitionRow(){
 			$sql = "INSERT INTO vf_transacciones_netpay ( id_transaccion_netpay ) VALUES ( NULL )";
-			$stm = $this->link->query( $sql ) or die( "Error al insrtar el id de transaccion netPay : {$this->link->error}" );
+			$stm = $this->link->query( $sql ) or die( "Error al insertar el id de transaccion netPay : {$this->link->error}" );
 			$sql = "SELECT LAST_INSERT_ID()";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el ultimo id insertado : {$this->link->error}" );
 			$row = $stm->fetch_row();

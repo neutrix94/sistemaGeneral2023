@@ -12,10 +12,10 @@
 	// Define una función para manejar los mensajes entrantes
 	eventSource.onmessage = function(event) {
 	    const messageContainer = document.getElementById('message-container');
-	    messageContainer.innerHTML += '<p>' + event.data + '</p>';
-	    if ( event.data  === 'canceled' ) {
+	    if ( event.data != '' && event.data != null ) {
+	    	messageContainer.innerHTML += '<p>' + event.data + '</p>';
         	eventSource.close(); // Cierra la conexión SSE
-        	console.log('Conexión SSE detenida.');
+        	//console.log('Conexión SSE detenida.');
         	alert( "Cobro exitoso!" );
         	setTimeout( function(){
         		$( '.emergent_content' ).html( '' );
