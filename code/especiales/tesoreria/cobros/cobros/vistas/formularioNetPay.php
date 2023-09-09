@@ -14,7 +14,7 @@
 	    const messageContainer = document.getElementById('message-container');
 	    if ( event.data != '' && event.data != null ) {
 	    	//messageContainer.innerHTML += '<p>' + event.data + '</p>';
-        	$( '.emergent_content' ).html( `<h2 class="text-success text-center">${event.data}</h2> );
+        	$( '.emergent_content' ).html( `<h2 class="text-success text-center">${event.data}</h2>` );
         	eventSource.close(); // Cierra la conexión SSE
         	//console.log('Conexión SSE detenida.');
         	//alert( "Cobro exitoso!" );
