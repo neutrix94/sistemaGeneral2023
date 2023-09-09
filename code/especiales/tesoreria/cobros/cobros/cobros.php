@@ -137,17 +137,15 @@
 	</div>
 
 	<div class="row header">
-		<table  width="100%" style="color:white;font-size: 25px;">
-			<tr>
-				<td>
-					<b>Cobro de Tickets</b>	
-				</td>
-				<td align="right">
-					<b>Sucursal:</b> <?php echo $sucursal;?><br>
-					<b>Cajero:</b> <?php echo $usuario;?>					
-				</td>
-			</tr>
-		</table>
+		<!--div class="col-4">
+			<b>Cobro de Tickets</b>	
+		</div-->
+		<div class="col-6 text-center">
+			<b>Sucursal:</b> <?php echo $sucursal;?>
+		</div>
+		<div class="col-6 text-center">
+			<b>Cajero:</b> <?php echo $usuario;?>	
+		</div>
 	</div>
 	<div class="contenido" align="center">
 	<!---->

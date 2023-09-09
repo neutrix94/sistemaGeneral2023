@@ -24,10 +24,10 @@
 	}
 
 	// Establece un tiempo máximo de ejecución del script en infinito
-	set_time_limit(0);
+	set_time_limit(60);
 
 	// Puedes ajustar el intervalo de retransmisión como desees
-	$retryInterval = 5000;
+	$retryInterval = 2000;
 	$c = 0;
 
 	while (true) {
