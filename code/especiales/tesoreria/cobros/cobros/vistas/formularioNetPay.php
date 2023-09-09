@@ -7,7 +7,7 @@
 <script>
 	// Crea una nueva conexión SSE
 	var server_url = 'ajax/server_events.php?transaction_id=<?php echo $resp->petition_id;?>';
-	alert( server_url );
+	//alert( server_url );
 	const eventSource = new EventSource( server_url );
 	// Define una función para manejar los mensajes entrantes
 	eventSource.onmessage = function(event) {

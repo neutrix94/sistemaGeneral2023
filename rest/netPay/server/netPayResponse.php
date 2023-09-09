@@ -122,7 +122,7 @@ $app->post('/', function (Request $request, Response $response){
   $stm = $link->query( $sql ) or die( "Error al insertar el reistro de transaccion : {$link->error}" );
   $resp = array(
     "code"=>"00",
-    "message"=>$response_message
+    "message"=>$message
   );
   return json_encode( $resp );
 });
