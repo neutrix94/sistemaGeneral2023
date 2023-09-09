@@ -341,3 +341,10 @@
 </div>
 </body>
 </html>
+
+<script type="text/javascript">
+	window.addEventListener('beforeunload', function(event) {
+  event.preventDefault();
+  event.returnValue = ''; // Este valor puede ser una cadena vacía
+});
+</script>
