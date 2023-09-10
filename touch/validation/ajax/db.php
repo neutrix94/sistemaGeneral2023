@@ -1177,7 +1177,14 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 					pp.id_producto AS product_id,
 					CONCAT( p.nombre, ' <b>( ', GROUP_CONCAT( pp.clave_proveedor SEPARATOR ', ' ), ' ) </b>', 
 						IF( p.es_ultimas_piezas = '1', CONCAT(' <span class=\"color_red\">$ ', pd.precio , '</span>' ), '' )
-					) AS name
+					) AS name,
+					IF( pp.codigo_barras_pieza_1 = '', 
+						IF( pp.codigo_barras_pieza_2 = '',
+							pp.codigo_barras_pieza_3,
+							pp.codigo_barras_pieza_2
+						),
+						pp.codigo_barras_pieza_1 
+					) AS barcode/*oscar 2023 para emergente de ultimas piezas*/
 				FROM ec_pedidos_detalle pd
 				LEFT JOIN ec_productos p
 				ON p.id_productos = pd.id_producto
@@ -1195,14 +1202,28 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
  
 			$resp = "seeker|";
 			$c = 0;
+	/*//aqui esta el detalle de ultimas piezas
 			while ( $row_name = $stm_name->fetch_assoc() ) {
 				/*$resp .= "<div class=\"group_card\" id=\"response_seeker_{$c}\" onclick=\"setProductByName( {$row_name['product_id']}, {$row_name['sale_detail_id']}, 1 );\">";
 					$resp .= "<p>{$row_name['name']}</p>";
 				$resp .= "</div>";
-				$c ++;	*/
+				$c ++;	
+			}
+		se puede arreglar con esto :	
+			if( $stm->num_rows > 1 && $found_by_name != 1 ){
+				return $this->buildLastPiecesForm( $stm );
+			}
+		*/	
+		/*oscar 2023 para emergente de ultimas piezas*/
+			if( $stm_name->num_rows > 1 ){
+				$row = $stm_name->fetch_assoc();
+				$resp = $this->validateProductBarcode( $row['barcode'], $ticket_id, $form_pieces, $user, $sucursal, 
+				$pieces_number = null, '', '' );
+			}else{
+				$row_name = $stm_name->fetch_assoc();
 				$resp .= "{$row_name['product_id']}|{$row_name['sale_detail_id']}";
 			}
-
+		/**/
 			//echo $resp;
 			return $resp;
 		}
