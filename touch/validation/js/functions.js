@@ -170,6 +170,7 @@ var global_view = '';
 				$( `#${id}_response` ).css( 'display', 'block' );*/
 				//alert(aux[1] + '!= ' + aux[2] );
 				if( aux[1] != '' && aux[2] != '' ){
+					//alert( aux[1] + " , " + aux[2] );
 					setProductByName( aux[1], aux[2], 1 );
 					$( '.emergent' ).focus();
 				}else{
