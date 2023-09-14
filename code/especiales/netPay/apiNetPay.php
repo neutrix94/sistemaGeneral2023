@@ -125,11 +125,13 @@
 			return $row;
 		}
 	//peticion de venta
-		public function salePetition(  $apiUrl, $amount = 0.01, $terminal_id ){
+		public function salePetition(  $apiUrl, $amount = 0.01, $terminal_id, $user_id, $store_id, $sale_folio, $session_id ){
 			
 			$terminal = $this->getTerminal( $terminal_id );
 			//var_dump( $terminal );
 			$token = $this->getToken( $terminal['terminal_serie'] );
+			//var_dump( $token );
+			//return '';
 			if( sizeof($token) == 0 || $token == null ){
 				$token = $this->requireToken( $terminal['terminal_serie'], 'password', 'Nacional', 'netpay' );
 			}
@@ -137,11 +139,10 @@
 		//arreglo de prueba
 			$data = array( 
 						"traceability"=>array(  
-							"id_sucursal"=>"", 
-							"id_cajero"=>"1", 
-							"folio_venta"=>"", 
-							"folio_unico_pago"=>"", 
-							"id_cajero_cobro"=>"" 
+							"id_sucursal"=>"{$store_id}", 
+							"id_cajero"=>"{$user_id}", 
+							"folio_venta"=>"{$sale_folio}", 
+							"id_sesion_cajero"=>"{$session_id}"
 						),
 			            "serialNumber"=>"{$terminal['terminal_serie']}",
 			            "amount"=> $amount,
@@ -177,7 +178,8 @@
 				if( $result->error == 'invalid_token' ){//token expirado
 					//die( 'here' );
 					$this->refreshToken( $token, $terminal['terminal_serie'] );
-					return $this->salePetition(  $apiUrl, $amount = 0.01, $terminal['terminal_serie'] );//$terminal_id = '1494113052'
+					return $this->salePetition( $apiUrl, $amount = 0.01, $terminal['terminal_serie'], $user_id, 
+										$store_id, $sale_folio, $session_id );//$terminal_id = '1494113052'
 				}
 			}
 			$result = json_encode( $result, true );
@@ -186,13 +188,20 @@
 			//return $response;
 		}
 	//cancelacion de cobro
-		public function saleCancelation( $apiUrl, $orderId, $terminal ){
+		public function saleCancelation( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id ){
 			$token = $this->getToken( $terminal );
 			if( sizeof($token) == 0 || $token == null ){
 				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
 			}
+			$petition_id = $this->insertNetPetitionRow();
 		//arreglo de prueba
-			$data = array( "traceability"=>array(  "idProducto"=>"1800", "idTienda"=>"1" ),
+			$data = array( "traceability"=>array(   
+							"id_sucursal"=>"{$store_id}", 
+							"id_cajero"=>"{$user_id}", 
+							"folio_venta"=>"{$sale_folio}", 
+							"id_sesion_cajero"=>"{$session_id}",
+							"petition_id"=>"{$petition_id}"
+						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
 			            "storeId"=>"9194",
@@ -217,20 +226,35 @@
 			  ),
 			));
 
+			/*$response = curl_exec($curl);
+			curl_close($curl);
+			return $response;*/
 			$response = curl_exec($curl);
 			curl_close($curl);
-			return $response;
+			$result = json_decode( $response );//json_encode(),
+			$result->petition_id = $petition_id; 
+			//var_dump($response);
+			//die( '' );
+			$result = json_encode( $result, true );
+			return $result;
 		}
 
 		//}
 	//reimpresion de cobro
-		public function saleReprint( $apiUrl, $orderId, $terminal ){
+		public function saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id ){
 			$token = $this->getToken( $terminal );
 			if( sizeof($token) == 0 || $token == null ){
 				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
 			}
+			$petition_id = $this->insertNetPetitionRow();
 		//arreglo de prueba
-			$data = array( "traceability"=>array(  "idProducto"=>"1800", "idTienda"=>"1" ),
+			$data = array( "traceability"=>array(   
+							"id_sucursal"=>"{$store_id}", 
+							"id_cajero"=>"{$user_id}", 
+							"folio_venta"=>"{$sale_folio}", 
+							"id_sesion_cajero"=>"{$session_id}",
+							"petition_id"=>"{$petition_id}"
+						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
 			            "storeId"=>"9194",
@@ -257,9 +281,12 @@
 
 			$response = curl_exec($curl);
 			curl_close($curl);
+			$result = json_decode( $response );//json_encode(),
+			$result->petition_id = $petition_id; 
 			//var_dump($response);
 			//die( '' );
-			return $response;
+			$result = json_encode( $result, true );
+			return $result;
 		}
 	}
 ?>

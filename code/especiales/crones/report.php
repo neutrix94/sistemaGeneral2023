@@ -9,52 +9,52 @@
 
 		}
 		function enviar_email( $contenido_correo ){
-		include("../../../include/PHPMailer/PHPMailerAutoload.php");
-	/*formacion del email*/
-	/*	$mail = new PHPMailer();	
-		$mail->IsSMTP(true);
-        $mail->SMTPAuth = true;
-		$mail->From = 'facturacion@lacasadelasluces.com';
-	    $mail->FromName = "Cron de Verificación de inventarios v1.0";
-	    $mail->Username = 'facturacion@lacasadelasluces.com';
-	    $mail->Mailer = "smtp";
-	    $mail->SMTPSecure = 'ssl';
-	    $mail->Host = 'mail.lacasadelasluces.com';
-	    $mail->Password = 'Macronet03*';
-	    $mail->Port = '465';
-	    $mail->CharSet = 'UTF-8';
-    	$mail->addAddress('neutrixsound@gmail.com');
-    	$mail->Subject =utf8_decode('Reporte de inventarios CRON ' . date('Y-m-d H:i:s'));
-		$mail->Body =utf8_decode($contenido_correo);
-		$mail->IsHTML(true);	*/
-		
-		$mail = new PHPMailer();
-	    $mail->IsSMTP(true);
-        $mail->SMTPAuth = true;
-        $mail->From = "avisos@lacasadelasluces.com.mx";
-        $mail->FromName = "Avisos Casa de las Luces";
-        $mail->Username = "avisos@lacasadelasluces.com.mx";
-        $mail->Mailer = "smtp";
-        $mail->SMTPSecure = "ssl";
-        $mail->Host = "mail.lacasadelasluces.com.mx";//dedi-268298.casadelasluces.com
-        $mail->Password = "(etU4H*Dk*Pf";
-        $mail->Port = 465;
-        $mail->CharSet = 'UTF-8';
-        
-    	$mail->addAddress('neutrixsound@gmail.com');/*$row[4], $row[5] , 'Oscar Mendoza'*/
-    	//$mail->addAddress('pedroestrada1978@gmail.com');//, 'Pedro Estrada'
-    	//$mail->addAddress('cdelasluces@gmail.com');//, 'Pedro Estrada'
-    	$mail->Subject =utf8_decode('Reporte de inventarios CRON ' . date('Y-m-d H:i:s'));
-		$mail->Body =utf8_decode($contenido_correo);
-		$mail->IsHTML(true);
-		
-		if (!$mail->send()){
-			echo ("Error al enviar el Correo: " . $mail->ErrorInfo);
-		}else{
-			echo "Correo exitoso enviado para monitoreo";
-		}	
+			include("../../../include/PHPMailer/PHPMailerAutoload.php");
+		/*formacion del email*/
+		/*	$mail = new PHPMailer();	
+			$mail->IsSMTP(true);
+	        $mail->SMTPAuth = true;
+			$mail->From = 'facturacion@lacasadelasluces.com';
+		    $mail->FromName = "Cron de Verificación de inventarios v1.0";
+		    $mail->Username = 'facturacion@lacasadelasluces.com';
+		    $mail->Mailer = "smtp";
+		    $mail->SMTPSecure = 'ssl';
+		    $mail->Host = 'mail.lacasadelasluces.com';
+		    $mail->Password = 'Macronet03*';
+		    $mail->Port = '465';
+		    $mail->CharSet = 'UTF-8';
+	    	$mail->addAddress('neutrixsound@gmail.com');
+	    	$mail->Subject =utf8_decode('Reporte de inventarios CRON ' . date('Y-m-d H:i:s'));
+			$mail->Body =utf8_decode($contenido_correo);
+			$mail->IsHTML(true);	*/
+			
+			$mail = new PHPMailer();
+		    $mail->IsSMTP(true);
+	        $mail->SMTPAuth = true;
+	        $mail->From = 'facturacion2023@sistemageneralcasa.com';//"avisos@lacasadelasluces.com.mx";
+	        $mail->FromName = "Resultado del CRON Sistema General";
+	        $mail->Username = "facturacion2023@sistemageneralcasa.com";
+	        $mail->Mailer = "smtp";
+	        $mail->SMTPSecure = "ssl";
+	        $mail->Host = "mail.sistemageneralcasa.com";//dedi-268298.casadelasluces.com
+	        $mail->Password = "!PgCq&2CkXG~";
+	        $mail->Port = 465;
+	        $mail->CharSet = 'UTF-8';
+	        
+	    	$mail->addAddress('neutrixsound@gmail.com');/*$row[4], $row[5] , 'Oscar Mendoza'*/
+	    	$mail->addAddress('pedroestrada1978@gmail.com');//, 'Pedro Estrada'
+	    	$mail->addAddress('fer.mb131197@gmail.com');//, 'Fernanda Medina'
+	    	$mail->Subject =utf8_decode('Reporte de CRON ' . date('Y-m-d H:i:s'));
+			$mail->Body =utf8_decode($contenido_correo);
+			$mail->IsHTML(true);
+			
+			if (!$mail->send()){
+				echo ("Error al enviar el Correo: " . $mail->ErrorInfo);
+			}else{
+				echo "Correo exitoso enviado para monitoreo";
+			}	
 
-	}
+		}
 
 	function genera_descarga_csv( $data ){
 	//reemplaza etiquetas
