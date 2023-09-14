@@ -97,18 +97,20 @@
   $eje=mysql_query($sql)or die("Error al consultar el permiso de cajero!!!<br>".mysql_error()."<br>".$sql);
   $es_cajero=mysql_fetch_row($eje);
   if($es_cajero[0]==1){
+/*
+  Deshabilitado por Oscar 2023 para cobros
     $sql="SELECT multicajero FROM ec_configuracion_sucursal WHERE id_sucursal=$user_sucursal";
     $eje=mysql_query($sql)or die("Error al consultar si la sucursal es multicajero!!!<br>".mysql_error());
     $r_c=mysql_fetch_row($eje);
    // die('here');
-    if($r_c[0]==1){
+    if($r_c[0]==1){*/
 ?>
     <p align="center" class="pqt" style="top:70%;" onclick="location.href='../code/especiales/tesoreria/cobros/cobros.php?';">
       <img src="img/cobros.png" height="70%" width="70%" title="ingresae para cobrar ventas">
       <br>Cobrar
     </p>
 <?php
-  }
+//  }
 }
 ?>
 </div>

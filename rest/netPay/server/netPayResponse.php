@@ -119,7 +119,9 @@ $app->post('/', function (Request $request, Response $response){
             /*40*/transactionCertificate = '{$transactionCertificate}',
             /*41*/transactionId = '{$transactionId}'
           WHERE id_transaccion_netpay = '{$folioNumber}'";
-  $stm = $link->query( $sql ) or die( "Error al insertar el reistro de transaccion : {$link->error}" );
+  $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
+//inserta el cobro del cajero
+  
   $resp = array(
     "code"=>"00",
     "message"=>$message

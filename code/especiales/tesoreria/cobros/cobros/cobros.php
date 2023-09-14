@@ -1,73 +1,15 @@
 <?php
 	include('../../../../../conectMin.php');
+	include('../../../../../conexionMysqli.php');
+	include('ajax/db.php');
+	$Payments = new Payments( $link );//instancia clase de pagos
+	$Payments->checkAccess( $user_id );//verifica permisos
+	$tarjetas_cajero = $Payments->getTerminals( $user_id );//afiliaciones por cajero
+	$cajas = $Payments->getBoxesMoney( $sucursal_id );//cheque o transferencia 
 	/*if($perfil_usuario!=7){
 		die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla!!!\nContacte al administrador desl sistema!!!");location.href="../../../../index.php?";</script>');
 	}*/
-	$sql="SELECT IF(p.ver=1 OR p.modificar=1,1,0) 
-			FROM sys_permisos p
-			LEFT JOIN sys_users_perfiles perf ON perf.id_perfil=p.id_perfil
-			LEFT JOIN sys_users u ON u.tipo_perfil=perf.id_perfil 
-			WHERE p.id_menu=200
-			AND u.id_usuario=$user_id";
-	//die($sql);
-	$eje=mysql_query($sql)or die("Error al consultar el permiso de cajero!!!<br>".mysql_error()."<br>".$sql);
-	$es_cajero=mysql_fetch_row($eje);
-	if($es_cajero[0]==0){
-		die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla!!!\nContacte al administrador desl sistema!!!");location.href="../../../../index.php?";</script>');
-	}
-//validamos que haya una sesion de caja iniciada con este cajero; de lo contrario avisamos que no hay sesión de caja y no dejamos acceder a esta pantalla
-	$sql="SELECT count(id_sesion_caja) FROM ec_sesion_caja WHERE id_cajero=$user_id AND hora_fin='00:00:00' AND fecha=current_date()";
-//	die($sql);
-	$eje=mysql_query($sql)or die("Error al verificar si ya existe una sesion de caja para este cajero!!!\n".mysql_error());
-	$r=mysql_fetch_row($eje);
-	if($r[0]!=1){
-		die('<script>alert("Es necesario abrir caja antes de cobrar!!!");location.href="../../../../code/especiales/tesoreria/abreCaja/abrirCaja.php?";</script>');
-	}
-//sacamos información de las afiliaciones
-	$sql="SELECT a.id_afiliacion,a.no_afiliacion 
-		FROM ec_afiliaciones a
-		LEFT JOIN ec_afiliaciones_cajero ac ON ac.id_afiliacion=a.id_afiliacion
-		WHERE ac.id_cajero='$user_id' AND ac.activo=1";
-	$eje=mysql_query($sql)or die("Error al consultar las afiliaciones para este cajero!!!<br>".mysql_error());
-	//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
-	$tarjetas_cajero='';
-	$c=0;
-	while($r=mysql_fetch_row($eje)){
-		$c++;
-		$tarjetas_cajero.='<tr>';
-			$tarjetas_cajero.='<td colspan="2" class="subtitulo"><p style="font-size:20px;margin:0;" align="center">Tarjeta '.$c.':</p></td>';
-		$tarjetas_cajero.='</tr>';
-		$tarjetas_cajero.='<tr>';
-			$tarjetas_cajero.='<td align="center">';
-				$tarjetas_cajero.='<select id="tarjeta_'.$c.'" class="form-select"><option value="'.$r[0].'">'.$r[1].'</option>';
-			$tarjetas_cajero.='</td>';
-			$tarjetas_cajero.='<td>';
-				$tarjetas_cajero .= "<div class=\"input-group\">
-						<input type=\"number\" class=\"form-control\" id=\"t{$c}\" value=\"\" 
-						onkeydown=\"prevenir(event);\" onkeyup=\"valida_tca(this,event,1,'.$c.');\">
-						<button
-							class=\"btn btn-primary\"
-							onclick=\"sendTerminalPetition( {$c}, {$r[0]} );\"
-						>
-							<i class=\"icon-credit-card-alt\"></i>
-						</button>
-						</div>";
-			$tarjetas_cajero.='</td>';
-		$tarjetas_cajero.='</tr>';	
-	}
-	echo '<input type="hidden" id="cantidad_tarjetas" value="'.$c.'">';
-//cehque o transferencia 
-	$sql="SELECT bc.id_caja_cuenta,bc.nombre 
-		FROM ec_caja_o_cuenta bc
-		LEFT JOIN ec_caja_o_cuenta_sucursal bcs ON bc.id_caja_cuenta=bcs.id_caja_o_cuenta 
-		WHERE bcs.estado_suc=1
-		AND bcs.id_sucursal='$user_sucursal'";
-	$eje=mysql_query($sql)or die("Error al listar los bancos o cajas!!!<br>".mysql_error());
-	$cajas='<select id="caja_o_cuenta" class="form-select"><option value="0">--SELECCIONAR--</option>';
-	while($r=mysql_fetch_row($eje)){
-		$cajas.='<option value="'.$r[0].'">'.$r[1].'</option>';
-	}
-	$cajas.='</select>';
+
 	$eje=mysql_query($sql)or die("Error al consultar afiliaciones del id_cajero!!!<br>".mysql_error());
 	$sql="SELECT CONCAT(u.nombre,' ',u.apellido_paterno,' ',u.apellido_materno) as nombre,s.nombre
 		FROM sys_users u 
@@ -77,21 +19,6 @@
 	$r=mysql_fetch_row($eje_datos);
 	$usuario=$r[0];
 	$sucursal=$r[1];
-/*informacion de bancos
-	$sql="SELECT cc.id_caja_cuenta,cc.nombre
-		FROM ec_caja_o_cuenta cc
-		LEFT JOIN ec_caja_o_cuenta_sucursal cs ON cs.id_caja_o_cuenta=cc.id_caja_cuenta
-		WHERE cs.id_sucursal='$user_sucursal'
-		AND cs.estado_suc=1";
-	$eje_bancos=mysql_query($sql)or die("Error al consultar las cajas por susucrsal!!!<br>".mysql_error());
-	$bancos='<select id="baco_o caja" class="entrada_num"><option value="0">--SELECCIONAR--</option>';
-	if(mysql_num_rows($eje_bancos)<=0){
-		$bancos.='<option value="0">No hay cajas o cuentas par esta sucursal</option>';
-	}
-	while($r=mysql_fetch_row($eje_bancos)){
-		$bancos.='<option value="'.$r[0].'">'.$r[1].'</option>';
-	}
-	$bancos.='</option>';*/
 ?>
 <!DOCTYPE html>
 <html>
@@ -102,6 +29,7 @@
 	<script type="text/javascript" src="../../../../../js/jquery-1.10.2.min.js"></script>
 	<script type="text/javascript" src="js/functions.js"></script>
 	<script type="text/javascript" src="js/apis.js"></script>
+	<script type="text/javascript" src="js/builder.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../../../../css/bootstrap/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="../../../../../css/icons/css/fontello.css">
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
@@ -136,83 +64,115 @@
 		</div>
 	</div>
 
-	<div class="row header">
-		<!--div class="col-4">
-			<b>Cobro de Tickets</b>	
-		</div-->
-		<div class="col-6 text-center">
-			<b>Sucursal:</b> <?php echo $sucursal;?>
-		</div>
-		<div class="col-6 text-center">
-			<b>Cajero:</b> <?php echo $usuario;?>	
+	<div class="row header" style="padding-top : 2px;">
+		<div class="col-12 text-center text-light">
+			<h3><b class="">Sucursal:</b> <?php echo $sucursal;?></h3>
+			<h3><b class="">Cajero:</b> <?php echo $usuario;?></h3>	
 		</div>
 	</div>
 	<div class="contenido" align="center">
-	<!---->
-		<table id="listado_cheque_transferencia">
-			<tr style="height: 30px;">
-				<th class="subtabla">Banco</th>
-				<th class="subtabla">Monto</th>
-				<th class="subtabla">observaciones</th>
-			</tr>
-			<tr></tr>
-		</table>
-		<input type="hidden" id="no_cheque_transferencia" value="0">
-<br>	
 		<div class="row" style="padding : 20px;">
-			<div class="col-6">
-					<p class="informativo"></p>
+			<div class="col-12">
+				<p class="informativo"></p>
 				<div class="input-group">
-						<input type="text" id="buscador" class="form-control" placeholder="Folio..." onkeyup="busca(event);">
-						<button title="Buscar de nuevo" onclick="link(2);">
-							<i class="icon-search"></i>
-						</button>
+					<input type="text" id="buscador" class="form-control" placeholder="Folio..." onkeyup="busca(event);">
+					<button 
+						title="Buscar de nuevo" 
+						onclick="link(2);"
+						class="btn btn-danger"
+					>
+						<i class="icon-erase"></i>
+					</button>
 					<!--<img src="../../../../img/especiales/buscar.png" width="50px"></p>-->
 					<div id="res_busc"></div>
 				</div>
 			</div>
-			<div class="col-3">
+			<div class="col-6">
 					<p class="informativo" align="center">Monto:<br>
 						<input type="text" id="monto_total" class="form-control" style="background:white;" disabled></p>
 			</div>
-			<div class="col-3">
-					<p class="informativo" align="center">Saldo a favor:<br>
+			<div class="col-6">
+					<p class="informativo" align="center">A favor:<br>
 					<input type="text" id="saldo_favor" class="form-control" style="background:white;" disabled></p>
 			</div>
 
 			<input type="hidden" id="id_venta" value="0">
 			<input type="hidden" id="venta_pagada" value="0">
 		</div>
-	<!---->
-		<table ><!--width="50%" class="pagos"-->
-			<tr>
-				<th width="70%">
-					Tipo de Pago
-				</th>
-				<th width="30%">
-					Monto
-				</th>
-			</tr>
-		<?php
-			echo $tarjetas_cajero;
-		?>
-	
-			<tr>
-				<td align="center"><b>Efectivo:</b></td>
-				<td align="left"><input type="number" id="efectivo" class="form-control" onkeydown="prevenir(event);" onkeyup="valida_tca(this,event,2);calcula_cambio();"></td>
-			</tr>
-			<tr>
-				<td align="center"><b>Recibido:</b></td>
-				<td align="left"><input type="number" id="efectivo_recibido" class="form-control" onkeydown="prevenir(event);" onkeyup="valida_tca(this,event,3);calcula_cambio();"></td>
-			</tr>
-			<tr>
-				<td align="center"><b>Cambio:</b></td>
-				<td align="left"><input type="number" id="efectivo_devolver" class="form-control" style="background: white;" disabled></td>
-			</tr>
-			<tr>
-				<td align="center"><b>Cheque o transferencia</b><br><?php echo $cajas;?></td>
-				<td align="left">
-				<div class="input-group">
+		<div class="row">
+			<h3>Tarjetas 
+				<button
+					type="button"
+					id="add_card_btn"
+					class="btn btn-success"
+					onclick="addPaymetCard( <?php echo $user_id;?> );"
+					style="font-size : 100% !important; padding : 2px !important;"
+				>
+					<i class="icon-plus-circle"></i>
+				</button>
+			</h3>
+			<table class="table table-striped">
+				<tbody id="payments_list">
+					<?php
+						echo $tarjetas_cajero;
+					?>
+				</tbody>
+			</table>
+			<div class="col-2"></div>
+			<div class="col-8" style="padding : 5px;">
+				<button
+					type="button"
+					class="btn btn-warning form-control"
+					onclick="enable_payments();"
+					id="start_payments_btn"
+				>
+					<i class="icon-play">Comenzar a cobrar</i>
+				</button>
+			</div>
+		</div>
+
+		<div class="row">
+			<h3>Efectivo</h3>
+			<div class="col-12 input-group">
+				<!--div align="center"><b>Efectivo:</b></div-->
+				<!--button type="button">Efectivo </button-->
+				<input 
+					type="number" 
+					id="efectivo" 
+					class="form-control text-end" 
+					onkeydown="prevenir(event);" 
+					onkeyup="valida_tca(this,event,2);calcula_cambio();">
+				<button 
+					type="button"
+					class="btn btn-success"
+					onclick="getCashPaymentForm();"
+				>
+					<i class="icon-plus"></i>
+				</button>
+			</div>
+			<!--div class="col-6  input-group">
+				<button type="button">Recibido</button>
+				<input 
+					type="number" 
+					id="efectivo_recibido" 
+					class="form-control" 
+					onkeydown="prevenir(event);" 
+					onkeyup="valida_tca(this,event,3);calcula_cambio();"
+				>
+			</div-->
+			<div class="col-6 input-group">
+				<!--button type="button">Cambio </button-->
+				<input type="number" id="efectivo_devolver" class="form-control" style="background: white;" disabled>
+			</div>
+		</div>
+		
+		<div class="row" align="center">
+			<h3>Cheque o transferencia</h3>
+			<div class="col-7">
+				<?php echo $cajas;?>
+			</div>
+			<div class="col-5">
+				<div class=" input-group">
 					<input type="number" id="monto_cheque_transferencia" class="form-control">
 					<button 
 						class="btn btn-success"
@@ -220,25 +180,67 @@
 						<i class="icon-plus"></i>
 					</button>
 				</div>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2" align="center">
-					<button id="cobrar" class="btn btn-success"  onclick="cobrar();">
-						<i class="icon-floppy">Cobrar e Imprimir</i>
-					</button>
-				</td>
-			</tr>
+			</div>
+		</div>
+
+		<br>
+	<!---->
+		<!--div class="col-12" id="card_payments">
+			<table class="table table-bordered table-striped">
+				<thead class="bg-danger text-light">
+					<tr>
+						<th class="text-center">Tipo Pago</th>
+						<th class="text-center">Caja</th>
+						<th class="text-center">Monto</th>
+						<th class="text-center">Reimpresion</th>
+						<th class="text-center">Cancelacion</th>
+					</tr>
+				</thead>
+				<tbody id="payments_list"></tbody>
+				<tfoot>
+					<tr>
+						<td></td>
+						<td>Total</td>
+						<td>0</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div-->
+
+		<table id="listado_cheque_transferencia" class="table table-striped" style="">
+			<thead>
+				<tr>
+					<th class="text-center">Banco</th>
+					<th class="text-center">Monto</th>
+					<th class="text-center">Observaciones</th>
+				</tr>
+			</thead>
 		</table>
+		<input type="hidden" id="no_cheque_transferencia" value="0">
+	<!---->
+		<div class="row">
+			<div class="col-2"></div>
+			<div class="col-8">
+				<button 
+					type="button"
+					id="cobrar" 
+					class="btn btn-success form-control"  onclick="cobrar();">
+					<i class="icon-floppy">Cobrar e Imprimir</i>
+				</button>
+			</div>
+			<div class="col-2"></div>
+		</div>
 	</div>
-	<div class="footer">
-		<a href="javascript:link(1);" class="mnu">
-			Regresar al panel
-		</a>
+	<div class="footer text-center">
+		<button
+			class="btn btn-light"
+			onclick="link(1);"
+		>
+			<i class="icon-home">Regresar al panel</i>
+		</button>
+		<!--a href="javascript:link(1);" class="mnu"></a-->
 		
 	</div>
 </div>
 </body>
 </html>
-<script type="text/javascript">
-</script>

@@ -85,7 +85,8 @@ var total_cobros=0,monto_real=0;
 				if(aux[0]!='ok'){
 					alert(dat);return false;
 				}else{
-					$("#efectivo").val(aux[3]-aux[4]);
+					//$("#efectivo").val(aux[3]-aux[4]);//oscar 2023
+					$("#t0").val(aux[3]-aux[4]);//oscar 2023
 					$("#monto_total").val(aux[3]);
 					$("#buscador").val(aux[2]);
 					$("#id_venta").val(aux[1]);
@@ -110,9 +111,40 @@ var total_cobros=0,monto_real=0;
 	}
 
 	function valida_tca(obj,e,flag,num){
+		const regex = /^[0-9]+$/; // Expresión regular que permite solo números
+		var value = $(obj).val();
+		if ( value.includes('.') ) {
+			alert( "No se admiten numeros decimales!" );
+    		value.replace('.', '');
+    		$( obj ).val( value );
+  		}
+  		if (!regex.test(value)) {
+    		$( obj ).val( value.replace(/[^\d]/g, '') );
+  		}
+  		/*var valorFormateado = parseFloat(value).toLocaleString('es', {
+		    style: 'currency',
+		    currency: 'MXN', // Cambia esto a tu moneda preferida si es diferente
+		    minimumFractionDigits: 0,
+		});*/
+		//formatear numero
+		value = value.replace(',','');
+		var valorFormateado = Mascara('###,###,###,###', value);
+		/*var aux_counter = 0;
+		value = value.replace(',', '');
+		for (var i = 0; i <= value.length - 1; i++) {
+			valorFormateado += value[i];
+			aux_counter ++;
+			if( aux_counter == 3 && i < value.length - 2 ){
+				valorFormateado += ',';
+				aux_counter = 0;
+			}
+		};*/
+
+		$( obj ).val( valorFormateado );
 	//sacamos el id del objeto
 	//sacamos el evento
 		var tca=e.keyCode;
+  		//alert( $(obj).val() );
 	//campos de tarjetas (afiliaciones)
 		if(flag==1){
 			if(tca==40 && document.getElementById("t"+parseInt(num+1))){
@@ -147,10 +179,10 @@ var total_cobros=0,monto_real=0;
 		var total_tarjetas=0,total_cheques=0,a_favor=0,total=0,monto_total=0;
 		//var recibido=$("#efectivo_recibido").val();
 	//sacamos los pagos por tarjeta
-		var tope_tarjetas=$("#cantidad_tarjetas").val();
-		for(var i=1;i<=tope_tarjetas;i++){
+		var tope_tarjetas=$("#payments_list tr").length;
+		for( var i=0;i <tope_tarjetas; i++ ){
 			if($("#t"+i).val()!=''){
-				total_tarjetas+=parseFloat($("#t"+i).val());
+				total_tarjetas+=parseFloat($("#t"+i).val().replaceAll( ',', '' ));
 			}else{
 				$("#t"+i).val(0);
 			}
@@ -215,11 +247,18 @@ var total_cobros=0,monto_real=0;
 			return false;
 		}
 	//obtenemos la referencia
-		var observacion='<p style="color:white;font-size:30px;" align="center">Ingrese la referencia del Cheque/Transferencia</p>';
-		observacion+='<p align="center"><textarea id="referencia_cheque_transferencia"></textarea>';
-		observacion+='<br><br><button class="boton" onclick="agregar_fila('+id_caja+','+monto+',\''+txt_select+'\')">Aceptar</button></p>';
-		$("#contenido_emergente").html(observacion);
-		$("#emergente").css("display","block");
+		var observacion = `<p class="text-success" align="center">
+			Ingresa la referencia del Cheque/Transferencia</p>
+			<p align="center">
+				<textarea id="referencia_cheque_transferencia"></textarea>
+				<br><br>
+				<button 
+					class="btn btn-success" 
+					onclick="agregar_fila( ${id_caja}, ${monto}, '${txt_select}')">
+				Aceptar</button>
+			</p>`;
+		$(".emergent_content").html(observacion);
+		$(".emergent").css("display","block");
 		return true;
 	}
 var cont_cheques_transferencia=0;
@@ -302,6 +341,42 @@ var cont_cheques_transferencia=0;
 				}
 			});
 		}
+/*funcion para agregar pagos con tarjeta*/
+	function addPaymetCard( user_id ){
+		var url = 'ajax/db.php?fl=getTerminals&user_id=' + user_id;
+		url += '&counter=' + $( '#payments_list tr' ).length;
+		//alert( url );
+		if( $( '#payments_list' ).length == 1 ){
+			$( '#t0' ).val( '' );
+		}
+		var resp = ajaxR( url );
+		$( '#payments_list' ).append( resp );
+	}
+//habilitar pagos
+	function enable_payments(){
+		var amount_total = parseInt( $( '#monto_total' ).val() );
+		var amount_sum = 0;
+		var stop = false;
+		//var stop = false;
+	//verifica que todos lo pagos esten lleno y sumen la cantidad del monto total
+		$( '#payments_list tr' ).each( function( index ){
+			//$( '#payment_btn_' + index ).removeClass( 'no_visible' );
+			amount_sum += parseInt( $( '#t' + index ).val().replaceAll( ',', '' ) );
+		});
+		if( amount_sum != amount_total ){
+			alert( "La suma de los montos es diferente del total!" );
+			return false;
+		}
+	//mustra los botones para enviar la peticion
+		$( '#payments_list tr' ).each( function( index ){
+			$( '#payment_btn_' + index ).removeClass( 'no_visible' );//muestra boton para cobrar
+			$( '#t' + index ).attr( 'readonly', true );
+			$( '#efectivo' ).attr( 'readonly', true );
+		});
+		$( '#start_payments_btn' ).addClass( 'no_visible' );
+		$( '#add_card_btn' ).addClass( 'no_visible' );
+
+	}
 //lamadas asincronas
 	function ajaxR( url ){
 		if(window.ActiveXObject)
