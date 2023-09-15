@@ -203,7 +203,11 @@ var global_meassures_path_camera_plugin = '';*/
 							matches ++;//tercera coincidencia
 						}
 					}
-					if( matches == 3 || ( matches == 3 && ( pieces_per_box_validation == $( '#pp_4_' + j ).html().trim() ) ) ){
+					if( matches == 3 || 
+						( matches == 3 
+							&& ( pieces_per_box_validation == $( '#pp_4_' + j ).html().trim() ) 
+							&& ( model_validation == $( '#pp_3_' + j ).html().trim() )
+						) ){
 						alert( "Hay modelos, piezas por caja y piezas por paquete repetidos, verifica y vuelve a intentar!" );
 						validation_is_valid = false;
 						return false;
