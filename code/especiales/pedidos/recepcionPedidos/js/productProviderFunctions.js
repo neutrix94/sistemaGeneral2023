@@ -207,7 +207,7 @@ var global_meassures_path_camera_plugin = '';*/
 						( matches == 2 
 							&& ( pieces_per_box_validation == $( '#pp_4_' + j ).html().trim() ) 
 							&& ( model_validation == $( '#pp_3_' + j ).html().trim() )
-							&& ( model_validation == '' || model_validation == 0 )
+							&& ( pieces_per_pack_validation == '' || pieces_per_pack_validation == 0 )
 						) ){
 						alert( "Hay modelos, piezas por caja y piezas por paquete repetidos, verifica y vuelve a intentar!" );
 						validation_is_valid = false;
