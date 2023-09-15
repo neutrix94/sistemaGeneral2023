@@ -299,7 +299,7 @@ window.onload=function(){
 /**/
 				dats+=$("#10_"+i).html()+",";//ubicación de Matriz
 				dats+=$("#11_"+i).html()+",";//ubicación de la sucursal Matriz
-				dats+=$("#12_"+i).html().trim();//observaciones del producto (impementado por Oscar 22.09.2020)
+				dats+=$("#12_"+i).html().trim().replaceAll( '\n', '*' );//observaciones del producto (impementado por Oscar 22.09.2020)
 /**/
 //			dats+=$("#7_"+i).val();//total de piezas
 				if(i<nFilasIniciales){
