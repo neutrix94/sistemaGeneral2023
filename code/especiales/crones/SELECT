@@ -20,21 +20,21 @@ FROM(
         pp.id_proveedor_producto AS product_provider_id_1,
         IF( pp.codigo_barras_pieza_1 = '',
             1,
-            INSTR( pp.codigo_barras_pieza_1 , pp.id_proveedor_producto ) 
+            INSTR( pp.codigo_barras_pieza_1 , LPAD( pp.id_proveedor_producto, 5, '0' ) ) 
         )AS piece_barcode_1_exists,
         pp.codigo_barras_pieza_1 AS piece_barcode_1,
 
         pp.id_proveedor_producto AS product_provider_id_2,
         IF( pp.codigo_barras_presentacion_cluces_1 = '',
             1,
-            INSTR( pp.codigo_barras_presentacion_cluces_1, pp.id_proveedor_producto )  
+            INSTR( pp.codigo_barras_presentacion_cluces_1, LPAD( pp.id_proveedor_producto, 5, '0' ) )  
         ) AS piece_pack_1_exists,
         pp.codigo_barras_presentacion_cluces_1 AS pack_barcode_1,
 
         pp.id_proveedor_producto AS product_provider_id_3,
         IF( pp.codigo_barras_caja_1 = '',
             1,
-            INSTR( pp.codigo_barras_caja_1 , pp.id_proveedor_producto )
+            INSTR( pp.codigo_barras_caja_1 , LPAD( pp.id_proveedor_producto, 5, '0' ) )
         ) AS box_barcode_1_exists,
         pp.codigo_barras_caja_1 AS box_barcode_1
     FROM ec_proveedor_producto pp
