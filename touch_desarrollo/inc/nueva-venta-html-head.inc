@@ -1479,7 +1479,9 @@ var hay_paquete=0;
         verif=ajaxR(url2);
 //alert( verif );//aqui me quede en el desarrollo Oscar Febrero 2023
 //alert('cantidad que llega a la función: '+cant);
-        if(verif!='ok' && global_last_pieces_array.indexOf( aux[1] ) == -1 && (cant=='' || cant==null) ){// deshabilitado por Oscar 2023 para excepciones de productos maquilados && aux[13]==0 && es_paleta_tmp==0 , aux[1]!='1808'
+        if(verif!='ok' && global_last_pieces_array.indexOf( aux[1] ) == -1 && (cant=='' || cant==null) ){// deshabilitado por Oscar 2023 para excepciones de productos maquilados && aux[13]==0 && es_paleta_tmp==0 
+    /*Reparar que si sale la emergente de inventario no incluya productos de ultimas piezas ( cambiar la condicion del parametro fijo por el arreglo )
+    aux[1]!='1808' se cambia por global_last_pieces_array.indexOf( aux[1] ) == -1*/
         
             //se implementa la condición de si la respuesta en la 13 es igual a cero (quiere decir que no es maquilado ni muestra paleta Oscar 10.11.2018) 
         //implementacion de Oscar 02.11.2018 para ocultar los resultados de busqueda
