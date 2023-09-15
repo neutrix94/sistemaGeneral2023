@@ -409,5 +409,75 @@
             $mensaje .= $contenido_tabla;
         }
     }
+
+    $sql = "SELECT
+                ax.product_id,
+                ax.list_order,
+                ax.products_name,
+                ax.product_provider_id_1,
+                ax.piece_barcode_1,
+                ax.product_provider_id_2,
+                ax.pack_barcode_1,
+                ax.product_provider_id_3,
+                ax.box_barcode_1
+            FROM(
+                SELECT
+                    p.id_productos AS product_id,
+                    p.orden_lista AS list_order,
+                    p.nombre AS products_name,
+
+                    pp.id_proveedor_producto AS product_provider_id_1,
+                    IF( pp.codigo_barras_pieza_1 = '',
+                        1,
+                        INSTR( pp.codigo_barras_pieza_1 , LPAD( pp.id_proveedor_producto, 5, '0' ) ) 
+                    )AS piece_barcode_1_exists,
+                    pp.codigo_barras_pieza_1 AS piece_barcode_1,
+
+                    pp.id_proveedor_producto AS product_provider_id_2,
+                    IF( pp.codigo_barras_presentacion_cluces_1 = '',
+                        1,
+                        INSTR( pp.codigo_barras_presentacion_cluces_1, LPAD( pp.id_proveedor_producto, 5, '0' ) )  
+                    ) AS piece_pack_1_exists,
+                    pp.codigo_barras_presentacion_cluces_1 AS pack_barcode_1,
+
+                    pp.id_proveedor_producto AS product_provider_id_3,
+                    IF( pp.codigo_barras_caja_1 = '',
+                        1,
+                        INSTR( pp.codigo_barras_caja_1 , LPAD( pp.id_proveedor_producto, 5, '0' ) )
+                    ) AS box_barcode_1_exists,
+                    pp.codigo_barras_caja_1 AS box_barcode_1
+                FROM ec_proveedor_producto pp
+                LEFT JOIN ec_productos p
+                ON pp.id_producto = p.id_productos
+                WHERE p.id_productos > 0
+            )ax
+            WHERE ax.piece_barcode_1_exists <= 0 
+            OR ax.piece_pack_1_exists <= 0 
+            OR ax.box_barcode_1_exists <= 0";
+    $stm = $link->query( $sql ) or die( "Error al consultar codigos de barra que no contienen el id proveedor producto : {$link->error}" );
+    if( $stm->num_rows <= 0 ){
+        $mensaje .= "<br><h2 style=\"color : green;\">No se encontraron codigos de barra que no contienen proveedor producto</h2><br>";
+    }else{
+        $encabezado = array('#', 'Id Producto', 'Orden de lista', 'Producto', 'Id proveedor producto', 
+            'CB pieza 1', 'Id proveedor producto', 'CB paquete 1', 'Id proveedor producto', 'CB caja 1' );
+        $mensaje .= ( $es_navegador == 1 ? 
+                    $report->csv_header_generator( $encabezado ) : 
+                    $report->crea_tabla_log( $encabezado, '<h2 style="color : red;">Se localizaron los siguientes codigos de barra que no contienen el proveedor producto : </h2>' ) 
+        );//crea encabezado de la tabla
+        $contenido_tabla = '';
+        while ( $row = $stm->fetch_assoc() ) {
+            $fallas ++;//suma una falla al reporte que se envia por correo
+        //crea una fila por cada registro encontrado con diferencias
+            $contenido_tabla .= ( $es_navegador == 1 ? 
+                                $report->csv_row_generator( $row ) : 
+                                $report->crea_fila_tabla_log( $row ) );
+        }
+    //agrega el contenido a la tabla
+        if ( $es_navegador == 0 ){
+            $mensaje .= str_replace('|table_content|', $contenido_tabla, $mensaje);
+        }else{
+            $mensaje .= $contenido_tabla;
+        }
+    }
 /*fin de cambio Oscar 2023*/
 ?>
