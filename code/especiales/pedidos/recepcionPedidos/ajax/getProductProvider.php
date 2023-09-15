@@ -451,7 +451,10 @@
 		$resp = "";
 		$sql = "SELECT 
 					id_proveedor_producto AS product_provider_id, 
-					clave_proveedor AS provider_clue
+				/*oscar 2023*/
+					CONCAT( clave_proveedor, ' ( ', presentacion_caja, ' ) ' )  AS provider_clue,
+					CONCAT( clave_proveedor, '|', presentacion_caja, '|', piezas_presentacion_cluces ) AS provider_clue_2
+				/**/
 				FROM ec_proveedor_producto
 				WHERE id_producto = {$product_id}
 				AND id_proveedor = {$provider_id}";
@@ -459,8 +462,8 @@
 		
 		$resp .= "<option value=\"0\">-- Seleccionar --</option>";
 		while ( $row = $stm->fetch_assoc() ) {
-			$resp .= "<option value=\"{$row['product_provider_id']}\"";
-			$resp .= ( $row['provider_clue'] == $option ? " selected" : "" );
+			$resp .= "<option value=\"{$row['product_provider_id']}\"";//oscar 2023
+			$resp .= ( $row['provider_clue_2'] == $option ? " selected" : "" );//oscar 2023
 			$resp .= ">{$row['provider_clue']}</option>";
 		}	
 		$resp .= "<option value=\"-1\">Administrar Proveedores</option>";
@@ -889,7 +892,7 @@
 				FROM ec_productos p
 				LEFT JOIN ec_proveedor_producto pp ON pp.id_producto = p.id_productos
 				WHERE p.id_productos = '{$id}'
-				ORDER BY pp.prioridad_surtimiento ASC";
+				ORDER BY pp.id_proveedor_producto ASC";//ORDER BY pp.prioridad_surtimiento ASC
 
 		$exc = $link->query( $sql ) or die( "Error al consultar la lista de proveedores para este producto : " . $link->error );
 
