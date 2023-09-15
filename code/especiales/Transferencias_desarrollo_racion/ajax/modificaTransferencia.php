@@ -73,7 +73,7 @@
 				ax.cantidad,/*7*/
 				ax.ubicacion_almacen,/*8*/
 				ax.ubicacion_almacen_sucursal,/*9*/	
-				ax.observaciones,
+				REPLACE( ax.observaciones, '\n', '*' )AS observaciones,
 				ax.nombre_estac			
 			FROM(
 			SELECT
