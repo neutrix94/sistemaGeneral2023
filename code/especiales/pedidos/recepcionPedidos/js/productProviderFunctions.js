@@ -156,6 +156,10 @@ var global_meassures_path_camera_plugin = '';*/
 			//alert( count_tmp );
 			if( $( '#pp_-1_' + ( count_tmp ) ).prop( 'checked' ) ){
 				selected_option = $( '#pp_3_' + ( count_tmp ) ).html().trim(); //$( '#pp_0_' + ( count_tmp ) ).html().trim();
+/*implementacion Oscar 2023 para error cuando prov prod tiene el mismo modelo*/
+				selected_option += "|" + $( '#pp_4_' + ( count_tmp ) ).html().trim();
+				selected_option += "|" + $( '#pp_5_' + ( count_tmp ) ).html().trim();
+/**/
 			}
 			if( index > 0 ){
 				product_providers += '|';
@@ -175,10 +179,64 @@ var global_meassures_path_camera_plugin = '';*/
 			});
 			count_tmp ++;
 		});
+	/*implementacion Oscar Validar que no se repitan 3 parametros ( mismo modelo, pie )as x caja, piezas x paquete)  si esto pasa que mande aviso y no deje guardar*/
+		var model_validation = '';
+		var pieces_per_box_validation = '';
+		var pieces_per_pack_model_validation = '';
+		var validation_is_valid = true;
+		for( var i = 1; i <= ( $( '#product_provider_list tr' ).length ); i++ ){
+			model_validation = $( '#pp_3_' + i ).html().trim();
+			pieces_per_box_validation = $( '#pp_4_' + i ).html().trim();
+			pieces_per_pack_validation = $( '#pp_5_' + i ).html().trim();
+			//alert( pieces_per_box_validation );
+			var matches = 0;//coincidencias
+			for( var j = 1; j <= ( $( '#product_provider_list tr' ).length ); j++ ){
+				if( i != j ){
+					if( model_validation == $( '#pp_3_' + j ).html().trim() ){
+						matches ++;//primera coincidencia
+					}
+					if( pieces_per_box_validation == $( '#pp_4_' + j ).html().trim() ){
+						matches ++;//segunda coincidencia
+					}
+					if( pieces_per_pack_validation != 0 && pieces_per_pack_validation != '' ){
+						if( pieces_per_pack_validation == $( '#pp_5_' + j ).html().trim() ){
+							matches ++;//tercera coincidencia
+						}
+					}
+					if( matches == 3 || ( matches == 3 && ( pieces_per_box_validation == $( '#pp_4_' + j ).html().trim() ) ) ){
+						alert( "Hay modelos, piezas por caja y piezas por paquete repetidos, verifica y vuelve a intentar!" );
+						validation_is_valid = false;
+						return false;
+					}
+				}
+			}
+		}
+		if( ! validation_is_valid ){
+			return false;
+		}
+	/*fin de cambio Oscar 2023*/
 		if( selected_option == '' ){
 			alert( "Debes seleccionar un proveedor - producto para el combo...!" );
 			return false;
 		}
+	/*implementacion Oscar 2023 Validar antes de guardar ( si existe la linea roja y no es la que tiene el radio no deje guardar )*/
+		//pp_0_3
+		var tmp_exists = false;
+		var counter_tmp = 1;
+		$( '#product_provider_list tr' ).each(function (index) {
+			if( $( '#pp_0_' + counter_tmp ).html() == '' ){
+				if( $( '#pp_-1_' + counter_tmp ).prop( 'checked' ) == false ){
+					alert( "Existe registro temporal ( linea en rojo ); Si no vas a utilizar este registro da click en eliminar para poder continuar!" );
+					tmp_exists = true;
+					return false;
+				}
+			}
+			counter_tmp ++;
+		});
+		if( tmp_exists ){
+			return false;
+		}
+	/*fin de cambio Oscar 2023*/
 	//	alert( selected_option );
 		//alert( product_providers ); //return false;
 		$.ajax({
