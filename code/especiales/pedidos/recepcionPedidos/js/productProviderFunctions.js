@@ -189,8 +189,8 @@ var global_meassures_path_camera_plugin = '';*/
 			pieces_per_box_validation = $( '#pp_4_' + i ).html().trim();
 			pieces_per_pack_validation = $( '#pp_5_' + i ).html().trim();
 			//alert( pieces_per_box_validation );
-			var matches = 0;//coincidencias
 			for( var j = 1; j <= ( $( '#product_provider_list tr' ).length ); j++ ){
+				var matches = 0;//coincidencias
 				if( i != j ){
 					if( model_validation == $( '#pp_3_' + j ).html().trim() ){
 						matches ++;//primera coincidencia
@@ -204,7 +204,7 @@ var global_meassures_path_camera_plugin = '';*/
 						}
 					}
 					if( matches == 3 || 
-						( matches == 3 
+						( matches == 2 
 							&& ( pieces_per_box_validation == $( '#pp_4_' + j ).html().trim() ) 
 							&& ( model_validation == $( '#pp_3_' + j ).html().trim() )
 						) ){
