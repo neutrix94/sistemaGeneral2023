@@ -202,17 +202,29 @@
         aux=aux.split(' | ');
         if(aux.length == 1)
         {//modificado por Oscar 2023 para busqueda codigo barras y orden lista
-            var res=ajaxR( 'ajax/buscaProdOrCoId.php?val='+aux[0]+"&can=1&can2=1&sale_id=" + idPedido );
+//var res=ajaxR( 'ajax/buscaProdOrCoId.php?val='+aux[0]+"&can=1&can2=1&sale_id=" + idPedido );
+            var res=ajaxR( 'ajax/buscaProdOrCoIdDevoluciones.php?val='+aux[0]+"&can=1&can2=1&sale_id=" + idPedido );
             //alert(res);
             
             var ax=res.split('|');
             
             if(ax[0] != 'exito')
             {
+
+      /*implementacion Oscar 2023 para que salgan las opciones de ultimas piezas*/
+            if( ax[0] == 'is_last_pieces' ){
+                $( '#buscadorLabel' ).focus();
+                $( '#cantidad2' ).val('');
+                return false;
+            }else{
+            /*anteriormente solo estaba este codigo*/
                 alert('Producto incorrecto, pruebe con uno diferente');
                 obj.focus();
                 obj.setSelectionRange(0, obj.value.length);
                 return false;
+
+            }
+      /*fin de cambio Oscar 2023*/
             }
             
             obj.value=ax[2]+" | "+ ax[3] + " |  |  | " + ax[17];//modificado por Oscar 2023 para busqueda codigo barras y orden lista
@@ -297,8 +309,8 @@
             return false;
         } 
         
-        if(!isNaN(obj.value))
-            return false;   
+        //if(!isNaN(obj.value))
+          //  return false;   
 
         if(obj.value.length >= 3){
             var url="ajax/saleReturnProductSeeker.php?clave="+obj.value+"&p="+idPedido;
@@ -436,7 +448,9 @@
         for(i=1;i<trs.length;i++){
             tds=trs[i].getElementsByTagName('td');
             //alert(aux[2]);
-            if(tds[1].innerHTML == busqueda /*&& sig == tds[9].valor */ && global_last_orders_array.indexOf( aux[0] ) == -1  ){//
+           // alert( `${tds[13].innerHTML} == ${busqueda}` );
+           if( tds[7].innerHTML == aux[4] ){//aqui cambio oscar 2023 para validar toamdno en cuenta lo que ya esta en el grid
+           // if(tds[1].innerHTML == busqueda /*&& sig == tds[9].valor */  ){//deshabilitado por Oscar 2023 && global_last_orders_array.indexOf( aux[0] ) == -1 Excluir de la logica de busqueda por escaneo los productos con el indicador de ultimas piezas ( que siempre salga como resultados de busqueda ) ( linea 440 )
                //alert('Repetido');
                 cant_anterior=parseInt(tds[3].innerHTML);
                 //alert(cant_anterior);
@@ -573,7 +587,8 @@
         }
         if(can2 != -1){
 //alert('aqui llega');
-            var url="ajax/buscaProdOrCoId.php?val="+busqueda+"&can="+can2+"&can2="+can2;
+//var url="ajax/buscaProdOrCoId.php?val="+busqueda+"&can="+can2+"&can2="+can2;
+            var url="ajax/buscaProdOrCoIdDevoluciones.php?val="+busqueda+"&can="+can2+"&can2="+can2;
             
             var res=ajaxR(url);
 //alert(res);

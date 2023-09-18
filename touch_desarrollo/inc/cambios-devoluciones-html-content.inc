@@ -229,6 +229,7 @@
                 return false;
             }
             
+            was_validated = ( $( '#notasDev_5_0'  ).attr( 'valor' ) == "<i class='icon-cancel-circled' style='color : red;'></i>" ? 0 : 1 );
             var num=NumFilas('pagosDev');
             var dets="";
             var ncan="";
