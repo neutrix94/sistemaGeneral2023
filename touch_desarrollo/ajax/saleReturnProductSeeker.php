@@ -15,7 +15,9 @@
     $pedido1="";
     $pedido2="";
     if(isset($p)){
-    	$pedido1=" JOIN ec_pedidos_detalle epd ON epd.id_producto=p.id_productos";
+    	$pedido1=" JOIN ec_pedidos_detalle epd 
+    	ON epd.id_producto=p.id_productos
+    	AND epd.id_pedido={$p}";//se agrega AND epd.id_pedido={$p} por Oscar 2023 par buscar ordenes de lista ultimas piezas
     	$pedido2=" AND epd.id_pedido=".$p;
     }
 
@@ -81,7 +83,8 @@ if($t!=null){
 					OR pp.codigo_barras_presentacion_cluces_1 = '{$clave}'
 					OR pp.codigo_barras_presentacion_cluces_2 = '{$clave}'
 					OR pp.codigo_barras_caja_1 = '{$clave}'
-					OR pp.codigo_barras_caja_2 = '{$clave}' )";
+					OR pp.codigo_barras_caja_2 = '{$clave}' )
+					OR ( p.orden_lista LIKE '%{$clave}%' AND p.es_ultimas_piezas = 1 )";//Oscar 2023 par buscar ordenes de lista ultimas piezas
 		$sql .= " GROUP BY epd.id_pedido_detalle";
     /*Fin de cambio Oscar 12.11.2018*/
 }else{
@@ -222,7 +225,8 @@ aux.id_pedido_detalle
 					OR pp.codigo_barras_presentacion_cluces_1 = '{$clave}'
 					OR pp.codigo_barras_presentacion_cluces_2 = '{$clave}'
 					OR pp.codigo_barras_caja_1 = '{$clave}'
-					OR pp.codigo_barras_caja_2 = '{$clave}')";
+					OR pp.codigo_barras_caja_2 = '{$clave}')
+					OR ( p.orden_lista LIKE '%{$clave}%' AND p.es_ultimas_piezas = 1 )";//Oscar 2023 par buscar ordenes de lista ultimas piezas
     /*Fin de cambio Oscar 12.11.2018*/
 
 		//complementamos búsqueda
