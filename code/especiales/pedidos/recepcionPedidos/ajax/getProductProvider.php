@@ -820,7 +820,7 @@
 	function getComboProviders( $current_provider, $counter, $link ){
 		$sql = "SELECT id_proveedor, nombre_comercial FROM ec_proveedor WHERE id_proveedor > 1";
 		$exc = $link->query( $sql ) or die( "Error al consultar proveedores : " . $link->error );
-		$resp = "<select id=\"pp_2_{$counter}\" onchange=\"changeProvider( this, {$counter} );\" class=\"form-control-select\">";
+		$resp = "<select id=\"pp_2_{$counter}\" onchange=\"changeProvider( this, {$counter} );\" class=\"form-select\">";
 		while ( $r = $exc->fetch_row() ) {
 			$resp .= "<option value=\"{$r[0]}\"";
 			$resp .= ( $r[0] == $current_provider ? ' selected' : '' );
