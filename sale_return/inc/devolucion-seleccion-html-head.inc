@@ -286,8 +286,9 @@
             $( '#lista_0' ).click();
             setTimeout( function () {
                 $( '#AgregaFila' ).click();
-                $( '#resBus' ).html( '' );
-                $( '#resBus' ).css( 'display', 'none' );
+/*deshabilitado por Oscar 2023 para Excluir de la logica de busqueda por escaneo los productos con el indicador de ultimas piezas ( que siempre salga como resultados de busqueda )
+$( '#resBus' ).html( '' );
+$( '#resBus' ).css( 'display', 'none' );*/
                 }, 10);
         }
         /*if(key == 13 && filant != -1){
@@ -426,8 +427,9 @@
     {
         key=(eve.which) ? eve.which : eve.keyCode;
         
-        if(key == 13)
-            agregaFila(f);            
+        if(key == 13){
+            agregaFila(f);
+        }           
     }
     
     function cancelaPaleta(){
@@ -474,7 +476,11 @@
             tds=trs[i].getElementsByTagName('td');
             //alert(aux[2]);
 //alert( `${tds[7].innerHTML.trim()} == ${product_provider_id.trim()}` );
-            if(tds[7].innerHTML.trim() == product_provider_id.trim() /*&& sig == tds[9].valor */&& global_last_orders_array.indexOf( aux[0] ) == -1 ){
+    /** codigo deshabilitado por Oscar 2023 para correcion 'Que no agregue en diferente renglon el mismo producto cuando este lleve el indicador de ultimas piezas'
+            if(tds[7].innerHTML.trim() == product_provider_id.trim() && global_last_orders_array.indexOf( aux[0] ) == -1 ){/*&& sig == tds[9].valor 
+        nuevo codigo : 
+    */
+            if( tds[8].innerHTML.trim() == id_pedido_detalle ){
 //alert('Repetido');
                 cant_anterior=parseInt(tds[3].innerHTML);
                 //alert(cant_anterior);
@@ -526,10 +532,20 @@
     //alert(res);
             busc.focus();
             busc.setSelectionRange(0, busc.value.length);
+/*Oscar 2023 Excluir de la logica de busqueda por escaneo los productos con el indicador de ultimas piezas ( que siempre salga como resultados de busqueda )*/
+            if( aux[0] == 'is_last_pieces' ){
+                $( '#buscadorLabel' ).val( '' );
+                $( '#cantidad2' ).val( '' );
+            }
+/*fin de cambio Oscar 2023*/
             return false;
         }
     //asignamos porcentaje de descuento
         document.getElementById("porc_desc").value=aux[8];
+/*Oscar 2023 Excluir de la logica de busqueda por escaneo los productos con el indicador de ultimas piezas ( que siempre salga como resultados de busqueda )*/
+        $( '#resBus' ).html( '' );
+        $( '#resBus' ).css( 'display', 'none' );
+/*fin de cambio Oscar 2023*/
         //alert(document.getElementById("porc_desc").value);
 //alert(aux[8]);
         //alert(res);
