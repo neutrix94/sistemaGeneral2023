@@ -737,7 +737,8 @@
 			$stm_upd = $link->query( $sql ) or die( "Error al actualizar el caso de transferencia : {$link->error}" );
 		//actualiza el satus de la transferencia
 			$sql = "UPDATE ec_transferencias 
-						SET id_estado = IF( id_estado = 6, 4 ,3 ) 
+						/*SET id_estado = IF( id_estado = 6, 4 ,3 ) deshabilitado por Oscar por error que regresa transferencias de status*/
+						SET id_estado = IF( id_estado = 6 OR id_estado = 4, 4, 3 ) 
 					WHERE id_transferencia IN( {$transfer_id} )";
 			/*$sql = "UPDATE ec_transferencias 
 						SET id_estado = IF( id_estado IN( 3 ), 
