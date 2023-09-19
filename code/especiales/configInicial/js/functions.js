@@ -291,9 +291,28 @@ var procesing_restoration = 0;
 		if( ! insert_triggers ){
 			return false;
 		}
+/*Implementacion Oscar 2023 para insertar procedures despues de la restauracion 2023/09/19*/
+		var insert_procedures = insert_bd_procedures();
+		if( ! insert_procedures ){
+
+		}
 		alert( "Base restaurada exitosamente!" );
 		procesing_restoration = 0;
 	}
+
+
+	function insert_bd_procedures(){
+		var url = "ajax/Restoration.php?restoration_fl=insert_procedures";
+		var resp = ajaxR( url ).split( '|' );
+		if( resp[0] == 'ok' ){
+			alert( resp[1] );
+			return true;
+		}else{
+			alert( resp );
+			return false;
+		}
+	}	
+/*fin de cambio Oscar 2023/09/19*/
 
 	function delete_bd_triggers(){
 		var url = "ajax/Restoration.php?restoration_fl=delete_triggers";

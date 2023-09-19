@@ -1,5 +1,21 @@
 <?php
+	
 	include("../../../conectMin.php");	
+/*Implementacion Oscar 2023/09/19 Comparar la url del host contra la url de linea y si detecta que es linea que no debe de redireccionar a la pantalla de restauracion*/
+	$server = $_SERVER['HTTP_HOST'];
+	$sql = "SELECT
+				url_api
+			FROM versionador_configuracion";
+	$stm = mysql_query( $sql ) or die( "Error al consultar url de api de versionador : " . mysql_error() );
+	$row = mysql_fetch_row( $stm );
+	$versioner_host = str_replace("https://", "", $row[0] );
+	$versioner_host = str_replace("http://", "", $versioner_host );
+	$versioner_host = explode( "/", $versioner_host );
+	$versioner_host = $versioner_host[0];
+	if( $versioner_host == $server ){
+		die( "<script>alert( 'Es el mismo host y seras redireccionado al index!' ); location.href = '../../../index.php?';</script>" );
+	}
+/*fin de cambio Oscar 2023/09/19*/
 
 	$sql="SELECT CONCAT(fecha,' ',hora) FROM sys_respaldos WHERE realizado=0 LIMIT 1";
 	$eje=mysql_query($sql)or die("Error al consultar fecha del respaldo!!!\n\n".$sql."\n\n".mysql_error());
@@ -11,6 +27,7 @@
 				hora,
 				folio_unico
 			FROM sys_respaldos
+			WHERE realizado = 0
 			ORDER BY id_respaldo DESC";
 	$stm = mysql_query( $sql )or die( "Error al consultar datos de restauracion : " . mysql_error() );
 	if( mysql_num_rows( $stm ) >= 1 ){
