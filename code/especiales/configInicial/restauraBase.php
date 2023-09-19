@@ -2,6 +2,7 @@
 	//include('../../../conexionDoble.php');
 	include( '../../../conexionMysqli.php' );
 /*implemetacion Oscar 2023 para restaurar por medio de API*/
+
 	$sql = "SELECT 
 	        	TRIM(value) AS path
 	        FROM api_config WHERE name = 'path'";

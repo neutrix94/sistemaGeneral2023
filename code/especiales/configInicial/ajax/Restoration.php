@@ -29,6 +29,12 @@
 				echo $Rest->insert_triggers();
 			break;
 
+/*Implementacion Oscar 2023 para insertar procedures despues de la restauracion 2023/09/19*/
+			case 'insert_procedures':
+				echo $Rest->insert_procedures();
+			break;
+/*fin de cambio Oscar 2023/09/19*/
+
 			case 'set_apis_paths':
 			//die( 'here' );
 				$api_path = ( isset( $_GET['api_path'] ) ? $_GET['api_path'] : $_POST['api_path'] );
@@ -81,7 +87,18 @@
 			return 'ok|triggers insertados exitosamente!';
 
 		}
+/*Implementacion Oscar 2023 para insertar procedures despues de la restauracion 2023/09/19*/
+		public function insert_procedures(){
+			include( '../../herramientas/mantenimiento_sistema/mysqlDDL.php' );
+			$mysqlDDL = new mysqlDDL( $this->link );
+			$enabled_procedures = $mysqlDDL->alterInventoryTriggersSinceFiles( '../../../../respaldos/storedProcedures/' );
+			if( $enabled_procedures != 'ok' ){
+				die( "Ocurrio un problema al reinsertar los storedProcedures en la base de datos : {$enabled_procedures}" );
+			}
+			return 'ok|storedProcedures insertados exitosamente!';
 
+		}
+/*fin de cambio Oscar 2023/09/19*/
 		public function delete_triggers(){
 			$sql = "SHOW TRIGGERS";
 			$stm = $this->link->query( $sql ) or die( "Error al listar triggers : {$this->link->error}" );
