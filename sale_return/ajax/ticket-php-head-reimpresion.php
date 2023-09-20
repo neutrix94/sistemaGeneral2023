@@ -533,10 +533,10 @@
     					id_archivo=null,
     					tipo_archivo='pdf',
     					nombre_archivo='$nombre_ticket',
-    					ruta_origen='$ruta_or',
-    					ruta_destino='$ruta_des',
+    					ruta_origen='{$ruta_or}/cache/ticket/',
+    					ruta_destino='cache/ticket/',
           			/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
-              			id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$user_sucursal'),
+              			id_sucursal = '{$user_sucursal}',
             		/*Fin de Cambio Oscar 03.03.2019*/
     					id_usuario='$user_id',
     					observaciones=''";
