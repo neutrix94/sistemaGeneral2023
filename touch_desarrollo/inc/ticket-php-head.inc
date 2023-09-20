@@ -669,7 +669,43 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
     /*fin de cambio Oscar 25.01.2019*/
     	}//fin de for $cont
 /*fin de cambio Oscar 17.09.2018*/
-
+/*implementacion Oscar 2023/09/20 para enviar impresion remota*/
+	if($user_tipo_sistema=='linea'){
+		$archivo_path = "../conexion_inicial.txt";
+			if(file_exists($archivo_path)){
+				$file = fopen($archivo_path,"r");
+				$line=fgets($file);
+				fclose($file);
+			    $config=explode("<>",$line);
+			    $tmp=explode("~",$config[0]);
+			    $ruta_des=base64_decode( $tmp[1] );
+			}else{
+				die("No hay archivo de configuración!!!");
+			}
+			$url = "localhost/{$ruta_des}/rest/print/send_file";
+			//die( $url );
+			$post_data = json_encode( array( "destinity_store_id"=>$this->store_id ) );
+			$crl = curl_init( $url );
+			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+			curl_setopt($crl, CURLOPT_POST, true);
+			curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+			  'Content-Type: application/json',
+			  'token: ' . $token)
+			);
+			$resp = curl_exec($crl);//envia peticion
+			//var_dump( $resp );
+			curl_close($crl);
+			//var_dump($resp);
+		//decodifica el json de respuesta
+			$result = json_decode(json_encode($resp), true);
+			$result = json_decode( $result );
+			//return $result;
+	}
+/*fin de cambio Oscar 2023*/
 /*Implementación Oscar 07.03.2019 para finalzar el satus de la devolución*/
     if(isset($_GET["id_pedido_original"]) || $_GET['es_apartado']==1){
     	$sql="UPDATE ec_devolucion SET status=3,observaciones='$mensaje_nota' WHERE id_pedido=$id_pedido_original";
