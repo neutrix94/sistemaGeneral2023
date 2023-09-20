@@ -23,7 +23,10 @@
 				$print_pieces = ( isset( $_GET['print_pieces'] ) ? $_GET['print_pieces'] : 0 );
 				echo $db->make_barcode( $product_provider_id, $user_id, $sucursal_id, $boxes, $packs, $pieces, $decimal, $print_pieces );
 			//oscar 2023 para consumir servicio de impresion remota
-				$db->sendPrint();
+				$tags_sinchronization = $db->sendPrint();
+				if( $tags_sinchronization != 'ok' ){
+					die( "<h2 class=\"text-center\">$tags_sinchronization</h2>" );
+				}
 			break;
 
 			case 'getImages' :
@@ -37,7 +40,10 @@
 			case 'makeBarcodesPieces' :
 				echo $db->make_barcode( $_GET['product_provider_id'], $user_id, $sucursal_id, 0, 0, 0, 0, $_GET['pieces_number'] );
 			//oscar 2023 para consumir servicio de impresion remota
-				$db->sendPrint();
+				$tags_sinchronization = $db->sendPrint();
+				if( $tags_sinchronization != 'ok' ){
+					die( "<h2 class=\"text-center\">$tags_sinchronization</h2>" );
+				}
 			break;
 
 			default :
@@ -85,12 +91,13 @@
 			  'token: ' . $token)
 			);
 			$resp = curl_exec($crl);//envia peticion
-			var_dump( $resp );
+			//var_dump( $resp );
 			curl_close($crl);
 			//var_dump($resp);
 		//decodifica el json de respuesta
 			$result = json_decode(json_encode($resp), true);
 			$result = json_decode( $result );
+			return $result;
 		}
 
 		public function getDistinctRoutes( $store_id ){
