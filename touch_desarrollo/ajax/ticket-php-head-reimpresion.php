@@ -552,7 +552,7 @@
 /*fin de cambio Oscar 17.09.2018*/
 /*implementacion Oscar 2023/09/20 para enviar impresion remota*/
 	if($user_tipo_sistema=='linea'){
-		$archivo_path = "../conexion_inicial.txt";
+		$archivo_path = "../../conexion_inicial.txt";
 		$url = "";
 			if(file_exists($archivo_path)){
 				$file = fopen($archivo_path,"r");
