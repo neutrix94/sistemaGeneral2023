@@ -473,7 +473,7 @@
             /*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
               id_sucursal='$user_sucursal',
             /*Fin de Cambio Oscar 03.03.2019*/
-              id_usuario='{$this->user}',
+              id_usuario='$user_id',
               observaciones=''";
           $inserta_reg_arch=$this->link->query($sql_arch)or die( "Error al guardar el registro de sincronización del ticket de Devolución : {$this->link->error}" );
 
