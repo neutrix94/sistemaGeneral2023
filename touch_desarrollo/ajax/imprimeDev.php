@@ -454,14 +454,22 @@
         
     /*implementación Oscar 25.01.2019 para la sincronización de tickets*/
         if($user_tipo_sistema=='linea'){
+/*implementacion Oscar 2023/09/20 para impresion remota*/
+          $sql = "SELECT 
+          dominio_sucursal AS store_dns
+          FROM ec_configuracion_sucursal
+          WHERE id_sucursal = ( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 )";
+          $stm = mysql_query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
+          $row = mysql_fetch_assoc( $stm );
+          $ruta_or = $row['store_dns'];
           $sql_arch="INSERT INTO sys_archivos_descarga SET 
               id_archivo=null,
               tipo_archivo='pdf',
               nombre_archivo='$nombre_ticket',
-              ruta_origen='$ruta_or',
-              ruta_destino='$ruta_des',
+              ruta_origen='{$ruta_or}/cache/ticket/',
+              ruta_destino='cache/ticket/',
             /*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
-              id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$user_sucursal'),
+              id_sucursal='$user_sucursal',
             /*Fin de Cambio Oscar 03.03.2019*/
               id_usuario='$user_id',
               observaciones=''";
@@ -477,7 +485,45 @@
 /*Fin de cambio Oscar 03.03.2019*/
       $ticket->Output("../../cache/ticket/".$nombre_ticket, "F");
 
-    
+      
+/*implementacion Oscar 2023/09/20 para enviar impresion remota*/
+      if($user_tipo_sistema=='linea'){
+        $archivo_path = "../../conexion_inicial.txt";
+        $url = "";
+          if(file_exists($archivo_path)){
+            $file = fopen($archivo_path,"r");
+            $line=fgets($file);
+            fclose($file);
+              $config=explode("<>",$line);
+              $tmp=explode("~",$config[0]);
+              $ruta_des=base64_decode( $tmp[1] );
+            $url = "localhost/{$ruta_des}/rest/print/send_file";
+          }else{
+            die("No hay archivo de configuración!!!");
+          }
+          //die( $url );
+          $post_data = json_encode( array( "destinity_store_id"=>$user_sucursal ) );
+          $crl = curl_init( $url );
+          curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+          curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+          curl_setopt($crl, CURLOPT_POST, true);
+          curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+          //curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+          curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+          curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'token: ' . $token)
+          );
+          $resp = curl_exec($crl);//envia peticion
+          //var_dump( $resp );
+          curl_close($crl);
+          //var_dump($resp);
+        //decodifica el json de respuesta
+          $result = json_decode(json_encode($resp), true);
+          $result = json_decode( $result );
+          //return $result;
+      }
+/*fin de cambio Oscar 2023*/
   //die('here');
     /*fin de cambio Oscar 25.01.2019*/
        //$ticket->Output("../../cache/ticket/ticket_".$user_sucursal."_" . date("YmdHis") . "_" . strtolower($tipofolio) . "_devolucion_" . $folio . "_2.pdf", "F");

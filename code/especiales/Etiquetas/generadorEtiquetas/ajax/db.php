@@ -25,7 +25,7 @@
 			//oscar 2023 para consumir servicio de impresion remota
 				$tags_sinchronization = $db->sendPrint();
 				if( $tags_sinchronization != 'ok' ){
-					die( "<h2 class=\"text-center\">$tags_sinchronization</h2>" );
+					die( "<h2 class=\"text-center\">{$tags_sinchronization}</h2>" );
 				}
 			break;
 
@@ -42,7 +42,7 @@
 			//oscar 2023 para consumir servicio de impresion remota
 				$tags_sinchronization = $db->sendPrint();
 				if( $tags_sinchronization != 'ok' ){
-					die( "<h2 class=\"text-center\">$tags_sinchronization</h2>" );
+					die( "<h2 class=\"text-center\">{$tags_sinchronization}</h2>" );
 				}
 			break;
 
@@ -378,7 +378,7 @@
 			}else{
 				die("No hay archivo de configuración!!!");
 			}*/
-		//implementacion Osacr 2023 para obtener el dominio del equipo		
+//implementacion Oscar 2023 para obtener el dominio del equipo		
 		$sql = "SELECT 
 					dominio_sucursal AS store_dns
 				FROM ec_configuracion_sucursal
@@ -387,7 +387,7 @@
 		$row = $stm->fetch_assoc();
 		$ruta_or = $row['store_dns'];
 		
-		//fin de cambio Oscar 2023
+//fin de cambio Oscar 2023
 
 			/*$archivo_path = "../../../../../conexion_inicial.txt";
 			if(file_exists($archivo_path)){
