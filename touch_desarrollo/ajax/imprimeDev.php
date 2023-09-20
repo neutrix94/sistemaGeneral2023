@@ -466,7 +466,6 @@
               id_archivo=null,
               tipo_archivo='pdf',
               nombre_archivo='$nombre_ticket',
-              nombre_archivo='$nombre_ticket',
               ruta_origen='{$ruta_or}/cache/ticket/',
               ruta_destino='cache/ticket/',
             /*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
