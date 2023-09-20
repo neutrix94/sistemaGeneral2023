@@ -65,7 +65,7 @@ $app->post('/send_file', function (Request $request, Response $response){
 		$sql = "UPDATE sys_archivos_descarga SET descargado = '1' WHERE id_archivo IN( {$result->ok_rows} )";
 		$stm = $link->query( $sql ) or die( "Error al actualizar los registros de archivos descargados : {$link->error}" );
 				
-		die( $sql );
+		//die( $sql );
 	}else{
 		die( "Algo salio mal : " );
 	}
