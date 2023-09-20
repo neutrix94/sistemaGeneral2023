@@ -71,7 +71,7 @@
 				die("No hay archivo de configuración!!!");
 			}
 			$url = "localhost/{$ruta_des}/rest/print/send_file";
-			die( $url );
+			//die( $url );
 			$post_data = json_encode( array( "destinity_store_id"=>$this->store_id ) );
 			$crl = curl_init( $url );
 			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
