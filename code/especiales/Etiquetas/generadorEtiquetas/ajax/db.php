@@ -358,7 +358,31 @@
 			//die( $file_name );
 			//include( '../../../../../conectMin.php' );
 			$resp = "\n";
-			$archivo_path = "../../../../../conexion_inicial.txt";
+			
+			/*$archivo_path = "../../../../../conexion_inicial.txt";
+			if(file_exists($archivo_path)){
+				$file = fopen($archivo_path,"r");
+				$line=fgets($file);
+				fclose($file);
+			    $config=explode("<>",$line);
+			    $tmp=explode("~",$config[0]);
+			    $ruta_or = base64_decode( $tmp[1] ).base64_decode( $tmp[0] );
+			    $ruta_or = . "/" . base64_decode( $tmp[1] ).base64_decode( $tmp[1] );
+			}else{
+				die("No hay archivo de configuración!!!");
+			}*/
+		//implementacion Osacr 2023 para obtener el dominio del equipo		
+		$sql = "SELECT 
+					dominio_sucursal AS store_dns
+				FROM ec_configuracion_sucursal
+				WHERE id_sucursal = {$store_id}";
+		$stm = $this->link->query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
+		$row = $stm->fetch_assoc();
+		$ruta_or = $row['store_dns'];
+		
+		//fin de cambio Oscar 2023
+
+			/*$archivo_path = "../../../../../conexion_inicial.txt";
 			if(file_exists($archivo_path)){
 				$file = fopen($archivo_path,"r");
 				$line=fgets($file);
@@ -369,7 +393,7 @@
 			    //$ruta_des=$tmp[1];
 			}else{
 				die("No hay archivo de configuración!!!");
-			}
+			}*/
 		//busca datos del usuario
 			$sql = "SELECT 
 						CONCAT( nombre, ' ', apellido_paterno ) AS name
@@ -601,7 +625,7 @@
 								id_archivo=null,
 								tipo_archivo='txt',
 								nombre_archivo='{$file_name}',
-								ruta_origen='{$ruta_or}{$key}',
+								ruta_origen='{$ruta_or}/{$key}',
 								ruta_destino='$key',
 								id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$store_id'),
 								id_usuario='$user_id',
