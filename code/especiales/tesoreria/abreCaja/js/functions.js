@@ -13,7 +13,7 @@
 //funcion que valida login
 	function abrir_caja(){
 	//validamos datos
-	var log,contra, cambio;
+	var log,contra, cambio, terminal_id;
 	log=$("#user").val();
 	if(log.length<=0){
 		alert("El campo de cajero no puede ir vacío!!!");
@@ -30,6 +30,12 @@
 	if(cambio.length<=0){
 		alert("El cambio inicial en caja es obligatorio*");
 		$("#cambio_caja").focus();
+		return false;
+	}
+	terminal_id = $( '#principal_terminal' ).val();
+	if(terminal_id == 0){
+		alert("Debes de elegir una terminal*");
+		$( '#principal_terminal' ).focus();
 		return false;
 	}
 	//enviamos datos por ajax
@@ -98,4 +104,40 @@
 	function cierra_emergente(){
 		$("#contenido_emergente").html('');
 		$("#emergente").css("display","none");	
+	}
+/*Implementaciones Oscar 2023*/
+	function setTerminal(){
+		var terminal_id = $( '#principal_terminal' ).val();
+		if( terminal_id == 0 ){
+			alert( "Selecciona una terminal valida para continuar!" );
+			return false;
+		}else{
+			var terminal_txt = $( '#principal_terminal option:selected' ).text().trim();
+			$( '#terminals_list' ).append( build_terminal_row( terminal_txt ) );
+		}
+	}
+
+	function rebuildTerminals(){
+		
+	}
+
+	function build_terminal_row( terminal ){
+		var content = `<tr>
+			<td>${terminal}</td>
+			<td>
+				<button 
+					type="button"
+					class="btn btn-danger"
+					onclick="remove_terminal( this );"
+				>
+					<i class="icon-cancel-circled"></i>
+				</button>
+			</td>
+		</tr>`;
+		return content;
+	}
+
+	function remove_terminal( obj ){
+		var element = $( obj ).parent( 'td' ).parent( 'tr' );
+		element.remove();
 	}

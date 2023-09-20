@@ -1,6 +1,7 @@
 <?php
 /*version casa 1.1*/
 	include('../../../../conectMin.php');
+	include('../../../../conexionMysqli.php');
 
 	$sql="SELECT id_sucursal FROM sys_sucursales WHERE acceso=1
 		UNION
@@ -38,6 +39,25 @@
 	$eje=mysql_query($sql)or die("Error al consultar el login del usuario logueado en este sistema!!!<br>".mysql_error());
 	$r=mysql_fetch_row($eje);
 	$login_cajero=$r[0];
+
+	function getTerminalsOptions( $user_id, $link ){
+		//die( 'here' );
+		$resp = "";
+		$sql = "SELECT 
+				a.id_afiliacion AS afiliation_id,
+				a.no_afiliacion AS afiliation_number
+			FROM ec_afiliaciones a
+			LEFT JOIN ec_afiliaciones_cajero ac 
+			ON ac.id_afiliacion=a.id_afiliacion
+			WHERE ac.id_cajero='{$user_id}' 
+			AND ac.activo=1";
+		$stm = $link->query( $sql ) or die( "Error al consultar las terminales : {$link->error}" );
+		//die( $sql );
+		while( $row = $stm->fetch_assoc() ){
+			$resp .= "<option value=\"{$row['afiliation_id']}\">{$row['afiliation_number']}</option>";
+		}
+		return $resp;
+	}
 ?>
 <!DOCTYPE html>
 <head>
@@ -54,7 +74,7 @@
 </head>
 <body onload="focus_password();">
 	<div id="emergente">
-		<div id="contenido_emergente">	
+		<div id="contenido_emergente">
 		</div>
 	</div>
 	<div id="global">
@@ -93,6 +113,36 @@
 						<br>
 						<p align="center">Monto de cambio en Caja</p>
 						<input type="number" id="cambio_caja" class="form-control" placeholder="Monto de cambio en Caja">
+						<br>
+						<p align="center">Terminal</p>
+						<div class="input-group">
+							<select id="principal_terminal" 
+								class="form-select">
+								<option value="">-- Seleccionar --</option>
+								<?php
+									echo getTerminalsOptions( $user_id, $link );
+								?>
+							</select>
+							<button
+								type="button"
+								class="btn btn-success"
+								onclick="setTerminal();"
+							>
+								<i class="icon-plus"></i>
+							</button>
+						</div>
+						<br>
+						<div class="bg-light">
+							<table class="table table-striped">
+								<thead class="">
+									<tr>
+										<th>Terminales</th>
+										<th>X</th>
+									</tr>
+								</thead>
+								<tbody id="terminals_list"></tbody>
+							</table>
+						</div>
 						<br><br>
 						<button 
 							type="button" 
