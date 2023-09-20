@@ -375,7 +375,7 @@
 		$sql = "SELECT 
 					dominio_sucursal AS store_dns
 				FROM ec_configuracion_sucursal
-				WHERE id_sucursal = {$store_id}";
+				WHERE id_sucursal = ( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 )";
 		$stm = $this->link->query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
 		$row = $stm->fetch_assoc();
 		$ruta_or = $row['store_dns'];
