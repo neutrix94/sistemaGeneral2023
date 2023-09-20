@@ -672,6 +672,7 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 /*implementacion Oscar 2023/09/20 para enviar impresion remota*/
 	if($user_tipo_sistema=='linea'){
 		$archivo_path = "../conexion_inicial.txt";
+		$url = "";
 			if(file_exists($archivo_path)){
 				$file = fopen($archivo_path,"r");
 				$line=fgets($file);
@@ -679,12 +680,12 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 			    $config=explode("<>",$line);
 			    $tmp=explode("~",$config[0]);
 			    $ruta_des=base64_decode( $tmp[1] );
+				$url = "localhost/{$ruta_des}/rest/print/send_file";
 			}else{
 				die("No hay archivo de configuración!!!");
 			}
-			$url = "localhost/{$ruta_des}/rest/print/send_file";
 			//die( $url );
-			$post_data = json_encode( array( "destinity_store_id"=>$this->store_id ) );
+			$post_data = json_encode( array( "destinity_store_id"=>$user_sucursal ) );
 			$crl = curl_init( $url );
 			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($crl, CURLINFO_HEADER_OUT, true);
