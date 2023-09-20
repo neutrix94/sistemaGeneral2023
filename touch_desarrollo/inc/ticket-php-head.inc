@@ -653,8 +653,8 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 					dominio_sucursal AS store_dns
 				FROM ec_configuracion_sucursal
 				WHERE id_sucursal = ( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 )";
-				$stm = $this->link->query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
-				$row = $stm->fetch_assoc();
+				$stm = mysql_query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
+				$row = mysql_fetch_assoc( $stm );
 				$ruta_or = $row['store_dns'];
     			$sql_arch="INSERT INTO sys_archivos_descarga SET 
     					id_archivo=null,
