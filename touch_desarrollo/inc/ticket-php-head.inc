@@ -649,15 +649,22 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
     		$nombre_ticket="ticket_".$user_sucursal."_" . date("YmdHis") . "_" . strtolower($tipofolio) . "_" . $folio . "_".$cont.".pdf";
         /*implementación Oscar 25.01.2019 para la sincronización de tickets*/
     		if($user_tipo_sistema=='linea'){
+    			$sql = "SELECT 
+					dominio_sucursal AS store_dns
+				FROM ec_configuracion_sucursal
+				WHERE id_sucursal = ( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 )";
+				$stm = $this->link->query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
+				$row = $stm->fetch_assoc();
+				$ruta_or = $row['store_dns'];
     			$sql_arch="INSERT INTO sys_archivos_descarga SET 
     					id_archivo=null,
     					tipo_archivo='pdf',
     					nombre_archivo='$nombre_ticket',
-    					ruta_origen='$ruta_or',
-    					ruta_destino='$ruta_des',
+    					ruta_origen='$ruta_or/cache/ticket/',
+    					ruta_destino='cache/ticket/',
 
     				/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
-    					id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$user_sucursal'),
+    					id_sucursal='$user_sucursal',
     				/*Fin de Cambio Oscar 03.03.2019*/
     					
     					id_usuario='$user_id',
