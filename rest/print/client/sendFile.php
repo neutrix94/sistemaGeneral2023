@@ -23,10 +23,9 @@ $app->post('/send_file', function (Request $request, Response $response){
 				ruta_destino AS file_destinity,
 				id_sucursal AS file_store 
 			FROM sys_archivos_descarga
-			WHERE descargado = 0
-			AND id_sucursal = {$store_id}
+			WHERE descargado = 1
 			ORDER BY id_archivo DESC
-			LIMIT 1";
+			LIMIT 10";
 	$stm = $link->query( $sql ) or die( "Error al consultar los archivos por descargar : {$sql} {$link->error}" );
 	while ( $row = $stm->fetch_assoc() ) {
 		$files[] = $row;
@@ -68,8 +67,7 @@ $app->post('/send_file', function (Request $request, Response $response){
 				
 		die( $sql );
 	}else{
-		echo ( "Algo salio mal : " );
-		var_dump($result)
+		die( "Algo salio mal : " );
 	}
 	return 'ok';
 	//return $result;
