@@ -1,9 +1,9 @@
 <?php
-    define('FPDF_FONTPATH','../../../../../include/fpdf153/font/');
+    define('FPDF_FONTPATH','../../../../include/fpdf153/font/');
     
-    include("../../../../../include/fpdf153/fpdf.php");
+    include("../../../../include/fpdf153/fpdf.php");
 /*implementación Oscar 25.01.2019 para sacar rutas de tickets*/
-    $archivo_path = "../../../../../conexion_inicial.txt";
+    $archivo_path = "../../../../conexion_inicial.txt";
     if(file_exists($archivo_path)){
         $file = fopen($archivo_path,"r");
         $line=fgets($file);

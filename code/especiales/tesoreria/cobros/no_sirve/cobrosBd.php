@@ -2,24 +2,32 @@
 	include('../../../../conectMin.php');
 	$fl=$_POST['flag'];
 	/*buscador por folios*/
-	if($fl=='buscador'){
+	if( $fl == 'buscador' ){
 		$clave=$_POST['valor'];
-		$sql="SELECT id_pedido,folio_nv,pagado FROM ec_pedidos WHERE folio_nv LIKE '%$clave%' AND id_sucursal=$user_sucursal";
+		$sql="SELECT 
+				id_pedido,
+				folio_nv,
+				pagado,
+				total
+			FROM ec_pedidos 
+			WHERE folio_nv LIKE '%$clave%' 
+			AND id_sucursal=$user_sucursal";
 		$eje=mysql_query($sql) or die("Error al buscar coincidencias por folio!!!\n".mysql_error());
 		echo 'ok|';
 		if(mysql_num_rows($eje)<=0){
 			die("Sin coincidencias!!!");
 		}
-		echo '<table width="100%" border="0">';
+		echo "<table width=\"100%\" border=\"0\">";
 		$c=0;
 	//listamos resultados
 		while($r=mysql_fetch_row($eje)){
-			$c++;//incrementamos contador
-			echo '<tr id="opc_'.$c.'" tabindex="'.$c.'" onclick="carga_pedido('.$r[0].','.$r[2].');" onkeyup="valida_tca_opc(event,'.$c.');" onfocus="marca('.$c.');" onblur="desmarca('.$c.');">';
-				echo '<td class="opc_buscador">'.$r[1].'</td>';
-			echo '<tr>';
+			$c++;//incrementamos contador //onclick=\"carga_pedido('{$r[0]}','{$r[2]}');\"
+			echo "<tr id=\"opc_{$c}\" tabindex=\"{$c}\" onclick=\"setTicket( {$r[0]}, '{$r[1]}', {$r[2]}, {$r[3]} );\" 
+				onkeyup=\"valida_tca_opc( event, {$c} );\" onfocus=\"marca( {$c} );\" onblur=\"desmarca( {$c} );\">
+					<td class=\"opc_buscador\">{$r[1]}</td>
+			<tr>";
 		}
-		die('</table>');
+		die( "</table>" );
 	}
 //flag:'carga_datos',valor:id
 	if($fl=='carga_datos'){
@@ -59,9 +67,7 @@
 	//efectivo
 		if( $monto_efectivo!='' && $monto_efectivo!=0 ){
 		//insertamos el pago en efectivo
-			$sql="INSERT INTO ec_cajero_cobros ( id_cajero_cobro, id_pedido, id_cajero, id_afiliacion, id_banco, 
-					monto, fecha, hora, observaciones, sincronizar ) 
-				VALUES(null,$id_pedido,$user_id,-1,-1,$monto_efectivo,now(),now(),'',1)";
+			$sql="INSERT INTO ec_cajero_cobros VALUES(null,$id_pedido,$user_id,-1,-1,$monto_efectivo,now(),now(),'',1)";
 			$eje=mysql_query($sql);
 			if(!$eje){
 				$error=mysql_error();
@@ -77,9 +83,7 @@
 		for($i=0;$i<sizeof($arr_tarjetas)-1;$i++){
 			$arr=explode("~",$arr_tarjetas[$i]);
 			//echo 'enttra';
-			$sql="INSERT INTO ec_cajero_cobros ( id_cajero_cobro, id_pedido, id_cajero, id_afiliacion, id_banco, 
-					monto, fecha, hora, observaciones, sincronizar ) 
-				VALUES(null,$id_pedido,$user_id,'$arr[0]',-1,'$arr[1]',now(),now(),'',1)";
+			$sql="INSERT INTO ec_cajero_cobros VALUES(null,$id_pedido,$user_id,'$arr[0]',-1,'$arr[1]',now(),now(),'',1)";
 			$eje=mysql_query($sql);
 			if(!$eje){
 				$error=mysql_error();
@@ -93,9 +97,7 @@
 		$arr_cheques=explode("°",$cheques);
 		for($i=0;$i<sizeof($arr_cheques)-1;$i++){
 			$arr=explode("~",$arr_cheques[$i]);
-			$sql="INSERT INTO ec_cajero_cobros ( id_cajero_cobro, id_pedido, id_cajero, id_afiliacion, id_banco, 
-					monto, fecha, hora, observaciones, sincronizar ) 
-				VALUES(null,$id_pedido,$user_id,-1,$arr[0],$arr[1],now(),now(),'$arr[2]',1)";
+			$sql="INSERT INTO ec_cajero_cobros VALUES(null,$id_pedido,$user_id,-1,$arr[0],$arr[1],now(),now(),'$arr[2]',1)";
 			$eje=mysql_query($sql);
 			if(!$eje){
 				$error=mysql_error();

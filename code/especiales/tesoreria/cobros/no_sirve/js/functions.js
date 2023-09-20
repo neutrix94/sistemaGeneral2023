@@ -1,5 +1,5 @@
-
 var total_cobros=0,monto_real=0;
+
 	function link(flag){
 		if(flag==1 && confirm("Realmente desea regresar al panel?")==true){
 			location.href='../../../../index.php?';
@@ -48,30 +48,29 @@ var total_cobros=0,monto_real=0;
 			return true;
 		}
 		//alert(e.keyCode);
-		if( e.keyCode==13 || e.keyCode==40 || e == 'intro' ){
-		//enviamos detos por ajax
-			$.ajax({
-				type:'post',
-				url:'cobrosBd.php',
-				cache:false,
-				data:{flag:'buscador',valor:txt},
-				success:function(dat){
-					var aux=dat.split("|");
-					if(aux[0]!='ok'){
-						alert(dat);return false;
-					}else{
-						$("#res_busc").html(aux[1]);
-						$("#res_busc").css("display","block");
-						if( e.keyCode==13 ){
-							$("#opc_1").click();
-						}else if(e.keyCode==40 || e == 'intro' ){
-							$("#opc_1").focus();
-							return true;
-						}
+	if(e.keyCode==13 || e.keyCode==40 || e == 'intro' ){
+	//enviamos detos por ajax
+		$.ajax({
+			type:'post',
+			url:'cobrosBd.php',
+			cache:false,
+			data:{flag:'buscador',valor:txt},
+			success:function(dat){
+				var aux=dat.split("|");
+				if(aux[0]!='ok'){
+					alert(dat);return false;
+				}else{
+					$("#res_busc").html(aux[1]);
+					$("#res_busc").css("display","block");
+					if( e.keyCode==13 || e == 'intro' ){
+						$("#opc_1").click();
+					}else if(e.keyCode==40){
+						$("#opc_1").focus();return true;
 					}
-				}		
-			});
-		}
+				}
+			}		
+		});
+	}
 	}
 
 	function carga_pedido(id,pagado){
@@ -86,8 +85,7 @@ var total_cobros=0,monto_real=0;
 				if(aux[0]!='ok'){
 					alert(dat);return false;
 				}else{
-					//$("#efectivo").val(aux[3]-aux[4]);//oscar 2023
-					$("#t0").val(aux[3]-aux[4]);//oscar 2023
+					$("#efectivo").val(aux[3]-aux[4]);
 					$("#monto_total").val(aux[3]);
 					$("#buscador").val(aux[2]);
 					$("#id_venta").val(aux[1]);
@@ -99,9 +97,6 @@ var total_cobros=0,monto_real=0;
 					total_cobros=aux[3]-aux[4];
 					//alert(aux[3]);
 					monto_real=aux[3]-aux[4];
-				
-					$( '#seeker_btn' ).addClass( 'no_visible' );//oculta boton de buscador
-					$( '#seeker_reset_btn' ).removeClass( 'no_visible' );//muestra boton de reseteo
 				}
 			}		
 		});
@@ -115,40 +110,9 @@ var total_cobros=0,monto_real=0;
 	}
 
 	function valida_tca(obj,e,flag,num){
-		const regex = /^[0-9]+$/; // Expresión regular que permite solo números
-		var value = $(obj).val();
-		if ( value.includes('.') ) {
-			alert( "No se admiten numeros decimales!" );
-    		value.replace('.', '');
-    		$( obj ).val( value );
-  		}
-  		if (!regex.test(value)) {
-    		$( obj ).val( value.replace(/[^\d]/g, '') );
-  		}
-  		/*var valorFormateado = parseFloat(value).toLocaleString('es', {
-		    style: 'currency',
-		    currency: 'MXN', // Cambia esto a tu moneda preferida si es diferente
-		    minimumFractionDigits: 0,
-		});*/
-		//formatear numero
-		value = value.replace(',','');
-		var valorFormateado = Mascara('###,###,###,###', value);
-		/*var aux_counter = 0;
-		value = value.replace(',', '');
-		for (var i = 0; i <= value.length - 1; i++) {
-			valorFormateado += value[i];
-			aux_counter ++;
-			if( aux_counter == 3 && i < value.length - 2 ){
-				valorFormateado += ',';
-				aux_counter = 0;
-			}
-		};*/
-
-		$( obj ).val( valorFormateado );
 	//sacamos el id del objeto
 	//sacamos el evento
 		var tca=e.keyCode;
-  		//alert( $(obj).val() );
 	//campos de tarjetas (afiliaciones)
 		if(flag==1){
 			if(tca==40 && document.getElementById("t"+parseInt(num+1))){
@@ -183,10 +147,10 @@ var total_cobros=0,monto_real=0;
 		var total_tarjetas=0,total_cheques=0,a_favor=0,total=0,monto_total=0;
 		//var recibido=$("#efectivo_recibido").val();
 	//sacamos los pagos por tarjeta
-		var tope_tarjetas=$("#payments_list tr").length;
-		for( var i=0;i <tope_tarjetas; i++ ){
+		var tope_tarjetas=$("#cantidad_tarjetas").val();
+		for(var i=1;i<=tope_tarjetas;i++){
 			if($("#t"+i).val()!=''){
-				total_tarjetas+=parseFloat($("#t"+i).val().replaceAll( ',', '' ));
+				total_tarjetas+=parseFloat($("#t"+i).val());
 			}else{
 				$("#t"+i).val(0);
 			}
@@ -223,7 +187,7 @@ var total_cobros=0,monto_real=0;
 
 	function calcula_cambio(){
 		var total_tarjetas=0,total_cheques=0,total_cobros=0;
-		var recibido=$("#efectivo_recibido").val().replaceAll( ',', '' );
+		var recibido=$("#efectivo_recibido").val();
 		var devolver=$("#efectivo_devolver").val();
 		if(recibido<=0){
 			return true;
@@ -251,18 +215,11 @@ var total_cobros=0,monto_real=0;
 			return false;
 		}
 	//obtenemos la referencia
-		var observacion = `<p class="text-success" align="center">
-			Ingresa la referencia del Cheque/Transferencia</p>
-			<p align="center">
-				<textarea id="referencia_cheque_transferencia"></textarea>
-				<br><br>
-				<button 
-					class="btn btn-success" 
-					onclick="agregar_fila( ${id_caja}, ${monto}, '${txt_select}')">
-				Aceptar</button>
-			</p>`;
-		$(".emergent_content").html(observacion);
-		$(".emergent").css("display","block");
+		var observacion='<p style="color:white;font-size:30px;" align="center">Ingrese la referencia del Cheque/Transferencia</p>';
+		observacion+='<p align="center"><textarea id="referencia_cheque_transferencia"></textarea>';
+		observacion+='<br><br><button class="boton" onclick="agregar_fila('+id_caja+','+monto+',\''+txt_select+'\')">Aceptar</button></p>';
+		$("#contenido_emergente").html(observacion);
+		$("#emergente").css("display","block");
 		return true;
 	}
 var cont_cheques_transferencia=0;
@@ -345,58 +302,34 @@ var cont_cheques_transferencia=0;
 				}
 			});
 		}
-/*funcion para agregar pagos con tarjeta*/
-	function addPaymetCard( user_id ){
-		if( $( '#id_venta' ).val() == 0 ){
-			alert( "Es necesario que selecciones una nota de venta para continuar" );
-			$( '#buscador' ).select();
-			return false;
-		}
-		var url = 'ajax/db.php?fl=getTerminals&user_id=' + user_id;
-		url += '&counter=' + $( '#payments_list tr' ).length;
-		//alert( url );
-		if( $( '#payments_list' ).length == 1 ){
-			$( '#t0' ).val( '' );
-		}
-		var resp = ajaxR( url );
-		$( '#payments_list' ).append( resp );
-	}
-//habilitar pagos
-	function enable_payments(){
-		var amount_total = parseInt( $( '#monto_total' ).val() );
-		var amount_sum = 0;
-		var stop = false;
-		//var stop = false;
-	//verifica que todos lo pagos esten lleno y sumen la cantidad del monto total
-		$( '#payments_list tr' ).each( function( index ){
-			//$( '#payment_btn_' + index ).removeClass( 'no_visible' );
-			amount_sum += parseInt( $( '#t' + index ).val().replaceAll( ',', '' ) );
-		});
-		if( amount_sum != amount_total ){
-			alert( "La suma de los montos es diferente del total!" );
-			return false;
-		}
-	//mustra los botones para enviar la peticion
-		$( '#payments_list tr' ).each( function( index ){
-			$( '#payment_btn_' + index ).removeClass( 'no_visible' );//muestra boton para cobrar
-			$( '#t' + index ).attr( 'readonly', true );
-			$( '#efectivo' ).attr( 'readonly', true );
-		});
-		$( '#start_payments_btn' ).addClass( 'no_visible' );
-		$( '#add_card_btn' ).addClass( 'no_visible' );
 
-	}
-//lamadas asincronas
-	function ajaxR( url ){
-		if(window.ActiveXObject)
-		{		
-			var httpObj = new ActiveXObject("Microsoft.XMLHTTP");
+		function api_petition( counter ){
+			var amount = $( '#t' + counter ).val();
+			if( amount <= 0 || amount == '' ){
+				alert( "El monto debe de ser mayor a cero, verfica y vuelve a intentar!" ); 
+				$( '#t' + counter ).focus();
+				$( '#t' + counter ).select();
+				return false;
+			}
+			var content = `<div class="row">
+				<div class="col-2"></div>
+				<div class="col-8">
+					<h2 class="text-center">Enviar peticion a Terminal</h2>
+					<button
+						class="btn btn-success form-control"
+						onclick="send_api_petition( ${counter}, ${amount} );"
+					>
+						<i class="icon-ok-circle">Enviar</i>
+					</button>
+				</div>
+			</div>`;
+			$( '.emergent_content' ).html( content );
+			$( '.emergent' ).css( 'display', 'block' );
 		}
-		else if (window.XMLHttpRequest)
-		{		
-			var httpObj = new XMLHttpRequest();	
+
+		function send_api_petition( counter, amount ){
+			var payment = new Object();
+			payment.terminal_id = $( '#tarjeta_' + counter ).val();
+			payment.amount = amount;
+
 		}
-		httpObj.open("POST", url , false, "", "");
-		httpObj.send(null);
-		return httpObj.responseText;
-	}

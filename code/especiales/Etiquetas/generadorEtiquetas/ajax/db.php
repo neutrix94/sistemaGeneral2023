@@ -22,6 +22,11 @@
 				$decimal = ( isset( $_GET['decimal'] ) ? $_GET['decimal'] : 0 );
 				$print_pieces = ( isset( $_GET['print_pieces'] ) ? $_GET['print_pieces'] : 0 );
 				echo $db->make_barcode( $product_provider_id, $user_id, $sucursal_id, $boxes, $packs, $pieces, $decimal, $print_pieces );
+			//oscar 2023 para consumir servicio de impresion remota
+				$tags_sinchronization = $db->sendPrint();
+				if( $tags_sinchronization != 'ok' ){
+					die( "<h2 class=\"text-center\">$tags_sinchronization</h2>" );
+				}
 			break;
 
 			case 'getImages' :
@@ -34,6 +39,11 @@
 			
 			case 'makeBarcodesPieces' :
 				echo $db->make_barcode( $_GET['product_provider_id'], $user_id, $sucursal_id, 0, 0, 0, 0, $_GET['pieces_number'] );
+			//oscar 2023 para consumir servicio de impresion remota
+				$tags_sinchronization = $db->sendPrint();
+				if( $tags_sinchronization != 'ok' ){
+					die( "<h2 class=\"text-center\">$tags_sinchronization</h2>" );
+				}
 			break;
 
 			default :
@@ -52,6 +62,42 @@
 			$this->link = $connection;
 			$this->store_id = $store_id;
 			//$this->getDistinctRoutes( $store_id );//consulta rutas
+		}
+
+		public function sendPrint(){
+			$archivo_path = "../../../../../conexion_inicial.txt";
+			if(file_exists($archivo_path)){
+				$file = fopen($archivo_path,"r");
+				$line=fgets($file);
+				fclose($file);
+			    $config=explode("<>",$line);
+			    $tmp=explode("~",$config[0]);
+			    $ruta_des=base64_decode( $tmp[1] );
+			}else{
+				die("No hay archivo de configuración!!!");
+			}
+			$url = "localhost/{$ruta_des}/rest/print/send_file";
+			//die( $url );
+			$post_data = json_encode( array( "destinity_store_id"=>$this->store_id ) );
+			$crl = curl_init( $url );
+			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+			curl_setopt($crl, CURLOPT_POST, true);
+			curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+			  'Content-Type: application/json',
+			  'token: ' . $token)
+			);
+			$resp = curl_exec($crl);//envia peticion
+			//var_dump( $resp );
+			curl_close($crl);
+			//var_dump($resp);
+		//decodifica el json de respuesta
+			$result = json_decode(json_encode($resp), true);
+			$result = json_decode( $result );
+			return $result;
 		}
 
 		public function getDistinctRoutes( $store_id ){
@@ -319,7 +365,31 @@
 			//die( $file_name );
 			//include( '../../../../../conectMin.php' );
 			$resp = "\n";
-			$archivo_path = "../../../../../conexion_inicial.txt";
+			
+			/*$archivo_path = "../../../../../conexion_inicial.txt";
+			if(file_exists($archivo_path)){
+				$file = fopen($archivo_path,"r");
+				$line=fgets($file);
+				fclose($file);
+			    $config=explode("<>",$line);
+			    $tmp=explode("~",$config[0]);
+			    $ruta_or = base64_decode( $tmp[1] ).base64_decode( $tmp[0] );
+			    $ruta_or = . "/" . base64_decode( $tmp[1] ).base64_decode( $tmp[1] );
+			}else{
+				die("No hay archivo de configuración!!!");
+			}*/
+		//implementacion Osacr 2023 para obtener el dominio del equipo		
+		$sql = "SELECT 
+					dominio_sucursal AS store_dns
+				FROM ec_configuracion_sucursal
+				WHERE id_sucursal = ( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 )";
+		$stm = $this->link->query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
+		$row = $stm->fetch_assoc();
+		$ruta_or = $row['store_dns'];
+		
+		//fin de cambio Oscar 2023
+
+			/*$archivo_path = "../../../../../conexion_inicial.txt";
 			if(file_exists($archivo_path)){
 				$file = fopen($archivo_path,"r");
 				$line=fgets($file);
@@ -330,7 +400,7 @@
 			    //$ruta_des=$tmp[1];
 			}else{
 				die("No hay archivo de configuración!!!");
-			}
+			}*/
 		//busca datos del usuario
 			$sql = "SELECT 
 						CONCAT( nombre, ' ', apellido_paterno ) AS name
@@ -562,7 +632,7 @@
 								id_archivo=null,
 								tipo_archivo='txt',
 								nombre_archivo='{$file_name}',
-								ruta_origen='{$ruta_or}{$key}',
+								ruta_origen='{$ruta_or}/{$key}',
 								ruta_destino='$key',
 								id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$store_id'),
 								id_usuario='$user_id',
