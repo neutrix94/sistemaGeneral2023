@@ -84,6 +84,7 @@
 			  'token: ' . $token)
 			);
 			$resp = curl_exec($crl);//envia peticion
+			var_dump( $resp );
 			curl_close($crl);
 			//var_dump($resp);
 		//decodifica el json de respuesta
