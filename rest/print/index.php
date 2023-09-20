@@ -7,19 +7,17 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 */
 require '../vendor/autoload.php';
 require '../src/config/db.php';         // DB Connect CL
-require '../src/config/dbFact.php';     // DB Connect Fact
+//require '../src/config/dbFact.php';     // DB Connect Fact
 $app = new \Slim\App;
-/*
-* Instancia utilities
-require 'utils/manageResponse.php';
-require 'utils/validaToken.php';
-/*
-* Instancia servicios por exponer
-*/
 
-//require 'server/netPayResponse_1.php';
-require 'server/netPayResponse.php';
-//die( 'here' );
+require 'client/sendFile.php';
+require 'server/getPrints.php';
 
+
+
+
+
+require 'client/sendFileDirectly.php';
+require 'server/getPrintsDirectly.php';
 
 $app->run();
