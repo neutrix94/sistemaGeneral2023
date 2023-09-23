@@ -62,7 +62,7 @@
 			$resp = '';
 			$sql = "SELECT 
 						p.id_productos,
-						CONCAT( p.nombre, '<br><span class_black>Clave Proveedor : <span class_tam>', pp.clave_proveedor , '</span> Caja con ' , pp.presentacion_caja , ' pzas</span>' ) AS nombre,
+						CONCAT( p.nombre ) AS nombre,/*, '<br><span class_black>Clave Proveedor : <span class_tam>', pp.clave_proveedor , '</span> Caja con ' , pp.presentacion_caja , ' pzas</span>'*/
 						ap.inventario,
 						SUM( rd.piezas_sueltas_recibidas + ( rd.piezas_por_caja * rd.cajas_recibidas ) ),
 						rd.id_status_ubicacion,
