@@ -52,7 +52,7 @@
 
 			case 'disabled_principal_location':
 				$product_id = ( isset( $_GET['product_id'] ) ? $_GET['product_id'] : $_POST['product_id'] );
-				$warehouse_id = ( isset( $_GET['warehouse_id'] ) ? $_GET['product_id'] : $_POST['product_id'] );
+				$warehouse_id = ( isset( $_GET['warehouse_id'] ) ? $_GET['warehouse_id'] : $_POST['warehouse_id'] );
 				echo $Locations->disabled_principal_location( $product_id , $warehouse_id );
 			break;
 			
@@ -77,6 +77,7 @@
 					WHERE id_producto = {$product_id}
 					AND id_almacen = {$warehouse_id}
 					AND es_principal = 1";
+					//die( $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al deshabilitar ubicacion principal del producto : {$link->error}" );
 			die( 'ok' );
 		}
