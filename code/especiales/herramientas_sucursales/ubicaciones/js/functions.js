@@ -68,7 +68,13 @@
 		//$( "#location_status_seeker").val( ( location_data[5] != '' && location_data[4] == 3 ? 2 : location_data[4] ) );
 		$( '#product_seeker_location_form_btn' ).css( 'display', 'none' );
 		$( '#product_reset_location_form_btn' ).css( 'display', 'block' );
-
+		setTimeout( function (){ 
+				if( $( '#locations_list tr' ).length <= 0 ){
+					$( '#is_principal' ).prop( 'checked', true );
+				}else{
+					$( '#is_principal' ).removeAttr( 'checked' );
+				}
+			}, 300);
 //setTimeout( function (){ getLocationDetail( $( "#location_status_seeker").val(), '_seeker' ); }, 300 );
 	}
 
