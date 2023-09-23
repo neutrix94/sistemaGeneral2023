@@ -39,7 +39,8 @@
         	//echo 'Ssql:'.$sql;
         }//fin de for i
     /*Se implementa el filtro $cond_externos Oscar 14.08.2018 patra filtrar productos internos, externos*/
-		$sql.=")) AND p.habilitado=1 AND p.es_maquilado=0 AND p.muestra_paleta=0 AND p.id_productos!=1808 $cond_externos ORDER BY p.orden_lista ASC";/*Modificación para no mostrar productos con muestra_paleta Oscar 23-05-2018*/
+		$sql.=")) AND p.habilitado=1 AND p.es_maquilado=0 AND p.muestra_paleta=0 $cond_externos ORDER BY p.orden_lista ASC";/*Modificación para no mostrar productos con muestra_paleta Oscar 23-05-2018*/
+		//AND p.id_productos!=1808 deshabilitado por Oscar 2023/09/23 para poder agregar el producto de ultimas piezas
 		//echo $sql;
 		$ejecuta=mysql_query($sql);
 		if(!$ejecuta){
