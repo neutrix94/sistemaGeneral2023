@@ -220,7 +220,8 @@
               LEFT JOIN ec_precios p1 on pd_1.id_precio=p1.id_precio
               LEFT JOIN sys_sucursales s1 ON IF($producto_externo=1,p1.id_precio=s1.lista_precios_externa,p1.id_precio=s1.id_precio)
               WHERE pd_1.id_producto=p.id_productos AND s1.id_sucursal=$user_sucursal LIMIT 1) 
-          ) as id_lista_precio
+          ) as id_lista_precio,
+          p.es_ultimas_piezas
       /*Fin de Cambio Oscar 18.03.2019*/
         /*Fin de cambio*/
           FROM ec_productos p
@@ -240,6 +241,9 @@
     if(mysql_num_rows($res) > 0)
     {
         $row=mysql_fetch_row($res);
+      if( $row[14] == 1 ){
+        die( "is_last_pieces|" );
+      }
         
         #die(($row[4]*$can) . " y " . redondea05($row[4]*$can));
         
@@ -289,7 +293,8 @@
           p.muestra_paleta,
         /*implementación Oscar 07.05.2018*/
           IF($t=1,IF(p.precio_venta_mayoreo is NULL OR p.precio_venta_mayoreo=0,IF(sp.es_externo=0,'muestra_emergente','es_externo'),0),0)/*10*/
-        /*Fin de cambio*/
+        /*Fin de cambio*/,
+          p.es_ultimas_piezas
           FROM ec_productos p
           JOIN sys_sucursales s ON s.id_sucursal=$user_sucursal
           JOIN sys_sucursales_producto sp ON sp.id_producto=p.id_productos
@@ -304,6 +309,9 @@
     $res=mysql_query($sql) or die("Error en 3:\n$sq\n\nDescripcion:\n".mysql_error());
     
     if(mysql_num_rows($res) > 0){
+      if( $row[11] == 1 ){
+        die( "is_last_pieces|" );
+      }
         $row=mysql_fetch_row($res);
       //capturamos resultados
         $row[4]=round($row[4],2);
