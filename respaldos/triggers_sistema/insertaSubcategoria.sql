@@ -25,6 +25,7 @@ BEGIN
         '"imagen" : "', new.imagen, '",',
         '"surtir_presentacion" : "', new.surtir_presentacion, '",',
         '"id_magento" : "', new.id_magento, '",',
+        '"tiene_ubicacion_prinicipal" : "', new.tiene_ubicacion_prinicipal, '",',
         '"sincronizar" : "0"',
         '}'
       ),
