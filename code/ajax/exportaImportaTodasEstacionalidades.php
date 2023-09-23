@@ -73,7 +73,7 @@
 	$num_estac=mysql_num_rows($eje_2);
 	for($i=0;$i<$num_estac;$i++){
 		$dat_enc=mysql_fetch_row($eje_2);
-		echo utf8_decode($dat_enc[1].',,'.$dat_enc[2].','.$dat_enc[3].',,,,,'.$dat_enc[5]);
+		echo utf8_decode($dat_enc[1].',,'.$dat_enc[2].','.$dat_enc[3].',,,,,,'.$dat_enc[5]);
 		if($i<($num_estac-1)){
 			echo utf8_decode(',');
 		}else{
@@ -86,7 +86,7 @@
 	echo utf8_decode('id_producto,'.'orden_lista,'.'nombre,'.'inventario_matriz,');
 	for($i=0;$i<$num_estac;$i++){
 		$dat_enc=mysql_fetch_row($eje_3);
-		echo $dat_enc[0].','.$dat_enc[1].','.$dat_enc[2].','.$dat_enc[3].','.$dat_enc[4].','.$dat_enc[5].','.$dat_enc[6].','.$dat_enc[7] . ',Total Ventas';
+		echo $dat_enc[0].','.$dat_enc[1].','.$dat_enc[2].','.$dat_enc[3].','.$dat_enc[4].','.$dat_enc[5].','.$dat_enc[6].','.$dat_enc[7] . ',Total Ventas,Habilitado sucursal';
 		if($i<($num_estac-1)){
 			echo utf8_decode(',');
 		}else{
@@ -120,7 +120,8 @@
 				ax3.nombre,
 				ax3.maximo AS estacionalidadAlta, 
 				ep2.maximo AS estacionalidadFinal,
-				ax3.sales_total/*Oscar 2023*/
+				ax3.sales_total,/*Oscar 2023*/
+				ax3.estado_suc/*Oscar 2023*/
 			FROM(
 				SELECT
 					MAX(ax2.ventas) as ventas,/*m¨¢ximoFiltrado*/
@@ -131,7 +132,8 @@
 					ax2.nombre,
 					ax2.maximo,
 					ax2.id_sucursal,
-					SUM( ax2.ventas ) AS sales_total/*Oscar 2023*/
+					SUM( ax2.ventas ) AS sales_total,/*Oscar 2023*/
+	    			ax2.estado_suc/*Oscar 2023*/
 				FROM(
 	                SELECT
 						ax1.id_sucursal,
@@ -142,7 +144,8 @@
 	    				ax1.maximo,
 	    				ax1.id_estacionalidad_producto,
 	    				ped.fecha_alta,
-	    				ax1.id_estacionalidad
+	    				ax1.id_estacionalidad,
+	    				ax1.estado_suc/*Oscar 2023*/
 					FROM(
 						SELECT
 							s.id_sucursal,
@@ -150,7 +153,8 @@
 	    				    p.id_productos,
 	    		    		ep.maximo,
 	        				ep.id_estacionalidad_producto,
-	        				ep.id_estacionalidad
+	        				ep.id_estacionalidad,
+	        				sp.estado_suc/*Oscar 2023*/
 	      				FROM ec_productos p
 		  				LEFT JOIN sys_sucursales_producto sp ON sp.id_producto=p.id_productos
 		  				LEFT JOIN sys_sucursales s on s.id_sucursal=sp.id_sucursal
@@ -182,7 +186,7 @@
 			$dat_est_pro=mysql_fetch_row($eje_3);
 			echo utf8_decode($dat_est_pro[0].','.$dat_est_pro[1].','.$dat_est_pro[2].','
 				.$dat_est_pro[4].','.$dat_est_pro[3].','.$dat_est_pro[5].','.$dat_est_pro[6]
-				.','.$dat_est_pro[7].','.$dat_est_pro[8]);/*Oscar 2023*/
+				.','.$dat_est_pro[7].','.$dat_est_pro[8].','.$dat_est_pro[9]);/*Oscar 2023 $dat_est_pro[8].','.$dat_est_pro[9]*/
 			if($j<(mysql_num_rows($eje_3)-1)){
 				echo utf8_decode(',');
 			}else{
