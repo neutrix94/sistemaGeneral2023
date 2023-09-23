@@ -73,8 +73,8 @@
 	}
 
 	function cleanProductLocationForm( ){
-		$( '#product_name' ).html( '' );
 		$( '#product_id' ).val( '' );
+		$( '#product_name' ).html( '' );
 		$( '#locations_list' ).html('');
 		/*$( '#product_id_location_form_' + type ).val( '' );
 		$( '#product_id_location_form_' + type ).attr( 'disabled', 'true' );

@@ -90,7 +90,7 @@
 					OR pp.codigo_barras_caja_1 = '{$txt}'
 					OR pp.codigo_barras_caja_2 = '{$txt}'
 					OR pp.clave_proveedor = '{$txt}'
-					GROUP BY pp.id_proveedor_producto
+					GROUP BY p.id_productos
 					ORDER BY p.orden_lista";
 			//return $sql;
 
