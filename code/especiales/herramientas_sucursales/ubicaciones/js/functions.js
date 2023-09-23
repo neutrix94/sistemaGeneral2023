@@ -68,7 +68,13 @@
 		//$( "#location_status_seeker").val( ( location_data[5] != '' && location_data[4] == 3 ? 2 : location_data[4] ) );
 		$( '#product_seeker_location_form_btn' ).css( 'display', 'none' );
 		$( '#product_reset_location_form_btn' ).css( 'display', 'block' );
-
+		setTimeout( function (){ 
+				if( $( '#locations_list tr' ).length <= 0 ){
+					$( '#is_principal' ).prop( 'checked', true );
+				}else{
+					$( '#is_principal' ).removeAttr( 'checked' );
+				}
+			}, 300);
 //setTimeout( function (){ getLocationDetail( $( "#location_status_seeker").val(), '_seeker' ); }, 300 );
 	}
 
@@ -189,12 +195,74 @@
 
 			//$( '#save_location_btn' ).html( 'disabled' );
 	}
-	function saveLocation( ){
+
+	function validate_only_one(){
+		var url = "ajax/db.php?location_fl=validate_only_one&product_id=" + $( '#product_id' ).val();
+		url += "&store_location_id=" + $( '#store_location_id' ).val().trim();
+		url += "&warehouse_id=" + $( '#warehouse_id' ).val().trim();
+		var resp = ajaxR( url );
+		//alert( resp );
+		if( resp =='ok' ){
+			return true;
+		}else{
+			return false;
+		}
+	/*	$.ajax({
+			type : 'post',
+			url : 'ajax/db.php',
+			cache : false,
+			data : { location_fl : 'validate_only_one',
+				product_id : $( '#product_id' ).val(),
+				store_location_id : $( '#store_location_id' ).val().trim(),
+				warehouse_id : $( '#warehouse_id' ).val().trim()
+			},
+			success : function ( dat ){
+				if( dat == 'ok' ){
+					saveLocation( true );
+					//console.log( dat );
+					//return true;
+				}
+			}
+		});*/
+	}
+
+	function disabled_principal_location_before(){
+		$.ajax({
+			type : 'post',
+			url : 'ajax/db.php',
+			cache : false,
+			data : { location_fl : 'disabled_principal_location',
+				product_id : $( '#product_id' ).val(),
+				warehouse_id : $( '#warehouse_id' ).val().trim()
+			},
+			success : function ( dat ){
+				console.log( dat );
+				alert( "Ubicacion Principal anterior deshabilitada!" );
+				if( dat == 'ok' ){
+					saveLocation( true );
+				}
+			}
+		});
+	}
+
+	function saveLocation( validated = null ){
 		var location_data = getFormData();
 		if( ! location_data ){
 			return false;
 		}else{
-			if( ! location_is_not_repeat( location_data ) ){
+			if( $( '#is_principal' ).prop( 'checked' ) == true && validated == null ){
+				if( ! validate_only_one() ){
+					if( ! confirm( "Este producto ya tiene una ubicacion principal; Realmente deseas habilitar esta ubicacion como principal?" ) ){
+						$( '#is_principal' ).removeAttr( 'checked' );
+						//saveLocation( );
+						//return false;
+					}else{
+						disabled_principal_location_before();
+						return false;
+					}
+				}
+			}
+			if( ! location_is_not_repeat( location_data ) ){//verifica que la ubicacion no se repita
 				return false;
 			}
 			//console.log( location_data );
@@ -367,3 +435,17 @@
 		}
 		return true;
 	}
+	//lamadas asincronas
+	function ajaxR(url){
+	    if(window.ActiveXObject){       
+	        var httpObj = new ActiveXObject("Microsoft.XMLHTTP");
+	    }
+	    else if (window.XMLHttpRequest)
+	    {       
+	        var httpObj = new XMLHttpRequest(); 
+	    }
+	    httpObj.open("POST", url , false, "", "");
+	    httpObj.send(null);
+	    return httpObj.responseText;
+	}        
+         
