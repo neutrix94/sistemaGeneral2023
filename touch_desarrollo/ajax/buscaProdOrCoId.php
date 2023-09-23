@@ -222,9 +222,22 @@ deshabilitado por Oscar 2022
             IF(s.mostrar_ubicacion=1,
                 IF($user_sucursal=1,
                   CONCAT('Ubicación: ',p.ubicacion_almacen,'  -  '),
-                  IF(sp.ubicacion_almacen_sucursal!='',
-                      CONCAT('Ubicacion: ',sp.ubicacion_almacen_sucursal,'  '),
-                    ''
+                  IF(( SELECT 
+                        CONCAT( pasillo_desde, altura_desde ) 
+                      FROM ec_sucursal_producto_ubicacion_almacen 
+                      WHERE id_sucursal = {$user_sucursal}
+                      AND es_principal = 1
+                      AND id_producto = p.id_productos
+                    ) IS NOT NULL,
+                    /*CONCAT('Ubicacion: ',sp.ubicacion_almacen_sucursal,'  '),*/
+                    ( SELECT 
+                        CONCAT( 'Ubicación: ', pasillo_desde, altura_desde, '  ' ) 
+                      FROM ec_sucursal_producto_ubicacion_almacen 
+                      WHERE id_sucursal = {$user_sucursal}
+                      AND es_principal = 1
+                      AND id_producto = p.id_productos
+                    ),
+                    ' NO- '
                   )
                 ),
                 ''
@@ -390,7 +403,6 @@ deshabilitado por Oscar 2022
     }
     
    
-    
     $sql="SELECT
           p.id_productos,
           p.orden_lista,
@@ -399,9 +411,22 @@ deshabilitado por Oscar 2022
             IF(s.mostrar_ubicacion=1,
                 IF($user_sucursal=1,
                   CONCAT('Ubicación: ',p.ubicacion_almacen,'  -  '),
-                  IF(sp.ubicacion_almacen_sucursal!='',
-                      CONCAT('Ubicacion: ',sp.ubicacion_almacen_sucursal,'  '),
-                    ''
+                  IF(( SELECT 
+                        CONCAT( pasillo_desde, altura_desde ) 
+                      FROM ec_sucursal_producto_ubicacion_almacen 
+                      WHERE id_sucursal = {$user_sucursal}
+                      AND es_principal = 1
+                      AND id_producto = p.id_productos
+                    ) IS NOT NULL,
+                    /*CONCAT('Ubicacion: ',sp.ubicacion_almacen_sucursal,'  '),*/
+                    ( SELECT 
+                        CONCAT( pasillo_desde, altura_desde ) 
+                      FROM ec_sucursal_producto_ubicacion_almacen 
+                      WHERE id_sucursal = {$user_sucursal}
+                      AND es_principal = 1
+                      AND id_producto = p.id_productos
+                    ),
+                    '-NO'
                   )
                 ),
                 ''
