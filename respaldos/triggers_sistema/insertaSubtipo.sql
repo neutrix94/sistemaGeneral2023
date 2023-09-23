@@ -23,6 +23,7 @@ BEGIN
         '"nombre" : "', new.nombre, '",',
         '"id_tipo" : "', new.id_tipo, '",',
         '"id_magento" : "', new.id_magento, '",',
+        '"tiene_ubicacion_prinicipal" : "', new.tiene_ubicacion_prinicipal, '",',
         '"sincronizar" : "0"',
         '}'
       ),
