@@ -34,13 +34,13 @@ $app->post('/send_file', function (Request $request, Response $response){
 	$post_data = json_encode( array( "files"=>$files ) );
 //obtiene los datos principales de la sucursal y el / los archivos
 	$sql = "SELECT 
-				dominio_sucursal AS store_dns
+				endpoint_impresion_es_servidor AS store_print_dns
 			FROM ec_configuracion_sucursal
 			WHERE id_sucursal = {$store_id}";
 	$stm = $link->query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
 //consume api en el servidor destino
 	$row = $stm->fetch_assoc();
-	$url = "{$row['store_dns']}/rest/print/recibir_archivo";//url
+	$url = "{$row['store_print_dns']}/rest/print/recibir_archivo";//url
 	
 	$resp = "";
 	$crl = curl_init( $url );
