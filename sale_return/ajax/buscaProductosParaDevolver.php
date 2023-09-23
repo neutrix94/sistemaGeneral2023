@@ -74,8 +74,8 @@
                   )
                 ) AS validated_pieces, /*11*/
 				pvu.id_proveedor_producto,/*12*/
-				pd.id_pedido_detalle,/*13*/
-				p.es_ultimas_piezas/*14 Oscar 2023 Excluir de la logica de busqueda por escaneo los productos con el indicador de ultimas piezas ( que siempre salga como resultados de busqueda )*/
+				pd.id_pedido_detalle/*13*/
+				/*p.es_ultimas_piezas/*14 Oscar 2023 Excluir de la logica de busqueda por escaneo los productos con el indicador de ultimas piezas ( que siempre salga como resultados de busqueda )*/
 		FROM ec_pedidos_detalle pd
 		LEFT JOIN ec_pedidos_validacion_usuarios pvu
 		ON pvu.id_pedido_detalle = pd.id_pedido_detalle
@@ -103,11 +103,11 @@
 			$montoDesc=round($rw[8]*$cantidad,2);
 			$rw[3]=round($rw[8],2);
 		}
-/*Oscar 2023 Excluir de la logica de busqueda por escaneo los productos con el indicador de ultimas piezas ( que siempre salga como resultados de busqueda )*/
+/*Oscar 2023 Excluir de la logica de busqueda por escaneo los productos con el indicador de ultimas piezas ( que siempre salga como resultados de busqueda )
 		if( $rw[14] == 1 ){
 			die( 'is_last_pieces|' );
 		}
-/*fin de cambio Oscar 2023*/		
+fin de cambio Oscar 2023*/		
 	//id_producto/ordenLista/cantidadDev/
 	//////confir//id_product//ordn_lsta//nombre//prec_orig//descuento_corr//mont_con_desc//maquila//%_desc
 		echo 'exito|'.$rw[0]."|".$rw[1]."|".$rw[2]."|".$rw[3]."|".$descuento."|".$montoDesc."|".$rw[6]."|".$rw[5]."|".$rw[12]."|".$rw[13];
