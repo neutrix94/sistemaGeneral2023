@@ -42,6 +42,19 @@
 				$store_location_id = ( isset( $_GET['store_location_id'] ) ? $_GET['store_location_id'] : $_POST['store_location_id'] );
 				echo $Locations->deteleProductLocation( $store_location_id );
 			break;
+
+			case 'validate_only_one' :
+				$product_id = ( isset( $_GET['product_id'] ) ? $_GET['product_id'] : $_POST['product_id'] );
+				$warehouse_id = ( isset( $_GET['warehouse_id'] ) ? $_GET['warehouse_id'] : $_POST['warehouse_id'] );
+				$store_location_id = ( isset( $_GET['store_location_id'] ) ? $_GET['store_location_id'] : $_POST['store_location_id'] );
+				echo $Locations->validate_only_one( $store_location_id, $product_id, $warehouse_id );
+			break;
+
+			case 'disabled_principal_location':
+				$product_id = ( isset( $_GET['product_id'] ) ? $_GET['product_id'] : $_POST['product_id'] );
+				$warehouse_id = ( isset( $_GET['warehouse_id'] ) ? $_GET['product_id'] : $_POST['product_id'] );
+				echo $Locations->disabled_principal_location( $product_id , $warehouse_id );
+			break;
 			
 			default:
 				die( "Access denied on : '{$action}'" );
@@ -56,6 +69,32 @@
 		function __construct( $connection )
 		{
 			$this->link = $connection;
+		}
+
+		public function disabled_principal_location( $product_id , $warehouse_id ){
+			$sql = "UPDATE ec_sucursal_producto_ubicacion_almacen
+						SET es_principal = 0
+					WHERE id_producto = {$product_id}
+					AND id_almacen = {$warehouse_id}
+					AND es_principal = 1";
+			$stm = $this->link->query( $sql ) or die( "Error al deshabilitar ubicacion principal del producto : {$link->error}" );
+			die( 'ok' );
+		}
+
+		public function validate_only_one( $store_location_id, $product_id, $warehouse_id ){
+			$sql = "SELECT 
+						id_ubicacion_sucursal
+					FROM ec_sucursal_producto_ubicacion_almacen
+					WHERE id_producto = {$product_id}
+					AND id_almacen = {$warehouse_id}
+					AND es_principal = 1";
+			//		die( $sql );
+			$sql .= ( $store_location_id != null && $store_location_id != '' ? " AND id_ubicacion_sucursal != {$store_location_id}" : "" );
+			$stm = $this->link->query( $sql ) or die( "Error al verificar si hay ubicacion primaria existente para este producto : {$sql} {$this->link->error}" );
+			if( $stm->num_rows >0 ){
+				die( 'no' );
+			}
+			die( 'ok' );
 		}
 
 		public function seekProductsLocations( $txt, $is_scanner ){
