@@ -34,6 +34,12 @@ BEGIN
                 '"pedir_password_devolucion" : "', new.pedir_password_devolucion, '",',
                 '"ofrecer_productos" : "', new.ofrecer_productos, '",',
                 '"imprimir_validaciones_pendientes" : "', new.imprimir_validaciones_pendientes, '",',
+                
+                '"dominio_sucursal" : "', new.dominio_sucursal, '",',
+                '"endpoint_impresion_remota" : "', new.endpoint_impresion_remota, '",',
+                '"endpoint_impresion_es_servidor" : "', new.endpoint_impresion_es_servidor, '",',
+                '"tiempo_vida_token_clientes" : "', new.tiempo_vida_token_clientes, '",',
+
                 '"sincronizar" : "0"',
                 '}'
             ),
