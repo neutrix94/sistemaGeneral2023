@@ -49,6 +49,7 @@
 		cleanProductLocationForm();
 		clean_location_form();
 		var location_data = location_array.split( '~' );
+		console.log( location_data );
 		$( '#product_id' ).val( location_data[0] );
 		getProductLocations( location_data[0] );
 		$( '#product_name' ).html( location_data[1] );//nombre
@@ -69,12 +70,17 @@
 		$( '#product_seeker_location_form_btn' ).css( 'display', 'none' );
 		$( '#product_reset_location_form_btn' ).css( 'display', 'block' );
 		setTimeout( function (){ 
-				if( $( '#locations_list tr' ).length <= 0 ){
-					$( '#is_principal' ).prop( 'checked', true );
+				if( location_data[7] == 1 ){
+					if( $( '#locations_list tr' ).length <= 0 ){
+						$( '#is_principal' ).prop( 'checked', true );
+					}else{
+						$( '#is_principal' ).removeAttr( 'checked' );
+					}
 				}else{
 					$( '#is_principal' ).removeAttr( 'checked' );
+					$( '#is_principal' ).attr( 'disabled', true );
 				}
-			}, 300);
+			}, 100);
 //setTimeout( function (){ getLocationDetail( $( "#location_status_seeker").val(), '_seeker' ); }, 300 );
 	}
 
@@ -82,6 +88,7 @@
 		$( '#product_id' ).val( '' );
 		$( '#product_name' ).html( '' );
 		$( '#locations_list' ).html('');
+		$( '#is_principal' ).removeAttr( 'disabled' );
 		/*$( '#product_id_location_form_' + type ).val( '' );
 		$( '#product_id_location_form_' + type ).attr( 'disabled', 'true' );
 		$( '#product_name_location_form_' + type ).attr( 'disabled', 'true' );
