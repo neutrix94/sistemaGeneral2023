@@ -13,6 +13,11 @@ $app->post('/', function (Request $request, Response $response){
   if( ! include( '../../conexionMysqli.php' ) ){
     die( "Error al incluir libreria de conexion!" );
   }
+//obtener el json en txt 
+  $body = $request->getBody();
+  $file = fopen("test.txt","w");
+  fwrite($file,"{$body}");
+  fclose($file);
 //respuesta
   $response_message = "Transaccion exitosa!";
 //recibe los parametros de netPay
@@ -57,6 +62,11 @@ $app->post('/', function (Request $request, Response $response){
   $transactionCertificate = $request->getParam( "transactionCertificate" );//39
   $transactionId = $request->getParam( "transactionId" );//40
   $traceability = $request->getParam( "traceability" );//41
+  
+  $transactionId_internal = $folioNumber;
+  if( $traceability['petition_id'] != null && $traceability['petition_id'] != '' ){
+    $transactionId_internal = $traceability['petition_id'];
+  }
 
   //traceability
  // $traceability['']
@@ -68,14 +78,15 @@ $app->post('/', function (Request $request, Response $response){
     /*16*/hasPin,/*17*/hexSign,/*18*/isQps,/*19*/message,/*20*/isRePrint,/*21*/moduleCharge,/*22*/moduleLote,/*23*/customerName,/*24*/terminalId,
     /*25*/orderId,/*26*/preAuth,/*27*/preStatus,/*28*/promotion,/*29*/rePrintDate,/*30*/rePrintMark,/*31*/reprintModule,/*32*/cardNumber,
     /*33*/storeName,/*34*/streetName,/*35*/ticketDate,/*36*/tipAmount,/*37*/tipLessAmount,/*38*/transDate,/*39*/transType,/*40*/transactionCertificate,
-    /*41*/transactionId )
+    /*41*/transactionId, /*42*/id_sucursal, /*43*/id_cajero, /*44*/folio_venta )
       VALUES( /*1*/NULL, /*2*/'{$affiliation}',/*3*/'{$applicationLabel}',/*4*/'{$arqc}',/*5*/'{$aid}',/*6*/'{$amount}',
     /*7*/'{$authCode}',/*8*/'{$bin}',/*9*/'{$bankName}',/*10*/'{$cardExpDate}',/*11*/'{$cardType}',/*12*/'{$cardTypeName}',/*13*/'{$cityName}',
     /*14*/'{$responseCode}',/*15*/'{$folioNumber}',/*16*/'{$hasPin}',/*17*/'{$hexSign}',/*18*/'{$isQps}',/*19*/'{$message}',/*20*/'{$isRePrint}',
     /*21*/'{$moduleCharge}',/*22*/'{$moduleLote}',/*23*/'{$customerName}',/*24*/'{$terminalId}',/*25*/'{$orderId}',/*26*/'{$preAuth}',
     /*27*/'{$preStatus}',/*28*/'{$promotion}',/*29*/'{$rePrintDate}',/*30*/'{$rePrintMark}',/*31*/'{$reprintModule}',/*32*/'{$cardNumber}',
     /*33*/'{$storeName}',/*34*/'{$streetName}',/*35*/'{$ticketDate}',/*36*/'{$tipAmount}',/*37*/'{$tipLessAmount}',/*38*/'{$transDate}',
-    /*39*/'{$transType}',/*40*/'{$transactionCertificate}',/*41*/'{$transactionId}' )";
+    /*39*/'{$transType}',/*40*/'{$transactionCertificate}',/*41*/'{$transactionId}',/*42*/'{$traceability['id_sucursal']}', 
+    /*43*/'{$traceability['id_cajero']}', /*44*/'{$traceability['folio_venta']}' )";
   
   $sql = "UPDATE vf_transacciones_netpay SET 
             /*2*/affiliation = '{$affiliation}',
@@ -117,11 +128,49 @@ $app->post('/', function (Request $request, Response $response){
             /*38*/transDate = '{$transDate}',
             /*39*/transType = '{$transType}',
             /*40*/transactionCertificate = '{$transactionCertificate}',
-            /*41*/transactionId = '{$transactionId}'
-          WHERE id_transaccion_netpay = '{$folioNumber}'";
+            /*41*/transactionId = '{$transactionId}',
+            /*42*/id_sucursal = '{$traceability['id_sucursal']}', 
+            /*43*/id_cajero = '{$traceability['id_cajero']}', 
+            /*44*/folio_venta = '{$traceability['folio_venta']}',
+            /*44*/id_sesion_cajero = '{$traceability['id_sesion_cajero']}'
+          WHERE id_transaccion_netpay = '{$transactionId_internal}'";//$folioNumber
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
-//inserta el cobro del cajero
-  
+  if( trim($message) == 'Transacción exitosa' ){
+  //consulta los datos en relacion al numero de serie de la terminal
+    $sql = "SELECT 
+              a.id_afiliacion AS affiliation_id,
+              cc.id_caja_cuenta AS bank_id,
+              (SELECT 
+                id_pedido FROM ec_pedidos 
+                WHERE folio_nv = '{$traceability['folio_venta']}' 
+                LIMIT 1
+              ) AS sale_id
+            FROM ec_afiliaciones a
+            LEFT JOIN ec_caja_o_cuenta cc
+            ON a.id_banco = cc.id_caja_cuenta
+            WHERE a.numero_serie_terminal = '{$terminalId}'";
+    $stm = $link->query( $sql ) or die( "Error al recuperar datos para insertar el cobro del cajero {$link->error}" );
+    $row = $stm->fetch_assoc();
+
+//inserta el cobro del cajero si oel cobro fue exitoso
+    $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_afiliacion, 
+    /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar ) 
+    VALUES ( /*1*/NULL, /*2*/'{$row['sale_id']}', /*3*/'{$traceability['id_cajero']}', /*4*/'{$row['affiliation_id']}', 
+    /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1 )";
+//    error_log( $sql );
+    $stm = $link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$link->error}" );
+    $paymet_id = $link->insert_id;
+//actualiza el id de cajero cobro en la transaccion
+    $sql = "UPDATE vf_transacciones_netpay 
+              SET id_cajero_cobro = '{$paymet_id}'
+            WHERE id_transaccion_netpay = '{$folioNumber}'";
+    $stm = $link->query( $sql ) or die( "Error al actualizar el cobro del cajero en la peticion : {$sql} {$link->error}" );
+    
+/*$fp = fopen('data.txt', 'w');
+fwrite($fp, $sql );
+fclose($fp);*/
+
+  }
   $resp = array(
     "code"=>"00",
     "message"=>$message
