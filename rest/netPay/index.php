@@ -9,17 +9,12 @@ require '../vendor/autoload.php';
 require '../src/config/db.php';         // DB Connect CL
 require '../src/config/dbFact.php';     // DB Connect Fact
 $app = new \Slim\App;
-/*
-* Instancia utilities
-require 'utils/manageResponse.php';
-require 'utils/validaToken.php';
-/*
-* Instancia servicios por exponer
-*/
 
-//require 'server/netPayResponse_1.php';
+//cliente
+require 'client/domain_test.php';
+
+//servidor
 require 'server/netPayResponse.php';
-//die( 'here' );
-
+require 'server/test.php';
 
 $app->run();
