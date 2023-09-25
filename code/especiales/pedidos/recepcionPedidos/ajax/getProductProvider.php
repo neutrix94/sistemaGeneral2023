@@ -453,7 +453,9 @@
 					id_proveedor_producto AS product_provider_id, 
 				/*oscar 2023*/
 					CONCAT( clave_proveedor, ' ( ', presentacion_caja, ' ) ' )  AS provider_clue,
-					CONCAT( clave_proveedor, '|', presentacion_caja, '|', piezas_presentacion_cluces ) AS provider_clue_2
+					CONCAT( clave_proveedor, '|', presentacion_caja, '|', piezas_presentacion_cluces ) AS provider_clue_2,
+					precio_pieza AS piece_price,
+					id_producto AS product_id
 				/**/
 				FROM ec_proveedor_producto
 				WHERE id_producto = {$product_id}
@@ -464,6 +466,14 @@
 		while ( $row = $stm->fetch_assoc() ) {
 			$resp .= "<option value=\"{$row['product_provider_id']}\"";//oscar 2023
 			$resp .= ( $row['provider_clue_2'] == $option ? " selected" : "" );//oscar 2023
+//implementacion Oscar 2023/09/25 ( Que se actualize el precio del producto en relacion al proveedor producto seleccionado en la emergente de proveedor producto )
+			if( $row['provider_clue_2'] == $option ){
+				$sql = "UPDATE ec_productos 
+							SET precio_compra = {$row['piece_price']} 
+						WHERE id_productos = {$row['product_id']}";
+				$product_update = $link->query( $sql ) or die( "Error al actualizar el precio de compra del producto : {$link->error}" );
+			}
+//fin de cambio Oscar 2023/09/25
 			$resp .= ">{$row['provider_clue']}</option>";
 		}	
 		$resp .= "<option value=\"-1\">Administrar Proveedores</option>";
