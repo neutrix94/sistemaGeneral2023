@@ -186,6 +186,14 @@
         	}
 
     /*FIN DE CAMBIO*/
+/*implementacion Oscar 2023/09/25 Que se actualice el precio en relacion al grid de remisiones de proveedor*/
+		$sql = "UPDATE ec_productos SET precio_compra = '{$row['2']}' WHERE id_productos = {$row[0]}";
+		$eje=mysql_query($sql);
+		if(!$eje){
+			mysql_query("ROLLBACK");
+			Muestraerror($smarty, "", "3", mysql_error(), $sql, "contenido.php");
+		}
+/*fin de cambio Oscar 2023/09/25*/
 
 /*FIN DE CAMBIOS OSCAR 2023*/
         //si tiene descuento

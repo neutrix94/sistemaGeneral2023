@@ -60,7 +60,10 @@
 				/*1*/CONCAT('$',ROUND(pr.precio_pieza,2),':',p.nombre_comercial) AS description,
 				/*2*/pr.presentacion_caja AS pieces_per_box,
 				/*3*/p.id_proveedor AS provider_id,
-				/*4*/pr.clave_proveedor AS provider_clue
+				/*4*/pr.clave_proveedor AS provider_clue,
+				/*5*/CONCAT( clave_proveedor, '|', presentacion_caja, '|', piezas_presentacion_cluces ) AS provider_clue_2,
+				/*6*/pr.id_producto AS product_id,
+				/*7*/pr.precio_pieza AS piece_price
 				FROM ec_proveedor_producto pr
 				LEFT JOIN ec_proveedor p ON p.id_proveedor=pr.id_proveedor
 				WHERE pr.id_producto='{$product_id}'
@@ -79,7 +82,16 @@
 			while($r=$eje->fetch_assoc() ){
 				$resp .= '<option value="'. $r['provider_id'] . '" ';
 				if( $option_selected !=	null ){
-					$resp .= ( $option_selected == $r['provider_clue'] ? ' selected' : '' ); 
+					$resp .= ( $option_selected == $r['provider_clue_2'] ? ' selected' : '' );
+//implementacion Oscar 2023/09/25 ( Que se actualize el precio del producto en relacion al proveedor producto seleccionado en la emergente de proveedor producto )
+					if( $row['provider_clue_2'] == $option ){
+						$sql = "UPDATE ec_productos 
+									SET precio_compra = {$r['piece_price']} 
+								WHERE id_productos = {$r['product_id']}";
+						$product_update = $link->query( $sql ) or die( "Error al actualizar el precio de compra del producto : {$link->error}" );
+					}
+//fin de cambio Oscar 2023/09/25 
+
 				}else{
 					$resp .= ( $counter_rows == 0 ? ' selected' : '' ); 
 				}
