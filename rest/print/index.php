@@ -17,7 +17,7 @@ require 'server/getPrints.php';
 
 
 
-require 'client/sendFileDirectly.php';
-require 'server/getPrintsDirectly.php';
+//require 'client/sendFileDirectly.php';
+//require 'server/getPrintsDirectly.php';
 
 $app->run();
