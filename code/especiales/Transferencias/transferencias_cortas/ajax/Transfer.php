@@ -30,7 +30,8 @@
 					( isset( $_GET['was_find_by_name'] ) ? $_GET['was_find_by_name'] : 0 ),
 					( isset( $_GET['pieces_form'] ) ? $_GET['pieces_form'] : 0 ),
 					( isset($_GET['unique_code'] ) && $_GET['unique_code'] != '' ?  $_GET['unique_code'] : '' ),
-					( isset($_GET['permission_box'] ) && $_GET['permission_box'] != '' ?  $_GET['permission_box'] : 0 ) );
+					( isset($_GET['permission_box'] ) && $_GET['permission_box'] != '' ?  $_GET['permission_box'] : 0 ),
+					( isset($_GET['destinity_store'] ) && $_GET['destinity_store'] != '' ?  $_GET['destinity_store'] : 0 ) );
 			break;
 
 			case 'getOptionsByProductId' :
@@ -314,7 +315,7 @@
 		}
 
 		public function validateBarcode( $barcode, $transfer_id, $user, $sucursal, $pieces_quantity = 1, 
-				$was_find_by_name = 0, $pieces_form, $unique_code = '', $permission_box  = 0 ){
+				$was_find_by_name = 0, $pieces_form, $unique_code = '', $permission_box  = 0, $destinity_store ){
 			$unique_code_validation;
 			if( $unique_code != '' && $unique_code != 0 ){
 				$unique_code_validation = $this->validateUniqueCode( $unique_code, $transfer_id );
@@ -365,18 +366,24 @@
 					FROM ec_proveedor_producto pp
 					LEFT JOIN ec_productos p
 					ON p.id_productos = pp.id_producto
+/*Oscar 2023/09/25 TRANSFERENCIAS RAPIDAS, QUE SOLO BUSQUE COINCIDENCIAS EN LOS PRODUCTOS HABILITADOS POR SUCURSAL*/
+					LEFT JOIN sys_sucursales_producto sp
+					ON sp.id_producto = pp.id_producto
 					WHERE ( pp.codigo_barras_pieza_1 = '{$barcode}' OR pp.codigo_barras_pieza_2 = '{$barcode}' 
 					OR pp.codigo_barras_pieza_3 = '{$barcode}' OR pp.codigo_barras_presentacion_cluces_1 = '{$barcode}'
 					OR pp.codigo_barras_presentacion_cluces_2 = '{$barcode}' OR pp.codigo_barras_caja_1 = '{$barcode}'
 					OR pp.codigo_barras_caja_2 = '{$barcode}')
 					AND pp.id_proveedor_producto IS NOT NULL
-					AND p.es_maquilado = 0";
+					AND p.es_maquilado = 0
+					AND sp.id_sucursal = {$destinity_store}
+					AND sp.estado_suc = 1";
+/*Fin de cambio Oscar 2023/09/25*/
 	//die( 'errro| ' . $sql );
 			$stm1 = $this->link->query( $sql ) or die( "error|Error al consultar si el código de barras existe : 
 				{$sql} {$this->link->error}" );
 			$row = $stm1->fetch_assoc();
 			if( $stm1->num_rows <= 0 ){
-				return $this->seekByName( $barcode );
+				return $this->seekByName( $barcode, $destinity_store );/*Oscar 2023/09/25 TRANSFERENCIAS RAPIDAS, QUE SOLO BUSQUE COINCIDENCIAS EN LOS PRODUCTOS HABILITADOS POR SUCURSAL*/
 			}
 
 			if( $pieces_form == 1 && $row['pack'] != 1 && $row['box'] != 1) {
@@ -688,7 +695,7 @@
 			return "ok|{$transfer_id}";
 		}
 		
-		public function seekByName( $barcode ){
+		public function seekByName( $barcode, $destinity_store ){
 			//die('|here');
 			$barcode_array = explode(' ', $barcode );
 			$condition = " OR (";
@@ -703,12 +710,18 @@
 				FROM ec_productos p
 				LEFT JOIN ec_proveedor_producto pp
 				ON pp.id_producto = p.id_productos
+/*Oscar 2023/09/25 TRANSFERENCIAS RAPIDAS, QUE SOLO BUSQUE COINCIDENCIAS EN LOS PRODUCTOS HABILITADOS POR SUCURSAL*/
+				LEFT JOIN sys_sucursales_producto sp
+				ON sp.id_producto = pp.id_producto
 				WHERE ( pp.clave_proveedor LIKE '%{$barcode}%'
 				{$condition} OR p.orden_lista = '{$barcode}' ) 
 				AND pp.id_proveedor_producto IS NOT NULL
 				AND p.id_productos > 0
 				AND p.es_maquilado = 0
+				AND sp.id_sucursal = {$destinity_store}
+				AND sp.estado_suc = 1
 				GROUP BY p.id_productos";
+/*Fin de cambio Oscar 2023/09/25*/
 			$stm_name = $this->link->query( $sql ) or die( "error|error al consultar coincidencias por nombre / clave proveedor : {$rhis->link->error}" );
 			if( $stm_name->num_rows <= 0 ){
 				return 'message_error|<br/><h3 class="inform_error">El código de barras no esta registrado en ningún producto, tampoco coincide ningún nombre / modelo de Producto </h3>' 
