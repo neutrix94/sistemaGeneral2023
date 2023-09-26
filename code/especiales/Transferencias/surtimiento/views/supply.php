@@ -104,9 +104,14 @@
 						<div class="col-4">
 							<label for=""> Paq : <b class="product_packs_quantity_txt"></b></label>
 						</div>
-						<div class="col-4">
-							<label for="">Piezas : <b class="product_pieces_quantity_txt"></b></label>
+						<div class="col-4" id="pieces_container">
+							<label id="presentation_pieces_label">Piezas : </label><b class="product_pieces_quantity_txt"></b>
 						</div>
+						<!--div class="col-3" id="maquiled_pieces_container">
+							<label for="" id="maquiled_pieces_label"></label>
+							<b id="maquiled_product_pieces_quantity_txt"
+								style="color: orange;"></b>
+						</div-->
 					</div>
 
 					<div class="row card_item pieces_required">
@@ -160,7 +165,19 @@
 								id="product_pieces_quantity_supplied"
 								value="0"
 							>
+						<!-- Indicador de producto maquilado -->
+							<input
+								type="hidden"
+								id="product_is_maquiled"
+								value="">
 						</div>
+						<!--div class="col-3 txt-center">
+							<input 
+								type="text"
+								id="maquiled_product_pieces_quantity"
+								class="form-control readonly text-center"
+							>
+						</div-->
 					</div>
 				
 					<div class="row card_item" style=""><!-- display : block !important; form_continue -->
