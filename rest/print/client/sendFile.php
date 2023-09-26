@@ -24,8 +24,8 @@ $app->post('/send_file', function (Request $request, Response $response){
 				id_sucursal AS file_store 
 			FROM sys_archivos_descarga
 			WHERE descargado = 0
-			ORDER BY id_archivo DESC
 			AND id_sucursal = {$store_id}
+			ORDER BY id_archivo DESC
 			LIMIT 10";
 	$stm = $link->query( $sql ) or die( "Error al consultar los archivos por descargar : {$sql} {$link->error}" );
 	while ( $row = $stm->fetch_assoc() ) {
