@@ -35,7 +35,7 @@ $app->post('/send_file', function (Request $request, Response $response){
 	$post_data = json_encode( array( "files"=>$files ) );
 //obtiene los datos principales de la sucursal y el / los archivos
 	$sql = "SELECT 
-				endpoint_impresion_remota
+				endpoint_impresion_remota AS store_print_dns
 			FROM ec_configuracion_sucursal
 			WHERE id_sucursal = {$store_id}";
 	$stm = $link->query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
