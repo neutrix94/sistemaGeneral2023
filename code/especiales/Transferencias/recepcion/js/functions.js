@@ -22,6 +22,20 @@
 	var current_origin_warehouse = '';
 /*fin de cambio Oscar 2023*/
 
+/*implementacion Oscar 2023/09/26 para evitar numeros decimales en emergente de piezas*/
+	function validate_is_not_decimal( obj ){
+		var value = $( obj ).val();
+		if( value.includes( '.' ) ){//value % 1 != 0
+			alert_scann( 'audio' );
+			alert_scann( 'error' );
+			alert( "No se permiten decimales en esta ventana!" );
+			var val = parseInt( $( obj ).val() );
+			$( obj ).focus().val('').val(val);
+			return false;
+		}
+	}
+/*fin de cambio Oscar 2023/09/26*/
+
 /*implementacion Oscar 2023 para validar que el usuario separa los codigos unico que son de diferente almacen*/
 	function mannager_has_separated_unique_code(){
 		var pss = $( '#manager_password' ).val();
