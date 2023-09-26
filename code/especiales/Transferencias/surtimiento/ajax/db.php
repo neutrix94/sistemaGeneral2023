@@ -70,14 +70,14 @@
 			case 'getMaquiledInPieces' ://( response.product_id, pieces );
 				echo getMaquiledInPieces( $_GET['product_id'], $_GET['quantity'], $link );
 			break;
-/**/
+/*Implementacion Oscar 2023/09/26 para el buscador de productos surtidos*/
 			case 'seekListProduct' :
 				$key = ( isset( $_GET['key'] ) ? $_GET['key'] : $_POST['key'] );
 				$assignment_id = ( isset( $_GET['assignment_id'] ) ? $_GET['assignment_id'] : $_POST['assignment_id'] );
 				//echo seekListProduct( $key, $assignment_id, $link );
 				echo buildListSupplied( $assignment_id, $link, $key );
 			break;
-/**/
+/*fin de cambio Oscar 2023/09/26*/
 			default:
 				die( "Permission Denied!" );
 			break;
