@@ -144,6 +144,9 @@ var global_was_find_by_name;
 		url += "&transfer_id=" + global_current_transfer;
 		url += "&pieces_quantity=" + ( pieces != null ? pieces : 1 );
 		url += "&was_find_by_name=" + 0;
+/*Oscar 2023/09/25 TRANSFERENCIAS RAPIDAS, QUE SOLO BUSQUE COINCIDENCIAS EN LOS PRODUCTOS HABILITADOS POR SUCURSAL*/
+		url += "&destinity_store=" + $( '#transfer_store_destinity' ).val();
+/*Fin de cambio Oscar 2023/09/25*/
 		if( $( '#multiple_pieces' ).prop( 'checked' ) && pieces == null ){
 			url += "&pieces_form=1";
 		}
