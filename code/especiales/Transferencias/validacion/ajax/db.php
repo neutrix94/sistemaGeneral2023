@@ -1424,7 +1424,10 @@
 				//die( '|here' );
 				$input_pieces = "";
 				if( $inform['piece'] != 0 ){
-					$input_pieces = "<p class=\"text-center\">Ingresa el número de piezas : </p><input type=\"number\" class=\"form-control\" id=\"new_supply_pieces_quantity\"> <br>";
+					$input_pieces = "<p class=\"text-center\">Ingresa el número de piezas : </p>
+					<input type=\"number\" class=\"form-control\" 
+						id=\"new_supply_pieces_quantity\"
+						onkeyup=\"validate_is_not_decimal( this );\"> <br>";////implementacion Oscar 2023/09/26 para evitar numeros decimales en emergente de piezas
 				}
 
 				$pieces = ( $pieces_quantity != null ? $pieces_quantity : $inform['piece'] );
@@ -1495,7 +1498,8 @@
 					$resp .= '<div><h5>Ingresa el número de Piezas : </h5></div>';
 					$resp .= '<div class="col-2"></div>';
 					$resp .= '<div class="col-8">';
-						$resp .= '<input type="number" class="form-control" id="pieces_quantity_emergent">';
+						$resp .= '<input type="number" class="form-control" id="pieces_quantity_emergent"';
+						$resp .= ' onkeyup="validate_is_not_decimal( this );">';//implementacion Oscar 2023/09/26 para evitar numeros decimales en emergente de piezas
 						$resp .= '<button type="button" class="btn btn-success form-control"';
 						$resp .= ' onclick="setPiecesQuantity();">';
 							$resp .= 'Aceptar';
