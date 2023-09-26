@@ -5,10 +5,10 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 //use Slim\Http\Response;
 //ini_set('max_execution_time', 1);
 /*
-* Endpoint: obtener_movimientos_almacen
-* Path: /obtener_movimientos_almacen
+* Endpoint: 
+* Path: /recibir_archivo
 * Método: POST
-* Descripción: Envia los archivos al servidor destino
+* Descripción: 
 */
 $app->post('/recibir_archivo', function (Request $request, Response $response){
 	include( '../../conexionMysqli.php' );
