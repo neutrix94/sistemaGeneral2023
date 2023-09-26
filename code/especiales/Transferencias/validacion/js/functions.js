@@ -16,6 +16,19 @@
 //window.navigator.vibrate() ;//&& 
 //window.navigator.vibrate(100);
 
+/*implementacion Oscar 2023/09/26 para evitar numeros decimales en emergente de piezas*/
+	function validate_is_not_decimal( obj ){
+		var value = $( obj ).val();
+		if( value.includes( '.' ) ){//value % 1 != 0
+			alert_scann( 'audio' );
+			alert_scann( 'error' );
+			alert( "No se permiten decimales en esta ventana!" );
+			var val = parseInt( $( obj ).val() );
+			$( obj ).focus().val('').val(val);
+			return false;
+		}
+	}
+/*fin de cambio Oscar 2023/09/26*/
 
 	//var global_focus_locked = 0;
 	var element_focus_locked = '';
