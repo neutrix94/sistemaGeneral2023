@@ -67,11 +67,38 @@
 				echo deleteProductSupplie( $_GET['row_id'], $_GET['transfer_detail_id'], $link );
 			break;
 
+			case 'getMaquiledInPieces' ://( response.product_id, pieces );
+				echo getMaquiledInPieces( $_GET['product_id'], $_GET['quantity'], $link );
+			break;
+/*Implementacion Oscar 2023/09/26 para el buscador de productos surtidos*/
+			case 'seekListProduct' :
+				$key = ( isset( $_GET['key'] ) ? $_GET['key'] : $_POST['key'] );
+				$assignment_id = ( isset( $_GET['assignment_id'] ) ? $_GET['assignment_id'] : $_POST['assignment_id'] );
+				//echo seekListProduct( $key, $assignment_id, $link );
+				echo buildListSupplied( $assignment_id, $link, $key );
+			break;
+/*fin de cambio Oscar 2023/09/26*/
 			default:
 				die( "Permission Denied!" );
 			break;
 		}	
 	}
+/*Modificacion Oscar 2023/09/25*/
+		function getMaquiledInPieces( $product_id, $pieces, $link ){
+			$sql = "SELECT
+						( {$pieces} / pd.cantidad ) AS presentation_quantity,
+						( SELECT 
+							CONCAT( TRIM( UPPER( pp.unidad_medida_pieza ) ), 'S : ')
+						FROM ec_proveedor_producto pp
+						WHERE pp.id_producto = pd.id_producto 
+						LIMIT 1) AS piece_unit
+						FROM ec_productos_detalle pd 
+						WHERE pd.id_producto_ordigen = {$product_id}";
+			$stm = $link->query( $sql ) or die( "Error al consultar detalle del producto maquilado : {$sql} {$link->error}" );
+			$row = $stm->fetch_assoc();
+			return "ok|" . json_encode( $row );
+		}
+/*Fin de cambio Oscar 2023/09/25*/
 
 		function getAssignmentDetail( $id, $user_transfer_tracking = null, $link ){
 			if( $user_transfer_tracking != null ){
@@ -102,7 +129,12 @@
 									nivel_bodega 
 								FROM ec_rangos_ubicaciones 
 								WHERE ppua.letra_ubicacion_desde BETWEEN desde AND hasta
-							) AS location_floor_from
+							) AS location_floor_from,
+							( SELECT 
+								IF( id_producto_ordigen IS NULL, '0', '1' ) 
+							FROM ec_productos_detalle
+							WHERE id_producto_ordigen = p.id_productos
+							) AS is_maquiled/*Oscar 2023*/
 						FROM ec_transferencias_surtimiento_usuarios tsu
 						LEFT JOIN ec_productos p
 						ON p.id_productos = tsu.id_producto
@@ -167,7 +199,12 @@
 								nivel_bodega 
 							FROM ec_rangos_ubicaciones 
 							WHERE ppua.letra_ubicacion_desde BETWEEN desde AND hasta
-						) AS location_floor_from
+						) AS location_floor_from,
+						( SELECT 
+							IF( id_producto_ordigen IS NULL, '0', '1' ) 
+						FROM ec_productos_detalle
+						WHERE id_producto_ordigen = p.id_productos
+						) AS is_maquiled/*Oscar 2023*/
 					FROM ec_transferencias_surtimiento_detalle tsd
 					LEFT JOIN ec_transferencia_productos tp 
 					ON tsd.id_transferencia_producto = tp.id_transferencia_producto
@@ -978,16 +1015,35 @@
 			return '';
 		}
 
-		function buildListSupplied( $assignment_id, $link ){
+		function buildListSupplied( $assignment_id, $link, $condition = '' ){
 			$resp = '';
+//implementacion Oscar 2023/09/26 En la pantalla de surtimiento, en el apartado de SURTIDO si puede tener una columna que tenga el numero de caja.
+			$sql = "SELECT 
+						CONCAT(
+							(SELECT 
+								SUBSTRING(prefijo, 3)
+							FROM sys_sucursales WHERE id_sucursal = t.id_sucursal_destino
+							)
+						)AS prefix
+					FROM ec_transferencias_surtimiento ts
+					LEFT JOIN ec_transferencias t
+					ON t.id_transferencia = ts.id_transferencia
+					LEFT JOIN sys_sucursales s
+					ON s.id_sucursal = t.id_sucursal_destino
+					WHERE ts.id_transferencia_surtimiento = {$assignment_id} ";
+			$stm = $link->query( $sql ) or die( "Error al consultar el prefio de la sucursal para el listado : {$link->error}" );
+			$row = $stm->fetch_assoc();
+			$store_prefix = $row['prefix'];
+//Fin de cambio Oscar 2023/09/26
 			$sql = "SELECT
 						tsu.id_surtimiento_usuario AS detail_id,
 						p.nombre AS name,
 						pp.clave_proveedor AS model,
 						tsu.cantidad_cajas_surtidas AS boxes,
 						tsu.cantidad_paquetes_surtidos AS packs,
-						tsu.cantidad_piezas_surtidas AS pieces,
-						tsu.total_piezas_surtidas AS total
+						ROUND( tsu.cantidad_piezas_surtidas, 2 ) AS pieces,
+						ROUND( tsu.total_piezas_surtidas, 2 ) AS total,
+						tp.numero_consecutivo AS consecutive_number
 					FROM ec_transferencias_surtimiento_usuarios tsu
 					LEFT JOIN ec_productos p 
 					ON p.id_productos = tsu.id_producto
@@ -1001,25 +1057,47 @@
 					ON tsd.id_transferencia_producto = tsu.id_transferencia_producto
 					LEFT JOIN ec_transferencias_surtimiento ts
 					ON ts.id_transferencia_surtimiento = tsd.id_transferencia_surtimiento
-					WHERE 1 AND ts.id_transferencia_surtimiento IN( {$assignment_id} )
-					GROUP BY tsu.id_surtimiento_usuario";
-			//return $sql;
-			$stm = $link->query( $sql ) or die( "Error al consultar los productos surtidos : " . $link->error );
+					WHERE 1 AND ts.id_transferencia_surtimiento IN( {$assignment_id} )";
+/*Implementacion Oscar 2023/09/26 para el buscador de productos surtidos*/
+			if( $condition != '' ){$array = explode( ' ' , $condition );
+				$extra = " OR ( ";
+				foreach ( $array as $key => $val ) {
+					$extra .= ( $extra == " OR ( " ? "" : " AND " );
+					$extra .= "p.nombre LIKE '%{$val}%'";
+				}
+				$extra .= " )";
+				$sql .= " AND ( pp.codigo_barras_pieza_1 = '{$condition}' OR pp.codigo_barras_pieza_2 = '{$condition}' 
+					OR pp.codigo_barras_pieza_3 = '{$condition}' OR pp.codigo_barras_presentacion_cluces_1 = '{$condition}' 
+					OR pp.codigo_barras_presentacion_cluces_2 = '{$condition}' OR pp.codigo_barras_caja_1 = '{$condition}' 
+					OR pp.codigo_barras_caja_2 = '{$condition}' 
+					OR p.orden_lista = '{$condition}' OR p.id_productos = '{$condition}' {$extra} )";
+
+			}
+			$sql .= " GROUP BY tsu.id_surtimiento_usuario";
+/*Fin de cambio Oscar 2023/09/26*/
+			$stm = $link->query( $sql ) or die( "Error al consultar los productos surtidos :  {$sql} " . $link->error );
 			if( $stm->num_rows <= 0 ){
 				$resp .= '<tr><td colspan="6" align="center">Sin registros!</td></tr>';
 			}
 			while ( $row = $stm->fetch_assoc() ) {
+				$row['pieces'] = str_replace( '.00', '', $row['pieces'] );
+				$row['total'] = str_replace( '.00', '', $row['total'] );
 				$resp .= '<tr onclick="edit_specific_detail( ' . $row['detail_id'] . ' );">';
 					$resp .= "<td>{$row['name']}</td>";
 					$resp .= "<td>{$row['model']}</td>";
-					$resp .= "<td>{$row['boxes']}</td>";
-					$resp .= "<td>{$row['packs']}</td>";
-					$resp .= "<td>{$row['pieces']}</td>";
-					$resp .= "<td>{$row['total']}</td>";
+					$resp .= "<td class=\"text-center\">{$row['boxes']}</td>";
+					$resp .= "<td class=\"text-center\">{$row['packs']}</td>";
+					$resp .= "<td class=\"text-center\">{$row['pieces']}</td>";
+					$resp .= "<td class=\"text-center\">{$row['total']}</td>";
+					$resp .= "<td class=\"text-center\">{$store_prefix}{$row['consecutive_number']}</td>";
 				$resp .= '</tr>';
 			}
 			return $resp;
 		}
+
+		/*function seekListProduct( $key, $assignment_id, $link ){
+
+		}*/
 
 	//consulta la contraseña de encargado
 		function checkManagerPassword( $pss, $link ){
