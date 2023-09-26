@@ -77,7 +77,6 @@
 			//decodifica JSON	
 				var response = JSON.parse( dat );
 					$( '#complete' ).removeAttr( 'disabled' );
-					
 					$( '#current_transfer_product_id' ).val( response.row_id ); 
 					$( '#product_name' ).html(response.name );
 					$( '#product_model' ).html( response.provider_model );
@@ -116,11 +115,11 @@
 					$( '.product_packs_quantity_txt' ).html( response.packs );
 					packs = parseInt( response.packs );
 					//$( '#product_packs_quantity' ).removeAttr( 'readonly' );
-					$( '.product_pieces_quantity_txt' ).html( response.pieces );
-					pieces = parseInt( response.pieces );
+					pieces = response.pieces.replace( '.0000', '' );
+					$( '.product_pieces_quantity_txt' ).html( pieces );
 					//$( '#product_pieces_quantity' ).removeAttr( 'readonly' );
-					$( '#current_product_id' ).val( response.product_id );
 					current_product_id = response.product_id;
+					$( '#current_product_id' ).val( response.product_id );
 
 					$( '#current_product_provider' ).val( response.product_provider_id );
 
@@ -155,6 +154,14 @@
 				//	alert( 'here' );
 				}
 
+/*Oscar 2023/09/25 ( maquilados )*/
+					$( '#product_is_maquiled' ).val( ( response.is_maquiled == 1 ? 1 : 0 ) );
+					if( response.is_maquiled == 1 ){
+						getMaquiledInPieces( response.product_id, pieces );
+					}else{
+
+					}
+/*fin de cambio Oscar 2023/09/25*/
 				$( '#complete' ).removeAttr( 'checked' );
 				$( '#incomplete' ).removeAttr( 'checked' );
 				build_list_supplied();
@@ -166,6 +173,21 @@
 			}
 		});
 	}
+
+	function getMaquiledInPieces( product_id, pieces ){
+		var url = "ajax/db.php?fl=getMaquiledInPieces&product_id=" + product_id;
+		url += "&quantity=" + pieces;
+		var resp = ajaxR( url ).split( '|' );
+		if( resp[0] == 'ok' ){
+			var tmp = JSON.parse( resp[1] );
+			//alert( tmp.presentation_quantity  );
+			$( '#presentation_pieces_label' ).html( tmp.piece_unit + " " );
+			$( '.product_pieces_quantity_txt' ).html( ( tmp.presentation_quantity == 0 ? '0' : parseInt( tmp.presentation_quantity ) ) );
+		}else{
+			alert( `getMaquiledInPieces : ${resp}` );
+		}
+	}
+
 	function edit_specific_detail( detail_id ){
 //alert( detail_id);
 		pack_off( assignment, current_transfer, detail_id );
@@ -193,7 +215,8 @@
 			case 1 : //surtitmiento completo
 				$( '#product_boxes_quantity' ).val( boxes );
 				$( '#product_packs_quantity' ).val( packs );
-				$( '#product_pieces_quantity' ).val( pieces );
+//deshabilitado Oscar 2023/09/25				$( '#product_pieces_quantity' ).val( pieces );
+				$( '#product_pieces_quantity' ).val( $( '.product_pieces_quantity_txt' ).html().trim() );
 
 				/*$( '#product_boxes_quantity' ).prop( 'readonly', true );
 				$( '#product_packs_quantity' ).prop( 'readonly', true );
@@ -367,6 +390,12 @@
 	}
 
 	function saveProductSupplie( is_multiple = null ){
+/*Implementacion Oscar 2023/09/26 Si el surtidor no selecciona el radio de completo o piezas incompletas y le da click en continuar que salga un mensaje que diga " SELECCIONA SI ESTAS SURTIENDO COMPLETO O PIEZAS INCOMPLETAS"*/
+		if( ! $( '#complete' ).prop( 'checked' ) && ! $( '#incomplete' ).prop( 'checked' ) ){
+			alert( "Es necesario escanear el producto y seleccionar el tipo de surtimiento para continuar : " );
+			return false;
+		}
+/*Fin de cambio Oscar 2023/09/26*/
 		var product_id, product_provider_id, supply_case;
 		var request_data = ''; 
 		if( is_multiple == null ){
