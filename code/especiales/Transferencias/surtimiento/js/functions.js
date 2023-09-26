@@ -650,6 +650,27 @@
 		});
 	}
 
+/*Implementacion Oscar 2023/09/26 para el buscador de productos surtidos*/
+	function list_seeker( obj, e ){
+		var txt = $( obj ).val();
+	//envia datos por ajax
+		$.ajax({
+			type : 'post',
+			url : 'ajax/db.php',
+			cache : false,
+			data : { fl : 'seekListProduct', 
+					key : txt,
+					assignment_id : assignment
+			},
+			success : function ( dat ){
+				$( '#list_assignmets_supplied' ).empty();
+				$( '#list_assignmets_supplied' ).html( dat );
+			}
+		});
+
+	}
+/*fin de cambio Oscar 2023/09/26*/
+
 	function setProduct(){
 	//habilita boton para continuar
 		$( '#supply_btn_continue' ).css( 'display', 'block' );

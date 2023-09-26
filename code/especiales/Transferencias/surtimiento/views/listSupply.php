@@ -1,5 +1,18 @@
 
 <br />
+<!-- Implementacion Oscar 2023/09/26 para el buscador de productos surtidos -->
+<div class="row" style="margin : 10px;">
+	<div class="input-group">
+		<input type="text" class="form-control" id="list_seeker" onkeyup="list_seeker( this, event );">
+		<button
+			class="btn btn-warning"
+			onclick="list_seeker( '#list_seeker', 'intro' );"
+		>
+			<i class="icon-search"></i>
+		</button>
+	</div>
+</div>
+<!-- Fin de cambio Oscar 2023/09/26 -->
 <table class="table table-bordered table-striped" style="margin : 10px; width : calc( 100% - 20px ); font-size : 80%;">
 	<thead class="header_sticky-0">
 		<tr>

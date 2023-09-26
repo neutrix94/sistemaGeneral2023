@@ -83,7 +83,6 @@
 
 				<div class="content_item list_supplied hidden"><!-- hidden -->
 					<?php 
-						echo 'here';
 						include( 'views/listSupply.php' );
 					?>
 				</div>

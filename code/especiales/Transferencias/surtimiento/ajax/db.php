@@ -70,7 +70,14 @@
 			case 'getMaquiledInPieces' ://( response.product_id, pieces );
 				echo getMaquiledInPieces( $_GET['product_id'], $_GET['quantity'], $link );
 			break;
-
+/**/
+			case 'seekListProduct' :
+				$key = ( isset( $_GET['key'] ) ? $_GET['key'] : $_POST['key'] );
+				$assignment_id = ( isset( $_GET['assignment_id'] ) ? $_GET['assignment_id'] : $_POST['assignment_id'] );
+				//echo seekListProduct( $key, $assignment_id, $link );
+				echo buildListSupplied( $assignment_id, $link, $key );
+			break;
+/**/
 			default:
 				die( "Permission Denied!" );
 			break;
@@ -1014,7 +1021,7 @@
 			return '';
 		}
 
-		function buildListSupplied( $assignment_id, $link ){
+		function buildListSupplied( $assignment_id, $link, $condition = '' ){
 			$resp = '';
 //implementacion Oscar 2023/09/26 En la pantalla de surtimiento, en el apartado de SURTIDO si puede tener una columna que tenga el numero de caja.
 			$sql = "SELECT 
@@ -1056,10 +1063,25 @@
 					ON tsd.id_transferencia_producto = tsu.id_transferencia_producto
 					LEFT JOIN ec_transferencias_surtimiento ts
 					ON ts.id_transferencia_surtimiento = tsd.id_transferencia_surtimiento
-					WHERE 1 AND ts.id_transferencia_surtimiento IN( {$assignment_id} )
-					GROUP BY tsu.id_surtimiento_usuario";
-			//return $sql;
-			$stm = $link->query( $sql ) or die( "Error al consultar los productos surtidos : " . $link->error );
+					WHERE 1 AND ts.id_transferencia_surtimiento IN( {$assignment_id} )";
+/*Implementacion Oscar 2023/09/26 para el buscador de productos surtidos*/
+			if( $condition != '' ){$array = explode( ' ' , $condition );
+				$extra = " OR ( ";
+				foreach ( $array as $key => $val ) {
+					$extra .= ( $extra == " OR ( " ? "" : " AND " );
+					$extra .= "p.nombre LIKE '%{$val}%'";
+				}
+				$extra .= " )";
+				$sql .= " AND ( pp.codigo_barras_pieza_1 = '{$condition}' OR pp.codigo_barras_pieza_2 = '{$condition}' 
+					OR pp.codigo_barras_pieza_3 = '{$condition}' OR pp.codigo_barras_presentacion_cluces_1 = '{$condition}' 
+					OR pp.codigo_barras_presentacion_cluces_2 = '{$condition}' OR pp.codigo_barras_caja_1 = '{$condition}' 
+					OR pp.codigo_barras_caja_2 = '{$condition}' 
+					OR p.orden_lista = '{$condition}' OR p.id_productos = '{$condition}' {$extra} )";
+
+			}
+			$sql .= " GROUP BY tsu.id_surtimiento_usuario";
+/*Fin de cambio Oscar 2023/09/26*/
+			$stm = $link->query( $sql ) or die( "Error al consultar los productos surtidos :  {$sql} " . $link->error );
 			if( $stm->num_rows <= 0 ){
 				$resp .= '<tr><td colspan="6" align="center">Sin registros!</td></tr>';
 			}
@@ -1078,6 +1100,10 @@
 			}
 			return $resp;
 		}
+
+		/*function seekListProduct( $key, $assignment_id, $link ){
+
+		}*/
 
 	//consulta la contraseña de encargado
 		function checkManagerPassword( $pss, $link ){
