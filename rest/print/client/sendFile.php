@@ -25,6 +25,7 @@ $app->post('/send_file', function (Request $request, Response $response){
 			FROM sys_archivos_descarga
 			WHERE descargado = 0
 			ORDER BY id_archivo DESC
+			AND id_sucursal = {$store_id}
 			LIMIT 10";
 	$stm = $link->query( $sql ) or die( "Error al consultar los archivos por descargar : {$sql} {$link->error}" );
 	while ( $row = $stm->fetch_assoc() ) {
@@ -34,7 +35,7 @@ $app->post('/send_file', function (Request $request, Response $response){
 	$post_data = json_encode( array( "files"=>$files ) );
 //obtiene los datos principales de la sucursal y el / los archivos
 	$sql = "SELECT 
-				endpoint_impresion_es_servidor AS store_print_dns
+				endpoint_impresion_remota
 			FROM ec_configuracion_sucursal
 			WHERE id_sucursal = {$store_id}";
 	$stm = $link->query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
