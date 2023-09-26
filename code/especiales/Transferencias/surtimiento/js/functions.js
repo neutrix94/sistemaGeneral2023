@@ -159,6 +159,8 @@
 					if( response.is_maquiled == 1 ){
 						getMaquiledInPieces( response.product_id, pieces );
 					}else{
+						$( '#presentation_pieces_label' ).html( "Piezas : " );
+						//$( '.product_pieces_quantity_txt' ).html( );
 
 					}
 /*fin de cambio Oscar 2023/09/25*/
@@ -174,6 +176,7 @@
 		});
 	}
 
+/*Oscar 2023/09/25 ( maquilados )*/
 	function getMaquiledInPieces( product_id, pieces ){
 		var url = "ajax/db.php?fl=getMaquiledInPieces&product_id=" + product_id;
 		url += "&quantity=" + pieces;
@@ -187,6 +190,7 @@
 			alert( `getMaquiledInPieces : ${resp}` );
 		}
 	}
+/*fin de cambio Oscar 2023/09/25*/
 
 	function edit_specific_detail( detail_id ){
 //alert( detail_id);

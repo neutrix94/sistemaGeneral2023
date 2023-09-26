@@ -83,15 +83,8 @@
 			break;
 		}	
 	}
+/*Modificacion Oscar 2023/09/25*/
 		function getMaquiledInPieces( $product_id, $pieces, $link ){
-			/*$sql = "SELECT
-						CONCAT( TRIM( UPPER( unidad_medida_pieza ) ), 'S : ') AS piece_unit,
-						( SELECT 
-							({$pieces}/ cantidad ) 
-						FROM ec_productos_detalle 
-						WHERE id_producto_ordigen = {$product_id}) AS presentation_quantity
-					FROM ec_proveedor_producto
-					WHERE id_producto = {$product_id}";*/
 			$sql = "SELECT
 						( {$pieces} / pd.cantidad ) AS presentation_quantity,
 						( SELECT 
@@ -105,6 +98,7 @@
 			$row = $stm->fetch_assoc();
 			return "ok|" . json_encode( $row );
 		}
+/*Fin de cambio Oscar 2023/09/25*/
 
 		function getAssignmentDetail( $id, $user_transfer_tracking = null, $link ){
 			if( $user_transfer_tracking != null ){
