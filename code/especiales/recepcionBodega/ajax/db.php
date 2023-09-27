@@ -1266,6 +1266,14 @@
 				$location_letter_from,$location_number_from, $aisle_from, $level_from, 
 				$location_letter_to, $location_number_to, $aisle_to, $level_to, 
 				$is_enabled, $is_principal, $is_temporal, $reception_detail_id, $type, $link ){
+/*Modificacion Oscar 2023/09/27 Poner validacion para que no se puedan agregar / editar en linea*/
+		$sql = "SELECT id_sucursal AS store_id FROM sys_sucursales WHERE acceso = 1 LIMIT 1";
+		$stm = $link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$link->error}" );
+		$row = $stm->fetch_assoc();
+		if( $row['store_id'] != -1 ){
+			die( "No se puede guardar porque este sistema es local, Modifica estos registros en el SISTEMA DE LINEA!" );
+		}
+/*Fin de cambio Oscar 2023/09/27*/
 		//echo 'here';
 		$sql = "";
 
