@@ -1358,6 +1358,9 @@
 				$stm = $link->query( $sql ) or die( "Error al actualizar como principal la ubicación insertada : {$link->error} {$sql}" );
 			}
 		}
+		$pp_location_id = ( $action == "insert" ? $last_id : $location_id );
+		$synchronization = insertProductProviderLocationSinchronization( $pp_location_id, $action, $link );//Oscar 2023
+		
 		if( $new_status != 'no_location' ){
 			$new_status = 2;
 			if( $new_status == 'new_location' ){
@@ -1471,5 +1474,87 @@
 			    }
 			    return $nuevaLetra;
 			}
+/*Implementacion Oscar 2023/09/27 Sincronizavcion de ubicaciones proveedor producto*/
+		function insertProductProviderLocationSinchronization( $location_id, $type, $link ){
+		//	die( 'here' );
+		//consulta la sucursal del sistema
+			$system_store_id;
+			$sql = "SELECT id_sucursal AS system_store_id, prefijo AS store_prefix FROM sys_sucursales WHERE acceso=1";
+			$stm = $link->query( $sql ) or die( "Error al consultar datos de sucursal sucursal para sincronizacion: {$link->error}" );
+			$row = $stm->fetch_assoc();
+			$system_store_id = $row['system_store_id'];
+			$store_prefix = $row['store_prefix'];
+		//actualiza el folio unico
+		//	$sql = "UPDATE ec_sucursal_producto_ubicacion_almacen 
+		//				SET folio_unico = '{$store_prefix}_UBIC_{$store_location_id}' 
+		//			WHERE id_ubicacion_sucursal = '{$store_location_id}'";
+		//	$stm = $this->link->query( $sql ) or die( "Error al actualizar el folio unico de ubicacion de sucursal : {$this->link->error}" );
+
+		//recupera el registro
+			$sql = "SELECT * FROM ec_proveedor_producto_ubicacion_almacen WHERE id_ubicacion_matriz = {$location_id}";
+			$stm = $link->query( $sql ) or die( "Error al consultar detalle de ubicacion proveedor producto : {$link->error}" );
+			$row = $row = $stm->fetch_assoc();
+		//inserta los registros de sincronizacion
+			if( $type == 'insert' || $type == 'update' ){
+				$sql = "INSERT INTO sys_sincronizacion_registros ( id_sincronizacion_registro, sucursal_de_cambio,
+							id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
+							SELECT 
+								NULL,
+								{$system_store_id},
+								id_sucursal,
+								CONCAT('{',
+									'\"table_name\" : \"ec_proveedor_producto_ubicacion_almacen\",',
+									'\"action_type\" : \"{$type}\",',
+									'\"primary_key\" : \"id_ubicacion_matriz\",',
+									'\"primary_key_value\" : \"', {$row['id_ubicacion_matriz']}, '\",',
+									'\"id_ubicacion_matriz\" : \"', {$row['id_ubicacion_matriz']}, '\",',
+									'\"id_almacen\" : \"', IF( {$row['id_almacen']} IS NULL, '', {$row['id_almacen']} ), '\",',
+									'\"id_producto\" : \"', IF( {$row['id_producto']} IS NULL, '', {$row['id_producto']} ), '\",',
+									'\"id_proveedor_producto\" : \"', IF( {$row['id_proveedor_producto']} IS NULL, '', {$row['id_proveedor_producto']} ), '\",',
+									'\"letra_ubicacion_desde\" : \"', '{$row['letra_ubicacion_desde']}', '\",',
+									'\"numero_ubicacion_desde\" : \"', {$row['numero_ubicacion_desde']}, '\",',
+									'\"letra_ubicacion_hasta\" : \"', '{$row['letra_ubicacion_hasta']}', '\",',
+									'\"numero_ubicacion_hasta\" : \"', {$row['numero_ubicacion_hasta']}, '\",',
+									'\"pasillo_desde\" : \"', {$row['pasillo_desde']}, '\",',
+									'\"pasillo_hasta\" : \"', {$row['pasillo_hasta']}, '\",',
+									'\"altura_desde\" : \"', '{$row['altura_desde']}', '\",',
+									'\"altura_hasta\" : \"', '{$row['altura_hasta']}', '\",',
+									'\"habilitado\" : \"', {$row['habilitado']}, '\",',
+									'\"es_principal\" : \"', {$row['es_principal']}, '\",',
+									'\"fecha_alta\" : \"', '{$row['fecha_alta']}', '\",',
+									'\"sincronizar\" : \"', {$row['sincronizar']}, '\"',
+									'}'
+								),
+								NOW(),
+								'{$type}_from_insertProductProviderLocationSinchronization',
+								1
+							FROM sys_sucursales 
+						WHERE id_sucursal = IF( {$system_store_id} = -1, 1, -1 )";
+				}else if( $type == 'delete' ){
+					$sql = "INSERT INTO sys_sincronizacion_registros ( id_sincronizacion_registro, sucursal_de_cambio,
+						id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
+						SELECT 
+							NULL,
+							{$system_store_id},
+							id_sucursal,
+							CONCAT('{',
+								'\"table_name\" : \"ec_proveedor_producto_ubicacion_almacen\",',
+								'\"action_type\" : \"{$type}\",',
+								'\"primary_key\" : \"id_ubicacion_matriz\",',
+								'\"primary_key_value\" : \"', '{$row['id_ubicacion_matriz']}', '\"',
+								'}'
+							),
+							NOW(),
+							'{$type}_from_insertStoreLocationSinchronization',
+							1
+						FROM sys_sucursales 
+						WHERE id_sucursal = IF( {$system_store_id} = -1, {$row['id_sucursal']}, -1 )";
+				}
+				$stm = $link->query( $sql ) or die( "Error al insertar registros de sincronizacion de ubicaciones del producto en sucursal :  {$link->error} {$sql}" );
+				
+				//die( 'here : ' . $sql );
+				return 'ok';
+		}
+/*Fin de cambio Oscar 2023/09/27*/
 
 ?>
