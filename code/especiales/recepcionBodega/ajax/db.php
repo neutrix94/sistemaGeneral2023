@@ -1474,7 +1474,7 @@
 			    }
 			    return $nuevaLetra;
 			}
-/*Implementacion Oscar 2023/09/27 Sincronizavcion de ubicaciones proveedor producto*/
+/*Implementacion Oscar 2023/09/27 Sincronizacion de Ubicaciones de proveedor producto en Matriz*/
 		function insertProductProviderLocationSinchronization( $location_id, $type, $link ){
 		//	die( 'here' );
 		//consulta la sucursal del sistema
