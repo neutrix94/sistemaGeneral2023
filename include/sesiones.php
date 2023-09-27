@@ -89,7 +89,7 @@
 			$row=mysql_fetch_assoc($res);
 			extract($row);
 
-/**/
+/*Implementacion Oscar 2023/09/27 Configuracion de perfiles ( Tipo de sistema de logueo linea y/o local )*/
 	$sql="(SELECT logueo_perfil 
 		FROM sys_users_perfiles WHERE id_perfil={$perfil_usuario})
 		UNION
@@ -100,10 +100,20 @@
 		die("Error al consultar el tipo de logueo del perfil de usuario!!!\n\n".mysql_error()."\n\n".$sql);
 	}
 	$row_valida_tipo_log=mysql_fetch_row($eje_valida_log);
-	if($row_valida_tipo_log[0]!=-1 && $row_valida_tipo_log[0]!=$row_valida_tipo_log[1]){
-		die('<script>alert("El usuario no puede loguearse en este sistema, contacte al administrador del sistema!!!");location.href="index.php";</script>');
+	if( $row_valida_tipo_log[0] == 2 ){//solo local
+		if( $row_valida_tipo_log[1] == -1 ){
+			die('<script>alert("El usuario no puede loguearse en este sistema ( SISTEMA LINEA ), contacte al administrador del sistema!!!");location.href="index.php";</script>');
+		}
 	}
-/**/	
+	if( $row_valida_tipo_log[0] == 3 ){//solo linea
+		if( $row_valida_tipo_log[1] != -1 ){
+			die('<script>alert("El usuario no puede loguearse en este sistema ( SISTEMA LOCAL ), contacte al administrador del sistema!!!");location.href="index.php";</script>');
+		}
+	}
+	/*if($row_valida_tipo_log[0] != 1 && $row_valida_tipo_log[0] != $row_valida_tipo_log[1]){
+		die('<script>alert("El usuario no puede loguearse en este sistema, contacte al administrador del sistema!!!");location.href="index.php";</script>');
+	}*/
+/*Fin de cambio Oscar 2023/09/27*/	
 
 /*Implementación Oscar 03.04.2019 para validar que el usuario tenga asistencia en caso de que la sucursal requiera este paso*/	
 	$sql="SELECT 
