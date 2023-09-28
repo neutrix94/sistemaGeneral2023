@@ -504,6 +504,21 @@
 						{/if}
 			<!--Fin de cambio Oscar 28.08.2019-->
 
+<!--Implementación Oscar 2023/09/23 para el boton de reimprimir desde el listado de cola de impresion-->
+							{if $tabla eq 'c3lzX2FyY2hpdm9zX2Rlc2Nhcmdh' && $no_tabla eq 'MA=='}
+								<td width="56" offsetWidth="56" tipo="libre" valor="Reenviar" align="center" campoBD='{$valuesEncGrid[x]}'>
+									<button 
+										class="icon-forward" 
+										width="22" 
+										height="22" 
+										border="0" 
+										onclick="reprint_since_queue_list('#')" 
+										style="color : ; background : green;"
+										onmouseover="this.style.cursor='hand';this.style.cursor='pointer';" alt="Autorizar" title="De clic para continuar proceso de la transferencia"></button>
+								</td>
+<!--Fin de cambio Oscar 2023/09/23-->
+							{/if}
+
 							<!--Implementación de oscar para agregar botones de link hacia pantalla de pedidos
 							{if $tabla eq 'ZWNfb2NfcmVjZXBjaW9u' && $no_tabla eq 'MA=='}
 								<td width="65" offsetWidth="65" tipo="libre" valor="Pagos" align="center" campoBD='{$valuesEncGrid[x]}'>
@@ -1353,9 +1368,9 @@ $("#imp_csv_prd").change(function(){
 			
 			if((tabla == 'ZWNfcGVkaWRvcw==' && no_tabla == 'MQ==') || (tabla == 'ZWNfcGVkaWRvcw==' && no_tabla == 'MA==')){
 			//si es pedidos
-				window.open('../../touch/index.php?printPan=1&scr=ticket&idp='+id);
+				window.open('../../touch_desarrollo/index.php?printPan=1&scr=ticket&idp='+id);
 			/*implementación Oscar 10.08.2018 para reimpresión de ticket*/
-				var reimprime=ajaxR("../../touch/ajax/ticket-php-head-reimpresion.php?id_ped="+id+"&reimpresion=1");
+				var reimprime=ajaxR("../../touch_desarrollo/ajax/ticket-php-head-reimpresion.php?id_ped="+id+"&reimpresion=1");
 			}else{
 				window.open('../pdf/imprimeDoc.php?tdoc='+tipo+'&id='+id);
 			}
@@ -1534,7 +1549,11 @@ $("#imp_csv_prd").change(function(){
 			}		
 						
 		}
-		
+/*Implementación Oscar 2023/09/23 para el boton de reimprimir desde el listado de cola de impresion*/
+		function reprint_since_queue_list( pos ){
+			alert( pos );
+		}
+/*Fin de cambio Oscar 2023/09/23*/
 		
 		function autorizaCot(pos)
 		{
