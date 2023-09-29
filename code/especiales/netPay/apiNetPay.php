@@ -1,46 +1,69 @@
 <?php
 	include( '../../../conexionMysqli.php' );
-	//$apiNetPay = new apiNetPay( $link );
-	//echo $apiNetPay->requireToken();
-	//echo $apiNetPay->getToken( '1494113052' );
-	//echo $apiNetPay->refreshToken();
-	/*$apiUrl = "http://nubeqa.netpay.com.mx:3334/integration-service/transactions/sale";
-	$amount = 10.00;
-	echo $apiNetPay->salePetition( $apiUrl, $amount );*/
-	//$apiUrl = "http://nubeqa.netpay.com.mx:3334/integration-service/transactions/cancel";
-	//$orderId = "230907115744-1494113052";
-	//echo $apiNetPay->saleCancelation( $apiUrl, $orderId );
+
 	class apiNetPay{
 		private $link;
-		function __construct( $connection )
+		private $store_id;
+		private $NetPayStoreId;
+		function __construct( $connection, $store_id )
 		{
 			$this->link = $connection;
+			$this->store_id = $store_id;
+			$this->NetPayStoreId = $this->getCurrentStoreId();
+			//die( $this->NetPayStoreId );
+		}
+	//obtener el storeId actual
+		public function getCurrentStoreId(){
+			$sql = "SELECT
+						rse.store_id_netpay AS storeId
+					FROM sys_sucursales s
+					LEFT JOIN vf_razones_sociales_emisores rse
+					ON rse.id_razon_social = s.razon_social_actual
+					WHERE s.id_sucursal = {$this->store_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar el StoreId actual : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			return $row['storeId'];
+		}
+	//obtencion de endpoints
+		public function getEndpoint( $terminal_id, $endpoint_type ){
+			$sql = "SELECT 
+						{$endpoint_type} AS endpoint
+					FROM ec_afiliaciones a 
+					LEFT JOIN ec_tipos_bancos tb
+					ON a.id_tipo_terminal = tb.id_tipo_banco
+					WHERE a.id_afiliacion = '{$terminal_id}'
+					OR a.numero_serie_terminal = '{$terminal_id}'";//die( $sql );
+			$stm = $this->link->query( $sql ) or die( "Error al consultar endpoint {$endpoint_type} : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			return $row['endpoint'];
 		}
 	//generacion de token
-		public function requireToken( $terminal_id = '1494113052', $grantType = 'password', $user = 'Nacional', $password = 'netpay' ){
-		//recupera el id de la terminal
-		//	$sql = "SELECT numero_serie";
+		public function requireToken( $terminal_id, $grantType = 'password', $user = 'Nacional', $password = 'netpay' ){
+			$apiUrl = $this->getEndpoint( $terminal_id, 'endpoint_token' );//obtiene url de api token
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
-			  CURLOPT_URL => "http://nubeqa.netpay.com.mx:3334/oauth-service/oauth/token",
-			  CURLOPT_RETURNTRANSFER => true,
-			  CURLOPT_ENCODING => "",
-			  CURLOPT_MAXREDIRS => 10,
-			  CURLOPT_TIMEOUT => 0,
-			  CURLOPT_FOLLOWLOCATION => true,
-			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			  CURLOPT_CUSTOMREQUEST => "POST",
-			  CURLOPT_POSTFIELDS => "grant_type={$grantType}&username={$user}&password={$password}",
-			  CURLOPT_HTTPHEADER => array(
-			    "Content-Type: application/x-www-form-urlencoded",
-			    "Authorization: Basic dHJ1c3RlZC1hcHA6c2VjcmV0"
-			  ),
+				CURLOPT_URL => $apiUrl,
+			  	CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_ENCODING => "",
+				CURLOPT_MAXREDIRS => 10,
+				CURLOPT_TIMEOUT => 0,
+				CURLOPT_FOLLOWLOCATION => true,
+				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+				CURLOPT_CUSTOMREQUEST => "POST",
+				CURLOPT_POSTFIELDS => "grant_type={$grantType}&username={$user}&password={$password}",
+				/*CURLOPT_POSTFIELDS => "grant_type=password&username=Nacional&password=netpay",*/
+				CURLOPT_HTTPHEADER => array(
+					"Content-Type: application/x-www-form-urlencoded",
+					"Authorization: Basic dHJ1c3RlZC1hcHA6c2VjcmV0"
+				),
 			));
 
 			$response = curl_exec($curl);
+			curl_close($curl);
 			//var_dump($response);
 			curl_close($curl);
 			$result = json_decode( $response );
+			//die( "result : {$result}" );
 			//var_dump($result);
 		//guarda el token en la base de datos
 			$sql = "INSERT INTO vf_tokens_terminales_netpay( id_token_terminal, id_razon_social, access_token, token_type, 
@@ -73,12 +96,11 @@
 		}
 	//renovacion de token
 		public function refreshToken( $token, $terminal_id ){
-		//recuperar refresh token
-			//$refresh_token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsib2F1dGgyX2lkIl0sInVzZXJfbmFtZSI6ImludGVncmFjaW9uZXNAbmV0cGF5LmNvbS5teCIsInNjb3BlIjpbInJlYWQiLCJ3cml0ZSJdLCJhdGkiOiJhYWE3NDdiOC0zNGI2LTQzODUtYmUyMC01NzFmZDE1Y2Q2MTYiLCJleHAiOjE2OTQyMjUwMTAsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJqdGkiOiJhY2EyMmEzMy05NDVlLTQyYzgtYjE4Ni1hNjczOTVhY2UzYmMiLCJjbGllbnRfaWQiOiJ0cnVzdGVkLWFwcCJ9.ha9zOM-pYQBgO2YtQsy-lbmV8ZNMa7FNsGfjcj1NymWgZO4lpTrHN1PT9Z47aCexC_pK655utkil2qpcJxHJ4IjiT5l_zrDKBHkuNqIQt0wwFpIOnN_Ml9tqLISBucBmykFeNJcMS0Sh4ZkleO6QpLqJ8L_PqAmmtlwMAwFgZEWZSjFl9VIEyasrMkL2N7hYvMVloDCLc9R5iVYNL4GUJ2KtnsjxqN9DG-WI0sCGHe_mxzAIf2_OHSSSXr0AC7KOVvd6mXvY9Nx8B0Uu9oE0HxB1q3Rh4X1hn2L7kAre2pwM4ZTEiuSxAOEUDpfAtl-z2Lfi_yBli3EP1NdFFZTagQ";
+			$apiUrl = $this->getEndpoint( $terminal_id, 'endpoint_token' );//obtiene url de api token
 			$refresh_token = $token['refresh_token'];
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
-			  CURLOPT_URL => "http://nubeqa.netpay.com.mx:3334/oauth-service/oauth/token",
+			  CURLOPT_URL => $apiUrl,
 			  CURLOPT_RETURNTRANSFER => true,
 			  CURLOPT_ENCODING => "",
 			  CURLOPT_MAXREDIRS => 10,
@@ -147,8 +169,12 @@
 			            "serialNumber"=>"{$terminal['terminal_serie']}",
 			            "amount"=> $amount,
 			            "folioNumber"=> "{$petition_id}",
-			            "storeId"=>"9194",
+			            /*"storeId"=>"9194",*/
+			            "storeId"=>"{$this->NetPayStoreId}",
+   						"isSmartAccounts"=>"true",
 						"disablePrintAnimation"=> ( $terminal['print_ticket'] == 1 ? false : true ) );
+			//var_dump($data);
+			//die( '' );
 			$post_data = json_encode( $data, true );
 		//envia peticion
 			$curl = curl_init();
@@ -179,7 +205,7 @@
 					//die( 'here' );
 					$this->refreshToken( $token, $terminal['terminal_serie'] );
 					return $this->salePetition( $apiUrl, $amount = 0.01, $terminal['terminal_serie'], $user_id, 
-										$store_id, $sale_folio, $session_id );//$terminal_id = '1494113052'
+										$store_id, $sale_folio, $session_id );
 				}
 			}
 			$result = json_encode( $result, true );
@@ -204,7 +230,9 @@
 						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
-			            "storeId"=>"9194",
+			            /*"storeId"=>"9194",*/
+			            "storeId"=>"{$this->NetPayStoreId}",
+   						"isSmartAccounts"=>"true",
 						"disablePrintAnimation"=>false
 					);
 			$post_data = json_encode( $data, true );
@@ -257,9 +285,12 @@
 						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
-			            "storeId"=>"9194",
+			            /*"storeId"=>"9194",*/
+			            "storeId"=>"{$this->NetPayStoreId}",
+   						"isSmartAccounts"=>"true",
 						"disablePrintAnimation"=>false
 					);
+			//var_dump( $data );return '';
 			$post_data = json_encode( $data, true );
 		//envia peticion
 			$curl = curl_init();
