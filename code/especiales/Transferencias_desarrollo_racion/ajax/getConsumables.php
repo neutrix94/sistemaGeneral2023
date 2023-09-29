@@ -7,14 +7,14 @@
 		switch ( $action ) {
 			case 'priorityCount' :
 				$condition = " ( p.id_categoria = 40 AND p.id_subcategoria = 151 ) OR p.codigo_barras_4 = 'Verificar'";
-				$sql = "SELECT 
+				/*$sql = "SELECT 
 							id_almacen AS warehouse_id 
 						FROM ec_almacen 
 						WHERE id_sucursal = {$user_sucursal} 
 						AND es_almacen = 1";
 				$stm = $link->query( $sql ) or die( "Error al consultar el almacen principal : {$link->error}" );
-				$row = $stm->fetch_assoc();
-				$warehouse_id = $row['warehouse_id'];
+				$row = $stm->fetch_assoc();*/
+				$warehouse_id = $_GET['warehouse_id'];
 				$sql = "SELECT
 					p.id_productos AS product_id,
 					pp.id_proveedor_producto AS product_provider_id,

@@ -1,8 +1,8 @@
 //4.1. Funcion para generar el calculo de Transferencia por medio del archivo %nuevaTransferencia.php%%
 
 
-function get_consumables(){
-	var url = "ajax/getConsumables.php?fl_type=priorityCount";
+function get_consumables( origin_warehouse ){
+	var url = "ajax/getConsumables.php?fl_type=priorityCount&warehouse_id=" + origin_warehouse;
 	var resp = ajaxR( url );
 	return resp;
 }
@@ -71,53 +71,6 @@ function save_consumables_inventory_adjustment(){
 }
 
 function ejecutar( flag ){
-	var tipo=document.getElementById('id_tipo').value;//obtenemos valor de tipo de transferencia
-	if( flag == '2' && ( tipo == 1 || tipo == 3 || tipo == 4 ) ){
-		var nota="", titulo_trans = "";
-		var revisa_datos=0;
-		var transfer_type = $('#tipo').val();
-		var consumables = get_consumables();
-		//alert( consumables );
-			var msg = `<div class="row">
-				<div class="col-12 text-end">
-					<button 
-						type="button"
-						class="btn btn-danger"
-						onclick="close_emergent();">
-						X
-					</button>
-				</div>
-			</div>
-			<div class="row text-center">
-				<h3>Captura el inventario de los consumibles para continuar con la transferencia : </h3>
-				<div class="col-12" style="max-height : 500px; overflow : scroll;">
-					${consumables}
-				</div>
-
-				<div class="row">
-						<div class="col-2"></div>
-						<div class="col-8">
-							<br>
-							<button 
-								onclick="save_consumables_inventory_adjustment();" 
-								class="btn btn-success form-control">
-								<i class="icon-floppy">Guardar y calcular transferencia</i>
-							</button>
-							<br><br>
-							<button 
-								onclick="ejecutar( 1 );" 
-								class="btn btn-warning form-control">
-								<i class="icon-warning">Omitir conteo</i>
-							</button>
-						</div>
-					</div>
-			</div>`;
-			$(".emergent_content").html(msg);//#proceso
-			$('.emergent').css( 'display' , 'block' );//mendamosventana de informe
-			$('#cargando').css('z-index','10000');//mendamosventana de informe
-			$("#cargando img").css("display","none");
-			return false;
-	}
 //obtenemos valores para enviarlos por ajax
 	var sucOrigen=document.getElementById('origen').value;
 	var sucDestino=document.getElementById('destino').value;
@@ -155,6 +108,53 @@ function ejecutar( flag ){
 		document.getElementById('id_tipo').value="0";//reseteamos el select tipo
 		return null;//retornamos false
 	}else{//caso contrario;
+	var tipo=document.getElementById('id_tipo').value;//obtenemos valor de tipo de transferencia
+		if( flag == '2' && ( tipo == 1 || tipo == 3 || tipo == 4 ) ){
+			var nota="", titulo_trans = "";
+			var revisa_datos=0;
+			var transfer_type = $('#tipo').val();
+			var consumables = get_consumables( alOrigen );
+			//alert( consumables );
+				var msg = `<div class="row">
+					<div class="col-12 text-end">
+						<button 
+							type="button"
+							class="btn btn-danger"
+							onclick="close_emergent();">
+							X
+						</button>
+					</div>
+				</div>
+				<div class="row text-center">
+					<h3>Captura el inventario de los consumibles para continuar con la transferencia : </h3>
+					<div class="col-12" style="max-height : 500px; overflow : scroll;">
+						${consumables}
+					</div>
+
+					<div class="row">
+							<div class="col-2"></div>
+							<div class="col-8">
+								<br>
+								<button 
+									onclick="save_consumables_inventory_adjustment();" 
+									class="btn btn-success form-control">
+									<i class="icon-floppy">Guardar y calcular transferencia</i>
+								</button>
+								<br><br>
+								<button 
+									onclick="ejecutar( 1 );" 
+									class="btn btn-warning form-control">
+									<i class="icon-warning">Omitir conteo</i>
+								</button>
+							</div>
+						</div>
+				</div>`;
+				$(".emergent_content").html(msg);//#proceso
+				$('.emergent').css( 'display' , 'block' );//mendamosventana de informe
+				$('#cargando').css('z-index','10000');//mendamosventana de informe
+				$("#cargando img").css("display","none");
+				return false;
+		}
 		var content = `<div class="text-center">
 				<h3 style="font-size : 200% !important;">Generando Transferencia</h3>
 				<img src="img/load.gif" witdh="30%" height="30%">
