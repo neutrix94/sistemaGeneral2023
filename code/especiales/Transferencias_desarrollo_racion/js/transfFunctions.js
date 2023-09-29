@@ -1,8 +1,8 @@
 //4.1. Funcion para generar el calculo de Transferencia por medio del archivo %nuevaTransferencia.php%%
 
 
-function get_consumables( origin_warehouse ){
-	var url = "ajax/getConsumables.php?fl_type=priorityCount&warehouse_id=" + origin_warehouse;
+function get_consumables( desinity_warehouse ){
+	var url = "ajax/getConsumables.php?fl_type=priorityCount&warehouse_id=" + desinity_warehouse;
 	var resp = ajaxR( url );
 	return resp;
 }
@@ -113,7 +113,7 @@ function ejecutar( flag ){
 			var nota="", titulo_trans = "";
 			var revisa_datos=0;
 			var transfer_type = $('#tipo').val();
-			var consumables = get_consumables( alOrigen );
+			var consumables = get_consumables( alDestino );
 			//alert( consumables );
 				var msg = `<div class="row">
 					<div class="col-12 text-end">
