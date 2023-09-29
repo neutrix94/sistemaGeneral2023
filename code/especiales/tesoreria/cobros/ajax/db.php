@@ -3,12 +3,13 @@
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
 		include( '../../../netPay/apiNetPay.php' );
-		$apiNetPay = new apiNetPay( $link );
+		$apiNetPay = new apiNetPay( $link, $sucursal_id );
 		$Payments = new Payments( $link );
 		$action = ( isset( $_GET['fl'] ) ? $_GET['fl'] : $_POST['fl'] );
 		switch ( $action ) {
 			case 'sendPaymentPetition' :
-				$apiUrl = "http://nubeqa.netpay.com.mx:3334/integration-service/transactions/sale";
+				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_venta' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/sale";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/sale
+				//die( 'here : ' . $apiUrl );
 			//recibe variables
 				$amount = ( isset( $_GET['amount'] ) ? $_GET['amount'] : $_POST['amount'] );
 				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
@@ -56,8 +57,10 @@
 				//$apiNetPay = new apiNetPay( $link );
 				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
-				
-				$apiUrl = "http://nubeqa.netpay.com.mx:3334/integration-service/transactions/reprint";
+				$terminal_id = $data['terminalId'];// ( isset( $_GET['terminal_id'] ) ? $_GET['terminal_id'] : $_POST['terminal_id'] );
+
+				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_reimpresion' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/reprint";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/reprint";
+				//die( $apiUrl );
 				$print = $apiNetPay->saleReprint( $apiUrl, $data['orderId'], $data['terminalId'],
 										$user_id, $sucursal_id, $sale_folio, $session_id );
 				//saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, session_id )
@@ -89,7 +92,8 @@
 				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				
-				$apiUrl = "http://nubeqa.netpay.com.mx:3334/integration-service/transactions/reprint";
+				$terminal_id = $data['terminalId'];
+				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_reimpresion' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/reprint";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/reprint";
 				$print = $apiNetPay->saleReprint( $apiUrl, $data['orderId'], $data['terminalId'],
 										$user_id, $sucursal_id, $sale_folio, $session_id );
 				//saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, session_id )
@@ -123,7 +127,8 @@
 				//echo $Payments->cancelByOrderId( $transaction_id );
 				//include( '../../../../netPay/apiNetPay.php' );
 				//$apiNetPay = new apiNetPay( $link );
-				$apiUrl = "http://nubeqa.netpay.com.mx:3334/integration-service/transactions/cancel";
+				$terminal_id = $data['terminalId'];
+				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_cancelacion' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/cancel";//"http://nubeqa.netpay.com.mx:3334/integration-service/transactions/cancel";
 				$cancel = $apiNetPay->saleCancelation( $apiUrl, $data['orderId'], $data['terminalId'],
 										$user_id, $sucursal_id, $sale_folio, $session_id );
 				$resp = json_decode( $cancel );
