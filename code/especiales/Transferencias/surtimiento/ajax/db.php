@@ -146,7 +146,7 @@
 						AND ppua.habilitado = '1'
 						WHERE tsu.id_surtimiento_usuario = '{$user_transfer_tracking}'
 						ORDER BY ppua.letra_ubicacion_desde, ppua.numero_ubicacion_desde,
-						ppua.pasillo_desde, ppua.altura_desde ASC";
+						ppua.pasillo_desde, ppua.altura_desde, p.orden_lista ASC";/*Oscar 2023/09/29 para ordenar por orden lista como tercer nivel de ordenamiento ( p.orden_lista )*/
 				$stm = $link->query( $sql ) or die( "Error al consultar el detalle de surtimiento : " . $link->error );
 				$row = $stm->fetch_assoc();
 //return $sql . ' - 1';
