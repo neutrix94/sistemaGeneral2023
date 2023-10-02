@@ -124,7 +124,10 @@
 					$( '#current_product_provider' ).val( response.product_provider_id );
 
 				//total de piezas
-					$( '#product_pieces_total' ).val( response.total_pieces_quantity );
+//Implementacion Oscar 2023/09/02 para quitar ceros de mas en el campo Toal pzs
+					var tmp = response.total_pieces_quantity.replace( '.0000', '' );
+					$( '#product_pieces_total' ).val( tmp );//response.total_pieces_quantity
+//fin de cambio Oscar 2023/09/02
 					$( '#current_user_tracking_id' ).val( 0 );
 
 					$( '#current_supply_id' ).val( response.supply_id );
