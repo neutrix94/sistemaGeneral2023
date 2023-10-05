@@ -636,6 +636,18 @@
 				//echo 'here 1:';
 			//	if( $product[8] > 0 ){
 		//die( 'here' );
+/*Oscar 2023/10/05 para conversion de maquilados*/
+				$sql_maquiled = "SELECT
+						( {$product[5]} * pd.cantidad ) AS presentation_quantity
+						FROM ec_productos_detalle pd 
+						WHERE pd.id_producto_ordigen = {$product[1]}";
+				$stm_maquiled = $link->query( $sql_maquiled ) or die( "error|Error al consultar detalle del producto maquilado : {$sql_maquiled} {$link->error}" );
+				if( $stm_maquiled->num_rows > 0 ){
+					$row = $stm_maquiled->fetch_assoc();
+					$product[5] = $row['presentation_quantity'];
+				}
+/*fin de cambio Oscar 2023/10/05*/
+				//consulta si el producto 
 					$sql = "INSERT INTO ec_transferencias_surtimiento_usuarios ( /*1*/id_surtimiento_usuario, /*2*/id_transferencia_producto,
 					/*3*/id_producto, /*4*/id_proveedor_producto, /*5*/cantidad_cajas_surtidas, /*6*/cantidad_paquetes_surtidos, /*7*/cantidad_piezas_surtidas,
 					/*8*/total_piezas_surtidas, /*9*/id_usuario_surtimiento, /*10*/id_transferencia_surtimiento, /*11*/id_surtimiento_detalle,
@@ -831,6 +843,18 @@
 				$new_detail_id = null;
 				$product = explode( '~', $product_provider );
 				$reference_transfer = $product[0];
+
+/*Oscar 2023/10/05 para conversion de maquilados*/
+				$sql_maquiled = "SELECT
+						( {$product[5]} * pd.cantidad ) AS presentation_quantity
+						FROM ec_productos_detalle pd 
+						WHERE pd.id_producto_ordigen = {$product[1]}";
+				$stm_maquiled = $link->query( $sql_maquiled ) or die( "error|Error al consultar detalle del producto maquilado : {$sql_maquiled} {$link->error}" );
+				if( $stm_maquiled->num_rows > 0 ){
+					$row = $stm_maquiled->fetch_assoc();
+					$product[5] = $row['presentation_quantity'];
+				}
+/*fin de cambio Oscar 2023/10/05*/
 			//verifica si existe
 				$sql = "SELECT 
 							id_surtimiento_usuario AS supply_id
