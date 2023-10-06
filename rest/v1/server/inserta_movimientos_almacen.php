@@ -78,7 +78,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
     return json_encode( array( "response" => $setMovements ) );
   }
 //consulta registros pendientes de sincronizar
-  $resp["rows_download"] = $movementsSynchronization->getSynchronizationMovements( $log['origin_store'], $rows_limit );
+  $resp["rows_download"] = $movementsSynchronization->getSynchronizationMovements( $log['origin_store'], $rows_limit, 1 );
   if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA' );
   }
