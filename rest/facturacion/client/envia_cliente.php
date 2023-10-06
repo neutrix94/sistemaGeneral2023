@@ -9,7 +9,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Descripción: Insercion de devoluciones
 */
 
-$app->post('/envia_cliente', function (Request $request, Response $response){
+$app->get('/envia_cliente', function (Request $request, Response $response){
 //variables
 	$req = [];
 	$req["rows"] = array(); 

@@ -1,5 +1,5 @@
 <?php
-	include( '../../../../../../conexionMysqli.php' );
+	include( '../../../../../conexionMysqli.php' );
 	header("Content-Type: text/event-stream");
 	header("Cache-Control: no-cache");
 	header("Connection: keep-alive");
@@ -11,11 +11,11 @@
 				WHERE id_transaccion_netpay = {$transaction_id}";
 		$stm = $link->query( $sql );
 		if( ! $stm ){
-			    echo "data: Error al consultar status de la transaccion : {$link->error}\n\n";
+			    echo "data: Error al consultar status de la transaccion : {$sql} {$link->error}\n\n";
 			    // Flushea el búfer de salida para asegurarse de que el mensaje se envíe inmediatamente
 			    ob_flush();
 			    flush();
-			return "Error al consultar status de la transaccion : {$link->error}";
+			//return "Error al consultar status de la transaccion : {$link->error}";
 		}else{
 			//return $sql;
 			$row = $stm->fetch_assoc();
@@ -23,8 +23,8 @@
 		}
 	}
 
-	// Establece un tiempo máximo de ejecución del script en infinito
-	set_time_limit(60);
+	/* Establece un tiempo máximo de ejecución del script en infinito
+	set_time_limit(60);*/
 
 	// Puedes ajustar el intervalo de retransmisión como desees
 	$retryInterval = 2000;
@@ -35,7 +35,7 @@
 	  //  $message = "Mensaje en tiempo real :: {$_GET['fl']} ::" . date('Y-m-d H:i:s');
 
 	    // Envia el mensaje al cliente
-		if( $c >= 4 ){
+		if( $c >= 3 ){
 			$message = getTransactionStatus( $_GET['transaction_id'], $link );
 			if( $message != '' ){
 			    echo "data: $message\n\n";
@@ -45,6 +45,14 @@
 			}
 		}
 		$c ++;
+	/*implementacion Oscar para descartar la transaccion despues de 2 minutos*/
+		if( $c == 90 ){
+			$sql = "UPDATE vf_transacciones_netpay 
+						SET message = 'DESCARTADO POR LIMITE DE TIEMPO CDLL'
+					WHERE id_transaccion_netpay = {$_GET['transaction_id']}";
+			$stm = $link->query( $sql ) or die( "Error al actualizar transaccion a 'DESCARTADO POR LIMITE DE TIEMPO CDLL' : {$link->error}" );
+		}
+
 	    // Espera durante el intervalo antes de enviar otro mensaje
 	    sleep($retryInterval / 1000);
 	}

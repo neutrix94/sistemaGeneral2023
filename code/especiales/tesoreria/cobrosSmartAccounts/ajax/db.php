@@ -11,9 +11,9 @@
 		$row = $stm->fetch_assoc();
 		$is_smart_accounts = $row['is_smart_accounts'];
 		//if( $row['is_smart_accounts'] == 0 ){
-			include( '../../../netPay/apiNetPay' );//sin smartaccounts
+		//	include( '../../../netPay/apiNetPaySinSmartAccount.php' );//sin smartaccounts
 		//}else{
-		//	include( '../../../netPay/apiNetPay.php' );
+			include( '../../../netPay/apiNetPay.php' );
 		//}
 	//
 		$apiNetPay = new apiNetPay( $link, $sucursal_id );
@@ -221,13 +221,13 @@
 		public function getTerminals( $user_id, $c = 0 ){
 			$resp = "";
 			$sql="SELECT 
-					a.id_afiliacion AS afiliation_id,
-					a.no_afiliacion AS afiliation_number
-				FROM ec_afiliaciones a
-				LEFT JOIN ec_afiliaciones_cajero ac 
-				ON ac.id_afiliacion=a.id_afiliacion
-				WHERE ac.id_cajero='{$user_id}' 
-				AND ac.activo=1";
+					tis.id_terminal_integracion AS afiliation_id,
+					tis.nombre_terminal AS afiliation_number
+				FROM ec_terminales_integracion_smartaccounts tis
+				LEFT JOIN ec_terminales_cajero_smartaccounts tcs
+				ON tis.id_terminal_integracion = tcs.id_terminal
+				WHERE tcs.id_cajero = '{$user_id}' 
+				AND tcs.activo = 1";
 			//$eje=mysql_query($sql)or die("Error al consultar las afiliaciones para este cajero!!!<br>".mysql_error());
 			$stm = $this->link->query( $sql ) or die( "Error al consultar las afiliaciones del cajero" );
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';

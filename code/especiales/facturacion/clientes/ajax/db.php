@@ -40,6 +40,10 @@
 				return '';
 			break;
 
+			case 'getCfdis' :
+				echo $BC->getCfdis();
+			break;
+
 			default:
 				die( "Access Denied on {$action}!" );
 			break;
@@ -52,6 +56,22 @@
 		function __construct( $connection ){
 			$this->link = $connection;
 		}
+	//funcion para recuperar los tipos de cfdi
+		function getCfdis( $cfdi = null ){
+			$resp = "";
+			$sql = "SELECT
+				clave AS clue,
+				nombre AS name
+			FROM vf_cfdi";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar los cfdis : {$this->link->error}" );
+			$resp = "<option value=\"0\">-- Seleccionar --</option>";
+			while( $row = $stm->fetch_assoc() ){
+				$resp .= "<option value=\"{$row['clue']}\"";
+				$resp .= ( $cfdi != null && $cfdi == $row['clue'] ? ' selected' : '' );
+				$resp .= ">{$row['name']}</option>";
+			}
+			return $resp;
+		}
 	//funciones para guardar clientes y sus contactos
 		public function saveCostumer( $rfc, $name, $telephone, $email, $person_type, $street_name, 
 						$internal_number, $external_number, $cologne, $municipality, $postal_code, $location, 
@@ -59,7 +79,7 @@
 			$this->link->autocommit( false );
 		//inserta el registro del cliente
 			$sql = "INSERT INTO vf_clientes_razones_sociales_tmp  
-						rfc = '{$rfc}', 
+						SET rfc = '{$rfc}', 
 						razon_social = '{$name}', 
 						id_tipo_persona = '', 
 						entrega_cedula_fiscal = '', 
@@ -71,7 +91,7 @@
 						del_municipio = '{$municipality}',
 						cp = '{postal_code}',
 						estado = '{$state}',
-						pais = '{$country}' )";
+						pais = '{$country}'";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar cliente : {$this->link->error}" );
 			$customer_id = $this->link->insert_id;
 		//inserta el detalle del cliente

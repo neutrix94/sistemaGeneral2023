@@ -105,7 +105,7 @@
    // die('here');
     if($r_c[0]==1){*/
 ?>
-    <p align="center" class="pqt" style="top:70%;" onclick="location.href='../code/especiales/tesoreria/cobros/cobros.php?';">
+    <p align="center" class="pqt" style="top:70%;" onclick="location.href='../code/especiales/tesoreria/cobros/index.php?';">
       <img src="img/cobros.png" height="70%" width="70%" title="ingresae para cobrar ventas">
       <br>Cobrar
     </p>
