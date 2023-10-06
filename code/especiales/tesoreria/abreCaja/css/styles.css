@@ -12,8 +12,7 @@
 	#log_caja{
 		position:relative;
 		border: 1px solid gray;
-		align-items: center;
-		top:-5%; 
+		top:2%; 
 		border-radius: 10px;
 		color:white;
 	}

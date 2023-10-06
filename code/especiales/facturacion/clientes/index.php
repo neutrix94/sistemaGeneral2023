@@ -1,7 +1,7 @@
 <?php
 	include( '../../../../conexionMysqli.php' );
 //validacion de token
-	if( !isset( $_GET['token'] ) ){
+	/*if( !isset( $_GET['token'] ) ){
 		die( "<h3 class=\"text-center\">No hay token, pide ayuda en la tienda donde realizaste la compra!</h3>" );
 	}else{
 		$sql = "SELECT 
@@ -18,7 +18,7 @@
 			}
 		}
 		echo "<input type=\"hidden\" id=\"current_token\" value=\"{$_GET['token']}\">";
-	}
+	}*/
 	$sql = "SELECT
 				UPPER( nombre ) AS name
 			FROM sys_estados";
@@ -28,15 +28,7 @@
 		$states .= "<option value=\"{$row['name']}\">{$row['name']}</option>";
 	}
 
-	$sql = "SELECT
-				clave AS clue,
-				nombre AS name
-			FROM vf_cfdi";
-	$stm = $link->query( $sql ) or die( "Error al consultar los cfdis : {$link->error}" );
-	$cfdis = "<option value=\"0\">-- Seleccionar --</option>";
-	while( $row = $stm->fetch_assoc() ){
-		$cfdis .= "<option value=\"{$row['clue']}\">{$row['name']}</option>";
-	}
+	
 
 	$sql = "SELECT
 				clave_numerica AS clue,
@@ -61,6 +53,7 @@
 	<script type="text/javascript" src="../../../../js/jquery-1.10.2.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../../../css/bootstrap/css/bootstrap.css">
 	<script type="text/javascript" src="../../../../css/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script type="text/javascript" src="js/contacts.js"></script>
 </head>
 <body>
 
@@ -115,7 +108,7 @@
 					<i class="icon-plus">Agregar contacto</i>
 				</button>
 			</div>
-			<div id="accordion">
+			<div id="accordion" id="accordionExample">
 			</div>
 		<!-- fin de acordion -->
 		</div>
@@ -406,7 +399,8 @@ email : email,*/
 					country : country,
 					state : state,
 					token : $( '#current_token' ).val(),
-					costumer_contacts : costumer_contacts
+					costumer_contacts : costumer_contacts,
+					costumer_fl : 'saveCostumer'
 			},
 			success : function( dat ){
 				if( dat == 'ok' ){
@@ -488,72 +482,6 @@ email : email,*/
 		$( '.emergent_content' ).html( "" );
 		$( '.emergent' ).css( "display", "none" );
 
-	}
-
-	function getCostumerContacts( costumer_id ){
-		var url = "ajax/db.php?costumer_fl=getCostumerContacts&costumer_id=" + costumer_id;
-		var resp = ajaxR( url ).split( "|" );
-		if( resp[0] != 'ok' ){
-			alert( "Error al consultar los datos de contacto del cliente : " + resp );
-		}else{
-			var contacts = JSON.parse( resp[1] );
-			return contacts;
-		}
-	}
-	function add_contact_form(  ){
-		buildCostumerContacts( null );
-	}
-	function buildCostumerContacts( contact ){
-		var content = ``;
-		var position = $( '.card' ).length;
-		content += `<div class="card">
-		    	<div class="card-header" id="heading${position}">
-		      	<h5 class="mb-0">
-		       	<button 
-		       		class="btn btn-link" 
-		       		data-toggle="collapse" 
-		       		data-target="#collapse${position}" 
-		       		aria-expanded="false" 
-		       		aria-controls="collapse${position}"
-		       	>
-		        ${contact.name} | Correo : ${contact.email}
-		        </button>
-		      </h5>
-		    </div>
-
-		    <div id="collapse${position}" class="collapse" aria-labelledby="heading${position}" data-parent="#accordion">
-		      	<div class="card-body">
-		      		<div class="col-sm-6">
-						Nombre de Contacto<span class="text-danger">*</span>
-					<input type="text" id="costumer_name_input_${position}" value="${contact.name}" class="form-control" onblur="changeToUpperCase( this );">
-					</div>
-					<div class="col-sm-6">
-						Telefono <span class="text-danger">*</span>
-						<input type="number" id="telephone_input_${position}" value="${contact.telephone}" class="form-control">
-					</div>
-					<div class="col-sm-6">
-						Celular <span class="text-danger">*</span>
-						<input type="number" id="cellphone_input_${position}" 
-						value="${contact.cellphone}" 
-						class="form-control">
-					</div>
-					<div class="col-sm-6">
-						Correo <span class="text-danger">*</span>
-						<input type="email" id="email_input_${position}" value="${contact.email}" class="form-control">
-					</div>
-					<div class="col-sm-6">
-						Uso CFDI <span class="text-danger">*</span>
-						<select class="form-select" id="cfdi_input_${position}">
-						<?php
-							//echo $cfdis;
-						?>
-						</select>
-					<br>
-					</div>
-		        </div>
-		    </div>
-		  </div>`;
-		return content;
 	}
 
 	function enable_scann_camera(){

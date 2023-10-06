@@ -13,7 +13,16 @@
 .pagos{background:#83B141;color: white;font-size: 20px;}
 .entrada_num{padding: 10px;width:80%;font-size: 25px;}
 /*#buscador{padding: 10px;width: 80%;font-size: 25px;}*/
-#res_busc{position: absolute;width: 40%;border: 1px solid;top:90px;background: white;height: 250px;overflow-y: auto;display:none;}
+#res_busc{
+	position: relative;
+	width: 100%;
+	border: 1px solid;
+	top:0px;
+	background: white;
+	height: 250px;
+	overflow-y: auto;
+	display:none;
+}
 /*.btn{padding: 10px;border-radius: 10px;}*/
 /*td{border:1px solid;}*/
 .mnu{text-decoration: none; position: absolute; padding: 10px;border:1px solid white;background: gray;top:15px;color: white;left: 45%;}
@@ -69,6 +78,13 @@ input[type=number] { -moz-appearance:textfield; }
 
 	.no_visible{
 		display: none;
+	}
+
+	.reverse_form_btn{
+		position : absolute;
+		top : 20px;
+		right: 50px;
+		z-index: 12;
 	}
 
 	.btn, .form-control, .form-select{

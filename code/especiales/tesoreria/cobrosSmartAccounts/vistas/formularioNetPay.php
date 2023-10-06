@@ -1,7 +1,7 @@
 <div class="row" style="padding : 20px;">
 	<div id="message-container" class="text-center">
-		<h2 class="text-center">Esperando autorizacion...</h2>
-		<img src="../../../../../img/img_casadelasluces/load.gif">
+		<h2 class="text-center"><?php echo $resp->message;?></h2>
+		<img src="../../../../img/img_casadelasluces/load.gif">
 	</div>
 	<button
 		class="btn btn-danger"

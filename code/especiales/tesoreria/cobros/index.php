@@ -1,6 +1,17 @@
 <?php
 	include('../../../../conectMin.php');
 	include('../../../../conexionMysqli.php');
+	//verifica si esta habilitada la funcion de SmartAccounts
+		$sql = "SELECT 
+					habilitar_smartaccounts_netpay AS is_smart_accounts
+				FROM sys_sucursales s
+				WHERE id_sucursal = {$sucursal_id}";
+		$stm = $link->query( $sql ) or die( "Error al consultar si esta habilitado SmartAccounts : {$link->error}" );
+		$row = $stm->fetch_assoc();
+		$is_smart_accounts = $row['is_smart_accounts'];
+		if( $row['is_smart_accounts'] == 1 ){
+			die( "<script>location.href=\"../cobrosSmartAccounts/index.php\";</script>" );
+		}
 	include('ajax/db.php');
 	$Payments = new Payments( $link );//instancia clase de pagos
 	$Payments->checkAccess( $user_id );//verifica permisos

@@ -1,5 +1,5 @@
 <?php
-	include('../../../../../conectMin.php');
+	include('../../../../conectMin.php');
 	$fl=$_POST['flag'];
 	/*buscador por folios*/
 	if($fl=='buscador'){

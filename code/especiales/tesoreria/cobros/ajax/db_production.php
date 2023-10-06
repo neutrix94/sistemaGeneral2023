@@ -1,24 +1,40 @@
 <?php
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
-		include( '../../../../../../conect.php' );
-		include( '../../../../../../conexionMysqli.php' );
-		include( '../../../../netPay/apiNetPay.php' );
+		include( '../../../../../conect.php' );
+		include( '../../../../../conexionMysqli.php' );
+		include( '../../../netPay/apiNetPay.php' );
 		$apiNetPay = new apiNetPay( $link );
 		$Payments = new Payments( $link );
 		$action = ( isset( $_GET['fl'] ) ? $_GET['fl'] : $_POST['fl'] );
 		switch ( $action ) {
 			case 'sendPaymentPetition' :
-				$apiUrl = "http://nubeqa.netpay.com.mx:3334/integration-service/transactions/sale";
+				$apiUrl = "https://suite.netpay.com.mx/gateway/integration-service/transactions/sale";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/sale
 			//recibe variables
 				$amount = ( isset( $_GET['amount'] ) ? $_GET['amount'] : $_POST['amount'] );
 				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
 				$terminal_id = ( isset( $_GET['terminal_id'] ) ? $_GET['terminal_id'] : $_POST['terminal_id'] );
 				$counter = ( isset( $_GET['counter'] ) ? $_GET['counter'] : $_POST['counter'] );
-				//die( $terminal_id );
-				$req =  $apiNetPay->salePetition( $apiUrl, $amount, $terminal_id );
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+			//consume servicio de venta
+				$req = $apiNetPay->salePetition( $apiUrl, $amount, $terminal_id, $user_id, 
+					$sucursal_id, $sale_folio, $session_id );
 				$resp = json_decode( $req );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
+					$transaction_id = $resp->petition_id;
 					include( '../vistas/formularioNetPay.php' );
+				}else{
+					die( "<div class=\"row text-center\">
+							<h2 class=\"text-center\">Ocurrio un error :</h2>
+							<h4>Codigo : {$resp->code}</h4>
+							<h4>Mensaje : {$resp->message}</h4>
+							<button
+								type=\"button\"
+								class=\"btn btn-danger\"
+								onclick=\"close_emergent();\"
+							>
+								<i class=\"icon-cancel-circle\">Aceptar y cerrar</i>
+							</button>
+						</div>" );
 				}
 				return '';
 			break;
@@ -37,24 +53,99 @@
 			case 'rePrintByOrderId' :
 				$transaction_id = ( isset( $_GET['transaction_id'] ) ? $_GET['transaction_id'] : $_POST['transaction_id'] );
 				$data = $Payments->getOrderResponse( $transaction_id );
-				//var_dump( $data );
-				//echo $Payments->cancelByOrderId( $transaction_id );
-				//include( '../../../../netPay/apiNetPay.php' );
-				//die( "here : {$transaction_id}" );
-				$apiNetPay = new apiNetPay( $link );
-				$apiUrl = "http://nubeqa.netpay.com.mx:3334/integration-service/transactions/reprint";
-				$print = $apiNetPay->saleReprint( $apiUrl, $data['orderId'], $data['terminalId'] );
-				return $print;
+				//$apiNetPay = new apiNetPay( $link );
+				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				
+				$apiUrl = "https://suite.netpay.com.mx/gateway/integration-service/transactions/reprint";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/reprint";
+				$print = $apiNetPay->saleReprint( $apiUrl, $data['orderId'], $data['terminalId'],
+										$user_id, $sucursal_id, $sale_folio, $session_id );
+				//saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, session_id )
+				$resp = json_decode( $print );
+				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
+					$counter = 'null';
+					include( '../vistas/formularioNetPay.php' );
+				}else{
+					die( "<div class=\"row text-center\">
+							<h2 class=\"text-center\">Ocurrio un error :</h2>
+							<h4>Codigo : {$resp->code}</h4>
+							<h4>Mensaje : {$resp->message}</h4>
+							<button
+								type=\"button\"
+								class=\"btn btn-danger\"
+								onclick=\"close_emergent();\"
+							>
+								<i class=\"icon-cancel-circle\">Aceptar y cerrar</i>
+							</button>
+						</div>" );
+				}
+				return '';
+				//return $print;
+			break;
+			case 'rePrintByOrderIdManual' :
+				$orderId = ( isset( $_GET['orderId'] ) ? $_GET['orderId'] : $_POST['orderId'] );
+				$data = $Payments->getOrderResponse( $orderId, true );
+				//$apiNetPay = new apiNetPay( $link );
+				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				
+				$apiUrl = "https://suite.netpay.com.mx/gateway/integration-service/transactions/reprint";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/reprint";
+				$print = $apiNetPay->saleReprint( $apiUrl, $data['orderId'], $data['terminalId'],
+										$user_id, $sucursal_id, $sale_folio, $session_id );
+				//saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, session_id )
+				$resp = json_decode( $print );
+				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
+					$counter = 'null';
+					include( '../vistas/formularioNetPay.php' );
+				}else{
+					die( "<div class=\"row text-center\">
+							<h2 class=\"text-center\">Ocurrio un error :</h2>
+							<h4>Codigo : {$resp->code}</h4>
+							<h4>Mensaje : {$resp->message}</h4>
+							<button
+								type=\"button\"
+								class=\"btn btn-danger\"
+								onclick=\"close_emergent();\"
+							>
+								<i class=\"icon-cancel-circle\">Aceptar y cerrar</i>
+							</button>
+						</div>" );
+				}
+				return '';
+				//return $print;
 			break;
 			case 'cancelByOrderId' :
 				$transaction_id = ( isset( $_GET['transaction_id'] ) ? $_GET['transaction_id'] : $_POST['transaction_id'] );
 				$data = $Payments->getOrderResponse( $transaction_id );
+
+				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				//echo $Payments->cancelByOrderId( $transaction_id );
 				//include( '../../../../netPay/apiNetPay.php' );
 				//$apiNetPay = new apiNetPay( $link );
-				$apiUrl = "http://nubeqa.netpay.com.mx:3334/integration-service/transactions/cancel";
-				$cancel = $apiNetPay->saleCancelation( $apiUrl, $data['orderId'], $data['terminalId'] );
-				return $cancel;
+				$apiUrl = "https://suite.netpay.com.mx/gateway/integration-service/transactions/cancel";//"http://nubeqa.netpay.com.mx:3334/integration-service/transactions/cancel";
+				$cancel = $apiNetPay->saleCancelation( $apiUrl, $data['orderId'], $data['terminalId'],
+										$user_id, $sucursal_id, $sale_folio, $session_id );
+				$resp = json_decode( $cancel );
+				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
+					$counter = 'null';
+					include( '../vistas/formularioNetPay.php' );
+				}else{
+					die( "<div class=\"row text-center\">
+							<h2 class=\"text-center\">Ocurrio un error :</h2>
+							<h4>Codigo : {$resp->code}</h4>
+							<h4>Mensaje : {$resp->message}</h4>
+							<button
+								type=\"button\"
+								class=\"btn btn-danger\"
+								onclick=\"close_emergent();\"
+							>
+								<i class=\"icon-cancel-circle\">Aceptar y cerrar</i>
+							</button>
+						</div>" );
+				}
+				return '';
+				//return $cancel;
 			break;
 				
 			default :
@@ -73,12 +164,20 @@
 			$this->link = $connection;
 		}
 
-		public function getOrderResponse( $transaction_id ){
-			$sql = "SELECT 
-						orderId,
-						terminalId
-					FROM vf_transacciones_netpay
-					WHERE id_transaccion_netpay = {$transaction_id}";
+		public function getOrderResponse( $transaction_id, $is_manual = false ){
+			if( ! $is_manual ){
+				$sql = "SELECT 
+							orderId,
+							terminalId
+						FROM vf_transacciones_netpay
+						WHERE id_transaccion_netpay = {$transaction_id}";
+			}else{
+				$sql = "SELECT 
+							orderId,
+							terminalId
+						FROM vf_transacciones_netpay
+						WHERE orderId = '{$transaction_id}'";
+			}
 			$stm = $this->link->query( $sql ) or die( "Error al consultar OrderId de la transacion : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
 			return $row;
