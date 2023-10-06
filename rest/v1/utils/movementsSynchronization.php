@@ -24,9 +24,9 @@
 		public function getSynchronizationMovements( $system_store, $limit, $type ){
 			$condition = "";
 			if( $type == 1 ){
-				$condition = "";
+				$condition = "AND id_status_sincronizacion IN( 1 )";
 			}elseif( $type == 2 ){
-				$condition = "";
+				$condition = "AND id_status_sincronizacion IN( 3 ) AND movimiento_sumado = 0";
 			}
 			$resp = array();
 			$sql = "SELECT 
@@ -35,7 +35,6 @@
 						tabla
 					FROM sys_sincronizacion_movimientos_almacen
 					WHERE tabla = 'ec_movimiento_almacen'
-					AND id_status_sincronizacion IN( 1 )
 					AND id_sucursal_destino = {$system_store}
 					{$condition}
 					LIMIT {$limit}";
