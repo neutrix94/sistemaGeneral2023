@@ -265,7 +265,7 @@
 					type="button"
 					id="cobrar" 
 					class="btn btn-success form-control"  onclick="cobrar();">
-					<i class="icon-floppy">Cobrar e Imprimir</i>
+					<i class="icon-floppy">Finalizar cobro</i>
 				</button>
 			</div>
 			<div class="col-2"></div>

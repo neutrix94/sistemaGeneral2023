@@ -211,9 +211,12 @@
 			if( isset( $result->error ) ){
 				if( $result->error == 'invalid_token' ){//token expirado
 					//die( 'here' );
-					$this->refreshToken( $token, $terminal['terminal_serie'] );
+					//$this->refreshToken( $token, $terminal['terminal_serie'] );
+					$sql = "DELETE FROM vf_tokens_terminales_netpay";
+					$stm = $this->link->query( $sql ) or die( "Error al eliminar tokens : {$this->link->error}" );
 					return $this->salePetition( $apiUrl, $amount = 0.01, $terminal['terminal_serie'], $user_id, 
 										$store_id, $sale_folio, $session_id );
+					return false;
 				}
 			}
 			$result = json_encode( $result, true );

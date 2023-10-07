@@ -158,6 +158,7 @@ $app->post('/', function (Request $request, Response $response){
     VALUES ( /*1*/NULL, /*2*/'{$row['sale_id']}', /*3*/'{$traceability['id_cajero']}', /*4*/'{$row['affiliation_id']}', 
     /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1 )";
 //    error_log( $sql );
+//actualiza el cajero de los cobros
     $stm = $link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$link->error}" );
     $paymet_id = $link->insert_id;
 //actualiza el id de cajero cobro en la transaccion
@@ -165,6 +166,20 @@ $app->post('/', function (Request $request, Response $response){
               SET id_cajero_cobro = '{$paymet_id}'
             WHERE id_transaccion_netpay = '{$folioNumber}'";
     $stm = $link->query( $sql ) or die( "Error al actualizar el cobro del cajero en la peticion : {$sql} {$link->error}" );
+        
+  //actualiza el id de cajero que cobro el pago*/
+    $sql="UPDATE ec_pedidos 
+            SET id_cajero = '{$traceability['id_cajero']}' 
+            WHERE id_pedido = {$row['sale_id']}";
+    $stm = $link->query( $sql ) or die( "Error al actualizar el pedido para este cajero : {$link->error}" );
+  //actualiza el id de cajero que cobro el pago*/
+    $sql="UPDATE ec_pedido_pagos 
+            SET id_cajero = '{$traceability['id_cajero']}',
+            fecha = now(),
+            hora = now() 
+            WHERE id_pedido = {$row['sale_id']}
+            AND id_cajero=0";
+    $stm = $link->query( $sql ) or die( "Error al actualizar el pago para este cajero : {$link->error}" );
     
 /*$fp = fopen('data.txt', 'w');
 fwrite($fp, $sql );
