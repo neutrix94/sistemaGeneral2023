@@ -383,7 +383,9 @@ var cont_cheques_transferencia=0;
 			$( '#t' + stop ).select();
 			return false;
 		}
-		amount_sum += parseInt( $( '#efectivo' ).val() );
+		if( $( '#efectivo' ).val() != '' ){
+			amount_sum += parseInt( $( '#efectivo' ).val() );
+		}
 		if( amount_sum != amount_total ){
 			alert( "La suma de los montos es diferente del total!" );
 			return false;
