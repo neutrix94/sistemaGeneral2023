@@ -137,18 +137,35 @@ $app->post('/', function (Request $request, Response $response){
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
   if( trim($message) == 'Transacción exitosa' ){
   //consulta los datos en relacion al numero de serie de la terminal
-    $sql = "SELECT 
-              a.id_afiliacion AS affiliation_id,
+    $sql = "";
+    if( isset( $traceability['smart_accounts'] ) && $traceability['smart_accounts'] == true ){
+      $sql = "SELECT
+              t.id_terminal_integracion AS affiliation_id,
               cc.id_caja_cuenta AS bank_id,
-              (SELECT 
-                id_pedido FROM ec_pedidos 
-                WHERE folio_nv = '{$traceability['folio_venta']}' 
-                LIMIT 1
+              (SELECT
+              id_pedido FROM ec_pedidos
+              WHERE folio_nv = '{$traceability['folio_venta']}'
+              LIMIT 1
               ) AS sale_id
-            FROM ec_afiliaciones a
+              FROM ec_terminales_integracion_smartaccounts t
             LEFT JOIN ec_caja_o_cuenta cc
-            ON a.id_banco = cc.id_caja_cuenta
-            WHERE a.numero_serie_terminal = '{$terminalId}'";
+            ON t.id_caja_cuenta = cc.id_caja_cuenta
+            WHERE t.numero_serie_terminal = '{$terminalId}'";
+
+    }else{
+      $sql = "SELECT 
+                a.id_afiliacion AS affiliation_id,
+                cc.id_caja_cuenta AS bank_id,
+                (SELECT 
+                  id_pedido FROM ec_pedidos 
+                  WHERE folio_nv = '{$traceability['folio_venta']}' 
+                  LIMIT 1
+                ) AS sale_id
+              FROM ec_afiliaciones a
+              LEFT JOIN ec_caja_o_cuenta cc
+              ON a.id_banco = cc.id_caja_cuenta
+              WHERE a.numero_serie_terminal = '{$terminalId}'";
+    }
     $stm = $link->query( $sql ) or die( "Error al recuperar datos para insertar el cobro del cajero {$link->error}" );
     $row = $stm->fetch_assoc();
 

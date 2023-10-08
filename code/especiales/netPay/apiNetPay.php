@@ -171,7 +171,8 @@
 							"id_sucursal"=>"{$store_id}", 
 							"id_cajero"=>"{$user_id}", 
 							"folio_venta"=>"{$sale_folio}", 
-							"id_sesion_cajero"=>"{$session_id}"
+							"id_sesion_cajero"=>"{$session_id}",
+							"smart_accounts"=>true
 						),
 			            "serialNumber"=>"{$terminal['terminal_serie']}",
 			            "amount"=> $amount,
@@ -239,7 +240,8 @@
 							"id_cajero"=>"{$user_id}", 
 							"folio_venta"=>"{$sale_folio}", 
 							"id_sesion_cajero"=>"{$session_id}",
-							"petition_id"=>"{$petition_id}"
+							"petition_id"=>"{$petition_id}",
+							"smart_accounts"=>true
 						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
@@ -296,7 +298,8 @@
 							"id_cajero"=>"{$user_id}", 
 							"folio_venta"=>"{$sale_folio}", 
 							"id_sesion_cajero"=>"{$session_id}",
-							"petition_id"=>"{$petition_id}"
+							"petition_id"=>"{$petition_id}",
+							"smart_accounts"=>true
 						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
