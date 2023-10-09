@@ -99,12 +99,12 @@
 				$sql = "INSERT INTO vf_clientes_razones_sociales ( /*1*/id_cliente_facturacion, /*2*/rfc, /*3*/razon_social, /*4*/id_tipo_persona,
 						/*5*/entrega_cedula_fiscal, /*6*/url_cedula_fiscal, /*7*/calle, /*8*/no_int, /*9*/no_ext, /*10*/colonia, /*11*/del_municipio, 
 						/*12*/cp, /*13*/estado, /*14*/pais, /*15*/regimen_fiscal, /*16*/productos_especificos, /*17*/fecha_alta, /*18*/sincronizar )
-						VALUES( NULL,  /*1*/'{$costumer['id_cliente_facturacion']}', /*2*/'{$costumer['rfc']}', /*3*/'{$costumer['razon_social']}', 
+						VALUES( /*1*/'{$costumer['id_cliente_facturacion']}', /*2*/'{$costumer['rfc']}', /*3*/'{$costumer['razon_social']}', 
 						/*4*/'{$costumer['id_tipo_persona']}', /*5*/'{$costumer['entrega_cedula_fiscal']}', /*6*/'{$costumer['url_cedula_fiscal']}',
 						/*7*/'{$costumer['calle']}', /*8*/'{$costumer['no_int']}', /*9*/'{$costumer['no_ext']}', /*10*/'{$costumer['colonia']}', 
 						/*11*/'{$costumer['del_municipio']}', /*12*/'{$costumer['cp']}', /*13*/'{$costumer['estado']}', /*14*/'{$costumer['pais']}', 
 						/*15*/'{$costumer['regimen_fiscal']}', /*16*/'{$costumer['productos_especificos']}', /*17*/NOW(), /*18*/1 )";
-				$stm = $this->link->query( $sql ) or die( "Error al insertar cliente de facturacion : {$this->link->error}" );
+				$stm = $this->link->query( $sql ) or die( "Error al insertar cliente de facturacion : {$sql} {$this->link->error}" );
 			//obtiene el id insertado
 				$costumer_id = $this->link->insert_id;
 				$costumer['id_cliente'] = $costumer_id;
