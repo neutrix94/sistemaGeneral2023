@@ -132,7 +132,8 @@ $app->post('/', function (Request $request, Response $response){
             /*42*/id_sucursal = '{$traceability['id_sucursal']}', 
             /*43*/id_cajero = '{$traceability['id_cajero']}', 
             /*44*/folio_venta = '{$traceability['folio_venta']}',
-            /*44*/id_sesion_cajero = '{$traceability['id_sesion_cajero']}'
+            /*44*/id_sesion_cajero = '{$traceability['id_sesion_cajero']}',
+            /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
           WHERE id_transaccion_netpay = '{$transactionId_internal}'";//$folioNumber
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
   if( trim($message) == 'Transacción exitosa' ){
@@ -179,25 +180,26 @@ $app->post('/', function (Request $request, Response $response){
     $stm = $link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$link->error}" );
     $paymet_id = $link->insert_id;
 //actualiza el id de cajero cobro en la transaccion
-    $sql = "UPDATE vf_transacciones_netpay 
-              SET id_cajero_cobro = '{$paymet_id}'
-            WHERE id_transaccion_netpay = '{$folioNumber}'";
-    $stm = $link->query( $sql ) or die( "Error al actualizar el cobro del cajero en la peticion : {$sql} {$link->error}" );
-        
+      $sql = "UPDATE vf_transacciones_netpay 
+                SET id_cajero_cobro = '{$paymet_id}'
+              WHERE id_transaccion_netpay = '{$folioNumber}'";
+      $stm = $link->query( $sql ) or die( "Error al actualizar el cobro del cajero en la peticion : {$sql} {$link->error}" );
+          
   //actualiza el id de cajero que cobro el pago*/
-    $sql="UPDATE ec_pedidos 
-            SET id_cajero = '{$traceability['id_cajero']}' 
-            WHERE id_pedido = {$row['sale_id']}";
-    $stm = $link->query( $sql ) or die( "Error al actualizar el pedido para este cajero : {$link->error}" );
-  //actualiza el id de cajero que cobro el pago*/
-    $sql="UPDATE ec_pedido_pagos 
-            SET id_cajero = '{$traceability['id_cajero']}',
-            fecha = now(),
-            hora = now() 
-            WHERE id_pedido = {$row['sale_id']}
-            AND id_cajero=0";
-    $stm = $link->query( $sql ) or die( "Error al actualizar el pago para este cajero : {$link->error}" );
-    
+    if( $row['sale_id'] != null && $row['sale_id'] != '' ){
+      $sql="UPDATE ec_pedidos 
+              SET id_cajero = '{$traceability['id_cajero']}' 
+              WHERE id_pedido = {$row['sale_id']}";
+      $stm = $link->query( $sql ) or die( "Error al actualizar el pedido para este cajero : {$sql} {$link->error}" );
+    //actualiza el id de cajero que cobro el pago*/
+      $sql="UPDATE ec_pedido_pagos 
+              SET id_cajero = '{$traceability['id_cajero']}',
+              fecha = now(),
+              hora = now() 
+              WHERE id_pedido = {$row['sale_id']}
+              AND id_cajero=0";
+      $stm = $link->query( $sql ) or die( "Error al actualizar el pago para este cajero : {$sql} {$link->error}" );
+    }
 /*$fp = fopen('data.txt', 'w');
 fwrite($fp, $sql );
 fclose($fp);*/

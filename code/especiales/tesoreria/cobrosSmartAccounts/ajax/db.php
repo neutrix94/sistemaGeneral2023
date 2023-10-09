@@ -71,11 +71,11 @@
 				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				$terminal_id = $data['terminalId'];// ( isset( $_GET['terminal_id'] ) ? $_GET['terminal_id'] : $_POST['terminal_id'] );
-
+				$store_id_netpay = $data['store_id_netpay'];
 				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_reimpresion' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/reprint";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/reprint";
 				//die( $apiUrl );
 				$print = $apiNetPay->saleReprint( $apiUrl, $data['orderId'], $data['terminalId'],
-										$user_id, $sucursal_id, $sale_folio, $session_id );
+										$user_id, $sucursal_id, $sale_folio, $session_id, $store_id_netpay );
 				//saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, session_id )
 				$resp = json_decode( $print );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
@@ -106,9 +106,11 @@
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				
 				$terminal_id = $data['terminalId'];
+				$store_id_netpay = $data['store_id_netpay'];
+
 				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_reimpresion' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/reprint";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/reprint";
 				$print = $apiNetPay->saleReprint( $apiUrl, $data['orderId'], $data['terminalId'],
-										$user_id, $sucursal_id, $sale_folio, $session_id );
+										$user_id, $sucursal_id, $sale_folio, $session_id, $store_id_netpay );
 				//saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, session_id )
 				$resp = json_decode( $print );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
@@ -141,9 +143,10 @@
 				//include( '../../../../netPay/apiNetPay.php' );
 				//$apiNetPay = new apiNetPay( $link );
 				$terminal_id = $data['terminalId'];
+				$store_id_netpay = $data['store_id_netpay'];
 				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_cancelacion' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/cancel";//"http://nubeqa.netpay.com.mx:3334/integration-service/transactions/cancel";
 				$cancel = $apiNetPay->saleCancelation( $apiUrl, $data['orderId'], $data['terminalId'],
-										$user_id, $sucursal_id, $sale_folio, $session_id );
+										$user_id, $sucursal_id, $sale_folio, $session_id, $store_id_netpay );
 				$resp = json_decode( $cancel );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
 					$counter = 'null';
@@ -186,13 +189,15 @@
 			if( ! $is_manual ){
 				$sql = "SELECT 
 							orderId,
-							terminalId
+							terminalId,
+							store_id_netpay
 						FROM vf_transacciones_netpay
 						WHERE id_transaccion_netpay = {$transaction_id}";
 			}else{
 				$sql = "SELECT 
 							orderId,
-							terminalId
+							terminalId,
+							store_id_netpay
 						FROM vf_transacciones_netpay
 						WHERE orderId = '{$transaction_id}'";
 			}
@@ -218,16 +223,21 @@
 			return 'ok';
 		}
 
-		public function getTerminals( $user_id, $c = 0 ){
+		public function getTerminals( $user_id, $c = 0, $store_id = 1 ){
 			$resp = "";
 			$sql="SELECT 
 					tis.id_terminal_integracion AS afiliation_id,
-					tis.nombre_terminal AS afiliation_number
+					CONCAT( tis.nombre_terminal, ' - terminal : ', tis.numero_serie_terminal, ' - storeId :', rse.store_id_netpay ) AS afiliation_number
 				FROM ec_terminales_integracion_smartaccounts tis
 				LEFT JOIN ec_terminales_cajero_smartaccounts tcs
 				ON tis.id_terminal_integracion = tcs.id_terminal
+				LEFT JOIN ec_terminales_sucursales_smartaccounts tss
+				ON tss.id_terminal = tcs.id_terminal
+				LEFT JOIN vf_razones_sociales_emisores rse
+				ON rse.id_razon_social = tss.id_razon_social
 				WHERE tcs.id_cajero = '{$user_id}' 
-				AND tcs.activo = 1";
+				AND tcs.activo = 1
+				AND tss.id_sucursal = {$store_id}";
 			//$eje=mysql_query($sql)or die("Error al consultar las afiliaciones para este cajero!!!<br>".mysql_error());
 			$stm = $this->link->query( $sql ) or die( "Error al consultar las afiliaciones del cajero" );
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
