@@ -1,5 +1,8 @@
 <?php
-
+//die( "here" );
+	/*include( '../../../conexionMysqli.php' );
+	$bill = new Bill( $link );
+	echo $bill->insertBillSystemCostumerSynchronization();*/
 	class Bill
 	{
 		private $link;	
@@ -38,8 +41,8 @@
 			
 			$this->link->autocommit( false );//comienza transaccion
 			while( $row = $stm->fetch_assoc() ){
-				$row['folio_unico'] = $this->update_unique_code( 'vf_clientes_razones_sociales_tmp', 'id_cliente_tmp', 'CL', $row['id_cliente_tmp'] );
-				$detail = $this->getTemporalCostumerDetail( $row['id_cliente_tmp'] );
+				$row['folio_unico'] = $this->update_unique_code( 'vf_clientes_razones_sociales_tmp', 'id_cliente_facturacion_tmp', 'CL', $row['id_cliente_facturacion_tmp'] );
+				$detail = $this->getTemporalCostumerDetail( $row['id_cliente_facturacion_tmp'] );
 				if( sizeof( $detail ) > 0 ){
 					$row['detail'] = $detail;
 				}
@@ -47,6 +50,7 @@
 				$sql = "INSERT INTO sys_sincronizacion_registros_facturacion ( id_sincronizacion_registro, sucursal_de_cambio, 
 	  			id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
 				VALUES( NULL, {$this->store_id}, -1, '{$json}', NOW(), 'envia_cliente.php', 1 )";
+				//die( $sql );
 				$stm2 = $this->link->query( $sql ) or die( "Error al insertar registro de sincronizacion : {$this->link->error}" );
 				$resp[] = $row;
 			}
@@ -64,9 +68,9 @@
 						correo,
 						uso_cfdi
 		  			FROM vf_clientes_contacto_tmp
-		  			WHERE id_cliente_tmp = {$costumer_id}
+		  			WHERE id_cliente_facturacion_tmp = {$costumer_id}
 		  			AND ( folio_unico IS NULL OR folio_unico = '' )";
-		  	$stm = $this->link->query( $sql ) or die( "Error al consultar razones sociales pendientes de sincronizar : {$this->link->error}" );
+		  	$stm = $this->link->query( $sql ) or die( "Error al consultar razones sociales pendientes de sincronizar : {$sql} {$this->link->error}" );
 			while( $row = $stm->fetch_assoc() ){
 				$row['folio_unico'] = $this->update_unique_code( 'vf_clientes_contacto_tmp', 'id_cliente_contacto_tmp', 'CLRZ', $row['id_cliente_contacto_tmp'] );
 				//$detail = $this->getTemporalCostumerDetail( $row['id_cliente_tmp'] );
@@ -83,13 +87,14 @@
 			$sql = "UPDATE {$table} 
 						SET folio_unico = '{$this->store_prefix}_{$prefix}_{$id}' 
 					WHERE {$keyname} = {$id}";
-			$stm = $this->link->query( $sql ) or die( "Error al actualizar folio unico en {$table} : {$this->link->error}" );
+			$stm = $this->link->query( $sql ) or die( "Error al actualizar folio unico en {$table} : {$sql} {$this->link->error}" );
 			return "{$this->store_prefix}_{$prefix}_{$id}";
 		}
+
 /*Insercion de clientes*/
 		public function insertCostumers( $costumers ){
-			$this->link->autocommit( false );
 			foreach ( $costumers as $key => $costumer ) {
+				$this->link->autocommit( false );
 			//inserta cabecera 
 				$sql = "INSERT INTO vf_clientes_razones_sociales ( /*1*/id_cliente_facturacion, /*2*/rfc, /*3*/razon_social, /*4*/id_tipo_persona,
 						/*5*/entrega_cedula_fiscal, /*6*/url_cedula_fiscal, /*7*/calle, /*8*/no_int, /*9*/no_ext, /*10*/colonia, /*11*/del_municipio, 
@@ -105,9 +110,12 @@
 				$costumer['id_cliente'] = $costumer_id;
 				$costumer['folio_unico'] = "CLIENTE_{$costumer_id}";
 			//actualiza el folio_unico de la cabecera de cliente
-				$sql = "UPDATE vf_clientes_razones_sociales SET folio_unico = '{$costumer['folio_unico']}' WHERE id_cliente = {$costumer['id_cliente']}";
+				$sql = "UPDATE vf_clientes_razones_sociales 
+							SET folio_unico = '{$costumer['folio_unico']}' 
+						WHERE id_cliente = {$costumer['id_cliente']}";
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar el folio unico del cliente : {$this->link->error}" );
-			//inserta el registro de sincronizacion del cliente
+				
+				//inserta el registro de sincronizacion del cliente
 				$synchronization = $this->insertCostumerSynchronizationRows( $costumer );
 			//inserta detalle ( contactos )
 				$detail = $costumer['detail'];
@@ -123,16 +131,18 @@
 				$detail['id_cliente_contacto'] = $detail_id;
 				$detail['folio_unico'] = "CONTACTO_{$detail_id}";
 			//actualiza el folio_unico de la cabecera de cliente
-				$sql = "UPDATE vf_clientes_contacto SET folio_unico = '{$detail['folio_unico']}' WHERE id_cliente_contacto = {$detail_id}";
+				$sql = "UPDATE vf_clientes_contacto SET folio_unico = '{$detail['folio_unico']}' WHERE id_cliente_contacto = {$detail_id}";
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar el folio unico del cliente : {$this->link->error}" );
 			//inserta el registro de sincronizacion del cliente
 				$synchronization = $this->insertCostumerContactSynchronizationRows( $detail, $costumer['folio_unico'] );
+			//inserta los registros de sincronizacion de clientes en los sistemas de facturacion
+				$billSystemCostumerSynchronization = $this->insertBillSystemCostumerSynchronization( $costumer, $detail );
+			//autoriza transaccion
+				$this->link->autocommit( true );
 			}
-			$this->link->autocommit( true );
 			return 'ok';
 		}
-
-	/*insercion de registros de sincronizacion clientes para sucursales locales en sistema general*/
+		/*insercion de registros de sincronizacion clientes para sucursales locales en sistema general*/
 		public function insertCostumerSynchronizationRows( $costumer ){
 		//consulta razon socialDECLARE store_id INTEGER;
 			$sql = "INSERT INTO sys_sincronizacion_registros_facturacion ( id_sincronizacion_registro, sucursal_de_cambio,
@@ -168,11 +178,10 @@
 						1
 					FROM sys_sucursales 
 					WHERE id_sucursal > 0";
-			$stm = $this->link->query( $sql ) or die( "Error al insertar registros de sincroniacion del cliente : {$this->link->error}" );
+			$stm = $this->link->query( $sql ) or die( "Error al insertar registros de sincronizacion del cliente : {$this->link->error}" );
 			return 'ok';
 		}
-
-	/*insercion de registros de sincronizacio clientes para sucursales locales en sistema general*/
+		/*insercion de registros de sincronizacion clientes para sucursales locales en sistema general*/
 		public function insertCostumerContactSynchronizationRows( $detail, $costumer_unique_folio ){
 		//consulta razon socialDECLARE store_id INTEGER;
   	
@@ -207,6 +216,41 @@
 					FROM sys_sucursales 
 					WHERE id_sucursal > 0";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar registros de sincronizacion de contacto de cliente : {$this->link->error}" );
+			return 'ok';
+		}
+
+		public function insertBillSystemCostumerSynchronization( $costumer, $detail ){
+			var_dump( $costumer );
+			var_dump( $detail );
+			require_once( 'SynchronizationManagmentLog.php' );
+			$SynchronizationManagmentLog = new SynchronizationManagmentLog( $this->link );
+		//arma la estructura de las peticiones
+			$data = array( "costumer"=>$costumer, "contact"=>$contact );
+			$post_data = json_encode( $data );
+			$endpoints = array();
+			//return $post_data; 
+		//obtiene las rutas de los sistemas de facturacion
+			$sql = "SELECT 
+						endpoint_api,
+						razon_social
+					FROM vf_razones_sociales_emisores
+					WHERE habilitado = 1
+					AND id_razon_social > 0";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar los endpoints de razones sociales : {$this->link->error}" );	
+			while( $row = $stm->fetch_assoc() ){
+				if( $row['endpoint_api'] == '' ){
+					die( "La razon social : {$row['razon_social']} no tiene configurado ningun endpoint, verifica y vuelve a intentar!" );
+				}
+				$endpoints[] = "{$row['endpoint_api']}/rest/facturacion/inserta_cliente";
+			}
+			foreach ( $endpoints as $key => $endpoint ) {
+			//	echo $endpoint;
+				$resp = $SynchronizationManagmentLog->sendPetition( $endpoint, $post_data );
+				if( $resp != 'ok' ){
+					die( "Error {$endpoint}: " . $resp );
+				}
+			}
+			//var_dump( $endpoints );
 			return 'ok';
 		}
 	}

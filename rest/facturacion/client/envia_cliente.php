@@ -9,7 +9,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Descripción: Insercion de devoluciones
 */
 
-$app->get('/envia_cliente', function (Request $request, Response $response){
+$app->post('/envia_cliente', function (Request $request, Response $response){
 //variables
 	$req = [];
 	$req["rows"] = array(); 
@@ -41,12 +41,15 @@ $app->get('/envia_cliente', function (Request $request, Response $response){
 	$Bill = new Bill( $link, $system_store, $store_prefix );
 //generacion de registros de sincronizacion
 	$make_sinchronization_rows = $Bill->getTemporalCostumer();
+	//var_dump( $make_sinchronization_rows );
+	//die( '' );
 //recupera los registros de sincronizacion
 	$req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $costumers_limit, 'sys_sincronizacion_registros_facturacion' );
 	$req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );//inserta request
 	//var_dump( $rows );
 	$post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
-	return $post_data;
+	//return $post_data;
+	die( "{$path}/rest/facturacion/inserta_cliente" );
 	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
 	return $result_1;
 	//return json_encode( $rows );
