@@ -112,7 +112,7 @@
 			//actualiza el folio_unico de la cabecera de cliente
 				$sql = "UPDATE vf_clientes_razones_sociales 
 							SET folio_unico = '{$costumer['folio_unico']}' 
-						WHERE id_cliente = {$costumer['id_cliente']}";
+						WHERE id_cliente_facturacion = {$costumer['id_cliente']}";
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar el folio unico del cliente : {$this->link->error}" );
 				
 				//inserta el registro de sincronizacion del cliente
