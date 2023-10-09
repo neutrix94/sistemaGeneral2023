@@ -49,7 +49,6 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	//var_dump( $rows );
 	$post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
 	//return $post_data;
-	die( "{$path}/rest/facturacion/inserta_cliente" );
 	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
 	return $result_1;
 	//return json_encode( $rows );
