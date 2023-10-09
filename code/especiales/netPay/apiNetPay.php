@@ -172,7 +172,8 @@
 							"id_cajero"=>"{$user_id}", 
 							"folio_venta"=>"{$sale_folio}", 
 							"id_sesion_cajero"=>"{$session_id}",
-							"smart_accounts"=>true
+							"smart_accounts"=>true,
+							"store_id_netpay"=>"{$terminal['store_id']}"
 						),
 			            "serialNumber"=>"{$terminal['terminal_serie']}",
 			            "amount"=> $amount,
@@ -226,7 +227,7 @@
 			//return $response;
 		}
 	//cancelacion de cobro
-		public function saleCancelation( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id ){
+		public function saleCancelation( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id, $store_id_netpay ){
 			$token = $this->getToken( $terminal );
 			if( sizeof($token) == 0 || $token == null ){
 				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
@@ -241,13 +242,14 @@
 							"folio_venta"=>"{$sale_folio}", 
 							"id_sesion_cajero"=>"{$session_id}",
 							"petition_id"=>"{$petition_id}",
-							"smart_accounts"=>true
+							"smart_accounts"=>true,
+							"store_id_netpay"=>$store_id_netpay
 						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
 			            /*"storeId"=>"9194",
 			            "storeId"=>"{$this->NetPayStoreId}",*/
-			            "storeId"=>"{$terminal_data['store_id']}",
+			            "storeId"=>"{$store_id_netpay}",
    						"isSmartAccounts"=>"true",
 						"disablePrintAnimation"=>false
 					);
@@ -285,7 +287,7 @@
 
 		//}
 	//reimpresion de cobro
-		public function saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id ){
+		public function saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id, $store_id_netpay ){
 			$token = $this->getToken( $terminal );
 			if( sizeof($token) == 0 || $token == null ){
 				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
@@ -299,13 +301,14 @@
 							"folio_venta"=>"{$sale_folio}", 
 							"id_sesion_cajero"=>"{$session_id}",
 							"petition_id"=>"{$petition_id}",
-							"smart_accounts"=>true
+							"smart_accounts"=>true,
+							"store_id_netpay"=>$store_id_netpay
 						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
 			            /*"storeId"=>"9194",
 			            "storeId"=>"{$this->NetPayStoreId}",*/
-			            "storeId"=>"{$terminal_data['store_id']}",
+			            "storeId"=>"{$store_id_netpay}",
    						"isSmartAccounts"=>"true",
 						"disablePrintAnimation"=>false
 					);
