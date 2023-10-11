@@ -168,6 +168,18 @@
 				return '';
 				//return $cancel;
 			break;
+/*implementacion Oscar 2023/10/10*/
+			case 'insertCashPayment' : 
+				$ammount = ( isset( $_GET['ammount'] ) ? $_GET['ammount'] : $_POST['ammount'] );
+				$sale_id = ( isset( $_GET['sale_id'] ) ? $_GET['sale_id'] : $_POST['sale_id'] );
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				echo $Payments->insertCashPayment( $ammount, $sale_id, $user_id, $session_id );
+			break;
+
+			case 'getHistoricPayment' :
+				$sale_id = ( isset( $_GET['sale_id'] ) ? $_GET['sale_id'] : $_POST['sale_id'] );
+				echo $Payments->getHistoricPayment( $sale_id );
+			break;
 				
 			default :
 				die( "Access denied on '{$action}'" );
@@ -183,6 +195,74 @@
 		function __construct( $connection )
 		{
 			$this->link = $connection;
+		}
+
+		public function getHistoricPayment( $sale_id ){
+			$resp = "";
+			$amount_payed = 0;
+			$sql = "SELECT
+						cc.id_cajero_cobro As payment_id,
+						cc.monto AS amount,
+						tp.nombre AS payment_type,
+						CONCAT( cc.fecha, ' ', cc.hora ) AS datetime
+					FROM ec_cajero_cobros cc
+					LEFT JOIN ec_tipos_pago tp
+					ON cc.id_tipo_pago = tp.id_tipo_pago
+					WHERe cc.id_pedido = {$sale_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar el historico de cobros : {$this->link->error}" );
+			if( $stm->num_rows > 0 ){
+				$resp = "<table class=\"table table-bordered table-striped\">
+					<thead>
+						<tr>
+							<th>Tipo Pago</th>
+							<th>Monto</th>
+							<th>Fecha / Hora</th>
+						</tr>
+					</thead>
+					<tbody>";
+				while( $row = $stm->fetch_assoc() ){
+					$resp .= "<tr>
+						<td>{$row['payment_type']}</td>
+						<td>{$row['amount']}</td>
+						<td>{$row['datetime']}</td>
+					</tr>";
+					$amount_payed += $row['amount'];
+				}
+				$resp .= "</tbody>
+					<tfoot>
+						<tr>
+							<td colspan=\"3\" class=\"text-end\">Total pagado : $ {$amount_payed}</td>
+						</tr>
+					</tfoot>
+					</table>";
+			}
+			return "ok|{$resp}";
+		}
+
+		public function insertCashPayment( $ammount, $sale_id, $user_id, $session_id ){
+			$this->link->autocommit( false );
+		//inserta el cobro del cajero en efectivo
+			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_pedido, id_cajero, id_afiliacion, id_banco, id_tipo_pago, 
+				monto, fecha, hora, observaciones, sincronizar) 
+			VALUES ( NULL, {$sale_id}, {$user_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', 1)";
+			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$this->link->error}" );
+		//actualiza el pago
+			$sql = "UPDATE ec_pedido_pagos 
+						SET id_cajero = {$user_id}, 
+						id_sesion_caja = {$session_id}
+					WHERE id_cajero = 0 AND id_sesion_caja = 0
+					AND id_pedido = {$sale_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al enlazar el cobro al cajero : {$this->link->error}" );
+		//actualiza la venta
+			$sql = "UPDATE ec_pedidos 
+						SET id_cajero = {$user_id}, 
+						id_sesion_caja = {$session_id}
+					WHERE id_cajero = 0 AND id_sesion_caja = 0
+					AND id_pedido = {$sale_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al enlazar la venta al cajero : {$this->link->error}" );
+
+			$this->link->autocommit( true );
+			return 'ok|';
 		}
 
 		public function getOrderResponse( $transaction_id, $is_manual = false ){

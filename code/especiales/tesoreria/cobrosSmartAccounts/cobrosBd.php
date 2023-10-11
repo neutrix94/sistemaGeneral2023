@@ -28,11 +28,19 @@
 		$sql="SELECT
 				p.id_pedido,
 				p.folio_nv,
-				SUM(IF(pp.id_pedido_pago IS NULL OR pp.id_cajero!=0,0,pp.monto)) as pagosPendientes,
-				REPLACE(p.id_devoluciones,'~',',') as idsDevoluciones
+				SUM( IF(pp.id_pedido_pago IS NULL , 0, pp.monto) ) as pagosPendientes,/*OR pp.id_cajero != 0*/
+				REPLACE( p.id_devoluciones, '~', ',' ) as idsDevoluciones,
+				( SELECT
+					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) )
+					FROM ec_cajero_cobros cc
+					WHERE cc.id_pedido = p.id_pedido 
+				) AS pagos_registrados/*Oscar 2023/10/10*/
 			FROM ec_pedidos p
-			LEFT JOIN ec_pedido_pagos pp ON p.id_pedido=pp.id_pedido
-			WHERE p.id_pedido=$clave";
+			LEFT JOIN ec_pedido_pagos pp 
+			ON p.id_pedido = pp.id_pedido
+		/*Oscar 2023/10/10*/
+			WHERE p.id_pedido = {$clave}
+			GROUP BY p.id_pedido";
 		$eje=mysql_query($sql) or die("Error al consultar los datos del pedido!!!\n".mysql_error());
 		$r=mysql_fetch_row($eje);
 	//checamos si hay devoluciones que dependan de este pedido y no esten pagadas
@@ -41,6 +49,10 @@
 		$sql="SELECT SUM(IF(id_devolucion_pago IS NULL OR id_cajero!=0,0,monto)) FROM ec_devolucion_pagos WHERE id_devolucion $condicion_devoluciones";
 		$eje=mysql_query($sql)or die("Error al consultar las devoluciones relacionadas a esta nota!!!\n".mysql_error().$sql);
 		$rd=mysql_fetch_row($eje);
+		if( $r[2] <= $r[4] ){
+			die( "was_payed|No hay pagos pendientes para esta nota de venta {$r[2]} <= {$r[4]}!" );
+		}
+		$r[2] = ( $r[2] - $r[4] );
 		if($rd[0]==''){$rd[0]=0;}
 		die('ok|'.$r[0].'|'.$r[1].'|'.$r[2].'|'.$rd[0]);
 	}
