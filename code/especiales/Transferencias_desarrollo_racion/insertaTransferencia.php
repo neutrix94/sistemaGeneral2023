@@ -31,7 +31,13 @@
 	}else{
 		$status_transferencia=1;//no autorizado
 	}
-/*fin de cambio*/	
+/*fin de cambio*/
+/*Oscar 2023/10/15 para escapar parentesis*/
+	$_POST['titulo'] = str_replace('(', '', $_POST['titulo'] );
+	$_POST['titulo'] = str_replace(')', '', $_POST['titulo'] );
+	$nota_transfer = str_replace('(', '', $nota_transfer );
+	$nota_transfer = str_replace(')', '', $nota_transfer );
+/*fin de cambio Oscar 2023/10/15*/	
 	//4. Inserta la cabecera de la transferencia (titulo_transferencia agregado por Oscar 2021)		
 		$sql="INSERT INTO ec_transferencias (id_usuario,folio,fecha,hora,id_sucursal_origen,id_sucursal_destino,observaciones,
 			id_razon_social_venta,id_razon_social_compra,facturable,porc_ganancia,id_almacen_origen,id_almacen_destino,id_tipo,
