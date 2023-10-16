@@ -29,7 +29,6 @@ BEGIN
                 '"action_type" : "update",',
                 '"primary_key" : "folio_unico",',
                 '"primary_key_value" : "', new.folio_unico, '",',
-                '"id_corte_caja" : "', new.id_corte_caja, '",',
                 '"id_afiliacion" : "', new.id_afiliacion, '",',
                 '"id_banco" : "', new.id_banco, '",',
                 '"monto" : "', new.monto, '",',
