@@ -57,7 +57,7 @@
 
 	$res.='</table></div>';
 //generamos botón para continuar
-	$res.='<br><button type="button" class="bt_continua" style="left:-10%;position:relative;" onclick="location.href=\'../especiales/Transferencias_desarrollo/transf.php\';">Continuar de todas formas</button>';	
+	$res.='<br><button type="button" class="bt_continua" style="left:-10%;position:relative;" onclick="location.href=\'../especiales/Transferencias_desarrollo_racion/transf.php\';">Continuar de todas formas</button>';	
 	$res.='<button type="button" class="bt_continua" onclick="document.getElementById(\'emergenteAutorizaTransfer\').style.display=\'none\';">Cancelar</button><br><br>';
 //generamos el estilo
 	$res.='<style>';

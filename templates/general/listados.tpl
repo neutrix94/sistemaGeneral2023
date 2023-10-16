@@ -1447,7 +1447,7 @@ $("#imp_csv_prd").change(function(){
 			//verificamos si corresponde a transferencia el boton y mandamos id de transferencia en caso de cumplir condiciones
 				if(tabla=='ZWNfdHJhbnNmZXJlbmNpYXM=' && tipo==2 && ( no_tabla=="MA==" || no_tabla=="MTI=" || no_tabla=="OQ==" ) ){
 					//alert('0*0');
-					location.href="../especiales/Transferencias_desarrollo/nuevaTransferencia.php?idTransfer="+id;
+					location.href="../especiales/Transferencias_desarrollo_racion/nuevaTransferencia.php?idTransfer="+id;
 					return false;
 				} 
 
@@ -1510,7 +1510,7 @@ $("#imp_csv_prd").change(function(){
 									return false;
 								}*/
 
-							url="../especiales/Transferencias_desarrollo/transf.php";
+							url="../especiales/Transferencias_desarrollo_racion/transf.php";
 							location.href=url;
 							/*return false;
 							}
