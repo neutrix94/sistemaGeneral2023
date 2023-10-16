@@ -27,7 +27,7 @@
 					OR pp.codigo_barras_pieza_2 = '{$texto}'
 					OR pp.codigo_barras_pieza_3 = '{$texto}') )";
 
-	$query .= " GROUP BY p.id_productos";die( $query );
+	$query .= " GROUP BY p.id_productos";//die( $query );
 
 	$result  = $link->query($query) or die('Prod: '.mysql_error());		  
 
