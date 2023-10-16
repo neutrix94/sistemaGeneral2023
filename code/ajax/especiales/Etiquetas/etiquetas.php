@@ -25,7 +25,11 @@
 	$query .= " OR pp.clave_proveedor = '{$texto}'";
 	$query .= " OR ( pp.codigo_barras_pieza_1 = '{$texto}' 
 					OR pp.codigo_barras_pieza_2 = '{$texto}'
-					OR pp.codigo_barras_pieza_3 = '{$texto}') )";
+					OR pp.codigo_barras_pieza_3 = '{$texto}'
+					OR pp.codigo_barras_presentacion_cluces_1 = '{$texto}'
+					OR pp.codigo_barras_presentacion_cluces_2 = '{$texto}'
+					OR pp.codigo_barras_caja_1 = '{$texto}'
+					OR pp.codigo_barras_caja_2 = '{$texto}') )";
 
 	$query .= " GROUP BY p.id_productos";//die( $query );
 
