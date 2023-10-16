@@ -1,0 +1,79 @@
+body{
+		position: absolute;
+		top :0;
+		width: 100%;
+		left  :0;
+		height: 100%;
+	}
+	.header{
+		background-color : #54CCEF;
+		position: absolute;
+		width: 100% !important;
+		height: 60px;
+		top : 0;
+		left: 0;
+		padding: 5px;
+		margin: 0;
+		padding-top : 10px;
+	}
+	.contentContainer{
+		position: absolute;
+		width: 100% !important;
+		top : 70px;
+		left: -2%;
+		height: calc( 100% - 140px );
+		overflow: auto;	
+	}
+	.footer{
+		background-color : #54CCEF;
+		position: absolute;
+		width: 100% !important;
+		top : 95%;
+
+	}
+
+	.group_card{
+		box-shadow: 1px 1px 5px rgba( 0,0,0, .5 );
+	}
+	.hidden{
+		display: none;
+	}
+
+	#seeker_response{
+		position: absolute;
+		top : 50px;
+		height: 300px;
+		width: 95%;
+		background-color: white;
+		box-shadow: 1px 1px 10px rgba( 0,0,0,.5 );
+		z-index: 10;
+		overflow: auto;
+		display: none;
+	}
+	.emergent{
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		left : 0;
+		top : 0;
+		background-color: rgba( 0, 0, 0, .3);
+		z-index: 3;
+		display: none;
+	}
+	.emergent_content{
+		position: relative;
+		top : 100px;
+		width: 95%;
+		left: 2.5%;
+		background-color: white;
+		box-shadow: 1px 1px 15px rgba( 0, 0, 0, .5 );
+		padding: 10px;
+		max-height: 80%;
+		overflow-y : auto;
+	}
+
+	.header_top_0{
+		position: sticky;
+		top : -10px;
+		background-color: white;
+	}
