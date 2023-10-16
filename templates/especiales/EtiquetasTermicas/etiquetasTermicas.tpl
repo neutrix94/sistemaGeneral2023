@@ -57,7 +57,14 @@
 			<h2>Producto:</h2>
 			<div class="input-group">
 				<input type='hidden' id='proId' value='0'>
-				<input type="text" id='busca' class="form-control" onkeyup="buscaProd()">
+				<input type="text" id='busca' class="form-control" onkeyup="buscaProd( event )"><button 
+					type="button" 
+					id=''  
+					onclick="buscaProd( 'intro' )" 
+					class="btn btn-warning"
+				>
+					<i class="icon-search"></i>
+				</button>
 				<button 
 					type="button" 
 					id='ag'  
@@ -257,9 +264,27 @@ function cambiaTP(val)
 	}
 
 
- 	function buscaProd()
+ 	function buscaProd( e )
  	{
-		var aBusc = document.getElementById('busca').value;
+ 		if( e.keyCode != 13 && e != 'intro' ){
+ 		 	document.getElementById('buscProd').className='ob';
+ 			return false;
+ 		}
+		var aBusc = document.getElementById('busca').value.trim();
+ 		if( aBusc == '' ){
+ 			alert( "El buscador no pude ir vacio!" );
+ 			document.getElementById('buscProd').focus();
+ 			return false;
+ 		}
+		var tmp_txt = aBusc.split( ' ' );
+		if( tmp_txt.length == 4 && ( ( tmp_txt[1].includes( 'PQ' ) ) || ( tmp_txt[1] ).includes( 'CJ' ) ) ){
+			aBusc = '';
+			for ( var i = 0; i < (tmp_txt.length - 1 ); i++ ) {
+				aBusc += ( aBusc != '' ? ' ' : '' );
+				aBusc += tmp_txt[i];
+			}
+		}
+		//alert( aBusc );
 		var url   = "../../../code/ajax/especiales/Etiquetas/etiquetas.php";
 		$('#buscProd').html("");
 		$.post(
