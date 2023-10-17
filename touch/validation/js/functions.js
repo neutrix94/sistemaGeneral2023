@@ -103,7 +103,7 @@ var global_view = '';
 			return false;
 		}
 		var tmp_txt = txt.split( ' ' );
-		if( tmp_txt.length == 4 && ( ( tmp_txt[1].includes( 'PQ' ) ) || ( tmp_txt[1] ).includes( 'CJ' ) ) ){
+		if( tmp_txt.length == 4 && ( ( tmp_txt[1].includes( 'PQ' ) )||( tmp_txt[1] ).includes( 'CJ' ) ) ){
 			txt = '';
 			for ( var i = 0; i < (tmp_txt.length - 1 ); i++ ) {
 				txt += ( txt != '' ? ' ' : '' );
