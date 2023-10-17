@@ -273,7 +273,7 @@ var assign_has_changed = 0;
 		setTimeout(function () {location.href = "index.php";}, 500);
 	}
 	function view_transfer( list, pos ){
-		location.href="../../Transferencias_desarrollo/nuevaTransferencia.php?idTransfer=" 
+		location.href="../../Transferencias_desarrollo_racion/nuevaTransferencia.php?idTransfer=" 
 		+ $( '#' + list + '_0_' + pos ).html().trim() + '&is_list_transfer=1';
 	}
 //cancelar transferencia
