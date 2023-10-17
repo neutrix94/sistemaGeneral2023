@@ -12,41 +12,45 @@
 	}
 //funcion que valida login
 	function abrir_caja(){
-	//validamos datos
-	var log,contra, cambio, terminal_id;
-	log=$("#user").val();
-	if(log.length<=0){
-		alert("El campo de cajero no puede ir vacío!!!");
-		$("#user").focus();
-		return false;
-	}
-	contra=$("#password").val();
-	if(contra.length<=0){
-		alert("La contraseña de cajero no puede ir vacía!!!");
-		$("#password").focus();
-		return false;
-	}
-	cambio=$("#cambio_caja").val();
-	if(cambio.length<=0){
-		alert("El cambio inicial en caja es obligatorio*");
-		$("#cambio_caja").focus();
-		return false;
-	}
-	terminal_id = $( '#principal_terminal' ).val();
-	if(terminal_id == 0){
-		alert("Debes de elegir una terminal*");
-		$( '#principal_terminal' ).focus();
-		return false;
-	}
+		//validamos datos
+		var log, contra, cambio, terminales = "";
+		log=$("#user").val();
+		if(log.length<=0){
+			alert("El campo de cajero no puede ir vacío!!!");
+			$("#user").focus();
+			return false;
+		}
+		contra=$("#password").val();
+		if(contra.length<=0){
+			alert("La contraseña de cajero no puede ir vacía!!!");
+			$("#password").focus();
+			return false;
+		}
+		cambio=$("#cambio_caja").val();
+		if(cambio.length<=0){
+			alert("El cambio inicial en caja es obligatorio*");
+			$("#cambio_caja").focus();
+			return false;
+		}
+//obtiene arreglo de terminales
+		$( '#terminals_list tr' ).each( function(index){
+			$( this ).children( 'td' ).each( function ( index2 ){
+				if( index2 == 0 ){
+					terminales += ( terminales == "" ? "" : "," );
+
+				}
+			});
+		});
 	//enviamos datos por ajax
 		$.ajax({
 			type:'post',
 			url:'abreSesionCaja.php',
 			cache:false,
 			data:{
-				login:log,
-				contrasena:contra,
-				cambio_caja : cambio	
+				login : log,
+				contrasena : contra,
+				cambio_caja : cambio,
+				terminales : terminales
 			},
 			success:function(dat){
 				if(dat!='ok'){
@@ -105,20 +109,79 @@
 		$("#contenido_emergente").html('');
 		$("#emergente").css("display","none");	
 	}
-/*Implementaciones Oscar 2023*/
-	function setTerminal(){
+/*Implementaciones Oscar 2023 para terminales sin smart Accounts*/
+	function setAfiliation(){
 		var terminal_id = $( '#principal_terminal' ).val();
 		if( terminal_id == 0 ){
 			alert( "Selecciona una terminal valida para continuar!" );
 			return false;
 		}else{
 			var terminal_txt = $( '#principal_terminal option:selected' ).text().trim();
-			$( '#terminals_list' ).append( build_terminal_row( terminal_txt ) );
+			var exists = false;
+			$( '#afiliations_list tr' ).each( function( index ){
+				$( this ).children( 'td' ).each( function ( index2 ){
+					if( index2 == 0 && $( this ).html().trim() == terminal_txt ){
+						exists = true;
+						return false;
+					}
+
+				});
+			});
+			if( exists ){
+				alert( "Esta terminal ya fue agregada para este usuario!" );
+			}else{
+				$( '#afiliations_list' ).append( build_afiliation_row( terminal_txt ) );
+			}
+			$( '#principal_terminal' ).val( '' );
 		}
 	}
 
-	function rebuildTerminals(){
-		
+	function build_afiliation_row( terminal ){
+		var content = `<tr>
+			<td>${terminal}</td>
+			<td>
+				<button 
+					type="button"
+					class="btn btn-danger"
+					onclick="remove_afiliation( this );"
+				>
+					<i class="icon-cancel-circled"></i>
+				</button>
+			</td>
+		</tr>`;
+		return content;
+	}
+
+	function remove_afiliation( obj ){
+		var element = $( obj ).parent( 'td' ).parent( 'tr' );
+		element.remove();
+	}
+
+/*Implementaciones Oscar 2023 para terminales con smart Accounts*/
+	function setTerminal(){
+		var terminal_id = $( '#principal_terminal_smartAccounts' ).val();
+		if( terminal_id == 0 ){
+			alert( "Selecciona una terminal valida para continuar!" );
+			return false;
+		}else{
+			var terminal_txt = $( '#principal_terminal_smartAccounts option:selected' ).text().trim();
+			var exists = false;
+			$( '#terminals_list tr' ).each( function( index ){
+				$( this ).children( 'td' ).each( function ( index2 ){
+					if( index2 == 0 && $( this ).html().trim() == terminal_txt ){
+						exists = true;
+						return false;
+					}
+
+				});
+			});
+			if( exists ){
+				alert( "Esta terminal ya fue agregada para este usuario!" );
+			}else{
+				$( '#terminals_list' ).append( build_terminal_row( terminal_txt ) );
+			}
+			$( '#principal_terminal_smartAccounts' ).val( '' );
+		}
 	}
 
 	function build_terminal_row( terminal ){
@@ -128,7 +191,7 @@
 				<button 
 					type="button"
 					class="btn btn-danger"
-					onclick="remove_terminal( this );"
+					onclick="remove_afiliation( this );"
 				>
 					<i class="icon-cancel-circled"></i>
 				</button>
@@ -137,7 +200,7 @@
 		return content;
 	}
 
-	function remove_terminal( obj ){
+	function remove_afiliation( obj ){
 		var element = $( obj ).parent( 'td' ).parent( 'tr' );
 		element.remove();
 	}

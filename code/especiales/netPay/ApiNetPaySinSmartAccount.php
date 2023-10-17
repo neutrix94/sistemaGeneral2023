@@ -9,12 +9,12 @@
 		{
 			$this->link = $connection;
 			$this->store_id = $store_id;
-			//$this->NetPayStoreId = $this->getCurrentStoreId();
+			$this->NetPayStoreId = $this->getCurrentStoreId();
 			//die( $this->NetPayStoreId );
 		}
 	//obtener el storeId actual
 		public function getCurrentStoreId(){
-			$sql = "SELECT
+			/*$sql = "SELECT
 						rse.store_id_netpay AS storeId
 					FROM sys_sucursales s
 					LEFT JOIN vf_razones_sociales_emisores rse
@@ -22,17 +22,19 @@
 					WHERE s.id_sucursal = {$this->store_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el StoreId actual : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			return $row['storeId'];
+			return $row['storeId'];*/
+			
+			return '1430851';
 		}
 	//obtencion de endpoints
 		public function getEndpoint( $terminal_id, $endpoint_type ){
 			$sql = "SELECT 
 						{$endpoint_type} AS endpoint
-					FROM ec_terminales_integracion_smartaccounts tis 
+					FROM ec_afiliaciones a 
 					LEFT JOIN ec_tipos_bancos tb
-					ON tis.id_tipo_terminal = tb.id_tipo_banco
-					WHERE tis.id_terminal_integracion = '{$terminal_id}'
-					OR tis.numero_serie_terminal = '{$terminal_id}'";//die( $sql );
+					ON a.id_tipo_terminal = tb.id_tipo_banco
+					WHERE a.id_afiliacion = '{$terminal_id}'
+					OR a.numero_serie_terminal = '{$terminal_id}'";//die( $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar endpoint {$endpoint_type} : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
 			return $row['endpoint'];
@@ -50,8 +52,9 @@
 				CURLOPT_FOLLOWLOCATION => true,
 				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 				CURLOPT_CUSTOMREQUEST => "POST",
-				CURLOPT_POSTFIELDS => "grant_type={$grantType}&username={$user}&password={$password}",
-				/*CURLOPT_POSTFIELDS => "grant_type=password&username=Nacional&password=netpay",*/
+				CURLOPT_POSTFIELDS => "grant_type=password&username=smartPos&password=netpay",
+				/*CURLOPT_POSTFIELDS => "grant_type={$grantType}&username={$user}&password={$password}",
+				CURLOPT_POSTFIELDS => "grant_type=password&username=Nacional&password=netpay",*/
 				CURLOPT_HTTPHEADER => array(
 					"Content-Type: application/x-www-form-urlencoded",
 					"Authorization: Basic dHJ1c3RlZC1hcHA6c2VjcmV0"
@@ -60,7 +63,7 @@
 
 			$response = curl_exec($curl);
 			curl_close($curl);
-			//var_dump($response);
+			var_dump($response);
 			curl_close($curl);
 			$result = json_decode( $response );
 			//die( "result : {$result}" );
@@ -136,19 +139,12 @@
 			$row = $stm->fetch_row();
 			return $row[0];
 		}
-		public function getTerminal( $terminal_id, $store_id ){
+		public function getTerminal( $terminal_id ){
 			$sql = "SELECT 
-						tis.numero_serie_terminal AS terminal_serie,
-						tis.imprimir_ticket AS print_ticket,
-						rse.store_id_netpay AS store_id
-					FROM ec_terminales_integracion_smartaccounts tis
-					LEFT JOIN ec_terminales_sucursales_smartaccounts tss
-					ON tss.id_terminal = tis.id_terminal_integracion
-					LEFT JOIN vf_razones_sociales_emisores rse
-					ON rse.id_razon_social = tss.id_razon_social
-					WHERE tis.id_terminal_integracion = {$terminal_id}
-					OR tis.numero_serie_terminal = {$terminal_id}
-					AND tss.id_sucursal = {$store_id}";
+						numero_serie_terminal AS terminal_serie,
+						imprimir_ticket AS print_ticket
+					FROM ec_afiliaciones
+					WHERE id_afiliacion = {$terminal_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar datos de la terminal : {$sql} {$this->link->error}" );
 			$row = $stm->fetch_assoc();
 			return $row;
@@ -156,7 +152,7 @@
 	//peticion de venta
 		public function salePetition(  $apiUrl, $amount = 0.01, $terminal_id, $user_id, $store_id, $sale_folio, $session_id ){
 			
-			$terminal = $this->getTerminal( $terminal_id, $store_id );
+			$terminal = $this->getTerminal( $terminal_id );
 			//var_dump( $terminal );
 			$token = $this->getToken( $terminal['terminal_serie'] );
 			//var_dump( $token );
@@ -171,21 +167,19 @@
 							"id_sucursal"=>"{$store_id}", 
 							"id_cajero"=>"{$user_id}", 
 							"folio_venta"=>"{$sale_folio}", 
-							"id_sesion_cajero"=>"{$session_id}",
-							"smart_accounts"=>true,
-							"store_id_netpay"=>"{$terminal['store_id']}"
+							"id_sesion_cajero"=>"{$session_id}"
 						),
 			            "serialNumber"=>"{$terminal['terminal_serie']}",
 			            "amount"=> $amount,
 			            "folioNumber"=> "{$petition_id}",
 			            /*"storeId"=>"9194",*/
-			            /*"storeId"=>"{$this->NetPayStoreId}",*/
-			            "storeId"=>"{$terminal['store_id']}",
-   						"isSmartAccounts"=>"true",
+			            "storeId"=>"{$this->NetPayStoreId}",
+   						/*"isSmartAccounts"=>"true", deshabilitado por Oscar para version sin SmartAccounts*/
 						"disablePrintAnimation"=> ( $terminal['print_ticket'] == 1 ? false : true ) );
 			//var_dump($data);
 			//die( '' );
 			$post_data = json_encode( $data, true );
+			//echo $post_data;die( '' );
 		//envia peticion
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
@@ -213,12 +207,9 @@
 			if( isset( $result->error ) ){
 				if( $result->error == 'invalid_token' ){//token expirado
 					//die( 'here' );
-					//$this->refreshToken( $token, $terminal['terminal_serie'] );
-					$sql = "DELETE FROM vf_tokens_terminales_netpay";
-					$stm = $this->link->query( $sql ) or die( "Error al eliminar tokens : {$this->link->error}" );
+					$this->refreshToken( $token, $terminal['terminal_serie'] );
 					return $this->salePetition( $apiUrl, $amount = 0.01, $terminal['terminal_serie'], $user_id, 
 										$store_id, $sale_folio, $session_id );
-					return false;
 				}
 			}
 			$result = json_encode( $result, true );
@@ -227,13 +218,11 @@
 			//return $response;
 		}
 	//cancelacion de cobro
-		public function saleCancelation( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id, $store_id_netpay ){
+		public function saleCancelation( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id ){
 			$token = $this->getToken( $terminal );
 			if( sizeof($token) == 0 || $token == null ){
 				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
 			}
-
-			$terminal_data = $this->getTerminal( $terminal, $store_id );
 			$petition_id = $this->insertNetPetitionRow();
 		//arreglo de prueba
 			$data = array( "traceability"=>array(   
@@ -241,16 +230,13 @@
 							"id_cajero"=>"{$user_id}", 
 							"folio_venta"=>"{$sale_folio}", 
 							"id_sesion_cajero"=>"{$session_id}",
-							"petition_id"=>"{$petition_id}",
-							"smart_accounts"=>true,
-							"store_id_netpay"=>$store_id_netpay
+							"petition_id"=>"{$petition_id}"
 						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
-			            /*"storeId"=>"9194",
-			            "storeId"=>"{$this->NetPayStoreId}",*/
-			            "storeId"=>"{$store_id_netpay}",
-   						"isSmartAccounts"=>"true",
+			            /*"storeId"=>"9194",*/
+			            "storeId"=>"{$this->NetPayStoreId}",
+   						/*"isSmartAccounts"=>"true", deshabilitado por Oscar para version sin SmartAccounts*/
 						"disablePrintAnimation"=>false
 					);
 			$post_data = json_encode( $data, true );
@@ -287,12 +273,11 @@
 
 		//}
 	//reimpresion de cobro
-		public function saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id, $store_id_netpay ){
+		public function saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id ){
 			$token = $this->getToken( $terminal );
 			if( sizeof($token) == 0 || $token == null ){
 				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
 			}
-			$terminal_data = $this->getTerminal( $terminal, $store_id );
 			$petition_id = $this->insertNetPetitionRow();
 		//arreglo de prueba
 			$data = array( "traceability"=>array(   
@@ -300,16 +285,13 @@
 							"id_cajero"=>"{$user_id}", 
 							"folio_venta"=>"{$sale_folio}", 
 							"id_sesion_cajero"=>"{$session_id}",
-							"petition_id"=>"{$petition_id}",
-							"smart_accounts"=>true,
-							"store_id_netpay"=>$store_id_netpay
+							"petition_id"=>"{$petition_id}"
 						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
-			            /*"storeId"=>"9194",
-			            "storeId"=>"{$this->NetPayStoreId}",*/
-			            "storeId"=>"{$store_id_netpay}",
-   						"isSmartAccounts"=>"true",
+			            /*"storeId"=>"9194",*/
+			            "storeId"=>"{$this->NetPayStoreId}",
+   						/*"isSmartAccounts"=>"true", deshabilitado por Oscar para version sin SmartAccounts*/
 						"disablePrintAnimation"=>false
 					);
 			//var_dump( $data );return '';

@@ -62,7 +62,7 @@ BEGIN
 				'"descripcion_sistema" : "', new.descripcion_sistema, '",',
 				'"intervalo_sinc" : "', new.intervalo_sinc, '",',
 				'"mostrar_alfanumericos" : "', new.mostrar_alfanumericos, '",',
-				'"razon_social_actual" : "', new.razon_social_actual, '",',
+				'"habilitar_smartaccounts_netpay" : "', new.habilitar_smartaccounts_netpay, '",',
 				'"sincronizar" : "0"',
 				'}'
 			),

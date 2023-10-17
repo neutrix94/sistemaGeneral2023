@@ -1,6 +1,17 @@
 <?php
-	include('../../../../../conectMin.php');
-	include('../../../../../conexionMysqli.php');
+	include('../../../../conectMin.php');
+	include('../../../../conexionMysqli.php');
+	//verifica si esta habilitada la funcion de SmartAccounts
+		$sql = "SELECT 
+					habilitar_smartaccounts_netpay AS is_smart_accounts
+				FROM sys_sucursales s
+				WHERE id_sucursal = {$sucursal_id}";
+		$stm = $link->query( $sql ) or die( "Error al consultar si esta habilitado SmartAccounts : {$link->error}" );
+		$row = $stm->fetch_assoc();
+		$is_smart_accounts = $row['is_smart_accounts'];
+		if( $row['is_smart_accounts'] == 1 ){
+			die( "<script>location.href=\"../cobrosSmartAccounts/index.php\";</script>" );
+		}
 	include('ajax/db.php');
 	$Payments = new Payments( $link );//instancia clase de pagos
 	$Payments->checkAccess( $user_id );//verifica permisos
@@ -9,16 +20,25 @@
 	/*if($perfil_usuario!=7){
 		die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla!!!\nContacte al administrador desl sistema!!!");location.href="../../../../index.php?";</script>');
 	}*/
-
-	$eje=mysql_query($sql)or die("Error al consultar afiliaciones del id_cajero!!!<br>".mysql_error());
-	$sql="SELECT CONCAT(u.nombre,' ',u.apellido_paterno,' ',u.apellido_materno) as nombre,s.nombre
+	$sql="SELECT 
+			CONCAT(u.nombre,' ',u.apellido_paterno,' ',u.apellido_materno) as user_name,
+			s.nombre AS store_name,
+			(SELECT 
+				id_sesion_caja
+			FROM ec_sesion_caja 
+			WHERE id_cajero = u.id_usuario
+			ORDER BY id_sesion_caja DESC
+			LIMIT 1
+			) AS session_id
 		FROM sys_users u 
-		LEFT JOIN sys_sucursales s ON s.id_sucursal=u.id_sucursal
+		LEFT JOIN sys_sucursales s 
+		ON s.id_sucursal=u.id_sucursal
 		WHERE u.id_usuario=$user_id";
-	$eje_datos=mysql_query($sql)or die("Eror al consultar los datos de usuario y sucursal");
+	$eje_datos=mysql_query($sql)or die("Error al consultar los datos de usuario y sucursal");
 	$r=mysql_fetch_row($eje_datos);
-	$usuario=$r[0];
-	$sucursal=$r[1];
+	$usuario = $r[0];
+	$sucursal = $r[1];
+	$session_id = $r[2];
 ?>
 <!DOCTYPE html>
 <html>
@@ -26,16 +46,17 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Cobrar</title>
-	<script type="text/javascript" src="../../../../../js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="../../../../js/jquery-1.10.2.min.js"></script>
 	<script type="text/javascript" src="js/functions.js"></script>
 	<script type="text/javascript" src="js/apis.js"></script>
 	<script type="text/javascript" src="js/builder.js"></script>
-	<link rel="stylesheet" type="text/css" href="../../../../../css/bootstrap/css/bootstrap.css">
-	<link rel="stylesheet" type="text/css" href="../../../../../css/icons/css/fontello.css">
+	<link rel="stylesheet" type="text/css" href="../../../../css/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="../../../../css/icons/css/fontello.css">
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
 </head>
 <body onload="document.getElementById('buscador').focus();">
 <div class="global">
+	<input type="hidden" id="session_id" value="<?php echo $session_id;?>">
 <!--emergentes -->
 	<div class="emergent" style="z-index : 20;">
 		<div style="position: relative; top : 120px; left: 90%; z-index:1; display:none;">
@@ -70,6 +91,17 @@
 			<h3><b class="">Cajero:</b> <?php echo $usuario;?></h3>	
 		</div>
 	</div>
+<!-- Cancelaciones /reimpresiones manuales -->
+	<div class="reverse_form_btn">
+		<button
+			type="button"
+			class="btn btn-success"
+			onclick="get_reverse_form();"
+		>
+			<i class="icon-history"></i>
+		</button>
+	</div>
+<!-- -->
 	<div class="contenido" align="center">
 		<div class="row" style="padding : 20px;">
 			<div class="col-12">
@@ -77,9 +109,18 @@
 				<div class="input-group">
 					<input type="text" id="buscador" class="form-control" placeholder="Folio..." onkeyup="busca(event);">
 					<button 
+						title="Buscar" 
+						onclick="busca('intro');"
+						class="btn btn-info"
+						id="seeker_btn"
+					>
+						<i class="icon-search"></i>
+					</button>
+					<button 
 						title="Buscar de nuevo" 
 						onclick="link(2);"
-						class="btn btn-danger"
+						class="btn btn-danger no_visible"
+						id="seeker_reset_btn"
 					>
 						<i class="icon-erase"></i>
 					</button>
@@ -162,7 +203,6 @@
 			</div-->
 			<div class="col-6 input-group">
 				<!--button type="button">Cambio </button-->
-				<input type="number" id="efectivo_devolver" class="form-control" style="background: white;" disabled>
 			</div>
 		</div>
 		
@@ -225,7 +265,7 @@
 					type="button"
 					id="cobrar" 
 					class="btn btn-success form-control"  onclick="cobrar();">
-					<i class="icon-floppy">Cobrar e Imprimir</i>
+					<i class="icon-floppy">Finalizar cobro</i>
 				</button>
 			</div>
 			<div class="col-2"></div>

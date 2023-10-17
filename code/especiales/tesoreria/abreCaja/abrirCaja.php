@@ -40,8 +40,7 @@
 	$r=mysql_fetch_row($eje);
 	$login_cajero=$r[0];
 
-	function getTerminalsOptions( $user_id, $link ){
-		//die( 'here' );
+	function getAfiliationsOptions( $user_id, $link ){
 		$resp = "";
 		$sql = "SELECT 
 				a.id_afiliacion AS afiliation_id,
@@ -52,9 +51,24 @@
 			WHERE ac.id_cajero='{$user_id}' 
 			AND ac.activo=1";
 		$stm = $link->query( $sql ) or die( "Error al consultar las terminales : {$link->error}" );
-		//die( $sql );
 		while( $row = $stm->fetch_assoc() ){
 			$resp .= "<option value=\"{$row['afiliation_id']}\">{$row['afiliation_number']}</option>";
+		}
+		return $resp;
+	}
+	function getTerminalsOptions( $user_id, $link ){
+		$resp = "";
+		$sql = "SELECT 
+				tis.id_terminal_integracion AS terminal_id,
+				tis.nombre_terminal AS terminal_name
+			FROM ec_terminales_integracion_smartaccounts tis
+			LEFT JOIN ec_terminales_cajero_smartaccounts tcs 
+			ON tis.id_terminal_integracion = tcs.id_terminal
+			WHERE tcs.id_cajero='{$user_id}' 
+			AND tcs.activo=1";
+		$stm = $link->query( $sql ) or die( "Error al consultar las terminales : {$link->error}" );
+		while( $row = $stm->fetch_assoc() ){
+			$resp .= "<option value=\"{$row['terminal_id']}\">{$row['terminal_name']}</option>";
 		}
 		return $resp;
 	}
@@ -78,21 +92,17 @@
 		</div>
 	</div>
 	<div id="global">
-		<img src="../../../../img/img_casadelasluces/Logo.png" 
+		<!--img src="../../../../img/img_casadelasluces/Logo.png" 
 			width="7%"
 			onclick="link(1);" 
 			title="Click para regresar al Panel de administración"
 			class="logo_img"
-		>
+		-->
 		<div class="row">
 			<div class="col-1"></div>
 			<div class="col-10">
 				<form id="log_caja" class="bg-primary text-center">
-					<br>
-					<h3>Abrir caja</h3>
-					<br>
-					<i class="icon-money border border-light rounded-circle" style="font-size : 300%; padding : 2%;" ></i>
-					<br><br>
+					<h3 class="icon-money">Abrir caja</h3>
 				<div class="row">
 					<div class="col-1"></div>
 					<div class="col-10">
@@ -104,19 +114,46 @@
 							value="<?php echo $login_cajero;?>" 
 							disabled>
 							<br>
-						<br>
 						<input 
 							type="password" 
 							id="password" 
 							class="form-control" 
 							placeholder="Contraseña">
-						<br>
 						<p align="center">Monto de cambio en Caja</p>
 						<input type="number" id="cambio_caja" class="form-control" placeholder="Monto de cambio en Caja">
-						<br>
-						<p align="center">Terminal</p>
+						<p align="center">Terminal sin SmartAccounts</p>
 						<div class="input-group">
 							<select id="principal_terminal" 
+								class="form-select">
+								<option value="">-- Seleccionar --</option>
+								<?php
+									echo getAfiliationsOptions( $user_id, $link );
+								?>
+							</select>
+							<button
+								type="button"
+								class="btn btn-success"
+								onclick="setAfiliation();"
+								disabled
+							>
+								<i class="icon-plus"></i>
+							</button>
+						</div>
+						<br>
+						<div class="bg-light">
+							<table class="table table-striped">
+								<thead class="">
+									<tr>
+										<th>Terminales</th>
+										<th><i class="icon-minus-circled"></i></th>
+									</tr>
+								</thead>
+								<tbody id="afiliations_list"></tbody>
+							</table>
+						</div>
+						<p align="center">Terminal con SmartAccounts</p>
+						<div class="input-group">
+							<select id="principal_terminal_smartAccounts" 
 								class="form-select">
 								<option value="">-- Seleccionar --</option>
 								<?php
@@ -137,20 +174,20 @@
 								<thead class="">
 									<tr>
 										<th>Terminales</th>
-										<th>X</th>
+										<th><i class="icon-minus-circled"></i></th>
 									</tr>
 								</thead>
 								<tbody id="terminals_list"></tbody>
 							</table>
 						</div>
-						<br><br>
+						<br>
 						<button 
 							type="button" 
-							class="btn btn-success"
+							class="btn btn-success form-control"
 							id="bot_abre" 
 							onclick="abrir_caja();">
-							<i class="icon-key-inv"></i><br>
-							Abrir Caja</button>
+							<i class="icon-key-inv">Abrir Caja</i>
+							</button>
 						<br><br>
 					</div>
 				</div>

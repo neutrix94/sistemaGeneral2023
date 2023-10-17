@@ -639,6 +639,7 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
     }
     
     if($printPan == 1) {
+    	ob_end_clean();
 	   $ticket->Output();
     }else{
 /*implementación Oscar 17.09.2018 para impresión de tickets de acuerdo a la configuración de la sucursal*/

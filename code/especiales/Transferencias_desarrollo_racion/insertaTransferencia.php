@@ -73,6 +73,7 @@
 	$details = explode( '|~|', $_POST['detail'] );
 	$counter = 0;
 	foreach ( $details as $key => $detail ) {
+		$counter ++;//modificado por Oscar 2023/09/30 ( por producto )
 		$det = explode( '~', $detail );
 		$product_id = $det[0];
 		$es_racionado = ( isset( $det[2] ) && $det[2] == 'es_racionado' ? 1 : 0 );//indicador de racion
@@ -80,7 +81,7 @@
 		foreach ( $product_providers_detail as $key2 => $pp ) {
 			$pp_detail = explode( '', $pp );
 			if( $pp_detail[7] > 0 || $pp_detail[8] > 0 || $pp_detail[9] > 0){
-				$counter ++;
+				//$counter ++; deshabilitado por Oscar 2023/09/30
 				$sql = "INSERT INTO ec_transferencia_productos( id_transferencia, id_producto_or, 
 					id_presentacion, cantidad_presentacion,cantidad, id_producto_de, 
 					referencia_resolucion, cantidad_cajas, cantidad_paquetes, cantidad_piezas, id_proveedor_producto,

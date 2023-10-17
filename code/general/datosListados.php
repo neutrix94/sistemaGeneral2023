@@ -179,6 +179,14 @@
 	}*/
 /*Fin de cambio Oscar 19.08.2019*/
 
+
+/*Implementación Oscar 2023/09/23 para el boton de reimprimir desde el listado de cola de impresion*/
+	if($datList['tabla']=='sys_archivos_descarga' && $datList['no_tabla']==0){
+		//die( 'here' );
+		$consulta=str_replace("FROM sys_archivos_descarga", ", 'imp' FROM sys_archivos_descarga", $consulta);
+	}
+/*Fin de cambio Oscar 2023/09/23*/
+
 //implementacion Oscar 2023 para no cargar datos del listado de vizualizacion de racion
 	if( $datList['tabla']=='sys_sucursales_producto' && $valor == '' ){
 		//die( 'here' );

@@ -84,7 +84,15 @@ var total_cobros=0,monto_real=0;
 			success:function(dat){
 				var aux=dat.split("|");
 				if(aux[0]!='ok'){
-					alert(dat);return false;
+					if( aux[0] == 'was_payed' ){//ya fue pagado totalmente
+						alert( aux[1] );
+						$( '#res_busc' ).html( '' );
+						$( '#res_busc' ).css( 'display', 'none' );
+						$( '#buscador' ).select();
+						return false;
+					}else{
+						alert(dat);return false;
+					}
 				}else{
 					//$("#efectivo").val(aux[3]-aux[4]);//oscar 2023
 					$("#t0").val(aux[3]-aux[4]);//oscar 2023
@@ -102,9 +110,21 @@ var total_cobros=0,monto_real=0;
 				
 					$( '#seeker_btn' ).addClass( 'no_visible' );//oculta boton de buscador
 					$( '#seeker_reset_btn' ).removeClass( 'no_visible' );//muestra boton de reseteo
+				/*implementacion Oscar 2023/10/10 para recuperar los pagos anteriores de la nota de venta*/
+					getHistoricPayment( aux[1] );
+				/*fin de cambio Oscar 2023/10/10*/
 				}
 			}		
 		});
+	}
+
+	function getHistoricPayment( sale_id ){
+		var url = "ajax/db.php?fl=getHistoricPayment&sale_id=" + sale_id; 
+		var resp = ajaxR( url ).split( "|" );
+		if( resp[0] != 'ok' ){
+			alert( "Error : \n" + resp );
+		}
+		$( '#historic_payments' ).html( resp[1] );
 	}
 
 	function prevenir(e){
@@ -293,6 +313,22 @@ var cont_cheques_transferencia=0;
 	}
 
 		function cobrar(){
+		//verifica si hay cobro en efectivo
+			if( parseInt( $( '#efectivo' ).val() ) > 0 ){
+			//insereta pago en efectivo
+				var url = "ajax/db.php?fl=insertCashPayment&ammount=" + parseInt( $( '#efectivo' ).val() );
+				url += "&session_id=" + $( '#session_id' ).val();
+				url += "&sale_id=" + $( '#id_venta' ).val();
+				//alert( url ); return false;
+				var resp = ajaxR( url ).split( '|' );
+				if( resp[0] != 'ok' ){
+					alert( "Error al insertar el pago en Efectivo: " + resp );
+					return false;
+				}
+			}
+		//manda impresion del ticket
+			var url = "ticket_pagos.php?id_pedido=" + $( '#id_venta' ).val();
+			var resp = ajaxR( url );
 			location.reload();
 			return false;
 			var id=$("#id_venta").val();

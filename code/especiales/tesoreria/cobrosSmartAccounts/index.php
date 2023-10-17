@@ -1,6 +1,17 @@
 <?php
 	include('../../../../conectMin.php');
 	include('../../../../conexionMysqli.php');
+	//verifica si esta habilitada la funcion de SmartAccounts
+		$sql = "SELECT 
+					habilitar_smartaccounts_netpay AS is_smart_accounts
+				FROM sys_sucursales s
+				WHERE id_sucursal = {$sucursal_id}";
+		$stm = $link->query( $sql ) or die( "Error al consultar si esta habilitado SmartAccounts : {$link->error}" );
+		$row = $stm->fetch_assoc();
+		$is_smart_accounts = $row['is_smart_accounts'];
+		if( $row['is_smart_accounts'] == 0 ){
+			die( "<script>location.href=\"../cobros/index.php\";</script>" );
+		}
 	include('ajax/db.php');
 	$Payments = new Payments( $link );//instancia clase de pagos
 	$Payments->checkAccess( $user_id );//verifica permisos
@@ -34,7 +45,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Cobrar</title>
+	<title>Cobrar | SmartAccounts</title>
 	<script type="text/javascript" src="../../../../js/jquery-1.10.2.min.js"></script>
 	<script type="text/javascript" src="js/functions.js"></script>
 	<script type="text/javascript" src="js/apis.js"></script>
@@ -74,7 +85,7 @@
 		</div>
 	</div>
 
-	<div class="row header" style="padding-top : 2px;">
+	<div class="row header bg-primary" style="padding-top : 2px;">
 		<div class="col-12 text-center text-light">
 			<h3><b class="">Sucursal:</b> <?php echo $sucursal;?></h3>
 			<h3><b class="">Cajero:</b> <?php echo $usuario;?></h3>	
@@ -100,7 +111,7 @@
 					<button 
 						title="Buscar" 
 						onclick="busca('intro');"
-						class="btn btn-info"
+						class="btn btn-primary"
 						id="seeker_btn"
 					>
 						<i class="icon-search"></i>
@@ -129,12 +140,15 @@
 			<input type="hidden" id="id_venta" value="0">
 			<input type="hidden" id="venta_pagada" value="0">
 		</div>
+	<!-- historico dfe pagos -->
+		<div class="row" id="historic_payments"></div>
+	<!-- -->
 		<div class="row">
 			<h3>Tarjetas 
 				<button
 					type="button"
 					id="add_card_btn"
-					class="btn btn-success"
+					class="btn btn-primary"
 					onclick="addPaymetCard( <?php echo $user_id;?> );"
 					style="font-size : 100% !important; padding : 2px !important;"
 				>
@@ -174,7 +188,7 @@
 					onkeyup="valida_tca(this,event,2);calcula_cambio();">
 				<button 
 					type="button"
-					class="btn btn-success"
+					class="btn btn-primary"
 					onclick="getCashPaymentForm();"
 				>
 					<i class="icon-plus"></i>
@@ -204,7 +218,7 @@
 				<div class=" input-group">
 					<input type="number" id="monto_cheque_transferencia" class="form-control">
 					<button 
-						class="btn btn-success"
+						class="btn btn-primary"
 						onclick="agrega_cheque_transferencia();">
 						<i class="icon-plus"></i>
 					</button>
@@ -253,14 +267,14 @@
 				<button 
 					type="button"
 					id="cobrar" 
-					class="btn btn-success form-control"  onclick="cobrar();">
-					<i class="icon-floppy">Cobrar e Imprimir</i>
+					class="btn btn-primary form-control"  onclick="cobrar();">
+					<i class="icon-floppy">Finalizar cobro</i>
 				</button>
 			</div>
 			<div class="col-2"></div>
 		</div>
 	</div>
-	<div class="footer text-center">
+	<div class="footer text-center bg-primary">
 		<button
 			class="btn btn-light"
 			onclick="link(1);"
