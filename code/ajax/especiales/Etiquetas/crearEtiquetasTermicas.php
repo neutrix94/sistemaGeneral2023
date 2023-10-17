@@ -288,10 +288,10 @@ $numProd = count($arr);
 //A400,255,2,5,2,2,N,","
 					$epl_code .= "A400,255,2,5,2,2,N,\",\"\n";
 				}
-				$epl_code .= "b510,290,Q,m2,s5,\"{$row['list_order']}\"\n";//QR
+				$epl_code .= "b500,290,Q,m2,s5,\"{$row['list_order']}\"\n";//QR
 				$epl_code .= "A486,380,2,5,{$price_size},4,N,\"{$row['price']}\"\n";
-				$epl_code .= "A623,150,2,3,2,3,N,\"{$part_1}\"\n";
-				$epl_code .= "A623,80,2,3,2,3,N,\"{$part_2}\"\n";
+				$epl_code .= "A612,150,2,3,2,3,N,\"{$part_1}\"\n";
+				$epl_code .= "A612,80,2,3,2,3,N,\"{$part_2}\"\n";
 				$epl_code .= "P1\n";
 	 		//die( "Code" . $epl_code );
 	 		}
