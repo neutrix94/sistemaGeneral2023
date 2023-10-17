@@ -68,7 +68,7 @@
 			<?php
 				if ( $permiso['nuevo'] == 1 ) {
 			?>
-				<button type="button" class="btn btn-success" onclick="location.href='../../Transferencias_desarrollo/transf.php?is_list_transfer=1';">Nueva Transferencia</button>
+				<button type="button" class="btn btn-success" onclick="location.href='../../Transferencias_desarrollo_racion/transf.php?is_list_transfer=1';">Nueva Transferencia</button>
 			<?php
 				}
 			?>

@@ -1,41 +1,45 @@
 <?php
-	include("../../../../conectMin.php");
-	
-	
-	//extract($_GET);
-	//extract($_POST);
+	include("../../../../conexionMysqli.php");
 	$texto=$_POST['texto'];
-//if(){
 	$query = "SELECT
-			  id_productos,
-			  CONCAT(orden_lista,'|',nombre) 
-			  FROM ec_productos
-			  WHERE (";
-//}else if(){
-
-//}
-//ampliamos exactitud de búsqueda
+			  p.id_productos,
+			  CONCAT(p.orden_lista,'|',p.nombre) 
+			  FROM ec_productos p
+			  LEFT JOIN ec_proveedor_producto pp
+			  ON p.id_productos = pp.id_producto
+			  WHERE p.nombre NOT IN( 'Libre', '0' ) 
+			  AND p.orden_lista NOT IN( '0' )
+			  AND ( (";
+//amplia exactitud de búsqueda
 	$arr=explode(" ",$texto);
 	for($i=0;$i<sizeof($arr);$i++){
 		if($arr[$i]!=''){
 			if($i>0){
 				$query.=" AND ";
 			}
-			$query.="nombre  LIKE '%".$arr[$i]."%'";
+			$query.="p.nombre LIKE '%".$arr[$i]."%'";
 		}
 	}
 	$query.=")";//cerramos el paréntesis del WHERE
+	$query .= " OR p.orden_lista = '{$texto}'";
+	$query .= " OR pp.clave_proveedor = '{$texto}'";
+	$query .= " OR ( pp.codigo_barras_pieza_1 = '{$texto}' 
+					OR pp.codigo_barras_pieza_2 = '{$texto}'
+					OR pp.codigo_barras_pieza_3 = '{$texto}'
+					OR pp.codigo_barras_presentacion_cluces_1 = '{$texto}'
+					OR pp.codigo_barras_presentacion_cluces_2 = '{$texto}'
+					OR pp.codigo_barras_caja_1 = '{$texto}'
+					OR pp.codigo_barras_caja_2 = '{$texto}') )";
 
-	$result  = mysql_query($query) or die('Prod: '.mysql_error());		  
+	$query .= " GROUP BY p.id_productos";//die( $query );
 
-		while($fila = mysql_fetch_row($result))
-		{
-			$data[]= array(
-							'id_pr'     => $fila[0],
-							'nombre'    => $fila[1]
-						);
-		}
+	$result  = $link->query($query) or die('Prod: '.mysql_error());		  
 
-		echo json_encode($data);
-
+	while( $fila = $result->fetch_row() ){
+		$data[]= array(
+						'id_pr'     => $fila[0],
+						'nombre'    => $fila[1]
+					);
+	}
+	echo json_encode($data);
 ?>

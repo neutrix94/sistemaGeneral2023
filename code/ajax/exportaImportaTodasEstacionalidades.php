@@ -12,7 +12,8 @@
 			p.id_productos,
 			p.orden_lista,
 			p.nombre,
-			SUM(IF(ma.id_movimiento_almacen IS NULL OR ma.id_sucursal!=1,0,(md.cantidad*tm.afecta)))
+			SUM(IF(ma.id_movimiento_almacen IS NULL OR ma.id_sucursal!=1,0,(md.cantidad*tm.afecta))),
+			p.observaciones AS observations/*implementacion Oscar 2023/10/16*/
 		FROM ec_productos p
 		LEFT JOIN ec_movimiento_detalle md ON p.id_productos=md.id_producto
 		LEFT JOIN ec_movimiento_almacen ma ON md.id_movimiento=ma.id_movimiento_almacen
@@ -90,7 +91,7 @@
 		if($i<($num_estac-1)){
 			echo utf8_decode(',');
 		}else{
-			echo utf8_decode("\n");
+			echo utf8_decode(",NOTAS GENERALES\n");
 		}
 	}
 
@@ -190,7 +191,7 @@
 			if($j<(mysql_num_rows($eje_3)-1)){
 				echo utf8_decode(',');
 			}else{
-				echo utf8_decode("\n");
+				echo utf8_decode(",{$dat_prod[4]}\n");//,{$dat_prod[4]}implementacion Oscar 2023/10/16
 			}
 		}//fin de for j
 	}//fin de for i

@@ -293,6 +293,8 @@ var cont_cheques_transferencia=0;
 	}
 
 		function cobrar(){
+			location.reload();
+			return false;
 			var id=$("#id_venta").val();
 			//alert(id);
 			if(id==0){
@@ -370,8 +372,20 @@ var cont_cheques_transferencia=0;
 	//verifica que todos lo pagos esten lleno y sumen la cantidad del monto total
 		$( '#payments_list tr' ).each( function( index ){
 			//$( '#payment_btn_' + index ).removeClass( 'no_visible' );
+			if( parseInt( $( '#t' + index ).val() ) <= 0 ){
+				stop = index;
+				return false;
+			}
 			amount_sum += parseInt( $( '#t' + index ).val().replaceAll( ',', '' ) );
 		});
+		if( stop != false ){
+			alert( "Hay cobros con tarjeta sin monto, verfica y vuelve a intentar!" );
+			$( '#t' + stop ).select();
+			return false;
+		}
+		if( $( '#efectivo' ).val() != '' ){
+			amount_sum += parseInt( $( '#efectivo' ).val() );
+		}
 		if( amount_sum != amount_total ){
 			alert( "La suma de los montos es diferente del total!" );
 			return false;
