@@ -93,6 +93,7 @@ var total_cobros=0,monto_real=0;
 					}else{
 						alert(dat);return false;
 					}
+					alert(dat);return false;
 				}else{
 					//$("#efectivo").val(aux[3]-aux[4]);//oscar 2023
 					$("#t0").val(aux[3]-aux[4]);//oscar 2023
@@ -113,10 +114,12 @@ var total_cobros=0,monto_real=0;
 				/*implementacion Oscar 2023/10/10 para recuperar los pagos anteriores de la nota de venta*/
 					getHistoricPayment( aux[1] );
 				/*fin de cambio Oscar 2023/10/10*/
+
 				}
 			}		
 		});
 	}
+
 
 	function getHistoricPayment( sale_id ){
 		var url = "ajax/db.php?fl=getHistoricPayment&sale_id=" + sale_id; 
@@ -329,6 +332,7 @@ var cont_cheques_transferencia=0;
 		//manda impresion del ticket
 			var url = "ticket_pagos.php?id_pedido=" + $( '#id_venta' ).val();
 			var resp = ajaxR( url );
+
 			location.reload();
 			return false;
 			var id=$("#id_venta").val();
