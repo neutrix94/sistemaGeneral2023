@@ -14,7 +14,7 @@ $numProd = count($arr);
 		$query="SELECT 
 					CONCAT( ax1.nombre_etiqueta, ' (', ax1.orden_lista,')' ) AS tag_name,
 					ax1.precio AS price,
-					ax1.orden_lista AS order_list,
+					ax1.orden_lista AS list_order,
 					ax1.id_productos AS product_id,
 					ax1.de_valor AS from_value,
 					ax1.es_externo AS is_extrernal,
@@ -48,7 +48,7 @@ $numProd = count($arr);
 		$query="SELECT 
 					CONCAT( ax1.nombre_etiqueta, ' (', ax1.orden_lista,')' ) AS tag_name,
 					ax1.precio AS price,
-					ax1.orden_lista AS order_list,
+					ax1.orden_lista AS list_order,
 					ax1.id_productos AS product_id,
 					ax1.es_externo AS is_extrernal,
 					ax1.oferta AS is_promotion
@@ -281,11 +281,14 @@ $numProd = count($arr);
 				$epl_code .= "R112,0\n";
 				$epl_code .= "f100\n";
 				$epl_code .= "N\n";
-					$epl_code .= "A623,360,2,5,3,3,N,\"$\"\n";
+//A590,280,2,4,4,4,N,"$"
+				$epl_code .= "A590,280,2,4,4,4,N,\"$\"\n";
 				if( $row['price'] > 999 ){
 					$price_size = 3;
-					$epl_code .= "A400,225,2,5,1,1,N,\",\"\n";
+//A400,255,2,5,2,2,N,","
+					$epl_code .= "A400,255,2,5,2,2,N,\",\"\n";
 				}
+				$epl_code .= "b510,290,Q,m2,s5,\"{$row['list_order']}\"\n";//QR
 				$epl_code .= "A486,380,2,5,{$price_size},4,N,\"{$row['price']}\"\n";
 				$epl_code .= "A623,150,2,3,2,3,N,\"{$part_1}\"\n";
 				$epl_code .= "A623,80,2,3,2,3,N,\"{$part_2}\"\n";
@@ -306,7 +309,7 @@ $numProd = count($arr);
 	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
 	 		//consulta los diferentes precios
 				$sql = "SELECT 
-							CONCAT( pd.de_valor, 'x', ROUND(pd.precio_venta)) as price
+							CONCAT( pd.de_valor, 'x', ROUND(pd.precio_venta * pd.de_valor )) as price
 						FROM sys_sucursales_producto sp
 						JOIN sys_sucursales s 
 						ON s.id_sucursal=sp.id_sucursal
@@ -339,14 +342,24 @@ $numProd = count($arr);
 				$epl_code .= "R112,0\n";
 				$epl_code .= "f100\n";
 				$epl_code .= "N\n";
+/*
+
+"1x22"
+"6x120"
+,"12x216"
+,"88888888888888888888888"
+,"ROJO M21124R (27093)888"
+
+*/
 				$price = $stm->fetch_assoc();
-				$epl_code .= "A550,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 1
+				$epl_code .= "A610,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 1
 				$price = $stm->fetch_assoc();
-				$epl_code .= "A410,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 2
+				$epl_code .= "A490,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 2
 				$price = $stm->fetch_assoc();
-				$epl_code .= "A270,10,1,4,5,4,N,\"{$price['price']}\"\n";//precio 3
-				$epl_code .= "A150,10,1,4,2,1,N,\"{$parts[0]}\"\n";
-				$epl_code .= "A100,10,1,4,2,1,N,\"{$parts[1]}\"\n";			
+				$epl_code .= "A370,10,1,4,5,4,N,\"{$price['price']}\"\n";//precio 3
+				$epl_code .= "A250,20,1,4,2,1,N,\"{$parts[0]}\"\n";
+				$epl_code .= "A200,20,1,4,2,1,N,\"{$parts[1]}\"\n";
+				$epl_code .= "b40,150,Q,m2,s5,\"{$row['list_order']}\"\n";			
 				$epl_code .= "P1\n";
 	 		//die( "Code" . $epl_code );
 	 		}
