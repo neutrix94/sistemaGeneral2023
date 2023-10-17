@@ -1,9 +1,11 @@
 <?php
-    define('FPDF_FONTPATH','../../../../../include/fpdf153/font/');
+
+    include( '../../../../conect.php' );
+    define('FPDF_FONTPATH','../../../../include/fpdf153/font/');
     
-    include("../../../../../include/fpdf153/fpdf.php");
+    include("../../../../include/fpdf153/fpdf.php");
 /*implementación Oscar 25.01.2019 para sacar rutas de tickets*/
-    $archivo_path = "../../../../../conexion_inicial.txt";
+    $archivo_path = "../../../../conexion_inicial.txt";
     if(file_exists($archivo_path)){
         $file = fopen($archivo_path,"r");
         $line=fgets($file);
@@ -37,12 +39,13 @@
     $datos_cajero=$r[0];
 
 //datos de la nota de venta
-    $eje=mysql_query("SELECT folio_nv,current_date(),current_time(),total FROM ec_pedidos WHERE id_pedido=$id_pedido")or die("Error al consultar el folio del pedido");
+    $eje=mysql_query("SELECT folio_nv,current_date(),current_time(),total, pagado FROM ec_pedidos WHERE id_pedido=$id_pedido")or die("Error al consultar el folio del pedido");
     $r=mysql_fetch_row($eje);
     $folio_nv=$r[0];
     $fecha=$r[1];
     $hora=$r[2];
     $total=$r[3];
+    $ticket_was_payed = $r[4];
 //Buscamos el numero de abono
     $sql="SELECT id_pedido_pago FROM ec_pedido_pagos WHERE id_pedido=$id_pedido 
 /*implementación Oscar 28.02.2019 para que no se salten folios de abonos cuando hay pago interno y externo*/
@@ -114,47 +117,27 @@
     }
     
     
-    $ticket = new TicketPDF("P", "mm", array(80,100+$num*6), "{$sucursal}", "{$folio}", 32);
+    $ticket = new TicketPDF("P", "mm", array(80,140+$num*6), "{$sucursal}", "{$folio}", 32);
     $ticket->AliasNbPages();
     $ticket->AddPage();
 
 	$bF=10;//tamaño de fuente 
 
-    $ticket->Image("../../../../touch/img/logo-casa-fondo-blanco.png", 5, 5, 18);
-    $ticket->Image("../../../../img/especiales/pagado.jpg", 10, 40, 50);
+    //$ticket->Image("../../../../touch/img/logo-casa-fondo-blanco.png", 5, 5, 18);
     
-    $ticket->SetFont('Arial','B',$bF+4);
-    $ticket->SetXY(14, 9);
-    $ticket->Cell(66, 6, utf8_decode("CASA DE LAS LUCES"), "" ,0, "C");
-    
-    $ticket->SetFont('Arial','',$bF+1);
-    $ticket->SetXY(14, $ticket->GetY()+8);
-    $ticket->Cell(66, 6, utf8_decode("Sucursal: {$ticket->sucursal}"), "" ,0, "C");
-    
-    $ticket->SetXY(22, $ticket->GetY()+6);
-    $ticket->Cell(66, 6, utf8_decode("NOTA DE VENTA: $folio_nv"), "" ,0, "L");
-    
-    $ticket->SetXY(22, $ticket->GetY()+6);
-    $ticket->Cell(66, 6, utf8_decode("TOTAL DE COMPRA: $".number_format($total)), "" ,0, "L");
-    
-    /*
-    $ticket->Image("../../../../touch/img/logo-casa-fondo-blanco.png", 28, 5, 22);
-    
-    $ticket->SetFont('Arial','B',$bF+4);
-    $ticket->SetXY(7, 40);
-    $ticket->Cell(66, 6, utf8_decode("CASA DE LAS LUCES"), "" ,0, "C");
+
+   // $ticket->SetFont('Arial','B',$bF+4);
+    //$ticket->SetXY(14, 9);
+    //$ticket->Cell(66, 6, utf8_decode("CASA DE LAS LUCES"), "" ,0, "C");
     
     $ticket->SetFont('Arial','',$bF+1);
-    $ticket->SetXY(7, $ticket->GetY()+4);
-    $ticket->Cell(66, 6, utf8_decode("Sucursal {$ticket->sucursal}"), "" ,0, "C");
     
-    $ticket->SetXY(7, $ticket->GetY()+4);
-    $ticket->Cell(66, 6, utf8_decode("NOTA DE VENTA: $folio_nv"), "" ,0, "L");
+    $ticket->SetXY(4, $ticket->GetY()+22);
+    $ticket->Cell(66, 6, utf8_decode("NOTA DE VENTA: $folio_nv"), "" ,0, "C");
     
-    $ticket->SetXY(7, $ticket->GetY()+4);
-    $ticket->Cell(66, 6, utf8_decode("TOTAL DE COMPRA: $".number_format($total)), "" ,0, "L");
-    
-    */
+    $ticket->SetXY(4, $ticket->GetY()+6);
+    $ticket->Cell(66, 6, utf8_decode("TOTAL DE COMPRA: $".number_format($total)), "" ,0, "C");
+
     $ticket->SetFont('Arial','',$bF);
     
     $ticket->SetXY(7, $ticket->GetY()+6);
@@ -171,53 +154,54 @@
     $ticket->SetFont('Arial','',$bF-2);
 
 //enlistamos los cobros con tarjetas
-    $arr_tarjetas=explode("°",$tarjetas);
-    for($i=0;$i<sizeof($arr_tarjetas)-1;$i++){
-
-        $arr=explode("~",$arr_tarjetas[$i]);
-        if($arr[1]>0){
-            $ticket->SetXY(7, $ticket->GetY()+6);
-            $ticket->Cell(66, 6, utf8_decode('Tarjeta'), "" ,0, "L");
+//consulta los cobros realizados
+    $sql = "SELECT
+                cc.id_cajero_cobro As payment_id,
+                cc.monto AS amount,
+                tp.nombre AS payment_type,
+                CONCAT( cc.fecha, ' ', cc.hora ) AS datetime
+            FROM ec_cajero_cobros cc
+            LEFT JOIN ec_tipos_pago tp
+            ON cc.id_tipo_pago = tp.id_tipo_pago
+            WHERE cc.id_pedido = {$id_pedido}";
+    $stm = mysql_query( $sql ) or die( "Error al consultar pagos para generacion de Ticket : " . mysql_error() );
+    $payments_total = 0;
+    while( $row = mysql_fetch_assoc( $stm ) ){
+        $ticket->SetXY(7, $ticket->GetY()+6);
+            $ticket->Cell(66, 6, utf8_decode( $row['payment_type'] ), "" ,0, "L");
         
             $ticket->SetX(35);
             $ticket->Cell(20, 6, $row[2], "" ,0, "L");
         
             $ticket->SetX(43);
-            $ticket->Cell(30, 6, "$ " . number_format($arr[1], 2), "" ,0, "R");
-        }
-    }//fin de for i
-
-//enlistamos los cobros con cheque/transferencia
-    $arr_cheques=explode("°",$cheques);
-    for($i=0;$i<sizeof($arr_cheques)-1;$i++){
-        $arr=explode("~",$arr_cheques[$i]);
-        $ticket->SetXY(7, $ticket->GetY()+6);
-        $ticket->Cell(66, 6, utf8_decode($arr[2]), "" ,0, "L");
-        
-        $ticket->SetX(35);
-        $ticket->Cell(20, 6, $row[2], "" ,0, "L");
-        
-        $ticket->SetX(43);
-        $ticket->Cell(30, 6, "$ " . number_format($arr[1], 2), "" ,0, "R");
-    }//fin de for i
-//pago en efectivo
-    if($monto_efectivo!='' && $monto_efectivo!=0 ){
-        $ticket->SetXY(7, $ticket->GetY()+6);
-        $ticket->Cell(66, 6, utf8_decode("Efectivo"), "" ,0, "L");
-        
-        $ticket->SetX(35);
-        $ticket->Cell(20, 6, $row[2], "" ,0, "L");
-        
-        $ticket->SetX(43);
-        $ticket->Cell(30, 6, "$ " . number_format($monto_efectivo, 2), "" ,0, "R");
-    
+            $ticket->Cell(30, 6, "$ " . number_format( $row['amount'], 2), "" ,0, "R");
+        $payments_total +=  $row['amount'];
+    }
+/*generacion de codigo de barras
+    include('../../../../include/barcode/barcode.php');
+    //$barcode_1 = ( isset( $_POST['code'] ) ? trim( $_POST['code'] ) : ''  );
+    $barcode_name = str_replace(' ', '', $folio_nv );
+    $barcodePath = "../../../../img/codigos_barra/{$barcode_name}.png";
+    barcode( $barcodePath, base64_encode( $folio_nv ), '50', 'horizontal', 'code128', true, 1);*/
+            //die( 'here : ' . $filepath );
+    //si esta pagado
+    if( $ticket_was_payed == 1 && ( $payments_total == $total ) ){
+        $ticket->Image("../../../../img/especiales/pagado.jpeg", 5, 2, 70);
+    //generacion de codigo de barras
+        include('../../../../include/barcode/barcode.php');
+        $barcode_name = str_replace(' ', '', $folio_nv );
+        $barcodePath = "../../../../img/codigos_barra/{$barcode_name}.png";
+        barcode( $barcodePath, base64_encode( $folio_nv ), '60', 'horizontal', 'code128', false, 1);
+    //se incrustra el codigo de barras en el ticket
+        $ticket->Image( $barcodePath, 6, 90, 70);
     }
 
-    $ticket->SetFont('Arial','B',$bF+5);
-    $ticket->SetXY(7, $ticket->GetY()+6);
-    $ticket->Cell(66, 1, "", "T" ,0, "C");
-    $ticket->SetXY(43, $ticket->GetY());
-    $ticket->Cell(30, 6, "$ " . number_format($monto_total_pagos, 2), "" ,0, "R");
+    //total de pagos
+        $ticket->SetFont('Arial','B',$bF+5);
+        $ticket->SetXY(7, $ticket->GetY()+6);
+        $ticket->Cell(66, 1, "", "T" ,0, "C");
+        $ticket->SetXY(43, $ticket->GetY());
+        $ticket->Cell(30, 6, "$ " . number_format( $payments_total, 2 ), "" ,0, "R");
 
 //recibido y cambio en caso de haber sido capturado este valor
     if($recibido!=0){

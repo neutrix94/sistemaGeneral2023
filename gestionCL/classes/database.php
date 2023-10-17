@@ -4,10 +4,19 @@ class db
 {
 
     // used to connect to the database
-    private $dbHost = 'localhost';
-    private $dbUser = 'root';
-    private $dbPass = '';
-    private $dbName = 'base_cdll_mis_pruebas';
+    private $dbHost;// = 'localhost';
+    private $dbUser;// = 'root';
+    private $dbPass;// = '';
+    private $dbName;// = 'base_cdll_mis_pruebas';
+
+    function __construct(){
+        error_reporting(0);
+        include( '../../config.inc.php' );
+        $this->dbHost = $dbHost;
+        $this->dbUser = $dbUser;
+        $this->dbPass = $dbPassword;
+        $this->dbName = $dbName;
+    }
 
     // get the database connection
     public function conectDB()
@@ -21,4 +30,5 @@ class db
         }
         return $dbConnection;
     }
+
 }
