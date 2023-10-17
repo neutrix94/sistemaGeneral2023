@@ -103,14 +103,21 @@ var global_view = '';
 			return false;
 		}
 		var tmp_txt = txt.split( ' ' );
-		if( tmp_txt.length == 4 ){
+		if( tmp_txt.length == 4 && ( ( tmp_txt[1].includes( 'PQ' ) ) || ( tmp_txt[1] ).includes( 'CJ' ) ) ){
 			txt = '';
 			for ( var i = 0; i < (tmp_txt.length - 1 ); i++ ) {
 				txt += ( txt != '' ? ' ' : '' );
 				txt += tmp_txt[i];
 			}
 		}
-		
+/*implementacion Oscar 2023/10/11 para decodificar el codigo de barras en formato64 
+deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion )
+		if( type == 'seekTicketBarcode' ){
+			txt = txt.replaceAll( '?', '=' );
+			txt = txt.replaceAll( '¿', '=' );
+			txt = atob( txt );
+		}
+fin de cambio Oscar 2023/10/11*/
 
 		alert_scann( 'audio' ); 
 		$( obj ).val( '' );
