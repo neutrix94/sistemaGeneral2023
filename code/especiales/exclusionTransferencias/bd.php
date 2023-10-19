@@ -30,8 +30,11 @@
 	}
 //buscar productos
 	if($flag=='busca'){
-		$txt=$_POST['clave'];
-		$sql="SELECT id_productos,nombre FROM ec_productos WHERE id_productos>1 AND (id_productos='$txt' OR orden_lista='$txt'";
+		$txt= trim( $_POST['clave'] );
+		$sql="SELECT id_productos,nombre FROM ec_productos 
+		WHERE id_productos>1 
+		AND orden_lista NOT IN( 0 )
+		AND (id_productos='$txt' OR orden_lista='$txt'";
 	//agudisamos la búsqueda
 		$aux=explode(" ",$txt);
 		for($i=0;$i<sizeof($aux);$i++){
