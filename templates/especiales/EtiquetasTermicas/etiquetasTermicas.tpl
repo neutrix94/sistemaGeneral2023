@@ -9,6 +9,10 @@
 {/literal}
 </style>
 <script language="JavaScript" src="../../../js/papaparse.min.js"></script>
+<div class="emergent">
+	<div class="emergent_content"></div>
+</div>
+
 <div id="campos">  
 <div id="titulo">1.3 Etiquetas</div>
 <br><br>
@@ -50,8 +54,40 @@
 		</div>
 		<div class="col-2"></div>
 	</div>
-	
-<!-- -->
+<!-- Importación de CSV Oscar 2023/10/18-->
+	<div class="row"> 
+		<h3>Importacion de CSV</h3>
+		<div class="col-6 text-center">
+			<input type="file" id="file_csv" style="display:none;" accept=".csv"/>
+			<button
+				id="import_btn"
+				class="btn btn-success form-control"
+				type="button"
+				onclick="document.getElementById('file_csv').click();"
+			>
+				<i class="icon-file-excel">Importar CSV</i>
+			</button>
+			<button
+				type="button"
+				class="btn btn-info"
+				onclick="show_import_emergent_view();"
+				style="border-radius:50%;"
+			>
+				<i class="">?</i>
+			</button>
+			<div class="input-group">
+				<input type="text" id="csv_description" class="form-control hidden" readonly>
+				<button class="btn btn-success hidden" type="button" id="import_csv">
+					<i class="icon-upload-1">Importar</i>
+				</button>
+			</div>
+		</div>
+		<div class="col-6">
+			<div class="">
+			</div>
+		</div>
+	</div>	
+<!-- Fin de cambio Oscar 2023/10/18 -->
 	<div class="row" style="padding : 20px !important;">
 		<div id='buscador' class="col-lg-9" >
 			<h2>Producto:</h2>
@@ -75,25 +111,6 @@
 					<i class="">Agregar</i>
 				</button>
 			</div>
-		<!-- 
-				<li>
-					<input type="file" id="file_csv" style="display:none;" accept=".csv"/>
-					<button 
-						id="import_btn"
-						class="btn_import" 
-						type="button" 
-						onclick="document.getElementById('file_csv').click();"
-					>
-						Importar CSV
-					</button>
-				</li>
-				<li id="">
-					<input type="text" id="csv_description" class="hidden" style="width: 140px !important;" readonly>
-				</li>
-				<li>
-					<button class="btn_import hidden" type="button" id="import_csv">Importar</button>
-				</li>
-			</ul-->	
 
 			<div id='listaProd' class="row">
 				<ul id='proLi'>
@@ -157,7 +174,13 @@
 </div>
 </form>
 </div>
-
+	<form 
+		id="TheForm" 
+		method="post" 
+		action="../../../code/ajax/especiales/Etiquetas/formatImportExample.php" target="TheWindow">
+			<input type="hidden" id="fl" name="fl" value="1" />
+			<input type="hidden" id="datos" name="datos" value=""/>
+	</form>
 
 {literal}
  <script>
@@ -207,6 +230,10 @@
 			cells[1] = cells[1].split('"').join('');
 			agregarListado( cells[0], cells[0]+'|'+cells[1] );
 		}//fin de for i
+		setTimeout( function(){
+				$( '#csv_description' ).css( 'display', 'none' );
+				$( '#import_csv' ).addClass( 'hidden' );
+			}, 500 );
 	}
 
 /*fin de cambio Oscar 2021*/
@@ -435,18 +462,83 @@ var rows_counter = 0;
 
  	}
  	
- 		 
-$(document).ready(function() {
+	 		 
+	$(document).ready(function() {
 
- 	$('#listaProd').on('click','.clsEliminarElemento',function(){
- 		$liPadre = $($(this).parents().get(0));
- 		$liPadre.remove();
- 	});
-   //Aquí van todas las acciones del documento.
-});
+	 	$('#listaProd').on('click','.clsEliminarElemento',function(){
+	 		$liPadre = $($(this).parents().get(0));
+	 		$liPadre.remove();
+	 	});
+	   //Aquí van todas las acciones del documento.
+	});
 
- 		
- 	
+	function show_import_emergent_view(){
+		var content = `<div class="text-center" style="padding : 10px;">
+			<h3 class="text-center">
+				Ejemplo de formato para generacion de etiquetas : 
+			</h3>
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>Id Producto</th>
+						<th>Nombre producto</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1821</td>
+						<td>Serie LED 50 Luces Blanca C/Transparente 3.5M</td>
+					</tr>
+					<tr>
+						<td>1822</td>
+						<td>Serie LED 50 Luces Calida c/Verde 6.5M</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="2" class="text-center">
+							<button
+								type="button"
+								class="btn btn-success"
+								onclick="download_import_format_example()"
+
+							>
+								<i class="icon-file-excel">Descargar ejemplo de formato</i>
+							</button>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" class="text-center">
+							<button
+								type="button"
+								class="btn btn-danger"
+								onclick="close_emergent()"
+
+							>
+								<i class="icon-cancel-circled">Cerrar</i>
+							</button>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>`;
+		$( '.emergent_content' ).html( content );
+		$( '.emergent' ).css( 'display', 'block' );
+	}	
+var ventana_abierta = null;
+	function download_import_format_example(){
+		close_emergent();
+		ventana_abierta=window.open('', 'TheWindow');	
+		document.getElementById('TheForm').submit();
+		setTimeout(cierra_pestana,3500);	
+	}
+	function cierra_pestana(){
+		ventana_abierta.close();//cerramos la ventana
+	}
+ 	function close_emergent(){
+ 		$( '.emergent_content' ).html( '' );
+ 		$( '.emergent' ).css( 'display', 'none' );
+ 	}
  </script>
  <style>
  	ul.filters {
@@ -576,6 +668,29 @@ label{
 .btn{
 	padding : 10px;
 }
+
+/*estilos de la venta emergente*/
+	.emergent{
+		position : fixed;
+		top : 0;
+		right : 0;
+		width : 100%;
+		height : 100%;
+		z-index : 100;
+		background : rgba( 0,0,0,.5 );
+		display : none;
+	}
+	.emergent_content{
+		position : absolute;
+		background : white;
+		top : 10%;
+		left : 10%;
+		width : 80%;
+		height : 30%;
+		max-height : 80%;
+		overflow : auto;
+	}
+/*fin de estilos ventana emergente*/
 
 @media only screen and (max-width: 500px) {
   *{
