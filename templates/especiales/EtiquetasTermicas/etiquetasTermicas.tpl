@@ -228,7 +228,9 @@
 			var cells = row.join(",").split(",");
 			cells[0] = cells[0].split('"').join('');
 			cells[1] = cells[1].split('"').join('');
-			agregarListado( cells[0], cells[0]+'|'+cells[1] );
+			for( var j = 1; j <= cells[2]; j++ ){
+				agregarListado( cells[0], cells[0]+'|'+cells[1] );
+			}
 		}//fin de for i
 		setTimeout( function(){
 				$( '#csv_description' ).css( 'display', 'none' );
@@ -482,16 +484,19 @@ var rows_counter = 0;
 					<tr>
 						<th>Id Producto</th>
 						<th>Nombre producto</th>
+						<th>Cantidad Etiquetas</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<td>1821</td>
 						<td>Serie LED 50 Luces Blanca C/Transparente 3.5M</td>
+						<td>2</td>
 					</tr>
 					<tr>
 						<td>1822</td>
 						<td>Serie LED 50 Luces Calida c/Verde 6.5M</td>
+						<td>1</td>
 					</tr>
 				</tbody>
 				<tfoot>
