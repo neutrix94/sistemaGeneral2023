@@ -36,12 +36,12 @@
 				{html_options values=$vals2 output=$textos2}
 			</select>
 		</div>
-		<div class="col-4">
+		<!--div class="col-4">
 			<label>&nbsp;Subtipos:</label>
 			<select id="subtip" class="form-select"  name='filtros'>
 				{html_options values=$vals3 output=$textos3}
 			</select>
-		</div>
+		</div-->
 	</div>
 	<div id='pli'class="row">
 		<div class="col-4">
@@ -90,7 +90,7 @@
 <!-- Fin de cambio Oscar 2023/10/18 -->
 	<div class="row" style="padding : 10px;">
 		<h2>Busqueda por transferencia : </h2>
-		<div class="col-6">
+		<div class="col-4">
 			<div class="input-group">
 				<input type="text"  id="transfersSeeker" class="form-control" onclick="seekTransfer(event);">
 				<button
@@ -100,6 +100,14 @@
 					<i class="icon-search"></i>
 				</button>
 			</div>
+		</div>
+		<div class="col-4">
+			<select id="store_id" class="form-select" onchange="getPriceListByStore();" name='filtros'>
+				{html_options values=$stores_ids output=$stores_names}
+			</select>
+		</div>
+		<div class="col-4">
+			<input type="text" id="price_name" class="form-control" readonly>
 		</div>
 	</div>
 
@@ -377,7 +385,7 @@ var rows_counter = 0;
  		 $( '#products_counter' ).val( rows_counter );
  	}
 var is_special = 0;//indicador de importacion / transferencia
-var transfer_store_id = 0;//indicador de importacion / transferencia
+//var transfer_store_id = 0;//indicador de importacion / transferencia
  	function getId(){
 			var elementos  = document.getElementsByName('pro');
 			var elementos2 = document.getElementsByName('parsTpl');
@@ -452,9 +460,14 @@ var transfer_store_id = 0;//indicador de importacion / transferencia
         if( $('#ticket_plantilla').val() == 6 ){
         	url= "../../../code/ajax/especiales/Etiquetas/etiquetasSinPrecios.php"; 
         }
-        console.log( e );
+    	if( $( '#store_id' ).val() == 0 || $( '#store_id' ).val() == '' ){
+    		alert( "Debes de elegir una sucursal para continuar!" );
+    		$( '#store_id' ).focus();
+    		return false;
+    	}
+/*        console.log( e );
         console.log( e2 );
-        console.log( filtros );
+        console.log( filtros );*/
         $.post(
          	url,
          	{
@@ -463,7 +476,7 @@ var transfer_store_id = 0;//indicador de importacion / transferencia
          		'fil[]' :filtros,
          		'ofert':oferta,/*implementado pr Oscar 2018 para filtrar productos con/sin oferta*/
          		'paquete':es_pqte,/*implementado pr Oscar 22.05.2018 para  indicar que se trata de impresión de paquetes*/
-         		'store_id' : transfer_store_id
+         		'store_id' : $( '#store_id' ).val()
          	},
          	function(data){
  //alert(data);
@@ -579,7 +592,8 @@ var ventana_abierta = null;
  			alert( resp );
  			return false;
  		}else{
- 			var transfer = JSON.parse( resp[1] );
+ 			var transfer = JSON.parse( resp[2] );
+ 			console.log( transfer );
  			$('#proLi').empty();//limpia los resultados de una consulta anterior
  			var data = JSON.parse( resp[1] );
  			console.log( data );
@@ -591,11 +605,29 @@ var ventana_abierta = null;
  			}
  			is_special = transfer.transfer_id;
  			transfer_store_id = transfer.destinity_store_id; 
+ 			$( '#store_id' ).val( transfer.destinity_store_id );
+ 			getPriceListByStore();
+ 			//alert( transfer.destinity_store_id );
  			//$( '#filters_1' ).css( 'display', 'none' );
  			//$( '#filters_2' ).css( 'display', 'block' );
 
  		}
  		return true;
+ 	}
+
+ 	function getPriceListByStore(){
+ 		var store_id = $( '#store_id' ).val();
+ 		if( store_id == '' ){
+ 			alert( "Debes de elegir una sucursal valida" );
+ 			$( '#store_id' ).focus();
+ 			return false;
+ 		}
+ 		var url = "../../../code/ajax/especiales/Etiquetas/formatImportExample.php?fl=getPriceList&store_id=" + store_id;
+ 		var resp = ajaxR( url ).split( '|' );
+ 		if( resp[0] != 'ok' ){
+ 			alert( "Error : " + resp );
+ 		}
+ 		$( '#price_name' ).val( resp[1] );
  	}
  </script>
  <style>

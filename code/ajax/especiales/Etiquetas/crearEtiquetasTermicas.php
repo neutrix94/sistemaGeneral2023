@@ -9,7 +9,7 @@ $numProd = 0;
 $numProd = count($arr);
 
 $store_id = $user_sucursal;
-if( isset( $_POST['store_id'] ) ){
+if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 	$store_id = $_POST['store_id'];
 }
 //recibimos variable $ofert
