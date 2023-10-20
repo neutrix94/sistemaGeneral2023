@@ -20,7 +20,7 @@
 <div id="filtros" class="row" style="width:90% !important;">
 <div id='cosa2'>
 <form action="">
-	<div class="filters row">
+	<div class="filters row" id="filters_1">
 		<div class="col-3">
 				<label for="categoria">Familias:</label>
 				<select id="categoria" class="form-select" name='filtros' onchange="cambiaSC(this.value)">
@@ -92,7 +92,7 @@
 		<h2>Busqueda por transferencia : </h2>
 		<div class="col-6">
 			<div class="input-group">
-				<input type="text" class="form-control" onclick="seekTransfer(event);">
+				<input type="text"  id="transfersSeeker" class="form-control" onclick="seekTransfer(event);">
 				<button
 					type="button"
 					class="btn btn-warning" onclick="seekTransfer('intro');"
@@ -102,6 +102,7 @@
 			</div>
 		</div>
 	</div>
+
 	<div class="row" style="padding : 20px !important;">
 		<div id='buscador' class="col-lg-9" >
 			<h2>Producto:</h2>
@@ -249,6 +250,8 @@
 		setTimeout( function(){
 				$( '#csv_description' ).css( 'display', 'none' );
 				$( '#import_csv' ).addClass( 'hidden' );
+ 				//$( '#filters_1' ).css( 'display', 'none' );
+ 				//$( '#filters_2' ).css( 'display', 'block' );
 			}, 500 );
 	}
 
@@ -373,7 +376,8 @@ var rows_counter = 0;
  		 rows_counter ++ ;
  		 $( '#products_counter' ).val( rows_counter );
  	}
-
+var is_special = 0;//indicador de importacion / transferencia
+var transfer_store_id = 0;//indicador de importacion / transferencia
  	function getId(){
 			var elementos  = document.getElementsByName('pro');
 			var elementos2 = document.getElementsByName('parsTpl');
@@ -382,6 +386,7 @@ var rows_counter = 0;
 			var e2         = [];
 			var filtros    = [];
 			var band = 0;
+
 
 		for(i=0;i<elementos2.length;i++){
         	e2.push(elementos2[i].value);
@@ -457,7 +462,8 @@ var rows_counter = 0;
          		'arr2[]':e2,
          		'fil[]' :filtros,
          		'ofert':oferta,/*implementado pr Oscar 2018 para filtrar productos con/sin oferta*/
-         		'paquete':es_pqte/*implementado pr Oscar 22.05.2018 para  indicar que se trata de impresión de paquetes*/
+         		'paquete':es_pqte,/*implementado pr Oscar 22.05.2018 para  indicar que se trata de impresión de paquetes*/
+         		'store_id' : transfer_store_id
          	},
          	function(data){
  //alert(data);
@@ -565,20 +571,29 @@ var ventana_abierta = null;
  		if( e.keyCode != 13 && e != 'intro'  ){
  			return false;
  		}
- 		var txt = $( '#transferSeeker' ).val();
- 		var url = "formatImportExample.phpfl=seekTransfer&txt=" + txt;
+ 		var txt = $( '#transfersSeeker' ).val();
+ 		var url = "../../../code/ajax/especiales/Etiquetas/formatImportExample.php?fl=seekTransfer&txt=" + txt;
  		var resp = ajaxR( url ).split( '|' );
+ 		//alert( resp );
  		if( resp[0] != 'ok' ){
  			alert( resp );
  			return false;
  		}else{
+ 			var transfer = JSON.parse( resp[1] );
  			$('#proLi').empty();//limpia los resultados de una consulta anterior
  			var data = JSON.parse( resp[1] );
+ 			console.log( data );
  			for( var pos in data ){
  				for( var i = 1; i <= data[pos].quantity; i++  ){
+ 				//alert(  data[pos].product_id +"-"+ data[pos].product_name );
  					agregarListado( data[pos].product_id, data[pos].product_name );
  				}
  			}
+ 			is_special = transfer.transfer_id;
+ 			transfer_store_id = transfer.destinity_store_id; 
+ 			//$( '#filters_1' ).css( 'display', 'none' );
+ 			//$( '#filters_2' ).css( 'display', 'block' );
+
  		}
  		return true;
  	}
