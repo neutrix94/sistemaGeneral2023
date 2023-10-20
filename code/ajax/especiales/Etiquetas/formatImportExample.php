@@ -1,7 +1,17 @@
 <?php
 	if( isset( $_GET['fl'] ) ){
 		include( '../../../../conexionMysqli.php' );
-		if( $_GET['fl'] == 'seekTransfer' ){
+		if( $_GET['fl'] == 'getPriceList' ){//nombre de lista de precios por sucursal
+			$sql = "SELECT
+						p.nombre AS price_name
+					FROM sys_sucursales s
+					LEFT JOIN ec_precios p
+					ON s.id_precio = p.id_precio
+					WHERE s.id_sucursal = {$_GET['store_id']}";
+			$stm = $link->query( $sql ) or die( "Error al consultar la lista de precios de la sucursal : {$sql} {$link->error}" );
+			$row = $stm->fetch_assoc();
+			die( "ok|{$row['price_name']}" );
+		}else if( $_GET['fl'] == 'seekTransfer' ){//busqueda por transferencias
 			$transfer = array();
 			$products = array();
 			$txt = trim( $_GET['txt'] );
