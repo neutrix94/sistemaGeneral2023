@@ -232,13 +232,13 @@ $numProd = count($arr);
 	$TermalPrinter = new TermalPrinter( $link );
 	switch( $template ){
 		case '1': 
-			$TermalPrinter->makeNormalTags($datos, $canProds, $arr2[1], $user_sucursal);
+			$TermalPrinter->makeNormalTags($datos, $canProds, $arr2[1], $user_sucursal, $arr2[0] );
 		break;
 		case '3': 
-			$TermalPrinter->makeSeveralTags($datos, $canProds, $arr2[1], $user_sucursal );
+			$TermalPrinter->makeSeveralTags($datos, $canProds, $arr2[1], $user_sucursal, $arr2[0] );
 		break;
 		case '4': 
-			$TermalPrinter->makeMoreThanOnePriceTags($datos, $canProds, $arr2[1], $user_sucursal);
+			$TermalPrinter->makeMoreThanOnePriceTags($datos, $canProds, $arr2[1], $user_sucursal, $arr2[0] );
 		break;
 		/*case '4': 
 			makeSeveralTags($datos, $canProds, $arr2[1], $user_sucursal);
@@ -255,45 +255,49 @@ $numProd = count($arr);
  			$this->link = $connection;
  		}
 
-	 	function makeNormalTags( $datos, $prods, $plantilla, $user_sucursal ) {
+	 	function makeNormalTags( $datos, $prods, $plantilla, $user_sucursal, $number ) {
 	 		//die( 'here' );
 	 		//var_dump( $datos['result']);
 	 		$epl_code = "";
 	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
-	 			$price_size = 4;
+	 			$position = $row['product_id'];
+	 			$tags_limit = $prods[$position];
+		 		for( $i = 1; $i <= $tags_limit; $i++ ){
+		 			$price_size = 4;
 
-				$row['tag_name'] = strtoupper( $row['tag_name'] );
-				$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
-				$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
-				$parts = $this->part_word( $row['tag_name'] );
-				$part_1 = $parts[0];
-				$part_2 = $parts[1];
-	 			
-	 			$epl_code .= "\nI8,A,001\n\n";
-				$epl_code .= "Q408,024\n";
-				$epl_code .= "q448\n";
-				$epl_code .= "rN\n";
-				$epl_code .= "S1\n";
-				$epl_code .= "D10\n";
-				$epl_code .= "ZT\n";
-				$epl_code .= "JF\n";
-				$epl_code .= "O\n";
-				$epl_code .= "R112,0\n";
-				$epl_code .= "f100\n";
-				$epl_code .= "N\n";
-//A590,280,2,4,4,4,N,"$"
-				$epl_code .= "A590,280,2,4,4,4,N,\"$\"\n";
-				if( $row['price'] > 999 ){
-					$price_size = 3;
-//A400,255,2,5,2,2,N,","
-					$epl_code .= "A400,255,2,5,2,2,N,\",\"\n";
+					$row['tag_name'] = strtoupper( $row['tag_name'] );
+					$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
+					$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
+					$parts = $this->part_word( $row['tag_name'] );
+					$part_1 = $parts[0];
+					$part_2 = $parts[1];
+		 			
+		 			$epl_code .= "\nI8,A,001\n\n";
+					$epl_code .= "Q408,024\n";
+					$epl_code .= "q448\n";
+					$epl_code .= "rN\n";
+					$epl_code .= "S1\n";
+					$epl_code .= "D10\n";
+					$epl_code .= "ZT\n";
+					$epl_code .= "JF\n";
+					$epl_code .= "O\n";
+					$epl_code .= "R112,0\n";
+					$epl_code .= "f100\n";
+					$epl_code .= "N\n";
+	//A590,280,2,4,4,4,N,"$"
+					$epl_code .= "A590,280,2,4,4,4,N,\"$\"\n";
+					if( $row['price'] > 999 ){
+						$price_size = 3;
+	//A400,255,2,5,2,2,N,","
+						$epl_code .= "A400,255,2,5,2,2,N,\",\"\n";
+					}
+					$epl_code .= "b500,290,Q,m2,s5,\"{$row['list_order']}\"\n";//QR
+					$epl_code .= "A486,380,2,5,{$price_size},4,N,\"{$row['price']}\"\n";
+					$epl_code .= "A612,150,2,3,2,3,N,\"{$part_1}\"\n";
+					$epl_code .= "A612,80,2,3,2,3,N,\"{$part_2}\"\n";
+					$epl_code .= "P{$number}\n";
+	 		//die( "Code" . $epl_code );
 				}
-				$epl_code .= "b500,290,Q,m2,s5,\"{$row['list_order']}\"\n";//QR
-				$epl_code .= "A486,380,2,5,{$price_size},4,N,\"{$row['price']}\"\n";
-				$epl_code .= "A612,150,2,3,2,3,N,\"{$part_1}\"\n";
-				$epl_code .= "A612,80,2,3,2,3,N,\"{$part_2}\"\n";
-				$epl_code .= "P1\n";
-	 		//die( "Code" . $epl_code );
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
 	 	//creacion de archivo
@@ -303,64 +307,59 @@ $numProd = count($arr);
 			die( 'ok' );
 	 	}
 
-	 	function makeSeveralTags( $datos, $prods, $plantilla, $store_id ) {
+	 	function makeSeveralTags( $datos, $prods, $plantilla, $store_id, $number ) {
 	 		//var_dump( $datos['result']);
 	 		$epl_code = "";
 	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
-	 		//consulta los diferentes precios
-				$sql = "SELECT 
-							CONCAT( pd.de_valor, 'x', ROUND(pd.precio_venta * pd.de_valor )) as price
-						FROM sys_sucursales_producto sp
-						JOIN sys_sucursales s 
-						ON s.id_sucursal=sp.id_sucursal
-						JOIN ec_precios pr 
-						ON s.id_precio = pr.id_precio
-						JOIN ec_precios_detalle pd 
-						ON sp.id_producto = pd.id_producto
-						AND pd.id_precio = pr.id_precio
-						WHERE sp.id_producto = {$row['product_id']}
-						AND sp.id_sucursal = {$store_id} 
-						AND sp.estado_suc=1";
-				$stm = $this->link->query( $sql ) or die( "Error al consultar los precios del producto : {$this->link->error}" );
-	 			$price_size = 4;
-				$row['tag_name'] = strtoupper( $row['tag_name'] );
-				$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
-				$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
-				$parts = $this->part_word( $row['tag_name'] );
-				$part_1 = $parts[0];
-				$part_2 = $parts[1];
+	 			$position = $row['product_id'];
+	 			$tags_limit = $prods[$position];
+		 		for( $i = 1; $i <= $tags_limit; $i++ ){
+		 		//consulta los diferentes precios
+					$sql = "SELECT 
+								CONCAT( pd.de_valor, 'x', ROUND(pd.precio_venta * pd.de_valor )) as price
+							FROM sys_sucursales_producto sp
+							JOIN sys_sucursales s 
+							ON s.id_sucursal=sp.id_sucursal
+							JOIN ec_precios pr 
+							ON s.id_precio = pr.id_precio
+							JOIN ec_precios_detalle pd 
+							ON sp.id_producto = pd.id_producto
+							AND pd.id_precio = pr.id_precio
+							WHERE sp.id_producto = {$row['product_id']}
+							AND sp.id_sucursal = {$store_id} 
+							AND sp.estado_suc=1";
+					$stm = $this->link->query( $sql ) or die( "Error al consultar los precios del producto : {$this->link->error}" );
+		 			$price_size = 4;
+					$row['tag_name'] = strtoupper( $row['tag_name'] );
+					$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
+					$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
+					$parts = $this->part_word( $row['tag_name'] );
+					$part_1 = $parts[0];
+					$part_2 = $parts[1];
 
-				$epl_code .= "\nI8,A,001\n\n";
-				$epl_code .= "Q408,024\n";
-				$epl_code .= "q448\n";
-				$epl_code .= "rN\n";
-				$epl_code .= "S1\n";
-				$epl_code .= "D10\n";
-				$epl_code .= "ZT\n";
-				$epl_code .= "JF\n";
-				$epl_code .= "O\n";
-				$epl_code .= "R112,0\n";
-				$epl_code .= "f100\n";
-				$epl_code .= "N\n";
-/*
-
-"1x22"
-"6x120"
-,"12x216"
-,"88888888888888888888888"
-,"ROJO M21124R (27093)888"
-
-*/
-				$price = $stm->fetch_assoc();
-				$epl_code .= "A610,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 1
-				$price = $stm->fetch_assoc();
-				$epl_code .= "A490,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 2
-				$price = $stm->fetch_assoc();
-				$epl_code .= "A370,10,1,4,5,4,N,\"{$price['price']}\"\n";//precio 3
-				$epl_code .= "A250,20,1,4,2,1,N,\"{$parts[0]}\"\n";
-				$epl_code .= "A200,20,1,4,2,1,N,\"{$parts[1]}\"\n";
-				$epl_code .= "b40,150,Q,m2,s5,\"{$row['list_order']}\"\n";			
-				$epl_code .= "P1\n";
+					$epl_code .= "\nI8,A,001\n\n";
+					$epl_code .= "Q408,024\n";
+					$epl_code .= "q448\n";
+					$epl_code .= "rN\n";
+					$epl_code .= "S1\n";
+					$epl_code .= "D10\n";
+					$epl_code .= "ZT\n";
+					$epl_code .= "JF\n";
+					$epl_code .= "O\n";
+					$epl_code .= "R112,0\n";
+					$epl_code .= "f100\n";
+					$epl_code .= "N\n";
+					$price = $stm->fetch_assoc();
+					$epl_code .= "A610,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 1
+					$price = $stm->fetch_assoc();
+					$epl_code .= "A490,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 2
+					$price = $stm->fetch_assoc();
+					$epl_code .= "A370,10,1,4,5,4,N,\"{$price['price']}\"\n";//precio 3
+					$epl_code .= "A250,20,1,4,2,1,N,\"{$parts[0]}\"\n";
+					$epl_code .= "A200,20,1,4,2,1,N,\"{$parts[1]}\"\n";
+					$epl_code .= "b40,150,Q,m2,s5,\"{$row['list_order']}\"\n";			
+					$epl_code .= "P{$number}\n";
+				}
 	 		//die( "Code" . $epl_code );
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
@@ -371,34 +370,38 @@ $numProd = count($arr);
 			die( 'ok' );
 	 	}
 
-	 	function makeMoreThanOnePriceTags( $datos, $prods, $plantilla, $store_id ) {
+	 	function makeMoreThanOnePriceTags( $datos, $prods, $plantilla, $store_id, $number ) {
 	 		//die( 'here' );
 	 		//var_dump( $datos['result']);
 	 		$epl_code = "";
 	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
-	 			$price_size = 4;
-				$row['tag_name'] = strtoupper( $row['tag_name'] );
-				$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
-				$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
-				$parts = $this->part_word( $row['tag_name'] );
-				$part_1 = $parts[0];
-				$part_2 = $parts[1];
-				$epl_code .= "\nI8,A,001\n\n";
-				$epl_code .= "Q408,024\n";
-				$epl_code .= "q448\n";
-				$epl_code .= "rN\n";
-				$epl_code .= "S1\n";
-				$epl_code .= "D10\n";
-				$epl_code .= "ZT\n";
-				$epl_code .= "JF\n";
-				$epl_code .= "O\n";
-				$epl_code .= "R112,0\n";
-				$epl_code .= "f100\n";
-				$epl_code .= "N\n";
-				$epl_code .= "A600,380,2,5,3,4,N,\"{$row['price']}\"\n";//precio
-				$epl_code .= "A615,150,2,3,2,3,N,\"{$parts[0]}\"\n";
-				$epl_code .= "A615,80,2,3,2,3,N,\"{$parts[1]}\"\n";			
-				$epl_code .= "P1\n";
+	 			$position = $row['product_id'];
+	 			$tags_limit = $prods[$position];
+		 		for( $i = 1; $i <= $tags_limit; $i++ ){
+		 			$price_size = 4;
+					$row['tag_name'] = strtoupper( $row['tag_name'] );
+					$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
+					$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
+					$parts = $this->part_word( $row['tag_name'] );
+					$part_1 = $parts[0];
+					$part_2 = $parts[1];
+					$epl_code .= "\nI8,A,001\n\n";
+					$epl_code .= "Q408,024\n";
+					$epl_code .= "q448\n";
+					$epl_code .= "rN\n";
+					$epl_code .= "S1\n";
+					$epl_code .= "D10\n";
+					$epl_code .= "ZT\n";
+					$epl_code .= "JF\n";
+					$epl_code .= "O\n";
+					$epl_code .= "R112,0\n";
+					$epl_code .= "f100\n";
+					$epl_code .= "N\n";
+					$epl_code .= "A600,380,2,5,3,4,N,\"{$row['price']}\"\n";//precio
+					$epl_code .= "A615,150,2,3,2,3,N,\"{$parts[0]}\"\n";
+					$epl_code .= "A615,80,2,3,2,3,N,\"{$parts[1]}\"\n";			
+					$epl_code .= "P{$number}\n";
+				}
 	 		//die( "Code" . $epl_code );
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
