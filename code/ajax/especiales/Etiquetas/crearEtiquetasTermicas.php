@@ -7,6 +7,11 @@ extract($_GET);
 extract($_POST);
 $numProd = 0;
 $numProd = count($arr);
+
+$store_id = $user_sucursal;
+if( isset( $_POST['store_id'] ) ){
+	$store_id = $_POST['store_id'];
+}
 //recibimos variable $ofert
 //------------ CONSULTA BASE  (Se anidan para sacar de lista de precios interna, externa Oscar 15.08.2018)-------------//
 	if($arr2[1] == 4 || $arr2[1] == 5){
@@ -38,7 +43,7 @@ $numProd = count($arr);
 					sp.es_externo,
 					pd.es_oferta
 					FROM ec_productos p
-					JOIN sys_sucursales_producto sp ON sp.id_producto=p.id_productos AND sp.id_sucursal=$user_sucursal AND sp.estado_suc=1
+					JOIN sys_sucursales_producto sp ON sp.id_producto=p.id_productos AND sp.id_sucursal=$stores_id AND sp.estado_suc=1
 					JOIN sys_sucursales s ON s.id_sucursal=sp.id_sucursal
 					JOIN ec_precios pr ON s.id_precio = pr.id_precio
 					JOIN ec_precios_detalle pd ON p.id_productos = pd.id_producto AND pd.de_valor > 1 AND pd.id_precio = pr.id_precio/*".$ofert."*/
@@ -69,8 +74,8 @@ $numProd = count($arr);
 						sp.es_externo,
 						pd.es_oferta 
 					FROM ec_productos p
-					JOIN sys_sucursales_producto sp ON sp.id_producto=p.id_productos AND sp.id_sucursal=$user_sucursal AND sp.estado_suc=1
-					JOIN sys_sucursales s ON sp.id_sucursal=s.id_sucursal AND s.id_sucursal IN($user_sucursal)
+					JOIN sys_sucursales_producto sp ON sp.id_producto=p.id_productos AND sp.id_sucursal=$store_id AND sp.estado_suc=1
+					JOIN sys_sucursales s ON sp.id_sucursal=s.id_sucursal AND s.id_sucursal IN($store_id)
 					JOIN ec_precios pr ON s.id_precio = pr.id_precio
 					JOIN ec_precios_detalle pd ON p.id_productos = pd.id_producto AND pd.de_valor=1/*no quitar este porque si no muestra todos los precios Oscar 24.10.2018*/ 
 					AND pd.id_precio = pr.id_precio /*".$ofert."*/
@@ -113,29 +118,37 @@ $numProd = count($arr);
 //si es desde productos capturados manuelamente
 	if($numProd > 0){
 		if($arr[0] != null){
-	    for($i=0;$i<$numProd;$i++){
-			if(isset($canProds[$arr[$i]]))
-				$canProds[$arr[$i]]++;
-			else
-				$canProds[$arr[$i]]=1;	
-		
-				if($fil[0] != (-1) || $fil[1] !=(-1) || $fil[2] != 0|| $fil[3] != 0 && $fil[4] != 0)
+			if($fil[0] != (-1) || $fil[1] !=(-1) || $fil[2] != 0|| $fil[3] != 0 && $fil[4] != 0)
+				{
+					$query .= " AND (";
+				}else{
+					$query .= " 1 AND (";
+				}
+		    for($i=0;$i<$numProd;$i++){
+				if(isset($canProds[$arr[$i]])){
+					$canProds[$arr[$i]]++;
+				}
+				else{
+					$canProds[$arr[$i]]=1;	
+				}
+			
+				/*if($fil[0] != (-1) || $fil[1] !=(-1) || $fil[2] != 0|| $fil[3] != 0 && $fil[4] != 0)
 				{
 					 $query .= " OR p.id_productos ='$arr[$i]'";
 				}
-				else{	
+				else{*/	
 					if($i==0){
 						$query .= " p.id_productos ='$arr[$i]'";
 					}else{
 						$query .= " OR p.id_productos ='$arr[$i]'";
 					}
-				} 
-		}//fin de for $i	
+				//} 
+			}//fin de for $i	
 		}
 	}
 /*implementación Oscar 15.08.2018 para obtener precios externos*/
-	$query.=")ax LEFT JOIN sys_sucursales_producto sp_1 ON ax.id_productos=sp_1.id_producto AND sp_1.id_sucursal=$user_sucursal AND sp_1.estado_suc=1
-					LEFT JOIN sys_sucursales s_1 ON sp_1.id_sucursal=s_1.id_sucursal AND s_1.id_sucursal IN($user_sucursal)
+	$query.=") )ax LEFT JOIN sys_sucursales_producto sp_1 ON ax.id_productos=sp_1.id_producto AND sp_1.id_sucursal=$store_id AND sp_1.estado_suc=1
+					LEFT JOIN sys_sucursales s_1 ON sp_1.id_sucursal=s_1.id_sucursal AND s_1.id_sucursal IN($store_id)
 					LEFT JOIN ec_precios pr_1 ON s_1.lista_precios_externa = pr_1.id_precio
 					LEFT JOIN ec_precios_detalle pd_1 ON sp_1.id_producto=pd_1.id_producto"; 
 /*cambio de Oscar 24.10.2018*/
@@ -226,22 +239,20 @@ $numProd = count($arr);
 
 	//die( "HERE : " . $sql );
 	//print_r($datos);
-	//creaPdf($datos, $canProds, $arr2[1], $user_sucursal);
 	//die( "Pantilla : {$arr2[1]}" );
 	$template = $arr2[1];
 	$TermalPrinter = new TermalPrinter( $link );
 	switch( $template ){
 		case '1': 
-			$TermalPrinter->makeNormalTags($datos, $canProds, $arr2[1], $user_sucursal, $arr2[0] );
+			$TermalPrinter->makeNormalTags($datos, $canProds, $arr2[1], $store_id, $arr2[0] );
 		break;
 		case '3': 
-			$TermalPrinter->makeSeveralTags($datos, $canProds, $arr2[1], $user_sucursal, $arr2[0] );
+			$TermalPrinter->makeSeveralTags($datos, $canProds, $arr2[1], $store_id, $arr2[0] );
 		break;
 		case '4': 
-			$TermalPrinter->makeMoreThanOnePriceTags($datos, $canProds, $arr2[1], $user_sucursal, $arr2[0] );
+			$TermalPrinter->makeMoreThanOnePriceTags($datos, $canProds, $arr2[1], $store_id, $arr2[0] );
 		break;
 		/*case '4': 
-			makeSeveralTags($datos, $canProds, $arr2[1], $user_sucursal);
 		break;*/
 	}
 	//secho $query;
@@ -255,7 +266,7 @@ $numProd = count($arr);
  			$this->link = $connection;
  		}
 
-	 	function makeNormalTags( $datos, $prods, $plantilla, $user_sucursal, $number ) {
+	 	function makeNormalTags( $datos, $prods, $plantilla, $store_id, $number ) {
 	 		//die( 'here' );
 	 		//var_dump( $datos['result']);
 	 		$epl_code = "";
@@ -327,6 +338,7 @@ $numProd = count($arr);
 							AND pd.id_precio = pr.id_precio
 							WHERE sp.id_producto = {$row['product_id']}
 							AND sp.id_sucursal = {$store_id} 
+							AND s.id_sucursal = {$store_id} 
 							AND sp.estado_suc=1";
 					$stm = $this->link->query( $sql ) or die( "Error al consultar los precios del producto : {$this->link->error}" );
 		 			$price_size = 4;
