@@ -88,6 +88,20 @@
 		</div>
 	</div>	
 <!-- Fin de cambio Oscar 2023/10/18 -->
+	<div class="row" style="padding : 10px;">
+		<h2>Busqueda por transferencia : </h2>
+		<div class="col-6">
+			<div class="input-group">
+				<input type="text" class="form-control" onclick="seekTransfer(event);">
+				<button
+					type="button"
+					class="btn btn-warning" onclick="seekTransfer('intro');"
+				>
+					<i class="icon-search"></i>
+				</button>
+			</div>
+		</div>
+	</div>
 	<div class="row" style="padding : 20px !important;">
 		<div id='buscador' class="col-lg-9" >
 			<h2>Producto:</h2>
@@ -433,7 +447,9 @@ var rows_counter = 0;
         if( $('#ticket_plantilla').val() == 6 ){
         	url= "../../../code/ajax/especiales/Etiquetas/etiquetasSinPrecios.php"; 
         }
-        //alert( url );return '';
+        console.log( e );
+        console.log( e2 );
+        console.log( filtros );
         $.post(
          	url,
          	{
@@ -543,6 +559,28 @@ var ventana_abierta = null;
  	function close_emergent(){
  		$( '.emergent_content' ).html( '' );
  		$( '.emergent' ).css( 'display', 'none' );
+ 	}
+
+ 	function seekTransfer( e ){
+ 		if( e.keyCode != 13 && e != 'intro'  ){
+ 			return false;
+ 		}
+ 		var txt = $( '#transferSeeker' ).val();
+ 		var url = "formatImportExample.phpfl=seekTransfer&txt=" + txt;
+ 		var resp = ajaxR( url ).split( '|' );
+ 		if( resp[0] != 'ok' ){
+ 			alert( resp );
+ 			return false;
+ 		}else{
+ 			$('#proLi').empty();//limpia los resultados de una consulta anterior
+ 			var data = JSON.parse( resp[1] );
+ 			for( var pos in data ){
+ 				for( var i = 1; i <= data[pos].quantity; i++  ){
+ 					agregarListado( data[pos].product_id, data[pos].product_name );
+ 				}
+ 			}
+ 		}
+ 		return true;
  	}
  </script>
  <style>
