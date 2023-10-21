@@ -372,6 +372,9 @@ var rows_counter = 0;
         if( $('#ticket_plantilla').val() == 6 ){
         	url= "../../../code/ajax/especiales/Etiquetas/etiquetasSinPrecios.php"; 
         }
+        console.log( e );
+        console.log( e2 );
+        console.log( filtros );
         $.post(
          	url,
          	{
