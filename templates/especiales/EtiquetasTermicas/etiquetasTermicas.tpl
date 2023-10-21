@@ -13,6 +13,7 @@
 	<div class="emergent_content"></div>
 </div>
 
+<input type="hidden" id="login_store_id" value="{$store_id}">
 <div id="campos">  
 <div id="titulo">1.3 Etiquetas</div>
 <br><br>
@@ -30,12 +31,24 @@
 		</div>
 	
 	
-		<div class="col-4">
+		<!--div class="col-4">
 			<label>&nbsp;Tipos:</label>
 			<select id="tip" class="form-select"  name='filtros' onclick="cambiaTP(this.value)">
 				{html_options values=$vals2 output=$textos2}
 			</select>
+		</div-->
+
+		<div class="col-8">
+			<label>&nbsp;Tipos:</label>
+			<div class="row" id="types_container">
+				{foreach from=$textos2 item=value}
+					<div class="col-4">
+						<input type="checkbox" checked><label style="margin-left : 10px;">{$value}</label>
+					</div>
+				{/foreach}
+			</div>
 		</div>
+
 		<!--div class="col-4">
 			<label>&nbsp;Subtipos:</label>
 			<select id="subtip" class="form-select"  name='filtros'>
@@ -102,7 +115,7 @@
 			</div>
 		</div>
 		<div class="col-4">
-			<select id="store_id" class="form-select" onchange="getPriceListByStore();" name='filtros'>
+			<select id="store_id" class="form-select" onchange="getPriceListByStore();" name='filtros' disabled>
 				{html_options values=$stores_ids output=$stores_names}
 			</select>
 		</div>
@@ -159,7 +172,7 @@
 	    		<option value="1">Plantilla normal</option>
 	    		<!-- option value="2">Colgantes</option-->
 	    		<option value="3">Varios precios ( picks )</option>
-	    		<option value="4">Precio oferta</option>
+	    		<option value="4">Precio 2 x tanto</option>
 	    		<!-- option value="5">Colgantes de oferta</option-->
 	    		<option value="6">Productos sin Precio</option>
 	    	</select></div>
@@ -273,6 +286,7 @@
 		var url="getSubCat.php?id_categoria="+val;
 		var res=ajaxR(url);
 		
+		//alert( res );
 		var aux=res.split('|');
 		if(aux[0] != 'exito')
 		{
@@ -280,24 +294,49 @@
 			return false;
 		}
 		
-		var obj=document.getElementById("tip");
-		obj.options.length=0;
+		//var obj=document.getElementById("tip");
+		//obj.options.length=0;
 		
-		obj.options[0] = new Option('----- Elige un tipo -----', -1);
+		//obj.options[0] = new Option('----- Elige un tipo -----', -1);
 		
+		$( '#types_container' ).html( '' );//limpia opciones anteriores
+		var content = `<div class="col-4">
+			<input type="checkbox" id="all_selected" onclick="change_all_types_checked();" checked>
+			<label style="margin-left : 10px;" >Todos</label>
+		</div>`;
 		for(i=1;i<aux.length;i++)
 		{
 			ax=aux[i].split('~');
-			obj.options[i] = new Option(ax[1], ax[0]);	
+			//obj.options[i] = new Option
+			//alert(ax[1] + ' _ ' + ax[0]);	
+			content += `<div class="col-4">
+				<input type="checkbox" value="${ax[0]}" checked><label style="margin-left : 10px;" >${ax[1]}</label>
+			</div>`;
 		}
-		
+		$( '#types_container' ).html( content );
+	}
+
+	function change_all_types_checked(){
+		if( $( '#all_selected' ).prop( 'checked' ) == true ){
+			$( '#types_container' ).children( 'div' ).each( function( index ){
+				$( this ).children( 'input' ).each( function( index2 ){
+					$( this ).prop( 'checked', 'true' );
+				});
+			});
+		}else{
+			$( '#types_container' ).children( 'div' ).each( function( index ){
+				$( this ).children( 'input' ).each( function( index2 ){
+					$( this ).removeAttr( 'checked' );
+				});
+			});
+		}
+
 	}
 
 function cambiaTP(val)
 	{
 		var url="getTipo.php?id_subcategoria="+val;
 		var res=ajaxR(url);
-		
 		var aux=res.split('|');
 		if(aux[0] != 'exito')
 		{
@@ -394,13 +433,33 @@ var is_special = 0;//indicador de importacion / transferencia
 			var e2         = [];
 			var filtros    = [];
 			var band = 0;
-
+			var typesFilter = -1;
+		if( $( '#all_selected' ).prop( 'checked' ) == true ){
+			typesFilter = -1;
+		}else{
+			typesFilter = '';
+			$( '#types_container' ).children( 'div' ).each( function( index ){
+				if( index > 0 ){
+					$( this ).children( 'input' ).each( function( index2 ){
+						if( $( this ).prop( 'checked' ) == true ){
+							typesFilter += ( typesFilter == '' ? '' : '___' );
+							typesFilter += $( this ).attr( 'value' );
+						}
+					});
+				}
+			});
+		}
+		//alert( typesFilter ); return '';
 
 		for(i=0;i<elementos2.length;i++){
         	e2.push(elementos2[i].value);
         }
         for(i=0;i<filtros1.length;i++){
-        	filtros.push(filtros1[i].value);
+        	if( i == 0 ){
+        		filtros.push(filtros1[i].value);
+        	}else{
+        		filtros.push(typesFilter);
+        	}
         }
 
 		if(elementos2[0].value == 0){
@@ -409,23 +468,21 @@ var is_special = 0;//indicador de importacion / transferencia
  			return false;
  		}
 	
- 		if(elementos2[1].value == (-1)){
+ 		if( elementos2[1].value == (-1) ){
  			alert('Elige una plantilla!!!');
  			elementos2[1].focus();
  			return false;
  		}
- 		//console.log(filtros[3]);
- 		if(filtros[2] > 0 )
- 		{
+	//console.log(filtros[3]);
+ 		if( filtros[2] > 0 ){
  			
  			band = 1;
  	    }
 
  		if(elementos.length > 0){
  			for(var i=0; i<elementos.length; i++) {
- 			e.push(elementos[i].value);
-
-          }
+ 				e.push(elementos[i].value);
+        	}
 
  		}else{
  			if(filtros[0]==(-1) && filtros [1] == (-1) && band == 0)
@@ -485,11 +542,12 @@ var is_special = 0;//indicador de importacion / transferencia
          		{
          			alert("Sin datos!!!\n");
          			alert(ax[0]);
-         			$("#listaProd").html(ax[1]);
+         			console.log( ax );
+         			//$("#listaProd").html(ax[1]);
          		}
          		if(ax[0] == 'ok')
          		{
-         			alert( "Etiquetas generadas exitosamente!" );
+         			alert( `Etiquetas generadas exitosamente!\n${ax[1]}\n${ax[2]}` );
          			//nuevaRuta = ax[1].substring(3,50);
          		    //window.open(nuevaRuta);
          		}	
@@ -629,8 +687,18 @@ var ventana_abierta = null;
  		}
  		$( '#price_name' ).val( resp[1] );
  	}
+
+ 	function setStoreId(){
+ 		var store_id = $( '#login_store_id' ).val();
+ 		$( '#store_id' ).val( store_id );
+ 	}
  </script>
- <style>
+
+<script>
+	setStoreId();
+</script>
+
+<style>
  	ul.filters {
 display: inline-flex;
 list-style: none;
@@ -789,6 +857,5 @@ label{
 }
 
 </style>
-
 {/literal}
 {include file="_footer.tpl" pagetitle="$contentheader"} 

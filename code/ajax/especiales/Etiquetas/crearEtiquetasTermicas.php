@@ -43,7 +43,7 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 					sp.es_externo,
 					pd.es_oferta
 					FROM ec_productos p
-					JOIN sys_sucursales_producto sp ON sp.id_producto=p.id_productos AND sp.id_sucursal=$stores_id AND sp.estado_suc=1
+					JOIN sys_sucursales_producto sp ON sp.id_producto=p.id_productos AND sp.id_sucursal=$store_id AND sp.estado_suc=1
 					JOIN sys_sucursales s ON s.id_sucursal=sp.id_sucursal
 					JOIN ec_precios pr ON s.id_precio = pr.id_precio
 					JOIN ec_precios_detalle pd ON p.id_productos = pd.id_producto AND pd.de_valor > 1 AND pd.id_precio = pr.id_precio/*".$ofert."*/
@@ -88,14 +88,17 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 	}
 //filtro de subcategoría
 	if($fil[1] != (-1)){
+		$fil[1] = str_replace( '___', ',', $fil[1] );
+		//die( "here {$fil[1]}" );
 			if($fil[0] != (-1)){
-				$query .= " AND p.id_subcategoria = '$fil[1]'";
+				$query .= " AND p.id_subcategoria IN( {$fil[1]} )";
 			}
 			else{
-				$query .= " p.id_subcategoria = '$fil[1]'";
+				$query .= " p.id_subcategoria IN( {$fil[1]} )";
 			}
 	}
-//filtro de subtipo
+/*deshabilitado por Oscar 2023/10/19
+filtro de subtipo 
 	if($fil[2] != (-1) && $fil[2] != 0 ){
 			if($fil[1] != (-1)){
 				$query .= " AND p.id_subtipo = '$fil[2]'";
@@ -103,7 +106,7 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 			else{
 				$query .= "p.id_subtipo = '$fil[2]'";
 			}		
-	}
+	}*/
 //filtro de rango de precios de venta
 	if($fil[3] != 0 && $fil[4] != 0){
 		if($fil[0] != (-1) || $fil[1] !=(-1) || $fil[2] != (-1)){
@@ -144,10 +147,14 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 					}
 				//} 
 			}//fin de for $i	
+			if( $fil[0] != (-1) || $fil[1] !=(-1) || $fil[2] != 0|| $fil[3] != 0 && $fil[4] != 0 ){
+				$query.=" )";
+			}
 		}
 	}
 /*implementación Oscar 15.08.2018 para obtener precios externos*/
-	$query.=") )ax LEFT JOIN sys_sucursales_producto sp_1 ON ax.id_productos=sp_1.id_producto AND sp_1.id_sucursal=$store_id AND sp_1.estado_suc=1
+	
+	$query.=" )ax LEFT JOIN sys_sucursales_producto sp_1 ON ax.id_productos=sp_1.id_producto AND sp_1.id_sucursal=$store_id AND sp_1.estado_suc=1
 					LEFT JOIN sys_sucursales s_1 ON sp_1.id_sucursal=s_1.id_sucursal AND s_1.id_sucursal IN($store_id)
 					LEFT JOIN ec_precios pr_1 ON s_1.lista_precios_externa = pr_1.id_precio
 					LEFT JOIN ec_precios_detalle pd_1 ON sp_1.id_producto=pd_1.id_producto"; 
@@ -158,7 +165,7 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 	}
 
 	$query.=" AND pd_1.id_precio = pr_1.id_precio
-					)ax1".$ofert;//.$oferta_anidada
+					)ax1 ".$ofert;//.$oferta_anidada
 	/*fin de cambio Oscar 15.08.2018*/
 /*fin de Cambio Oscar 15.08.2018*/
 
@@ -169,7 +176,7 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 	//print_r($canProds);
 	
 //die('ok|'.$query);		
-	$result = mysql_query($query) or die ('Productos: '.mysql_error());
+	$result = mysql_query($query) or die ( "Productos: {$query}" . mysql_error() );
 	$cant   = mysql_num_rows($result);
 	if($cant > 0){
     //echo $query;
@@ -266,15 +273,17 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
  			$this->link = $connection;
  		}
 
-	 	function makeNormalTags( $datos, $prods, $plantilla, $store_id, $number ) {
-	 		//die( 'here' );
+	 	function makeNormalTags( $datos, $prods, $plantilla, $store_id, $number = 1 ) {
+	 		//die( 'here : ' . $number );
 	 		//var_dump( $datos['result']);
 	 		$epl_code = "";
+	 		$products_counter = 0;
+	 		$tags_counter = 0;
 	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
 	 			$position = $row['product_id'];
-	 			$tags_limit = $prods[$position];
+	 			$tags_limit = ( $prods[$position] > 0 ? $prods[$position] : 1 );
 		 		for( $i = 1; $i <= $tags_limit; $i++ ){
-		 			$price_size = 4;
+					$price_size = 4;
 
 					$row['tag_name'] = strtoupper( $row['tag_name'] );
 					$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
@@ -307,23 +316,26 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 					$epl_code .= "A612,150,2,3,2,3,N,\"{$part_1}\"\n";
 					$epl_code .= "A612,80,2,3,2,3,N,\"{$part_2}\"\n";
 					$epl_code .= "P{$number}\n";
+
+	 				$tags_counter += $number;//contador etiquetas
 	 		//die( "Code" . $epl_code );
 				}
+	 			$products_counter ++;//contador productos
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
 	 	//creacion de archivo
 	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
 			fwrite($file, $epl_code );
 			fclose($file);
-			die( 'ok' );
+			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
 	 	}
 
-	 	function makeSeveralTags( $datos, $prods, $plantilla, $store_id, $number ) {
+	 	function makeSeveralTags( $datos, $prods, $plantilla, $store_id, $number = 1  ) {
 	 		//var_dump( $datos['result']);
 	 		$epl_code = "";
 	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
 	 			$position = $row['product_id'];
-	 			$tags_limit = $prods[$position];
+	 			$tags_limit = ( $prods[$position] > 0 ? $prods[$position] : 1 );
 		 		for( $i = 1; $i <= $tags_limit; $i++ ){
 		 		//consulta los diferentes precios
 					$sql = "SELECT 
@@ -371,7 +383,10 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 					$epl_code .= "A200,20,1,4,2,1,N,\"{$parts[1]}\"\n";
 					$epl_code .= "b40,150,Q,m2,s5,\"{$row['list_order']}\"\n";			
 					$epl_code .= "P{$number}\n";
+
+	 				$tags_counter += $number;//contador etiquetas
 				}
+	 			$products_counter ++;//contador productos
 	 		//die( "Code" . $epl_code );
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
@@ -379,16 +394,16 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
 			fwrite($file, $epl_code );
 			fclose($file);
-			die( 'ok' );
+			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
 	 	}
 
-	 	function makeMoreThanOnePriceTags( $datos, $prods, $plantilla, $store_id, $number ) {
+	 	function makeMoreThanOnePriceTags( $datos, $prods, $plantilla, $store_id, $number = 1 ) {
 	 		//die( 'here' );
 	 		//var_dump( $datos['result']);
 	 		$epl_code = "";
 	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
 	 			$position = $row['product_id'];
-	 			$tags_limit = $prods[$position];
+	 			$tags_limit = ( $prods[$position] > 0 ? $prods[$position] : 1 );
 		 		for( $i = 1; $i <= $tags_limit; $i++ ){
 		 			$price_size = 4;
 					$row['tag_name'] = strtoupper( $row['tag_name'] );
@@ -413,7 +428,10 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 					$epl_code .= "A615,150,2,3,2,3,N,\"{$parts[0]}\"\n";
 					$epl_code .= "A615,80,2,3,2,3,N,\"{$parts[1]}\"\n";			
 					$epl_code .= "P{$number}\n";
+
+	 				$tags_counter += $number;//contador etiquetas
 				}
+	 			$products_counter ++;//contador productos
 	 		//die( "Code" . $epl_code );
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
@@ -421,7 +439,7 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
 			fwrite($file, $epl_code );
 			fclose($file);
-			die( 'ok' );
+			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
 	 	}
 
 /*
