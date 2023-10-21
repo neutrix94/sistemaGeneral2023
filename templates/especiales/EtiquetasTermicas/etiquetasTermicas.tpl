@@ -13,6 +13,7 @@
 	<div class="emergent_content"></div>
 </div>
 
+<input type="hidden" id="login_store_id" value="{$store_id}">
 <div id="campos">  
 <div id="titulo">1.3 Etiquetas</div>
 <br><br>
@@ -20,7 +21,7 @@
 <div id="filtros" class="row" style="width:90% !important;">
 <div id='cosa2'>
 <form action="">
-	<div class="filters row">
+	<div class="filters row" id="filters_1">
 		<div class="col-3">
 				<label for="categoria">Familias:</label>
 				<select id="categoria" class="form-select" name='filtros' onchange="cambiaSC(this.value)">
@@ -30,18 +31,30 @@
 		</div>
 	
 	
-		<div class="col-4">
+		<!--div class="col-4">
 			<label>&nbsp;Tipos:</label>
 			<select id="tip" class="form-select"  name='filtros' onclick="cambiaTP(this.value)">
 				{html_options values=$vals2 output=$textos2}
 			</select>
+		</div-->
+
+		<div class="col-8">
+			<label>&nbsp;Tipos:</label>
+			<div class="row" id="types_container">
+				{foreach from=$textos2 item=value}
+					<div class="col-4">
+						<input type="checkbox" checked><label style="margin-left : 10px;">{$value}</label>
+					</div>
+				{/foreach}
+			</div>
 		</div>
-		<div class="col-4">
+
+		<!--div class="col-4">
 			<label>&nbsp;Subtipos:</label>
 			<select id="subtip" class="form-select"  name='filtros'>
 				{html_options values=$vals3 output=$textos3}
 			</select>
-		</div>
+		</div-->
 	</div>
 	<div id='pli'class="row">
 		<div class="col-4">
@@ -88,6 +101,29 @@
 		</div>
 	</div>	
 <!-- Fin de cambio Oscar 2023/10/18 -->
+	<div class="row" style="padding : 10px;">
+		<h2>Busqueda por transferencia : </h2>
+		<div class="col-4">
+			<div class="input-group">
+				<input type="text"  id="transfersSeeker" class="form-control" onclick="seekTransfer(event);">
+				<button
+					type="button"
+					class="btn btn-warning" onclick="seekTransfer('intro');"
+				>
+					<i class="icon-search"></i>
+				</button>
+			</div>
+		</div>
+		<div class="col-4">
+			<select id="store_id" class="form-select" onchange="getPriceListByStore();" name='filtros' disabled>
+				{html_options values=$stores_ids output=$stores_names}
+			</select>
+		</div>
+		<div class="col-4">
+			<input type="text" id="price_name" class="form-control" readonly>
+		</div>
+	</div>
+
 	<div class="row" style="padding : 20px !important;">
 		<div id='buscador' class="col-lg-9" >
 			<h2>Producto:</h2>
@@ -136,7 +172,7 @@
 	    		<option value="1">Plantilla normal</option>
 	    		<!-- option value="2">Colgantes</option-->
 	    		<option value="3">Varios precios ( picks )</option>
-	    		<option value="4">Precio oferta</option>
+	    		<option value="4">Precio 2 x tanto</option>
 	    		<!-- option value="5">Colgantes de oferta</option-->
 	    		<option value="6">Productos sin Precio</option>
 	    	</select></div>
@@ -235,6 +271,8 @@
 		setTimeout( function(){
 				$( '#csv_description' ).css( 'display', 'none' );
 				$( '#import_csv' ).addClass( 'hidden' );
+ 				//$( '#filters_1' ).css( 'display', 'none' );
+ 				//$( '#filters_2' ).css( 'display', 'block' );
 			}, 500 );
 	}
 
@@ -248,6 +286,7 @@
 		var url="getSubCat.php?id_categoria="+val;
 		var res=ajaxR(url);
 		
+		//alert( res );
 		var aux=res.split('|');
 		if(aux[0] != 'exito')
 		{
@@ -255,24 +294,49 @@
 			return false;
 		}
 		
-		var obj=document.getElementById("tip");
-		obj.options.length=0;
+		//var obj=document.getElementById("tip");
+		//obj.options.length=0;
 		
-		obj.options[0] = new Option('----- Elige un tipo -----', -1);
+		//obj.options[0] = new Option('----- Elige un tipo -----', -1);
 		
+		$( '#types_container' ).html( '' );//limpia opciones anteriores
+		var content = `<div class="col-4">
+			<input type="checkbox" id="all_selected" onclick="change_all_types_checked();" checked>
+			<label style="margin-left : 10px;" >Todos</label>
+		</div>`;
 		for(i=1;i<aux.length;i++)
 		{
 			ax=aux[i].split('~');
-			obj.options[i] = new Option(ax[1], ax[0]);	
+			//obj.options[i] = new Option
+			//alert(ax[1] + ' _ ' + ax[0]);	
+			content += `<div class="col-4">
+				<input type="checkbox" value="${ax[0]}" checked><label style="margin-left : 10px;" >${ax[1]}</label>
+			</div>`;
 		}
-		
+		$( '#types_container' ).html( content );
+	}
+
+	function change_all_types_checked(){
+		if( $( '#all_selected' ).prop( 'checked' ) == true ){
+			$( '#types_container' ).children( 'div' ).each( function( index ){
+				$( this ).children( 'input' ).each( function( index2 ){
+					$( this ).prop( 'checked', 'true' );
+				});
+			});
+		}else{
+			$( '#types_container' ).children( 'div' ).each( function( index ){
+				$( this ).children( 'input' ).each( function( index2 ){
+					$( this ).removeAttr( 'checked' );
+				});
+			});
+		}
+
 	}
 
 function cambiaTP(val)
 	{
 		var url="getTipo.php?id_subcategoria="+val;
 		var res=ajaxR(url);
-		
 		var aux=res.split('|');
 		if(aux[0] != 'exito')
 		{
@@ -359,7 +423,8 @@ var rows_counter = 0;
  		 rows_counter ++ ;
  		 $( '#products_counter' ).val( rows_counter );
  	}
-
+var is_special = 0;//indicador de importacion / transferencia
+//var transfer_store_id = 0;//indicador de importacion / transferencia
  	function getId(){
 			var elementos  = document.getElementsByName('pro');
 			var elementos2 = document.getElementsByName('parsTpl');
@@ -368,12 +433,33 @@ var rows_counter = 0;
 			var e2         = [];
 			var filtros    = [];
 			var band = 0;
+			var typesFilter = -1;
+		if( $( '#all_selected' ).prop( 'checked' ) == true ){
+			typesFilter = -1;
+		}else{
+			typesFilter = '';
+			$( '#types_container' ).children( 'div' ).each( function( index ){
+				if( index > 0 ){
+					$( this ).children( 'input' ).each( function( index2 ){
+						if( $( this ).prop( 'checked' ) == true ){
+							typesFilter += ( typesFilter == '' ? '' : '___' );
+							typesFilter += $( this ).attr( 'value' );
+						}
+					});
+				}
+			});
+		}
+		//alert( typesFilter ); return '';
 
 		for(i=0;i<elementos2.length;i++){
         	e2.push(elementos2[i].value);
         }
         for(i=0;i<filtros1.length;i++){
-        	filtros.push(filtros1[i].value);
+        	if( i == 0 ){
+        		filtros.push(filtros1[i].value);
+        	}else{
+        		filtros.push(typesFilter);
+        	}
         }
 
 		if(elementos2[0].value == 0){
@@ -382,23 +468,21 @@ var rows_counter = 0;
  			return false;
  		}
 	
- 		if(elementos2[1].value == (-1)){
+ 		if( elementos2[1].value == (-1) ){
  			alert('Elige una plantilla!!!');
  			elementos2[1].focus();
  			return false;
  		}
- 		//console.log(filtros[3]);
- 		if(filtros[2] > 0 )
- 		{
+	//console.log(filtros[3]);
+ 		if( filtros[2] > 0 ){
  			
  			band = 1;
  	    }
 
  		if(elementos.length > 0){
  			for(var i=0; i<elementos.length; i++) {
- 			e.push(elementos[i].value);
-
-          }
+ 				e.push(elementos[i].value);
+        	}
 
  		}else{
  			if(filtros[0]==(-1) && filtros [1] == (-1) && band == 0)
@@ -433,7 +517,14 @@ var rows_counter = 0;
         if( $('#ticket_plantilla').val() == 6 ){
         	url= "../../../code/ajax/especiales/Etiquetas/etiquetasSinPrecios.php"; 
         }
-        //alert( url );return '';
+    	if( $( '#store_id' ).val() == 0 || $( '#store_id' ).val() == '' ){
+    		alert( "Debes de elegir una sucursal para continuar!" );
+    		$( '#store_id' ).focus();
+    		return false;
+    	}
+/*        console.log( e );
+        console.log( e2 );
+        console.log( filtros );*/
         $.post(
          	url,
          	{
@@ -441,7 +532,8 @@ var rows_counter = 0;
          		'arr2[]':e2,
          		'fil[]' :filtros,
          		'ofert':oferta,/*implementado pr Oscar 2018 para filtrar productos con/sin oferta*/
-         		'paquete':es_pqte/*implementado pr Oscar 22.05.2018 para  indicar que se trata de impresión de paquetes*/
+         		'paquete':es_pqte,/*implementado pr Oscar 22.05.2018 para  indicar que se trata de impresión de paquetes*/
+         		'store_id' : $( '#store_id' ).val()
          	},
          	function(data){
  //alert(data);
@@ -450,11 +542,12 @@ var rows_counter = 0;
          		{
          			alert("Sin datos!!!\n");
          			alert(ax[0]);
-         			$("#listaProd").html(ax[1]);
+         			console.log( ax );
+         			//$("#listaProd").html(ax[1]);
          		}
          		if(ax[0] == 'ok')
          		{
-         			alert( "Etiquetas generadas exitosamente!" );
+         			alert( `Etiquetas generadas exitosamente!\n${ax[1]}\n${ax[2]}` );
          			//nuevaRuta = ax[1].substring(3,50);
          		    //window.open(nuevaRuta);
          		}	
@@ -544,8 +637,68 @@ var ventana_abierta = null;
  		$( '.emergent_content' ).html( '' );
  		$( '.emergent' ).css( 'display', 'none' );
  	}
+
+ 	function seekTransfer( e ){
+ 		if( e.keyCode != 13 && e != 'intro'  ){
+ 			return false;
+ 		}
+ 		var txt = $( '#transfersSeeker' ).val();
+ 		var url = "../../../code/ajax/especiales/Etiquetas/formatImportExample.php?fl=seekTransfer&txt=" + txt;
+ 		var resp = ajaxR( url ).split( '|' );
+ 		//alert( resp );
+ 		if( resp[0] != 'ok' ){
+ 			alert( resp );
+ 			return false;
+ 		}else{
+ 			var transfer = JSON.parse( resp[2] );
+ 			console.log( transfer );
+ 			$('#proLi').empty();//limpia los resultados de una consulta anterior
+ 			var data = JSON.parse( resp[1] );
+ 			console.log( data );
+ 			for( var pos in data ){
+ 				for( var i = 1; i <= data[pos].quantity; i++  ){
+ 				//alert(  data[pos].product_id +"-"+ data[pos].product_name );
+ 					agregarListado( data[pos].product_id, data[pos].product_name );
+ 				}
+ 			}
+ 			is_special = transfer.transfer_id;
+ 			transfer_store_id = transfer.destinity_store_id; 
+ 			$( '#store_id' ).val( transfer.destinity_store_id );
+ 			getPriceListByStore();
+ 			//alert( transfer.destinity_store_id );
+ 			//$( '#filters_1' ).css( 'display', 'none' );
+ 			//$( '#filters_2' ).css( 'display', 'block' );
+
+ 		}
+ 		return true;
+ 	}
+
+ 	function getPriceListByStore(){
+ 		var store_id = $( '#store_id' ).val();
+ 		if( store_id == '' ){
+ 			alert( "Debes de elegir una sucursal valida" );
+ 			$( '#store_id' ).focus();
+ 			return false;
+ 		}
+ 		var url = "../../../code/ajax/especiales/Etiquetas/formatImportExample.php?fl=getPriceList&store_id=" + store_id;
+ 		var resp = ajaxR( url ).split( '|' );
+ 		if( resp[0] != 'ok' ){
+ 			alert( "Error : " + resp );
+ 		}
+ 		$( '#price_name' ).val( resp[1] );
+ 	}
+
+ 	function setStoreId(){
+ 		var store_id = $( '#login_store_id' ).val();
+ 		$( '#store_id' ).val( store_id );
+ 	}
  </script>
- <style>
+
+<script>
+	setStoreId();
+</script>
+
+<style>
  	ul.filters {
 display: inline-flex;
 list-style: none;
@@ -704,6 +857,5 @@ label{
 }
 
 </style>
-
 {/literal}
 {include file="_footer.tpl" pagetitle="$contentheader"} 

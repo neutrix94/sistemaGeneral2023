@@ -33,7 +33,7 @@
 
 	$query = "SELECT 
 			DISTINCT(-1) AS id_subcategoria,
-			'----- Elige un tipo -----' AS nombre
+			'Todos' AS nombre
 			FROM ec_subcategoria";
 	$result  = mysql_query($query) or die('Categorias: '.mysql_error());
 	$vals2   = array();
@@ -64,7 +64,25 @@
 	mysql_free_result($result);
 	$smarty->assign('vals3',$vals3);
 	$smarty->assign('textos3',$textos3);
+//oscar 2023
+	$query = "SELECT 
+				id_sucursal,
+				nombre
+			FROM sys_sucursales WHERE id_sucursal > 0";
+	$result  = mysql_query($query) or die('sucursales: '.mysql_error());
+	$stores_ids   = array();
+	$stores_names = array();
+		array_push($stores_ids,0);
+		array_push($stores_names,'-- Elige una sucursal --');
+	while( $fila = mysql_fetch_row($result) ){	
+		array_push($stores_ids,$fila[0]);
+		array_push($stores_names,$fila[1]);
+	}
+	mysql_free_result($result);
+	$smarty->assign('stores_ids',$stores_ids);
+	$smarty->assign('stores_names',$stores_names);
 
+	$smarty->assign('store_id',$user_sucursal);//oscar 2023/10/20
 //			die( 'here' );
 	$smarty->display("especiales/EtiquetasTermicas/etiquetasTermicas.tpl");
 	
