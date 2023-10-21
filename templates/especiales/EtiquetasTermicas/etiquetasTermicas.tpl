@@ -43,7 +43,7 @@
 			<div class="row" id="types_container">
 				{foreach from=$textos2 item=value}
 					<div class="col-4">
-						<input type="checkbox" checked><label style="margin-left : 10px;">{$value}</label>
+						<input type="checkbox" id="all_selected" checked><label style="margin-left : 10px;">{$value}</label>
 					</div>
 				{/foreach}
 			</div>
@@ -170,10 +170,10 @@
 	    	<div><select name="parsTpl" class="form-select" id="ticket_plantilla">
 	    	    <option value="-1">---- Elige plantilla ----</option>
 	    		<option value="1">Plantilla normal</option>
-	    		<!-- option value="2">Colgantes</option-->
+	    		<option value="2">Colgantes</option>
 	    		<option value="3">Varios precios ( picks )</option>
 	    		<option value="4">Precio 2 x tanto</option>
-	    		<!-- option value="5">Colgantes de oferta</option-->
+	    		<option value="5">Colgantes de oferta</option>
 	    		<option value="6">Productos sin Precio</option>
 	    	</select></div>
 
@@ -310,7 +310,7 @@
 			//obj.options[i] = new Option
 			//alert(ax[1] + ' _ ' + ax[0]);	
 			content += `<div class="col-4">
-				<input type="checkbox" value="${ax[0]}" checked><label style="margin-left : 10px;" >${ax[1]}</label>
+				<input type="checkbox" value="${ax[0]}" onclick="check_if_all_is_checked();" checked><label style="margin-left : 10px;" >${ax[1]}</label>
 			</div>`;
 		}
 		$( '#types_container' ).html( content );
@@ -331,6 +331,25 @@
 			});
 		}
 
+	}
+
+	function check_if_all_is_checked(){
+		var all_checked = true;
+		$( '#types_container' ).children( 'div' ).each( function( index ){
+			if( index > 0 ){
+				$( this ).children( 'input' ).each( function( index2 ){
+					if( $( this ).prop( 'checked' ) == false ){
+						all_checked = false;
+						return false;
+					}
+				});
+			}
+		});
+		if( all_checked == false ){
+			$( '#all_selected' ).prop( 'checked', false );
+		}else{
+			$( '#all_selected' ).prop( 'checked', true );
+		}
 	}
 
 function cambiaTP(val)
@@ -506,7 +525,7 @@ var is_special = 0;//indicador de importacion / transferencia
         	oferta=" WHERE ax1.oferta=1";
         }
         //fin de cambio
-    //implemenatción para impresión de paquetes Oscar 22.05.2018
+    //implementación para impresión de paquetes Oscar 22.05.2018
     	var es_pqte=0;
     	if(document.getElementById('categoria').value==-2){
     		es_pqte=1;

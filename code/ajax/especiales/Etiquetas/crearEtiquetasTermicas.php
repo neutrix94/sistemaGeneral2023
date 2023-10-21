@@ -153,7 +153,9 @@ filtro de subtipo
 		}
 	}
 /*implementación Oscar 15.08.2018 para obtener precios externos*/
-	
+	if( $arr2[1] == 5 ){
+		$query.=" GROUP BY p.id_productos ";
+	}
 	$query.=" )ax LEFT JOIN sys_sucursales_producto sp_1 ON ax.id_productos=sp_1.id_producto AND sp_1.id_sucursal=$store_id AND sp_1.estado_suc=1
 					LEFT JOIN sys_sucursales s_1 ON sp_1.id_sucursal=s_1.id_sucursal AND s_1.id_sucursal IN($store_id)
 					LEFT JOIN ec_precios pr_1 ON s_1.lista_precios_externa = pr_1.id_precio
@@ -175,7 +177,8 @@ filtro de subtipo
 	//$query.=$ofert;
 	//print_r($canProds);
 	
-//die('ok|'.$query);		
+//die('ok|'.$query);	
+	$query = str_replace( 'WHERE  AND', 'WHERE 1 AND', $query );	
 	$result = mysql_query($query) or die ( "Productos: {$query}" . mysql_error() );
 	$cant   = mysql_num_rows($result);
 	if($cant > 0){
@@ -253,14 +256,18 @@ filtro de subtipo
 		case '1': 
 			$TermalPrinter->makeNormalTags($datos, $canProds, $arr2[1], $store_id, $arr2[0] );
 		break;
+		case '2':
+			$TermalPrinter->makeBigTags( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+		break;
 		case '3': 
-			$TermalPrinter->makeSeveralTags($datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+			$TermalPrinter->makeSeveralTags( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
 		break;
 		case '4': 
-			$TermalPrinter->makeMoreThanOnePriceTags($datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+			$TermalPrinter->makeMoreThanOnePriceTags( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
 		break;
-		/*case '4': 
-		break;*/
+		case '5':
+			$TermalPrinter->makeSeveralBigTags( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+		break;
 	}
 	//secho $query;
  }else{
@@ -333,6 +340,8 @@ filtro de subtipo
 	 	function makeSeveralTags( $datos, $prods, $plantilla, $store_id, $number = 1  ) {
 	 		//var_dump( $datos['result']);
 	 		$epl_code = "";
+	 		$products_counter = 0;
+	 		$tags_counter = 0;
 	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
 	 			$position = $row['product_id'];
 	 			$tags_limit = ( $prods[$position] > 0 ? $prods[$position] : 1 );
@@ -403,6 +412,8 @@ filtro de subtipo
 	 		//die( 'here' );
 	 		//var_dump( $datos['result']);
 	 		$epl_code = "";
+	 		$products_counter = 0;
+	 		$tags_counter = 0;
 	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
 	 			$position = $row['product_id'];
 	 			$tags_limit = ( $prods[$position] > 0 ? $prods[$position] : 1 );
@@ -435,6 +446,102 @@ filtro de subtipo
 				}
 	 			$products_counter ++;//contador productos
 	 		//die( "Code" . $epl_code );
+	 		}
+	 		$file_name = date("Y_m_d_H_i_s");
+	 	//creacion de archivo
+	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+			fwrite($file, $epl_code );
+			fclose($file);
+			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
+	 	}
+
+	 	function makeBigTags( $datos, $prods, $plantilla, $store_id, $number = 1 ){
+	 		$epl_code = "";
+	 		$products_counter = 0;
+	 		$tags_counter = 0;
+	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
+	 			$position = $row['product_id'];
+	 			$tags_limit = ( $prods[$position] > 0 ? $prods[$position] : 1 );
+		 		for( $i = 1; $i <= $tags_limit; $i++ ){
+		 			$price_size = 8;
+					$row['tag_name'] = strtoupper( $row['tag_name'] );
+					$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
+					$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
+					$parts = $this->part_word( $row['tag_name'] );
+					if( $row['price'] > 999 ){
+						$price_size = 7;
+					}
+
+					$epl_code .= "\nI8,A,001\n\n";
+					$epl_code .= "Q1215,024\n";
+					$epl_code .= "q863\n";
+					$epl_code .= "rN\n";
+					$epl_code .= "S6\n";
+					$epl_code .= "D10\n";
+					$epl_code .= "ZT\n";
+					$epl_code .= "JF\n";
+					$epl_code .= "O\n";
+					$epl_code .= "R24,0\n";
+					$epl_code .= "f100\n";
+					$epl_code .= "N\n";
+					$epl_code .= "A200,1200,3,5,4,4,N,\"$\"\n";
+					$epl_code .= "b20,1050,Q,m2,s8,\"{$row['list_order']}\"\n";
+					$epl_code .= "A50,1000,3,5,{$price_size},{$price_size},N,\"{$row['price']}\"\n";
+					$epl_code .= "A481,1200,3,1,6,6,N,\"{$parts[0]}\"\n";
+					$epl_code .= "A612,1200,3,1,6,6,N,\"$parts[1]\"\n";
+					$epl_code .= "P{$number}\n";
+
+		 			$tags_counter += $number;//contador etiquetas
+		 		}
+	 			$products_counter ++;//contador productos
+	 		}
+	 		$file_name = date("Y_m_d_H_i_s");
+	 	//creacion de archivo
+	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+			fwrite($file, $epl_code );
+			fclose($file);
+			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
+
+	 	}
+
+	 	function makeSeveralBigTags( $datos, $prods, $plantilla, $store_id, $number = 1 ){
+	 		$epl_code = "";
+	 		$products_counter = 0;
+	 		$tags_counter = 0;
+	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
+	 			$position = $row['product_id'];
+	 			$tags_limit = ( $prods[$position] > 0 ? $prods[$position] : 1 );
+		 		for( $i = 1; $i <= $tags_limit; $i++ ){
+		 			$price_size = 6;
+					$row['tag_name'] = strtoupper( $row['tag_name'] );
+					$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
+					$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
+					$parts = $this->part_word( $row['tag_name'] );
+					if( strlen( $row['price'] ) > 5 ){//$row['price'] > 999 || 
+					//die(  'here1|here1 : ' );
+						$price_size = 5;
+					}
+
+					$epl_code .= "\nI8,A,001\n";
+					$epl_code .= "Q1215,024\n";
+					$epl_code .= "q863\n";
+					$epl_code .= "rN\n";
+					$epl_code .= "S6\n";
+					$epl_code .= "D10\n";
+					$epl_code .= "ZT\n";
+					$epl_code .= "JF\n";
+					$epl_code .= "O\n";
+					$epl_code .= "R24,0\n";
+					$epl_code .= "f100\n";
+					$epl_code .= "N\n";
+					$epl_code .= "A120,1210,3,5,6,{$price_size},N,\"{$row['price']}\"\n";
+					$epl_code .= "A500,1210,3,1,6,6,N,\"{$parts[0]}\"\n";
+					$epl_code .= "A610,1210,3,1,6,6,N,\"{$parts[1]}\"\n";
+					$epl_code .= "P{$number}\n";
+
+		 			$tags_counter += $number;//contador etiquetas
+		 		}
+	 			$products_counter ++;//contador productos
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
 	 	//creacion de archivo
