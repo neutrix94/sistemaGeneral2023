@@ -353,38 +353,40 @@ filtro de subtipo
 							AND s.id_sucursal = {$store_id} 
 							AND sp.estado_suc=1";
 					$stm = $this->link->query( $sql ) or die( "Error al consultar los precios del producto : {$this->link->error}" );
-		 			$price_size = 4;
-					$row['tag_name'] = strtoupper( $row['tag_name'] );
-					$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
-					$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
-					$parts = $this->part_word( $row['tag_name'] );
-					$part_1 = $parts[0];
-					$part_2 = $parts[1];
+			 		if( $stm->num_rows >= 2 ){
+			 			$price_size = 4;
+						$row['tag_name'] = strtoupper( $row['tag_name'] );
+						$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
+						$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
+						$parts = $this->part_word( $row['tag_name'] );
+						$part_1 = $parts[0];
+						$part_2 = $parts[1];
 
-					$epl_code .= "\nI8,A,001\n\n";
-					$epl_code .= "Q408,024\n";
-					$epl_code .= "q448\n";
-					$epl_code .= "rN\n";
-					$epl_code .= "S1\n";
-					$epl_code .= "D10\n";
-					$epl_code .= "ZT\n";
-					$epl_code .= "JF\n";
-					$epl_code .= "O\n";
-					$epl_code .= "R112,0\n";
-					$epl_code .= "f100\n";
-					$epl_code .= "N\n";
-					$price = $stm->fetch_assoc();
-					$epl_code .= "A610,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 1
-					$price = $stm->fetch_assoc();
-					$epl_code .= "A490,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 2
-					$price = $stm->fetch_assoc();
-					$epl_code .= "A370,10,1,4,5,4,N,\"{$price['price']}\"\n";//precio 3
-					$epl_code .= "A250,20,1,4,2,1,N,\"{$parts[0]}\"\n";
-					$epl_code .= "A200,20,1,4,2,1,N,\"{$parts[1]}\"\n";
-					$epl_code .= "b40,150,Q,m2,s5,\"{$row['list_order']}\"\n";			
-					$epl_code .= "P{$number}\n";
+						$epl_code .= "\nI8,A,001\n\n";
+						$epl_code .= "Q408,024\n";
+						$epl_code .= "q448\n";
+						$epl_code .= "rN\n";
+						$epl_code .= "S1\n";
+						$epl_code .= "D10\n";
+						$epl_code .= "ZT\n";
+						$epl_code .= "JF\n";
+						$epl_code .= "O\n";
+						$epl_code .= "R112,0\n";
+						$epl_code .= "f100\n";
+						$epl_code .= "N\n";
+						$price = $stm->fetch_assoc();
+						$epl_code .= "A610,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 1
+						$price = $stm->fetch_assoc();
+						$epl_code .= "A490,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 2
+						$price = $stm->fetch_assoc();
+						$epl_code .= "A370,10,1,4,5,4,N,\"{$price['price']}\"\n";//precio 3
+						$epl_code .= "A250,20,1,4,2,1,N,\"{$parts[0]}\"\n";
+						$epl_code .= "A200,20,1,4,2,1,N,\"{$parts[1]}\"\n";
+						$epl_code .= "b40,150,Q,m2,s5,\"{$row['list_order']}\"\n";			
+						$epl_code .= "P{$number}\n";
 
-	 				$tags_counter += $number;//contador etiquetas
+		 				$tags_counter += $number;//contador etiquetas
+		 			}
 				}
 	 			$products_counter ++;//contador productos
 	 		//die( "Code" . $epl_code );
