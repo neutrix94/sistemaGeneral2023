@@ -487,8 +487,8 @@ filtro de subtipo
 					$epl_code .= "A200,1200,3,5,4,4,N,\"$\"\n";
 					$epl_code .= "b20,1050,Q,m2,s8,\"{$row['list_order']}\"\n";
 					$epl_code .= "A50,1000,3,5,{$price_size},{$price_size},N,\"{$row['price']}\"\n";
-					$epl_code .= "A481,1200,3,1,6,6,N,\"{$parts[0]}\"\n";
-					$epl_code .= "A612,1200,3,1,6,6,N,\"$parts[1]\"\n";
+					$epl_code .= "A481,1200,3,1,5,5,N,\"{$parts[0]}\"\n";
+					$epl_code .= "A612,1200,3,1,5,5,N,\"$parts[1]\"\n";
 					$epl_code .= "P{$number}\n";
 
 		 			$tags_counter += $number;//contador etiquetas
