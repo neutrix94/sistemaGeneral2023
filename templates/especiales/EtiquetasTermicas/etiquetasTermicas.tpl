@@ -173,10 +173,10 @@
 	    		<option value="2">Colgantes</option>
 	    		<option value="3">Varios precios ( picks )</option>
 	    		<option value="4">Precio 2 x tanto</option>
-	    		<option value="5">Colgantes de oferta</option>
+	    		<option value="5">Colgantes 2 x tanto</option>
 	    		<option value="6">Productos sin Precio</option>
 	    	</select></div>
-
+<!-- check ofertas -->
 	    	<div id="ofertas">
 		    	<span>
 		    		<b>Filtrar por:</b>
