@@ -139,7 +139,7 @@
 						p.id_productos,
 						p.orden_lista,
 						p.nombre,
-						p.clave,
+						REPLACE(p.clave, ',', '' ) AS clave,
 						SUM(tp.cantidad) AS cantidad
 					FROM ec_transferencia_productos tp
 					LEFT JOIN ec_transferencias t
@@ -163,7 +163,7 @@
 						p.id_productos,
 						p.orden_lista,
 						p.nombre,
-						p.clave,
+						REPLACE(p.clave, ',', '' ) AS clave,
 						pd.cantidad_producto
 					FROM ec_paquete_detalle pd
 					LEFT JOIN ec_paquetes pq
@@ -287,32 +287,32 @@
 			foreach ($not_in_pack as $key => $value) {
 				//echo 'here ';
 				$resp .= "<tr>
-					<td class=\"text-warning\">{$not_in_pack[$key]['id_productos']}</td>
-					<td class=\"text-warning\">{$not_in_pack[$key]['orden_lista']}</td>
-					<td class=\"text-warning\">{$not_in_pack[$key]['nombre']}</td>
-					<td class=\"text-warning\">{$not_in_pack[$key]['clave']}</td>
-					<td class=\"text-warning\">{$not_in_pack[$key]['cantidad']}</td>
-					<td class=\"text-warning\"></td>
-					<td class=\"text-warning\"></td>
-					<td class=\"text-warning\"></td>
-					<td class=\"text-warning\"></td>
-					<td class=\"text-warning\"></td>
+					<td class=\"text-primary\">{$not_in_pack[$key]['id_productos']}</td>
+					<td class=\"text-primary\">{$not_in_pack[$key]['orden_lista']}</td>
+					<td class=\"text-primary\">{$not_in_pack[$key]['nombre']}</td>
+					<td class=\"text-primary\">{$not_in_pack[$key]['clave']}</td>
+					<td class=\"text-primary\">{$not_in_pack[$key]['cantidad']}</td>
+					<td class=\"text-primary\"></td>
+					<td class=\"text-primary\"></td>
+					<td class=\"text-primary\"></td>
+					<td class=\"text-primary\"></td>
+					<td class=\"text-primary\"></td>
 				</tr>";
 			}
 		//	echo $resp;
 		//no estan en transferencias
 			foreach ($not_in_transfer as $key => $value) {
 				$resp .= "<tr>
-					<td class=\"text-secondary\"></td>
-					<td class=\"text-secondary\"></td>
-					<td class=\"text-secondary\"></td>
-					<td class=\"text-secondary\"></td>
-					<td class=\"text-secondary\"></td>
-					<td class=\"text-secondary\">{$not_in_transfer[$key]['id_productos']}</td>
-					<td class=\"text-secondary\">{$not_in_transfer[$key]['orden_lista']}</td>
-					<td class=\"text-secondary\">{$not_in_transfer[$key]['nombre']}</td>
-					<td class=\"text-secondary\">{$not_in_transfer[$key]['clave']}</td>
-					<td class=\"text-secondary\">{$not_in_transfer[$key]['cantidad_producto']}</td>
+					<td class=\"text-warning\"></td>
+					<td class=\"text-warning\"></td>
+					<td class=\"text-warning\"></td>
+					<td class=\"text-warning\"></td>
+					<td class=\"text-warning\"></td>
+					<td class=\"text-warning\">{$not_in_transfer[$key]['id_productos']}</td>
+					<td class=\"text-warning\">{$not_in_transfer[$key]['orden_lista']}</td>
+					<td class=\"text-warning\">{$not_in_transfer[$key]['nombre']}</td>
+					<td class=\"text-warning\">{$not_in_transfer[$key]['clave']}</td>
+					<td class=\"text-warning\">{$not_in_transfer[$key]['cantidad_producto']}</td>
 				</tr>";
 			}
 			//var_dump($correctly_rows);
@@ -320,7 +320,22 @@
 			/*var_dump($not_in_transfer);
 			var_dump($different_quantity);*/
 			$resp .= "</tbody>
-					</table>";
+					</table>
+
+			<div class="\row\">
+				<div class=\"col-3\">
+					<i class=\"icon-bookmark text-success\">Coincide</i>
+				</div>
+				<div class=\"col-3\">
+					<i class=\"icon-bookmark text-dager\">Diferencia en cantidad</i>
+				</div>
+				<div class=\"col-3\">
+					<i class=\"icon-bookmark text-primary\">No está en paquete</i>
+				</div>
+				<div class=\"col-3\">
+					<i class=\"icon-bookmark text-warning\">No está en Transferencia</i>
+				</div>
+			</div>";
 			die( $resp );
 		}
 	}
