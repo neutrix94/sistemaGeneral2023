@@ -133,6 +133,8 @@
 			$first_array = array();
 			$second_array = array();
 			$filter = explode('~', $filters[0] );
+			$store_filter = $filter[2];
+			$filter = explode('~', $filters[1] );
 			$sql = "SELECT
 						p.id_productos,
 						p.orden_lista,
@@ -146,6 +148,7 @@
 					ON p.id_productos = tp.id_producto_or
 					WHERE t.titulo_transferencia = '{$filter[2]}' 
 					OR t.folio = '{$filter[2]}'
+					AND t.id_sucursal_destino = {$store_filter}
 					GROUP BY tp.id_producto_or
 					ORDER BY p.orden_lista";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar la primera consulta de comparacion : {$this->link->error} : {$sql}" );
@@ -154,7 +157,7 @@
 			}
 			//echo $sql . "<br>";
 			
-			$filter = explode('~', $filters[1] );
+			$filter = explode('~', $filters[2] );
 			//var_dump( $filters );
 			$sql = "SELECT
 						p.id_productos,
@@ -167,7 +170,8 @@
 					ON pd.id_paquete = pq.id_paquete
 					LEFT JOIN ec_productos p
 					ON p.id_productos = pd.id_producto
-					WHERE pq.id_paquete = '{$filter[2]}'
+					WHERE pq.id_sucursal_creacion = {$store_filter}
+					AND pq.id_paquete = '{$filter[2]}'
 					OR pq.nombre = '{$filter[2]}'
 					GROUP BY pd.id_producto
 					ORDER BY p.orden_lista";
