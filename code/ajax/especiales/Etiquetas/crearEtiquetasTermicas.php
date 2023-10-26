@@ -156,7 +156,7 @@ filtro de subtipo
 	if( $arr2[1] == 5 ){
 		$query.=" GROUP BY p.id_productos ";
 	}
-	$query.=" )ax LEFT JOIN sys_sucursales_producto sp_1 ON ax.id_productos=sp_1.id_producto AND sp_1.id_sucursal=$store_id AND sp_1.estado_suc=1
+	$query.=" ORDER BY p.orden_lista ASC )ax LEFT JOIN sys_sucursales_producto sp_1 ON ax.id_productos=sp_1.id_producto AND sp_1.id_sucursal=$store_id AND sp_1.estado_suc=1
 					LEFT JOIN sys_sucursales s_1 ON sp_1.id_sucursal=s_1.id_sucursal AND s_1.id_sucursal IN($store_id)
 					LEFT JOIN ec_precios pr_1 ON s_1.lista_precios_externa = pr_1.id_precio
 					LEFT JOIN ec_precios_detalle pd_1 ON sp_1.id_producto=pd_1.id_producto"; 
@@ -177,8 +177,9 @@ filtro de subtipo
 	//$query.=$ofert;
 	//print_r($canProds);
 	
+	$query .= " ORDER BY ax1.orden_lista ASC";	
 //die('ok|'.$query);	
-	$query = str_replace( 'WHERE  AND', 'WHERE 1 AND', $query );	
+	$query = str_replace( 'WHERE  AND', 'WHERE 1 AND', $query );
 	$result = mysql_query($query) or die ( "Productos: {$query}" . mysql_error() );
 	$cant   = mysql_num_rows($result);
 	if($cant > 0){
