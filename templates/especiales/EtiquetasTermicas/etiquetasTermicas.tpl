@@ -175,6 +175,7 @@
 	    		<option value="4">Precio 2 x tanto</option>
 	    		<option value="5">Colgantes 2 x tanto</option>
 	    		<option value="6">Productos sin Precio</option>
+	    		<option value="7">Varios precios ( decoracion )</option>
 	    	</select></div>
 <!-- check ofertas -->
 	    	<div id="ofertas">

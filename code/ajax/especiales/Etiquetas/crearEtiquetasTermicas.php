@@ -268,6 +268,9 @@ filtro de subtipo
 		case '5':
 			$TermalPrinter->makeSeveralBigTags( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
 		break;
+		case '7':
+			$TermalPrinter->makeSeveralTagsMixed( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+		break;
 	}
 	//secho $query;
  }else{
@@ -542,6 +545,115 @@ filtro de subtipo
 		 			$tags_counter += $number;//contador etiquetas
 		 		}
 	 			$products_counter ++;//contador productos
+	 		}
+	 		$file_name = date("Y_m_d_H_i_s");
+	 	//creacion de archivo
+	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+			fwrite($file, $epl_code );
+			fclose($file);
+			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
+	 	}
+
+
+	 	function makeSeveralTagsMixed( $datos, $prods, $plantilla, $store_id, $number = 1  ) {
+	 		//var_dump( $datos['result']);
+	 		$epl_code = "";
+	 		$products_counter = 0;
+	 		$tags_counter = 0;
+	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
+	 			$position = $row['product_id'];
+	 			$tags_limit = ( $prods[$position] > 0 ? $prods[$position] : 1 );
+		 		for( $i = 1; $i <= $tags_limit; $i++ ){
+		 		//consulta los diferentes precios
+					$sql = "SELECT 
+								CONCAT( pd.de_valor, 'x', ROUND(pd.precio_venta * pd.de_valor )) as price
+							FROM sys_sucursales_producto sp
+							JOIN sys_sucursales s 
+							ON s.id_sucursal=sp.id_sucursal
+							JOIN ec_precios pr 
+							ON s.id_precio = pr.id_precio
+							JOIN ec_precios_detalle pd 
+							ON sp.id_producto = pd.id_producto
+							AND pd.id_precio = pr.id_precio
+							WHERE sp.id_producto = {$row['product_id']}
+							AND sp.id_sucursal = {$store_id} 
+							AND s.id_sucursal = {$store_id} 
+							AND sp.estado_suc=1";
+					$stm = $this->link->query( $sql ) or die( "Error al consultar los precios del producto : {$this->link->error}" );
+			 		if( $stm->num_rows >= 2 ){
+			 			$price_size = 4;
+						$row['tag_name'] = strtoupper( $row['tag_name'] );
+						$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
+						$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
+						$parts = $this->part_word( $row['tag_name'] );
+						$part_1 = $parts[0];
+						$part_2 = $parts[1];
+
+						$epl_code .= "\nI8,A,001\n\n";
+						$epl_code .= "Q408,024\n";
+						$epl_code .= "q448\n";
+						$epl_code .= "rN\n";
+						$epl_code .= "S1\n";
+						$epl_code .= "D10\n";
+						$epl_code .= "ZT\n";
+						$epl_code .= "JF\n";
+						$epl_code .= "O\n";
+						$epl_code .= "R112,0\n";
+						$epl_code .= "f100\n";
+						$epl_code .= "N\n";
+						$price = $stm->fetch_assoc();
+						$epl_code .= "A610,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 1
+						$price = $stm->fetch_assoc();
+						$epl_code .= "A490,10,1,4,5,5,N,\"{$price['price']}\"\n";//precio 2
+						$price = $stm->fetch_assoc();
+						$epl_code .= "A370,10,1,4,5,4,N,\"{$price['price']}\"\n";//precio 3
+						$epl_code .= "A250,20,1,4,2,1,N,\"{$parts[0]}\"\n";
+						$epl_code .= "A200,20,1,4,2,1,N,\"{$parts[1]}\"\n";
+						$epl_code .= "b40,150,Q,m2,s5,\"{$row['list_order']}\"\n";			
+						$epl_code .= "P{$number}\n";
+
+		 				$tags_counter += $number;//contador etiquetas
+		 			}else{
+
+						$price_size = 4;
+
+						$row['tag_name'] = strtoupper( $row['tag_name'] );
+						$row['tag_name'] = str_replace( "Ñ", "N", $row['tag_name'] );
+						$row['tag_name'] = str_replace( "ñ", "n", $row['tag_name'] );
+						$parts = $this->part_word( $row['tag_name'] );
+						$part_1 = $parts[0];
+						$part_2 = $parts[1];
+			 			
+			 			$epl_code .= "\nI8,A,001\n\n";
+						$epl_code .= "Q408,024\n";
+						$epl_code .= "q448\n";
+						$epl_code .= "rN\n";
+						$epl_code .= "S1\n";
+						$epl_code .= "D10\n";
+						$epl_code .= "ZT\n";
+						$epl_code .= "JF\n";
+						$epl_code .= "O\n";
+						$epl_code .= "R112,0\n";
+						$epl_code .= "f100\n";
+						$epl_code .= "N\n";
+		//A590,280,2,4,4,4,N,"$"
+						$epl_code .= "A590,280,2,4,4,4,N,\"$\"\n";
+						if( $row['price'] > 999 ){
+							$price_size = 3;
+		//A400,255,2,5,2,2,N,","
+							$epl_code .= "A400,255,2,5,2,2,N,\",\"\n";
+						}
+						$epl_code .= "b500,290,Q,m2,s5,\"{$row['list_order']}\"\n";//QR
+						$epl_code .= "A486,380,2,5,{$price_size},4,N,\"{$row['price']}\"\n";
+						$epl_code .= "A612,150,2,3,2,3,N,\"{$part_1}\"\n";
+						$epl_code .= "A612,80,2,3,2,3,N,\"{$part_2}\"\n";
+						$epl_code .= "P{$number}\n";
+
+	 					$tags_counter += $number;//contador etiquetas
+		 			}
+				}
+	 			$products_counter ++;//contador productos
+	 		//die( "Code" . $epl_code );
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
 	 	//creacion de archivo
