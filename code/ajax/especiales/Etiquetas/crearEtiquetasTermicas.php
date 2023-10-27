@@ -308,7 +308,7 @@ filtro de subtipo
 					$epl_code .= "q448\n";
 					$epl_code .= "rN\n";
 					$epl_code .= "S1\n";
-					$epl_code .= "D10\n";
+					$epl_code .= "D7\n";
 					$epl_code .= "ZT\n";
 					$epl_code .= "JF\n";
 					$epl_code .= "O\n";
@@ -380,7 +380,7 @@ filtro de subtipo
 						$epl_code .= "q448\n";
 						$epl_code .= "rN\n";
 						$epl_code .= "S1\n";
-						$epl_code .= "D10\n";
+						$epl_code .= "D7\n";
 						$epl_code .= "ZT\n";
 						$epl_code .= "JF\n";
 						$epl_code .= "O\n";
@@ -434,7 +434,7 @@ filtro de subtipo
 					$epl_code .= "q448\n";
 					$epl_code .= "rN\n";
 					$epl_code .= "S1\n";
-					$epl_code .= "D10\n";
+					$epl_code .= "D7\n";
 					$epl_code .= "ZT\n";
 					$epl_code .= "JF\n";
 					$epl_code .= "O\n";
@@ -481,7 +481,7 @@ filtro de subtipo
 					$epl_code .= "q863\n";
 					$epl_code .= "rN\n";
 					$epl_code .= "S6\n";
-					$epl_code .= "D10\n";
+					$epl_code .= "D7\n";
 					$epl_code .= "ZT\n";
 					$epl_code .= "JF\n";
 					$epl_code .= "O\n";
@@ -531,7 +531,7 @@ filtro de subtipo
 					$epl_code .= "q863\n";
 					$epl_code .= "rN\n";
 					$epl_code .= "S6\n";
-					$epl_code .= "D10\n";
+					$epl_code .= "D7\n";
 					$epl_code .= "ZT\n";
 					$epl_code .= "JF\n";
 					$epl_code .= "O\n";
@@ -595,7 +595,7 @@ filtro de subtipo
 						$epl_code .= "q448\n";
 						$epl_code .= "rN\n";
 						$epl_code .= "S1\n";
-						$epl_code .= "D10\n";
+						$epl_code .= "D7\n";
 						$epl_code .= "ZT\n";
 						$epl_code .= "JF\n";
 						$epl_code .= "O\n";
@@ -630,7 +630,7 @@ filtro de subtipo
 						$epl_code .= "q448\n";
 						$epl_code .= "rN\n";
 						$epl_code .= "S1\n";
-						$epl_code .= "D10\n";
+						$epl_code .= "D7\n";
 						$epl_code .= "ZT\n";
 						$epl_code .= "JF\n";
 						$epl_code .= "O\n";
@@ -672,7 +672,7 @@ Q408,024
 q448
 rN
 S1
-D10
+D7
 ZT
 JF
 O
