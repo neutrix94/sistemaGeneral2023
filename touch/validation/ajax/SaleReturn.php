@@ -512,27 +512,30 @@
 			        LEFT JOIN ec_pedido_pagos pp ON pp.id_pedido=ax.id_pedido
 			        WHERE pp.id_pedido = {$this->sale_id}";
 			// die($sql);
-			    $eje = $this->link->query($sql) or die("Error al insertar el pago de la devolución 2 : {$this->link->error} ");
+			    $eje = $this->link->query($sql) or die("Error al consultar pago de la devolución 2 : {$this->link->error} ");
 			    
 			    $datos_1 = $eje->fetch_row();
 			//insertamos las devoluciones completas
 			    //externa
 			    if($datos_1[0]>0){
-			        $sql = "INSERT INTO ec_devolucion_pagos (id_devolucion_pago,id_devolucion,id_tipo_pago,monto,referencia,es_externo,fecha,hora,id_cajero, id_sesion_caja )
+			        /*$sql = "INSERT INTO ec_devolucion_pagos (id_devolucion_pago,id_devolucion,id_tipo_pago,monto,referencia,es_externo,fecha,hora,id_cajero, id_sesion_caja )
 			       	VALUES( NULL, {$this->external_return_id}, 1,{$datos_1[0]},'{$datos_1[0]}',1,now(),now(),{$this->teller_id}, {$this->teller_session_id} )";
-			        $eje = $this->link->query($sql) or die("Error al insertar el pago de la devolución externa : {$sql} {$this->link->error}");
+			        $eje = $this->link->query($sql) or die("Error al insertar el pago de la devolución externa : {$sql} {$this->link->error}");*/
+			    	$sql = "UPDATE ec_devolucion SET monto_devolucion = {$datos_1[0]} WHERE id_devolucion = {$this->external_return_id}";
+			        $eje = $this->link->query($sql) or die("Error al actualizar pago de cebecera devolución externa : {$sql} {$this->link->error}");
 			    }
 			//interna
 			    if($datos_1[1]>0){
-			        $sql="INSERT INTO ec_devolucion_pagos (id_devolucion_pago,id_devolucion,id_tipo_pago,monto,referencia,es_externo,fecha,hora,id_cajero, id_sesion_caja )
+			        /*$sql="INSERT INTO ec_devolucion_pagos (id_devolucion_pago,id_devolucion,id_tipo_pago,monto,referencia,es_externo,fecha,hora,id_cajero, id_sesion_caja )
 			        VALUES( NULL, {$this->internal_return_id},1,{$datos_1[1]},'{$datos_1[1]}',0,now(),now(), {$this->teller_id}, {$this->teller_session_id} )";
-			        $eje = $this->link->query( $sql ) or die( "Error al insertar el pago de la devolución interna : {$sql} {$this->link->error}");
-			            
+			        $eje = $this->link->query( $sql ) or die( "Error al insertar el pago de la devolución interna : {$sql} {$this->link->error}");*/
+			    	$sql = "UPDATE ec_devolucion SET monto_devolucion = {$datos_1[1]} WHERE id_devolucion = {$this->internal_return_id}";
+			        $eje = $this->link->query($sql) or die("Error al actualizar pago de cebecera devolución interna : {$sql} {$this->link->error}");         
 			    }   
 			    $this->total_abonado=$datos_1[2];  
 			//actualizamos los pagos para anularlos en los cálculos
-			    $sql="UPDATE ec_pedido_pagos SET referencia=monto WHERE id_pedido = {$this->sale_id}";
-			    $eje = $this->link->query( $sql ) or die( "Error al actualizar la referencia de los pagos : {$this->link->error}" );
+			//    $sql="UPDATE ec_pedido_pagos SET referencia=monto WHERE id_pedido = {$this->sale_id}";
+			//    $eje = $this->link->query( $sql ) or die( "Error al actualizar la referencia de los pagos : {$this->link->error}" );
 			    
 			}//fin de si no esta pagada la nota de venta
 //echo '<br>hasta aqui termina el pago de devolución</br>';

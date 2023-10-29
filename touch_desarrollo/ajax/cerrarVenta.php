@@ -66,6 +66,10 @@
     $r_c=mysql_fetch_row($eje);
     $id_cajero=$r_c[0];
     $id_sesion_caja=$r_c[1];
+/*Modificacion Oscar 2023/10/11 para no enlzar directamente el cajero a la venta cuando es unicajero*/
+    $id_cajero = 0;
+    $id_sesion_caja = 0;
+/*fin de cambio Oscar 2203/10/11*/
 /**/
 	try{
 		mysql_query("BEGIN");
@@ -138,7 +142,7 @@
 					/*16*/ieps,
 					/*17*/total,
 					/*18*/dias_proximo,
-					/*19*/pagado,
+					/*19*/IF( '{$es_apartado}' = '0' OR '{$es_apartado}' = '', 1, 0 ),
 					/*20*/surtido,
 					/*21*/enviado,
 					/*22*/id_sucursal,
@@ -495,7 +499,7 @@
 		//}
 	/*Fin de cambio*/
 
-		
+/*deshabilitado por Oscar 2023/10/16		
         
         if($_GET["ap"] == '0')
         {
@@ -509,12 +513,9 @@
 		if (!mysql_query($cs)){
 			throw new Exception("Imposible eliminar entradas obsoletas de pagos. " . mysql_error());
 		}
-		
 		for ($ix=0; $ix<$nitems; ++$ix)
 		{
 		    if($_GET["mon{$ix}"] > 0){
-            	//	echo 'pago_interno:'.$pago_interno."|pago_externo:".$pago_externo;
-		    /*implementación Oscar 08.08.2018*/
             	for($ij=0;$ij<=1;$ij++){
             		if($ij==0&&$pago_interno>0||$ij==1&&$pago_externo>0){
     					$cs="INSERT INTO ec_pedido_pagos SET
@@ -539,21 +540,18 @@
 						}else{
 							$cs.="es_externo=1";//externo
 						}
-					/**/
 						$cs.=",id_cajero = {$id_cajero}, id_sesion_caja = {$id_sesion_caja}";
-					/**/ 
             			if(!mysql_query($cs)){
 							throw new Exception("Imposible almacenar registro (pago). <br><br>$cs<br><br>" . mysql_error());
     					}
             		}
     				
             	}//fin de for $ij
-            /*fin de cambio*/
             }        
         //capturamos el id
             $id_pago=mysql_insert_id();
 		}//fin de for $ix
-        
+*/
         //Actualizamos el estatus del pago
         
         $sql="	SELECT
@@ -572,7 +570,7 @@
             throw new Exception("Imposible almacenar registro (pago). <br><br>$sql<br><br>" . mysql_error());
         
         $row=mysql_fetch_row($res);
-        
+        $new_total = $row[0];
         if($row[0] <= $row[1]){
             $sql="UPDATE ec_pedidos SET pagado=1 WHERE id_pedido=$id_pedido_r";
             if (!mysql_query($sql))
@@ -599,13 +597,59 @@
 		mysql_close();
 		exit();
 	}
+	//die( "DEvoluciones : {$_GET['id_devoluciones']}" );
+/*Implementacion Osaccr 25.06.2019 para insertar la referencia de las devoluciones en el pedido*/
+	if( isset( $_GET['id_devoluciones'] ) ){
+		$id_devoluciones = $_GET['id_devoluciones'];
+		$sql="UPDATE ec_pedidos SET id_devoluciones='$id_devoluciones' WHERE id_pedido=$id_pedido_r";
+		$eje=mysql_query($sql)or die("Error al actualizar los ids de devolucion para este pedido!!!\n".mysql_error());
+	//consulta id de pedido original 
+		$tmp_devs = str_replace('~', ',', $id_devoluciones );
+		$devs_array = explode( '~', $id_devoluciones );
+		$sql = "SELECT 
+					p.id_pedido AS original_sale_id, 
+					SUM( pp.monto ) AS payments_total, 
+					p.id_sesion_caja AS original_sale_session_id,
+					SUM( d.monto_devolucion ) AS return_amount
+				FROM ec_pedidos p
+				LEFT JOIN ec_pedido_pagos pp
+				ON p.id_pedido = pp.id_pedido
+				LEFT JOIN ec_devolucion d
+				ON d.id_pedido = p.id_pedido 
+				WHERE d.id_devolucion IN( {$tmp_devs} )
+				GROUP BY p.id_pedido";
+		$stm = mysql_query( $sql ) or die( "Error al consultar informacion del pedido original : " . mysql_error() );
+		$row = mysql_fetch_assoc( $stm );
+		$return_internal_ammount = 0;
+		$return_external_ammount = 0;
+	//consulta el monto de la devolucion interna
+		$sql = "SELECT monto_devolucion, es_externo FROM ec_devolucion WHERE id_devolucion IN( $tmp_devs )";
+		$stm_amount = mysql_query( $sql ) or die( "Error al consultar los montos de la devolucion  : " . mysql_error() );
+		while ( $row_amount = mysql_fetch_assoc($stm_amount) ) {
+			if( $row_amount['es_externo'] == 0 ){
+				$return_internal_ammount += $row_amount['monto_devolucion'];
+			}else if( $row_amount['es_externo'] == 1 ){
+				$return_external_ammount += $row_amount['monto_devolucion'];
+			}
+		}
+	//consulta el monto de la devolucion externa
+		
+	//inserta la relacion de los pedidos
+		$sql = "INSERT INTO ec_pedidos_relacion_devolucion ( /*1*/id_pedido_relacion_devolucion, /*2*/id_pedido_original, /*3*/monto_pedido_original,
+		/*4*/id_sesion_caja_pedido_orginal, /*5*/id_devolucion_interna, /*6*/monto_devolucion_interna, /*7*/id_devolucion_externa, 
+		/*8*/monto_devolucion_externa, /*9*/id_pedido_relacionado, /*10*/monto_pedido_relacionado, /*11*/id_sesion_caja_pedido_relacionado )
+		VALUES ( /*1*/NULL, /*2*/{$row['original_sale_id']}, /*3*/{$row['payments_total']}, /*4*/{$row['original_sale_session_id']}, 
+		/*5*/{$devs_array[0]}, /*6*/{$return_internal_ammount}, /*7*/{$devs_array[1]}, /*8*/{$return_external_ammount}, 
+		/*9*/{$id_pedido_r}, /*10*/{$new_total}, /*11*/0 )";
+		$stm = mysql_query( $sql ) or die( "Error al insertar la relacion entre pedidos : " . mysql_error() );
+	}
+/*Fin de cambio Oscar 25.06.2019*/
 	mysql_query("commit");
 	echo 'ok|'.$id_pedido_r."|";
-/*implementacion Oscar 02.11.2018 para validar que no pase de la pantalla de cerrar ventas si el monto de pagos es menor al monto de la venta*/
+/*implementacion Oscar 02.11.2018 para validar que no pase de la pantalla de cerrar ventas si el monto de pagos es menor al monto de la venta*
 	$sql="SELECT
 				p.total,
 				ROUND(SUM(IF(pp.monto is null,0,pp.monto))),
-				/*pp.monto,*/
 				p.pagado
 			FROM ec_pedidos p 
 			LEFT JOIN ec_pedido_pagos pp ON p.id_pedido=pp.id_pedido
@@ -615,9 +659,6 @@
 
 	if($r[0]>$r[1] && $r[2]==1){//si el monto es mayor a los pagos y la nota está como pagada
 		//insertamos el error
-		$sql="INSERT INTO sys_bitacora_errores VALUES(/*1*/null,/*2*/{$user_sucursal},
-			/*3*/'Se guardo apartado como pagado en el pedido $id_pedido_r, folio: $folio Monto: $ $r[0] Pagos: $ $r[1]',/*4*/now(),/*5*/$user_id,/*6*/'', /*7*/'0', 
-			/*8*/'0', /*9*/'0')";
 		$eje=mysql_query($sql)or die("Error al insertar error!!!".$sql."\n\n".mysql_error());
 	//guardaos el error
 		$sql="UPDATE ec_pedidos SET pagado=0 WHERE id_pedido=$id_pedido_r";//actualizamos a no pagada la nota de venta
@@ -634,12 +675,7 @@
 	}
 /*Fin de cambio 02.11.2018*/
 	
-/*Implementacion Osaccr 25.06.2019 para insertar la referencia de las devoluciones en el pedido*/
-	if(isset($id_devoluciones)){
-		$sql="UPDATE ec_pedidos SET id_devoluciones='$id_devoluciones' WHERE id_pedido=$id_pedido_r";
-		$eje=mysql_query($sql)or die("Error al actualizar los ids de devolucion para este pedido!!!\n".mysql_error());
-	}
-/*Fin de cambio Oscar 25.06.2019*/
+
 
 //echo '|<img src="../include/barcode/barcode.php?filepath=../../img/codigos_barra/'.$folio.'.png&text='.$folio.'&size=60&orientation=horizontal&codeType=Code30&print=true">';
 	echo '|'.$folio;//

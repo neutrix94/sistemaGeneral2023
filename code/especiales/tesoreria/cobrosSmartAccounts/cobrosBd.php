@@ -28,7 +28,7 @@
 		$sql="SELECT
 				p.id_pedido,
 				p.folio_nv,
-				SUM( IF(pp.id_pedido_pago IS NULL , 0, pp.monto) ) as pagosPendientes,/*OR pp.id_cajero != 0*/
+				p.total/*SUM( IF(pp.id_pedido_pago IS NULL , 0, pp.monto) )*/ as pagosPendientes,/*OR pp.id_cajero != 0*/
 				REPLACE( p.id_devoluciones, '~', ',' ) as idsDevoluciones,
 				( SELECT
 					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) )
@@ -44,13 +44,36 @@
 		$eje=mysql_query($sql) or die("Error al consultar los datos del pedido!!!\n".mysql_error());
 		$r=mysql_fetch_row($eje);
 	//checamos si hay devoluciones que dependan de este pedido y no esten pagadas
-		$condicion_devoluciones='IN('.$r[3].')';
+		$condicion_devoluciones = "IN('{$r[3]}')";
 		//die($condicion_devoluciones);
-		$sql="SELECT SUM(IF(id_devolucion_pago IS NULL OR id_cajero!=0,0,monto)) FROM ec_devolucion_pagos WHERE id_devolucion $condicion_devoluciones";
+		$sql="SELECT ROUND( SUM( IF( id_devolucion IS NULL ,0,monto_devolucion ) ) ) FROM ec_devolucion WHERE id_devolucion $condicion_devoluciones";
 		$eje=mysql_query($sql)or die("Error al consultar las devoluciones relacionadas a esta nota!!!\n".mysql_error().$sql);
 		$rd=mysql_fetch_row($eje);
 		if( $r[2] <= $r[4] ){
-			die( "was_payed|No hay pagos pendientes para esta nota de venta {$r[2]} <= {$r[4]}!" );
+//verifica si hay una devolucion ligada al pedido sin cajero
+			$sql = "SELECT 
+						d.id_pedido,
+						d.folio, 
+						SUM( dp.monto ),
+						d.observaciones,
+						SUM( d.monto_devolucion )
+					FROM ec_devolucion d 
+					LEFT JOIN ec_devolucion_pagos dp
+					ON d.id_devolucion = dp.id_devolucion
+					WHERE d.id_pedido = '{$clave}'
+					AND d.id_cajero = 0
+					AND d.id_sesion_caja = 0
+					GROUP BY d.id_pedido";
+//die( $sql );
+			$return_stm = mysql_query( $sql ) or die( "Error al consultar si hay una devolucion pendiente : " . mysql_error() );
+			if( mysql_num_rows( $return_stm ) > 0 ){
+				$return_row = mysql_fetch_row( $return_stm );
+				if( $return_row[3] == 'Dinero regresado al cliente' ){
+					$pending_ammount = $return_row[4]- $return_row[2];
+					die( "ok|{$return_row[0]}|{$return_row[1]}|0|{$pending_ammount}" );//{$return_row[2]}
+				}
+			}
+			die( "was_payed|Esta nota ya fue pagada exitosamente!" );
 		}
 		$r[2] = ( $r[2] - $r[4] );
 		if($rd[0]==''){$rd[0]=0;}

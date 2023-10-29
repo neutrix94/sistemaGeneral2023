@@ -339,6 +339,7 @@ var emrge_aviso='';
 				ids_dvs+="&id_devoluciones="+$('#ids_de_devoluciones').val();
 			}
 		/*Fin de cambio Oscar 25.06.2019*/
+		//alert( "ajax/cerrarVenta.php?idp="+id_pedido+"&ap="+es_apartado+"&faceb="+face+"&cor="+correoC+"&"+datos+""+saldo_favor+ids_dvs );return false;
 			$.ajax({
 				async: false,
 				type: 'GET',
@@ -356,7 +357,7 @@ var emrge_aviso='';
 		/*Implementación Oscar 30.11.2018 para no dejar hacer más de una venta por dar click doble*/
 				hay_proceso=1;//ocupamos el proceso
 		/*Fin de cambio Oscar 30.11.2018*/
-	//alert(data);
+	alert(data);
 				retval = ax[0].match (/^ok$/i);
 				pedidor=ax[1];
 		/**/
@@ -586,7 +587,8 @@ function bloquea_pantalla(){
 			//implementacion Oscar 2023 para eliminar el sessionStorage
   				sessionStorage.clear();
 				//alert('pausa antes del ticket');
-				var u1="index.php?scr=ticket&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
+				//deshabilitado por Oscar 2023/10/12 var u1="index.php?scr=ticket&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
+				var u1="index.php?scr=talon_pago&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
 				//var u2="index.php?scr=ticket&idp="+pedidor+"&noImp=2&tv="+tipoVenta;
 			//agregamos saldos a favor
 				if(s_f!='no'){

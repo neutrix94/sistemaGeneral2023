@@ -217,21 +217,28 @@
     for($i=0;$i<$nitems;$i++){
     	$descuentos+=$_GET["desc{$i}"];//echo "<br>descuentos:  ".$descuentos."<br>";
     //extraemos datos del detalle del pedido
-    	$sql1="SELECT pd.cantidad,
-                        pd.id_pedido_detalle,
-                        pd.es_externo,
-                        /*ROUND(((pd.precio-pd.descuento)*{$_GET["can{$i}"]})-(({$_GET["can{$i}"]}*pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100))) */
-                        ROUND(((pd.monto-pd.descuento)/pd.cantidad)-IF(pd.descuento>0,0,(pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100)),2)*{$_GET["can{$i}"]}
-                        FROM ec_pedidos_detalle pd
-                        LEFT JOIN ec_pedidos pe ON pd.id_pedido=pe.id_pedido 
-                        WHERE pe.id_pedido='$idp' 
-                        AND pd.id_producto='{$_GET["idp{$i}"]}'
-                        AND pd.id_pedido_detalle = '{$_GET["pd{$i}"]}'";
+        $get_product_id = $_GET["idp{$i}"];
+        $get_sale_detail = $_GET["pd{$i}"];
+        $get_quantity = $_GET["can{$i}"];
+    	$sql1="SELECT 
+                pd.cantidad,
+                pd.id_pedido_detalle,
+                pd.es_externo,
+                /*ROUND(((pd.precio-pd.descuento)*{$_GET["can{$i}"]})-(({$_GET["can{$i}"]}*pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100))) */
+                ROUND(((pd.monto-pd.descuento)/pd.cantidad)-IF(pd.descuento>0,0,(pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100)),2)*{$get_quantity}
+                FROM ec_pedidos_detalle pd
+                LEFT JOIN ec_pedidos pe ON pd.id_pedido=pe.id_pedido 
+                WHERE pe.id_pedido='$idp' 
+                AND pd.id_producto='{$get_product_id}'
+                AND pd.id_pedido_detalle = '{$get_sale_detail}'";
     	//die($sql1);
         $eje1=mysql_query($sql1)or die("Error al consultar la cantidad de productos a devolver\n\n".$sql1."\n\n".mysql_error());
     	$r=mysql_fetch_row($eje1);
         //sacamos descuento por pieza
-            $sql2="SELECT IF(descuento>0,(descuento/cantidad),0) FROM ec_pedidos_detalle WHERE id_pedido_detalle='$r[1]'";
+            $sql2="SELECT 
+                        IF(descuento>0,(descuento/cantidad),0) 
+                    FROM ec_pedidos_detalle 
+                    WHERE id_pedido_detalle='$r[1]'";
             $eje2=mysql_query($sql2);
             if(!$eje2){
                 $error=mysql_error();
@@ -241,10 +248,11 @@
             $des=mysql_fetch_row($eje2); 
         //actualizamos el detalle del pedido
     		$sql2="UPDATE ec_pedidos_detalle SET 
-                    cantidad=(cantidad-{$_GET["can{$i}"]}),
-                    monto=cantidad*precio,descuento=(IF(descuento=0,0,$des[0]*cantidad)),
+                    cantidad=(cantidad-{$get_quantity}),
+                    monto=cantidad*precio,
+                    descuento=(IF(descuento=0,0,$des[0]*cantidad)),
                     modificado=1
-    		  		WHERE id_pedido_detalle='{$_GET["pd{$i}"]}'";//-{$_GET["can{$i}"]}
+    		  		WHERE id_pedido_detalle='{$get_sale_detail}'";//-{$_GET["can{$i}"]}
     		$eje2=mysql_query($sql2);
     		if(!$eje2){
                 $error=mysql_error();
@@ -254,20 +262,20 @@
 
 /*implementación Oscar 01.10.2019 para verificar si el producto es maquilado*/
     //comprobamos si el producto es maquilado
-            $sql="SELECT id_producto_ordigen,cantidad FROM ec_productos_detalle WHERE id_producto='{$_GET["idp{$i}"]}'"; 
+            $sql="SELECT id_producto_ordigen,cantidad FROM ec_productos_detalle WHERE id_producto='{$get_product_id}'"; 
             $eje_maq=mysql_query($sql)or die("Error al consultar el origen de la maquila");
             if(mysql_num_rows($eje_maq)==1){
                 $r_maq=mysql_fetch_row($eje_maq);
-                $_GET["idp{$i}"]=$r_maq[0];
-                $_GET["can{$i}"]=$r_maq[1]*$_GET["can{$i}"];
+                $get_product_id = $r_maq[0];
+                $get_quantity=$r_maq[1] * $get_quantity;
             }
 /*fin de cambio Oscar 01.10.2019*/
 
     //insertamos el detalle de la devolucion
     	$ins_det="INSERT INTO ec_devolucion_detalle(id_devolucion_detalle,id_devolucion,id_producto,
             cantidad, id_pedido_detalle)
-                    SELECT NULL,IF($r[2]=0,$id_dev_interna,$id_dev_externa),'{$_GET["idp{$i}"]}',
-                    '{$_GET["can{$i}"]}','{$_GET["pd{$i}"]}'";////VALUES(NULL,'$id_dev','{$_GET["idp{$i}"]}','{$_GET["can{$i}"]}')
+                    SELECT NULL,IF({$r[2]}=0,{$id_dev_interna},{$id_dev_externa}),'{$get_product_id}',
+                    '{$get_quantity}','{$get_sale_detail}'";////VALUES(NULL,'$id_dev','{$_GET["idp{$i}"]}','{$_GET["can{$i}"]}')
     	$insDD=mysql_query($ins_det);
     	if(!$insDD){
             $error=mysql_error();
@@ -281,10 +289,10 @@
              id_equivalente, sincronizar ) 
             SELECT 
             NULL,
-            IF($r[2]=0,$id_nvo_mov_int,$id_nvo_mov_ext),
-            '{$_GET["idp{$i}"]}',
-            '{$_GET["can{$i}"]}',
-            '{$_GET["can{$i}"]}',
+            IF({$r[2]}=0,{$id_nvo_mov_int},{$id_nvo_mov_ext}),
+            '{$get_product_id}',
+            '{$get_quantity}',
+            '{$get_quantity}',
             -1,
             -1,
             NULL,
@@ -314,6 +322,16 @@
 ?>
 <?php
 */
+/*Oscar 2023/120/25 para total en cabecera de internos/externos*/
+    if( $monto_internos > 0 ){
+        $sql = "UPDATE ec_devolucion SET monto_devolucion = {$monto_internos} WHERE id_devolucion = {$id_dev_interna}";
+        mysql_query( $sql ) or die( "Error al actualizar monto en cabecera de devolución interna : " . mysql_error() );
+    }
+    if( $monto_externos > 0 ){
+        $sql = "UPDATE ec_devolucion SET monto_devolucion = {$monto_externos} WHERE id_devolucion = {$id_dev_externa}";
+        mysql_query( $sql ) or die( "Error al actualizar monto en cabecera de devolución externa : " . mysql_error() );
+    }
+/*fin de cambio Oscar 2023/10/25*/
 
 //si la nota esta vacia que la deje como validada
     $sql = "SELECT 
@@ -330,10 +348,10 @@
     }
 //insertamos el pago de la devolucion
 $total_abonado=0;
-if($pedido_pagado==1){
+/*if($pedido_pagado==1){
     for($i=0;$i<=1;$i++){
         if($i==0&&$num_internos>0||$i==1&&$num_externos>0){
-            $insPD="INSERT INTO ec_devolucion_pagos(id_devolucion_pago,id_devolucion,id_tipo_pago,monto,referencia,es_externo,fecha,hora,id_cajero, id_sesion_caja )/*se agrego campo es externo Oscar 09.08.2018*/
+            $insPD="INSERT INTO ec_devolucion_pagos(id_devolucion_pago,id_devolucion,id_tipo_pago,monto,referencia,es_externo,fecha,hora,id_cajero, id_sesion_caja )//se agrego campo es externo Oscar 09.08.2018
     		  VALUES(NULL,";
         //id de la devolucion
             if($i==0){
@@ -348,7 +366,7 @@ if($pedido_pagado==1){
             }else if($i==1){
                 $insPD.=$monto_externos.",'',1";           
             }
-            $insPD.=", NOW(), NOW(),{$id_cajero}, {$id_sesion_caja} )";
+            $insPD.=", NOW(), NOW(), 0, 0 )";//modificacion Oscar 2023/10/12 {$id_cajero}, {$id_sesion_caja}
             $insert=mysql_query($insPD);
             if(!$insert){
                 $error=mysql_error();
@@ -388,7 +406,7 @@ else{
     if($datos_1[0]>0){
         $sql="INSERT INTO ec_devolucion_pagos ( id_devolucion_pago, id_devolucion, id_tipo_pago, monto,
         referencia, es_externo, fecha, hora, id_cajero, id_sesion_caja )
-        VALUES(null,$id_dev_externa,1,$datos_1[0],'$datos_1[0]',1,now(),now(), {$id_cajero}, {$id_sesion_caja} )";
+        VALUES(null,$id_dev_externa,1,$datos_1[0],'$datos_1[0]',1,now(),now(), 0, 0 )";//modificacion Oscar 2023/10/12 {$id_cajero}, {$id_sesion_caja}
         $eje=mysql_query($sql);
         if(!$eje){
             $error=mysql_error();
@@ -400,7 +418,7 @@ else{
     if($datos_1[1]>0){
         $sql="INSERT INTO ec_devolucion_pagos ( id_devolucion_pago, id_devolucion, id_tipo_pago, monto,
         referencia, es_externo, fecha, hora, id_cajero, id_sesion_caja )
-        VALUES(null,$id_dev_interna,1,$datos_1[1],'$datos_1[0]',0,now(),now(), {$id_cajero}, {$id_sesion_caja} )";
+        VALUES(null,$id_dev_interna,1,$datos_1[1],'$datos_1[0]',0,now(),now(), 0, 0 )";//modificacion Oscar 2023/10/12 {$id_cajero}, {$id_sesion_caja}
         $eje=mysql_query($sql);
         if(!$eje){
             $error=mysql_error();
@@ -418,13 +436,27 @@ else{
         die("Error al actualizar la referencia de los pagos!!!\n\n".$sql."\n\n".$error);
     }
 }//fin de si no esta pagada la nota de venta
-
+*/
+    if($pedido_pagado==1){
+    //actualizamos los pagos para anularlos en los cálculos
+        $sql="UPDATE ec_pedido_pagos SET referencia = monto WHERE id_pedido = {$idp}";
+        $eje=mysql_query($sql);
+        if(!$eje){
+            $error=mysql_error();
+            mysql_query("ROLLBACK");//cancelamos transacción
+            die("Error al actualizar la referencia de los pagos!!!\n\n".$sql."\n\n".$error);
+        }
+    }
 //Actualizamos el monto del pedio anterior y generamos el ticket...
-    $subTotal="SELECT SUM(monto),SUM(descuento) FROM ec_pedidos_detalle WHERE id_pedido='$idp'";//consultamos las sumas de los productos del pedido
+    $subTotal="SELECT 
+                    SUM(monto),
+                    SUM(descuento) 
+                FROM ec_pedidos_detalle 
+                WHERE id_pedido = '{$idp}'";//consultamos las sumas de los productos del pedido
     $calc=mysql_query($subTotal);
     if(!$calc){
     	mysql_query("ROLLBACK");
-    	die("Error al calcular el nuevo monto del pedido!!!\n\n");
+    	die( "Error al calcular el nuevo monto del pedido!!!" );
     }
     $subTotal=mysql_fetch_row($calc);    
 //checamos si hay descuento
@@ -437,7 +469,7 @@ else{
     }
 /**/
     $extra=str_replace("*", "&", $extra);
-    $url_recarga='index.php?scr=nueva-venta&s_f_c='.$totalDev.$extra."&abonado=".$total_abonado;
+    $url_recarga = "index.php?scr=nueva-venta&s_f_c={$totalDev}{$extra}&abonado={$total_abonado}";
     $sql="UPDATE ec_devolucion SET observaciones='$url_recarga' WHERE id_pedido=$idp";
     $eje=mysql_query($sql)or die("Error al actualizar observaciones en las devoluciones!!\n\n".mysql_error()."\n\n".$sql);
 /**/
