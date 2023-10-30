@@ -470,7 +470,7 @@
 	//insertamos el pago de la devolucion
 			$this->total_abonado=0;
 			if( $this->was_payed == 1 ){
-			    for($i=0;$i<=1;$i++){
+			    /*for($i=0;$i<=1;$i++){
 			        if( ( $i == 0 && $this->internal_counter > 0 ) || ( $i == 1 && $this->external_counter > 0 ) ){
 			            $insPD="INSERT INTO ec_devolucion_pagos(id_devolucion_pago,id_devolucion,id_tipo_pago,monto,referencia,es_externo,fecha,hora,id_cajero, id_sesion_caja )
 			    		  VALUES(NULL,";
@@ -493,7 +493,25 @@
 			            $insert = $this->link->query( $insPD ) or die( "Error al insertar el pago de la devolución 1 : {$this->link->error}" );
 			                           
 			        }//fin de if si son validos
-			    }//fin de for i
+			    }//fin de for i*/
+
+			    //externa
+			    if( $this->external_return_amount > 0 ){
+			        /*$sql = "INSERT INTO ec_devolucion_pagos (id_devolucion_pago,id_devolucion,id_tipo_pago,monto,referencia,es_externo,fecha,hora,id_cajero, id_sesion_caja )
+			       	VALUES( NULL, {$this->external_return_id}, 1,{$datos_1[0]},'{$datos_1[0]}',1,now(),now(),{$this->teller_id}, {$this->teller_session_id} )";
+			        $eje = $this->link->query($sql) or die("Error al insertar el pago de la devolución externa : {$sql} {$this->link->error}");*/
+			    	$sql = "UPDATE ec_devolucion SET monto_devolucion = {$this->external_return_amount} WHERE id_devolucion = {$this->external_return_id}";
+			        $eje = $this->link->query($sql) or die("Error al actualizar pago de cebecera devolución externa : {$sql} {$this->link->error}");
+			    }
+			//interna
+			    if( $this->internal_return_amount > 0 ){
+			        /*$sql="INSERT INTO ec_devolucion_pagos (id_devolucion_pago,id_devolucion,id_tipo_pago,monto,referencia,es_externo,fecha,hora,id_cajero, id_sesion_caja )
+			        VALUES( NULL, {$this->internal_return_id},1,{$datos_1[1]},'{$datos_1[1]}',0,now(),now(), {$this->teller_id}, {$this->teller_session_id} )";
+			        $eje = $this->link->query( $sql ) or die( "Error al insertar el pago de la devolución interna : {$sql} {$this->link->error}");*/
+			    	$sql = "UPDATE ec_devolucion SET monto_devolucion = {$this->internal_return_amount} WHERE id_devolucion = {$this->internal_return_id}";
+			        $eje = $this->link->query($sql) or die("Error al actualizar pago de cebecera devolución interna : {$sql} {$this->link->error}");         
+			    }   
+			    $this->total_abonado=$datos_1[2];  
 			}else{
 			    $sql = "SELECT 
 			            SUM(IF(pp.es_externo=1,pp.monto,0))-IF(ax.devExternos IS NULL,0,ax.devExternos) as externos,

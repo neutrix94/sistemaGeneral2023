@@ -208,7 +208,7 @@
 	}
 	
 	//+40+130
-	$ticket = new TicketPDF("P", "mm", array(80,60+$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
+	$ticket = new TicketPDF("P", "mm", array(80,80+$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
 	
@@ -322,67 +322,6 @@
 		$ticket->Cell(66*0.25, 6, "-$ " . number_format($descuentoGen, 2), "" ,0, "R");
 	}
 	
-	/*$ticket->SetXY(5+66*0.4, $ticket->GetY()+5);
-	$ticket->Cell(66*0.3, 6, utf8_decode("Total"), "" ,0, "L");
-	
-	$ticket->SetXY(5+66*0.75, $ticket->GetY());
-	$ticket->Cell(66*0.25, 6, "$ " . number_format($total, 2), "" ,0, "R");*/
-	
-	/*$ticket->SetY($ticket->GetY()+4);
-	$ticket->SetXY(7+66*0.40, $ticket->GetY()+3);
-	$ticket->Cell(66*0.32, 2, "DEscuento", "T" ,0, "C");
-	
-	$ticket->SetXY(7+66*0.75, $ticket->GetY());
-	$ticket->Cell(66*0.25, 2, "$descuento", "T" ,0, "C");
-	$ticket->SetY($ticket->GetY()-5);*/
-	
-	/* ver si esto sirveif (count($pagos)) {
-		
-		$ticket->SetXY(66*0.1, $ticket->GetY()+5);
-		$ticket->Cell(66*0.3, 6, utf8_decode("Fecha de pago"), "" ,0, "L");
-
-		$ticket->SetXY(66*0.45, $ticket->GetY());
-		$ticket->Cell(66*0.3, 6, utf8_decode("Forma de pago"), "" ,0, "L");
-			
-		$ticket->SetXY(5+66*0.75, $ticket->GetY());
-		$ticket->Cell(66*0.25, 6, utf8_decode("Monto"), "" ,0, "R");
-		
-		$ticket->SetY($ticket->GetY()+3);
-		$ticket->SetXY(66*0.10, $ticket->GetY()+3);
-		$ticket->Cell(66*0.32, 2, "", "T" ,0, "C");		
-
-		$ticket->SetY($ticket->GetY());
-		$ticket->SetXY(66*0.45, $ticket->GetY());
-		$ticket->Cell(66*0.32, 2, "", "T" ,0, "C");
-		
-		$ticket->SetXY(5+66*0.75, $ticket->GetY());
-		$ticket->Cell(66*0.25, 2, "", "T" ,0, "C");
-		$ticket->SetY($ticket->GetY()-5);
-		
-		foreach ($pagos as $pago) {
-			$ticket->SetXY(66*0.1, $ticket->GetY()+5);//66*0.4
-			$ticket->Cell(66*0.5, 6, utf8_decode("{$pago["nombre"]}"), "" ,0, "L");
-			
-			$ticket->SetXY(5+66*0.75, $ticket->GetY());
-			$ticket->Cell(66*0.25, 6, "$ " . number_format($pago["monto"], 2), "" ,0, "R");
-		}
-
-		if($lineas_dev>0){
-			$ticket->SetXY(5+66*0.4, $ticket->GetY()+5);
-			$ticket->Cell(66*0.3, 6, utf8_decode("- Devoluciones"), "" ,0, "L");
-			$ticket->SetXY(5+66*0.75, $ticket->GetY());
-			$ticket->Cell(66*0.25, 6, "$ " . number_format($monto_devolucion, 2), "" ,0, "R");
-
-		}
-
-		$resta = $total - $total_pagos;
-		if($resta < 0)
-		{
-			$resta = 0;
-		}	    
-	   
-	}*/
-
 	$ticket->SetFont('Arial','',$bF-2);
 	if($pagado == 1) {
 	//implementado por Oscar 29-12-2017
@@ -392,23 +331,23 @@
 			$ticket->SetXY(5, $ticket->GetY()+8);
 			$ticket->Cell(66, 6, utf8_decode("TOTAL"), "" ,0, "C");
 				
-			$ticket->SetXY(5+66*0.75, $ticket->GetY() + 8);
-			$ticket->Cell(66*0.25, 6, "$ " . number_format($total, 2), "" ,0, "C");
+			$ticket->SetXY(5, $ticket->GetY() + 9);
+			$ticket->Cell(66, 6, "$ " . number_format($total, 2), "" ,0, "C");
 		//
 			//$ticket->SetXY(5, $ticket->GetY()+8);
 			$ticket->SetXY(5, $ticket->GetY()+15);
 			$ticket->Cell(5, 6, utf8_decode("Saldo a favor:"), "" ,0, "L");
 
-			$ticket->SetXY(5+66*0.75, $ticket->GetY()+15);
-			$ticket->Cell(66*0.25, 6, "$ " . number_format($s_f_i, 2), "" ,0, "R");
+			$ticket->SetXY(5, $ticket->GetY()+15);/*+66*0.75*/
+			$ticket->Cell(66, 6, "$ " . number_format($s_f_i, 2), "" ,0, "C");/*66*0.25*/
 
 		//
 			$ticket->SetFont('Arial','B',30);
 			$ticket->SetXY(5, $ticket->GetY()+15);
 			$ticket->Cell(66, 6, utf8_decode($accion), "" ,0, "C");
 
-			$ticket->SetXY(5+66*0.75, $ticket->GetY()+15);
-			$ticket->Cell(66*0.25, 6, "$ ".$total, "" ,0, "");//C R
+			$ticket->SetXY(5, $ticket->GetY()+15);
+			$ticket->Cell(66, 6, "$ ".number_format($total, 2), "" ,0, "C");//C R
 
 		}else{
 			$ticket->SetFont('Arial','B',30);
@@ -463,51 +402,6 @@
 	
 	}
 
-	/*$ar = fopen("../leyenda_ticket/leyenda.txt","r") or die ('No se pudo abrir el archivo');
-
-	 
-    while(!feof($ar))
-    {
-        $linea=fgets($ar);
-    }
-    fclose($ar);
-    $acotado = substr($linea,0,165);
-
-    $ticket->SetFont('Arial','',$bF-2);
-    $ticket->SetXY(10, $ticket->GetY()+6);
-    $ticket-> MultiCell(60,5, utf8_decode($acotado), 0 ,'J',false);
-
-    $ticket->SetXY(5, $ticket->GetY()+3);
-    $ticket->Cell(66, 6, utf8_decode("Comprobante Simplificado de Operación"), "" ,0, "C");
-
-    $ticket->SetXY(5, $ticket->GetY()+4);
-    $ticket->Cell(66, 6, utf8_decode("con público en general deacuerdo a la"), "" ,0, "C");
-
-    $ticket->SetXY(5, $ticket->GetY()+4);
-    $ticket->Cell(66, 6, utf8_decode("regla 2.7.1.24 de la resolución miselanea"), "" ,0, "C");
-
-    $ticket->SetXY(5, $ticket->GetY()+4);
-    $ticket->Cell(66, 6, utf8_decode("fiscal para 2018."), "" ,0, "C");*/
-
-//implementacion de Facebook y codigo Qr Oscar(03-11-2017)
-
-    //$ticket->SetXY(5,$ticket->GetY()+4);$ticket->SetXY(5, $ticket->GetY()+4);
-/*    
-    $ticket->SetXY(5, $ticket->GetY()+4);
-    $ticket->Cell(66, 6, utf8_decode("Siguenos en Facebook:"), "" ,0, "C");
-
-    $ticket->SetXY(5, $ticket->GetY()+4);
-    $ticket->Cell(66, 6, utf8_decode("www.facebook.com/LacasadelasLucesMX"), "" ,0, "C");
-
-    $ticket->SetFont('Arial','b',$bF+3);
-    $ticket->SetXY(5, $ticket->GetY()+6);
-    $ticket->Cell(66, 6, utf8_decode("Visita www.casadelasluces.com"), "" ,0, "C");
-    
-    $ticket->SetFont('Arial','',$bF-2);
-    $ticket->SetXY(5, $ticket->GetY()+6);
-    //$ticket->Cell(66, 6, utf8_decode("(escanea el código Qr)"), "" ,0, "C");
-    //$ticket->Image("codeQr/qr-code.png", 20, $ticket->GetY()+5,38);
-*/
     if(file_exists("../img/codigos_barra/".$folio.".png")){
     	$ticket->SetXY(5, $ticket->GetY()+3);
     	$ticket->Image("../img/codigos_barra/".$folio.".png", 15, $ticket->GetY()+5,46);
@@ -552,54 +446,54 @@
     			$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);
 
     		}
-    	$ticket->Output("../cache/ticket/".$nombre_ticket, "F");
+    		$ticket->Output("../cache/ticket/".$nombre_ticket, "F");
     /*fin de cambio Oscar 25.01.2019*/
     	}//fin de for $cont
-/*fin de cambio Oscar 17.09.2018*/
-/*implementacion Oscar 2023/09/20 para enviar impresion remota*/
-	if($user_tipo_sistema=='linea'){
-		$archivo_path = "../conexion_inicial.txt";
-		$url = "";
-			if(file_exists($archivo_path)){
-				$file = fopen($archivo_path,"r");
-				$line=fgets($file);
-				fclose($file);
-			    $config=explode("<>",$line);
-			    $tmp=explode("~",$config[0]);
-			    $ruta_des=base64_decode( $tmp[1] );
-				$url = "localhost/{$ruta_des}/rest/print/send_file";
-			}else{
-				die("No hay archivo de configuración!!!");
-			}
-			//die( $url );
-			$post_data = json_encode( array( "destinity_store_id"=>$user_sucursal ) );
-			$crl = curl_init( $url );
-			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($crl, CURLINFO_HEADER_OUT, true);
-			curl_setopt($crl, CURLOPT_POST, true);
-			curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
-			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
-			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
-			  'Content-Type: application/json',
-			  'token: ' . $token)
-			);
-			$resp = curl_exec($crl);//envia peticion
-			//var_dump( $resp );
-			curl_close($crl);
-			//var_dump($resp);
-		//decodifica el json de respuesta
-			$result = json_decode(json_encode($resp), true);
-			$result = json_decode( $result );
-			//return $result;
-	}
-/*fin de cambio Oscar 2023*/
+	/*fin de cambio Oscar 17.09.2018*/
+	/*implementacion Oscar 2023/09/20 para enviar impresion remota*/
+		if($user_tipo_sistema=='linea'){
+			$archivo_path = "../conexion_inicial.txt";
+			$url = "";
+				if(file_exists($archivo_path)){
+					$file = fopen($archivo_path,"r");
+					$line=fgets($file);
+					fclose($file);
+				    $config=explode("<>",$line);
+				    $tmp=explode("~",$config[0]);
+				    $ruta_des=base64_decode( $tmp[1] );
+					$url = "localhost/{$ruta_des}/rest/print/send_file";
+				}else{
+					die("No hay archivo de configuración!!!");
+				}
+				//die( $url );
+				$post_data = json_encode( array( "destinity_store_id"=>$user_sucursal ) );
+				$crl = curl_init( $url );
+				curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+				curl_setopt($crl, CURLOPT_POST, true);
+				curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+				//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+				curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+				curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+				  'Content-Type: application/json',
+				  'token: ' . $token)
+				);
+				$resp = curl_exec($crl);//envia peticion
+				//var_dump( $resp );
+				curl_close($crl);
+				//var_dump($resp);
+			//decodifica el json de respuesta
+				$result = json_decode(json_encode($resp), true);
+				$result = json_decode( $result );
+				//return $result;
+		}
+	/*fin de cambio Oscar 2023*/
 
-/*Implementación Oscar 07.03.2019 para finalzar el satus de la devolución*/
-    if(isset($_GET["id_pedido_original"]) || $_GET['es_apartado']==1){
-    	$sql="UPDATE ec_devolucion SET status=3,observaciones='$mensaje_nota' WHERE id_pedido=$id_pedido_original";
-        $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
-	}
+	/*Implementación Oscar 07.03.2019 para finalzar el satus de la devolución*/
+	    if(isset($_GET["id_pedido_original"]) || $_GET['es_apartado']==1){
+	    	$sql="UPDATE ec_devolucion SET status=3,observaciones='$mensaje_nota' WHERE id_pedido=$id_pedido_original";
+	        $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
+		}
 /*Fin de cambio Oscar 07.03.2019*/
        	
        	header ("location: index.php?scr=evaluation"); 

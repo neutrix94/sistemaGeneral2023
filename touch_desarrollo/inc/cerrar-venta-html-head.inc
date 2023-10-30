@@ -602,6 +602,7 @@ function bloquea_pantalla(){
 				}
 			/*Fin de cambio Oscar 07.03.2019*/
 				//alert(u1);
+				//console.log( u1 ); return false;
 	//fin de cambio
 				$.ajax({
 					async: false,

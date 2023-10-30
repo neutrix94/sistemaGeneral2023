@@ -335,9 +335,9 @@ var cont_cheques_transferencia=0;
 			//var url = "ticket_pagos.php?id_pedido=" + $( '#id_venta' ).val();
 			//var resp = ajaxR( url );
 			var url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( '#id_venta' ).val();
-			alert( url );
+			//alert( url );
 			var resp = ajaxR( url );
-			alert( url );
+			//alert( url );
 
 			location.reload();
 			return false;
