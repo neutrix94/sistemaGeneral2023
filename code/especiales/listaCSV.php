@@ -249,6 +249,7 @@
               ON ipp.id_proveedor_producto = pp.id_proveedor_producto
               LEFT JOIN ec_proveedor_producto_ubicacion_almacen ppua
               ON ppua.id_proveedor_producto = pp.id_proveedor_producto
+              WHERE pp.id_producto = ax1.id_productos
               ORDER BY ipp.inventario DESC
               LIMIT 1
               ) AS Ubicacion
