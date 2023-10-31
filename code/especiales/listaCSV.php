@@ -56,11 +56,11 @@
               ax1.invTotal,
               IF(hpc.id_historico_precio_compra IS NULL,0,hpc.precio)as precioCompraAnterior,
               ax1.totalEntradas,
-              ax1.observaciones,
+              REPLACE( ax1.observaciones, '\n', '*' ) AS observaciones,
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*' ) ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -74,7 +74,7 @@
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*' ) ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -88,7 +88,7 @@
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*' ) ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -194,11 +194,11 @@
               ax1.invTotal,
               IF(hpc.id_historico_precio_compra IS NULL,0,hpc.precio)as precioCompraAnterior,
               ax1.totalEntradas,
-              ax1.observaciones,
+              REPLACE( ax1.observaciones, '\n', '*' ) AS observaciones,
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*') ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -212,7 +212,7 @@
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*' ) SEPARATOR '<br>') )
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -226,7 +226,7 @@
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( prn.nota, '\n', '*' ) ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
