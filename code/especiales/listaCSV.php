@@ -102,7 +102,7 @@
                 IF( ppua.id_ubicacion_matriz IS NULL, 
                   '-',
                   CONCAT( ppua.letra_ubicacion_desde, '', ppua.numero_ubicacion_desde, 
-                    IF( ppua.pasillo_desde != 0, '', CONCAT( ' Pasillo : ', ppua.pasillo_desde ) ), 
+                    IF( ppua.pasillo_desde = 0, '', CONCAT( ' Pasillo : ', ppua.pasillo_desde ) ), 
                     IF( ppua.altura_desde = '', '', CONCAT( ' Altura : ', ppua.altura_desde ) )
                   )
                 )
@@ -240,7 +240,7 @@
                 IF( ppua.id_ubicacion_matriz IS NULL, 
                   '-',
                   CONCAT( ppua.letra_ubicacion_desde, '', ppua.numero_ubicacion_desde, 
-                    IF( ppua.pasillo_desde != 0, '', CONCAT( ' Pasillo : ', ppua.pasillo_desde ) ), 
+                    IF( ppua.pasillo_desde = 0, '', CONCAT( ' Pasillo : ', ppua.pasillo_desde ) ), 
                     IF( ppua.altura_desde = '', '', CONCAT( ' Altura : ', ppua.altura_desde ) )
                   )
                 )
