@@ -315,14 +315,10 @@
 					<td class=\"text-warning\">{$not_in_transfer[$key]['cantidad_producto']}</td>
 				</tr>";
 			}
-			//var_dump($correctly_rows);
-			//var_dump($not_in_pack[0]['id_productos']);
-			/*var_dump($not_in_transfer);
-			var_dump($different_quantity);*/
+
 			$resp .= "</tbody>
 					</table>
-
-			<div class="\row\">
+			<div class=\"row\">
 				<div class=\"col-3\">
 					<i class=\"icon-bookmark text-success\">Coincide</i>
 				</div>
