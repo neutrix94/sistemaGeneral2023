@@ -4,10 +4,10 @@ class db
 {
 
     // used to connect to the database
-    private $dbHost;// = 'localhost';
-    private $dbUser;// = 'root';
-    private $dbPass;// = '';
-    private $dbName;// = 'base_cdll_mis_pruebas';
+    private $dbHost;// = 'localhost'
+    private $dbUser;// = 'root'
+    private $dbPass;// = ''
+    private $dbName;// = 'base_cdll_mis_pruebas'
 
     function __construct(){
         error_reporting(0);

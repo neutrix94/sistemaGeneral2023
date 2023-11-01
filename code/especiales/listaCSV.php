@@ -34,7 +34,7 @@
         }else{
           echo "VENTAS TOTALES ".$ano_antes.",";
         }
-        echo "INVENTARIO DE TODAS LAS SUCURSALES,PRECIO COMPRA ANTERIOR,ENTRADAS AÑO ACTUAL,OBSERVACIONES,NOTAS DE PRECIO, NOTAS DE DECORACIÓN, NOTAS DE EXHIBICIÓN\n";
+        echo "INVENTARIO DE TODAS LAS SUCURSALES,PRECIO COMPRA ANTERIOR,ENTRADAS AÑO ACTUAL,OBSERVACIONES,NOTAS DE PRECIO, NOTAS DE DECORACIÓN, NOTAS DE EXHIBICIÓN, UBICACION\n";
 
         $sql="SELECT
               ax1.id_productos,
@@ -56,11 +56,11 @@
               ax1.invTotal,
               IF(hpc.id_historico_precio_compra IS NULL,0,hpc.precio)as precioCompraAnterior,
               ax1.totalEntradas,
-              ax1.observaciones,
+              REPLACE( ax1.observaciones, '\n', '*' ) AS observaciones,
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*' ) ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -74,7 +74,7 @@
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*' ) ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -88,7 +88,7 @@
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*' ) ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -97,7 +97,24 @@
               ON pvn.id_valor_nota = pr_n.id_valor_nota
               WHERE id_producto = ax1.id_productos
               AND pr_n.id_categoria_nota = 3
-              ) AS 'NOTAS EXHIBICIÖN'
+              ) AS 'NOTAS EXHIBICIÖN',
+              (SELECT
+                IF( ppua.id_ubicacion_matriz IS NULL, 
+                  '-',
+                  CONCAT( ppua.letra_ubicacion_desde, '', ppua.numero_ubicacion_desde, 
+                    IF( ppua.pasillo_desde = 0, '', CONCAT( ' Pasillo : ', ppua.pasillo_desde ) ), 
+                    IF( ppua.altura_desde = '', '', CONCAT( ' Altura : ', ppua.altura_desde ) )
+                  )
+                )
+              FROM ec_inventario_proveedor_producto ipp
+              LEFT JOIN ec_proveedor_producto pp 
+              ON ipp.id_proveedor_producto = pp.id_proveedor_producto
+              LEFT JOIN ec_proveedor_producto_ubicacion_almacen ppua
+              ON ppua.id_proveedor_producto = pp.id_proveedor_producto
+              WHERE pp.id_producto = ax1.id_productos
+              ORDER BY ipp.inventario DESC
+              LIMIT 1
+              ) AS Ubicacion
             FROM(
               SELECT
                 ax.id_productos,
@@ -177,11 +194,11 @@
               ax1.invTotal,
               IF(hpc.id_historico_precio_compra IS NULL,0,hpc.precio)as precioCompraAnterior,
               ax1.totalEntradas,
-              ax1.observaciones,
+              REPLACE( ax1.observaciones, '\n', '*' ) AS observaciones,
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*') ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -195,7 +212,7 @@
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*' ) SEPARATOR '<br>') )
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -209,7 +226,7 @@
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( pvn.nombre_valor_nota, ' : ', pr_n.nota ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( prn.nota, '\n', '*' ) ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -218,7 +235,24 @@
               ON pvn.id_valor_nota = pr_n.id_valor_nota
               WHERE id_producto = ax1.id_productos
               AND pr_n.id_categoria_nota = 3
-              ) AS 'NOTAS EXHIBICIÖN'
+              ) AS 'NOTAS EXHIBICIÖN',
+              (SELECT
+                IF( ppua.id_ubicacion_matriz IS NULL, 
+                  '-',
+                  CONCAT( ppua.letra_ubicacion_desde, '', ppua.numero_ubicacion_desde, 
+                    IF( ppua.pasillo_desde = 0, '', CONCAT( ' Pasillo : ', ppua.pasillo_desde ) ), 
+                    IF( ppua.altura_desde = '', '', CONCAT( ' Altura : ', ppua.altura_desde ) )
+                  )
+                )
+              FROM ec_inventario_proveedor_producto ipp
+              LEFT JOIN ec_proveedor_producto pp 
+              ON ipp.id_proveedor_producto = pp.id_proveedor_producto
+              LEFT JOIN ec_proveedor_producto_ubicacion_almacen ppua
+              ON ppua.id_proveedor_producto = pp.id_proveedor_producto
+              WHERE pp.id_producto = ax1.id_productos
+              ORDER BY ipp.inventario DESC
+              LIMIT 1
+              ) AS Ubicacion
             FROM(
               SELECT
                 ax.id_productos,
