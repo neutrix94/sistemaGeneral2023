@@ -2197,8 +2197,7 @@
 				{/literal}
 
 					{section loop=$gridArray name=x}
-
-						{if $gridArray[x][11] neq 'false' && $gridArray[x][0] neq '84' }//&& $gridArray[x][0] neq '84' Se agrega por Oscar 2023 para hacer solo informativo el grid de detalle proveedor producto
+						{if $gridArray[x][11] neq 'false' && $gridArray[x][0] neq '84' && $gridArray[x][0] neq '54' }// && $gridArray[x][0] neq '84' Se agrega por Oscar 2023 para hacer solo informativo el grid de detalle proveedor producto
 						//alert( '{$gridArray[x][2]}');
 							{if $gridArray[x][4] neq ''}
 								var aux={$gridArray[x][4]};
