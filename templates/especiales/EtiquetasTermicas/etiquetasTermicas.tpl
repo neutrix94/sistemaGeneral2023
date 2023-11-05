@@ -21,7 +21,8 @@
 <div id="filtros" class="row" style="width:90% !important;">
 <div id='cosa2'>
 <form action="">
-	<div class="filters row" id="filters_1">
+
+	<div class="filters row" id="filters_1" {if $special_permission eq 0 }style="display : none !important;"{/if}>
 		<div class="col-3">
 				<label for="categoria">Familias:</label>
 				<select id="categoria" class="form-select" name='filtros' onchange="cambiaSC(this.value)">
@@ -29,14 +30,6 @@
 					<option value="-2">PAQUETES</option>
 				</select>
 		</div>
-	
-	
-		<!--div class="col-4">
-			<label>&nbsp;Tipos:</label>
-			<select id="tip" class="form-select"  name='filtros' onclick="cambiaTP(this.value)">
-				{html_options values=$vals2 output=$textos2}
-			</select>
-		</div-->
 
 		<div class="col-8">
 			<label>&nbsp;Tipos:</label>
@@ -48,15 +41,8 @@
 				{/foreach}
 			</div>
 		</div>
-
-		<!--div class="col-4">
-			<label>&nbsp;Subtipos:</label>
-			<select id="subtip" class="form-select"  name='filtros'>
-				{html_options values=$vals3 output=$textos3}
-			</select>
-		</div-->
 	</div>
-	<div id='pli'class="row">
+	<div id='pli' class="row" {if $special_permission eq 0 }style="display : none !important;"{/if}>
 		<div class="col-4">
 			<label>Precio desde : </label>
 			<input type='number' class="form-control" name='filtros' value="0" min="0">
@@ -67,8 +53,8 @@
 		</div>
 		<div class="col-2"></div>
 	</div>
-<!-- Importación de CSV Oscar 2023/10/18-->
-	<div class="row"> 
+
+	<div class="row" {if $special_permission eq 0 }style="display : none !important;"{/if}> 
 		<h3>Importacion de CSV</h3>
 		<div class="col-6 text-center">
 			<input type="file" id="file_csv" style="display:none;" accept=".csv"/>
@@ -100,8 +86,7 @@
 			</div>
 		</div>
 	</div>	
-<!-- Fin de cambio Oscar 2023/10/18 -->
-	<div class="row" style="padding : 10px;">
+	<div class="row" style="padding : 10px;{if $special_permission eq 0 }display : none !important;{/if}" >
 		<h2>Busqueda por transferencia : </h2>
 		<div class="col-4">
 			<div class="input-group">
@@ -127,27 +112,35 @@
 	<div class="row" style="padding : 20px !important;">
 		<div id='buscador' class="col-lg-9" >
 			<h2>Producto:</h2>
-			<div class="input-group">
-				<input type='hidden' id='proId' value='0'>
-				<input type="text" id='busca' class="form-control" onkeyup="buscaProd( event )"><button 
-					type="button" 
-					id=''  
-					onclick="buscaProd( 'intro' )" 
-					class="btn btn-warning"
-				>
-					<i class="icon-search"></i>
-				</button>
-				<button 
-					type="button" 
-					id='ag'  
-					onclick="agregarListado()" 
-					disabled="true" 
-					class="btn btn-success"
-				>
-					<i class="">Agregar</i>
-				</button>
+			<div class="row">
+				<div class="col-9">
+					<div class="input-group">
+						<input type='hidden' id='proId' value='0'>
+						<input type="text" id='busca' class="form-control" onkeyup="buscaProd( event )"><button 
+							type="button" 
+							id=''  
+							onclick="buscaProd( 'intro' )" 
+							class="btn btn-warning"
+						>
+							<i class="icon-search"></i>
+						</button>
+					</div>
+				</div>
+				<div class="col-3">
+					<div class="input-group">
+						<input type="number" id="tags_seeker_quantity" class="form-control">
+						<button 
+							type="button" 
+							id='ag'  
+							onclick="agregarListado()" 
+							disabled="true" 
+							class="btn btn-success"
+						>
+							<i class="icon-plus"></i>
+						</button>
+					</div>
+				</div>
 			</div>
-
 			<div id='listaProd' class="row">
 				<ul id='proLi'>
 				</ul>
@@ -164,19 +157,34 @@
 			</div>
 		</div>
 	    <div id='tpl' class="col-lg-3">
-	    	<div><label>N&uacute;mero de etiquetas:</label></div>
-	    	<div><input type="number" class="form-control" name='parsTpl' value="1" min="1"></div>
+	    	<div {if $special_permission eq 0 }style="display : none !important;"{/if}>
+		    	<div><label>N&uacute;mero de etiquetas:</label></div>
+		    	<div><input type="number" class="form-control" name='parsTpl' value="1" min="1"></div>
+	    	</div>
+
+	    	<div><label >Tipo de etiqueta:</label></div>
+	    	<div>
+	    		<select name="" class="form-select" id="tag_type" onchange="buildTemplateOptions();">
+		    	    <option value="-1">---- Elige tipo etiqueta ----</option>
+		    		<option value="1">Etiqueta mediana</option>
+		    		<option value="2">Etiqueta Grande</option>
+	    		</select>
+	    	</div>
+
 	    	<div><label >Plantilla:</label></div>
-	    	<div><select name="parsTpl" class="form-select" id="ticket_plantilla">
-	    	    <option value="-1">---- Elige plantilla ----</option>
-	    		<option value="1">Plantilla normal</option>
-	    		<option value="2">Colgantes</option>
-	    		<option value="3">Varios precios ( picks )</option>
-	    		<option value="4">Precio 2 x tanto</option>
-	    		<option value="5">Colgantes 2 x tanto</option>
-	    		<option value="6">Productos sin Precio</option>
-	    		<option value="7">Varios precios ( decoracion )</option>
-	    	</select></div>
+	    	<div>
+	    		<select name="parsTpl" class="form-select" id="ticket_plantilla">
+		    	    <option value="-1">---- Elige plantilla ----</option>
+		    		<!--option value="1">Plantilla normal</option>
+		    		<option value="3">Varios precios ( picks )</option>
+		    		<option value="4">Precio 2 x tanto</option>
+		    		<option value="6">Productos sin Precio</option>
+		    		<option value="7">Varios precios ( decoracion )</option>
+
+		    		<option value="2">Colgantes</option>
+		    		<option value="5">Colgantes 2 x tanto</option-->
+		    	</select>
+			</div>
 <!-- check ofertas -->
 	    	<div id="ofertas">
 		    	<span>
@@ -424,6 +432,10 @@ function cambiaTP(val)
  		document.getElementById('busca').value=valor;
  		document.getElementById('proId').value=id;
  		document.getElementById('ag').disabled=false;
+ 		$( '#buscProd' ).html( '' );
+ 		$( '#buscProd' ).css( 'display', 'none' );
+ 		$( '#tags_seeker_quantity' ).val( 1 );
+ 		$( '#tags_seeker_quantity' ).select();
  	}
 var rows_counter = 0;
  	function agregarListado( id = null, valor = null )
@@ -432,16 +444,25 @@ var rows_counter = 0;
  			valor = document.getElementById('busca').value;
  			id = document.getElementById('proId').value
  		}
+ 		var quantity = $( '#tags_seeker_quantity' ).val();
+ 		if( quantity <= 0 ){
+ 			alert( "La cantidad por agregar debe de ser mayor a cero!" );
+ 			$( '#tags_seeker_quantity' ).select();
+ 			return false;
+ 		}
  		/*var valor = document.getElementById('busca').value;
- 		var id = document.getElementById('proId').value;*/
- 		 $('#proLi').append("<li class='proLiC' id='li"+id+"'>"+valor+"<input type='text' name='pro' style='display:none' value='"+id+"'></input><a class='clsEliminarElemento'>&nbsp;</a></li>");
- 		 document.getElementById('buscProd').className='ob';
- 		 document.getElementById('listaProd').style.display='block';
- 		 document.getElementById('busca').value='';
- 		 document.getElementById('proId').value='';
- 		 document.getElementById('ag').disabled=true;
- 		 rows_counter ++ ;
- 		 $( '#products_counter' ).val( rows_counter );
+	 		var id = document.getElementById('proId').value;*/
+	 	for( var i = 1; i <= quantity; i++ ){
+	 		 $('#proLi').append("<li class='proLiC' id='li"+id+"'>"+valor+"<input type='text' name='pro' style='display:none' value='"+id+"'></input><a class='clsEliminarElemento'>&nbsp;</a></li>");
+	 		 document.getElementById('buscProd').className='ob';
+	 		 document.getElementById('listaProd').style.display='block';
+	 		 document.getElementById('busca').value='';
+	 		 document.getElementById('proId').value='';
+	 		 document.getElementById('ag').disabled=true;
+	 		 rows_counter ++ ;
+	 		 $( '#products_counter' ).val( rows_counter );
+	 	}
+	  	$( '#tags_seeker_quantity' ).val( '' );
  	}
 var is_special = 0;//indicador de importacion / transferencia
 //var transfer_store_id = 0;//indicador de importacion / transferencia
@@ -712,6 +733,28 @@ var ventana_abierta = null;
  		var store_id = $( '#login_store_id' ).val();
  		$( '#store_id' ).val( store_id );
  	}
+
+ 	function buildTemplateOptions(){
+ 		var options = "";
+ 		var tag_type = $( '#tag_type' ).val();
+ 		if( tag_type == -1 ){
+ 			options = `<option value="-1">---- Elige plantilla ----</option>`;
+ 		}else if( tag_type == 1 ){
+ 			options = `<option value="-1">---- Elige plantilla ----</option>
+				<option value="1">Plantilla normal</option>
+				<option value="3">Varios precios ( picks )</option>
+				<option value="4">Precio 2 x tanto</option>
+				<option value="6">Productos sin Precio</option>
+				<option value="7">Varios precios ( decoracion )</option>`;
+ 		}else if( tag_type == 2 ){
+ 			options = `<option value="-1">---- Elige plantilla ----</option>
+ 				<option value="2">Colgantes</option>
+		    	<option value="5">Colgantes 2 x tanto</option>`;
+ 		}
+ 		$( '#ticket_plantilla' ).empty();
+ 		$( '#ticket_plantilla' ).html( options );
+		    		
+ 	}
  </script>
 
 <script>
@@ -770,7 +813,7 @@ height: 400px;
 overflow: scroll;
 left: 1%;
 z-index:10;
-top : 38%;
+top : 25%;
 }
 .proLiC {
 border: solid;
