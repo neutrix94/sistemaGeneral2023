@@ -83,7 +83,22 @@
 	$smarty->assign('stores_names',$stores_names);
 
 	$smarty->assign('store_id',$user_sucursal);//oscar 2023/10/20
-//			die( 'here' );
+/*implementacion Oscar 2023/11/04 para permiso de filtros de etiquetas*/
+	$sql = "SELECT
+				IF( p.ver = 1 OR p.modificar = 1 OR p.eliminar = 1 OR p.nuevo = 1 OR p.imprimir = 1 OR p.generar = 1, 1, 0 ) AS special_permission
+			FROM sys_permisos p
+			LEFT JOIN sys_users_perfiles up
+			ON p.id_perfil = up.id_perfil
+			LEFT JOIN sys_users u
+			ON u.tipo_perfil = up.id_perfil
+			WHERE p.id_menu = 298
+			AND u.id_usuario = {$user_id}";
+	$result = mysql_query($query) or die( 'Permiso especial : ' . mysql_error() );
+	$row = mysql_fetch_row( $result );
+	mysql_free_result($result);
+	$smarty->assign( 'special_permission',$row['special_permission'] );
+	//die( $sql );
+/*fin de cambio Oscar 2023/11/04*/
 	$smarty->display("especiales/EtiquetasTermicas/etiquetasTermicas.tpl");
 	
 ?>
