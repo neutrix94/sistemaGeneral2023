@@ -433,7 +433,8 @@ function cambiaTP(val)
  		document.getElementById('proId').value=id;
  		document.getElementById('ag').disabled=false;
  		$( '#buscProd' ).html( '' );
- 		$( '#buscProd' ).css( 'display', 'none' );
+ 		//$( '#buscProd' ).css( 'display', 'none' );
+	 	document.getElementById('buscProd').className='ob';
  		$( '#tags_seeker_quantity' ).val( 1 );
  		$( '#tags_seeker_quantity' ).select();
  	}
