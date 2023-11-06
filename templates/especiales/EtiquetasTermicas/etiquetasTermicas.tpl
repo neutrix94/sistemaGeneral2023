@@ -198,6 +198,12 @@
 		    		</center>
 		    	</span>
 		    </div>
+<!-- Implementacion Oscar 2023/11/05 para ver ejemplo de etiquetas -->
+			<div class="row">
+				<h4 class="text-center">Ejemplo de etiqueta : <h4>
+				<img src="../../../img/tags/tag_1.png" width="100%" id="tag_template_example">
+			</div>
+<!-- Fin de cambio Oscar 2023/11/05 -->
 		    <div id='btn'>
     			<button 
     				type="button" 
@@ -447,9 +453,10 @@ var rows_counter = 0;
  		}
  		var quantity = $( '#tags_seeker_quantity' ).val();
  		if( quantity <= 0 ){
- 			alert( "La cantidad por agregar debe de ser mayor a cero!" );
- 			$( '#tags_seeker_quantity' ).select();
- 			return false;
+ 			quantity = 1;
+ 			//alert( "La cantidad por agregar debe de ser mayor a cero!" );
+ 		//	$( '#tags_seeker_quantity' ).select();
+ 			//return false;
  		}
  		/*var valor = document.getElementById('busca').value;
 	 		var id = document.getElementById('proId').value;*/
