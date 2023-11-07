@@ -1,10 +1,10 @@
 <?php
-//extraemos indicador de tipo de ticket
+//recibe variables
    $flag=$_GET['fl'];
    $id_transfer=$_GET['id_transf'];
    $boxes_limit = $_GET['limit'];
    $limit_counter = $_GET['limit_counter'];
-//incluimos librerias
+//incluye librerias
    include("../../../../conectMin.php");
    include( "../../../../conexionMysqli.php" );
 	define('FPDF_FONTPATH','../../../../include/fpdf153/font/');
@@ -38,11 +38,11 @@
 			ON t.id_almacen_destino = alm2.id_almacen
 			LEFT JOIN sys_users u ON t.id_usuario = u.id_usuario
 			WHERE t.id_transferencia = {$id_transfer}";
-//die( $sql );
+
 	$stm = $link->query( $sql ) or die( "Error al consultar los datos de la transferencia : {$link->error}" );
-//die( 'ok' );
+
 	$row = $stm->fetch_assoc();
-//die( 'here : ' . $row['user_name'] );
+
 	class TicketPDF extends FPDF {
 		// Members
 		var $sucursal = "";
@@ -91,20 +91,7 @@
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
 	$bF=10;
-/*	if($impresa==1){
-		$ticket->SetFont('Arial','B',$bF+6);
-		$ticket->SetXY(5, $ticket->GetY()+4);
-		$ticket->Cell(66, 6, utf8_decode("REIMPRESIÓN"), "" ,0, "C");
-	}
 
-	transfer_title
-	transfer_folio
-	origin_warehouse
-	destinity_warehouse
-	user_name
-	creation_date
-	last_update_time
-*/
 //encabezado
 	$ticket->SetFont('Arial','B',$bF+2);
 	if($impresa==1){
@@ -113,13 +100,18 @@
 		$ticket->SetXY(5, $ticket->GetY()+5);
 	}
 //titulo de transferencia
-	$ticket->SetXY(5, $ticket->GetY()+5);
-	$ticket->Cell(70, 6, utf8_decode( "TÍTULO : " ), "" ,0, "C");
-	$ticket->SetXY(5, $ticket->GetY()+5);
-	$ticket->Cell(70, 6, utf8_decode( $row['transfer_title'] ), "" ,0, "C");
-	
-	/*$ticket->SetXY(5, $ticket->GetY()+6);
-	$ticket->Cell(66, 3, "", "TB" ,0, "C");*/
+		$ticket->SetXY(5, $ticket->GetY()+5);
+		$ticket->Cell(70, 6, utf8_decode( "TÍTULO : " ), "" ,0, "C");
+	if( strlen( $row['transfer_title'] ) > 30 ){
+		$parts = part_word( $row['transfer_title'] );
+		$ticket->SetXY(5, $ticket->GetY()+5);
+		$ticket->Cell(70, 6, utf8_decode( $parts[0] ), "" ,0, "C");
+		$ticket->SetXY(5, $ticket->GetY()+5);
+		$ticket->Cell(70, 6, utf8_decode( $parts[1] ), "" ,0, "C");
+	}else{
+		$ticket->SetXY(5, $ticket->GetY()+5);
+		$ticket->Cell(70, 6, utf8_decode( $row['transfer_title'] ), "" ,0, "C");
+	}
 //folio
 	$ticket->SetFont('Arial','B',$bF);
 	$ticket->SetXY(3, $ticket->GetY()+7);
@@ -144,13 +136,14 @@
 
 //
 	include('../../../../include/barcode/barcode.php');
-	$row['transfer_folio'] = str_replace(' ', '', $row['transfer_folio'] );
-	$barcodePath = "../../../../img/codigos_barra/{$row['transfer_folio']}.png";
+	$row['transfer_folio'] = trim( $row['transfer_folio'] );// 
+	$aux_name = str_replace(' ', '', $row['transfer_folio'] );
+	$barcodePath = "../../../../img/codigos_barra/{$aux_name}.png";
 	barcode( $barcodePath, $row['transfer_folio'], '60', 'horizontal', 'code128', false, 1);
 
-  	if( file_exists("../../../../img/codigos_barra/{$row['transfer_folio']}.png") ){
+  	if( file_exists("../../../../img/codigos_barra/{$aux_name}.png") ){
     	$ticket->SetXY(5, $ticket->GetY()+10);
-    	$ticket->Image("../../../../img/codigos_barra/{$row['transfer_folio']}.png", 5, $ticket->GetY()+5,70);
+    	$ticket->Image("../../../../img/codigos_barra/{$aux_name}.png", 5, $ticket->GetY()+5,70);
    }
 //
 
@@ -184,9 +177,9 @@
 	$contador=0;
 
 	
-    if($printPan == 1) {
-	   $ticket->Output();
-    }else{
+	if($printPan == 1) {
+		$ticket->Output();
+	}else{
 /*actualizamos la transferencia como impresa*/
 	if($impresa==0){
 		mysql_query("BEGIN");
@@ -214,22 +207,51 @@
     			$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);
 
     		}
-    	/*if(isset($_GET['num_tickets'])){
-    		for($j=0;$j<$_GET['num_tickets'];$j++){
-				$ticket->Output("../../../../cache/ticket/".$j."_".$nombre_ticket, "F");    			
-    		}
-    	}else{*/
     	  	$ticket->Output("../../../../cache/ticket/".$nombre_ticket, "F");
-    	//}
-    /*fin de cambio Oscar 25.01.2019*/
     	}
-/*fin de cambio Oscar 17.09.2018*/
-	if($impresa==0){mysql_query("COMMIT");}
-    echo 'ok|'.$nombre_ticket;
-       //$ticket->Output("../../cache/ticket/ticket_".$user_sucursal."_" . date("YmdHis") . "_" . strtolower($tipofolio) . "_" . $folio . "_2.pdf", "F");
-     //  header ("location: index.php?scr=home"); 
-    }
-
-	//exit (0);
+	if($impresa==0){
+		mysql_query("COMMIT");
+	}
+   	echo 'ok|'.$nombre_ticket;
+   }
+//funcion para partir texto en 2
+	function part_word( $txt ){
+		$size = strlen( $txt );
+		$half = round( $size / 2 );
+		$words = explode(' ', $txt );
+		$resp = array( '','');
+		$chars_counter = 0;
+		$middle_word = "";
+		foreach ($words as $key => $word) {
+			$is_middle = 0;
+			if( $key > 0 ){
+				$chars_counter ++;//espacio
+				if( $chars_counter == $half ){
+					$is_middle = 1;
+				}
+			}
+			for( $i = 0; $i < strlen( $word ); $i ++ ){
+				$chars_counter ++;//palabras
+				if( $chars_counter == $half || $is_middle == 1){
+					$middle_word = $word;
+					$is_middle = 1;
+				}
+			}
+			if( $middle_word == '' ){
+				$resp[0] .= ( $resp[0] != '' ? ' ' : '' );
+				$resp[0] .= $word;
+			}else if( $middle_word != '' && $is_middle == 0 ){
+				$resp[1] .= ( $resp[1] != '' ? ' ' : '' );
+				$resp[1] .= $word;
+			}
+			$is_middle = 0;
+		}
+		if( strlen( "{$resp[0]} {$middle_word}" ) < strlen( "{$middle_word} {$resp[1]}" )  ){//asigna palabra intermedia a primera parte
+			$resp[0] = "{$resp[0]} {$middle_word}";
+		}else{//asigna palabra intermedia a segunda parte
+			$resp[1] = "{$middle_word} {$resp[1]}";
+		}
+		return $resp;
+	}
 
 ?>
