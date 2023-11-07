@@ -93,10 +93,10 @@
 			ON u.tipo_perfil = up.id_perfil
 			WHERE p.id_menu = 298
 			AND u.id_usuario = {$user_id}";
-	$result = mysql_query($query) or die( 'Permiso especial : ' . mysql_error() );
+	$result = mysql_query($sql) or die( 'Permiso especial : ' . mysql_error() );
 	$row = mysql_fetch_row( $result );
+	$smarty->assign( 'special_permission',$row[0] );
 	mysql_free_result($result);
-	$smarty->assign( 'special_permission',$row['special_permission'] );
 	//die( $sql );
 /*fin de cambio Oscar 2023/11/04*/
 	$smarty->display("especiales/EtiquetasTermicas/etiquetasTermicas.tpl");

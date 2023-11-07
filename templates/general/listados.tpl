@@ -465,12 +465,20 @@
 			<!--Fin de cambio Oscar 21.02.2019-->
 
 			<!--Implementación Oscar 22.02.2019 para agregar botón de impresión de Transferencias en ticket-->
-							{if $tabla eq 'ZWNfdHJhbnNmZXJlbmNpYXM=' && ( $no_tabla eq 'MA==' || $no_tabla eq 'MTI=' || $no_tabla eq 'Ng==' )}<!-- implementacion Oscar 2023 para el listado de resoluciones -->
+							{if $tabla eq 'ZWNfdHJhbnNmZXJlbmNpYXM=' && ( $no_tabla eq 'MA==' || $no_tabla eq 'MTI=' ) }<!-- implementacion Oscar 2023 para el listado de resoluciones -->
 								<td width="56" offsetWidth="56" tipo="libre" valor="Ticket" align="center" campoBD='{$valuesEncGrid[x]}'>
 									<img class="imprimirmini" src="{$rooturl}img/impresion_tkt.png" width="22" height="22" border="0" onclick="imprimeTicketTrans('#')" onmouseover="this.style.cursor='hand';this.style.cursor='pointer';" alt="Autorizar" title="De clic para imprimir ticket de resolucion"/>
 								</td>
 							{/if}
 			<!--Fin de cambio Oscar 21.02.2019-->
+
+			<!-- Implementacion Oscar 2023/11/05 para el ticket de transferencias rapidas -->
+							{if $tabla eq 'ZWNfdHJhbnNmZXJlbmNpYXM=' && $no_tabla eq 'Ng==' }
+								<td width="56" offsetWidth="56" tipo="libre" valor="Ticket" align="center" campoBD='{$valuesEncGrid[x]}'>
+									<img class="imprimirmini" src="{$rooturl}img/impresion_tkt.png" width="22" height="22" border="0" onclick="show_emergent_fast_transfer_ticket('#')" onmouseover="this.style.cursor='hand';this.style.cursor='pointer';" alt="Autorizar" title="De clic para imprimir ticket de resolucion"/>
+								</td>
+							{/if}
+			<!-- Fin de cambio Oscar 2023/11/05 -->
 
 			<!--Implementación Oscar 03.03.2019 para agregar botón de impresión de Transferencias en ticket-->
 							{if $tabla eq 'ZWNfZGV2b2x1Y2lvbg==' && $no_tabla eq 'MQ=='}
@@ -1006,6 +1014,45 @@ $("#imp_csv_prd").change(function(){
 			$("#listado_Fila"+pos).css('background','rgba(0,225,0,.5)');
 		}
 /*Fin de cambio Oscar 22.02.2019*/
+
+/*implementacion Oscar 2023/11/06*/
+	function show_emergent_fast_transfer_ticket( pos ){
+		var content = `<div class="row" style="text-align : center;">
+			<div class="col-3"></div>
+			<div class="col-6">
+				<h3>Ingresa el numero de cajas : </h3>
+				<input type="number" id="boxes_quantity" class="form-control">
+				<br><br>
+				<button
+					type="button"
+					class="btn btn-success"
+					onclick="print_fast_transfer_ticket( ${pos} )"
+				>
+					<i class="icon-">Imprimir</i>
+				</button>
+			</div>
+			<div class="col-3"></div>
+		</div>`;
+		$( '.emergent_content' ).html( content );
+		$( '.emergent' ).css( 'display', 'block' );
+	}
+
+	function print_fast_transfer_ticket( pos ){
+		var limit = $( '#boxes_quantity' ).val();
+		for( var i = 1; i<= limit ; i++  ){
+			var id=celdaValorXY('listado', 0, pos);
+			var impr_tkt=ajaxR("../especiales/Transferencias/ticket_transferencia/ticket_fast_transfer.php?flag=reimpresion&id_transf="+id+"&limit=" + limit + "&limit_counter=" + i );
+			var ax = impr_tkt.split( '|' );
+			if( ax[0] != 'ok' ){
+				alert( "Error al imprmir ticket : \n" + impr_tkt );
+			}
+			//alert( impr_tkt );
+		}
+		alert( "Tickets generados exitosamente!" );
+		$( '.emergent_content' ).html( '' );
+		$( '.emergent' ).css( 'display', 'none' );
+	}
+/*fin de cambio Oscar 2023/11/06*/
 		
 		function resolverTrans(pos){
 			var f=document.form1;
