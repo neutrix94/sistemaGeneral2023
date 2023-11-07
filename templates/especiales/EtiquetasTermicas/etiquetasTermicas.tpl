@@ -173,7 +173,7 @@
 
 	    	<div><label >Plantilla:</label></div>
 	    	<div>
-	    		<select name="parsTpl" class="form-select" id="ticket_plantilla">
+	    		<select name="parsTpl" class="form-select" id="ticket_plantilla" onchange="change_template_image();">
 		    	    <option value="-1">---- Elige plantilla ----</option>
 		    		<!--option value="1">Plantilla normal</option>
 		    		<option value="3">Varios precios ( picks )</option>
@@ -190,7 +190,7 @@
 		    	<span>
 		    		<b>Filtrar por:</b>
 		    			<p align="center">
-		    				<select id="ofe" class="form-control" align="center">
+		    				<select id="ofe" class="form-control" align="center"  onchange="change_template_image();">
 		    					<option value="1">Sin Oferta</option>
 		    					<option value="2">Con Oferta</option>
 		    				</select>			
@@ -198,6 +198,25 @@
 		    		</center>
 		    	</span>
 		    </div>
+<!-- Implementacion Oscar 2023/11/05 para ver ejemplo de etiquetas -->
+			<div class="row">
+				<h4 class="text-center">Ejemplo de etiqueta : <h4>
+				<div class="row">
+					<div class="col-4"><hr></div>
+					<div class="col-4"><p class="text-center" id="tag_width"></p></div>
+					<div class="col-4"><hr></div>
+					<div class="col-2" class="text-center" style="vertical-align: middle;">
+						<br><br>
+						<p style="vertical-align: middle;" class="text-center" id="tag_height"></p>
+					</div>
+					<div class="col-10">
+						<img src="" width="100%" id="tag_template_example">
+					</div>
+				</div>
+				<!--img src="../../../img/tags/tag_1.png" width="100%" id="tag_template_example"-->
+				<!--img src="../../../img/tags/colgante_1_oferta.png" width="100%" id="tag_template_example"-->
+			</div>
+<!-- Fin de cambio Oscar 2023/11/05 -->
 		    <div id='btn'>
     			<button 
     				type="button" 
@@ -433,7 +452,8 @@ function cambiaTP(val)
  		document.getElementById('proId').value=id;
  		document.getElementById('ag').disabled=false;
  		$( '#buscProd' ).html( '' );
- 		$( '#buscProd' ).css( 'display', 'none' );
+ 		//$( '#buscProd' ).css( 'display', 'none' );
+	 	document.getElementById('buscProd').className='ob';
  		$( '#tags_seeker_quantity' ).val( 1 );
  		$( '#tags_seeker_quantity' ).select();
  	}
@@ -446,9 +466,10 @@ var rows_counter = 0;
  		}
  		var quantity = $( '#tags_seeker_quantity' ).val();
  		if( quantity <= 0 ){
- 			alert( "La cantidad por agregar debe de ser mayor a cero!" );
- 			$( '#tags_seeker_quantity' ).select();
- 			return false;
+ 			quantity = 1;
+ 			//alert( "La cantidad por agregar debe de ser mayor a cero!" );
+ 		//	$( '#tags_seeker_quantity' ).select();
+ 			//return false;
  		}
  		/*var valor = document.getElementById('busca').value;
 	 		var id = document.getElementById('proId').value;*/
@@ -737,23 +758,69 @@ var ventana_abierta = null;
  	function buildTemplateOptions(){
  		var options = "";
  		var tag_type = $( '#tag_type' ).val();
+ 		var height = '', width = ''; 
  		if( tag_type == -1 ){
  			options = `<option value="-1">---- Elige plantilla ----</option>`;
- 		}else if( tag_type == 1 ){
+ 		}else if( tag_type == 1 ){//<option value="3">Varios precios ( picks )</option>
  			options = `<option value="-1">---- Elige plantilla ----</option>
 				<option value="1">Plantilla normal</option>
-				<option value="3">Varios precios ( picks )</option>
+				
 				<option value="4">Precio 2 x tanto</option>
 				<option value="6">Productos sin Precio</option>
 				<option value="7">Varios precios ( decoracion )</option>`;
+				height = '5 cm';
+				width = '7.6 cm';
  		}else if( tag_type == 2 ){
  			options = `<option value="-1">---- Elige plantilla ----</option>
  				<option value="2">Colgantes</option>
 		    	<option value="5">Colgantes 2 x tanto</option>`;
+			height = '10 cm';
+			width = '15 cm';
  		}
  		$( '#ticket_plantilla' ).empty();
+ 		$( '#tag_template_example' ).attr( "src", "" );
  		$( '#ticket_plantilla' ).html( options );
-		    		
+ 		$( '#tag_width' ).html( width );
+ 		$( '#tag_height' ).html( height );
+ 	}
+
+ 	function change_template_image(){
+ 		var template = $( "#ticket_plantilla" ).val();
+ 		var oferta = $( '#ofe' ).val();//1 sin oferta, 2 con oferta
+ 		if( template == "" || template == "-1" ){
+ 			$( '#tag_template_example' ).attr( "src", "" );
+ 		}else if( template == "1" ){
+	 		if( oferta == 1 ){
+	 			$( '#tag_template_example' ).attr( "src", "../../../img/tags/tag_1.png" );
+	 		}else if( oferta == 2 ){
+	 			$( '#tag_template_example' ).attr( "src", "../../../img/tags/tag_1_oferta.png" );
+	 		}
+ 		}else if( template == "2" ){
+ 			if( oferta == 1 ){
+ 				$( '#tag_template_example' ).attr( "src", "../../../img/tags/colgante_normal.png" );
+ 			}else if( oferta == 2 ){
+ 				$( '#tag_template_example' ).attr( "src", "../../../img/tags/colgante_normal_oferta.png" );
+ 			}
+ 		}else if( template == "3" ){
+ 			$( '#tag_template_example' ).attr( "src", "../../../img/tags/.png" );
+
+ 		}else if( template == "4" ){
+ 			$( '#tag_template_example' ).attr( "src", "../../../img/tags/2_x_tanto.png" );
+
+ 		}else if( template == "5" ){
+ 			$( '#tag_template_example' ).attr( "src", "../../../img/tags/colgante_2_x_tanto.png" );
+
+ 		}else if( template == "6" ){
+ 			$( '#tag_template_example' ).attr( "src", "../../../img/tags/.png" );
+
+ 		}else if( template == "7" ){
+	 		if( oferta == 1 ){
+	 			$( '#tag_template_example' ).attr( "src", "../../../img/tags/varios_precios.png" );
+	 		}else if( oferta == 2 ){
+ 				$( '#tag_template_example' ).attr( "src", "../../../img/tags/varios_precios_oferta.png" );
+	 		}
+ 		}
+ 		
  	}
  </script>
 
