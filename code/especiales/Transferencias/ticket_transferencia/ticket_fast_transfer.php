@@ -113,11 +113,18 @@
 		$ticket->SetXY(5, $ticket->GetY()+5);
 	}
 //titulo de transferencia
-	$ticket->SetXY(5, $ticket->GetY()+5);
-	$ticket->Cell(70, 6, utf8_decode( "TÍTULO : " ), "" ,0, "C");
-	$ticket->SetXY(5, $ticket->GetY()+5);
-	$ticket->Cell(70, 6, utf8_decode( $row['transfer_title'] ), "" ,0, "C");
-	
+		$ticket->SetXY(5, $ticket->GetY()+5);
+		$ticket->Cell(70, 6, utf8_decode( "TÍTULO : " ), "" ,0, "C");
+	if( strlen( $row['transfer_title'] ) > 30 ){
+		$parts = part_word( $row['transfer_title'] );
+		$ticket->SetXY(5, $ticket->GetY()+5);
+		$ticket->Cell(70, 6, utf8_decode( $parts[0] ), "" ,0, "C");
+		$ticket->SetXY(5, $ticket->GetY()+5);
+		$ticket->Cell(70, 6, utf8_decode( $parts[1] ), "" ,0, "C");
+	}else{
+		$ticket->SetXY(5, $ticket->GetY()+5);
+		$ticket->Cell(70, 6, utf8_decode( $row['transfer_title'] ), "" ,0, "C");
+	}
 	/*$ticket->SetXY(5, $ticket->GetY()+6);
 	$ticket->Cell(66, 3, "", "TB" ,0, "C");*/
 //folio
@@ -144,13 +151,14 @@
 
 //
 	include('../../../../include/barcode/barcode.php');
-	$row['transfer_folio'] = str_replace(' ', '', $row['transfer_folio'] );
-	$barcodePath = "../../../../img/codigos_barra/{$row['transfer_folio']}.png";
+	$row['transfer_folio'] = trim( $row['transfer_folio'] );// 
+	$aux_name = str_replace(' ', '', $row['transfer_folio'] );
+	$barcodePath = "../../../../img/codigos_barra/{$aux_name}.png";
 	barcode( $barcodePath, $row['transfer_folio'], '60', 'horizontal', 'code128', false, 1);
 
-  	if( file_exists("../../../../img/codigos_barra/{$row['transfer_folio']}.png") ){
+  	if( file_exists("../../../../img/codigos_barra/{$aux_name}.png") ){
     	$ticket->SetXY(5, $ticket->GetY()+10);
-    	$ticket->Image("../../../../img/codigos_barra/{$row['transfer_folio']}.png", 5, $ticket->GetY()+5,70);
+    	$ticket->Image("../../../../img/codigos_barra/{$aux_name}.png", 5, $ticket->GetY()+5,70);
    }
 //
 
@@ -230,6 +238,44 @@
      //  header ("location: index.php?scr=home"); 
     }
 
+		function part_word( $txt ){
+			$size = strlen( $txt );
+			$half = round( $size / 2 );
+			$words = explode(' ', $txt );
+			$resp = array( '','');
+			$chars_counter = 0;
+			$middle_word = "";
+			foreach ($words as $key => $word) {
+				$is_middle = 0;
+				if( $key > 0 ){
+					$chars_counter ++;//espacio
+					if( $chars_counter == $half ){
+						$is_middle = 1;
+					}
+				}
+				for( $i = 0; $i < strlen( $word ); $i ++ ){
+					$chars_counter ++;//palabras
+					if( $chars_counter == $half || $is_middle == 1){
+						$middle_word = $word;
+						$is_middle = 1;
+					}
+				}
+				if( $middle_word == '' ){
+					$resp[0] .= ( $resp[0] != '' ? ' ' : '' );
+					$resp[0] .= $word;
+				}else if( $middle_word != '' && $is_middle == 0 ){
+					$resp[1] .= ( $resp[1] != '' ? ' ' : '' );
+					$resp[1] .= $word;
+				}
+				$is_middle = 0;
+			}
+			if( strlen( "{$resp[0]} {$middle_word}" ) < strlen( "{$middle_word} {$resp[1]}" )  ){//asigna palabra intermedia a primera parte
+				$resp[0] = "{$resp[0]} {$middle_word}";
+			}else{//asigna palabra intermedia a segunda parte
+				$resp[1] = "{$middle_word} {$resp[1]}";
+			}
+			return $resp;
+		}
 	//exit (0);
 
 ?>
