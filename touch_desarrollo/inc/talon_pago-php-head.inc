@@ -400,12 +400,20 @@
 		$ticket->SetXY(1, $ticket->GetY()+8);
 		$ticket->Cell(66, 6, utf8_decode("FOLIO APARTADO: ".$folioA), "", 0, 'C');
 	
-	}
+	}	
 
-    if(file_exists("../img/codigos_barra/".$folio.".png")){
-    	$ticket->SetXY(5, $ticket->GetY()+3);
-    	$ticket->Image("../img/codigos_barra/".$folio.".png", 15, $ticket->GetY()+5,46);
-    }
+    //generacion de codigo de barras
+        include('../include/barcode/barcode.php');
+        $barcode_name = str_replace(' ', '', $folio );
+        $barcodePath = "../img/codigos_barra/{$barcode_name}.png";
+        barcode( $barcodePath, $folio, '60', 'horizontal', 'code128', true, 1);
+    //se incrustra el codigo de barras en el ticket
+        //$ticket->Image( $barcodePath, 6, $ticket->GetY()+10, 70);
+
+	    if(file_exists("../img/codigos_barra/".$folio.".png")){
+	    	$ticket->SetXY(5, $ticket->GetY()+8);
+	    	$ticket->Image("../img/codigos_barra/".$folio.".png", 15, $ticket->GetY()+5,46);
+	    }
 
   		$ticket->SetFont('Arial','B',$bF+3);
 		$ticket->SetXY(1, $ticket->GetY()+40);
