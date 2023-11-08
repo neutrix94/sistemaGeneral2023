@@ -341,5 +341,62 @@
 			$result = json_encode( $result, true );
 			return $result;
 		}
+
+	//reversado
+		public function Reverse( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id, $store_id_netpay ){
+			$token = $this->getToken( $terminal );
+			if( sizeof($token) == 0 || $token == null ){
+				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
+			}
+			$terminal_data = $this->getTerminal( $terminal, $store_id );
+			$petition_id = $this->insertNetPetitionRow();
+		//arreglo de prueba
+			$data = array( "traceability"=>array(   
+							"id_sucursal"=>"{$store_id}", 
+							"id_cajero"=>"{$user_id}", 
+							"folio_venta"=>"{$sale_folio}", 
+							"id_sesion_cajero"=>"{$session_id}",
+							"petition_id"=>"{$petition_id}",
+							"smart_accounts"=>true,
+							"store_id_netpay"=>$store_id_netpay
+						),
+			            "serialNumber"=>"{$terminal}",
+			            "orderId"=> $orderId,
+					    "folioId"=>"{{folioId}}",
+			            /*"storeId"=>"9194",
+			            "storeId"=>"{$this->NetPayStoreId}",*/
+			            "storeId"=>"{$store_id_netpay}",
+   						"isSmartAccounts"=>"true",
+						"disablePrintAnimation"=>false
+					);
+			//var_dump( $data );return '';
+			$post_data = json_encode( $data, true );
+		//envia peticion
+			$curl = curl_init();
+			curl_setopt_array($curl, array(
+			  CURLOPT_URL => $apiUrl,//"http://nubeqa.netpay.com.mx:3334/integration-service/transactions/sale",
+			  CURLOPT_RETURNTRANSFER => true,
+			  CURLOPT_ENCODING => "",
+			  CURLOPT_MAXREDIRS => 10,
+			  CURLOPT_TIMEOUT => 0,
+			  CURLOPT_FOLLOWLOCATION => true,
+			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			  CURLOPT_CUSTOMREQUEST => "POST",
+			  CURLOPT_POSTFIELDS => $post_data,
+			  CURLOPT_HTTPHEADER => array(
+			    "Content-Type: application/json",
+			    "Authorization: Bearer {$token['access_token']}"
+			  ),
+			));
+
+			$response = curl_exec($curl);
+			curl_close($curl);
+			$result = json_decode( $response );//json_encode(),
+			$result->petition_id = $petition_id; 
+			//var_dump($response);
+			//die( '' );
+			$result = json_encode( $result, true );
+			return $result;
+		}
 	}
 ?>

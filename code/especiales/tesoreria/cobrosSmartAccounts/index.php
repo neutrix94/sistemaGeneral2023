@@ -130,11 +130,11 @@
 			</div>
 			<div class="col-6">
 					<p class="informativo" align="center">Monto:<br>
-						<input type="text" id="monto_total" class="form-control" style="background:white;" disabled></p>
+						<input type="text" id="monto_total" class="form-control text-end" style="background:white;" disabled></p>
 			</div>
 			<div class="col-6">
 					<p class="informativo" align="center">A favor:<br>
-					<input type="text" id="saldo_favor" class="form-control" style="background:white;" disabled></p>
+					<input type="text" id="saldo_favor" class="form-control text-end" style="background:white;" disabled></p>
 			</div>
 
 			<input type="hidden" id="id_venta" value="0">
@@ -144,6 +144,21 @@
 		<div class="row" id="historic_payments"></div>
 	<!-- -->
 		<div class="row">
+			<div class="input-group">
+				<input type="text" id="terminal_qr_input" class="form-control" 
+					placeholder="Escanear /codigo QR de la terminal"
+					onkeyup="seekTerminalByQr( event );"
+				>
+				<button
+					type="button"
+					class="btn btn-success"
+					onclick="seekTerminalByQr( 'intro' );"
+				>
+					<i class="icon-qrcode"></i>
+				</button>
+			</div>		
+		</div>
+		<div class="row" id="cards_container">
 			<h3>Tarjetas 
 				<button
 					type="button"

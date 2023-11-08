@@ -1,4 +1,0 @@
-INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_afiliacion, 
-    /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar ) 
-    VALUES ( /*1*/NULL, /*2*/'423147', /*3*/'784', /*4*/'111', 
-    /*5*/'26', /*6*/'1.0', /*7*/NOW(), /*8*/NOW(), /*9*/'230912184719-1494113052', /*10*/1 )
