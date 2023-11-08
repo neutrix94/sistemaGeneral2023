@@ -13,7 +13,7 @@
 			p.orden_lista,
 			p.nombre,
 			SUM(IF(ma.id_movimiento_almacen IS NULL OR ma.id_sucursal!=1,0,(md.cantidad*tm.afecta))),
-			p.observaciones AS observations/*implementacion Oscar 2023/10/16*/
+			REPLACE( p.observaciones, '\n', '*' ) AS observations/*implementacion Oscar 2023/10/16*/
 		FROM ec_productos p
 		LEFT JOIN ec_movimiento_detalle md ON p.id_productos=md.id_producto
 		LEFT JOIN ec_movimiento_almacen ma ON md.id_movimiento=ma.id_movimiento_almacen
