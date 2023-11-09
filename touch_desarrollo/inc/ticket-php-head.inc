@@ -1,3 +1,5 @@
+
+text/x-generic ticket-php-head.inc ( PHP script, UTF-8 Unicode text )
 <?php
 	#header("Content-Type: text/plain;charset=utf-8");
 	//die('here');
@@ -156,7 +158,29 @@ Fin de cambio Oscar 25.06.2019*/
                 	''
               	),
             	IF(s.mostrar_alfanumericos=0,'',CONCAT('Clave: ',ax.clave))
-          )as info
+          )as info,
+          IF( ax.id_producto = 2758
+			OR ax.id_producto = 2854
+			OR ax.id_producto = 2759
+			OR ax.id_producto = 1918
+			OR ax.id_producto = 3317
+			OR ax.id_producto = 1820
+			OR ax.id_producto = 2760
+			OR ax.id_producto = 2761
+			OR ax.id_producto = 2767
+			OR ax.id_producto =	2768
+			OR ax.id_producto = 1956
+			OR ax.id_producto = 3813
+			OR ax.id_producto = 3814
+			OR ax.id_producto = 2769
+			OR ax.id_producto = 3628
+			OR ax.id_producto = 2736
+			OR ax.id_producto = 4118,
+			( SELECT 
+				DATE_SUB(CURDATE(), INTERVAL -1 DAY) 
+			),
+			'' 
+		) AS is_special
 		/*Fin de cambio 10.10.2018*/
 		FROM(
 			SELECT
@@ -176,7 +200,7 @@ Fin de cambio Oscar 25.06.2019*/
 	    )ax
 		LEFT JOIN sys_sucursales_producto sp ON ax.id_producto=sp.id_producto
 		JOIN sys_sucursales s ON sp.id_sucursal=s.id_sucursal AND s.id_sucursal IN($user_sucursal)";
-	       
+	//die( $cs );
 	$descProds=0;
 	if ($rs = mysql_query($cs))
 	{
@@ -202,6 +226,10 @@ Fin de cambio Oscar 25.06.2019*/
 		/*implementación Oscar 10.10.2018 para imprimir ubicación y calve_proveedor en ticket*/
 			if($dr["infoAdicional"]==1){
 				$lineas_productos+=.8;
+			}
+
+			if($dr["is_special"] != '' ){
+				$lineas_productos+=2;
 			}
 		/*fin de cambio 10.10.2018*/	
 		}
@@ -391,6 +419,19 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 			$ticket->SetXY(5,($ticket->GetY()-1.5));
 			$ticket->MultiCell(66*0.63, 4, utf8_decode("{$producto["info"]}"), "", "L", false);
 		}
+
+		
+
+		if( $producto["is_special"] != '' ){
+			$ticket->SetXY(5, $ticket->GetY() + 2 );
+			$ticket->MultiCell(35, 4, utf8_decode("Fecha entrega : \n {$producto["is_special"]} 18:30 hrs"), "1", "C", false);
+			$ticket->SetXY(40, $ticket->GetY() - 8 );
+			$ticket->MultiCell(35, 4, utf8_decode("\n\n"), "1", "C", false);
+			$ticket->SetXY(5, $ticket->GetY() + 4 );
+		}
+
+//http://localhost/pruebas_etiquetas/touch_desarrollo/index.php?scr=ticket&idp=425108
+
 		$ticket->SetFont('Arial','',$bF-2);
 	/*fin de cambio 10.10.2018*/
 	}
@@ -407,6 +448,17 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 	
 		$ticket->SetXY(5, $y);
 		$ticket->MultiCell(66*0.63, 4, utf8_decode("{$productoP["producto"]}"), "", "L", false);
+
+
+		
+
+		if( $productoP["is_special"] != '' ){
+			$ticket->SetXY(5, $ticket->GetY() + 4 );
+			$ticket->MultiCell(35, 4, utf8_decode("Fecha entrega"), "", "C", false);
+			$ticket->MultiCell(35, 39, utf8_decode("{$productoP["is_special"]}"), "", "C", false);
+		}
+
+
 
 		
 
@@ -677,7 +729,7 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
     /*fin de cambio Oscar 25.01.2019*/
     	}//fin de for $cont
 /*fin de cambio Oscar 17.09.2018*/
-/*implementacion Oscar 2023/09/20 para enviar impresion remota*/
+/*implementacion Oscar 2023/09/20 para enviar impresion remota*
 	if($user_tipo_sistema=='linea'){
 		$archivo_path = "../conexion_inicial.txt";
 		$url = "";
