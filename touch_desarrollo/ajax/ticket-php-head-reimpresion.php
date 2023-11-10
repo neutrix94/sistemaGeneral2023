@@ -346,7 +346,7 @@
 		}
 		if( $producto["is_special"] != '' ){
 			$ticket->SetXY(5, $ticket->GetY() + 2 );
-			$ticket->MultiCell(35, 4, utf8_decode("Fecha entrega : \n {$productoP["is_special"]} 18:30 hrs"), "1", "C", false);
+			$ticket->MultiCell(35, 4, utf8_decode("Fecha entrega : \n {$producto["is_special"]} 18:30 hrs"), "1", "C", false);
 			$ticket->SetXY(40, $ticket->GetY() - 8 );
 			$ticket->MultiCell(35, 4, utf8_decode("\n\n"), "1", "C", false);
 			$ticket->SetXY(5, $ticket->GetY() + 4 );
