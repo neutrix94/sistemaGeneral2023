@@ -376,6 +376,17 @@
 		}
 	}
 /*Fin de cambio 06.06.2018*/
+	
+
+/*Modificacion Oscar 2023/11/08 para correcion de descarga reporte de todas las ventas*/
+	if($id_reporte==35){
+		$extras = "AND ( ped.fecha_alta BETWEEN '{$fecdel} 01:00:00' AND '{$fecal} 23:59:59' )";
+		//die("condiciones: ".$extras);
+		$sql=str_replace('YYY',$extras,$sql);
+		//$sql=str_replace('_ZZZ_',$condiciones_35,$sql);
+	}
+/*fin de cambio Oscar 2023/11/08*/
+
 
 	$condiciones.=" $extras";	
 	

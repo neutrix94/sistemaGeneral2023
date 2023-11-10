@@ -111,7 +111,29 @@
 	       		IF(s.mostrar_ubicacion=1 AND sp.ubicacion_almacen_sucursal!='',CONCAT('Ubicación: ',sp.ubicacion_almacen_sucursal,' | '),''),
 	       		IF(s.mostrar_alfanumericos=1,CONCAT('Clave: ',P.clave),'')
 
-	       	)as info
+	       	)as info,
+	   		IF( P.id_productos = 2758
+				OR P.id_productos = 2854
+				OR P.id_productos = 2759
+				OR P.id_productos = 1918
+				OR P.id_productos = 3317
+				OR P.id_productos = 1820
+				OR P.id_productos = 2760
+				OR P.id_productos = 2761
+				OR P.id_productos = 2767
+				OR P.id_productos =	2768
+				OR P.id_productos = 1956
+				OR P.id_productos = 3813
+				OR P.id_productos = 3814
+				OR P.id_productos = 2769
+				OR P.id_productos = 3628
+				OR P.id_productos = 2736
+				OR P.id_productos = 4118,
+				( SELECT 
+					DATE_SUB(CURDATE(), INTERVAL -1 DAY) 
+				),
+				'' 
+			) AS is_special
 		/*Fin de cambio 10.10.2018*/
 	       FROM ec_productos P
 	       INNER JOIN ec_pedidos_detalle PD ON PD.id_producto = P.id_productos
@@ -147,6 +169,9 @@
 	    /*implementación Oscar 10.10.2018 para imprimir ubicación y calve_proveedor en ticket*/
 			if($dr['info']==1){
 				$lineas_productos+=.8;
+			}
+			if($dr["is_special"] != '' ){
+				$lineas_productos+=2;
 			}
 		/*Fin de cambio 10.10.2018*/
 
@@ -354,6 +379,13 @@
 			$ticket->SetXY(5,($ticket->GetY()-1.5));
 			$ticket->MultiCell(66*0.63, 4, utf8_decode("{$producto["info"]}"), "", "L", false);
 		}
+		if( $producto["is_special"] != '' ){
+			$ticket->SetXY(5, $ticket->GetY() + 2 );
+			$ticket->MultiCell(35, 4, utf8_decode("Fecha entrega : \n {$producto["is_special"]} 18:30 hrs"), "1", "C", false);
+			$ticket->SetXY(40, $ticket->GetY() - 8 );
+			$ticket->MultiCell(35, 4, utf8_decode("\n\n"), "1", "C", false);
+			$ticket->SetXY(5, $ticket->GetY() + 4 );
+		}
 		$ticket->SetFont('Arial','',$bF-2);
 	/*fin de cambio 10.10.2018*/
 
@@ -371,6 +403,14 @@
 	
 		$ticket->SetXY(5, $y);
 		$ticket->MultiCell(66*0.63, 4, utf8_decode("{$productoP["producto"]}"), "", "L", false);
+
+		if( $productoP["is_special"] != '' ){
+			$ticket->SetXY(5, $ticket->GetY() + 2 );
+			$ticket->MultiCell(35, 4, utf8_decode("Fecha entrega : \n {$productoP["is_special"]} 18:30 hrs"), "1", "C", false);
+			$ticket->SetXY(40, $ticket->GetY() - 8 );
+			$ticket->MultiCell(35, 4, utf8_decode("\n\n"), "1", "C", false);
+			$ticket->SetXY(5, $ticket->GetY() + 4 );
+		}
 
 	}
 
