@@ -507,7 +507,16 @@
 	}
 /**/
 	function transfers_in_transit( $transfers_ids, $store_id, $reception_token, $reception_block_id, $link ){
-	//
+	//consulta el id de almacen destino oscar 2023/11/09
+		$sql = "SELECT 
+					id_almacen_destino AS warehouse_id
+				FROM ec_transferencias
+				WHERE id_transferencia IN( $transfers_ids )
+				LIMIT 1";
+		$stm = $link->query( $sql ) or die( "Error al consultar el id de almacén de las transferencias : {$link->error}" );
+		$row = $stm->fetch_assoc();
+		$warehouse_id = $row['warehouse_id'];
+		//
 		$link->autocommit( false );
 
 		$sql = "UPDATE ec_transferencias SET id_estado = 8 WHERE id_transferencia IN( {$transfers_ids} )";
@@ -522,6 +531,9 @@
 		if( $row['finish_store_block'] == 1 ){
 		//libera bloque de recepcion de la sucursal
 			$sql = "DELETE FROM ec_transferencias_recepcion_actual WHERE id_sucursal = '{$store_id}'";
+
+			$sql .= " AND id_bloque_transferencia_recepcion = {$reception_block_id} AND id_almacen = {$warehouse_id}";//oscar 2023/11/09
+			
 			$stm = $link->query( $sql ) or die( "Error al liberar el bloque actual de la sucursal : {$link->error}" );
 		}
 	//marca como finalizada la sesiion del dispositivo
@@ -1314,8 +1326,20 @@
 				$stm_upd = $link->query( $sql ) or die( "Error al actualizar el bloque a resuelto : {$link->error}" );
 			}
 		}
+		$sql = "SELECT 
+					id_almacen_destino AS warehouse_id
+				FROM ec_transferencias
+				WHERE id_transferencia IN( $transfers_ids )
+				LIMIT 1";
+		$stm = $link->query( $sql ) or die( "Error al consultar el id de almacén de las transferencias : {$link->error}" );
+		$row = $stm->fetch_assoc();
+		$warehouse_id = $row['warehouse_id'];
+
 	//elimina el bloque de recepcion actual
 		$sql = "DELETE FROM ec_transferencias_recepcion_actual WHERE id_sucursal = {$sucursal}";
+
+		$sql .= " AND id_bloque_transferencia_recepcion = {$reception_block_id} AND id_almacen = {$warehouse_id}";//oscar 2023/11/09
+
 		$link->query( $sql ) or die( "Error al eliminar los registros de transferencias por recibir : {$link->error}" );
 		$transfers_array = explode( ',', $transfers_ids );
 
@@ -2526,28 +2550,40 @@
 
 	function setTransferToReceive( $transfers_ids, $validation_blocks, $reception_blocks, $sucursal_id, $user_id, $new_transfers  = '', $link ){
 		//elimina los registros transferencias que se encuentran en recepcion
+		$sql = "SELECT 
+					id_almacen_destino AS warehouse_id
+				FROM ec_transferencias
+				WHERE id_transferencia IN( $transfers_ids )
+				LIMIT 1";
+		$stm = $link->query( $sql ) or die( "Error al consultar el id de almacén de las transferencias : {$sql} {$link->error}" );
+		$row = $stm->fetch_assoc();
+		$warehouse_id = $row['warehouse_id'];
+
 		$link->autocommit( false );
 		$sql = "SELECT 
 					id_bloque_transferencia_recepcion AS reception_block_id
 				FROM ec_transferencias_recepcion_actual
 				WHERE id_sucursal = {$sucursal_id}
+				AND id_almacen IN( $warehouse_id )/*oscar 2023/11/09*/
 				GROUP BY id_bloque_transferencia_recepcion";
 		$stm = $link->query( $sql ) or die( "Error al consultar el bloque de recepcion actual : {$link->error}" );
 		
 		if( $stm->num_rows > 0 ){
 			$row = $stm->fetch_assoc();
 			if( $row['reception_block_id'] != $reception_blocks ){
-				return "exception|<div class=\"text-center\">
-	           					<h5>La(s) transferencia(s) Que intentas validar no correponden al bloque que se esta recibiendo actualmente, 
-	           					verifica y vuelve a intentar</h5>
-		           				<button
-		           					type=\"button\"
-		           					class=\"btn btn-success\"
-		           					onclick=\"location.reload();\"
-		           				>
-		           					<i class=\"icon-ok-circle\">Aceptar</i>
-		           				</button>
-	           				</div>";
+				if( $row['reception_block_id'] != $reception_blocks ){
+					return "exception|<div class=\"text-center\">
+		           					<h5>No se puede(n) recibir la(s) transferencia(s) escaneada(s) porque ya se esta(n) recibiendo otra(s) Transferencia(s) con el mismo almacen destino, 
+		           					verifica y vuelve a intentar</h5>
+			           				<button
+			           					type=\"button\"
+			           					class=\"btn btn-success\"
+			           					onclick=\"location.reload();\"
+			           				>
+			           					<i class=\"icon-ok-circle\">Aceptar</i>
+			           				</button>
+		           				</div>";
+				}
 			}
 		}
 		//	die( $sql );
@@ -2658,9 +2694,19 @@
 
 	//elimina los registros anteriores
 		$sql = "DELETE FROM ec_transferencias_recepcion_actual WHERE id_sucursal = {$sucursal_id}";
+/*oscar 2023/11/09*/
+		$sql .= " AND id_almacen = {$warehouse_id}";
+/*oscar 2023/11/09*/
 		$link->query( $sql ) or die( "Error al eliminar los registros de transferencias por recibir : {$link->error}" );
 		$transfers_array = explode( ',', $transfers_ids );
-
+		$sql = "SELECT 
+					id_almacen_destino AS warehouse_id
+				FROM ec_transferencias
+				WHERE id_transferencia IN( $transfers_ids )
+				LIMIT 1";
+		$stm = $link->query( $sql ) or die( "Error al consultar el id de almacén de las transferencias : {$sql} {$link->error}" );
+		$row = $stm->fetch_assoc();
+		$warehouse_id = $row['warehouse_id'];
 		foreach ( $transfers_array as $key => $transfer ) {
 			$sql = "INSERT INTO ec_transferencias_recepcion_actual (
 					 /*1*/id_transferencia_recepcion_actual,
@@ -2668,14 +2714,16 @@
 					/*3*/id_bloque_transferencia_validacion,
 					/*4*/id_bloque_transferencia_recepcion,
 					/*5*/id_usuario_alta,
-					/*6*/fecha_alta )
+					/*6*/fecha_alta,
+					/*7*/id_almacen )
 				SELECT
 					/*id_transferencia_recepcion_actual*/NULL,
 					/*id_sucursal*/'{$sucursal_id}',
 					/*id_bloque_transferencia_validacion*/btv.id_bloque_transferencia_validacion,
 					/*id_bloque_transferencia_recepcion*/btrd.id_bloque_transferencia_recepcion,
 					/*id_usuario_alta*/'{$user_id}',
-					/*fecha_alta*/NOW()
+					/*fecha_alta*/NOW(),
+					{$warehouse_id}
 				FROM ec_bloques_transferencias_validacion btv
 				LEFT JOIN ec_bloques_transferencias_recepcion_detalle btrd
 				ON btv.id_bloque_transferencia_validacion = btrd.id_bloque_transferencia_validacion
@@ -3428,14 +3476,24 @@
 
 		$row = $stm->fetch_assoc();
 		$resp .= "<input type=\"hidden\" id=\"finish_resolution_permission\" value=\"{$row['permission']}\">";
+		
+		/*$sql = "SELECT 
+					id_almacen_destino AS warehouse_id
+				FROM ec_transferencias
+				WHERE id_transferencia IN( $transfers_ids )
+				LIMIT 1";
+		$stm = $link->query( $sql ) or die( "Error al consultar el id de almacén de las transferencias : {$sql} {$link->error}" );
+		$row = $stm->fetch_assoc();
+		$warehouse_id = $row['warehouse_id'];*/
 
-		$sql = "SELECT
+		/*$sql = "SELECT
 					id_bloque_transferencia_recepcion AS current_block
 				FROM ec_transferencias_recepcion_actual
-				WHERE id_sucursal = {$store_id}";
+				WHERE id_sucursal = {$store_id}
+				AND id_almacen = {$warehouse_id}";
 		$stm = $link->query( $sql ) or die( "Error al consultar permisos especiales : {$link->error}" );
 		$row = $stm->fetch_assoc();
-		$resp .= "<input type=\"hidden\" id=\"current_store_reception_block\" value=\"{$row['current_block']}\">";
+		$resp .= "<input type=\"hidden\" id=\"current_store_reception_block\" value=\"{$row['current_block']}\">";*/
 
 		return $resp;
 	}

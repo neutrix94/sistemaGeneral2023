@@ -12,7 +12,7 @@
 			$( '.transfers_list_content tr' ).each( function ( index ){
 				//alert();
 				if( $( '#reception_list_3_' + index ).html().trim() == txt ){
-					if( $( '#current_store_reception_block' ).val() != '' ){
+					/*if( $( '#current_store_reception_block' ).val() != '' ){
 						if( $( '#current_store_reception_block' ).val() != $( '#reception_block_' + index ).val().trim() && global_current_reception_blocks == '' ){	
 							alert( "Hay un bloque de recepcion pendiente de finalizar, Solo se puede recibir un bloque a la vez." 
 								+ "\nPara agregar esta transferencia es necesario que primero se escaneen las demas transferencias del bloque o se finalice la recepcion del bloque anterior!" );
@@ -21,7 +21,7 @@
 							stop = true;	
 							return false;	
 						}	
-					}
+					}*/
 				/*implementacion Oscar 2023 para validar que sea mismo almacen origen y destino entre las transferencias escaneadas*/	
 					if( current_origin_warehouse == '' ){
 						current_origin_warehouse = $( '#reception_list_10_' + index ).html().trim();
