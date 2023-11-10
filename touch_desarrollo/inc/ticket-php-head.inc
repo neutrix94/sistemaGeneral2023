@@ -729,7 +729,7 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
     /*fin de cambio Oscar 25.01.2019*/
     	}//fin de for $cont
 /*fin de cambio Oscar 17.09.2018*/
-/*implementacion Oscar 2023/09/20 para enviar impresion remota*
+/*implementacion Oscar 2023/09/20 para enviar impresion remota*/
 	if($user_tipo_sistema=='linea'){
 		$archivo_path = "../conexion_inicial.txt";
 		$url = "";
