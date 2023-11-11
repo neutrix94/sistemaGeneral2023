@@ -175,7 +175,26 @@ Fin de cambio Oscar 25.06.2019*/
 			OR ax.id_producto = 2769
 			OR ax.id_producto = 3628
 			OR ax.id_producto = 2736
-			OR ax.id_producto = 4118,
+			OR ax.id_producto = 4118
+			OR ax.id_producto = 2007
+			OR ax.id_producto = 2764
+			OR ax.id_producto = 2008
+			OR ax.id_producto = 2113
+			OR ax.id_producto = 3318
+			OR ax.id_producto = 1826
+			OR ax.id_producto = 2762
+			OR ax.id_producto = 2763
+			OR ax.id_producto = 4104
+			OR ax.id_producto = 4105
+			OR ax.id_producto = 2770
+			OR ax.id_producto = 2771
+			OR ax.id_producto = 2715
+			OR ax.id_producto = 3821
+			OR ax.id_producto = 3822
+			OR ax.id_producto = 2772
+			OR ax.id_producto = 3629
+			OR ax.id_producto = 2735
+			OR ax.id_producto = 4117,
 			( SELECT 
 				DATE_SUB(CURDATE(), INTERVAL -1 DAY) 
 			),

@@ -128,7 +128,26 @@
 				OR P.id_productos = 2769
 				OR P.id_productos = 3628
 				OR P.id_productos = 2736
-				OR P.id_productos = 4118,
+				OR P.id_productos = 4118
+				OR P.id_productos = 2007
+				OR P.id_productos = 2764
+				OR P.id_productos = 2008
+				OR P.id_productos = 2113
+				OR P.id_productos = 3318
+				OR P.id_productos = 1826
+				OR P.id_productos = 2762
+				OR P.id_productos = 2763
+				OR P.id_productos = 4104
+				OR P.id_productos = 4105
+				OR P.id_productos = 2770
+				OR P.id_productos = 2771
+				OR P.id_productos = 2715
+				OR P.id_productos = 3821
+				OR P.id_productos = 3822
+				OR P.id_productos = 2772
+				OR P.id_productos = 3629
+				OR P.id_productos = 2735
+				OR P.id_productos = 4117,
 				( SELECT 
 					DATE_SUB(CURDATE(), INTERVAL -1 DAY) 
 				),
