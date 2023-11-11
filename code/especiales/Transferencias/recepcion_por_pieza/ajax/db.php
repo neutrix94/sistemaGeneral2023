@@ -1964,7 +1964,14 @@
 		$scanned_data = $stm1->fetch_assoc();
 		$validation_data = validate_scanner_type( $scanned_data, $barcode, $pieces_quantity, $excedent_permission, $permission_box, $transfers, $link );
 		if( $validation_data != 'ok' ){
-			return $validation_data;
+		/*oscar 2023/11/10 par escaneo pieza por pieza*/
+			$tmp_aux = explode('|', $validation_data );
+			if( $tmp_aux[0] == 'pieces_form' ){
+				$pieces_quantity = 1;
+			}else{
+				return $validation_data;
+			}
+		/*fin de cambio Oscar 2023/11/10*/
 		}
 
 		//validacion para no dejar pasar códigos estandar si es paquete o caja

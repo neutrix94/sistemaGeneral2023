@@ -1,0 +1,829 @@
+<?php
+	if( isset( $_GET['fl'] ) ){
+		include( '../../../../../config.ini.php' );
+		include( '../../../../../conect.php' );
+		include( '../../../../../conexionMysqli.php' );
+
+		$action = $_GET['fl'];
+
+		switch ( $action ) {
+			case 'validateBarcode' :
+			if( !isset( $_GET['manager_permission'] ) ){
+				 $_GET['manager_permission'] = null;
+			}
+			if( !isset( $_GET['pieces_quantity'] ) ){
+				 $_GET['pieces_quantity'] = null;
+			}
+			if( !isset( $_GET['permission_box'] ) ){
+				 $_GET['permission_box'] = null;
+			}
+			if( !isset( $_GET['unique_code'] ) ){
+				 $_GET['unique_code'] = null;
+			}
+				echo validateBarcode( $_GET['barcode'], $_GET['transfers'], $user_id, $_GET['manager_permission'], 
+						$_GET['pieces_quantity'], $_GET['permission_box'], $_GET['unique_code'],  $link );
+			break;
+
+			case 'loadLastReceptions' :
+				echo loadLastReceptions( $_GET['transfers'], $user_id, $sucursal_id, $link );
+			break;
+
+			case 'getReceptionResumen' : 
+				echo getReceptionResumen( $_GET['type'], $_GET['transfers'], $link );
+			break;
+			case 'insertNewProductReception' : 
+				echo insertNewProductReception( $_GET['transfers'], $_GET['p_id'], $_GET['p_p_id'], 
+						$_GET['box'], $_GET['pack'], $_GET['piece'], $link );
+			break;
+
+			case 'getReceptionProductDetail' :
+				echo getReceptionProductDetail( $_GET['transfers'], $_GET['p_id'], $_GET['p_p_id'], $user_id, $link );
+			break;
+
+			case 'validateManagerPassword' : 
+				echo validateManagerPassword( $_GET['pass'], $link );
+			break;
+
+			case 'getProductResolution' :
+				echo getProductResolution( $_GET['t_id'], $_GET['t_p'], $_GET['p_id'], $_GET['type'], $link );
+			break;
+
+			case 'saveResolutionRow' :
+				echo saveResolutionRow( $_GET['product_id'], $_GET['transfer_product_id'], $_GET['quantity'], $_GET['type'], $user_id, $link );
+			break;
+
+			case 'getOptionsByProductId' :
+				echo getOptionsByProductId( $_GET['product_id'], $link );
+			break;
+
+			default:
+				die( "Permission Denied on {$action}!" );
+			break;
+		}
+	}
+
+
+	function validateBarcode( $barcode, $transfers, $user, $excedent_permission = null, 
+		$pieces_quantity = null, $permission_box = null, $unique_code = null, $link ){
+		//verifica que el código único no haya sido usado anteriormente
+		if( $unique_code != null ){
+			$sql = "SELECT
+						t.folio,
+						CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS name,
+						s1.nombre AS origin_name,
+						s2.nombre AS destinity_name,
+						tcu.id_status_transferencia_codigo AS unique_barcode_status,
+						tcu.id_transferencia
+					FROM ec_transferencia_codigos_unicos tcu
+					LEFT JOIN ec_transferencias t
+					ON t.id_transferencia = tcu.id_transferencia
+					LEFT JOIN sys_users u
+					ON u.id_usuario = tcu.id_usuario_validacion
+					LEFT JOIN sys_sucursales s1 
+					ON s1.id_sucursal = t.id_sucursal_origen
+					LEFT JOIN sys_sucursales s2 
+					ON s2.id_sucursal = t.id_sucursal_destino
+					WHERE tcu.codigo_unico = '{$unique_code}'";
+			$stm = $link->query( $sql ) or die( "error|Error al validar si el código único ya fue registrado : {$link->error}" );
+			if( $stm->num_rows > 0 ){
+				$row = $stm->fetch_assoc();
+				if( $row['unique_barcode_status'] != 1 ){
+					$resp = "exception_repeat_unic|<h5 class=\"orange\">Este código único ya fue recibido anteriormente</h5>";
+					$resp .= "<p>Escaneado por : {$row['name']}</p>";
+					$resp .= "<p>Pertenece a Transferencia : {$row['folio']}</p>";
+					$resp .= "<p>Sucursal Origen : <b class=\"orange\">{$row['origin_name']}</b></p>";
+					$resp .= "<p>Sucursal Origen : <b class=\"orange\">{$row['destinity_name']}</b></p>";
+					$resp .= "<div class=\"row\">";
+						$resp .= "<div class=\"col-3\"></div>";
+						$resp .= "<div class=\"col-6\">";
+							$resp .= "<button 
+										class=\"btn btn-warning form-control\" 
+										onclick=\"close_emergent( '#barcode_seeker', '#barcode_seeker' );\">";
+								$resp .= "<i class=\"icon-ok-circle\">Aceptar</i>";
+							$resp .= "</button>";
+						$resp .= "</div>";
+					$resp .= "</div>";
+					return $resp;
+				}
+			}
+		}
+	//verifica si el codigo de caja es de validacion de la caja
+			if( $permission_box == null ){
+				$sql = "SELECT 
+							id_codigo_validacion
+						FROM ec_codigos_validacion_cajas
+						WHERE codigo_barras = '{$barcode}'";
+				$stm = $link->query( $sql ) or die( "error|Error al consultar si es código de validación de caja : {$link->error}" );
+				if( $stm->num_rows == 1 ){
+					$resp = 'emergent|is_box_code|';
+					$resp .= '<div>';
+						$resp .= '<div class="row">';
+							$resp .= '<div class="col-2"></div>';
+							$resp .= '<div class="col-8">';
+								$resp .= '<label for="tmp_sell_barcode">El código de barras del sello es válido, para continuar escaneé el código de barras de la caja : </label>';
+								$resp .= '<input type="text" id="tmp_sell_barcode" class="form-control" onkeyup="validateBarcode( this, event, null, null, 1 );"><br>';
+								$resp .= '<button type="button" class="btn btn-success form-control"';
+								$resp .= ' onclick="validateBarcode( \'#tmp_sell_barcode\', \'enter\', null, null, 1 );">';
+									$resp .= '<i class="icon-ok-circle">Aceptar</i>';
+								$resp .= '</button><br><br>';
+								$resp .= '<button type="button" class="btn btn-danger form-control"';
+								$resp .= ' onclick="close_emergent( \'#barcode_seeker\' );">';
+									$resp .= '<i class="icon-cancel-cirlce">Cancelar</i>';
+								$resp .= '</button>';
+							$resp .= '</div>';
+						$resp .= '</div>';
+					$resp .= '</div>';
+					return $resp;
+				}
+			}
+	//verifica si el código de barras existe
+		$sql = "SELECT
+					pp.id_proveedor_producto AS product_provider_id,
+					pp.id_producto AS product_id
+				FROM ec_proveedor_producto pp
+				WHERE ( pp.codigo_barras_pieza_1 = '{$barcode}' OR pp.codigo_barras_pieza_2 = '{$barcode}' 
+				OR pp.codigo_barras_pieza_3 = '{$barcode}' OR pp.codigo_barras_presentacion_cluces_1 = '{$barcode}'
+				OR pp.codigo_barras_presentacion_cluces_2 = '{$barcode}' OR pp.codigo_barras_caja_1 = '{$barcode}'
+				OR pp.codigo_barras_caja_2 = '{$barcode}')";
+		$stm1 = $link->query( $sql ) or die( "error|Error al consultar si el código de barras existe : " . $link->error );
+		
+		if( $stm1->num_rows <= 0 ){
+			return seekByName( $barcode, $link );
+		}
+		$first_data = $stm1->fetch_assoc();
+
+	//verifica que el proveedor producto exista en alguna transferencia
+		$sql = "SELECT
+					tp.id_transferencia_producto AS transfer_product_id,
+					tp.id_producto_or AS product_id,
+					pp.id_proveedor_producto AS product_provider_id,
+					IF( '$barcode' = pp.codigo_barras_pieza_1 OR '$barcode' = pp.codigo_barras_pieza_2 
+					OR '$barcode' = pp.codigo_barras_pieza_3, 1, 0 ) AS piece,
+					IF( '$barcode' = pp.codigo_barras_presentacion_cluces_1 OR '$barcode' = pp.codigo_barras_presentacion_cluces_2,
+					1, 0 ) AS pack,
+					IF( '$barcode' = pp.codigo_barras_caja_1 OR '$barcode' = pp.codigo_barras_caja_2,
+					1, 0 ) AS 'box',
+					tp.cantidad_cajas,
+					tp.cantidad_paquetes,
+					tp.cantidad_piezas,
+					tp.cantidad,
+					SUM( IF( tru.id_transferencia_recepcion IS NULL, 
+							0, 
+							( tru.cantidad_cajas_recibidas * pp.presentacion_caja ) 
+						) 
+					) AS validated_boxes,
+					SUM(IF( tru.id_transferencia_recepcion IS NULL, 
+							0, 
+							( tru.cantidad_paquetes_recibidos * pp.piezas_presentacion_cluces ) 
+						) 
+					) AS validated_packs,
+					SUM(IF( tru.id_transferencia_recepcion IS NULL, 
+							0, 
+							tru.cantidad_piezas_recibidas 
+						) 
+					) AS validated_pieces
+				FROM ec_transferencias_validacion_usuarios tvu
+				LEFT JOIN ec_proveedor_producto pp
+				ON tvu.id_proveedor_producto = pp.id_proveedor_producto
+				LEFT JOIN ec_transferencia_productos tp
+				ON tp.id_transferencia_producto = tvu.id_transferencia_producto
+				LEFT JOIN ec_transferencias t ON tp.id_transferencia = t.id_transferencia
+				LEFT JOIN ec_transferencias_recepcion_usuarios tru 
+				ON tp.id_transferencia_producto = tru.id_transferencia_producto
+				WHERE t.id_transferencia IN( {$transfers} )
+				AND ( pp.codigo_barras_pieza_1 = '{$barcode}' OR pp.codigo_barras_pieza_2 = '{$barcode}' 
+					OR pp.codigo_barras_pieza_3 = '{$barcode}' OR pp.codigo_barras_presentacion_cluces_1 = '{$barcode}'
+					OR pp.codigo_barras_presentacion_cluces_2 = '{$barcode}' OR pp.codigo_barras_caja_1 = '{$barcode}'
+					OR pp.codigo_barras_caja_2 = '{$barcode}')
+				GROUP BY tp.id_transferencia_producto";
+		//die('error|' . $sql);
+		$stm2 = $link->query( $sql ) or die( "error|Error al buscar el producto por código de barras :  " . $link->error );
+	//verifica si el producto existe en la transferencia
+		if( $stm2->num_rows <= 0 ){
+			$sql = "SELECT
+					tp.id_transferencia_producto AS transfer_product_id,
+					tp.id_producto_or AS product_id,
+					pp.id_proveedor_producto AS product_provider_id,
+					IF( '$barcode' = pp.codigo_barras_pieza_1 OR '$barcode' = pp.codigo_barras_pieza_2 
+					OR '$barcode' = pp.codigo_barras_pieza_3, 1, 0 ) AS piece,
+					IF( '$barcode' = pp.codigo_barras_presentacion_cluces_1 OR '$barcode' = pp.codigo_barras_presentacion_cluces_2,
+					1, 0 ) AS pack,
+					IF( '$barcode' = pp.codigo_barras_caja_1 OR '$barcode' = pp.codigo_barras_caja_2,
+					1, 0 ) AS 'box'
+				FROM ec_proveedor_producto pp
+				LEFT JOIN ec_transferencia_productos tp
+				ON tp.id_producto_or = pp.id_producto
+				LEFT JOIN ec_transferencias t ON tp.id_transferencia = t.id_transferencia
+				WHERE t.id_transferencia IN( {$transfers} )
+				AND ( pp.codigo_barras_pieza_1 = '{$barcode}' OR pp.codigo_barras_pieza_2 = '{$barcode}' 
+					OR pp.codigo_barras_pieza_3 = '{$barcode}' OR pp.codigo_barras_presentacion_cluces_1 = '{$barcode}'
+					OR pp.codigo_barras_presentacion_cluces_2 = '{$barcode}' OR pp.codigo_barras_caja_1 = '{$barcode}'
+					OR pp.codigo_barras_caja_2 = '{$barcode}')";
+			$stm3 = $link->query( $sql ) or die( "error|Error al consultar si el producto existe en la transferencia : {$link->error} {$sql}" );
+			if( $stm3->num_rows <= 0){
+				$inform = $stm3->fetch_assoc();
+				//$resp = 'exception|<br/><h3 class="inform_error">El producto no pertenece a esta(s) Transferencia(s).<br />Este producto tiene que ser devuelto a Matriz</h3>';	
+				$resp = 'exception|<br/><h3 class="inform_error">El producto no corresponde a la(s) Transferencia(s)<br />';
+					$resp .= '<b class="red">Aparte este producto, NO ACOMODAR!</b></h3>';  
+				$resp .= '<div class="row"><div class="col-2"></div><div class="col-8">';
+					$resp .= '<button class="btn btn-warning form-control" onclick="close_emergent( \'#barcode_seeker\', \'#barcode_seeker\' )">';
+						$resp .= '<i class="icon-ok-circle">Aceptar</i>';
+					$resp .= '</button>';
+				//$resp .= '<input type="password" id="manager_password" class="form-control emergent_manager_password"><br />';
+				//$resp .= '<button class="btn btn-danger form-control" onclick="save_new_reception_detail( ';
+				//	$resp .= " {$inform['product_id']}, {$inform['product_provider_id']}, {$inform['box']}, {$inform['pack']}, {$inform['piece']} ";
+				//$resp .= ' );">Aceptar</button></div><br/><br/>';
+				$resp .= "</div></div><br/><br/>";
+				return $resp;
+			}else{
+				$inform = $stm3->fetch_assoc();
+				$resp = 'exception|<br/><h3 class="inform_error">El modelo del producto no corresponde a la(s) Transferencia(s)<br />';
+					$resp .= '<b class="red">Aparte este producto, NO ACOMODAR!</b></h3>'; 
+				$resp .= '<div class="row"><div class="col-2"></div><div class="col-8">';
+					$resp .= '<button class="btn btn-warning form-control" onclick="close_emergent( \'#barcode_seeker\', \'#barcode_seeker\' )">';
+						$resp .= '<i class="icon-ok-circle">Aceptar</i>';
+					$resp .= '</button>';
+				//$resp .= '<input type="password" id="manager_password" class="form-control emergent_manager_password"><br />';
+				//$resp .= '<button class="btn btn-danger form-control" onclick="save_new_reception_detail( ';
+					//$resp .= " {$inform['product_id']}, {$inform['product_provider_id']}, {$inform['box']}, {$inform['pack']}, {$inform['piece']} ";
+				//$resp .= ' );">Aceptar</button></div><br/><br/>';
+				$resp .= "</div></div><br/><br/>";
+				return $resp;
+			}
+		}
+		$row = $stm2->fetch_assoc();
+		if( $row['piece'] == 1 && $pieces_quantity == null){
+			$resp = 'emergent|<div class="row">';
+					$resp .= '<div><h5>Ingrese el número de Piezas : </h5></div>';
+					$resp .= '<div class="col-2"></div>';
+					$resp .= '<div class="col-8">';
+						$resp .= '<input type="number" class="form-control" id="pieces_quantity_emergent">';
+						$resp .= '<button type="button" class="btn btn-success form-control"';
+						$resp .= ' onclick="setPiecesQuantity();">';
+							$resp .= 'Aceptar';
+						$resp .= '</button>';
+					$resp .= '</div>';
+				$resp .= '</div>';
+			$resp .= '</div>';
+			return $resp;
+		}
+		if( $pieces_quantity != null ){
+			$row['piece'] = $pieces_quantity;
+		}
+		return insertProductReception( $row, $user, $transfers, $excedent_permission, $link );
+	}
+
+	function insertProductReception( $data, $user, $transfers, $excedent_permission = null, $link ){
+		//$link->autocommit( false );
+	//verifica transferencias pendientes de validación	
+		$sql = "SELECT 
+					tp.id_transferencia_producto,
+					( tp.cantidad_cajas - tp.cantidad_cajas_recibidas ) AS boxes_to_reception,
+					( tp.cantidad_paquetes - tp.cantidad_paquetes_recibidos ) AS packs_to_reception,
+					( tp.cantidad_piezas - tp.cantidad_piezas_recibidas ) AS pieces_to_reception
+				FROM ec_transferencia_productos tp
+				/*LEFT JOIN ec_productos p ON tp.id_producto_or = p.id_productos*/
+				WHERE tp.id_transferencia IN( {$transfers} )
+				AND tp.id_producto_or = '{$data['product_id']}'
+				AND tp.id_proveedor_producto = '{$data['product_provider_id']}'
+				AND tp.cantidad > tp.total_piezas_recibidas";
+		$stm = $link->query( $sql ) or die( "error|Error al consultar transferencias pendientes de validar : " . $link->error );
+	
+		//return 'error|'. $sql;
+		$description = '';
+		if( $stm->num_rows <= 0 && $_GET['manager_permission'] == null ){
+			//while( $r = $stm->fetch_assoc() ){
+				$numeric_value = '';
+				if( $data['piece'] != 0 ){
+					$numeric_value = $data['piece'];
+					$description = 'La(s) pieza(s)';
+				}else if( $data['pack'] != 0 ){
+					$numeric_value = $data['pack'];
+					$description = 'El paquete';
+				}else if( $data['box'] != 0 ){
+					$numeric_value = $data['box'];
+					$description = 'La caja';
+				}
+			$resp = 'exception|<h5>' . $description . ' que escaneó supera la cantidad que se tiene que recibir, si se va a quedar';
+			$resp .= ' con la mercancía pida la autorización del encargado : </h5>';
+			$resp .= '<div class="row"><div class="col-2"></div>';
+				$resp .= '<div class="col-8">';
+					$resp .= '<input type="password" class="form-control" id="manager_password">';
+					$res .= '<p id="response_password"></p>';
+					$resp .= '<button type="button" class="btn btn-success form-control';
+						$resp .= ' form-control" onclick="confirm_exceeds(  );">';
+						$resp .= '<i class="icon-ok-circle">Aceptar</i>';
+					$resp .= '</button>';
+
+					$resp .= '<button type="button" class="btn btn-danger form-control';
+						$resp .= ' form-control" onclick="return_exceeds();">';
+						$resp .= '<i class="icon-ok-circle">Regresar producto</i>';
+					$resp .= '</button>';
+				$resp .= '</div>';
+			$resp .= '</div>';
+			return $resp;
+		}
+	//inserta el registro de validación
+		$sql = "INSERT INTO ec_transferencias_recepcion_usuarios ( id_transferencia_recepcion, id_transferencia_producto,
+		id_usuario, id_producto, id_proveedor_producto, cantidad_cajas_recibidas, cantidad_paquetes_recibidos, cantidad_piezas_recibidas, 
+		fecha_recepcion, id_status )
+		VALUES( NULL, '{$data['transfer_product_id']}', '{$user}', '{$data['product_id']}', '{$data['product_provider_id']}', 
+			'{$data['box']}', '{$data['pack']}', '{$data['piece']}', NOW(), 1 )";
+		$stm = $link->query( $sql ) or die( "error|Error al insertar el registro de recepción : " . $link->error );
+		//die( '|Error : ' . $sql );
+	//actualiza la validacion del producto en la transferencia
+		$sql = "UPDATE ec_transferencia_productos tp 
+				LEFT JOIN ec_proveedor_producto pp 
+				ON tp.id_proveedor_producto = pp.id_proveedor_producto
+			SET tp.cantidad_cajas_recibidas =  ( tp.cantidad_cajas_recibidas + {$data['box']} ),
+			tp.cantidad_paquetes_recibidos =  ( tp.cantidad_paquetes_recibidos + {$data['pack']} ),
+			tp.cantidad_piezas_recibidas =  ( tp.cantidad_piezas_recibidas + {$data['piece']} ),
+			tp.total_piezas_recibidas = ( ( pp.presentacion_caja * tp.cantidad_cajas_recibidas ) 
+								+ ( pp.piezas_presentacion_cluces * tp.cantidad_paquetes_recibidos ) 
+								+ tp.cantidad_piezas_recibidas )
+			WHERE tp.id_transferencia_producto = '{$data['transfer_product_id']}'
+			AND pp.id_proveedor_producto = '{$data['product_provider_id']}'";
+		$stm = $link->query( $sql ) or die( "error|Error al actualizar las piezas validadas en la transferencia : " . $link->error );
+		//$link->autocommit( true );
+		return 'ok|Producto Recibido exitosamente!';
+	}
+
+	function  validateManagerPassword( $password, $link ){
+		$sql = "SELECT id_usuario FROM sys_users WHERE contrasena = md5( '{$password}' )";
+		$stm = $link->query( $sql ) or die( "Error al verificar password de encargado : " . $link->error );
+		if( $stm->num_rows <= 0 ){
+			die( 'La contraseña del encargado es incorrecta.' );
+		}
+		return 'ok';
+	}
+/*cargar ultimas recepciones*/
+	function loadLastReceptions( $transfers, $user, $sucursal, $link ){
+		$sql = "SELECT
+					tru.id_transferencia_recepcion AS transfer_reception_id,
+					p.id_productos AS product_id,
+					CONCAT( p.nombre, ' ( MODELO : <b>', pp.clave_proveedor, '</b> )' ) AS name,
+					t.folio AS transfer,
+					IF(	tru.cantidad_cajas_recibidas > 0, 
+						CONCAT( tru.cantidad_cajas_recibidas, ' caja', IF( tru.cantidad_cajas_recibidas > 1, 's', '' )),
+						IF( tru.cantidad_paquetes_recibidos > 0,
+							CONCAT( tru.cantidad_paquetes_recibidos, ' paquete', IF( tru.cantidad_cajas_recibidas > 1, 's', '' )),
+							CONCAT( tru.cantidad_piezas_recibidas, ' pieza', IF( tru.cantidad_piezas_recibidas > 1, 's', '' ))
+						)
+					) AS recived,
+					pp.id_proveedor_producto AS product_provider_id,
+					sp.ubicacion_almacen_sucursal AS location
+				FROM ec_transferencias_recepcion_usuarios tru
+				LEFT JOIN ec_transferencia_productos tp 
+				ON tru.id_transferencia_producto = tp.id_transferencia_producto
+				LEFT JOIN ec_transferencias t ON tp.id_transferencia = t.id_transferencia
+				LEFT JOIN ec_productos p ON tru.id_producto = p.id_productos
+				LEFT JOIN ec_proveedor_producto pp 
+				ON tru.id_proveedor_producto = pp.id_proveedor_producto
+				LEFT JOIN sys_sucursales_producto sp 
+				ON sp.id_producto = pp.id_producto
+				WHERE t.id_transferencia IN( {$transfers} )
+				AND tru.id_usuario = '{$user}'
+				AND sp.id_sucursal = '{$sucursal}'
+				ORDER BY tru.id_transferencia_recepcion DESC
+				LIMIT 3";
+				//die( $sql );
+		$stm = $link->query( $sql )or die( "Error al consultar las últimas revisiones : " . $link->error );
+		return buildLastReceptions( $stm );	
+	}
+
+	function buildLastReceptions( $stm ){
+		$resp = '';
+		while ( $row = $stm->fetch_assoc() ) {
+			$resp .= '<tr>';
+				$resp .= '<td class="no_visible">' . $row['transfer_reception_id'] . '</td>';
+				$resp .= '<td>' . $row['name'] . '</td>';
+				$resp .= '<td>' . $row['recived'] . '</td>';
+				$resp .= '<td style="font-size : 50%;">' . $row['transfer'] . '<br /> <b>Ubicación : ' . $row['location'] . '</b></td>';
+				$resp .= '<td><button class="btn btn-warning"';
+				$resp .= ' onclick="getReceptionProductDetail(' . $row['product_id'] . ', ' . $row['product_provider_id'] . ' );"><i class="icon-eye"></i></button></td>';
+			$resp .= '</tr>';
+		}
+		return $resp;
+	}
+//resumen
+	function getReceptionResumen( $type, $transfers, $link ){
+		$resp = "";
+		$sql = "";
+		//die( 'type : ' . $type );
+		switch ( $type ) {
+			case 1:
+				//$final_type = 'missing';
+				$sql = "SELECT 
+							tp.id_transferencia_producto AS transfer_product_id,
+							CONCAT( p.nombre, 
+									IF( pp.id_proveedor_producto IS NULL, 
+										'',
+										CONCAT( ' ( MODELO : ', pp.clave_proveedor, ' ) ' )
+									) 
+
+							) AS name,
+							( IF(tp.total_piezas_validacion = 0, tp.cantidad, tp.cantidad_piezas_validacion) - tp.total_piezas_recibidas ) AS difference,
+							tp.id_producto_or AS product_id,
+							tp.id_transferencia AS transfer_id,
+							'missing' AS type
+						FROM ec_transferencia_productos tp
+						LEFT JOIN ec_productos p 
+						ON tp.id_producto_or = p.id_productos
+						LEFT JOIN ec_proveedor_producto pp
+						ON tp.id_proveedor_producto = pp.id_proveedor_producto
+						WHERE tp.id_transferencia IN( {$transfers} )
+						/*AND ( tp.total_piezas_validacion - tp.total_piezas_recibidas ) > 0*/";
+			break;
+			
+			case 2:
+				$final_type = 'excedent';
+				$sql = "SELECT 
+							tp.id_transferencia_producto AS transfer_product_id,
+							CONCAT( p.nombre, ' ( MODELO : ', pp.clave_proveedor, ' ) ' ) AS name,
+							( tp.cantidad - tp.total_piezas_recibidas ) AS difference,
+							tp.id_producto_or AS product_id,
+							tp.id_transferencia AS transfer_id,
+							'excedent' AS type
+						FROM ec_transferencia_productos tp
+						LEFT JOIN ec_productos p 
+						ON tp.id_producto_or = p.id_productos
+						LEFT JOIN ec_proveedor_producto pp
+						ON tp.id_proveedor_producto = pp.id_proveedor_producto
+						WHERE tp.id_transferencia IN( {$transfers} )
+						AND ( tp.total_piezas_validacion - tp.total_piezas_recibidas ) < 0";
+			break;
+			
+			case 3:
+				$sql = "SELECT 
+							tr.id_transferencia_producto AS transfer_product_id,
+							CONCAT( p.nombre, ' ( MODELO : ', pp.clave_proveedor, ' ) ' ) AS name,
+							( tp.cantidad - tp.total_piezas_recibidas ) AS difference,
+							tp.id_producto_or AS product_id,
+							tp.id_transferencia AS transfer_id
+						FROM ec_transferencias_resolucion tr 
+						LEFT JOIN ec_transferencia_productos tp
+						ON tp.id_transferencia_producto = tr.id_transferencia_producto
+						LEFT JOIN ec_productos p 
+						ON tp.id_producto_or = p.id_productos
+						LEFT JOIN ec_proveedor_producto pp
+						ON tp.id_proveedor_producto = pp.id_proveedor_producto
+						WHERE tr.id_transferencia IN( {$transfers} )
+						AND piezas_mantiene > 0";
+			break;
+			
+			default:
+				return 'Permission denied on getReceptionResumen!';	
+			break;
+		}
+		$stm = $link->query( $sql ) or die( "Error al consultar los productos del resumen : " . $link->error );
+		$total_rows = $stm->num_rows;
+		while ( $row = $stm->fetch_assoc() ){
+			$resp .= "<tr>";
+				$resp .= "<td class=\"no_visible\">{$row['transfer_product_id']}</td>";
+				$resp .= "<td>{$row['name']}</td>";
+				$resp .= "<td>{$row['difference']}</td>";
+				$resp .= "<td><button 
+								class=\"btn\"
+								onclick=\"show_resumen_detail( {$row['transfer_id']}, {$row['transfer_product_id']}, {$row['product_id']}, '{$row['type']}' );\"
+							><i class=\"icon-zoom-in-outline\"></i></button></td>";
+			$resp .= "</tr>";
+		}
+		return $total_rows . '|' . $resp . $sql;
+	}
+
+	function insertNewProductReception( $transfers, $product_id, $product_provider_id, $box, $pack, $piece, $link ){
+	//verifica a ue transferencia se le asignara el producto
+		$sql = "SELECT 
+					t.id_transferencia AS transfer_id,
+					ma.id_movimiento_almacen AS mov_id,
+					SUM( ( tp.cantidad - tp.total_piezas_validacion ) ) AS difference
+				FROM ec_transferencias t
+				LEFT JOIN ec_transferencia_productos tp
+				ON t.id_transferencia = tp.id_transferencia
+				LEFT JOIN ec_movimiento_almacen ma
+				ON ma.id_transferencia = t.id_transferencia
+				WHERE t.id_transferencia IN( {$transfers} )
+				AND tp.id_producto_or IN( {$product_id} )
+				ORDER BY SUM( ( tp.cantidad - tp.total_piezas_validacion ) ) DESC
+				LIMIT 1";
+		//return $sql;
+		$stm = $link->query( $sql ) or die( "Error al consultar en que transferencia esta el producto : " . $link->error );
+	//vuelve a validar que el producto exista en alguna transferencia
+		if( $stm->num_rows <= 0 ){
+			die( "error|<h5>El producto no pertence a ninguna Transferencia <br /> Aparte el producto de la transfereencia para que no sea enviado a la sucursal</h5>" );
+		}
+		$transf = $stm->fetch_assoc();
+		$transfer_id = $transf['transfer_id'];
+		$mov_id = $transf['mov_id'];
+
+	//inserta el detalle en transferencia producto
+		$sql = "INSERT INTO ec_transferencia_productos( /*1*/id_transferencia, /*2*/id_producto_or, 
+			/*3*/id_presentacion, /*4*/cantidad_presentacion, /*5*/cantidad, /*6*/id_producto_de, 
+			/*7*/referencia_resolucion, /*8*/cantidad_cajas, /*9*/cantidad_paquetes, 
+			/*10*/cantidad_piezas, /*11*/id_proveedor_producto, /*12*/cantidad_cajas_surtidas,
+			/*13*/cantidad_paquetes_surtidos, /*14*/cantidad_piezas_surtidas, 
+			/*15*/total_piezas_surtimiento, /*16*/cantidad_cajas_validacion, 
+			/*17*/ cantidad_paquetes_validacion, /*18*/ cantidad_piezas_validacion, 
+			/*19*/total_piezas_validacion, /*20*/cantidad_cajas_recibidas, /*21*/cantidad_paquetes_recibidos, 
+			/*22*/cantidad_piezas_recibidas,/*23*/total_piezas_recibidas,/*24*/agregado_surtimiento_validacion )
+			SELECT
+			/*1*/'{$transfer_id}',
+			/*2*/'{$product_id}',
+			/*3*/-1,
+			/*4*/( pp.presentacion_caja * {$box} ) 
+					+ ( pp.piezas_presentacion_cluces * {$pack} ) 
+					+ {$piece} ,
+			/*5*/( pp.presentacion_caja * {$box} ) 
+					+ ( pp.piezas_presentacion_cluces * {$pack}) 
+					+ {$piece} ,
+			/*6*/'{$product_id}',
+			/*7*/( pp.presentacion_caja * {$box} ) 
+					+ ( pp.piezas_presentacion_cluces * {$pack} ) 
+					+ {$piece},
+			/*8*/'{$box}',
+			/*9*/'{$pack}',
+			/*10*/'{$piece}',
+			/*11*/'{$product_provider_id}',
+			/*12*/'{$box}',
+			/*13*/'{$pack}',
+			/*14*/'{$piece}',
+			/*15*/( pp.presentacion_caja * {$box} ) 
+					+ ( pp.piezas_presentacion_cluces * {$pack} ) 
+					+ {$piece},
+			/*16*/'{$box}',
+			/*17*/'{$pack}',
+			/*18*/'{$piece}',
+			/*19*/( pp.presentacion_caja * {$box} ) 
+					+ ( pp.piezas_presentacion_cluces * {$pack} ) 
+					+ {$piece},
+			/*20*/'{$box}',
+			/*21*/'{$pack}',
+			/*22*/'{$piece}',
+			/*23*/( pp.presentacion_caja * {$box} ) 
+					+ ( pp.piezas_presentacion_cluces * {$pack} ) 
+					+ {$piece},
+			/*24*/'1'
+			FROM ec_proveedor_producto pp
+			WHERE pp.id_proveedor_producto = '{$product_provider_id}'";
+		$stm = $link->query( $sql ) or die( "Error al insertar el nuevo registro en la transferencia" . $link->error );
+		$new_detail_id  = $link->insert_id;
+	//inserta el detalle del movimiento de almacen
+		$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
+				id_pedido_detalle, id_oc_detalle, id_proveedor_producto )
+				SELECT 
+					'{$mov_id}',
+					tp.id_producto_or,
+					tp.cantidad,
+					tp.cantidad,
+					-1,
+					-1, 
+					tp.id_proveedor_producto
+				FROM ec_transferencia_productos tp
+				WHERE tp.id_transferencia_producto = '{$new_detail_id}'";
+		$stm = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen : " . $link->error );
+		return "El producto fue agregado y validado exitosamente!";
+	}
+
+//obtener detalle de la recepción
+	function getReceptionProductDetail( $transfers, $product_id, $product_provider_id, $user, $link ){
+		$sql = "SELECT
+					tru.id_transferencia_recepcion AS row_id,
+					( ( tru.cantidad_cajas_recibidas * pp.presentacion_caja )
+					+ ( tru.cantidad_paquetes_recibidos * pp.piezas_presentacion_cluces )
+					+ tru.cantidad_piezas_recibidas ) AS pieces_recived,
+					tru.fecha_recepcion AS dateTime 
+				FROM ec_transferencias_recepcion_usuarios tru
+				LEFT JOIN ec_transferencia_productos tp
+				ON tru.id_transferencia_producto = tp.id_transferencia_producto
+				LEFT JOIN ec_transferencias t
+				ON t.id_transferencia = tp.id_transferencia
+				LEFT JOIN ec_proveedor_producto pp
+				ON pp.id_proveedor_producto = tru.id_proveedor_producto
+				WHERE tru.id_producto = '{$product_id}'
+				AND tru.id_proveedor_producto = '{$product_provider_id}'
+				AND tru.id_usuario = '{$user}'
+				AND t.id_transferencia IN( {$transfers} )";
+		$stm = $link->query( $sql ) or die( "Error al consultar historial de productos recibidos : " . $link->error . $sql );
+		return buildReceptionProductDetail( $stm );
+	}
+
+	function buildReceptionProductDetail( $stm ){
+		$resp = '<table class="table table-bordered table-striped">';
+			$resp .= '<thead>';
+				$resp .= '<tr>';
+					$resp .= '<th>Piezas Recibidas</th>';
+					$resp .= '<th>Fecha / hora</th>';
+				$resp .= '</tr>';
+			$resp .= '<thead>';
+			$resp .= '<tbody>';
+		while( $row = $stm->fetch_assoc() ){
+			$resp .= '<tr>';
+				$resp .= '<td class="text-center">' . $row['pieces_recived'] . '</td>' ;
+				$resp .= '<td class="text-center">' . $row['dateTime'] . '</td>' ;
+			$resp .= '</tr>';
+		}
+			$resp .= '</tbody>';
+		$resp .= '</table> <br />';
+		$resp .= '<div class="row">';
+			$resp .= '<div class="col-2"></div>';
+			$resp .= '<div class="col-8">';
+				$resp .= '<button class="btn btn-success form-control" onclick="close_emergent();">';
+					$resp .= 'Aceptar';
+				$resp .= '</button>';
+			$resp .= '</div>';
+		$resp .= '</div>';
+		return $resp;
+	}
+
+	function getProductResolution( $transfer_id, $transfer_product_id, $product_id, $type, $link ){
+		$resp = '';
+	//consulta los productos que coinciden con el producto origen
+		$sql = "SELECT
+					tp.id_transferencia_producto AS transfer_product_id,
+					tp.id_producto_or AS product_id,
+					tp.cantidad AS original_quantity,
+					tp.total_piezas_surtimiento AS supply_pieces,
+					tp.total_piezas_validacion AS validated_pieces,
+					tp.total_piezas_recibidas AS recived_pieces,
+					p.nombre AS name,
+					pp.clave_proveedor AS provider_clue
+				FROM ec_transferencia_productos tp
+				LEFT JOIN ec_productos p ON p.id_productos = tp.id_producto_or
+				LEFT JOIN ec_proveedor_producto pp ON pp.id_proveedor_producto = tp.id_proveedor_producto
+				WHERE tp.id_transferencia IN( {$transfer_id} )
+				AND tp.id_producto_or = {$product_id}";
+
+		$stm = $link->query( $sql ) or die( "Error al consultar los productos relacionados por resolver : {$link->error}");
+
+		$resp .= "<div class=\"\">";
+		$counter = 0;
+		while( $row = $stm->fetch_assoc() ){
+			$difference = $row['validated_pieces'] - $row['recived_pieces'];		
+			$resp .= "<div class=\"group_card\">";
+				$resp .= "<h5>{$row['name']} MODELO : <b>{$row['provider_clue']}</b></h5>";
+				$resp .= "<div class=\"row\">";
+					$resp .= "<div class=\"col-4\">";
+						$resp .= "<label>Pedido</label>";
+						$resp .= "<input type=\"number\" id=\"resolution_1_{$counter}\" class=\"form-control txt_alg_right\" onfocus=\"this.select();\" value=\"{$row['original_quantity']}\">";
+					$resp .= "</div>";
+					$resp .= "<div class=\"col-4\">";
+						$resp .= "<label>Enviado</label>";
+						$resp .= "<input type=\"number\" id=\"resolution_2_{$counter}\" class=\"form-control txt_alg_right\" onfocus=\"this.select();\" value=\"{$row['validated_pieces']}\">";
+					$resp .= "</div>";
+					$resp .= "<div class=\"col-4\">";
+						$resp .= "<label>Recibido</label>";
+						$resp .= "<input type=\"number\" id=\"resolution_3_{$counter}\" class=\"form-control txt_alg_right\" onfocus=\"this.select();\" value=\"{$row['recived_pieces']}\">";
+					$resp .= "</div>";
+
+					$resp .= "<div class=\"col-12\">";
+						$resp .= "<label class=\"txt_alg_center red\" style=\"position:relative;width:100%;\">Faltante</label>";
+						$resp .= "<input type=\"number\" id=\"resolution_4_{$counter}\" class=\"form-control txt_alg_right red\" onfocus=\"this.select();\" value=\"{$difference}\">";
+						$resp .= "<input type=\"hidden\" id=\"resolution_5_{$counter}\" class=\"no_visible\" value=\"{$row['product_id']}\">";
+						$resp .= "<input type=\"hidden\" id=\"resolution_6_{$counter}\" class=\"no_visible\" value=\"{$row['transfer_product_id']}\">";
+					$resp .= "</div>";
+
+				$resp .= "</div>";
+			$resp .= "</div>";
+			$counter ++;
+		}
+			/*$resp .= "<table class=\"table table-striped table-bordered\">";
+
+			$resp .= "</table>";*/
+		$resp .= "</div>";
+
+		$resp .= "<div class=\"row\">";
+			$resp .= "<div class=\"col-2\"></div>";
+			$resp .= "<div class=\"col-8\">";
+				$resp .= "<button class=\"btn btn-success form-control\" onclick=\"save_resolution( '{$type}' )\">";
+					$resp .= "<i class=\"icon-ok-circle\">Guardar Faltante</i>";
+				$resp .= "</button><br><br>";
+				$resp .= "<button class=\"btn btn-danger form-control\" onclick=\"close_emergent();\">";
+					$resp .= "<i class=\"icon-cancel-circled\">Cancelar</i>";
+				$resp .= "</button>";
+			$resp .= "</div>";
+		$resp .= "</div>";
+		return $resp;
+	}
+
+	function saveResolutionRow( $product_id, $transfer_product_id, $quantity, $type, $user, $link ) {
+		$quantity_excedent = ( $type == 'excedent' ? $quantity : 0 );
+		$quantity_return = ( $type == 'missing' ? $quantity : 0 );
+	//inserta el registro de resolución de transferencias
+		$sql = "INSERT INTO ec_transferencias_resolucion ( /*1*/id_transferencia_resolucion, /*2*/id_transferencia, /*3*/id_transferencia_producto, 
+			/*4*/piezas_mantiene, /*5*/piezas_devuelve, /*6*/id_usuario )
+			SELECT 
+				/*1*/nULL,
+				/*2*/id_transferencia,
+				/*3*/id_transferencia_producto,
+				/*4*/{$quantity_excedent},
+				/*5*/{$quantity_return},
+				/*6*/{$user}
+			FROM ec_transferencia_productos 
+			WHERE id_transferencia_producto IN( {$transfer_product_id} )";
+		$stm = $link->query( $sql ) or die( "Error al insertar el registro de resolución de transferencias : {$link->error}" );
+		return '<h5>El registro fue insertado exitosamenete!</h5><button onclick="close_emergent();" class="btn btn-success form-control">' 
+		. '<i class="icon-ok-circle">Aceptar</i></button>';
+	}
+
+	function seekByName( $barcode, $link ){
+		//die('|here');
+		$barcode_array = explode(' ', $barcode );
+		$condition = " OR (";
+		foreach ($barcode_array as $key => $barcode_txt ) {
+			$condition .= ( $condition == ' OR (' ? '' : ' AND' );
+			$condition .= " p.nombre LIKE '%{$barcode_txt}%'";
+		}
+		$condition .= " )";
+		$sql = "SELECT
+				pp.id_producto AS product_id,
+				CONCAT( p.nombre, ' <b>( ', GROUP_CONCAT( pp.clave_proveedor SEPARATOR ', ' ), ' ) </b>' ) AS name
+			FROM ec_productos p
+			LEFT JOIN ec_proveedor_producto pp
+			ON pp.id_producto = p.id_productos
+			WHERE ( pp.clave_proveedor LIKE '%{$barcode}%'
+			{$condition} ) AND pp.id_proveedor_producto IS NOT NULL
+			GROUP BY p.id_productos";
+		$stm_name = $link->query( $sql ) or die( "error|error al consultar coincidencias por nombre / modelo : {$link->error}" );
+		if( $stm_name->num_rows <= 0 ){
+			return 'exception|<br/><h3 class="inform_error">El código de barras no esta registrado en ningún producto, tampoco coincide ningún nombre / modelo de Producto </h3>' 
+			. '<div class="row"><div class="col-2"></div><div class="col-8">'
+			. '<button class="btn btn-danger form-control" onclick="close_emergent( \'#barcode_seeker\' );">Aceptar</button></div><br/><br/>';
+		}
+
+		$resp = "seeker|";
+		while ( $row_name = $stm_name->fetch_assoc() ) {
+			$resp .= "<div class=\"group_card\" onclick=\"setProductByName( {$row_name['product_id']} );\">";
+				$resp .= "<p>{$row_name['name']}</p>";
+			$resp .= "</div>";
+		}
+		//echo $resp;
+		return $resp;
+	}
+
+	function getOptionsByProductId( $product_id, $link ){
+		$sql = "SELECT
+					pp.id_proveedor_producto AS product_provider_id,
+					pp.clave_proveedor AS provider_clue,
+					pp.piezas_presentacion_cluces AS pack_pieces,
+					pp.presentacion_caja AS box_pieces,
+					ipp.inventario AS inventory,
+					pp.codigo_barras_pieza_1 AS piece_barcode_1
+				FROM ec_proveedor_producto pp
+				LEFT JOIN ec_inventario_proveedor_producto ipp
+				ON ipp.id_producto = pp.id_producto 
+				AND ipp.id_proveedor_producto = pp.id_proveedor_producto
+				WHERE pp.id_producto = {$product_id}
+				AND ipp.id_almacen = 1";
+		$stm_name = $link->query( $sql ) or die( "error|Error al consutar el detalle del producto : {$link->error}" ); 
+		$resp = "<div class=\"row\">";
+			//$resp .= "<div class=\"col-2\"></div>";
+			$resp .= "<div class=\"col-12\">";
+				$resp .= "<h5>Seleccione el modelo del producto : </h5>";
+				$resp .= "<table class=\"table table-bordered table-striped table_70\">";
+				$resp .= "<thead>
+							<tr>
+								<th>Modelo</th>
+								<th>Inventario</th>
+								<th>Pzs x caja</th>
+								<th>Pzs x paquete</th>
+								<th>Seleccionar</th>
+							</tr>
+						</thead><tbody id=\"model_by_name_list\" >";
+				$counter = 0;
+				while( $row_name = $stm_name->fetch_assoc() ){
+					$resp .= "<tr>";
+						$resp .= "<td id=\"p_m_1_{$counter}\" align=\"center\">{$row_name['provider_clue']}</td>";
+						$resp .= "<td id=\"p_m_2_{$counter}\" align=\"center\">{$row_name['inventory']}</td>";
+						$resp .= "<td id=\"p_m_3_{$counter}\" align=\"center\">{$row_name['box_pieces']}</td>";
+						$resp .= "<td id=\"p_m_4_{$counter}\" align=\"center\">{$row_name['pack_pieces']}</td>";
+						$resp .= "<td align=\"center\"><input type=\"radio\" id=\"p_m_5_{$counter}\" 
+							value=\"{$row_name['piece_barcode_1']}\"  name=\"search_by_name_selection\"></td>";
+					$resp .= "</tr>";
+					$counter ++;
+				}
+				$resp .= "</tbody></table>";
+			$resp .= "</div>";
+			$resp .= "<div class=\"col-2\"></div>";
+			$resp .= "<div class=\"col-8\">
+						<button class=\"btn btn-success form-control\" onclick=\"setProductModel();\">
+							<i class=\"icon-ok-circle\">Continuar</i>
+						</button><br><br>
+						<button class=\"btn btn-danger form-control\"
+							onclick=\"close_emergent( '#barcode_seeker', '#barcode_seeker' );\">
+							<i class=\"icon-ok-circle\">Cancelar</i>
+						</button>
+					</div>";
+		$resp .= "</div>";
+		return $resp;
+	}
+
+	function getBarcodesTypes( $link ){
+		$sql = "SELECT 
+					omitir_codigos_barras_unicos AS skip_unique_barcodes
+				FROM sys_configuracion_sistema";
+		$stm = $link->query( $sql ) or die( "Error al consultar configuración de códigos de barras : {$link->error}" );
+		$row = $stm->fetch_assoc();
+		return "<input type=\"hidden\" id=\"skip_unique_barcodes\" value=\"{$row['skip_unique_barcodes']}\">";
+	}
+
+?>

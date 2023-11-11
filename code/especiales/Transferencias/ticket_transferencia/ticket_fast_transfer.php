@@ -86,23 +86,28 @@
 	}
 	
 	
-	$ticket = new TicketPDF("P", "mm", array(80,(90+$lineas_productos*15+30+10)), "{$sucursal}", "{$folio}", 10);/*por 9*/
+	$ticket = new TicketPDF("P", "mm", array(80,(240+$lineas_productos*15+30+10)), "{$sucursal}", "{$folio}", 10);/*por 9*/
 	
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
 	$bF=10;
 
-//encabezado
+//cinta superior
 	$ticket->SetFont('Arial','B',$bF+2);
-	if($impresa==1){
-		$ticket->SetXY(5, $ticket->GetY()+5);
-	}else{
-		$ticket->SetXY(5, $ticket->GetY()+5);
-	}
+	$ticket->SetXY(5, 4);
+	$ticket->Cell(66, 3, "", "TB" ,0, "C");
+	
+	$ticket->SetXY(5, $ticket->GetY()+30);
+	$ticket->Cell(70, 6, utf8_decode( "PEGAR DIUREX AQUI : " ), "" ,0, "C");
+
+	$ticket->SetXY(5, $ticket->GetY()+30);
+	$ticket->SetXY(5, $ticket->GetY());
+	$ticket->Cell(66, 3, "", "TB" ,0, "C");
 //titulo de transferencia
-		$ticket->SetXY(5, $ticket->GetY()+5);
+	$ticket->SetFont('Arial','B',$bF+8);
+	$ticket->SetXY(5, $ticket->GetY()+5);
 		$ticket->Cell(70, 6, utf8_decode( "TÍTULO : " ), "" ,0, "C");
-	if( strlen( $row['transfer_title'] ) > 30 ){
+	if( strlen( $row['transfer_title'] ) > 25 ){
 		$parts = part_word( $row['transfer_title'] );
 		$ticket->SetXY(5, $ticket->GetY()+5);
 		$ticket->Cell(70, 6, utf8_decode( $parts[0] ), "" ,0, "C");
@@ -148,14 +153,16 @@
 //
 
 //numero de caja
-	$ticket->SetFont('Arial','B',$bF + 5);
-	$ticket->SetXY(3, $ticket->GetY()+30);
-	$ticket->Cell(70, 6, utf8_decode("Caja {$limit_counter} de {$boxes_limit}" ), "" ,0, "C");
+	$ticket->SetFont('Arial','B',$bF + 30);
+	$ticket->SetXY(3, $ticket->GetY()+35);
+	$ticket->Cell(70, 6, utf8_decode("CAJA" ), "" ,0, "C");
+	$ticket->SetXY(3, $ticket->GetY()+15);
+	$ticket->Cell(70, 6, utf8_decode("{$limit_counter} DE {$boxes_limit}" ), "" ,0, "C");
 
 
 //fecha, hora de creacion
 	$ticket->SetFont('Arial','B',$bF);
-	$ticket->SetXY( 3, $ticket->GetY()+7 );
+	$ticket->SetXY( 3, $ticket->GetY()+10 );
 	$ticket->Cell( 33, 6, utf8_decode( "CREACION : " ), "" ,0, "C");
 	$ticket->SetXY( 34, $ticket->GetY() );
 	$ticket->Cell( 33, 6, utf8_decode( "AUTORIZACIÓN :" ), "" ,0, "C");
@@ -167,14 +174,26 @@
 	$ticket->SetXY( 34, $ticket->GetY() );
 	$ticket->Cell( 33, 6, utf8_decode( $row['last_update_time'] ), "" ,0, "C");
 
-//Usuario de la remisión
+//Usuario
 	$ticket->SetFont('Arial','B',$bF);
 	$ticket->SetXY( 3, $ticket->GetY()+4 );
 	//$ticket->SetFont('Arial','B',$bF);
 	$ticket->SetXY(3, $ticket->GetY()+4);
 	$ticket->Cell(70, 6, utf8_decode("Creada por : " . $row['user_name'] ), "" ,0, "C"); 
 	
-	$contador=0;
+
+//cinta superior
+	$ticket->SetFont('Arial','B',$bF+2);
+	$ticket->SetXY(5, $ticket->GetY()+8);
+	$ticket->Cell(66, 3, "", "TB" ,0, "C");
+	
+	$ticket->SetXY(5, $ticket->GetY()+30);
+	$ticket->Cell(70, 6, utf8_decode( "PEGAR DIUREX AQUI : " ), "" ,0, "C");
+
+	$ticket->SetXY(5, $ticket->GetY()+30);
+	$ticket->SetXY(5, $ticket->GetY());
+	$ticket->Cell(66, 3, "", "TB" ,0, "C");
+//	$contador=0;
 
 	
 	if($printPan == 1) {
