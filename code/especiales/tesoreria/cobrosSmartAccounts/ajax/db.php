@@ -195,6 +195,16 @@
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				echo $Payments->setPaymentWhithouthIntegration( $afiliation_id, $ammount, $authorization_number, $sale_id, $session_id, $user_id );
 			break;
+
+			case 'getTicketsToReprint' :
+				$key = ( isset( $_GET['key'] ) ? $_GET['key'] : '' );
+				echo $Payments->getLastTickets( $key, $user_sucursal );
+			break;
+
+			case 'validatePayments' : 
+				$sale_id = $_GET['sale_id'];
+				echo $Payments->validatePayments( $sale_id );
+			break;
 				
 			default :
 				die( "Access denied on '{$action}'" );
@@ -210,6 +220,28 @@
 		function __construct( $connection )
 		{
 			$this->link = $connection;
+		}
+
+		public function validatePayments( $sale_id ){
+			$sql = "SELECT
+						p.total AS sale_total,
+						SUM( pp.monto ) AS payments_total,
+						p.pagado AS was_payed
+					FROM ec_pedidos p
+					LEFT JOIN ec_pedido_pagos pp
+					ON pp.id_pedido = p.id_pedido
+					WHERE p.id_pedido = {$sale_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar los totales para validar : {$sql} : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			if( $row['was_payed'] == 1 && $row['sale_total'] > $row['payments_total'] ){
+				die( "<div class=\"row\">
+					<h3 class=\"text-center text-danger fs-2\">La venta no esta liquidada, registra todos los pagos y vuelve a intentar</h3>
+					<button class=\"btn btn-danger\" onclick=\"close_emergent();\">
+						<i class=\"icon-cancel-circled\">Aceptar y cerrar</i>
+					</button>
+				</div>" );
+			}
+			die( 'ok|' );
 		}
 
 		public function setPaymentWhithouthIntegration( $afiliation_id, $ammount, $authorization_number, $sale_id, $session_id, $user_id ){	
@@ -700,6 +732,61 @@
 			}
 			$resp .= '</select>';
 			return $resp;
+		}
+
+		public function getLastTickets( $key = '', $store_id ){
+			$condition = "";
+			if( isset( $_GET['key'] ) ){
+				$key = $_GET['key'];
+				$condition = " AND ( CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) LIKE '%{$key}%'";
+				$condition .= " OR p.folio_nv LIKE '%{$key}%' OR p.total LIKE '%{$key}%' OR c.nombre LIKE '%{$key}%'";
+				$condition .= " ) ";
+			}
+			$current_year = date("Y");
+			//die( "YEAR : {$current_year}" );
+			$sql = "SELECT
+						CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS user_name,
+						p.folio_nv,
+						p.total,
+						p.id_pedido,
+						p.fecha_alta,
+						c.nombre AS costumer_name,
+						SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS payments_amount
+					FROM ec_pedidos p
+					LEFT JOIN sys_users u
+					ON p.id_usuario = u.id_usuario
+					LEFT JOIN ec_clientes c
+					ON p.id_cliente = c.id_cliente
+					LEFT JOIN ec_pedido_pagos pp
+					ON pp.id_pedido = p.id_pedido
+					WHERE p.id_sucursal = {$store_id}
+					AND p.fecha_alta LIKE '%{$current_year}%'
+					{$condition}
+					GROUP BY p.id_pedido
+					ORDER BY p.id_pedido DESC
+					LIMIT 30";//die( $sql );
+			$stm = $this->link->query( $sql ) or die( "Error al consultar los datos de las notas de venta : {$this->link->error}" );
+			$resp = "";
+			while ( $row = $stm->fetch_assoc() ) {
+				$resp .= "<tr>
+					<td class=\"text-start\">{$row['user_name']}</td>
+					<td class=\"text-center\">{$row['folio_nv']}</td>
+					<td class=\"text-end text-primary\">{$row['total']}</td>
+					<td class=\"text-end text-success\">{$row['payments_amount']}</td>
+					<td class=\"text-end\">{$row['costumer_name']}</td>
+					<td class=\"text-end\">{$row['fecha_alta']}</td>
+					<td class=\"text-center\">
+						<button
+							type=\"button\"
+							class=\"btn btn-light\"
+							onclick=\"print_ticket( {$row['id_pedido']} );\"
+						>
+							<i class=\"icon-print\"></i>
+						</button>
+					</td>
+				</tr>";
+			}
+			die( $resp );
 		}
 
 	}

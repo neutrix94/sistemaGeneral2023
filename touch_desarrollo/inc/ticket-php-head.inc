@@ -352,16 +352,13 @@ Fin de cambio Oscar 25.06.2019*/
 
 	$ticket->SetFont('Arial','B',$bF+4);
 	$ticket->SetXY(5, $ticket->GetY()+1);
+	if($pagado == 0){
+		$ticket->SetFont('Arial','B',$bF+4);
+		//$ticket->SetXY(5, $ticket->GetY()+1);
+		$ticket->Cell(66, 3, utf8_decode("ABONO EN APARTADO"), "" ,0, "C");
+	}
 
     while( $row = mysql_fetch_assoc( $stm ) ){
-        /*$ticket->SetXY(7, $ticket->GetY()+6);
-            $ticket->Cell(66, 6, utf8_decode( $row['payment_type'] ), "" ,0, "L");
-        
-            $ticket->SetX(35);
-            $ticket->Cell(20, 6, $row[2], "" ,0, "L");
-        
-            $ticket->SetX(43);
-            $ticket->Cell(30, 6, "$ " . number_format( $row['amount'], 2), "" ,0, "R");*/
         $payments_total +=  $row['amount'];
     }
 /*fin de cambio Oscar 2023/10/12*/
@@ -751,7 +748,8 @@ $ticket->SetXY(5, $ticket->GetY()+4);
     }*/
 /*Implementado por Oscar 2023/10/12*/
 	
-    if(  ( $payments_total == $total ) ){//$ticket_was_payed == 1 &&
+    if(  ( $payments_total == $total || $pagado == 0 ) ){//$ticket_was_payed == 1 &&
+    	//die( 'ere' );
        // $ticket->Image("../../../../img/especiales/pagado.jpeg", 5, 2, 70);
     //generacion de codigo de barras
         include('../include/barcode/barcode.php');
