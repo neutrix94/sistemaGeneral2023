@@ -247,7 +247,7 @@
                     cantidad=(cantidad-{$get_quantity}),
                     monto=cantidad*precio,descuento=(IF(descuento=0,0,$des[0]*cantidad)),
                     modificado=1
-    		  		WHERE id_pedido_detalle='{$get_product_id}'";//-{$_GET["can{$i}"]}
+    		  		WHERE id_pedido_detalle='{$get_sale_detail}'";//-{$_GET["can{$i}"]}
     		$eje2=mysql_query($sql2);
     		if(!$eje2){
                 $error=mysql_error();
