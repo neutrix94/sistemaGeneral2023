@@ -86,9 +86,14 @@
 	</div>
 
 	<div class="row header bg-primary" style="padding-top : 2px;">
-		<div class="col-12 text-center text-light">
+		<div class="col-1 text-center text-light" style="padding-top : 1%;">
+			<button type="button" class="btn btn-success" onclick="show_reprint_view();" >
+				<i class="icon-print"></i>
+			</button>
+		</div>
+		<div class="col-10 text-center text-light">
 			<h3><b class="">Sucursal:</b> <?php echo $sucursal;?></h3>
-			<h3><b class="">Cajero:</b> <?php echo $usuario;?></h3>	
+			<h3><b class="">Cajero:</b> <?php echo $usuario;?></h3>
 		</div>
 	</div>
 <!-- Cancelaciones /reimpresiones manuales -->
@@ -195,12 +200,12 @@
 			<div class="col-12 input-group">
 				<!--div align="center"><b>Efectivo:</b></div-->
 				<!--button type="button">Efectivo </button-->
+				<!--onkeydown="prevenir(event);" 
+					onkeyup="valida_tca(this,event,2);calcula_cambio();"-->
 				<input 
 					type="number" 
 					id="efectivo" 
-					class="form-control text-end" 
-					onkeydown="prevenir(event);" 
-					onkeyup="valida_tca(this,event,2);calcula_cambio();">
+					class="form-control text-end" >
 				<button 
 					type="button"
 					class="btn btn-primary"

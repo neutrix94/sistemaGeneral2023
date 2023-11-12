@@ -5,7 +5,7 @@
 	if( isset( $_GET['key'] ) ){
 		$key = $_GET['key'];
 		$condition = " AND ( CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) LIKE '%{$key}%'";
-		$condition .= " OR p.folio_nv LIKE '%{$key}%' OR p.total LIKE '%{$key}%'";
+		$condition .= " OR p.folio_nv LIKE '%{$key}%' OR p.total LIKE '%{$key}%' OR c.nombre LIKE '%{$key}%'";
 		$condition .= " ) ";
 	}
 	$current_year = date("Y");
@@ -15,10 +15,13 @@
 				p.folio_nv,
 				p.total,
 				p.id_pedido,
-				p.fecha_alta
+				p.fecha_alta,
+				c.nombre AS costumer_name
 			FROM ec_pedidos p
 			LEFT JOIN sys_users u
 			ON p.id_usuario = u.id_usuario
+			LEFT JOIN ec_clientes c
+			ON p.id_cliente = c.id_cliente
 			WHERE p.id_sucursal = {$user_sucursal}
 			AND p.fecha_alta LIKE '%{$current_year}%'
 			{$condition}
@@ -31,6 +34,7 @@
 			<td class=\"text-start\">{$row['user_name']}</td>
 			<td class=\"text-center\">{$row['folio_nv']}</td>
 			<td class=\"text-end\">{$row['total']}</td>
+			<td class=\"text-end\">{$row['costumer_name']}</td>
 			<td class=\"text-end\">{$row['fecha_alta']}</td>
 			<td class=\"text-center\">
 				<button

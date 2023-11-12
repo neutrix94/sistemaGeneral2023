@@ -318,9 +318,10 @@ var cont_cheques_transferencia=0;
 	}
 
 		function cobrar(){
+			var sale_id = $( '#id_venta' ).val();
 		//verifica si hay cobro en efectivo
-			if( parseInt( $( '#efectivo' ).val() ) != 0 && $( '#efectivo' ).val().trim() != '' ){
-			//insereta pago en efectivo
+			/*if( parseInt( $( '#efectivo' ).val() ) != 0 && $( '#efectivo' ).val().trim() != '' ){
+			//inserta pago en efectivo
 				var url = "ajax/db.php?fl=insertCashPayment&ammount=" + parseInt( $( '#efectivo' ).val() );
 				url += "&session_id=" + $( '#session_id' ).val();
 				url += "&sale_id=" + $( '#id_venta' ).val();
@@ -330,11 +331,22 @@ var cont_cheques_transferencia=0;
 					alert( "Error al insertar el pago en Efectivo: " + resp );
 					return false;
 				}
+			}*/
+		//verifica que el total de pagos sea igual al total de venta
+			var url = "ajax/db.php?fl=validatePayments&sale_id=" + sale_id;
+			//alert( url );
+			var resp = ajaxR( url ).split( '|' );
+			if( resp[0] != 'ok' ){
+				$( '.emergent_content' ).html( resp );
+				$( '.emergent' ).css( 'display', 'block' );
+				return false;
 			}
+			//alert( resp );
+
 		//manda impresion del ticket
 			//var url = "ticket_pagos.php?id_pedido=" + $( '#id_venta' ).val();
 			//var resp = ajaxR( url );
-			var url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( '#id_venta' ).val();
+			url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( '#id_venta' ).val();
 			//alert( url );
 			var resp = ajaxR( url );
 			//alert( url );

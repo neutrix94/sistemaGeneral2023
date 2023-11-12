@@ -203,13 +203,14 @@
         <input type="text" id="tickets_seeker" class="form-control" onkeyup="seek_ticket( event );"  style="box-shadow : 1px 1px 1px rgba( 0,20,0,.5 );" placeholder="Buscar...">
         <button class="icon-search btn btn-primary" onclick="seek_ticket( 'intro' );"></button>
       </div>
-      <div style="height : 400px;max-height : 400px; overflow : scroll; position : sticky;" class="list_container">
+      <div style="height : 350px;max-height : 350px; overflow : scroll; position : sticky;" class="list_container">
         <table class="table table-bordered table-striped tickets_table">
           <thead style="position : sticky; top : 0; background-color : white;">
             <tr>
               <th class="text-center">Vendedor</th>
               <th class="text-center">Folio</th>
               <th class="text-center">Monto</th>
+              <th class="text-center">Cliente</th>
               <th class="text-center">Fecha</th>
               <th class="text-center">Imprimir</th>
             </tr>
