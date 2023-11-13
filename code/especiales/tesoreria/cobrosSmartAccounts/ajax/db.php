@@ -236,9 +236,18 @@
 			if( $row['was_payed'] == 1 && $row['sale_total'] > $row['payments_total'] ){
 				die( "<div class=\"row\">
 					<h3 class=\"text-center text-danger fs-2\">La venta no esta liquidada, registra todos los pagos y vuelve a intentar</h3>
+					<div class=\"\">
+						<div class=\"col-6 text-primary\">
+							Total : {$row['sale_total']}
+						</div>
+						<div class=\"col-6 text-success\">
+							Pagado : {$row['payments_total']}
+						</div>
+					</div>
 					<button class=\"btn btn-danger\" onclick=\"close_emergent();\">
 						<i class=\"icon-cancel-circled\">Aceptar y cerrar</i>
 					</button>
+
 				</div>" );
 			}
 			die( 'ok|' );
