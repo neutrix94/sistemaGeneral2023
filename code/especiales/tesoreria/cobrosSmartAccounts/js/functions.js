@@ -319,10 +319,10 @@ var cont_cheques_transferencia=0;
 
 		function cobrar(){
 			var sale_id = $( '#id_venta' ).val();
-		//verifica si hay cobro en efectivo
-			/*if( parseInt( $( '#efectivo' ).val() ) != 0 && $( '#efectivo' ).val().trim() != '' ){
+		//verifica si hay cobro en efectivo a favor
+			if( parseInt( $( '#saldo_favor' ).val() ) != 0 && $( '#saldo_favor' ).val().trim() != '' ){
 			//inserta pago en efectivo
-				var url = "ajax/db.php?fl=insertCashPayment&ammount=" + parseInt( $( '#efectivo' ).val() );
+				var url = "ajax/db.php?fl=insertCashPayment&ammount=" + parseInt( $( '#saldo_favor' ).val() );
 				url += "&session_id=" + $( '#session_id' ).val();
 				url += "&sale_id=" + $( '#id_venta' ).val();
 				//alert( url ); return false;
@@ -331,7 +331,7 @@ var cont_cheques_transferencia=0;
 					alert( "Error al insertar el pago en Efectivo: " + resp );
 					return false;
 				}
-			}*/
+			}
 		//verifica que el total de pagos sea igual al total de venta
 			var url = "ajax/db.php?fl=validatePayments&sale_id=" + sale_id;
 			//alert( url );
