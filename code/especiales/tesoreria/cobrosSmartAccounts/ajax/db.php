@@ -26,6 +26,9 @@
 			//recibe variables
 				$amount = ( isset( $_GET['amount'] ) ? $_GET['amount'] : $_POST['amount'] );
 				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
+				
+				$validation = $Payments->validate_payment_is_not_bigger( $sale_folio, $amount );
+
 				$terminal_id = ( isset( $_GET['terminal_id'] ) ? $_GET['terminal_id'] : $_POST['terminal_id'] );
 				$counter = ( isset( $_GET['counter'] ) ? $_GET['counter'] : $_POST['counter'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
@@ -173,6 +176,7 @@
 				$ammount = ( isset( $_GET['ammount'] ) ? $_GET['ammount'] : $_POST['ammount'] );
 				$sale_id = ( isset( $_GET['sale_id'] ) ? $_GET['sale_id'] : $_POST['sale_id'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
 				echo $Payments->insertCashPayment( $ammount, $sale_id, $user_id, $session_id );
 			break;
 
@@ -193,6 +197,7 @@
 				$authorization_number = ( isset( $_GET['authorization_number'] ) ? $_GET['authorization_number'] : $_POST['authorization_number'] );
 				$sale_id = ( isset( $_GET['sale_id'] ) ? $_GET['sale_id'] : $_POST['sale_id'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
 				echo $Payments->setPaymentWhithouthIntegration( $afiliation_id, $ammount, $authorization_number, $sale_id, $session_id, $user_id );
 			break;
 
@@ -220,6 +225,65 @@
 		function __construct( $connection )
 		{
 			$this->link = $connection;
+		}
+
+		public function validate_payment_is_not_bigger( $sale_id, $ammount ){
+		//busqueda por id
+			$sql = "SELECT
+						p.total AS sale_total,
+						SUM( pp.monto ) AS payments_total,
+						p.pagado AS was_payed
+					FROM ec_pedidos p
+					LEFT JOIN ec_pedido_pagos pp
+					ON pp.id_pedido = p.id_pedido
+					WHERE p.id_pedido = '{$sale_id}'";//OR foilio_nv = '{$sale_id}'
+			$stm = $this->link->query( $sql ) or die( "Error al consultar pagos para comprobacion : {$this->link->error}" );
+			if( $stm->num_rows == 0 ){	//busqueda por folio
+			
+				$sql = "SELECT
+						p.total AS sale_total,
+						SUM( pp.monto ) AS payments_total,
+						p.pagado AS was_payed
+					FROM ec_pedidos p
+					LEFT JOIN ec_pedido_pagos pp
+					ON pp.id_pedido = p.id_pedido
+					WHERE OR folio_nv = '{$sale_id}'";//
+				$stm = $this->link->query( $sql ) or die( "Error al consultar pagos para comprobacion : {$this->link->error}" );
+			}
+			if( $stm->num_rows == 0 ){
+				die( "error|La nota de venta {$sale_id} no fue encontrada." );
+			}
+
+			$row = $stm->fetch_assoc();
+			$sale_total = $row['sale_total'];
+			$payments_total = $row['payments_total'];
+			$rest = $row['sale_total'] - $row['payments_total'];
+			$tmp_total = $payments_total + $ammount;
+			if( $sale_total < $tmp_total ){
+				die( "error|<h3 class=\"text-center\">El pago no puede ser mayor al total de la venta!</h3>
+					<div class=\"row text-center\">
+						<div class=\"col-3 text-primary\">
+							Total : {$sale_total}
+						</div>
+						<div class=\"col-3 text-success\">
+							Total Pagado : {$payments_total}
+						</div>
+						<div class=\"col-3 text-danger\">
+							Restante : {$rest}
+						</div>
+						<div class=\"col-3 text-warning\">
+							Monto Pago : {$ammount}
+						</div>
+						<button
+							type=\"button\"
+							class=\"btn btn-danger\"
+							onclick=\"close_emergent();\"	
+						>
+							<i class=\"icon-ok-circled\">Aceptar</i>
+						</button>
+					</div>" );
+			}
+			return 'ok';
 		}
 
 		public function validatePayments( $sale_id ){
