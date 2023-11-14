@@ -247,7 +247,7 @@
 					FROM ec_pedidos p
 					LEFT JOIN ec_pedido_pagos pp
 					ON pp.id_pedido = p.id_pedido
-					WHERE OR folio_nv = '{$sale_id}'";//
+					WHERE p.folio_nv = '{$sale_id}'";//
 				$stm = $this->link->query( $sql ) or die( "Error al consultar pagos para comprobacion : {$this->link->error}" );
 			}
 			if( $stm->num_rows == 0 ){
