@@ -563,7 +563,8 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 			$sql = "SELECT 
 						id_pedido AS row_id,
 						folio_nv,
-						total
+						total,
+						pagado
 					FROM ec_pedidos
 					WHERE id_sucursal = '{$user_sucursal}'
 					AND folio_nv != 'agrupacion'
@@ -572,7 +573,7 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 					LIMIT 1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar código de barras del ticket : {$this->link->error} {$sql}" );
 			if( $stm->num_rows <= 0 ){
-				$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no fue encontrada.<br>Verifique y vuelva a intentar!</p>";
+				$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no fue encontrada.<br>Verifica y vuelve a intentar!</p>";
 				$resp .= "<div class=\"row\">";
 					$resp .= "<div class=\"col-2\"></div>";
 					$resp .= "<div class=\"col-8\">";
@@ -585,6 +586,38 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 				return $resp;
 			}else{
 				$row = $stm->fetch_assoc();
+			//consulta si el pedido tiene pagos
+				$sql = "SELECT 
+							SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS payments_total
+						FROM ec_pedido_pagos pp
+						WHERE pp.id_pedido = {$row['row_id']}";
+				$stm_aux = $this->link->query( $sql ) or die( "Error al consultar los pagos del pedido : {$this->link->error}" );
+				$row_aux = $stm_aux->fetch_assoc();
+				if( $row_aux['payments_total'] < $row['total'] && $row['pagado'] == 1 ){//venta no liquidada
+					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no ah sido liquidada<br>Verifica y vuelve a intentar!</p>";
+					$resp .= "<div class=\"row\">";
+						$resp .= "<div class=\"col-2\"></div>";
+						$resp .= "<div class=\"col-8\">";
+							$resp .= "<button class=\"btn btn-success form-control\"
+							 onclick=\"close_emergent( null, '#barcode_seeker' );\">";
+								$resp .= "<i class=\"icon-ok-circle\">Aceptar</i>";
+							$resp .= "</button>";
+						$resp .= "</div>";
+					$resp .= "</div><br><br>";
+					return $resp;
+				}else if( $row_aux['payments_total'] == 0 && $row['pagado'] == 0 ){//apartado sin pagos
+					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas <b class=\"text-primary\">( apartado )</b> con el folio : <b>{$barcode}</b> no tiene pagos registrados<br>Verifica y vuelve a intentar!</p>";
+					$resp .= "<div class=\"row\">";
+						$resp .= "<div class=\"col-2\"></div>";
+						$resp .= "<div class=\"col-8\">";
+							$resp .= "<button class=\"btn btn-success form-control\"
+							 onclick=\"close_emergent( null, '#barcode_seeker' );\">";
+								$resp .= "<i class=\"icon-ok-circle\">Aceptar</i>";
+							$resp .= "</button>";
+						$resp .= "</div>";
+					$resp .= "</div><br><br>";
+					return $resp;
+				}
 				return "ok|{$row['row_id']}|{$row['folio_nv']}|{$row['total']}";
 			}
 		}

@@ -11,7 +11,8 @@
 		$row = $stm->fetch_assoc();
 		$is_smart_accounts = $row['is_smart_accounts'];
 		//if( $row['is_smart_accounts'] == 0 ){
-			include( '../../../netPay/apiNetPay' );//sin smartaccounts
+			include( '../../../netPay/ApiNetPaySinSmartAccount.php' );//sin smartaccounts
+		//die( 'here' );
 		//}else{
 		//	include( '../../../netPay/apiNetPay.php' );
 		//}
@@ -33,6 +34,7 @@
 				$req = $apiNetPay->salePetition( $apiUrl, $amount, $terminal_id, $user_id, 
 					$sucursal_id, $sale_folio, $session_id );
 				$resp = json_decode( $req );
+		//die( 'here' );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
 					$transaction_id = $resp->petition_id;
 					include( '../vistas/formularioNetPay.php' );
