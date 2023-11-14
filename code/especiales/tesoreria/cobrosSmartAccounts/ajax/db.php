@@ -236,9 +236,10 @@
 					FROM ec_pedidos p
 					LEFT JOIN ec_pedido_pagos pp
 					ON pp.id_pedido = p.id_pedido
-					WHERE p.id_pedido = '{$sale_id}'";//OR foilio_nv = '{$sale_id}'
+					WHERE p.id_pedido = '{$sale_id}'
+					GROUP BY p.id_pedido";//OR foilio_nv = '{$sale_id}'
 			$stm = $this->link->query( $sql ) or die( "Error al consultar pagos para comprobacion : {$this->link->error}" );
-			if( $stm->num_rows == 0 ){	//busqueda por folio
+			if( $stm->num_rows <= 0 ){	//busqueda por folio
 			
 				$sql = "SELECT
 						p.total AS sale_total,
@@ -247,7 +248,8 @@
 					FROM ec_pedidos p
 					LEFT JOIN ec_pedido_pagos pp
 					ON pp.id_pedido = p.id_pedido
-					WHERE p.folio_nv = '{$sale_id}'";//
+					WHERE p.folio_nv = '{$sale_id}'
+					GROUP BY p.id_pedido";//
 				$stm = $this->link->query( $sql ) or die( "Error al consultar pagos para comprobacion : {$this->link->error}" );
 			}
 			if( $stm->num_rows == 0 ){
