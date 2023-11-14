@@ -58,7 +58,9 @@
 		//alert( url ); return false;
 		var resp = ajaxR( url ).split( '|' );
 		if( resp[0] != 'ok' ){
-			alert( "Error al insertar el pago en Efectivo: " + resp );
+			//alert( "Error al insertar el pago en Efectivo: " + resp );
+			$( '.emergent_content' ).html( resp[1] );
+			$( '.emergent' ).css( 'display', 'block' );
 			return false;
 		}else{
 			$( '#efectivo' ).val( '' );
