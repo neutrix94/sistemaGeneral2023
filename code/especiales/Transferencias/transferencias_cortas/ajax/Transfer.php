@@ -402,9 +402,10 @@
 					<div class=\"col-2\"></div>
 						<div class=\"col-8\">
 							<input 
-								type=\"number\" 
+								type=\"text\" 
 								class=\"form-control\" 
-								id=\"pieces_quantity_emergent\">
+								id=\"pieces_quantity_emergent\"
+								oninput=\"validarNumero(this)\">
 							<button 
 								type=\"button\" class=\"btn btn-success form-control\"
 								onclick=\"setPiecesQuantity( '{$barcode}' );\"
