@@ -381,7 +381,7 @@ var audio_is_playing;
 						<div><h5>Ingresa el número de Piezas "${product_name}" a quitar de la Transferencia : </h5></div>
 					<div class="col-2"></div>
 						<div class="col-8">
-							<input type="number" class="form-control" id="pieces_quantity_emergent">
+							<input type="text" class="form-control" oninput="validarNumero(this)" id="pieces_quantity_emergent">
 							<button type="button" class="btn btn-success form-control"
 							 onclick="delete_scanns( ${counter}, ${transfer_product_id}, ${is_maquiled}, 1 );">
 								Aceptar
@@ -406,7 +406,14 @@ var audio_is_playing;
 		$( '.emergent' ).css( 'display', 'block' );
 		$( '#pieces_quantity_emergent' ).focus();
 	}
-
+/*oscar 2023/11/15*/
+	function validarNumero(input) {
+	  input.value = input.value.replace(/[^\d]/g, ''); // Eliminar no números
+	  input.focus();
+	  // Establece la posición del cursor al final del texto
+	  input.setSelectionRange(input.value.length, input.value.length)
+	}
+/*fin de cambio Oscar 2023/11/15*/
 	function getPendingTransfers( store_id ){
 		var url = "ajax/Transfer.php?fl_transfer=getPendingTransfers";
 		var response = ajaxR( url ).split( '|' );
