@@ -276,7 +276,9 @@ fin de cambio Oscar 2023/10/11*/
 			var response = ajaxR( url ).trim().split( '|' );
 			if( response[0] != 'ok' ){
 				alert( "Error : " + response[0] );
+				return false;
 			}
+
 			$( '.emergent_content' ).html( response[1] );
 			$( '.emergent' ).css( 'display', 'block' );
 		
@@ -285,11 +287,15 @@ fin de cambio Oscar 2023/10/11*/
 				//$( '#btn_reload_final' ).css( 'display', 'none' );
 	            url = "../../touch_desarrollo/ajax/ticket-php-head-reimpresion.php?id_ped="+localStorage.getItem( 'current_ticket' )+"&id_dev=0";
 	            var reimp = ajaxR(url);
+	
 				setTimeout( function (){
 				//libera el id de ticket
 					location.href = response[2];
 					localStorage.setItem( 'current_ticket', null );
-				}, 1000 );
+				}, 2000 );
+				alert_scann( 'validation_ok' );//oscar 2023
+			}else{
+				alert_scann( 'validation_ok' );//oscar 2023
 			}
 		//libera el id de ticket
 			localStorage.setItem( 'current_ticket', null );

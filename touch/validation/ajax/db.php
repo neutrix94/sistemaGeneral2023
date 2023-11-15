@@ -1360,7 +1360,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 								<input 
 									type=\"number\" 
 									id=\"{$prefix}vrs_row_2_{$counter}\"
-									value=\"0\" 
+									value=\"\" 
 									class=\"form-control text-end\"
 									" . ( $is_editable != true ? ' readonly' : '' ) . 
 									( $is_editable == true ? "onchange=\"recalculateReturnProduct();\"" : "" ) 

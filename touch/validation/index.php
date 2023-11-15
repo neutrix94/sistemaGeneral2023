@@ -36,6 +36,9 @@
 	<audio id="error" controls style="display : none;">
 		<source type="audio/wav" src="../../files/sounds/error.mp3">
 	</audio>
+  <audio id="validation_ok" controls style="display : none;">
+    <source type="audio/wav" src="../../files/sounds/validation_finished.mp3">
+  </audio>
 
 	<div class="emergent" tabindex="1">
 		<div style="position: relative; top : 120px; left: 90%; z-index:1; display : none;">
