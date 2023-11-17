@@ -2290,6 +2290,12 @@ function InsertaFila(tabla,datos)
 	/*aux=document.getElementById('c'+tabla+'_'+lk+'_'+newFila);
 	if(aux)
 		aux.focus();*/
+	
+	if( tabla == 'productosMovimiento' ){
+		setTimeout( function(){
+			make_responsive_grids();
+		}, 1000 );
+	}
 }
 
 function InsertaFilaNoVal(tabla)
