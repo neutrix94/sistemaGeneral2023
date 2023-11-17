@@ -6,6 +6,22 @@
 	{include file="general/utilidadesGenerales.tpl"}
 <!-- Fin de cambio Oscar 2021 -->
 
+<!-- implementacion Oscar 2023/11/15 para agregar JS adicional y ok en escaneos de la plantilla-->
+	{include file="general/responsive_by_js.tpl"}
+
+	<audio id="ok" controls style="display : none;">
+		<source type="audio/wav" src="../../files/sounds/ok.mp3">
+	</audio>
+
+	<audio id="error" controls style="display : none;">
+		<source type="audio/wav" src="../../files/sounds/error.mp3">
+	</audio>
+	<div class="emergent" style="position : fixed; top : 0; left : 0; width : 100%; height : 100%; background-color : rgba( 0,0,0,.5 ); z-index : 10000; display : none;">
+	
+		<div class="emergent_content" style="position : relative; background-color : white; width : 90%; left : 5%; height : 50%; top : 10%;"></div>
+	</div>
+<!-- Fin de cambio Oscar 2023/11/15 -->
+
 <!-- Excepcion 1: Implementacion para botones de exportacion de ubicaciones desde la configuracion de la sucursal -->
 {if $tabla eq 'ec_configuracion_sucursal' && $no_tabla eq '0'}
 	<table style="position:absolute;bottom:30%;">
@@ -1241,7 +1257,25 @@
 				<div style="width:51.5%;height:200px;background:white;left:0px;position:relative;border:1px solid;display:none;overflow:auto;" id="res_bus_glob_{$smarty.section.x.index}"></div>
 				<input type="hidden" value="" id="aux_1_{$smarty.section.x.index}"><!--id-->
 				<input type="hidden" value="" id="aux_2_{$smarty.section.x.index}"><!--descripcion-->
-			</div>
+			{if $gridArray[x][0] eq '9'}
+				<div class="row">
+					<div class="col-6">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Buscador por codigo de barras"
+								onkeyup="seekProductProviderByBarcode( event )" id="barcode_seeker"
+							>
+							<button
+								type="button"
+								class="btn btn-warning"
+							>
+								<i class="icon-barcode"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			{/if}
+		</div>
+
 	<!--Implementación de Oscar 16.05.2018 para exportar/importar lista de estacionalidades
 	{if $tabla eq 'ec_estacionalidad' && $no_tabla eq '0'}
 		<div style="position:absolute;bottom:-40%;z-index:3;">
@@ -1383,6 +1417,7 @@
 						//descomponemos descripcion de buscador
 							var arr=document.getElementById('b_g_'+n_b).value.split("°");
 						/***********************************implementación de confirmación de movimiento de almacen prod c/maquila Oscar 11.04.2018*/
+						//alert( 'here' );
 							if(grid_id == 9){//si es el grid de movimientos de almacén entra al proceso de validación...
 								var es_pd_mq=ajaxR("../ajax/validaMovProdMaq.php?id_pr="+arr[0]);
 								var arr_mq=es_pd_mq.split("|");
@@ -1415,6 +1450,7 @@
 									alert("Error!!!\n\n"+dat);
 								}else{
 									$("#img_add_"+n_b).attr("onclick",resul[2]);
+									return 'ok';
 								}
 							}
 							});
@@ -1463,7 +1499,7 @@
 											//alert("resalta:"+"#"+posic+"_"+arr_re[2]+"_"+i);
 											$("#"+posic+"_"+arr_re[2]+"_"+i).select();//#c
 											$("#"+posic+"_"+arr_re[2]+"_"+i).focus();//#c
-											var arr=document.getElementById('b_g_'+n_b).value( '' );//modificacion Oscar 2023 para limpiar buscador
+											var arr = $('#b_g_'+n_b).val( '' );//modificacion Oscar 2023 para limpiar buscador
 											return '1';
 										}
 									}
@@ -2961,3 +2997,12 @@ Fin de deshabilitar Oscar 08.11.2018*/
 {include file="general/funciones.tpl" tabla=$tabla}
 
 {include file="_footer.tpl" pagetitle="$contentheader"}
+
+
+{if $tabla eq 'ec_movimiento_almacen'}
+	{literal}
+		<script>
+			make_responsive_grids();
+		</script>
+	{/literal}
+{/if}

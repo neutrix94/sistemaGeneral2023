@@ -322,7 +322,7 @@
 			return 0;
 		}
 
-		function cambiaDesc(pos, grid, posOri, posFin,dt,num_div,enf,celda_valida_repetidos)//dt agregado por Oscar 13/02/2017 (por implementacion de buscador)
+		function cambiaDesc(pos, grid, posOri, posFin,dt,num_div,enf,celda_valida_repetidos )//dt agregado por Oscar 13/02/2017 (por implementacion de buscador)
 		/*variable valida_repetidos implementada por Oscar 16-09-2020 */
 		{
 			//alert(pos + ' -- ' + grid + ' -- ' + posOri + ' -- ' + posFin + ' -- ' + dt + ' -- ' + num_div + ' -- ' + enf);
@@ -385,8 +385,16 @@
 			}
 		/*implementación Oscar 2022*/
 			if( grid == 'productosMovimiento' ){
-				valorXY(grid, 8, pos, aux[2]);
-				valorXYNoOnChange(grid, 8, pos, aux[2]);
+				//setTimeout( function(){//oscar 2023/11/16
+				try{
+					valorXY(grid, 8, pos, aux[2]);
+					valorXYNoOnChange(grid, 8, pos, aux[2]);
+				}catch(error){
+					console.log( error );
+					//alert( "Error : " + error );
+				//	alert_scann( 'error' );
+				}
+				//}, 300 );
 			}
 		/*fin de cambio Oscar 2022*/
 		}
