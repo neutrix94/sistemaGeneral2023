@@ -66,7 +66,11 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
   $stm = $link->query( $sql ) or die( "Error al consultar el path del api : {$link->error}" );
   $row = $stm->fetch_assoc();
   $api_path = $row['value'];
-  die( "api_path : {$api_path}" );
+
+  $result_1 = $SynchronizationManagmentLog->sendPetition( "{$api_path}/rest/facturacion/clientes/nuevoCliente", $post_data );
+return $result_1;
+  return $resp;
+  //die( "api_path : {$api_path}" );
 });
 
 ?>
