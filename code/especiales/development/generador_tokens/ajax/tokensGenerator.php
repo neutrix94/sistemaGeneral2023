@@ -78,7 +78,7 @@
 			$stm = $this->link->query( $sql ) or die( "Error al insertar datos_del token : {$this->link->error}" );
 			$id = $this->link->insert_id;
 		//forma token
-			$token = "{$store}-{$user}-" . uniqid() . "-{$id}";
+			$token = "{$store}{$user}{$id}";//" . uniqid() . "-
 			$sql = "UPDATE ec_asistencia_tokens SET token = '{$token}' WHERE id_token = {$id}";
 			$stm = $this->link->query( $sql ) or die( "Error al actualizar token : {$this->link->error}" );
 			$this->link->autocommit( true );
