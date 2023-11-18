@@ -12,7 +12,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 $app->post('/envia_cliente', function (Request $request, Response $response){
 //variables
 	$req = [];
-	$req["rows"] = array(); 
+	$req["rows"] = array();
 	$result = "";
 //librerias
 	if ( ! include( '../../conexionMysqli.php' ) ){

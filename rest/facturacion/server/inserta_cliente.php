@@ -61,6 +61,12 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
     $response_string = "No llegaron clientes, posiblemente tengas que bajar el limite de registros de sincronizacion de facturacion!";
     $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $response_string, $resp["log"]["unique_folio"] );
   }
+//consume el webservice para insertar cliente en los sistemas de factureacion
+  $sql = "SELECT value FROM api_config WHERE name = 'path' LIMIT 1";
+  $stm = $link->query( $sql ) or die( "Error al consultar el path del api : {$link->error}" );
+  $row = $stm->fetch_assoc();
+  $api_path = $row['value'];
+  die( "api_path : {$api_path}" );
 });
 
 ?>
