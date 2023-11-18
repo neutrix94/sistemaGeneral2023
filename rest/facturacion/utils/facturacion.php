@@ -47,6 +47,7 @@
 					$row['detail'] = $detail;
 				}
 				$json = json_encode( $row );
+			//die( $json );
 				$sql = "INSERT INTO sys_sincronizacion_registros_facturacion ( id_sincronizacion_registro, sucursal_de_cambio, 
 	  			id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
 				VALUES( NULL, {$this->store_id}, -1, '{$json}', NOW(), 'envia_cliente.php', 1 )";
@@ -59,6 +60,7 @@
 		}
 
 		public function getTemporalCostumerDetail( $costumer_id ){
+			$row = array();
 			$sql = "SELECT 
 						id_cliente_contacto_tmp,
 						id_cliente_facturacion_tmp,
@@ -69,17 +71,19 @@
 						uso_cfdi
 		  			FROM vf_clientes_contacto_tmp
 		  			WHERE id_cliente_facturacion_tmp = {$costumer_id}
-		  			AND ( folio_unico IS NULL OR folio_unico = '' )";
+		  			AND ( folio_unico IS NULL OR folio_unico = '' )"; //die( $sql );
 		  	$stm = $this->link->query( $sql ) or die( "Error al consultar razones sociales pendientes de sincronizar : {$sql} {$this->link->error}" );
 			while( $row = $stm->fetch_assoc() ){
 				$row['folio_unico'] = $this->update_unique_code( 'vf_clientes_contacto_tmp', 'id_cliente_contacto_tmp', 'CLRZ', $row['id_cliente_contacto_tmp'] );
+				//die( 'HERE : ' . $row['folio_unico'] );
 				//$detail = $this->getTemporalCostumerDetail( $row['id_cliente_tmp'] );
 				//if( sizeof( $detail ) > 0 ){
 					//$row['detail'] = $detail;
 				//}
 				//var_dump( $row );
+				return $row;
 			}
-			return $row;
+			//var_dump( $row );
 		}
 
 		public function update_unique_code( $table, $keyname, $prefix, $id ){

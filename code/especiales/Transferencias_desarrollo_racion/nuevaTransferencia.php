@@ -17,7 +17,7 @@
 	if ( ! isset( $_GET['idTransfer'] ) && $row['ration_config'] == 1 ){
 		include( 'ajax/racionTransferencia.php' );
 		//var_dump($link); 
-		$rT = new racionTransferencia( $link, true );
+		$rT = new racionTransferencia( $link, false );//true
 		echo $rT->calculate_ration();
 	}
 //2. Incluye archivo %consultaTransferencia.php%%
