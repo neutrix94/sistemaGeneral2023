@@ -224,8 +224,8 @@
 		}
 
 		public function insertBillSystemCostumerSynchronization( $costumer, $detail ){
-			var_dump( $costumer );
-			var_dump( $detail );
+			//var_dump( $costumer );
+			//var_dump( $detail );
 			require_once( 'SynchronizationManagmentLog.php' );
 			$SynchronizationManagmentLog = new SynchronizationManagmentLog( $this->link );
 		//arma la estructura de las peticiones

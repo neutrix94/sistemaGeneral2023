@@ -23,7 +23,8 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 					ax1.id_productos AS product_id,
 					ax1.de_valor AS from_value,
 					ax1.es_externo AS is_extrernal,
-					ax1.oferta AS is_promotion
+					ax1.oferta AS is_promotion,
+					ax1.nombre_etiqueta AS just_tag_name
 				FROM(
 				SELECT
 					ax.nombre_etiqueta,
@@ -56,7 +57,8 @@ if( isset( $_POST['store_id'] ) && $_POST['store_id'] > 0 ){
 					ax1.orden_lista AS list_order,
 					ax1.id_productos AS product_id,
 					ax1.es_externo AS is_extrernal,
-					ax1.oferta AS is_promotion
+					ax1.oferta AS is_promotion,
+					ax1.nombre_etiqueta AS just_tag_name
 				FROM(
 				SELECT
 					ax.nombre_etiqueta,
@@ -269,6 +271,10 @@ filtro de subtipo
 		case '5':
 			$TermalPrinter->makeSeveralBigTags( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
 		break;
+		case '6':
+		//die('here');
+			$TermalPrinter->makeTagsWithouthPrice( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+		break;
 		case '7':
 			$TermalPrinter->makeSeveralTagsMixed( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
 		break;
@@ -283,6 +289,63 @@ filtro de subtipo
  		function __construct( $connection ){
  			$this->link = $connection;
  		}
+
+	 	function makeTagsWithouthPrice( $datos, $prods, $plantilla, $store_id, $number = 1 ) {
+	 		//die( 'here : ' . $number );
+	 		//var_dump( $datos['result']);
+	 		$epl_code = "";
+	 		$products_counter = 0;
+	 		$tags_counter = 0;
+	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
+	 			$position = $row['product_id'];
+	 			$tags_limit = ( $prods[$position] > 0 ? $prods[$position] : 1 );
+		 		for( $i = 1; $i <= $tags_limit; $i++ ){
+					$price_size = 4;
+
+					$row['just_tag_name'] = strtoupper( $row['just_tag_name'] );
+					$row['just_tag_name'] = str_replace( "Ñ", "N", $row['just_tag_name'] );
+					$row['just_tag_name'] = str_replace( "ñ", "n", $row['just_tag_name'] );
+					$parts = $this->part_word( $row['just_tag_name'] );
+					$part_1 = $parts[0];
+					$part_2 = $parts[1];
+		 			
+		 			$epl_code .= "\nI8,A,001\n\n";
+					$epl_code .= "Q408,024\n";
+					$epl_code .= "q448\n";
+					$epl_code .= "rN\n";
+					$epl_code .= "S1\n";
+					$epl_code .= "D5\n";
+					$epl_code .= "ZT\n";
+					$epl_code .= "JF\n";
+					$epl_code .= "O\n";
+					$epl_code .= "R112,0\n";
+					$epl_code .= "f100\n";
+					$epl_code .= "N\n";
+	//A590,280,2,4,4,4,N,"$"
+					//$epl_code .= "A590,280,2,4,4,4,N,\"$\"\n";
+					//if( $row['price'] > 999 ){
+					//	$price_size = 3;
+	//A400,255,2,5,2,2,N,","
+					//	$epl_code .= "A400,255,2,5,2,2,N,\",\"\n";
+					//}
+					$epl_code .= "b450,20,Q,m2,s5,\"{$row['list_order']}\"\n";//QR
+					$epl_code .= "A350,120,2,3,2,6,N,\"{$row['list_order']}\"\n";
+					$epl_code .= "A612,400,2,3,2,6,N,\"{$part_1}\"\n";
+					$epl_code .= "A612,270,2,3,2,6,N,\"{$part_2}\"\n";
+					$epl_code .= "P{$number}\n";
+
+	 				$tags_counter += $number;//contador etiquetas
+	 		//die( "Code" . $epl_code );
+				}
+	 			$products_counter ++;//contador productos
+	 		}
+	 		$file_name = date("Y_m_d_H_i_s");
+	 	//creacion de archivo
+	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+			fwrite($file, $epl_code );
+			fclose($file);
+			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
+	 	}
 
 	 	function makeNormalTags( $datos, $prods, $plantilla, $store_id, $number = 1 ) {
 	 		//die( 'here : ' . $number );
