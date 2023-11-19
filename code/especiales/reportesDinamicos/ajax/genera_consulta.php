@@ -89,12 +89,21 @@
 	        if( $r[1] == 'Herramienta' ){
 	            die("Consulta ejecutada exitosamente." );
 			}
-			echo $this->buildReportFrontEnd( $stm );
+			echo $this->buildReportFrontEnd( $stm, $id_herr );
 		}
 
-		public function buildReportFrontEnd( $stm ){
+		public function buildReportFrontEnd( $stm, $report_id ){
 	    	$resp = "";
 	    	$names;
+
+	    //consulta de tiempo validadores
+	    	$hours_sum = 0;
+	    	$sales_sum = 0;
+	    	$products_sum = 0;
+	    	$current_user = 0;
+	    	$username = "";
+	    	$first_date = "";
+	    	$last_date = "";
 
 			$info_campo = $stm->fetch_fields();
 
@@ -114,6 +123,37 @@
 					$resp .= '</tr>';
 					$resp .= '</thead>';
 					$resp .= '<tbody id="rows_list">';
+				}
+				if( $report_id == 2 ){
+				  //  die( 'here' );
+					if( $current_user != $r[0] ){//si es un usuario diferente
+						if( $current_user != 0 ){
+							$resp .= "<tr>
+								<td></td><td></td>
+								<td class=\"text-success\">Total {$username}</td>
+								<td class=\"text-success\">{$first_date}</td>
+								<td class=\"text-success\">{$last_date}</td>
+								<td class=\"text-success\">{$hours_sum}</td>
+								<td class=\"text-success\">{$products_sum}</td>
+								<td class=\"text-success\">{$sales_sum}</td>
+							</tr>";
+						}
+						$current_user = $r[0];
+						
+				    	$hours_sum = 0;
+				    	$sales_sum = 0;
+				    	$products_sum = 0;
+				    	//$current_user = 0;
+						$first_date = $r[3];
+				    	//$last_date = "";
+					}//else{
+						$username = $r[2];
+						$hours_sum += $r[5];
+						$products_sum += $r[6];
+						$sales_sum += $r[7];
+						$last_date = $r[4];
+
+					//}
 				}
 			//formacion filas
 				$resp .= '<tr>';
