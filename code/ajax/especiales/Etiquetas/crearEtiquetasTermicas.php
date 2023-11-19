@@ -328,8 +328,8 @@ filtro de subtipo
 	//A400,255,2,5,2,2,N,","
 					//	$epl_code .= "A400,255,2,5,2,2,N,\",\"\n";
 					//}
-					$epl_code .= "b450,20,Q,m2,s5,\"{$row['list_order']}\"\n";//QR
-					$epl_code .= "A350,120,2,3,2,6,N,\"{$row['list_order']}\"\n";
+					$epl_code .= "b450,20,Q,m2,s6,\"{$row['list_order']}\"\n";//QR
+					$epl_code .= "A350,120,2,3,3,6,N,\"({$row['list_order']})\"\n";
 					$epl_code .= "A612,400,2,3,2,6,N,\"{$part_1}\"\n";
 					$epl_code .= "A612,270,2,3,2,6,N,\"{$part_2}\"\n";
 					$epl_code .= "P{$number}\n";
