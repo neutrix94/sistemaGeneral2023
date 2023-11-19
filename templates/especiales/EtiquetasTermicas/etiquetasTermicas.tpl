@@ -576,9 +576,9 @@ var is_special = 0;//indicador de importacion / transferencia
     //fin de cambio
         var url= "../../../code/ajax/especiales/Etiquetas/crearEtiquetasTermicas.php"; 
         
-        if( $('#ticket_plantilla').val() == 6 ){
+        /*if( $('#ticket_plantilla').val() == 6 ){
         	url= "../../../code/ajax/especiales/Etiquetas/etiquetasSinPrecios.php"; 
-        }
+        }*/
     	if( $( '#store_id' ).val() == 0 || $( '#store_id' ).val() == '' ){
     		alert( "Debes de elegir una sucursal para continuar!" );
     		$( '#store_id' ).focus();
