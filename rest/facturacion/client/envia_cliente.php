@@ -51,7 +51,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	//return $post_data;
 	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
     $result = json_decode( $result_1 );//decodifica respuesta
-   	var_dump($result);
+   	//var_dump($result);
    	$rows_inserted =  "";//array();
    	if( $result->download != '' && $result->download != null ){
 		//die( 'herre' );

@@ -97,8 +97,9 @@
 
 /*Insercion de clientes en linea*/
 		public function insertCostumers( $costumers ){
+			$rows = "";
+			$this->link->autocommit( false );
 			foreach ( $costumers as $key => $costumer ) {
-				$this->link->autocommit( false );
 			//inserta cabecera 
 				$sql = "INSERT INTO vf_clientes_razones_sociales ( /*1*/id_cliente_facturacion, /*2*/rfc, /*3*/razon_social, /*4*/id_tipo_persona,
 						/*5*/entrega_cedula_fiscal, /*6*/url_cedula_fiscal, /*7*/calle, /*8*/no_int, /*9*/no_ext, /*10*/colonia, /*11*/del_municipio, 
@@ -141,10 +142,13 @@
 				$synchronization = $this->insertCostumerContactSynchronizationRows( $detail, $costumer['folio_unico'] );
 			//inserta los registros de sincronizacion de clientes en los sistemas de facturacion
 				$billSystemCostumerSynchronization = $this->insertBillSystemCostumerSynchronization( $costumer, $detail );
-			//autoriza transaccion
-				$this->link->autocommit( true );
+				
+				$rows .= ( $rows == "" ? "" : "," );
+				$rows .= $costumer["synchronization_row_id"];
 			}
-			return 'ok';
+		//autoriza transaccion
+			$this->link->autocommit( true );
+			return $rows;
 		}
 
 /*Insercion de clientes en local*/

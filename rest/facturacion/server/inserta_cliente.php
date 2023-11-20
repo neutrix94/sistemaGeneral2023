@@ -55,12 +55,12 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
     //inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_returns["error"], $resp["log"]["unique_folio"] );
     }else{
-      $resp["ok_rows"] = $insert_returns["ok_rows"];
-      $resp["error_rows"] = $insert_returns["error_rows"];
-      $tmp_ok = $insert_returns->tmp_ok;
-      $tmp_no = $insert_returns->tmp_no;
+      $resp["ok_rows"] = $insert_returns;//$insert_returns["ok_rows"];
+      //$resp["error_rows"] = $insert_returns["error_rows"];
+      //$tmp_ok = $insert_returns->tmp_ok;
+      //$tmp_no = $insert_returns->tmp_no;
     //inserta respuesta exitosa
-      $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_returns["ok_rows"]} | {$insert_returns["error_rows"]}", $resp["log"]["unique_folio"] );
+      $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$resp["ok_rows"]} | {$insert_returns["error_rows"]}", $resp["log"]["unique_folio"] );
     }
   }else{
   //inserta excepcion controlada
