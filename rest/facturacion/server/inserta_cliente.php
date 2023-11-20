@@ -28,6 +28,12 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
  // $returnsSynchronization = new returnsSynchronization( $link );//instancia clase de sincronizacion de movimientos
   
+
+  if( ! include( 'utils/rowsSynchronization.php' ) ){
+    die( "No se incluyó : rowsSynchronization.php" );
+  }//die( 'here' );
+  $rowsSynchronization = new rowsSynchronization( $link );
+
   $resp = array();
   $resp["ok_rows"] = '';
   $resp["error_rows"] = '';
@@ -64,7 +70,7 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
 //consulta las cliemtes que se tiene que descargar 
   $costumers_limit = 50;
 
-  $resp["download"] = $rowsSynchronization->getSynchronizationRows( -1, $log['system_store'], $costumers_limit, 'sys_sincronizacion_registros_facturacion' );
+  $resp["download"] = $rowsSynchronization->getSynchronizationRows( -1, $log['origin_store'], $costumers_limit, 'sys_sincronizacion_registros_facturacion' );
 
 //consume el webservice para insertar cliente en los sistemas de factureacion
   $sql = "SELECT value FROM api_config WHERE name = 'path' LIMIT 1";
@@ -76,7 +82,7 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
   if( trim( $result_1 ) != 'ok' ){
     die( "Error : $result_1" );
   }
-  
+  //die( 'here' );
   return $resp;
   //die( "api_path : {$api_path}" );
 });

@@ -50,7 +50,40 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	$post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
 	//return $post_data;
 	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
-	return $result_1;
+    $result = json_decode( $result_1 );//decodifica respuesta
+   	$rows_inserted =  "";//array();
+   	if( $result->download != '' && $result->download != null ){
+		//die( 'herre' );
+		//var_dump($result->download[0]->table_name);
+		foreach ($result->download as $key => $costumer) {
+			//var_dump( $costumer );die( $costumer->table_name );//hasta aqui me quede Oscar 2023/11/18
+		//inserta los clientes localmente 
+			//echo $costumer;
+			$insert_costumer = $Bill->insertCostumersLocal( $costumer );
+			if( $insert_costumer == 'ok' ){
+				$rows_inserted .= ( $rows_inserted == "" ? "" : "," );
+				$rows_inserted .= $costumer->synchronization_row_id;
+			}
+		}
+		if( $rows_inserted != "" ){
+			$sql = "UPDATE sys_sincronizacion_registros_facturacion SET status_sincronizacion = 3 WHERE id_sincronizacion_registro IN( {$rows_inserted } )";
+			//die( $sql );
+			$update_sinc_rows = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
+			$post_data = json_encode( array( "QUERY"=>$sql ) );
+			$result_1_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/", $post_data );
+			if( $result_1_1 != '' && $result_1_1 != NULL ){
+				die( "Error al actualizar peticion : {$result_1_1}" );
+			}
+		}
+	    //$rows_download = json_decode(json_encode($result->download), true);//json_encode($result->rows_download);
+	    //return $rows_download;
+	    //$log_download = json_decode(json_encode($result->log_download), true );
+   }
+   // var_dump( $result['download'] )
+    //$rows_download = json_decode(json_encode($result->download), true);//json_encode($result->rows_download);
+	//return $rows_download;
+//return $result_1;
+
 	//return json_encode( $rows );
 	
 	//inserta en tabla de sincronizacion
