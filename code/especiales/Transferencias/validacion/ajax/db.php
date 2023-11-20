@@ -1836,6 +1836,7 @@
 					$resp .= '<th>';
 					$resp .= ( $type == 1 ? 'Faltante' : 'Agregadas' );
 					$resp .= '</th>';
+					$resp .= "<th class=\"text-center\">Surtió</th>";//Oscar 2023/11/20
 				$resp .= '</tr>';
 			$resp .= '</thead>';
 			$resp .= '<tbody id="validation_resume_' . $type . '">';
@@ -1854,7 +1855,8 @@
 						ax.reference,
 						ax.difference,
 						ax.assortment_quantity,
-						ax.transfer_product_id
+						ax.transfer_product_id,
+						IF( ts.id_transferencia_surtimiento IS NULL, 'Sin asigar', CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) ) AS username
 					FROM(
 						SELECT
 							CONCAT( p.nombre, ' <b>', pp.clave_proveedor, '<b>' ) AS name,
@@ -1877,6 +1879,12 @@
 						/*AND tr.id_transferencia_producto IS NULL*/
 						GROUP BY tp.id_transferencia_producto, tp.id_proveedor_producto
 					)ax
+					LEFT JOIN ec_transferencias_surtimiento_detalle tsd
+					ON tsd.id_transferencia_producto = ax.transfer_product_id
+					LEFT JOIN ec_transferencias_surtimiento ts
+					ON ts.id_transferencia_surtimiento = tsd.id_transferencia_surtimiento
+					LEFT JOIN sys_users u
+					ON u.id_usuario = ts.id_usuario_asignado
 					WHERE ax.difference > 0
 					GROUP BY ax.transfer_product_id";
                //die( $sql );
@@ -1886,7 +1894,8 @@
 					t.id_transferencia AS reference, 
 					SUM( tp.cantidad ) AS difference,
 					tp.total_piezas_surtimiento AS assortment_quantity,
-					tp.id_transferencia_producto AS transfer_product_id
+					tp.id_transferencia_producto AS transfer_product_id,
+						IF( ts.id_transferencia_surtimiento IS NULL, '-', CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) ) AS username
 				FROM ec_transferencia_productos tp
 				LEFT JOIN ec_productos p 
 				ON tp.id_producto_or = p.id_productos
@@ -1894,6 +1903,14 @@
 				ON tp.id_proveedor_producto = pp.id_proveedor_producto
 				LEFT JOIN ec_transferencias t 
 				ON tp.id_transferencia = t.id_transferencia
+
+					LEFT JOIN ec_transferencias_surtimiento_detalle tsd
+					ON tsd.id_transferencia_producto = tp.id_transferencia_producto
+					LEFT JOIN ec_transferencias_surtimiento ts
+					ON ts.id_transferencia_surtimiento = tsd.id_transferencia_surtimiento
+					LEFT JOIN sys_users u
+					ON u.id_usuario = ts.id_usuario_asignado
+
 				WHERE tp.id_transferencia IN( {$transfers} )
 				AND tp.agregado_en_surtimiento = 1
                 GROUP BY tp.id_transferencia_producto, tp.id_proveedor_producto";/*
@@ -1916,6 +1933,7 @@
 					$resp .= '<td>' . $row['name'] . '</td>';
 					$resp .= '<td>' . $row['reference'] . '</td>';
 					$resp .= '<td align="right">' . round($row['difference'], 4) . '</td>';
+					$resp .= '<td align="center">' . $row['username'] . '</td>';
 				if( $type == 1 ){	
 					$resp .= "<td align=\"center\">";
 					$resp .= "<button
