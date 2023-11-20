@@ -83,7 +83,7 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
     die( "Error : $result_1" );
   }
   //die( 'here' );
-  return $resp;
+  return json_encode($resp);
   //die( "api_path : {$api_path}" );
 });
 
