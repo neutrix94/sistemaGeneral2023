@@ -73,12 +73,14 @@
 /**/
 	function build_content( info, rfc ){
 		var name = "";
+		isMoral = false;
 		$( '#rfc_input' ).val( rfc );//rfc
 		$( '#rfc_input' ).attr( 'readonly', true );
 		//tipo de persona
 		if( rfc.length == 12 ){
 			$( '#person_type_combo' ).val( 3 );
 			$( '#person_type_combo' ).attr( 'disabled', true );
+			isMoral = true;
 		}else if( rfc.length == 13 ){
 			$( '#person_type_combo' ).val( 2 );
 			$( '#person_type_combo' ).attr( 'disabled', true );
@@ -95,16 +97,22 @@
 					//if( j == 1 ){
 					//	alert( info_final[j] );
 				/*nombre razon social*/
-					if( i == 0 && j == 3 ){
-						name += info_final[j] + " ";//build_content( globalData );
-					}
-					if( i == 0 && j == 5 ){
-						name += info_final[j] + " ";//build_content( globalData );
-					}
-					if( i == 0 && j == 7 ){
-						name += info_final[j];//build_content( globalData );
+					if( i == 0 && isMoral ){//alert(1);
+						name = info_final[1];
 						$( '#name_input' ).val( name );
 						$( '#name_input' ).attr( 'readonly', true );
+					}else{//alert( 2 );
+						if( i == 0 && j == 3 ){
+							name += info_final[j] + " ";//build_content( globalData );
+						}
+						if( i == 0 && j == 5 ){
+							name += info_final[j] + " ";//build_content( globalData );
+						}
+						if( i == 0 && j == 7 ){
+							name += info_final[j];//build_content( globalData );
+							$( '#name_input' ).val( name );
+							$( '#name_input' ).attr( 'readonly', true );
+						}
 					}
 				/*ESTADO*/
 					if( i == 2 && j == 1 ){
