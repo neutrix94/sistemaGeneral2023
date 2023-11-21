@@ -144,10 +144,12 @@
 				$billSystemCostumerSynchronization = $this->insertBillSystemCostumerSynchronization( $costumer, $detail );
 				
 				$rows .= ( $rows == "" ? "" : "," );
-				$rows .= $costumer["synchronization_row_id"];
+				$rows .= $costumer['detail']['synchronization_row_id'];
+				//var_dump(  $costumer['detail'] );
 			}
 		//autoriza transaccion
 			$this->link->autocommit( true );
+			//die( "Rows : {$rows}" );
 			return $rows;
 		}
 
