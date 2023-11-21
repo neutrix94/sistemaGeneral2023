@@ -34,9 +34,13 @@
 				$token = $_POST['token'];
 				$costumer_name = $_POST['costumer_name'];
 				$cellphone = $_POST['cellphone'];
+				$costumer_contacts = $_POST['costumer_contacts'];
+				$fiscal_regime = $_POST['fiscal_regime'];
+				$fiscal_cedule = $_POST['fiscal_cedule'];
 				echo $BC->saveCostumer( $rfc, $name, $telephone, $email, $person_type, $street_name, 
 					$internal_number, $external_number, $cologne, $municipality, $postal_code, $location, 
-					$reference, $country, $state, $token, $costumer_name, $cellphone );
+					$reference, $country, $state, $token, $costumer_name, $cellphone, $fiscal_regime, 
+					$fiscal_cedule, $costumer_contacts );
 				return '';
 			break;
 
@@ -75,15 +79,57 @@
 	//funciones para guardar clientes y sus contactos
 		public function saveCostumer( $rfc, $name, $telephone, $email, $person_type, $street_name, 
 						$internal_number, $external_number, $cologne, $municipality, $postal_code, $location, 
-						$reference, $country, $state, $token, $costumer_name, $cellphone ){
+						$reference, $country, $state, $token, $costumer_name, $cellphone, $fiscal_regime, $fiscal_cedule, $costumer_contacts ){
+		//verifica datos del cliente por medio de API
+			$local_path = "";
+			$archivo_path = "../../../../../conexion_inicial.txt";
+			if(file_exists($archivo_path) ){
+				$file = fopen($archivo_path,"r");
+				$line=fgets($file);
+				fclose($file);
+				$config=explode("<>",$line);
+				$tmp=explode("~",$config[0]);
+				$local_path = "localhost/" . base64_decode( $tmp[1] ) . "/rest/v1/facturaReceptor";
+			}else{
+				die("No hay archivo de configuración!!!");
+			}
+			$data = array( "rfc"=>$rfc, "nombre"=>$name, "usoCFDI"=>"G03", "domicilioFiscal"=>$postal_code, 
+				"regimenFiscal"=>$fiscal_regime );
+			$sql = "select token from api_token where id_user=0 and expired_in > now() limit 1;";
+			$stm = $this->link->query($sql) or die( "Error al consultar el token : {$this->link->error}" );
+			$respuesta = $stm->fetch_assoc();
+			$token = $respuesta['token'];
+
+			$post_data = json_encode( $data );
+			//die( $post_data );
+			$crl = curl_init( $local_path );
+			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+			curl_setopt($crl, CURLOPT_POST, true);
+			curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+		    curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+			  'Content-Type: application/json',
+			  'token: ' . $token)
+			);
+			$resp = curl_exec($crl);//envia peticion
+			curl_close($crl);
+			//die( $resp );
+			$result = json_decode( $resp );
+			//var_dump($result);
+			if( $result->status != 200 ){
+				var_dump($result);
+				die( $result->result );
+			}
 			$this->link->autocommit( false );
 		//inserta el registro del cliente
 			$sql = "INSERT INTO vf_clientes_razones_sociales_tmp  
 						SET rfc = '{$rfc}', 
 						razon_social = '{$name}', 
 						id_tipo_persona = '', 
-						entrega_cedula_fiscal = '', 
-						url_cedula_fiscal = '',
+						entrega_cedula_fiscal = IF( '{$fiscal_cedule}' = '', 0, 1 ), 
+						url_cedula_fiscal = '{$fiscal_cedule}',
 						calle = '{$street_name}',
 						no_int = '{$internal_number}',
 						no_ext = '{$external_number}',
@@ -96,7 +142,7 @@
 			$customer_id = $this->link->insert_id;
 		//inserta el detalle del cliente
 			$contacts = explode( "|~|", $costumer_contacts );
-			foreach ($variable as $key => $value) {
+			foreach ($contacts as $key => $value) {
 				if( $value != '' ){
 					$contact = explode("~", $value);
 					$sql = "INSERT INTO vf_clientes_contacto_tmp
@@ -110,10 +156,38 @@
 					$stm_contact = $this->link->query( $sql ) or die( "Error al insertar contacto(s) del cliente : {$this->link->error}" );  
 				}
 			}
+			$this->link->autocommit( true );
+		//consume el api para subir clientes a linea
+			$local_path = "";
+			$archivo_path = "../../../../../conexion_inicial.txt";
+			if(file_exists($archivo_path) ){
+				$file = fopen($archivo_path,"r");
+				$line=fgets($file);
+				fclose($file);
+				$config=explode("<>",$line);
+				$tmp=explode("~",$config[0]);
+				$local_path = "localhost/" . base64_decode( $tmp[1] ) . "/rest/facturacion/envia_cliente";
+			}else{
+				die("No hay archivo de configuración!!!");
+			}
+			//die( $local_path );
+			$crl = curl_init( $local_path );
+			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+			curl_setopt($crl, CURLOPT_POST, true);
+			//curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+		    curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+			  'Content-Type: application/json',
+			  'token: ' . $token)
+			);
+			$resp = curl_exec($crl);//envia peticion
+			curl_close($crl);
+			die( "{$resp}" );
 		//elimina el token
 			$sql = "DELETE FROM vf_tokens_alta_clientes WHERE token = '{$token}'";
 			$stm = $this->link->query( $sql ) or die( "Error al eliminar el token : {$this->link->error}" );
-			$this->link->autocommit( true );
 	//consume api para subir cliente
 			die( 'ok' );
 		}

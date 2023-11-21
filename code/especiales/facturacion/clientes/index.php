@@ -57,7 +57,7 @@
 </head>
 <body>
 
-	<div class="emergent">
+	<div class="emergent" style="display: none;">
 		<div class="row">
 			<div class="col-12 emergent_content" tabindex="1">
 				<h2 class="icon-ok-circled text-success">Token valido</h2>
@@ -89,7 +89,7 @@
 	<div class="row text-center" style="padding : 20px;">
 		<label class="text-start">Buscador por RFC</label>
 		<div class="input-group">
-			<input type="text" id="rfc_seeker" class="form-control">
+			<input type="text" id="rfc_seeker" onkeyup="check_if_exists_costumer( event );" class="form-control">
 			<button
 				class="btn btn-primary"
 				onclick="check_if_exists_costumer( 'intro' );"
@@ -170,6 +170,7 @@
 		</div>
 		<div class="col-sm-6">
 			Cedula fiscal :<br>
+			<input type="text" id="fiscal_cedule" class="form-control" style="background : transparent;" readonly>
 			<!--input type="checkbox">
 			<input type="file">
 			<button 
@@ -267,7 +268,7 @@
 		var costumer_contacts = "";
 		var costumer_name, rfc, name, cellphone, telephone, email, person_type, street_name,
 			internal_number, external_number, cologne, municipality, 
-			postal_code, location, reference, country, state;
+			postal_code, location, reference, country, state, fiscal_cedule;
 
 	//obtener datos de contacto
 		$( '.card' ).each( function( index ){
@@ -378,10 +379,23 @@
 			$( '#state_combo' ).focus();
 			return false;
 		}
+
+		fiscal_regime = $( '#regime_input' ).val();
+		if( fiscal_regime == '' ){
+			alert( "El campo Regimen Fiscal no puede ir vacío!" );
+			$( '#regime_input' ).focus();
+			return false;
+		}
+		fiscal_cedule = $( '#fiscal_cedule' ).val();
 /*cellphone : cellphone
 costumer_name : costumer_name,
 telephone :telephone,
 email : email,*/
+		//alert( costumer_contacts );
+		if( costumer_contacts == '' ){
+			alert( "Debes de capturar almenos un contacto para continuar!" );
+			return false;
+		}
 		$.ajax({
 			type : 'post',
 			url : 'ajax/db.php',
@@ -400,7 +414,9 @@ email : email,*/
 					state : state,
 					token : $( '#current_token' ).val(),
 					costumer_contacts : costumer_contacts,
-					costumer_fl : 'saveCostumer'
+					costumer_fl : 'saveCostumer',
+					fiscal_regime : fiscal_regime,
+					fiscal_cedule : fiscal_cedule
 			},
 			success : function( dat ){
 				if( dat == 'ok' ){
@@ -428,11 +444,20 @@ email : email,*/
 		$( '.emergent' ).css( 'display', 'none' );
 	}
 
+var rfc_url = false;
 	function check_if_exists_costumer( e ){
 		if( e.keyCode != 13 && e != 'intro' ){
 			return false;
 		}
-		var rfc = $( '#rfc_seeker' ).val();
+		var rfc = $( '#rfc_seeker' ).val().trim();
+	//condicion si es url
+
+	//alert( rfc.includes( 'https' ) );
+		if( rfc.includes( 'https' ) && rfc.includes( '_' )  ){
+			rfc_url = true;
+			var tmp = rfc.split( '_' );
+			rfc = tmp[1];
+		}
 		if( rfc == "" ){
 			alert( "El RFC no puede ir vacio!" );
 			$( '#rfc_seeker' ).focus();
@@ -441,8 +466,12 @@ email : email,*/
 		var url = "ajax/db.php?costumer_fl=seek_by_rfc&rfc=" + rfc;
 		var resp = ajaxR( url ).split( "|" );
 		if( resp[0] != 'ok' ){
-			console.log( resp[0] );
-			alert( "El rfc " + rfc + " no esta registrado!" );
+			//console.log( resp[0] );
+			if( rfc_url != false ){
+				getDataSat( url );
+			}else{
+				alert( "El rfc " + rfc + " no esta registrado, captura los datos del cliente!" );
+			}
 		}else{
 			var costumer = JSON.parse( resp[1].trim() );
 		//muestra emergente

@@ -85,7 +85,7 @@
 	function getCfdis(){
 		var url = "ajax/db.php?costumer_fl=getCfdis";
 		var resp = ajaxR( url );
-		alert(resp);
+	//alert(resp);
 		return resp;	
 	}
 //obtener todos los datos de contacto
@@ -141,6 +141,6 @@
 			}
 			contacts += contact_cfdi;
 		}
-		alert( contacts );
+		//alert( contacts );
 		return contacts;
 	}

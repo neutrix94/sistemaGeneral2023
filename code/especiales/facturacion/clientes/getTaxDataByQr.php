@@ -1,14 +1,13 @@
-<html>
+<!--html-->
 	<!--script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script-->
 	<script type="text/javascript" src="cleaner.js"></script><head>
-	<title></title>
-</head>
-<body>
+<!--/head-->
+<!--body>
 		<div class="row">
 			<div class="col-1">
 			</div>
 			<div class="col-10">
-				<div class="input-group"><!-- -->
+				<div class="input-group">
 					<input type="text" class="form-control" id="url_value" placeholder="Ingresa la url">
 					<button type="button" class="btn btn-primary" id="get_data_btn" onclick="getDataSat();">
 						Consultar
@@ -21,21 +20,23 @@
 		</div>
 
 
-</body>
+</body-->
 </html>
 <script type="text/javascript">
 	var global_popout = 0;
 	function getDataSat( url ){
-			var url = $( '#url_value' ).val().trim();//'https://siat.sat.gob.mx/app/qr/faces/pages/mobile/validadorqr.jsf?D1=10&D2=1&D3=16050344931_HELC720716ME6';
+			var url = $( '#rfc_seeker' ).val().trim();//'https://siat.sat.gob.mx/app/qr/faces/pages/mobile/validadorqr.jsf?D1=10&D2=1&D3=16050344931_HELC720716ME6';
 			if( url.length <= 0 ){
 				alert( "Es necesario ingresar una url para continuar!" );
-				$( '#url_value' ).focus();
+				$( '#rfc_seeker' ).focus();
 				return false;
 			}
 		//	url = 'https://siat.sat.gob.mx/app/qr/faces/pages/mobile/validadorqr.jsf?D1=10&D2=1&D3=20090196414_CLB200805GW0';
 			var response = ajaxR( url );
 			//alert( response );
 			processData( response);
+			$( '#fiscal_cedule' ).val( url );
+			$( '#rfc_seeker' ).val('');
 	}
 
 	function processData( data ){

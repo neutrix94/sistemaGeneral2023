@@ -12,7 +12,7 @@
   <?php
     include( 'getTaxDataByQr.php' );
   ?>
-  <main class="wrapper" style="padding-top:2em">
+  <main class="wrapper" style="display:none;">
     <section class="container" id="demo-content">
       <!--modal-->
       <div id="myNav" class="overlay">
@@ -26,7 +26,7 @@
         </div>
       </div>
       <!-- Selección de cámara-->
-      <div id="sourceSelectPanel"><!--style="display:none;"-->
+      <div id="sourceSelectPanel" style="display:none;"><!--style="display:none;"-->
         <label for="sourceSelect">Cámara</label>
         <select id="sourceSelect" class="form-select" style="max-width:200px">
         </select>
