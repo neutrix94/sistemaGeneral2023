@@ -51,7 +51,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	//return $post_data;
 	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
     $result = json_decode( $result_1 );//decodifica respuesta
-   	var_dump($result_1);
+   	//var_dump($result_1);
    	
 	if( $result->ok_rows != "" ){
 		$sql = "UPDATE sys_sincronizacion_registros_facturacion SET status_sincronizacion = 3 WHERE id_sincronizacion_registro IN( {$result->ok_rows} )";
