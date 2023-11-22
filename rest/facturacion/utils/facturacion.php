@@ -172,7 +172,7 @@
 			//inserta el registro de sincronizacion del cliente
 				$synchronization = $this->insertCostumerContactSynchronizationRows( $detail, $costumer['folio_unico'] );
 			//inserta los registros de sincronizacion de clientes en los sistemas de facturacion
-				$billSystemCostumerSynchronization = $this->insertBillSystemCostumerSynchronization( $costumer, $detail );
+			//	$billSystemCostumerSynchronization = $this->insertBillSystemCostumerSynchronization( $costumer, $detail );
 				
 				$rows .= ( $rows == "" ? "" : "," );
 				$rows .= $costumer['detail']['synchronization_row_id'];
@@ -358,7 +358,7 @@
 			$stm = $this->link->query( $sql ) or die( "Error al insertar registros de sincronizacion de contacto de cliente : {$this->link->error}" );
 			return 'ok';
 		}
-
+/*
 		public function insertBillSystemCostumerSynchronization( $costumer, $detail ){
 			//var_dump( $costumer );
 			//var_dump( $detail );
@@ -392,6 +392,6 @@
 			}
 			//var_dump( $endpoints );
 			return 'ok';
-		}
+		}*/
 	}
 ?>

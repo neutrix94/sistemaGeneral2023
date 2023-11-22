@@ -158,7 +158,8 @@
 						del_municipio = '{$municipality}',
 						cp = '{$postal_code}',
 						estado = '{$state}',
-						pais = '{$country}'";
+						pais = '{$country}',
+						regimen_fiscal = '{$fiscal_regime}'";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar cliente : {$this->link->error}" );
 			$customer_id = $this->link->insert_id;
 		//inserta el detalle del cliente

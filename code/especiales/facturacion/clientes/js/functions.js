@@ -4,10 +4,12 @@
 	}
 
 	function save_costumer(){
+		$( '.emergent_content' ).html( `<br><br><br><h2 class="text-center">Guardando...</h2>` );
+		$( '.emergent' ).css( 'display', 'block' );
 		var costumer_contacts = "";
 		var costumer_name, rfc, name, cellphone, telephone, email, person_type, street_name,
 			internal_number, external_number, cologne, municipality, 
-			postal_code, location, reference, country, state, fiscal_cedule;
+			postal_code, location, reference, country, state, fiscal_cedule, fiscal_regime;
 
 	//obtener datos de contacto
 		$( '.card' ).each( function( index ){
