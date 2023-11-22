@@ -100,28 +100,35 @@
 			$rows = "";
 			$this->link->autocommit( false );
 			foreach ( $costumers as $key => $costumer ) {
-			//inserta cabecera 
-				$sql = "INSERT INTO vf_clientes_razones_sociales ( /*1*/id_cliente_facturacion, /*2*/rfc, /*3*/razon_social, /*4*/id_tipo_persona,
-						/*5*/entrega_cedula_fiscal, /*6*/url_cedula_fiscal, /*7*/calle, /*8*/no_int, /*9*/no_ext, /*10*/colonia, /*11*/del_municipio, 
-						/*12*/cp, /*13*/estado, /*14*/pais, /*15*/regimen_fiscal, /*16*/productos_especificos, /*17*/fecha_alta, /*18*/sincronizar )
-						VALUES( /*1*/'{$costumer['id_cliente_facturacion']}', /*2*/'{$costumer['rfc']}', /*3*/'{$costumer['razon_social']}', 
-						/*4*/'{$costumer['id_tipo_persona']}', /*5*/'{$costumer['entrega_cedula_fiscal']}', /*6*/'{$costumer['url_cedula_fiscal']}',
-						/*7*/'{$costumer['calle']}', /*8*/'{$costumer['no_int']}', /*9*/'{$costumer['no_ext']}', /*10*/'{$costumer['colonia']}', 
-						/*11*/'{$costumer['del_municipio']}', /*12*/'{$costumer['cp']}', /*13*/'{$costumer['estado']}', /*14*/'{$costumer['pais']}', 
-						/*15*/'{$costumer['regimen_fiscal']}', /*16*/'{$costumer['productos_especificos']}', /*17*/NOW(), /*18*/1 )";
-				$stm = $this->link->query( $sql ) or die( "Error al insertar cliente de facturacion : {$sql} {$this->link->error}" );
-			//obtiene el id insertado
-				$costumer_id = $this->link->insert_id;
-				$costumer['id_cliente'] = $costumer_id;
-				$costumer['folio_unico'] = "CLIENTE_{$costumer_id}";
-			//actualiza el folio_unico de la cabecera de cliente
-				$sql = "UPDATE vf_clientes_razones_sociales 
-							SET folio_unico = '{$costumer['folio_unico']}' 
-						WHERE id_cliente_facturacion = {$costumer['id_cliente']}";
-				$stm = $this->link->query( $sql ) or die( "Error al actualizar el folio unico del cliente : {$this->link->error}" );
+				//consulta si el cliente ya existe
+				$sql = "SELECT id_cliente FROM vf_clientes_razones_sociales WHERE rfc = '{$costumer['rfc']}'";
+				$stm_check = $this->link->query( $sql ) or die( "Error al consultar si el cliente existe : {$this->link->error}" );
+				if( $stm_check->num_rows > 0 ){
+
+				}else{
+				//inserta cabecera 
+					$sql = "INSERT INTO vf_clientes_razones_sociales ( /*1*/id_cliente_facturacion, /*2*/rfc, /*3*/razon_social, /*4*/id_tipo_persona,
+							/*5*/entrega_cedula_fiscal, /*6*/url_cedula_fiscal, /*7*/calle, /*8*/no_int, /*9*/no_ext, /*10*/colonia, /*11*/del_municipio, 
+							/*12*/cp, /*13*/estado, /*14*/pais, /*15*/regimen_fiscal, /*16*/productos_especificos, /*17*/fecha_alta, /*18*/sincronizar )
+							VALUES( /*1*/NULL, /*2*/'{$costumer['rfc']}', /*3*/'{$costumer['razon_social']}', 
+							/*4*/'{$costumer['id_tipo_persona']}', /*5*/'{$costumer['entrega_cedula_fiscal']}', /*6*/'{$costumer['url_cedula_fiscal']}',
+							/*7*/'{$costumer['calle']}', /*8*/'{$costumer['no_int']}', /*9*/'{$costumer['no_ext']}', /*10*/'{$costumer['colonia']}', 
+							/*11*/'{$costumer['del_municipio']}', /*12*/'{$costumer['cp']}', /*13*/'{$costumer['estado']}', /*14*/'{$costumer['pais']}', 
+							/*15*/'{$costumer['regimen_fiscal']}', /*16*/'{$costumer['productos_especificos']}', /*17*/NOW(), /*18*/1 )";
+					$stm = $this->link->query( $sql ) or die( "Error al insertar cliente de facturacion : {$sql} {$this->link->error}" );
+				//obtiene el id insertado
+					$costumer_id = $this->link->insert_id;
+					$costumer['id_cliente'] = $costumer_id;
+					$costumer['folio_unico'] = "CLIENTE_{$costumer_id}";
+				//actualiza el folio_unico de la cabecera de cliente
+					$sql = "UPDATE vf_clientes_razones_sociales 
+								SET folio_unico = '{$costumer['folio_unico']}' 
+							WHERE id_cliente_facturacion = {$costumer['id_cliente']}";
+					$stm = $this->link->query( $sql ) or die( "Error al actualizar el folio unico del cliente : {$this->link->error}" );
 				
 				//inserta el registro de sincronizacion del cliente
-				$synchronization = $this->insertCostumerSynchronizationRows( $costumer );
+					$synchronization = $this->insertCostumerSynchronizationRows( $costumer );
+				}
 			//inserta detalle ( contactos )
 				$detail = $costumer['detail'];
 				$detail['id_cliente_facturacion'] = $costumer_id;
@@ -234,7 +241,7 @@
 		public function insertCostumerContactSynchronizationRows( $detail, $costumer_unique_folio ){
 		//consulta razon socialDECLARE store_id INTEGER;
   	
-			$sql = "INSERT INTO sys_sincronizacion_registros ( id_sincronizacion_registro, sucursal_de_cambio,
+			$sql = "INSERT INTO sys_sincronizacion_registros_facturacion ( id_sincronizacion_registro, sucursal_de_cambio,
 					id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
 					SELECT
 						NULL,
