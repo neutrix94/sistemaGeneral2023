@@ -119,8 +119,25 @@
 			$result = json_decode( $resp );
 			//var_dump($result);
 			if( $result->status != 200 ){
-				var_dump($result);
-				die( $result->result );
+			//casos de respuesta
+				if( isset( $result->result ) ){
+					die( "<div class=\"row\">
+						<h2 class=\"text-center text-danger fs-1\">{$result->result}</h2>
+						<h2 class=\"text-center text-primary\">Verifica y vuelve a intenar.</h2>
+						<button
+							type=\"button\"
+							onclick=\"close_emergent();\"
+							class=\"btn btn-danger\"
+						>
+							<i class=\"icon-ok-circled\">Aceptar</i>
+						</button>
+					</div>" );
+				}else{
+					var_dump($result);
+				}
+					//die( $result->result );
+					//return 
+				//die( $result->result );
 			}
 			$this->link->autocommit( false );
 		//inserta el registro del cliente

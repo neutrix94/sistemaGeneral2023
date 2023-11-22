@@ -12,8 +12,8 @@
   <?php
     include( 'getTaxDataByQr.php' );
   ?>
-  <main class="wrapper" style="display:none;">
-    <section class="container" id="demo-content">
+  <main class="wrapper" style="padding-top:2em">
+    <section class="container" id="demo-content" style="display:none;">
       <!--modal-->
       <div id="myNav" class="overlay">
         <a id="resetButton" class="closebtn">&times;</a>

@@ -51,7 +51,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	//return $post_data;
 	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
     $result = json_decode( $result_1 );//decodifica respuesta
-   	//var_dump($result_1);
+   	var_dump($result_1);
    	
 	if( $result->ok_rows != "" ){
 		$sql = "UPDATE sys_sincronizacion_registros_facturacion SET status_sincronizacion = 3 WHERE id_sincronizacion_registro IN( {$result->ok_rows} )";
@@ -65,10 +65,18 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 			//var_dump( $costumer );die( $costumer->table_name );//hasta aqui me quede Oscar 2023/11/18
 		//inserta los clientes localmente 
 			//echo $costumer;
-			$insert_costumer = $Bill->insertCostumersLocal( $costumer );
-			if( $insert_costumer == 'ok' ){
-				$rows_inserted .= ( $rows_inserted == "" ? "" : "," );
-				$rows_inserted .= $costumer->synchronization_row_id;
+			if( $costumer->table_name == 'vf_clientes_razones_sociales' ){
+				$insert_costumer = $Bill->insertCostumersLocal( $costumer );
+				if( $insert_costumer == 'ok' ){
+					$rows_inserted .= ( $rows_inserted == "" ? "" : "," );
+					$rows_inserted .= $costumer->synchronization_row_id;
+				}
+			}else if( $costumer->table_name == 'vf_clientes_contacto' ){
+				$insert_costumer_contact = $Bill->insertCostumerContactLocal( $costumer );
+				if( $insert_costumer_contact == 'ok' ){
+					$rows_inserted .= ( $rows_inserted == "" ? "" : "," );
+					$rows_inserted .= $costumer->synchronization_row_id;
+				}
 			}
 		}
 		if( $rows_inserted != "" ){

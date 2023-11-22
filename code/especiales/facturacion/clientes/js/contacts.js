@@ -47,10 +47,10 @@
 						onkeyup="change_accordion_header( 'name', ${position}, this );"
 					>
 					</div>
-					<div class="col-sm-6">
+					<!--div class="col-sm-6">
 						Telefono <span class="text-danger">*</span>
 						<input type="number" id="telephone_input_${position}" value="${contact == null ? '' : contact.telephone}" class="form-control">
-					</div>
+					</div-->
 					<div class="col-sm-6">
 						Celular <span class="text-danger">*</span>
 						<input type="number" id="cellphone_input_${position}" 
@@ -106,12 +106,12 @@
 			contacts += contact_name + '~';
 		//telefono
 			contact_telephone = $( `#telephone_input_${i}` ).val();
-			if( contact_telephone.length <= 0 ){
+			/*if( contact_telephone.length <= 0 ){
 				alert( "El telefono del contacto no puede ir vacio!" );
 				( $( `#header_btn_${i}` ).hasClass( 'collapsed' ) ? $( `#header_btn_${i}` ).click() : null );
 				$( `#telephone_input_${i}` ).focus();
 				return false;
-			}
+			}*/
 			contacts += contact_telephone += '~';
 		//celular
 			contact_cellphone = $( `#cellphone_input_${i}` ).val();
