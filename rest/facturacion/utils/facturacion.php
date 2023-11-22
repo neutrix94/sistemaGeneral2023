@@ -309,7 +309,7 @@
 							'\"pais\" : \"', '{$costumer['pais']}', '\",',
 							'\"regimen_fiscal\" : \"', '{$costumer['regimen_fiscal']}', '\",',
 							'\"productos_especificos\" : \"',  '{$costumer['productos_especificos']}', '\",',
-							'\"folio_unico\" : \"',  '{$costumer['folio_unico']}', '\",',
+							'\"folio_unico\" : \"', '{$costumer['folio_unico']}', '\",',
 							'\"sincronizar\" : \"1\"',
 							'}'
 						),
@@ -334,7 +334,7 @@
 						CONCAT('{',
 							'\"table_name\" : \"vf_clientes_contacto\",',
 							'\"action_type\" : \"insert\",',
-							'\"id_cliente_facturacion\" : \"', '{$detail['costumer_unique_folio']}', '\",',
+							'\"id_cliente_facturacion\" : \"', '{$costumer_unique_folio}', '\",',
 							'\"nombre\" : \"', '{$detail['nombre']}', '\",',
 							'\"telefono\" : \"', '{$detail['telefono']}', '\",',
 							'\"celular\" : \"', '{$detail['celular']}', '\",',
