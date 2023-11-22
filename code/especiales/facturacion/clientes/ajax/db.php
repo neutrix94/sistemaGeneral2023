@@ -45,7 +45,8 @@
 			break;
 
 			case 'getCfdis' :
-				echo $BC->getCfdis();
+				$cfdi = ( isset( $_GET['cfdi'] ) ? $_GET['cfdi'] : null );
+				echo $BC->getCfdis( $cfdi );
 			break;
 
 			default:
@@ -67,6 +68,9 @@
 				clave AS clue,
 				nombre AS name
 			FROM vf_cfdi";
+			//if( $cfdi != null ){
+			//	$sql .= 
+			//}
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los cfdis : {$this->link->error}" );
 			$resp = "<option value=\"0\">-- Seleccionar --</option>";
 			while( $row = $stm->fetch_assoc() ){
@@ -144,7 +148,7 @@
 			$sql = "INSERT INTO vf_clientes_razones_sociales_tmp  
 						SET rfc = '{$rfc}', 
 						razon_social = '{$name}', 
-						id_tipo_persona = '', 
+						id_tipo_persona = '{$person_type}', 
 						entrega_cedula_fiscal = IF( '{$fiscal_cedule}' = '', 0, 1 ), 
 						url_cedula_fiscal = '{$fiscal_cedule}',
 						calle = '{$street_name}',
@@ -152,7 +156,7 @@
 						no_ext = '{$external_number}',
 						colonia = '{$cologne}',
 						del_municipio = '{$municipality}',
-						cp = '{postal_code}',
+						cp = '{$postal_code}',
 						estado = '{$state}',
 						pais = '{$country}'";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar cliente : {$this->link->error}" );
@@ -170,6 +174,7 @@
 								correo = '{$contact[3]}',
 								uso_cfdi = '{$contact[4]}',
 								fecha_alta = NOW()";
+								//die( $sql );
 					$stm_contact = $this->link->query( $sql ) or die( "Error al insertar contacto(s) del cliente : {$this->link->error}" );  
 				}
 			}
@@ -217,7 +222,8 @@
 						telefono AS telephone,
 						celular AS cellphone,
 						correo AS email,
-						uso_cfdi AS cdfi_use
+						uso_cfdi AS cdfi_use,
+						folio_unico AS unique_folio
 					FROM vf_clientes_contacto 
 					WHERE id_cliente_facturacion = {$costumer_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar datos de contacto : {$this->link->error}" );

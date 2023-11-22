@@ -15,10 +15,15 @@
 		var tmp =  $( '.card' ).length - 1;
 		$( `#header_btn_${tmp}` ).click();
 	}
-	function buildCostumerContacts( contact ){
+	function buildCostumerContacts( contact = null ){
 		var content = ``;
 		var position = $( '.card' ).length;
-		var cfdis = getCfdis();
+		var cfdis = '';
+		if( contact != null ){
+			cfdis = getCfdis( ( contact.cdfi_use != '' && contact.cdfi_use != null ? contact.cdfi_use : null ) );
+		}else{
+			cfdis = getCfdis( null );
+		}
 		content += `<div class="accordion-item card">
 			<h2 class="accordion-header" id="heading${position}">
 				<button 
@@ -72,6 +77,16 @@
 						</select>
 					<br>
 					</div>
+					<div class="col-sm-6">
+						Folio Único
+						<input type="text" id="unique_folio_${position}" 
+							value="${contact == null ? '' : contact.unique_folio}" 
+							class="form-control"
+							onkeyup="change_accordion_header( 'email', ${position}, this );"
+							disabled
+						>
+					<br>
+					</div>
 		        </div>
 		    </div>`;
 		return content;
@@ -82,8 +97,11 @@
 		$( `#span_${type}_${position}` ).html( value );
 	}
 
-	function getCfdis(){
+	function getCfdis( cfdi = null ){
 		var url = "ajax/db.php?costumer_fl=getCfdis";
+		if( cfdi != null ){
+			url += "&cfdi=" + cfdi;
+		}
 		var resp = ajaxR( url );
 	//alert(resp);
 		return resp;	

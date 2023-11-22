@@ -342,7 +342,7 @@
 							'\"uso_cfdi\" : \"', '{$detail['uso_cfdi']}', '\",',
 							'\"fecha_alta\" : \"', '{$detail['fecha_alta']}', '\",',
 							'\"fecha_ultima_actualizacion\" : \"', '{$detail['fecha_ultima_actualizacion']}', '\",',
-							'\"folio_unico\" : \"', '{$detail['fecha_alta']}', '\",',
+							'\"folio_unico\" : \"', '{$detail['folio_unico']}', '\",',
 							'\"sincronizar\" : \"', 1, '\"',
 							'}'
 						),

@@ -25,7 +25,9 @@
 <script type="text/javascript">
 	var global_popout = 0;
 	function getDataSat( url ){
+			//if( url == '' || url == null ){
 			var url = $( '#rfc_seeker' ).val().trim();//'https://siat.sat.gob.mx/app/qr/faces/pages/mobile/validadorqr.jsf?D1=10&D2=1&D3=16050344931_HELC720716ME6';
+			//}
 			if( url.length <= 0 ){
 				alert( "Es necesario ingresar una url para continuar!" );
 				$( '#rfc_seeker' ).focus();
@@ -116,8 +118,8 @@
 					}
 				/*ESTADO*/
 					if( i == 2 && j == 1 ){
-						$( '#state_combo' ).val( info_final[j] );
-						$( '#state_combo' ).attr( 'disabled', true );
+						$( '#state_input' ).val( info_final[j] );
+						$( '#state_input' ).attr( 'disabled', true );
 					}
 				/*MUNICIPIO*/
 					if( i == 2 && j == 3 ){

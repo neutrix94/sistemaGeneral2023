@@ -112,10 +112,10 @@
 			return false;
 		}
 		
-		state = $( '#state_combo' ).val();
-		if( state == '' ){
+		state = $( '#state_input' ).val();
+		if( state.trim() == '' || state.trim == '-- Seleccionar --' ){
 			alert( "El campo ESTADO no puede ir vacío!" );
-			$( '#state_combo' ).focus();
+			$( '#state_input' ).focus();
 			return false;
 		}
 
@@ -226,6 +226,8 @@ var rfc_url = false;
 	}
 
 	function getCostumerDB( costumer ){
+		$( '.emergent_content' ).html( "<br><br><br><h3 class=\"text-center text-primary\">Obteniendo informacion...</h3>" );
+		$( '.emergent' ).css( "display", "block" );
 		//$( '#costumer_name_input' ).val( costumer.costumer_id );
 		$( '#rfc_input' ).val( costumer.rfc );
 		$( '#name_input' ).val( costumer.bussines_name );
@@ -238,8 +240,9 @@ var rfc_url = false;
 		$( '#cologne_input' ).val( costumer.cologne );
 		$( '#municipality_input' ).val( costumer.municipality );
 		$( '#postal_code_input' ).val( costumer.postal_code );
-		$( '#state_combo' ).val( costumer.state );
+		$( '#state_input' ).val( costumer.state );
 		$( '#regime_input' ).val( costumer.tax_regime );
+		$( '#fiscal_cedule' ).val( costumer.fiscal_certificate_url );
 	//carga los datos de contacto
 		var contacts = getCostumerContacts( costumer.costumer_id );
 		var contacts_view = ``;
@@ -249,7 +252,12 @@ var rfc_url = false;
 		$( '#accordion' ).empty();
 		$( '#accordion' ).html( contacts_view );
 
-		$( '#social_reason_container' ).html( contacts_view );
+	//	$( '#social_reason_container' ).html( contacts_view );
+		if( costumer.fiscal_certificate_url != '' ){
+			//getDataSat( costumer.fiscal_certificate_url );
+			$( '#rfc_seeker' ).val( costumer.fiscal_certificate_url );
+			getDataSat( 'intro' );
+		}
 	//oculta emergente
 		$( '.emergent_content' ).html( "" );
 		$( '.emergent' ).css( "display", "none" );

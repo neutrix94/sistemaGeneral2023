@@ -228,11 +228,7 @@
 		</div>
 		<div class="col-lg-6">
 			Estado <span class="text-danger">*</span>
-			<select id="state_combo" class="form-select">
-				<?php
-					echo $states;
-				?>
-			</select>
+			<input type="text" id="state_input" class="form-control">
 		</div>
 		<div class="col-lg-6">
 			Regimen Fiscal <span class="text-danger">*</span>
