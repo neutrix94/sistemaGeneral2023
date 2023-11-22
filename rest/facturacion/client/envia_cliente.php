@@ -82,7 +82,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 		if( $rows_inserted != "" ){
 			$sql = "UPDATE sys_sincronizacion_registros_facturacion SET status_sincronizacion = 3 WHERE id_sincronizacion_registro IN( {$rows_inserted } )";
 			//die( $sql );
-			$update_sinc_rows = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
+//$update_sinc_rows = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
 			$post_data = json_encode( array( "QUERY"=>$sql ) );
 			$result_1_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/", $post_data );
 			if( $result_1_1 != '' && $result_1_1 != NULL ){

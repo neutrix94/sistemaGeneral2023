@@ -228,24 +228,7 @@
 			//die( 'here2 : ' . $sql );
 			//obtiene el id insertado
 				$costumer_id = $this->link->insert_id;
-				//$costumer->id_cliente = $costumer_id;
-				
-			//inserta detalle ( contactos )
-				//$detail = $costumer['detail'];
-				//$detail['id_cliente_facturacion'] = $costumer_id;
-				//$sql = "INSERT INTO vf_clientes_contacto ( /*1*/id_cliente_contacto, /*2*/id_cliente_facturacion, /*3*/nombre, /*4*/telefono, /*5*/celular, /*6*/correo,
-				//		/*7*/uso_cfdi, /*8*/fecha_alta, /*9*/fecha_ultima_actualizacion, /*10*/folio_unico, /*11*/sincronizar )
-				//		VALUES( /*1*/NULL, /*2*/'{$detail['id_cliente_facturacion']}', /*3*/'{$detail['nombre']}', /*4*/'{$detail['telefono']}', /*5*/'{$detail['celular']}', 
-				//			/*6*/'{$detail['correo']}', /*7*/'{$detail['uso_cfdi']}', /*8*/NOW(), /*9*/'0000/00/00', 
-				//			/*10*/'', /*11*/1 )";
-				//$stm = $this->link->query( $sql ) or die( "Error al insertar contacto del cliente de facturacion : {$this->link->error}" );
-		//obtiene el id insertado
-				//$detail_id = $this->link->insert_id;
-				//$detail['id_cliente_contacto'] = $detail_id;
-				//$detail['folio_unico'] = "CONTACTO_{$detail_id}";
-			//inserta el registro de sincronizacion del cliente
 				$this->link->autocommit( true );
-//}
 			return 'ok';
 		}
 
