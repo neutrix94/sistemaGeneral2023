@@ -135,6 +135,7 @@ email : email,*/
 		//alert( costumer_contacts );
 		if( costumer_contacts == '' ){
 			alert( "Debes de capturar almenos un contacto para continuar!" );
+			close_emergent();
 			return false;
 		}
 
