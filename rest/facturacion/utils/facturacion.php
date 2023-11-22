@@ -107,7 +107,7 @@
 					$row_costumer = $stm_check->fetch_assoc();
 					$costumer['folio_unico'] = $row_costumer['folio_unico'];//valor de folio unico
 					$sql = "UPDATE vf_clientes_razones_sociales
-								SET /*1*/id_cliente_facturacion, 
+								SET 
 								/*2*/rfc = '{$costumer['rfc']}', 
 								/*3*/razon_social = '{$costumer['razon_social']}', 
 								/*4*/id_tipo_persona = '{$costumer['id_tipo_persona']}',
@@ -211,7 +211,7 @@
 							/*16*/productos_especificos = '{$costumer->productos_especificos}', 
 							/*17*/fecha_alta = '{$costumer->fecha_alta}', 
 							/*18*/sincronizar = '1'
-							WHERE folio_unico = {$costumer_row['folio_unico']}";
+							WHERE folio_unico = '{$costumer_row['folio_unico']}'";
 					$stm = $this->link->query( $sql ) or die( "Error al actualizar cliente de facturacion en local : {$sql} {$this->link->error}" );
 				}else{
 				//inserta cabecera 
