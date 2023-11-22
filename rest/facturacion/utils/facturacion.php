@@ -101,7 +101,7 @@
 			$this->link->autocommit( false );
 			foreach ( $costumers as $key => $costumer ) {
 				//consulta si el cliente ya existe
-				$sql = "SELECT id_cliente FROM vf_clientes_razones_sociales WHERE rfc = '{$costumer['rfc']}'";
+				$sql = "SELECT id_cliente_facturacion FROM vf_clientes_razones_sociales WHERE rfc = '{$costumer['rfc']}'";
 				$stm_check = $this->link->query( $sql ) or die( "Error al consultar si el cliente existe : {$this->link->error}" );
 				if( $stm_check->num_rows > 0 ){
 
