@@ -26,7 +26,7 @@
 	var global_popout = 0;
 	function getDataSat( url ){
 			//if( url == '' || url == null ){
-			var url = $( '#rfc_seeker' ).val().trim();//'https://siat.sat.gob.mx/app/qr/faces/pages/mobile/validadorqr.jsf?D1=10&D2=1&D3=16050344931_HELC720716ME6';
+			var	url = $( '#rfc_seeker' ).val().trim();//'https://siat.sat.gob.mx/app/qr/faces/pages/mobile/validadorqr.jsf?D1=10&D2=1&D3=16050344931_HELC720716ME6';
 			//}
 			if( url.length <= 0 ){
 				alert( "Es necesario ingresar una url para continuar!" );

@@ -215,6 +215,22 @@ var rfc_url = false;
 			//console.log( resp[0] );
 			if( rfc_url != false ){
 				getDataSat( url );
+				var content = `<div class="row">
+					<h2 class="text-center text-warning">El cliente no existe, verifica los datos del cliente y captura datos de contacto</h2>
+					<div class="col-3"></div>
+					<div class="col-6 text-center">
+						<button
+							type="button"
+							class="btn btn-success"
+							onclick="close_emergent();"
+
+						>
+							<i class="icon-ok-circle">Aceptar</i>
+						</button>
+					</div>
+				</div>`;
+				$( '.emergent_content' ).html( content );
+				$( '.emergent' ).css( "display", "block" );
 			}else{
 				alert( "El rfc " + rfc + " no esta registrado, captura los datos del cliente!" );
 			}
@@ -261,9 +277,23 @@ var rfc_url = false;
 			$( '#rfc_seeker' ).val( costumer.fiscal_certificate_url );
 			getDataSat( 'intro' );
 		}
-	//oculta emergente
-		$( '.emergent_content' ).html( "" );
-		$( '.emergent' ).css( "display", "none" );
+	//emergente
+		var content = `<div class="row">
+			<h2 class="text-center text-primary">El cliente ya existe, verifica los contactos del cliente</h2>
+			<div class="col-3"></div>
+			<div class="col-6 text-center">
+				<button
+					type="button"
+					class="btn btn-success"
+					onclick="close_emergent();"
+
+				>
+					<i class="icon-ok-circle">Aceptar</i>
+				</button>
+			</div>
+		</div>`;
+		$( '.emergent_content' ).html( content );
+		$( '.emergent' ).css( "display", "block" );
 
 	}
 

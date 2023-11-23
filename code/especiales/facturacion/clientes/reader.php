@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="author" content="ZXing for JS">
   <title>Scanne Zxing</title>
-   <link rel="stylesheet" rel="preload" as="style" onload="this.rel='stylesheet';this.onload=null" href="library/milligram.min.css">
-   <link rel="stylesheet" href="library/modalStyle.css">
+   <!--link rel="stylesheet" rel="preload" as="style" onload="this.rel='stylesheet';this.onload=null" href="library/milligram.min.css">
+   <link rel="stylesheet" href="library/modalStyle.css"-->
 
 </head>
 <body>
