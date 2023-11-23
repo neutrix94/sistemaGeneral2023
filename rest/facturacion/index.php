@@ -19,5 +19,6 @@ require 'client/envia_cliente_facturacion.php';
 
 //server
 require 'server/inserta_cliente.php';
+//die( 'here' );
 
 $app->run();

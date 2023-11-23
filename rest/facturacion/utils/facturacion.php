@@ -100,20 +100,35 @@
 			$rows = "";
 			$this->link->autocommit( false );
 			foreach ( $costumers as $key => $costumer ) {
-				if( isset( $costumer["table_name"] ) ){
-	          //inserta contactos
+			    //var_dump( $costumer );
+				if( $costumer["table_name"] == "vf_clientes_contacto" ){
+	          //actualiza contactos
 	            $sql = "UPDATE vf_clientes_contacto SET
                       nombre = '{$costumer['nombre']}', 
                       celular = '{$costumer['celular']}', 
                       correo = '{$costumer['correo']}', 
                       uso_cfdi = '{$costumer['uso_cfdi']}', 
                       fecha_ultima_actualizacion = NOW()
-                    WHERE folio_unico = '{$costumer['detail']['folio_unico']}'";
+                    WHERE folio_unico = '{$costumer['id_cliente_contacto']}'";
+                   // die( $sql );
 					$stm = $this->link->query( $sql ) or die( "Error al actualizar contacto de cliente facturacion : {$sql} {$this->link->error}" );
+
+				//Consulta folio unico del cliente
+					$sql = "SELECT 
+								folio_unico 
+							FROM vf_clientes_razones_sociales
+							WHERE id_cliente_facturacion IN(
+							SELECT 
+								id_cliente_facturacion 
+							FROM vf_clientes_contacto
+							WHERE folio_unico = '{$costumer["table_name"]}' )";
+					$check_contact_stm = $this->link->query( $sql ) or die( "Error al consultar datos del ciente en relacion al contacto : {$this->link->error}" );
+					$row_costumer_tmp = $check_contact_stm->fetch_assoc();
+
 				//inserta registro de sincronizacion para actualizacion
-					$this->insertCostumerContactSynchronizationRows( $costumer, 'update', '' );
+					$this->insertCostumerContactSynchronizationRows( $costumer, 'update', $row_costumer_tmp['folio_unico'] );
 					$rows .= ( $rows == "" ? "" : "," );
-					$rows .= $costumer['detail']['synchronization_row_id'];
+					$rows .= $costumer['synchronization_row_id'];
 
 				}else{//insercion de cliente
 				//consulta si el cliente ya existe

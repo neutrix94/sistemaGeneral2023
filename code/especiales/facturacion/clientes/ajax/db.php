@@ -1,4 +1,5 @@
 <?php
+	include( '../../../../../conect.php' );
 	include( '../../../../../conexionMysqli.php' );
 	if( isset( $_GET['costumer_fl'] ) || isset( $_POST['costumer_fl'] ) ){
 		$BC = new BillCostumer( $link );
@@ -40,7 +41,7 @@
 				echo $BC->saveCostumer( $rfc, $name, $telephone, $email, $person_type, $street_name, 
 					$internal_number, $external_number, $cologne, $municipality, $postal_code, $location, 
 					$reference, $country, $state, $token, $costumer_name, $cellphone, $fiscal_regime, 
-					$fiscal_cedule, $costumer_contacts );
+					$fiscal_cedule, $costumer_contacts, $user_sucursal );
 				return '';
 			break;
 
@@ -83,7 +84,7 @@
 	//funciones para guardar clientes y sus contactos
 		public function saveCostumer( $rfc, $name, $telephone, $email, $person_type, $street_name, 
 						$internal_number, $external_number, $cologne, $municipality, $postal_code, $location, 
-						$reference, $country, $state, $token, $costumer_name, $cellphone, $fiscal_regime, $fiscal_cedule, $costumer_contacts ){
+						$reference, $country, $state, $token, $costumer_name, $cellphone, $fiscal_regime, $fiscal_cedule, $costumer_contacts, $store_id ){
 		//verifica datos del cliente por medio de API
 			$local_path = "";
 			$archivo_path = "../../../../../conexion_inicial.txt";
@@ -181,13 +182,13 @@
 							$stm_contact = $this->link->query( $sql ) or die( "Error al insertar contacto(s) del cliente : {$this->link->error}" );  
 						}else{//si es un contacto existente
 							$id = str_replace("CLIENTE_", "", $contact[5] );
-							$array = ( "id_cliente_contacto"=>$id, "nombre"=>$contact[0], "telefono"=>$contact[1], "celular"=>$contact[2], 
+							$array = array( "id_cliente_contacto"=>$id, "nombre"=>$contact[0], "telefono"=>$contact[1], "celular"=>$contact[2], 
 								"correo"=>$contact[3], "usoCFDI"=>$contact[4], "table_name"=>"vf_clientes_contacto"  );
 							$json = json_encode( $array );
 						//die( $json );
 							$sql = "INSERT INTO sys_sincronizacion_registros_facturacion ( id_sincronizacion_registro, sucursal_de_cambio, 
 				  			id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
-							VALUES( NULL, {$this->store_id}, -1, '{$json}', NOW(), 'envia_cliente.php', 1 )";
+							VALUES( NULL, {$store_id}, -1, '{$json}', NOW(), 'envia_cliente.php', 1 )";
 							//die( $sql );
 							$stm2 = $this->link->query( $sql ) or die( "Error al insertar registro de sincronizacion : {$this->link->error}" );
 						}
@@ -221,7 +222,7 @@
 			);
 			$resp = curl_exec($crl);//envia peticion
 			curl_close($crl);
-			die( "{$resp}" );
+			//die( "{$resp}" );
 		//elimina el token
 			$sql = "DELETE FROM vf_tokens_alta_clientes WHERE token = '{$token}'";
 			$stm = $this->link->query( $sql ) or die( "Error al eliminar el token : {$this->link->error}" );
