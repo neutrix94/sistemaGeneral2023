@@ -237,6 +237,10 @@
 					echo $regimes;
 				?>
 			</select>
+		</div>
+		<div class="col-lg-6">
+			Folio Único
+				<input type="text" id="costumer_unique_folio" class="form-control">
 			<br><br>
 			<br><br>
 		</div>

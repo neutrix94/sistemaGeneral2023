@@ -10,14 +10,14 @@
 		}
 	}
 	function add_contact_form(  ){
-		var content = buildCostumerContacts( null );
+		var content = buildCostumerContacts( null, $( '.card' ).length );
 		$( '#accordion' ).append( content );
 		var tmp =  $( '.card' ).length - 1;
 		$( `#header_btn_${tmp}` ).click();
 	}
-	function buildCostumerContacts( contact = null ){
+	function buildCostumerContacts( contact = null, position ){
 		var content = ``;
-		var position = $( '.card' ).length;
+		//var position = ;
 		var cfdis = '';
 		if( contact != null ){
 			cfdis = getCfdis( ( contact.cdfi_use != '' && contact.cdfi_use != null ? contact.cdfi_use : null ) );
@@ -79,7 +79,7 @@
 					</div>
 					<div class="col-sm-6">
 						Folio Único
-						<input type="text" id="unique_folio_${position}" 
+						<input type="text" id="contact_unique_folio_${position}" 
 							value="${contact == null ? '' : contact.unique_folio}" 
 							class="form-control"
 							onkeyup="change_accordion_header( 'email', ${position}, this );"

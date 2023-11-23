@@ -138,6 +138,7 @@
 					</div>" );
 				}else{
 					var_dump($result);
+					die('');
 				}
 					//die( $result->result );
 					//return 
@@ -250,7 +251,8 @@
 						crs.cp AS postal_code,
 						crs.estado AS state,
 						crs.pais AS country,
-						crs.regimen_fiscal AS tax_regime
+						crs.regimen_fiscal AS tax_regime,
+						crs.folio_unico AS unique_folio
 					FROM vf_clientes_razones_sociales crs
 					WHERE crs.rfc = '{$rfc}'";
 			//die( $sql );

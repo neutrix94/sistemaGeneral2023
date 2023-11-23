@@ -6,21 +6,59 @@
 	function save_costumer(){
 		$( '.emergent_content' ).html( `<br><br><br><h2 class="text-center">Guardando...</h2>` );
 		$( '.emergent' ).css( 'display', 'block' );
+		var stop = false;
 		var costumer_contacts = "";
 		var costumer_name, rfc, name, cellphone, telephone, email, person_type, street_name,
 			internal_number, external_number, cologne, municipality, 
-			postal_code, location, reference, country, state, fiscal_cedule, fiscal_regime;
+			postal_code, location, reference, country, state, fiscal_cedule, fiscal_regime, costumer_unique_folio;
 
 	//obtener datos de contacto
 		$( '.card' ).each( function( index ){
 			costumer_contacts += ( costumer_contacts == "" ? "" : "|~|" );
 			costumer_contacts += $( '#costumer_name_input_' + index ).val() + "~";//nombre
-			costumer_contacts += $( '#telephone_input_' + index ).val() + "~";//telefono
+			if( $( '#costumer_name_input_' + index ).val() == "" ){
+				alert( "El nombre de contacto es obligatorio!" );
+				close_emergent();
+				$( '#costumer_name_input_' + index ).focus();
+				stop = true;
+				return false;
+			}
+			costumer_contacts += "~";//telefono
 			costumer_contacts += $( '#cellphone_input_' + index ).val() + "~";//celular
+			if( $( '#cellphone_input_' + index ).val() == "" ){
+				alert( "El numero telefónico de contacto es obligatorio!" );
+				close_emergent();
+				stop = true;
+				$( '#cellphone_input_' + index ).focus();
+				return false;
+			}
 			costumer_contacts += $( '#email_input_' + index ).val() + "~";//correo
-			costumer_contacts += $( '#cfdi_input_' + index ).val();//uso cfdi
+			if( $( '#email_input_' + index ).val() == "" ){
+				alert( "El correo de contacto es obligatorio!" );
+				close_emergent();
+				stop = true;
+				$( '#email_input_' + index ).focus();
+				return false;
+			}
+			if( $( '#cfdi_input_' + index ).val() == 0 ){
+				alert( "Elige un uso de CFDI válido!" );
+				close_emergent();
+				stop = true;
+				$( '#cfdi_input_' + index ).focus();
+				return false;
+			}
+			costumer_contacts += $( '#cfdi_input_' + index ).val() + "~";//uso cfdi
+			if( $( '#contact_unique_folio_' + index ).val() == "" ){
+				costumer_contacts += "";
+			}else{
+				costumer_contacts += $( '#contact_unique_folio_' + index ).val();//uso cfdi
+			}
 		});
 		//alert( costumer_contacts ); return false;
+
+		if( stop ){
+			return false;
+		}
 		/*costumer_name = $( '#costumer_name_input' ).val();
 		if( telephone == '' ){
 			alert( "El campo NOMBRE DEL CLIENTE / EMPRESA no puede ir vacío!" );
@@ -128,6 +166,8 @@
 			return false;
 		}
 		fiscal_cedule = $( '#fiscal_cedule' ).val();
+
+		costumer_unique_folio = ( $("#costumer_unique_folio").val() == "" ? "" : $("#costumer_unique_folio").val() );
 /*cellphone : cellphone
 costumer_name : costumer_name,
 telephone :telephone,
@@ -262,11 +302,13 @@ var rfc_url = false;
 		$( '#state_input' ).val( costumer.state );
 		$( '#regime_input' ).val( costumer.tax_regime );
 		$( '#fiscal_cedule' ).val( costumer.fiscal_certificate_url );
+		$( '#costumer_unique_folio' ).val( costumer.unique_folio );
+		$( '#costumer_unique_folio' ).attr( 'disabled', true );
 	//carga los datos de contacto
 		var contacts = getCostumerContacts( costumer.costumer_id );
 		var contacts_view = ``;
 		for( var position in contacts ){
-			contacts_view += buildCostumerContacts( contacts[position] );
+			contacts_view += buildCostumerContacts( contacts[position], position );
 		}
 		$( '#accordion' ).empty();
 		$( '#accordion' ).html( contacts_view );
@@ -280,13 +322,13 @@ var rfc_url = false;
 	//emergente
 		var content = `<div class="row">
 			<h2 class="text-center text-primary">El cliente ya existe, verifica los contactos del cliente</h2>
+			<h2 class="text-success text-center">Folio de cliente : ${costumer.unique_folio}</h2>
 			<div class="col-3"></div>
 			<div class="col-6 text-center">
 				<button
 					type="button"
-					class="btn btn-success"
+					class="btn btn-success form-control"
 					onclick="close_emergent();"
-
 				>
 					<i class="icon-ok-circle">Aceptar</i>
 				</button>
