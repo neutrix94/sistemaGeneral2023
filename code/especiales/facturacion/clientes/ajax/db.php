@@ -165,21 +165,34 @@
 			$customer_id = $this->link->insert_id;
 		//inserta el detalle del cliente
 			$contacts = explode( "|~|", $costumer_contacts );
-			foreach ($contacts as $key => $value) {
-				if( $value != '' ){
-					$contact = explode("~", $value);
-					$sql = "INSERT INTO vf_clientes_contacto_tmp
-								SET id_cliente_facturacion_tmp = '{$customer_id}',
-								nombre = '{$contact[0]}',
-								telefono = '{$contact[1]}',
-								celular = '{$contact[2]}',
-								correo = '{$contact[3]}',
-								uso_cfdi = '{$contact[4]}',
-								fecha_alta = NOW()";
-								//die( $sql );
-					$stm_contact = $this->link->query( $sql ) or die( "Error al insertar contacto(s) del cliente : {$this->link->error}" );  
+				foreach ($contacts as $key => $value) {
+					if( $value != '' ){
+						$contact = explode("~", $value);
+						if( $contact[5] == '' ){//si es nuevo
+							$sql = "INSERT INTO vf_clientes_contacto_tmp
+										SET id_cliente_facturacion_tmp = '{$customer_id}',
+										nombre = '{$contact[0]}',
+										telefono = '{$contact[1]}',
+										celular = '{$contact[2]}',
+										correo = '{$contact[3]}',
+										uso_cfdi = '{$contact[4]}',
+										fecha_alta = NOW()";
+										//die( $sql );
+							$stm_contact = $this->link->query( $sql ) or die( "Error al insertar contacto(s) del cliente : {$this->link->error}" );  
+						}else{//si es un contacto existente
+							$id = str_replace("CLIENTE_", "", $contact[5] );
+							$array = ( "id_cliente_contacto"=>$id, "nombre"=>$contact[0], "telefono"=>$contact[1], "celular"=>$contact[2], 
+								"correo"=>$contact[3], "usoCFDI"=>$contact[4], "table_name"=>"vf_clientes_contacto"  );
+							$json = json_encode( $array );
+						//die( $json );
+							$sql = "INSERT INTO sys_sincronizacion_registros_facturacion ( id_sincronizacion_registro, sucursal_de_cambio, 
+				  			id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
+							VALUES( NULL, {$this->store_id}, -1, '{$json}', NOW(), 'envia_cliente.php', 1 )";
+							//die( $sql );
+							$stm2 = $this->link->query( $sql ) or die( "Error al insertar registro de sincronizacion : {$this->link->error}" );
+						}
+					}
 				}
-			}
 			$this->link->autocommit( true );
 		//consume el api para subir clientes a linea
 			$local_path = "";
