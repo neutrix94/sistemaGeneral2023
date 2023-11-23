@@ -37,12 +37,13 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	
 	if( ! include( 'utils/facturacion.php' ) ){
 		die( "No se incluyó : facturacion.php" );
-	}//die( 'here' );
+	}
+	//die( 'here' );
 	$Bill = new Bill( $link, $system_store, $store_prefix );
 //generacion de registros de sincronizacion
 	$make_sinchronization_rows = $Bill->getTemporalCostumer();
 	//var_dump( $make_sinchronization_rows );
-	//die( '' );
+	//die( 'here' );
 //recupera los registros de sincronizacion
 	$req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $costumers_limit, 'sys_sincronizacion_registros_facturacion' );
 	$req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );//inserta request
