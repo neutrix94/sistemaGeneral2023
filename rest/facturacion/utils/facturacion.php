@@ -308,7 +308,7 @@
 			$check_stm = $this->link->query( $sql ) or die( "Error al consultar si el cliente existe en linea por RFC : {$this->link->error}" );
 			if( $stm->num_rows > 0 ){
 				$aux_row = $stm->fetch_assoc();
-				$costumer['id_cliente_facturacion'] = $aux_row['id_cliente_facturacion'];
+				$costumer['id_cliente_facturacion'] = "{$aux_row['id_cliente_facturacion']}";
 			}
 			//$costumer_id = "";
 			$sql = ( $costumer['id_cliente_facturacion'] == "" || $costumer['id_cliente_facturacion'] == 0 ? "INSERT INTO" : "UPDATE" );
@@ -333,7 +333,7 @@
 			if ( $costumer['id_cliente_facturacion'] == "" || $costumer['id_cliente_facturacion'] == 0 ){
 				$action = "INSERTAR";
 				$stm = $this->link->query( $sql ) or die( "Error al insertar el nuevo cliente : {$this->link->error}" );
-				$costumer['id_cliente_facturacion'] = $this->link->insert_id;
+				$costumer['id_cliente_facturacion'] = "{$this->link->insert_id"};
 				$costumer['folio_unico'] = "CLIENTE_{$costumer['id_cliente_facturacion']}";
 			//actualiza el folio unico
 				$sql = "UPDATE vf_clientes_razones_sociales 
