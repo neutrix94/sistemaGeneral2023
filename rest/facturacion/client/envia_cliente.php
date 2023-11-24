@@ -53,7 +53,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
     $result = json_decode( $result_1 );//decodifica respuesta
    	var_dump($result_1);
-   	$rows_download = json_decode(  json_encode( $result->download, true ), true );
+   	$rows_download = json_decode(  json_encode( $result->download, JSON_UNESCAPED_UNICODE ), true );
    	//var_dump( $rows_download );
    	$Bill->insertLocalCostumers( $rows_download );
    	//var_dump( $example[0]['razon_social'] );
@@ -88,7 +88,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 			$sql = "UPDATE sys_sincronizacion_registros_facturacion SET status_sincronizacion = 3 WHERE id_sincronizacion_registro IN( {$rows_inserted } )";
 			//die( $sql );
 //$update_sinc_rows = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
-			$post_data = json_encode( array( "QUERY"=>$sql ) );
+			$post_data = json_encode( array( "QUERY"=>$sql ), JSON_UNESCAPED_UNICODE );
 			$result_1_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/", $post_data );
 			if( $result_1_1 != '' && $result_1_1 != NULL ){
 				die( "Error al actualizar peticion : {$result_1_1}" );

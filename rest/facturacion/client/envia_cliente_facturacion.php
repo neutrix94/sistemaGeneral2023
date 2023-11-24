@@ -42,6 +42,7 @@ $app->post('/clientes/nuevoCliente', function (Request $request, Response $respo
   //itera bases de datos
   foreach ($costumers as $key_1 => $costumer) {
     $linkFact->autocommit( false );
+    //var_dump( $costumer );
       foreach ($bd_facturacion as $key_2 => $bd_destino) {
         $client_exists = false;
       //verifica si el cliente existe en relacion al rfc
@@ -94,7 +95,7 @@ $app->post('/clientes/nuevoCliente', function (Request $request, Response $respo
                 estado = '{$costumer['estado']}', 
                 pais = '{$costumer['pais']}'";
         if( $client_exists == false ){
-            $stm = $linkFact->query( $sql ) or die( "Error al insertar nueva razon social cliente de facturacion en {$bd_destino} : {$linkFact->error}" );
+            $stm = $linkFact->query( $sql ) or die( "Error al insertar nueva razon social cliente de facturacion en {$bd_destino} : {$sql} {$linkFact->error}" );
         }else{
           $sql .= " WHERE id_cliente_rs = {$costumer['id_cliente_facturacion']}";
           $stm = $linkFact->query( $sql ) or die( "Error al actualizar razon social de facturacion en {$bd_destino} : {$linkFact->error}" );
@@ -103,8 +104,8 @@ $app->post('/clientes/nuevoCliente', function (Request $request, Response $respo
         foreach ( $costumer['detail'] as $key => $contact ) {
           $contact_exists = false;
         //consulta si el contacto existe
-          $sql = "SELECT id_cliente_contacto FROM ec_clientes_contaco WHERE id_cliente_contacto = {$costumer['detail'][$key]['id_cliente_contacto']}";
-          $stm = $linkFact->query( $sql );
+          $sql = "SELECT id_cliente_contacto FROM ec_clientes_contacto WHERE id_cliente_contacto = {$costumer['detail'][$key]['id_cliente_contacto']}";
+          $stm = $linkFact->query( $sql ) or die( "Error al consultar si existe el contacto en facturacion : {$linkFact->error}" );
           if( $stm->num_rows > 0 ){
             $contact_exists = true;
           }

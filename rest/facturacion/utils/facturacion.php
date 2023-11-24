@@ -47,7 +47,7 @@
 				if( sizeof( $detail ) > 0 ){
 					$row['detail'] = $detail;
 				}
-				$json = json_encode( $row );
+				$json = json_encode( $row, JSON_UNESCAPED_UNICODE );
 			//die( $json );
 				$sql = "INSERT INTO sys_sincronizacion_registros_facturacion ( id_sincronizacion_registro, sucursal_de_cambio, 
 	  			id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
@@ -333,7 +333,7 @@
 			if ( $costumer['id_cliente_facturacion'] == "" || $costumer['id_cliente_facturacion'] == 0 ){
 				$action = "INSERTAR";
 				$stm = $this->link->query( $sql ) or die( "Error al insertar el nuevo cliente : {$this->link->error}" );
-				$costumer['id_cliente_facturacion'] = "{$this->link->insert_id"};
+				$costumer['id_cliente_facturacion'] = "{$this->link->insert_id}";
 				$costumer['folio_unico'] = "CLIENTE_{$costumer['id_cliente_facturacion']}";
 			//actualiza el folio unico
 				$sql = "UPDATE vf_clientes_razones_sociales 
@@ -376,7 +376,7 @@
 				}
 			}
 		//inserta el registro de sincronizacion para sucursales locales
-			$costumer_json = json_encode( $costumer );
+			$costumer_json = json_encode( $costumer, JSON_UNESCAPED_UNICODE );
 			$sql = "INSERT INTO sys_sincronizacion_registros_facturacion ( id_sincronizacion_registro, sucursal_de_cambio,
 					id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
 					SELECT

@@ -82,10 +82,10 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
   $row = $stm->fetch_assoc();
   $api_path = $row['value'];
 
-  $post_data = json_encode( array( "costumers"=>$costumers ) );  
+  $post_data = json_encode( array( "costumers"=>$resp["download"] ), JSON_UNESCAPED_UNICODE );  
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$api_path}/rest/facturacion/clientes/nuevoCliente", $post_data );
   if( trim( $result_1 ) != 'ok' ){
-    die( "Error : $result_1" );
+    die( "Error al insertar registros en facuracion : $result_1" );
   }
   //die( 'here' );
   return json_encode($resp);
