@@ -123,7 +123,7 @@ $app->post('/clientes/nuevoCliente', function (Request $request, Response $respo
                 telefono = '{$costumer['detail'][$key]['telefono']}',
                 celular = '{$costumer['detail'][$key]['celular']}', 
                 correo = '{$costumer['detail'][$key]['correo']}', 
-                uso_cfdi = '{$costumer['detail'][$key]['uso_cfdi']}', 
+                uso_cfdi = ( SELECT id FROM ec_cfdi WHERE clave ='{$costumer['detail'][$key]['uso_cfdi']}' LIMIT 1 ), 
                 fecha_ultima_actualizacion = NOW(), 
                 sincronizar = '1',
                 folio_unico = '{$costumer['detail'][$key]['folio_unico']}'";

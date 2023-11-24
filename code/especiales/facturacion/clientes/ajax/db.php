@@ -128,6 +128,17 @@
 			if( $result->status != 200 ){
 			//casos de respuesta
 				if( isset( $result->result ) ){
+					//var_dump( $result );
+					//var_dump( $result->result[4]->Key );
+					if( $result->result[4]->Key == "regimenFiscalEsperado" && $result->result[3]->Key == "regimenFiscalReportado" ){
+						if( $result->result[3]->Value != $result->result[4]->Value ){
+							$result->result = "El régimen fiscal es inválido!";
+						}
+					}else if( $result->result[0]->Key == "Mensaje" ){
+						$result->result = $result->result[0]->Value;
+					}else if( $result->result[0]->Key == "message" ){
+						$result->result = $result->result[0]->Value;
+					}
 					die( "<div class=\"row\">
 						<h2 class=\"text-center text-danger fs-1\">{$result->result}</h2>
 						<h2 class=\"text-center text-primary\">Verifica y vuelve a intenar.</h2>
