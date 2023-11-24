@@ -15,7 +15,6 @@
 	//obtener datos de contacto
 		$( '.card' ).each( function( index ){
 			costumer_contacts += ( costumer_contacts == "" ? "" : "|~|" );
-			costumer_contacts += $( '#costumer_name_input_' + index ).val() + "~";//nombre
 			if( $( '#costumer_name_input_' + index ).val() == "" ){
 				alert( "El nombre de contacto es obligatorio!" );
 				close_emergent();
@@ -23,8 +22,10 @@
 				stop = true;
 				return false;
 			}
+			costumer_contacts += $( '#costumer_name_input_' + index ).val() + "~";//nombre
+
 			costumer_contacts += "~";//telefono
-			costumer_contacts += $( '#cellphone_input_' + index ).val() + "~";//celular
+			
 			if( $( '#cellphone_input_' + index ).val() == "" ){
 				alert( "El numero telefónico de contacto es obligatorio!" );
 				close_emergent();
@@ -32,7 +33,8 @@
 				$( '#cellphone_input_' + index ).focus();
 				return false;
 			}
-			costumer_contacts += $( '#email_input_' + index ).val() + "~";//correo
+			costumer_contacts += $( '#cellphone_input_' + index ).val() + "~";//celular
+			
 			if( $( '#email_input_' + index ).val() == "" ){
 				alert( "El correo de contacto es obligatorio!" );
 				close_emergent();
@@ -40,6 +42,8 @@
 				$( '#email_input_' + index ).focus();
 				return false;
 			}
+			costumer_contacts += $( '#email_input_' + index ).val() + "~";//correo
+
 			if( $( '#cfdi_input_' + index ).val() == 0 ){
 				alert( "Elige un uso de CFDI válido!" );
 				close_emergent();
@@ -48,10 +52,17 @@
 				return false;
 			}
 			costumer_contacts += $( '#cfdi_input_' + index ).val() + "~";//uso cfdi
+
+			if( $( '#contact_unique_folio_' + index ).val() == "" ){
+				costumer_contacts += "~";
+			}else{
+				costumer_contacts += $( '#contact_unique_folio_' + index ).val() + "~";//folio_unico
+			}
+
 			if( $( '#contact_unique_folio_' + index ).val() == "" ){
 				costumer_contacts += "";
 			}else{
-				costumer_contacts += $( '#contact_unique_folio_' + index ).val();//uso cfdi
+				costumer_contacts += $( '#costumer_contact_id_' + index ).val() + "";//id contacto
 			}
 		});
 		//alert( costumer_contacts ); return false;
@@ -88,6 +99,7 @@
 		rfc = $( '#rfc_input' ).val();
 		if( rfc == '' ){
 			alert( "El campo RFC no puede ir vacío!" );
+			close_emergent();
 			$( '#rfc_input' ).focus();
 			return false;
 		}
@@ -106,9 +118,10 @@
 
 		street_name = $( '#street_name_input' ).val();	
 		if( street_name == '' ){
-			alert( "El campo CALLE no puede ir vacío!" );
-			$( '#street_name_input' ).focus();
-			return false;
+			street_name = "";
+		//	alert( "El campo CALLE no puede ir vacío!" );
+		//	$( '#street_name_input' ).focus();
+		//	return false;
 		}
 
 		internal_number = $( '#internal_number_input' ).val();	
@@ -117,54 +130,62 @@
 
 		cologne = $( '#cologne_input' ).val();	
 		if( cologne == '' ){
-			alert( "El campo no puede ir vacío!" );
-			$( '#cologne_input' ).focus();
-			return false;
+			cologne = "";
+		//	alert( "El campo no puede ir vacío!" );
+		//	$( '#cologne_input' ).focus();
+		//	return false;
 		}
 
 		municipality = $( '#municipality_input' ).val();	
 		if( municipality == '' ){
-			alert( "El campo MUNICIPIO/DELEGACIÓN no puede ir vacío!" );
-			$( '#municipality_input' ).focus();
-			return false;
+			municipality = "";
+		//	alert( "El campo MUNICIPIO/DELEGACIÓN no puede ir vacío!" );
+		//	$( '#municipality_input' ).focus();
+		//	return false;
 		}
 
 		postal_code = $( '#postal_code_input' ).val();	
 		if( postal_code == '' ){
 			alert( "El campo CODIGO POSTAL no puede ir vacío!" );
+			close_emergent();
 			$( '#postal_code_input' ).focus();
 			return false;
 		}
 		
 		location = $( '#location_input' ).val();	
 		if( location == '' ){
-			alert( "El campo LOCACIÓN no puede ir vacío!" );
-			$( '#location_input' ).focus();
-			return false;
+			location = "";
+			//alert( "El campo LOCACIÓN no puede ir vacío!" );
+			//$( '#location_input' ).focus();
+			//return false;
 		}
 		
 		reference = ( $( '#reference_input' ).val() == '' ? '' : $( '#reference_input' ).val() );
 		
 		country = $( '#country_combo' ).val();
 		if( country == '' ){
-			alert( "El campo PAIS no puede ir vacío!" );
-			$( '#country_combo' ).focus();
-			return false;
+			country = "";
+			//alert( "El campo PAIS no puede ir vacío!" );
+			//$( '#country_combo' ).focus();
+			//return false;
 		}
 		
 		state = $( '#state_input' ).val();
 		if( state.trim() == '' || state.trim == '-- Seleccionar --' ){
-			alert( "El campo ESTADO no puede ir vacío!" );
-			$( '#state_input' ).focus();
-			return false;
+			state = "";
+			//alert( "El campo ESTADO no puede ir vacío!" );
+			//$( '#state_input' ).focus();
+			//return false;
 		}
 
 		fiscal_regime = $( '#regime_input' ).val();
 		if( fiscal_regime == '' ){
 			alert( "El campo Regimen Fiscal no puede ir vacío!" );
+			close_emergent();
 			$( '#regime_input' ).focus();
 			return false;
 		}
+
 		fiscal_cedule = $( '#fiscal_cedule' ).val();
 
 		costumer_unique_folio = ( $("#costumer_unique_folio").val() == "" ? "" : $("#costumer_unique_folio").val() );

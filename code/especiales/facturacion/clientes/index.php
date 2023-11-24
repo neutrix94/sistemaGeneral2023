@@ -240,7 +240,13 @@
 		</div>
 		<div class="col-lg-6">
 			Folio Único
-				<input type="text" id="costumer_unique_folio" class="form-control">
+				<input type="text" id="costumer_unique_folio" class="form-control" value="" disabled>
+			<br><br>
+			<br><br>
+		</div>
+		<div class="col-lg-6">
+			Id Cliente : 
+				<input type="text" id="costumer_id" class="form-control" value="" disabled>
 			<br><br>
 			<br><br>
 		</div>

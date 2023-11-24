@@ -38,10 +38,11 @@
 				$costumer_contacts = $_POST['costumer_contacts'];
 				$fiscal_regime = $_POST['fiscal_regime'];
 				$fiscal_cedule = $_POST['fiscal_cedule'];
+				$costumer_id = $_POST['costumer_id'];
 				echo $BC->saveCostumer( $rfc, $name, $telephone, $email, $person_type, $street_name, 
 					$internal_number, $external_number, $cologne, $municipality, $postal_code, $location, 
 					$reference, $country, $state, $token, $costumer_name, $cellphone, $fiscal_regime, 
-					$fiscal_cedule, $costumer_contacts, $user_sucursal );
+					$fiscal_cedule, $costumer_contacts, $costumer_id, $user_sucursal );
 				return '';
 			break;
 
@@ -84,7 +85,8 @@
 	//funciones para guardar clientes y sus contactos
 		public function saveCostumer( $rfc, $name, $telephone, $email, $person_type, $street_name, 
 						$internal_number, $external_number, $cologne, $municipality, $postal_code, $location, 
-						$reference, $country, $state, $token, $costumer_name, $cellphone, $fiscal_regime, $fiscal_cedule, $costumer_contacts, $store_id ){
+						$reference, $country, $state, $token, $costumer_name, $cellphone, $fiscal_regime, $fiscal_cedule, 
+						$costumer_contacts, $costumer_id, $store_id ){
 		//verifica datos del cliente por medio de API
 			$local_path = "";
 			$archivo_path = "../../../../../conexion_inicial.txt";
@@ -161,39 +163,30 @@
 						cp = '{$postal_code}',
 						estado = '{$state}',
 						pais = '{$country}',
-						regimen_fiscal = '{$fiscal_regime}'";
+						regimen_fiscal = '{$fiscal_regime}',
+						id_cliente_facturacion = IF( '$costumer_id' = '' OR '$costumer_id' = '0', '0', '{$costumer_id}' )";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar cliente : {$this->link->error}" );
 			$customer_id = $this->link->insert_id;
 		//inserta el detalle del cliente
 			$contacts = explode( "|~|", $costumer_contacts );
-				foreach ($contacts as $key => $value) {
-					if( $value != '' ){
-						$contact = explode("~", $value);
-						if( $contact[5] == '' ){//si es nuevo
-							$sql = "INSERT INTO vf_clientes_contacto_tmp
-										SET id_cliente_facturacion_tmp = '{$customer_id}',
-										nombre = '{$contact[0]}',
-										telefono = '{$contact[1]}',
-										celular = '{$contact[2]}',
-										correo = '{$contact[3]}',
-										uso_cfdi = '{$contact[4]}',
-										fecha_alta = NOW()";
-										//die( $sql );
-							$stm_contact = $this->link->query( $sql ) or die( "Error al insertar contacto(s) del cliente : {$this->link->error}" );  
-						}else{//si es un contacto existente
-							$id = str_replace("CLIENTE_", "", $contact[5] );
-							$array = array( "id_cliente_contacto"=>$id, "nombre"=>$contact[0], "telefono"=>$contact[1], "celular"=>$contact[2], 
-								"correo"=>$contact[3], "usoCFDI"=>$contact[4], "table_name"=>"vf_clientes_contacto"  );
-							$json = json_encode( $array );
-						//die( $json );
-							$sql = "INSERT INTO sys_sincronizacion_registros_facturacion ( id_sincronizacion_registro, sucursal_de_cambio, 
-				  			id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
-							VALUES( NULL, {$store_id}, -1, '{$json}', NOW(), 'envia_cliente.php', 1 )";
-							//die( $sql );
-							$stm2 = $this->link->query( $sql ) or die( "Error al insertar registro de sincronizacion : {$this->link->error}" );
-						}
-					}
+			//$contacts_to_insert = array();
+			foreach ($contacts as $key => $value) {
+				if( $value != '' ){
+					$contact = explode("~", $value);
+					$sql = "INSERT INTO vf_clientes_contacto_tmp
+								SET id_cliente_facturacion_tmp = '{$customer_id}',
+								nombre = '{$contact[0]}',
+								telefono = '{$contact[1]}',
+								celular = '{$contact[2]}',
+								correo = '{$contact[3]}',
+								uso_cfdi = '{$contact[4]}',
+								fecha_alta = NOW(),
+								id_cliente_facturacion = IF( '$costumer_id' = '' OR '$costumer_id' = '0', '0', '{$costumer_id}' ),
+								id_cliente_contacto = IF( '{$contact[6]}' = '' OR '{$contact[6]}' = '0', '0', '{$contact[6]}' )";
+								//die( $sql );
+					$stm_contact = $this->link->query( $sql ) or die( "Error al insertar contacto(s) del cliente : {$this->link->error}" );
 				}
+			}
 			$this->link->autocommit( true );
 		//consume el api para subir clientes a linea
 			$local_path = "";
@@ -220,13 +213,12 @@
 			  'Content-Type: application/json',
 			  'token: ' . $token)
 			);
-			$resp = curl_exec($crl);//envia peticion
+$resp = curl_exec($crl);//envia peticion  HABILITAR OSCAR
 			curl_close($crl);
 			//die( "{$resp}" );
 		//elimina el token
-			$sql = "DELETE FROM vf_tokens_alta_clientes WHERE token = '{$token}'";
-			$stm = $this->link->query( $sql ) or die( "Error al eliminar el token : {$this->link->error}" );
-	//consume api para subir cliente
+			//$sql = "DELETE FROM vf_tokens_alta_clientes WHERE token = '{$token}'";
+			//$stm = $this->link->query( $sql ) or die( "Error al eliminar el token : {$this->link->error}" );
 			die( 'ok' );
 		}
 		public function getCostumerContacts( $costumer_id ){

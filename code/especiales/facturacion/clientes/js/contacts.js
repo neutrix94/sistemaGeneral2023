@@ -82,7 +82,14 @@
 						<input type="text" id="contact_unique_folio_${position}" 
 							value="${contact == null ? '' : contact.unique_folio}" 
 							class="form-control"
-							onkeyup="change_accordion_header( 'email', ${position}, this );"
+							disabled
+						>
+					</div>
+					<div class="col-sm-6">
+						Id Cliente
+						<input type="text" id="costumer_contact_id_${position}" 
+							value="${contact == null ? '' : contact.contact_id}" 
+							class="form-control"
 							disabled
 						>
 					<br>
