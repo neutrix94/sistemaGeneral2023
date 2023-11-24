@@ -77,6 +77,7 @@ $app->post('/clientes/nuevoCliente', function (Request $request, Response $respo
           $sql .= " WHERE id_cliente = {$costumer['id_cliente_facturacion']}";
           $stm = $linkFact->query( $sql ) or die( "Error al actualiza cliente de facturacion en {$bd_destino} : {$linkFact->error}" );
         }
+   //     echo "{$sql} ____________________ ";
       //razon social de cliente
         $sql = ( $client_exists == false ? "INSERT INTO" : "UPDATE" );
         $sql .= " {$bd_destino}.ec_clientes_razones_sociales SET ";
@@ -100,11 +101,13 @@ $app->post('/clientes/nuevoCliente', function (Request $request, Response $respo
           $sql .= " WHERE id_cliente_rs = {$costumer['id_cliente_facturacion']}";
           $stm = $linkFact->query( $sql ) or die( "Error al actualizar razon social de facturacion en {$bd_destino} : {$linkFact->error}" );
         }
+       // echo "{$sql} ____________________ ";
       //procesa el detalle
+          $contact_exists = false;
         foreach ( $costumer['detail'] as $key => $contact ) {
           $contact_exists = false;
         //consulta si el contacto existe
-          $sql = "SELECT id_cliente_contacto FROM ec_clientes_contacto WHERE id_cliente_contacto = {$costumer['detail'][$key]['id_cliente_contacto']}";
+          $sql = "SELECT id_cliente_contacto FROM {$bd_destino}.ec_clientes_contacto WHERE id_cliente_contacto = {$costumer['detail'][$key]['id_cliente_contacto']}";
           $stm = $linkFact->query( $sql ) or die( "Error al consultar si existe el contacto en facturacion : {$linkFact->error}" );
           if( $stm->num_rows > 0 ){
             $contact_exists = true;
@@ -132,6 +135,7 @@ $app->post('/clientes/nuevoCliente', function (Request $request, Response $respo
             $sql .= " WHERE id_cliente_contacto = {$costumer['detail'][$key]['id_cliente_contacto']}";
             $stm = $linkFact->query( $sql ) or die( "Error al actualizar el contacto : {$linkFact->error}" );
           }
+   //     echo "{$sql} ____________________ ";
         }
       }
 //  $linkFact->autocommit( true );
