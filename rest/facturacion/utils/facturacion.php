@@ -371,7 +371,7 @@
 								WHERE id_cliente_contacto = {$costumer['detail'][$key]['id_cliente_contacto']}";
 						$stm = $this->link->query( $sql ) or die( "Error al actualizar el folio unico del nuevo cliente : {$this->link->error}" );
 				}else{
-					$costumer['detail'][$key]['folio_unico'] = "CLIENTE_{$costumer['detail'][$key]['id_cliente_contacto']}";
+					$costumer['detail'][$key]['folio_unico'] = "CONTACTO_{$costumer['detail'][$key]['id_cliente_contacto']}";
 					$sql .= " WHERE id_cliente_contacto = {$costumer['detail'][$key]['id_cliente_contacto']}";
 					$stm = $this->link->query( $sql ) or die( "Error al actualizar el contacto : {$this->link->error}" );
 				}

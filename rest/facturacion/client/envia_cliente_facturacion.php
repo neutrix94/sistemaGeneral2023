@@ -41,7 +41,7 @@ $app->post('/clientes/nuevoCliente', function (Request $request, Response $respo
   }
   //itera bases de datos
   foreach ($costumers as $key_1 => $costumer) {
-    $linkFact->autocommit( false );
+  // $linkFact->autocommit( false );
     //var_dump( $costumer );
       foreach ($bd_facturacion as $key_2 => $bd_destino) {
         $client_exists = false;
@@ -134,7 +134,7 @@ $app->post('/clientes/nuevoCliente', function (Request $request, Response $respo
           }
         }
       }
-    $linkFact->autocommit( true );
+//  $linkFact->autocommit( true );
   }
   die( 'ok' );
 
