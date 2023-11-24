@@ -10,7 +10,7 @@
 		var costumer_contacts = "";
 		var costumer_name, rfc, name, cellphone, telephone, email, person_type, street_name,
 			internal_number, external_number, cologne, municipality, 
-			postal_code, location, reference, country, state, fiscal_cedule, fiscal_regime, costumer_unique_folio;
+			postal_code, location, reference, country, state, fiscal_cedule, fiscal_regime, costumer_unique_folio, costumer_id;
 
 	//obtener datos de contacto
 		$( '.card' ).each( function( index ){
@@ -189,6 +189,7 @@
 		fiscal_cedule = $( '#fiscal_cedule' ).val();
 
 		costumer_unique_folio = ( $("#costumer_unique_folio").val() == "" ? "" : $("#costumer_unique_folio").val() );
+		costumer_id = ( $("#costumer_id").val() == "" ? "" : $("#costumer_id").val() );
 /*cellphone : cellphone
 costumer_name : costumer_name,
 telephone :telephone,
@@ -222,7 +223,8 @@ email : email,*/
 					costumer_contacts : costumer_contacts,
 					costumer_fl : 'saveCostumer',
 					fiscal_regime : fiscal_regime,
-					fiscal_cedule : fiscal_cedule
+					fiscal_cedule : fiscal_cedule,
+					costumer_id : costumer_id
 			},
 			success : function( dat ){
 				if( dat.trim() == 'ok' ){
@@ -324,7 +326,8 @@ var rfc_url = false;
 		$( '#regime_input' ).val( costumer.tax_regime );
 		$( '#fiscal_cedule' ).val( costumer.fiscal_certificate_url );
 		$( '#costumer_unique_folio' ).val( costumer.unique_folio );
-		$( '#costumer_unique_folio' ).attr( 'disabled', true );
+		$( '#costumer_id' ).val( costumer.costumer_id );
+		//$( '#costumer_unique_folio' ).attr( 'disabled', true );
 	//carga los datos de contacto
 		var contacts = getCostumerContacts( costumer.costumer_id );
 		var contacts_view = ``;
