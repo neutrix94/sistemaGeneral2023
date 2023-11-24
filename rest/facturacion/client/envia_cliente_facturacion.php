@@ -40,15 +40,17 @@ $app->post('/clientes/nuevoCliente', function (Request $request, Response $respo
     $bd_facturacion[]=$row['nombre_bd'];
   }
   //itera bases de datos
-  foreach ($costumers as $key => $costumer) {
+  foreach ($costumers as $key_1 => $costumer) {
     $linkFact->autocommit( false );
-      foreach ($bd_facturacion as $key => $bd_destino) {
+      foreach ($bd_facturacion as $key_2 => $bd_destino) {
         $client_exists = false;
       //verifica si el cliente existe en relacion al rfc
         $sql = "SELECT id_cliente FROM {$bd_destino}.ec_clientes WHERE id_cliente >= 10000 AND nombre = '{$costumer['rfc']}'";
         $stm_check_costumer = $linkFact->query( $sql ) or die( "Error al consultar si el cliente ya existe : {$linkFact->error}" );
         if( $stm_check_costumer->num_rows > 0 ){
           $client_exists = true;
+          //$costumer['id_cliente_facturacion'] = $aux_row['id_cliente_facturacion'];
+
         }
         $sql = ( $client_exists == false ? "INSERT INTO" : "UPDATE" );
         $sql .= " {$bd_destino}.ec_clientes SET ";
