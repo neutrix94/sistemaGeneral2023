@@ -14,6 +14,7 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
     die( 'No se incluyó conexion' );
   }
+  $link->set_charset("utf8mb4");
   /*if ( ! include( 'utils/returnsSynchronization.php' ) ){
     die( 'No se incluyó libereria de Devoluciones' );
   }*/

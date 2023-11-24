@@ -12,6 +12,7 @@
 			$this->link = $connection;
 			$this->store_id = $store_id;
 			$this->store_prefix = $store_prefix;
+  			$this->link->set_charset("utf8mb4");
 		}
 
 /*Generacion de sincronizacion de clietenes ( temporal )*/
