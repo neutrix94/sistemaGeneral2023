@@ -49,11 +49,15 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	$req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );//inserta request
 	//var_dump( $rows );
 	$post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
-	//return $post_data;
+//return $post_data;
 	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
     $result = json_decode( $result_1 );//decodifica respuesta
-   	var_dump($result_1);
-   	
+   	//var_dump($result);
+   	$rows_download = json_decode(  json_encode( $result->download, true ), true );
+   	//var_dump( $rows_download );
+   	$Bill->insertLocalCostumers( $rows_download );
+   	//var_dump( $example[0]['razon_social'] );
+   	die( "debug end" );	
 	if( $result->ok_rows != "" ){
 		$sql = "UPDATE sys_sincronizacion_registros_facturacion SET status_sincronizacion = 3 WHERE id_sincronizacion_registro IN( {$result->ok_rows} )";
 		$stm = $link->query( $sql ) or die( "Erorr al actualizar registros de sincronizacion en local : {$link->error}" );
