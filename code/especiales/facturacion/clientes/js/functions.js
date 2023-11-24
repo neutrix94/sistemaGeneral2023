@@ -103,6 +103,22 @@
 			$( '#rfc_input' ).focus();
 			return false;
 		}
+//validacion de tipo de Persona
+		if( rfc.length == 12 ){
+			if( $( '#person_type_combo' ).val() != 3 ){
+				alert( "El tipo de persona es incorrecto, verifica y vuleve a intentar!" );
+				$( '#person_type_combo' ).focus();
+				close_emergent();
+				return false;
+			}
+		}else if( rfc.length == 13 ){
+			if( $( '#person_type_combo' ).val() != 2 ){
+				alert( "El tipo de persona es incorrecto, verifica y vuleve a intentar!" );
+				$( '#person_type_combo' ).focus();
+				close_emergent();
+				return false;
+			}
+		}
 		name = $( '#name_input' ).val();
 		if( name == '' ){
 			alert( "El campo NOMBRE/RAZON SOCIAL no puede ir vacío!" );
