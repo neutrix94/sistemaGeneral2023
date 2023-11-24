@@ -48,7 +48,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	$req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $costumers_limit, 'sys_sincronizacion_registros_facturacion' );
 	$req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );//inserta request
 	//var_dump( $rows );
-	$post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
+	$post_data = json_encode($req, JSON_UNESCAPED_UNICODE);//forma peticion//
 //return $post_data;
 	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
     $result = json_decode( $result_1 );//decodifica respuesta

@@ -303,6 +303,13 @@
 		public function insertLineCostumer( $costumer ){
 			//var_dump( $costumer['url_cedula_fiscal'] );
 			$action = "";
+		//verifica si el cliente existe en relacion al RFC
+			$sql = "SELECT id_cliente_facturacion FROM ec_clientes WHERE rfc = '{$costumer['rfc']}'";
+			$check_stm = $this->link->query( $sql ) or die( "Error al consultar si el cliente existe en linea por RFC : {$this->link->error}" );
+			if( $stm->num_rows > 0 ){
+				$aux_row = $stm->fetch_assoc();
+				$costumer['id_cliente_facturacion'] = $aux_row['id_cliente_facturacion'];
+			}
 			//$costumer_id = "";
 			$sql = ( $costumer['id_cliente_facturacion'] == "" || $costumer['id_cliente_facturacion'] == 0 ? "INSERT INTO" : "UPDATE" );
 			$sql .= " vf_clientes_razones_sociales SET

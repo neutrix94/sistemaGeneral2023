@@ -213,7 +213,7 @@
 			  'Content-Type: application/json',
 			  'token: ' . $token)
 			);
-$resp = curl_exec($crl);//envia peticion  HABILITAR OSCAR
+//$resp = curl_exec($crl);//envia peticion  HABILITAR OSCAR
 			curl_close($crl);
 			//die( "{$resp}" );
 		//elimina el token
