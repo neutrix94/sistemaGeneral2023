@@ -113,7 +113,7 @@
 			//inserta los registros de sincronizacion de clientes en los sistemas de facturacion
 				
 				$rows .= ( $rows == "" ? "" : "," );
-				$rows .= $costumer['detail']['synchronization_row_id'];
+				$rows .= $costumer['detail'][0]['synchronization_row_id'];
 			}
 		//autoriza transaccion
 			$this->link->autocommit( true );
@@ -133,7 +133,7 @@
 			//inserta los registros de sincronizacion de clientes en los sistemas de facturacion
 				
 				$rows .= ( $rows == "" ? "" : "," );
-				$rows .= $costumer['detail']['synchronization_row_id'];
+				$rows .= $costumer['detail'][0]['synchronization_row_id'];
 			}
 		//autoriza transaccion
 			$this->link->autocommit( true );

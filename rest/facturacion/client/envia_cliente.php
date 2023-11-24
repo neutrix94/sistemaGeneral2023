@@ -18,7 +18,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	if ( ! include( '../../conexionMysqli.php' ) ){
     	die( 'No se incluyó libereria conexionMysqli.php' );
   	}
-  	$linkFact->set_charset("utf8mb4");
+  	$link->set_charset("utf8mb4");
   	if ( ! include( 'utils/rowsSynchronization.php' ) ){
     	die( 'No se incluyó libereria de registros de sincronizacion' );
   	}
@@ -56,7 +56,17 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
    	var_dump($result_1);
    	$rows_download = json_decode(  json_encode( $result->download, JSON_UNESCAPED_UNICODE ), true );
    	//var_dump( $rows_download );
-   	$Bill->insertLocalCostumers( $rows_download );
+   	$updated = $Bill->insertLocalCostumers( $rows_download );
+   	if( $updated != "" ){
+		$sql = "UPDATE sys_sincronizacion_registros_facturacion SET status_sincronizacion = 3 WHERE id_sincronizacion_registro IN( {$updated } )";
+		//die( $sql );
+	//$update_sinc_rows = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
+		$post_data = json_encode( array( "QUERY"=>$sql ), JSON_UNESCAPED_UNICODE );
+		$result_1_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/", $post_data );
+		if( $result_1_1 != '' && $result_1_1 != NULL ){
+			die( "Error al actualizar peticion : {$result_1_1}" );
+		}
+	}
    	//var_dump( $example[0]['razon_social'] );
    	die( "debug end" );	
 	if( $result->ok_rows != "" ){
@@ -85,16 +95,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 				}
 			}
 		}
-		if( $rows_inserted != "" ){
-			$sql = "UPDATE sys_sincronizacion_registros_facturacion SET status_sincronizacion = 3 WHERE id_sincronizacion_registro IN( {$rows_inserted } )";
-			//die( $sql );
-//$update_sinc_rows = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
-			$post_data = json_encode( array( "QUERY"=>$sql ), JSON_UNESCAPED_UNICODE );
-			$result_1_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/", $post_data );
-			if( $result_1_1 != '' && $result_1_1 != NULL ){
-				die( "Error al actualizar peticion : {$result_1_1}" );
-			}
-		}
+		
 	    //$rows_download = json_decode(json_encode($result->download), true);//json_encode($result->rows_download);
 	    //return $rows_download;
 	    //$log_download = json_decode(json_encode($result->log_download), true );
