@@ -52,7 +52,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 //return $post_data;
 	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
     $result = json_decode( $result_1 );//decodifica respuesta
-   	//var_dump($result);
+   	var_dump($result_1);
    	$rows_download = json_decode(  json_encode( $result->download, true ), true );
    	//var_dump( $rows_download );
    	$Bill->insertLocalCostumers( $rows_download );

@@ -304,7 +304,7 @@
 			//var_dump( $costumer['url_cedula_fiscal'] );
 			$action = "";
 		//verifica si el cliente existe en relacion al RFC
-			$sql = "SELECT id_cliente_facturacion FROM ec_clientes WHERE rfc = '{$costumer['rfc']}'";
+			$sql = "SELECT id_cliente_facturacion FROM vf_clientes_razones_sociales WHERE rfc = '{$costumer['rfc']}'";
 			$check_stm = $this->link->query( $sql ) or die( "Error al consultar si el cliente existe en linea por RFC : {$this->link->error}" );
 			if( $stm->num_rows > 0 ){
 				$aux_row = $stm->fetch_assoc();
