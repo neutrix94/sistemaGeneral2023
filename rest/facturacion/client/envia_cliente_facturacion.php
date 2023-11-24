@@ -80,7 +80,7 @@ $app->post('/clientes/nuevoCliente', function (Request $request, Response $respo
         if( $client_exists == false ){
           $sql .= "id_cliente_rs = '{$costumer['id_cliente_facturacion']}', ";
         }
-        $sql = "id_cliente = '{$costumer['id_cliente_facturacion']}', 
+        $sql .= "id_cliente = '{$costumer['id_cliente_facturacion']}', 
                 rfc = '{$costumer['rfc']}', 
                 razon_social = '{$costumer['razon_social']}', 
                 calle = '{$costumer['calle']}', 
