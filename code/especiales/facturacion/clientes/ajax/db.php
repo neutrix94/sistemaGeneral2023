@@ -199,7 +199,7 @@
 				}
 			}
 			$this->link->autocommit( true );
-		//consume el api para subir clientes a linea
+		//consume el api para subir/descargar clientes a linea
 			$local_path = "";
 			$archivo_path = "../../../../../conexion_inicial.txt";
 			if(file_exists($archivo_path) ){
@@ -224,7 +224,7 @@
 			  'Content-Type: application/json',
 			  'token: ' . $token)
 			);
-$resp = curl_exec($crl);//envia peticion  HABILITAR OSCAR
+			$resp = curl_exec($crl);//envia peticion 
 			curl_close($crl);
 			//die( "{$resp}" );
 		//elimina el token
@@ -253,6 +253,34 @@ $resp = curl_exec($crl);//envia peticion  HABILITAR OSCAR
 		}
 
 		public function seek_by_rfc( $rfc ){
+		//consume el api para subir/descargar clientes a linea
+			$local_path = "";
+			$archivo_path = "../../../../../conexion_inicial.txt";
+			if(file_exists($archivo_path) ){
+				$file = fopen($archivo_path,"r");
+				$line=fgets($file);
+				fclose($file);
+				$config=explode("<>",$line);
+				$tmp=explode("~",$config[0]);
+				$local_path = "localhost/" . base64_decode( $tmp[1] ) . "/rest/facturacion/envia_cliente";
+			}else{
+				die("No hay archivo de configuración!!!");
+			}
+			//die( $local_path );
+			$crl = curl_init( $local_path );
+			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+			curl_setopt($crl, CURLOPT_POST, true);
+			//curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+		    curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+			  'Content-Type: application/json',
+			  'token: ' . $token)
+			);
+			$resp = curl_exec($crl);//envia peticion 
+			curl_close($crl);
+		//busca en base de datos
 			$sql = "SELECT 
 						crs.id_cliente_facturacion As costumer_id,
 						crs.rfc AS rfc,
