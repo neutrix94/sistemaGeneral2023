@@ -24,10 +24,13 @@
 </html>
 <script type="text/javascript">
 	var global_popout = 0;
-	function getDataSat( url ){
-			//if( url == '' || url == null ){
-			var	url = $( '#rfc_seeker' ).val().trim();//'https://siat.sat.gob.mx/app/qr/faces/pages/mobile/validadorqr.jsf?D1=10&D2=1&D3=16050344931_HELC720716ME6';
-			//}
+	function getDataSat( url_ = null ){
+			var url = "";
+			if( url_ == '' || url_ == null ){
+				url = $( '#rfc_seeker' ).val().trim();//'https://siat.sat.gob.mx/app/qr/faces/pages/mobile/validadorqr.jsf?D1=10&D2=1&D3=16050344931_HELC720716ME6';
+			}else{
+				url = url_;
+			}
 			if( url.length <= 0 ){
 				alert( "Es necesario ingresar una url para continuar!" );
 				$( '#rfc_seeker' ).focus();
@@ -36,7 +39,7 @@
 		//	url = 'https://siat.sat.gob.mx/app/qr/faces/pages/mobile/validadorqr.jsf?D1=10&D2=1&D3=20090196414_CLB200805GW0';
 			var response = ajaxR( url );
 			//alert( response );
-			processData( response);
+			processData( response );
 			$( '#fiscal_cedule' ).val( url );
 			$( '#rfc_seeker' ).val('');
 	}
@@ -64,6 +67,7 @@
 			});
 		} );
 		console.log( globalData );
+		alert( globalData );
 	}
 
 	function openProceesData( data ){
@@ -76,6 +80,7 @@
 	function build_content( info, rfc ){
 		var name = "";
 		isMoral = false;
+		var costumer_regimes = new Array();
 		$( '#rfc_input' ).val( rfc );//rfc
 		$( '#rfc_input' ).attr( 'readonly', true );
 		//tipo de persona
@@ -152,14 +157,39 @@
 						$( '#postal_code_input' ).val( info_final[j] );
 						$( '#postal_code_input' ).attr( 'disabled', true );
 					}
+					if( i == 4 ){
+						if( j % 2 != 0 && j < (info_final.length - 2) && info_final[j].includes( '-' ) == false ){
+							costumer_regimes.push( info_final[j] );
+						}
 
+					//	$( '#postal_code_input' ).val( info_final[j] );
+					//	$( '#postal_code_input' ).attr( 'disabled', true );
+					}
 					//}
 				}
 				//resp += `</table><br>`;
 			}
 		}
-		//$( '#response_container' ).html( resp );
+		//alert( 'here' );
+		$( "#regime_input" ).children( 'option' ).each( function( index ){
+			if( index > 0 ){
+				if( ! costumer_regimes.includes( $( this ).text() ) ){
+					$( this ).css( 'display', 'none' );
+				}else{
+					if( costumer_regimes.length == 2 ){
+						$( this ).attr( 'selected', true );
+						$( "#regime_input" ).attr( 'disabled', true );
+					}
+				}
+			}
+			//alert( $( this ).text() );
+		});
+		//alert( costumer_regimes.length );
+		$( '#country_combo' ).attr( 'disabled', true );
+		$( '#fiscal_cedule' ).attr( 'disabled', true );
 		global_popout.close();
+		//console.log( costumer_regimes );
+		//$( '#response_container' ).html( resp );
 	}
 /**/
 

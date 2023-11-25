@@ -37,7 +37,7 @@
 	$stm = $link->query( $sql ) or die( "Error al consultar los cfdis : {$link->error}" );
 	$regimes = "<option value=\"0\">-- Seleccionar --</option>";
 	while( $row = $stm->fetch_assoc() ){
-		$regimes .= "<option value=\"{$row['clue']}\">{$row['name']}</option>";
+		$regimes .= "<option value=\"{$row['clue']}\" >{$row['name']}</option>";
 	}
 ?>
 <!DOCTYPE html>

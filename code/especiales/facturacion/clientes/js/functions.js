@@ -1,6 +1,16 @@
 
 	function changeToUpperCase( obj ){
 		$( obj ).val( $( obj ).val().toUpperCase() );
+		if( $( obj ).attr( 'id' ) == 'name_input' && $( obj ).val() != '' ){
+			var tmp = $( obj ).val().trim();
+			tmp = tmp.replaceAll( 'Á', 'A' );
+			tmp = tmp.replaceAll( 'É', 'E' );
+			tmp = tmp.replaceAll( 'Í', 'I' );
+			tmp = tmp.replaceAll( 'Ó', 'O' );
+			tmp = tmp.replaceAll( 'Ú', 'U' );
+			tmp = tmp.replaceAll( '"', '\"' );
+			$( obj ).val( tmp );
+		}
 	}
 
 	function save_costumer(){
@@ -269,8 +279,8 @@ email : email,*/
 		$( '.emergent' ).css( 'display', 'none' );
 	}
 
-var rfc_url = false;
 	function check_if_exists_costumer( e ){
+		var rfc_url = false;
 		if( e.keyCode != 13 && e != 'intro' ){
 			return false;
 		}
@@ -279,7 +289,7 @@ var rfc_url = false;
 
 	//alert( rfc.includes( 'https' ) );
 		if( rfc.includes( 'https' ) && rfc.includes( '_' )  ){
-			rfc_url = true;
+			rfc_url = rfc;
 			var tmp = rfc.split( '_' );
 			rfc = tmp[1];
 		}
@@ -293,7 +303,7 @@ var rfc_url = false;
 		if( resp[0] != 'ok' ){
 			//console.log( resp[0] );
 			if( rfc_url != false ){
-				getDataSat( url );
+				getDataSat( rfc_url );
 				var content = `<div class="row">
 					<h2 class="text-center text-warning">El cliente no existe, verifica los datos del cliente y captura datos de contacto</h2>
 					<div class="col-3"></div>
@@ -311,7 +321,28 @@ var rfc_url = false;
 				$( '.emergent_content' ).html( content );
 				$( '.emergent' ).css( "display", "block" );
 			}else{
-				alert( "El rfc " + rfc + " no esta registrado, captura los datos del cliente!" );
+				var content = `<div class="row">
+					<h2 class="text-center text-warning">El rfc ${rfc} no esta registrado, captura los datos del cliente!</h2>
+					<div class="col-3"></div>
+					<div class="col-6 text-center">
+						<button
+							type="button"
+							class="btn btn-success"
+							onclick="close_emergent();"
+
+						>
+							<i class="icon-ok-circle">Aceptar</i>
+						</button>
+					</div>
+				</div>`;
+				$( '.emergent_content' ).html( content );
+				$( '.emergent' ).css( "display", "block" );
+				//alert( "El rfc " + rfc + " no esta registrado, captura los datos del cliente!" );
+				$( '#rfc_input' ).val( rfc );
+
+				$( "#regime_input" ).children( 'option' ).each( function( index ){
+					$( this ).css( 'display', 'block' );
+				});
 			}
 		}else{
 			var costumer = JSON.parse( resp[1].trim() );
@@ -320,10 +351,37 @@ var rfc_url = false;
 			$( '.emergent' ).css( "display", "block" );
 		//obtiene los datos de contacto
 			getCostumerDB( costumer );
+			if( rfc_url ){
+				getDataSat( rfc_url );
+			}
 		}
 	}
 
 	function getCostumerDB( costumer ){
+
+
+		$( '#street_name_input' ).val( "" );
+		$( '#street_name_input' ).removeAttr( "disabled" );
+		$( '#internal_number_input' ).val( "" );
+		$( '#internal_number_input' ).removeAttr( "disabled" );
+		$( '#external_number_input' ).val( "" );
+		$( '#external_number_input' ).removeAttr( "disabled" );
+		$( '#cologne_input' ).val( "" );
+		$( '#cologne_input' ).removeAttr( "disabled" );
+		$( '#municipality_input' ).val( "" );
+		$( '#municipality_input' ).removeAttr( "disabled" );
+		$( '#postal_code_input' ).val( "" );
+		$( '#postal_code_input' ).removeAttr( "disabled" );
+		$( '#state_input' ).val( "" );
+		$( '#state_input' ).removeAttr( "disabled" );
+		$( '#regime_input' ).val( "" );
+		$( '#regime_input' ).removeAttr( "disabled" );
+	//muestra todas las opciones de los regimenes
+		$( "#regime_input" ).children( 'option' ).each( function( index ){
+			$( this ).css( 'display', 'block' );
+		});
+
+
 		$( '.emergent_content' ).html( "<br><br><br><h3 class=\"text-center text-primary\">Obteniendo informacion...</h3>" );
 		$( '.emergent' ).css( "display", "block" );
 		//$( '#costumer_name_input' ).val( costumer.costumer_id );
@@ -343,6 +401,8 @@ var rfc_url = false;
 		$( '#fiscal_cedule' ).val( costumer.fiscal_certificate_url );
 		$( '#costumer_unique_folio' ).val( costumer.unique_folio );
 		$( '#costumer_id' ).val( costumer.costumer_id );
+
+
 		//$( '#costumer_unique_folio' ).attr( 'disabled', true );
 	//carga los datos de contacto
 		var contacts = getCostumerContacts( costumer.costumer_id );
@@ -354,10 +414,18 @@ var rfc_url = false;
 		$( '#accordion' ).html( contacts_view );
 
 	//	$( '#social_reason_container' ).html( contacts_view );
-		if( costumer.fiscal_certificate_url != '' ){
+		//if( costumer.fiscal_certificate_url != '' ){
 			//getDataSat( costumer.fiscal_certificate_url );
-			$( '#rfc_seeker' ).val( costumer.fiscal_certificate_url );
-			getDataSat( 'intro' );
+		//	$( '#rfc_seeker' ).val( costumer.fiscal_certificate_url );
+		//	getDataSat( 'intro' );
+		//}
+		//alert( costumer.fiscal_certificate_url );
+		if( costumer.fiscal_certificate_url != '' && costumer.fiscal_certificate_url != null	 ){
+			setTimeout( function(){
+				getDataSat( costumer.fiscal_certificate_url );
+			}, 300 );
+		}else{
+
 		}
 	//emergente
 		var content = `<div class="row">
