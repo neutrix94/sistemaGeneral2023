@@ -27,7 +27,7 @@
 					$row['data'] = str_replace( "\n", " ", $row['data'] );
 					$row['data'] = str_replace( "\r\n", " ", $row['data'] );
 					$row['data'] = preg_replace("/[\r\n|\n|\r|\r\n]+/", PHP_EOL, $row['data'] );
-					//$row['data'] = str_replace('Ñ', 'N', $row['data'] );
+					$row['data'] = str_replace('Ñ', 'N', $row['data'] );
 					$row['data'] = trim( $row['data'] );
 
 
