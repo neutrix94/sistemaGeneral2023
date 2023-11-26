@@ -100,8 +100,10 @@
 			}else{
 				die("No hay archivo de configuración!!!");
 			}
+			//$aux_name = str_replace("&", "&amp;", $name );
+			//die( "nombre : " . $name );
 			$data = array( "rfc"=>$rfc, "nombre"=>$name, "usoCFDI"=>"G03", "domicilioFiscal"=>$postal_code, 
-				"regimenFiscal"=>$fiscal_regime );
+				"regimenFiscal"=>$fiscal_regime ); 
 			$sql = "select token from api_token where id_user=0 and expired_in > now() limit 1;";
 			$stm = $this->link->query($sql) or die( "Error al consultar el token : {$this->link->error}" );
 			$respuesta = $stm->fetch_assoc();
@@ -157,6 +159,8 @@
 					//die( $result->result );
 					//return 
 				//die( $result->result );
+			}else{
+				//var_dump( $result );
 			}
 			$this->link->autocommit( false );
 		//inserta el registro del cliente
@@ -224,7 +228,7 @@
 			  'Content-Type: application/json',
 			  'token: ' . $token)
 			);
-			$resp = curl_exec($crl);//envia peticion 
+$resp = curl_exec($crl);//envia peticion 
 			curl_close($crl);
 			//die( "{$resp}" );
 		//elimina el token

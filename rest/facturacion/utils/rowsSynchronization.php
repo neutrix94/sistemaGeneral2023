@@ -1,5 +1,5 @@
 <?php
-
+//ok 2023/11/25
 	class rowsSynchronization
 	{
 		private $link;
@@ -33,7 +33,7 @@
 
 					$row['data'] = str_replace('"}', '", "synchronization_row_id" : "' . $row['synchronization_row_id'] . '" }', $row['data'] );
 					
-					array_push( $resp, json_decode($row['data'], JSON_UNESCAPED_UNICODE ) );//decodifica el JSON
+					array_push( $resp, json_decode($row['data'] ) );//decodifica el JSON
 					$movements_counter ++;
 				}
 			}

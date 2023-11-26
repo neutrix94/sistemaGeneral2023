@@ -106,6 +106,9 @@
 				/*nombre razon social*/
 					if( i == 0 && isMoral ){//alert(1);
 						name = info_final[1];
+						//name = name.replaceAll( '"', '\"' );
+						//name = name.replace( '&amp;', '&' );
+						//	alert( name );
 						$( '#name_input' ).val( name );
 						$( '#name_input' ).attr( 'readonly', true );
 					}else{//alert( 2 );
@@ -117,6 +120,9 @@
 						}
 						if( i == 0 && j == 7 ){
 							name += info_final[j];//build_content( globalData );
+							//name = name.replaceAll( '"', '\"' );
+							//name = name.replaceAll( '&amp;', '&' );
+							//alert( name );
 							$( '#name_input' ).val( name );
 							$( '#name_input' ).attr( 'readonly', true );
 						}
@@ -171,11 +177,13 @@
 			}
 		}
 		//alert( 'here' );
+		var matches = 0;
 		$( "#regime_input" ).children( 'option' ).each( function( index ){
 			if( index > 0 ){
 				if( ! costumer_regimes.includes( $( this ).text() ) ){
 					$( this ).css( 'display', 'none' );
 				}else{
+					matches ++;
 					if( costumer_regimes.length == 2 ){
 						$( this ).attr( 'selected', true );
 						$( "#regime_input" ).attr( 'disabled', true );
@@ -184,6 +192,12 @@
 			}
 			//alert( $( this ).text() );
 		});
+		if( matches == 0 ){
+			$( "#regime_input" ).children( 'option' ).each( function( index ){
+						$( this ).css( 'display', 'block' );
+				//alert( $( this ).text() );
+			});
+		}
 		//alert( costumer_regimes.length );
 		$( '#country_combo' ).attr( 'disabled', true );
 		$( '#fiscal_cedule' ).attr( 'disabled', true );

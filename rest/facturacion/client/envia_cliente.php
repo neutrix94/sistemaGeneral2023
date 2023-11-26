@@ -1,4 +1,5 @@
 <?php
+//ok 2023/11/25
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -53,7 +54,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 //return $post_data;
 	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
     $result = json_decode( $result_1 );//decodifica respuesta
-   	//var_dump($result_1);
+   	var_dump($result_1);
    	$rows_download = json_decode(  json_encode( $result->download, JSON_UNESCAPED_UNICODE ), true );
    	//var_dump( $rows_download );
    	$updated = $Bill->insertLocalCostumers( $rows_download );

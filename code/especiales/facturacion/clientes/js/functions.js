@@ -9,6 +9,7 @@
 			tmp = tmp.replaceAll( 'Ó', 'O' );
 			tmp = tmp.replaceAll( 'Ú', 'U' );
 			tmp = tmp.replaceAll( '"', '\"' );
+			tmp = tmp.replaceAll( '&AMP;', '&amp;' );
 			$( obj ).val( tmp );
 		}
 	}
