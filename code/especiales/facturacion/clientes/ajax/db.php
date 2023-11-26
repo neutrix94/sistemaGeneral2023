@@ -231,6 +231,10 @@
 $resp = curl_exec($crl);//envia peticion 
 			curl_close($crl);
 			//die( "{$resp}" );
+			if( $resp != "ok" ){
+				var_dump( $resp );
+				die( "Error!" );
+			}
 		//elimina el token
 			//$sql = "DELETE FROM vf_tokens_alta_clientes WHERE token = '{$token}'";
 			//$stm = $this->link->query( $sql ) or die( "Error al eliminar el token : {$this->link->error}" );
