@@ -29,7 +29,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	}
   	$SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
 //obtiene configuracion
-	$config = $SynchronizationManagmentLog->getSystemConfiguration( 'ec_movimiento_almacen' );
+	$config = $SynchronizationManagmentLog->getSystemConfiguration( 'sys_sincronizacion_registros_facturacion' );
 	//return json_encode( $config );
 	$path = trim ( $config['value'] );
 	$system_store = $config['system_store'];
@@ -59,6 +59,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
    		var_dump($result_1);
    		die('<br><div class="text-center"><button class="btn btn-danger" onclick="close_emergent();">Cerrar</button></div>');
    	}
+   //	var_dump( $result );
    	$rows_download = json_decode(  json_encode( $result->download, JSON_UNESCAPED_UNICODE ), true );
    	//var_dump( $rows_download );
    	$updated = $Bill->insertLocalCostumers( $rows_download );

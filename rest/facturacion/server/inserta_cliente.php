@@ -74,7 +74,7 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
     $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $response_string, $resp["log"]["unique_folio"] );
   }
 //consulta las cliemtes que se tiene que descargar 
-  $costumers_limit = 50;
+  $costumers_limit = 1000;
 
   $resp["download"] = $rowsSynchronization->getSynchronizationRows( -1, $log['origin_store'], $costumers_limit, 'sys_sincronizacion_registros_facturacion' );
 
