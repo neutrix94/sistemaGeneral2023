@@ -418,7 +418,7 @@ email : email,*/
 				$( '.emergent_content' ).html( content );
 				$( '.emergent' ).css( "display", "block" );
 				//alert( "El rfc " + rfc + " no esta registrado, captura los datos del cliente!" );
-				$( '#rfc_input' ).val( rfc );
+				$( '#rfc_input' ).val( rfc.toUpperCase() );
 
 				$( "#regime_input" ).children( 'option' ).each( function( index ){
 					$( this ).css( 'display', 'block' );
