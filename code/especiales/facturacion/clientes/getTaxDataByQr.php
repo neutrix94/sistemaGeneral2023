@@ -107,7 +107,8 @@
 					if( i == 0 && isMoral ){//alert(1);
 						name = info_final[1];
 						//name = name.replaceAll( '"', '\"' );
-						//name = name.replace( '&amp;', '&' );
+						name = name.replace( '&amp;', '&' );
+						name = name.replace( '&AMP;', '&' );
 						//	alert( name );
 						$( '#name_input' ).val( name );
 						$( '#name_input' ).attr( 'readonly', true );
@@ -121,7 +122,8 @@
 						if( i == 0 && j == 7 ){
 							name += info_final[j];//build_content( globalData );
 							//name = name.replaceAll( '"', '\"' );
-							//name = name.replaceAll( '&amp;', '&' );
+							name = name.replace( '&amp;', '&' );
+							name = name.replaceAll( '&AMP;', '&' );
 							//alert( name );
 							$( '#name_input' ).val( name );
 							$( '#name_input' ).attr( 'readonly', true );

@@ -58,6 +58,29 @@
 </head>
 <body>
 
+
+	<audio id="ok" controls style="display:none;">
+		<source type="audio/wav" src="../../../../files/sounds/ok.mp3">
+	</audio>
+	<audio id="error" controls style="display:none;">
+		<source type="audio/wav" src="../../../../files/sounds/error.mp3">
+	</audio>
+
+	<audio id="costumer_exists" controls style="display:none;">
+		<source type="audio/wav" src="../../../../files/sounds/costumers/costumer_exists.mp3">
+	</audio>
+	<audio id="costumer_saved" controls style="display:none;">
+		<source type="audio/wav" src="../../../../files/sounds/costumers/costumer_saved.mp3">
+	</audio>
+	<audio id="new_costumer_with_constance" controls style="display:none;">
+		<source type="audio/wav" src="../../../../files/sounds/costumers/new_costumer_with_constance.mp3">
+	</audio>
+	<audio id="new_costumer_without_constance" controls style="display:none;">
+		<source type="audio/wav" src="../../../../files/sounds/costumers/new_costumer_without_constance.mp3">
+	</audio>
+
+
+	
 	<div class="emergent" style="display: none;">
 		<div class="row">
 			<div class="col-12 emergent_content" tabindex="1">
@@ -252,14 +275,30 @@
 		</div>
 	</div>
 	<div class="row text-center bg-primary" style="text-align : center;position : fixed; bottom : 0; width : 100%; left : 0; padding : 10px;">
-		<div class="col-sm-2"></div>
-		<div class="col-sm-8 text-center" style="text-align : center !important;">
+		<div class="col-3">
+			<button
+				class="btn btn-light"
+				type="button"
+				onclick="if( confirm( 'Salir al panel?' ) ){ location.href = '../../../../index.php?'}"
+			>
+				<i class="icon-home-1"></i>
+			</button>
+		</div>
+		<div class="col-6 text-center" style="text-align : center !important;">
 			<button
 				type="button"
 				class="btn btn-success form-control"
 				onclick="save_costumer();"
 			>
 				<i class="icon-floppy">Guardar</i>
+			</button>
+		</div><div class="col-3">
+			<button
+				class="btn btn-light"
+				type="button"
+				onclick="alert( 'Proximamente...' );"
+			>
+				<i class="icon-help-1"></i>
 			</button>
 		</div>
 	</div>

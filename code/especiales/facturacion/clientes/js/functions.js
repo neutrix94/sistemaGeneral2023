@@ -1,3 +1,17 @@
+audio_is_playing = null;
+
+	function alert_scann( type ){
+		if( audio_is_playing ){
+			audio = null;
+		}
+		var audio = document.getElementById(type);
+		
+		audio_is_playing = true;
+		audio.currentTime = 0;
+		audio.playbackRate = 1;
+		audio.play();
+
+	}
 
 	function changeToUpperCase( obj ){
 		$( obj ).val( $( obj ).val().toUpperCase() );
@@ -9,7 +23,8 @@
 			tmp = tmp.replaceAll( 'Ó', 'O' );
 			tmp = tmp.replaceAll( 'Ú', 'U' );
 			tmp = tmp.replaceAll( '"', '\"' );
-			tmp = tmp.replaceAll( '&AMP;', '&amp;' );
+			//tmp = tmp.replaceAll( '&AMP;', '&amp;' );
+			tmp = tmp.replaceAll( '&AMP;', '&' );
 			$( obj ).val( tmp );
 		}
 	}
@@ -28,6 +43,7 @@
 			costumer_contacts += ( costumer_contacts == "" ? "" : "|~|" );
 			if( $( '#costumer_name_input_' + index ).val() == "" ){
 				alert( "El nombre de contacto es obligatorio!" );
+				alert_scann( "error" );
 				close_emergent();
 				$( '#costumer_name_input_' + index ).focus();
 				stop = true;
@@ -39,6 +55,7 @@
 			
 			if( $( '#cellphone_input_' + index ).val() == "" ){
 				alert( "El numero telefónico de contacto es obligatorio!" );
+				alert_scann( "error" );
 				close_emergent();
 				stop = true;
 				$( '#cellphone_input_' + index ).focus();
@@ -48,6 +65,7 @@
 			
 			if( $( '#email_input_' + index ).val() == "" ){
 				alert( "El correo de contacto es obligatorio!" );
+				alert_scann( "error" );
 				close_emergent();
 				stop = true;
 				$( '#email_input_' + index ).focus();
@@ -57,6 +75,7 @@
 
 			if( $( '#cfdi_input_' + index ).val() == 0 ){
 				alert( "Elige un uso de CFDI válido!" );
+				alert_scann( "error" );
 				close_emergent();
 				stop = true;
 				$( '#cfdi_input_' + index ).focus();
@@ -109,6 +128,7 @@
 
 		rfc = $( '#rfc_input' ).val();
 		if( rfc == '' ){
+			alert_scann( "error" );
 			alert( "El campo RFC no puede ir vacío!" );
 			close_emergent();
 			$( '#rfc_input' ).focus();
@@ -117,6 +137,7 @@
 //validacion de tipo de Persona
 		if( rfc.length == 12 ){
 			if( $( '#person_type_combo' ).val() != 3 ){
+				alert_scann( "error" );
 				alert( "El tipo de persona es incorrecto, verifica y vuleve a intentar!" );
 				$( '#person_type_combo' ).focus();
 				close_emergent();
@@ -124,6 +145,7 @@
 			}
 		}else if( rfc.length == 13 ){
 			if( $( '#person_type_combo' ).val() != 2 ){
+				alert_scann( "error" );
 				alert( "El tipo de persona es incorrecto, verifica y vuleve a intentar!" );
 				$( '#person_type_combo' ).focus();
 				close_emergent();
@@ -132,12 +154,14 @@
 		}
 		name = $( '#name_input' ).val();
 		if( name == '' ){
+			alert_scann( "error" );
 			alert( "El campo NOMBRE/RAZON SOCIAL no puede ir vacío!" );
 			$( '#name_input' ).focus();
 			return false;
 		}
 		person_type = $( '#person_type_combo' ).val();
 		if( person_type == '' ){
+			alert_scann( "error" );
 			alert( "El campo TIPO DE PERSONA no puede ir vacío!" );
 			$( '#person_type_combo' ).focus();
 			return false;
@@ -173,6 +197,7 @@
 
 		postal_code = $( '#postal_code_input' ).val();	
 		if( postal_code == '' ){
+			alert_scann( "error" );
 			alert( "El campo CODIGO POSTAL no puede ir vacío!" );
 			close_emergent();
 			$( '#postal_code_input' ).focus();
@@ -207,6 +232,7 @@
 
 		fiscal_regime = $( '#regime_input' ).val();
 		if( fiscal_regime == '' ){
+			alert_scann( "error" );
 			alert( "El campo Regimen Fiscal no puede ir vacío!" );
 			close_emergent();
 			$( '#regime_input' ).focus();
@@ -223,6 +249,7 @@ telephone :telephone,
 email : email,*/
 		//alert( costumer_contacts );
 		if( costumer_contacts == '' ){
+			alert_scann( "error" );
 			alert( "Debes de capturar almenos un contacto para continuar!" );
 			close_emergent();
 			return false;
@@ -254,9 +281,12 @@ email : email,*/
 					costumer_id : costumer_id
 			},
 			success : function( dat ){
-				if( dat.trim() == 'ok' ){
-					var content = `<div class="row" style="padding : 10px;">
-						<h2 class="">El usuario fue registrado exitosamente!</h2>
+				dat = dat.trim().split( '|' );
+				if( dat[0]== 'ok' ){
+					var content = `<div class="row text-center" style="padding : 10px;">
+						<h2 class="text-success text-center">El cliente fue registrado exitosamente!</h2>
+						<br><br>
+						<h2 class="text-primary text-center">Folio del cliente : <b>${dat[1]}</b></h2>
 						<br><br>
 						<button
 							class="btn btn-success form-control"
@@ -265,9 +295,11 @@ email : email,*/
 							<i class="icon-ok-circle">Aceptar</i>
 						</button>
 					</div>`;
+					alert_scann( "costumer_saved" );
 					$( '.emergent_content' ).html( content );
 					$( '.emergent' ).css( 'display', 'block' );
 				}else{
+					alert_scann( "error" );
 					$( '.emergent_content' ).html( dat );
 					$( '.emergent' ).css( 'display', 'block' );
 				}
@@ -321,6 +353,7 @@ email : email,*/
 				</div>`;
 				$( '.emergent_content' ).html( content );
 				$( '.emergent' ).css( "display", "block" );
+				alert_scann( 'new_costumer_with_constance' );
 			}else{
 				var content = `<div class="row">
 					<h2 class="text-center text-warning">El rfc ${rfc} no esta registrado, captura los datos del cliente!</h2>
@@ -344,6 +377,7 @@ email : email,*/
 				$( "#regime_input" ).children( 'option' ).each( function( index ){
 					$( this ).css( 'display', 'block' );
 				});
+				alert_scann( 'new_costumer_without_constance' );
 			}
 		}else{
 			var costumer = JSON.parse( resp[1].trim() );
@@ -445,6 +479,8 @@ email : email,*/
 		</div>`;
 		$( '.emergent_content' ).html( content );
 		$( '.emergent' ).css( "display", "block" );
+
+		alert_scann( 'costumer_exists' );
 
 	}
 

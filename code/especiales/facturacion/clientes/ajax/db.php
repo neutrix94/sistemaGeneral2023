@@ -87,6 +87,13 @@
 						$internal_number, $external_number, $cologne, $municipality, $postal_code, $location, 
 						$reference, $country, $state, $token, $costumer_name, $cellphone, $fiscal_regime, $fiscal_cedule, 
 						$costumer_contacts, $costumer_id, $store_id ){
+		//obtiene caracteres de reemplazo
+			$sql = "SELECT caracter, codigo_reemplazo FROM vf_caracteres_especiales WHERE id_caracter_especial > 1";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar los caracteres especiales : {$this->link->error}" );
+			$replace = array();
+			while ( $row = $stm->fetch_assoc() ) {
+				$replace[] = $row;
+			}
 		//verifica datos del cliente por medio de API
 			$local_path = "";
 			$archivo_path = "../../../../../conexion_inicial.txt";
@@ -100,8 +107,18 @@
 			}else{
 				die("No hay archivo de configuración!!!");
 			}
-			//$aux_name = str_replace("&", "&amp;", $name );
+//echo $name;
+			foreach ($replace as $key => $rep) {
+				$name = str_replace( "{$rep['caracter']}", "{$rep['codigo_reemplazo']}", $name );//nombre razon social
+				//$row[23] = str_replace( "{$rep['codigo_reemplazo']}", "{$rep['caracter']}", $row[23] );//calle
+				//$row[26] = str_replace( "{$rep['codigo_reemplazo']}", "{$rep['caracter']}", $row[26] );//colonia
+				//$row[27] = str_replace( "{$rep['codigo_reemplazo']}", "{$rep['caracter']}", $row[27] );//del_municipio
+			}
+//die( 'here : ' . $name );
+			//$name = str_replace('"', '&quot;', $name );
+			
 			//die( "nombre : " . $name );
+
 			$data = array( "rfc"=>$rfc, "nombre"=>$name, "usoCFDI"=>"G03", "domicilioFiscal"=>$postal_code, 
 				"regimenFiscal"=>$fiscal_regime ); 
 			$sql = "select token from api_token where id_user=0 and expired_in > now() limit 1;";
@@ -141,6 +158,7 @@
 					}else if( $result->result[0]->Key == "message" ){
 						$result->result = $result->result[0]->Value;
 					}
+					//var_dump( $result );
 					die( "<div class=\"row\">
 						<h2 class=\"text-center text-danger fs-1\">{$result->result}</h2>
 						<h2 class=\"text-center text-primary\">Verifica y vuelve a intenar.</h2>
@@ -235,10 +253,13 @@ $resp = curl_exec($crl);//envia peticion
 				var_dump( $resp );
 				die( "Error!" );
 			}
+			$sql = "SELECT folio_unico FROM vf_clientes_razones_sociales WHERE rfc = '{$rfc}'";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar el folio unico del cliente final : {$this->link->error}" );
+			$final_costumer = $stm->fetch_assoc();
 		//elimina el token
 			//$sql = "DELETE FROM vf_tokens_alta_clientes WHERE token = '{$token}'";
 			//$stm = $this->link->query( $sql ) or die( "Error al eliminar el token : {$this->link->error}" );
-			die( 'ok' );
+			die( 'ok|' . $final_costumer['folio_unico'] );
 		}
 		public function getCostumerContacts( $costumer_id ){
 			$resp = array();
