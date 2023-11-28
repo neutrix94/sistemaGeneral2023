@@ -1,5 +1,5 @@
 <?php
-
+//ok 2023/11/25
 	class rowsSynchronization
 	{
 		private $link;
@@ -27,13 +27,13 @@
 					$row['data'] = str_replace( "\n", " ", $row['data'] );
 					$row['data'] = str_replace( "\r\n", " ", $row['data'] );
 					$row['data'] = preg_replace("/[\r\n|\n|\r|\r\n]+/", PHP_EOL, $row['data'] );
-					$row['data'] = str_replace('Ñ', 'N', $row['data'] );
+					//$row['data'] = str_replace('Ñ', 'N', $row['data'] );
 					$row['data'] = trim( $row['data'] );
 
 
 					$row['data'] = str_replace('"}', '", "synchronization_row_id" : "' . $row['synchronization_row_id'] . '" }', $row['data'] );
 					
-					array_push( $resp, json_decode($row['data']) );//decodifica el JSON
+					array_push( $resp, json_decode($row['data'] ) );//decodifica el JSON
 					$movements_counter ++;
 				}
 			}

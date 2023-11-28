@@ -10,15 +10,20 @@
 		}
 	}
 	function add_contact_form(  ){
-		var content = buildCostumerContacts( null );
+		var content = buildCostumerContacts( null, $( '.card' ).length );
 		$( '#accordion' ).append( content );
 		var tmp =  $( '.card' ).length - 1;
 		$( `#header_btn_${tmp}` ).click();
 	}
-	function buildCostumerContacts( contact ){
+	function buildCostumerContacts( contact = null, position ){
 		var content = ``;
-		var position = $( '.card' ).length;
-		var cfdis = getCfdis();
+		//var position = ;
+		var cfdis = '';
+		if( contact != null ){
+			cfdis = getCfdis( ( contact.cdfi_use != '' && contact.cdfi_use != null ? contact.cdfi_use : null ) );
+		}else{
+			cfdis = getCfdis( null );
+		}
 		content += `<div class="accordion-item card">
 			<h2 class="accordion-header" id="heading${position}">
 				<button 
@@ -47,10 +52,10 @@
 						onkeyup="change_accordion_header( 'name', ${position}, this );"
 					>
 					</div>
-					<div class="col-sm-6">
+					<!--div class="col-sm-6">
 						Telefono <span class="text-danger">*</span>
 						<input type="number" id="telephone_input_${position}" value="${contact == null ? '' : contact.telephone}" class="form-control">
-					</div>
+					</div-->
 					<div class="col-sm-6">
 						Celular <span class="text-danger">*</span>
 						<input type="number" id="cellphone_input_${position}" 
@@ -72,6 +77,23 @@
 						</select>
 					<br>
 					</div>
+					<div class="col-sm-6">
+						Folio Único
+						<input type="text" id="contact_unique_folio_${position}" 
+							value="${contact == null ? '' : contact.unique_folio}" 
+							class="form-control"
+							disabled
+						>
+					</div>
+					<div class="col-sm-6">
+						Id Cliente
+						<input type="text" id="costumer_contact_id_${position}" 
+							value="${contact == null ? '' : contact.contact_id}" 
+							class="form-control"
+							disabled
+						>
+					<br>
+					</div>
 		        </div>
 		    </div>`;
 		return content;
@@ -82,10 +104,13 @@
 		$( `#span_${type}_${position}` ).html( value );
 	}
 
-	function getCfdis(){
+	function getCfdis( cfdi = null ){
 		var url = "ajax/db.php?costumer_fl=getCfdis";
+		if( cfdi != null ){
+			url += "&cfdi=" + cfdi;
+		}
 		var resp = ajaxR( url );
-		alert(resp);
+	//alert(resp);
 		return resp;	
 	}
 //obtener todos los datos de contacto
@@ -106,12 +131,12 @@
 			contacts += contact_name + '~';
 		//telefono
 			contact_telephone = $( `#telephone_input_${i}` ).val();
-			if( contact_telephone.length <= 0 ){
+			/*if( contact_telephone.length <= 0 ){
 				alert( "El telefono del contacto no puede ir vacio!" );
 				( $( `#header_btn_${i}` ).hasClass( 'collapsed' ) ? $( `#header_btn_${i}` ).click() : null );
 				$( `#telephone_input_${i}` ).focus();
 				return false;
-			}
+			}*/
 			contacts += contact_telephone += '~';
 		//celular
 			contact_cellphone = $( `#cellphone_input_${i}` ).val();
@@ -141,6 +166,6 @@
 			}
 			contacts += contact_cfdi;
 		}
-		alert( contacts );
+		//alert( contacts );
 		return contacts;
 	}

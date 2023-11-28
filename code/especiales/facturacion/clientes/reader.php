@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="author" content="ZXing for JS">
   <title>Scanne Zxing</title>
-   <link rel="stylesheet" rel="preload" as="style" onload="this.rel='stylesheet';this.onload=null" href="library/milligram.min.css">
-   <link rel="stylesheet" href="library/modalStyle.css">
+   <!--link rel="stylesheet" rel="preload" as="style" onload="this.rel='stylesheet';this.onload=null" href="library/milligram.min.css">
+   <link rel="stylesheet" href="library/modalStyle.css"-->
 
 </head>
 <body>
@@ -13,7 +13,7 @@
     include( 'getTaxDataByQr.php' );
   ?>
   <main class="wrapper" style="padding-top:2em">
-    <section class="container" id="demo-content">
+    <section class="container" id="demo-content" style="display:none;">
       <!--modal-->
       <div id="myNav" class="overlay">
         <a id="resetButton" class="closebtn">&times;</a>
@@ -26,7 +26,7 @@
         </div>
       </div>
       <!-- Selección de cámara-->
-      <div id="sourceSelectPanel"><!--style="display:none;"-->
+      <div id="sourceSelectPanel" style="display:none;"><!--style="display:none;"-->
         <label for="sourceSelect">Cámara</label>
         <select id="sourceSelect" class="form-select" style="max-width:200px">
         </select>
