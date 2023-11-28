@@ -108,15 +108,16 @@
 				die("No hay archivo de configuración!!!");
 			}
 //echo $name;
+//die( 'here : ' . $name );
+			$name = str_replace('"', '&quot;', $name );
+			
 			foreach ($replace as $key => $rep) {
-				$name = str_replace( "{$rep['caracter']}", "{$rep['codigo_reemplazo']}", $name );//nombre razon social
+			//	$name = str_replace( ''.$rep['caracter'].'', "{$rep['codigo_reemplazo']}", $name );//nombre razon social
+				//$name = str_replace( "&QUOT;", "&quot;", $name );//nombre razon social
 				//$row[23] = str_replace( "{$rep['codigo_reemplazo']}", "{$rep['caracter']}", $row[23] );//calle
 				//$row[26] = str_replace( "{$rep['codigo_reemplazo']}", "{$rep['caracter']}", $row[26] );//colonia
 				//$row[27] = str_replace( "{$rep['codigo_reemplazo']}", "{$rep['caracter']}", $row[27] );//del_municipio
 			}
-//die( 'here : ' . $name );
-			//$name = str_replace('"', '&quot;', $name );
-			
 			//die( "nombre : " . $name );
 
 			$data = array( "rfc"=>$rfc, "nombre"=>$name, "usoCFDI"=>"G03", "domicilioFiscal"=>$postal_code, 
@@ -149,7 +150,10 @@
 				if( isset( $result->result ) ){
 					//var_dump( $result );
 					//var_dump( $result->result[4]->Key );
-					if( $result->result[4]->Key == "regimenFiscalEsperado" && $result->result[3]->Key == "regimenFiscalReportado" ){
+					//var_dump( $result->result[5]->Key );
+					//die( '' );
+					if( $result->result[4]->Key == "regimenFiscalEsperado" && $result->result[3]->Key == "regimenFiscalReportado" 
+						|| $result->result[5]->Key == "regimenFiscalEsperado" && $result->result[4]->Key == "regimenFiscalReportado" ){
 						if( $result->result[3]->Value != $result->result[4]->Value ){
 							$result->result = "El régimen fiscal es inválido!";
 						}

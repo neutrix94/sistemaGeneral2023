@@ -17,6 +17,10 @@
 	}
 	function buildCostumerContacts( contact = null, position ){
 		var content = ``;
+		var color = "rgba( 0,0,0,.1 )";
+		if( position % 2 != 0 ){
+			color = "white";
+		}
 		//var position = ;
 		var cfdis = '';
 		if( contact != null ){
@@ -24,7 +28,7 @@
 		}else{
 			cfdis = getCfdis( null );
 		}
-		content += `<div class="accordion-item card">
+		content += `<div class="accordion-item card" id="contact_container_${position}" style="background-color : ${color};">
 			<h2 class="accordion-header" id="heading${position}">
 				<button 
 					type="button" 
@@ -94,9 +98,26 @@
 						>
 					<br>
 					</div>
+					<div>
+						<button 
+							type="button"
+							class="btn btn-danger"
+							onclick="delete_contact( ${position} )"
+							${contact != null ? 'disabled' : ''} 
+						>
+							<i class="icon-canceled-circled">Eliminar</i>
+						</button>
+					</div>
 		        </div>
 		    </div>`;
 		return content;
+	}
+	
+	function delete_contact( pos ){
+		if( !confirm( "Eliminar contacto?" ) ){
+			return false;
+		}
+		$( '#contact_container_' + pos ).remove();
 	}
 
 	function change_accordion_header( type, position, obj ){

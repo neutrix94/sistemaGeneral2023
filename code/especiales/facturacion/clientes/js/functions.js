@@ -30,21 +30,54 @@ audio_is_playing = null;
 	}
 
 	function save_costumer(){
-		$( '.emergent_content' ).html( `<br><br><br><h2 class="text-center">Guardando...</h2>` );
+		/*$( '.emergent_content' ).html( `<div class="text-center"><br><br><br><h2 class="text-center">Guardando...</h2>
+				<img src="../../../../img/img_casadelasluces/load.gif" widt="50%"></div>` );
+		$( '.emergent' ).css( 'display', 'block' );*/
+		setTimeout( function(){
+			$( '.emergent_content' ).html( `<div class="text-center"><br><br><br><h2 class="text-center">Guardando...</h2>
+				<img src="../../../../img/img_casadelasluces/load.gif" widt="50%"></div>` );
 		$( '.emergent' ).css( 'display', 'block' );
+
+		}, 100 );
 		var stop = false;
 		var costumer_contacts = "";
 		var costumer_name, rfc, name, cellphone, telephone, email, person_type, street_name,
 			internal_number, external_number, cologne, municipality, 
 			postal_code, location, reference, country, state, fiscal_cedule, fiscal_regime, costumer_unique_folio, costumer_id;
-
+	//elimina los contactos vacios
+		$( '.card' ).each( function( index ){
+			var data_counter = 0;
+			costumer_contacts += ( costumer_contacts == "" ? "" : "|~|" );
+			if( $( '#costumer_name_input_' + index ).val() != "" ){
+				data_counter ++;
+			}
+			if( $( '#cellphone_input_' + index ).val() != "" ){
+				data_counter ++;
+			}
+			if( $( '#email_input_' + index ).val() != "" ){
+				data_counter ++;
+			}
+			if( $( '#cfdi_input_' + index ).val() != 0 ){
+				data_counter ++;
+			}
+			if( $( '#contact_unique_folio_' + index ).val() != "" ){
+				data_counter ++;
+			}
+			if( $( '#contact_unique_folio_' + index ).val() != "" ){
+				data_counter ++;
+			}
+			//alert( data_counter );
+			if( data_counter == 0 ){
+				$( this ).remove();
+			}
+		});
 	//obtener datos de contacto
 		$( '.card' ).each( function( index ){
 			costumer_contacts += ( costumer_contacts == "" ? "" : "|~|" );
 			if( $( '#costumer_name_input_' + index ).val() == "" ){
 				alert( "El nombre de contacto es obligatorio!" );
 				alert_scann( "error" );
-				close_emergent();
+				setTimeout( function(){ close_emergent(); }, 100 );
 				$( '#costumer_name_input_' + index ).focus();
 				stop = true;
 				return false;
@@ -56,7 +89,9 @@ audio_is_playing = null;
 			if( $( '#cellphone_input_' + index ).val() == "" ){
 				alert( "El numero telefónico de contacto es obligatorio!" );
 				alert_scann( "error" );
-				close_emergent();
+					setTimeout( function(){
+						close_emergent();
+					}, 100 );
 				stop = true;
 				$( '#cellphone_input_' + index ).focus();
 				return false;
@@ -66,7 +101,9 @@ audio_is_playing = null;
 			if( $( '#email_input_' + index ).val() == "" ){
 				alert( "El correo de contacto es obligatorio!" );
 				alert_scann( "error" );
-				close_emergent();
+				setTimeout( function(){
+					close_emergent();
+				}, 100 );
 				stop = true;
 				$( '#email_input_' + index ).focus();
 				return false;
@@ -76,7 +113,9 @@ audio_is_playing = null;
 			if( $( '#cfdi_input_' + index ).val() == 0 ){
 				alert( "Elige un uso de CFDI válido!" );
 				alert_scann( "error" );
-				close_emergent();
+				setTimeout( function(){
+					close_emergent();
+				}, 100 );
 				stop = true;
 				$( '#cfdi_input_' + index ).focus();
 				return false;
@@ -130,7 +169,9 @@ audio_is_playing = null;
 		if( rfc == '' ){
 			alert_scann( "error" );
 			alert( "El campo RFC no puede ir vacío!" );
-			close_emergent();
+			setTimeout( function(){
+				close_emergent();
+			}, 100 );
 			$( '#rfc_input' ).focus();
 			return false;
 		}
@@ -139,16 +180,20 @@ audio_is_playing = null;
 			if( $( '#person_type_combo' ).val() != 3 ){
 				alert_scann( "error" );
 				alert( "El tipo de persona es incorrecto, verifica y vuleve a intentar!" );
+				setTimeout( function(){
+					close_emergent();
+				}, 100 );
 				$( '#person_type_combo' ).focus();
-				close_emergent();
 				return false;
 			}
 		}else if( rfc.length == 13 ){
 			if( $( '#person_type_combo' ).val() != 2 ){
 				alert_scann( "error" );
 				alert( "El tipo de persona es incorrecto, verifica y vuleve a intentar!" );
+				setTimeout( function(){
+					close_emergent();
+				}, 100 );
 				$( '#person_type_combo' ).focus();
-				close_emergent();
 				return false;
 			}
 		}
@@ -156,6 +201,9 @@ audio_is_playing = null;
 		if( name == '' ){
 			alert_scann( "error" );
 			alert( "El campo NOMBRE/RAZON SOCIAL no puede ir vacío!" );
+			setTimeout( function(){
+				close_emergent();
+			}, 100 );
 			$( '#name_input' ).focus();
 			return false;
 		}
@@ -163,6 +211,9 @@ audio_is_playing = null;
 		if( person_type == '' ){
 			alert_scann( "error" );
 			alert( "El campo TIPO DE PERSONA no puede ir vacío!" );
+			setTimeout( function(){
+				close_emergent();
+			}, 100 );
 			$( '#person_type_combo' ).focus();
 			return false;
 		}
@@ -170,9 +221,6 @@ audio_is_playing = null;
 		street_name = $( '#street_name_input' ).val();	
 		if( street_name == '' ){
 			street_name = "";
-		//	alert( "El campo CALLE no puede ir vacío!" );
-		//	$( '#street_name_input' ).focus();
-		//	return false;
 		}
 
 		internal_number = $( '#internal_number_input' ).val();	
@@ -182,24 +230,20 @@ audio_is_playing = null;
 		cologne = $( '#cologne_input' ).val();	
 		if( cologne == '' ){
 			cologne = "";
-		//	alert( "El campo no puede ir vacío!" );
-		//	$( '#cologne_input' ).focus();
-		//	return false;
 		}
 
 		municipality = $( '#municipality_input' ).val();	
 		if( municipality == '' ){
 			municipality = "";
-		//	alert( "El campo MUNICIPIO/DELEGACIÓN no puede ir vacío!" );
-		//	$( '#municipality_input' ).focus();
-		//	return false;
 		}
 
 		postal_code = $( '#postal_code_input' ).val();	
 		if( postal_code == '' ){
 			alert_scann( "error" );
 			alert( "El campo CODIGO POSTAL no puede ir vacío!" );
-			close_emergent();
+			setTimeout( function(){
+				close_emergent();
+			}, 100 );
 			$( '#postal_code_input' ).focus();
 			return false;
 		}
@@ -207,9 +251,6 @@ audio_is_playing = null;
 		location = $( '#location_input' ).val();	
 		if( location == '' ){
 			location = "";
-			//alert( "El campo LOCACIÓN no puede ir vacío!" );
-			//$( '#location_input' ).focus();
-			//return false;
 		}
 		
 		reference = ( $( '#reference_input' ).val() == '' ? '' : $( '#reference_input' ).val() );
@@ -217,24 +258,20 @@ audio_is_playing = null;
 		country = $( '#country_combo' ).val();
 		if( country == '' ){
 			country = "";
-			//alert( "El campo PAIS no puede ir vacío!" );
-			//$( '#country_combo' ).focus();
-			//return false;
 		}
 		
 		state = $( '#state_input' ).val();
 		if( state.trim() == '' || state.trim == '-- Seleccionar --' ){
 			state = "";
-			//alert( "El campo ESTADO no puede ir vacío!" );
-			//$( '#state_input' ).focus();
-			//return false;
 		}
 
 		fiscal_regime = $( '#regime_input' ).val();
 		if( fiscal_regime == '' ){
 			alert_scann( "error" );
 			alert( "El campo Regimen Fiscal no puede ir vacío!" );
-			close_emergent();
+			setTimeout( function(){
+				close_emergent();
+			}, 100 );
 			$( '#regime_input' ).focus();
 			return false;
 		}
@@ -251,7 +288,9 @@ email : email,*/
 		if( costumer_contacts == '' ){
 			alert_scann( "error" );
 			alert( "Debes de capturar almenos un contacto para continuar!" );
-			close_emergent();
+			setTimeout( function(){
+				close_emergent();
+			}, 100 );
 			return false;
 		}
 
@@ -296,12 +335,16 @@ email : email,*/
 						</button>
 					</div>`;
 					alert_scann( "costumer_saved" );
-					$( '.emergent_content' ).html( content );
-					$( '.emergent' ).css( 'display', 'block' );
+					setTimeout( function(){
+							$( '.emergent_content' ).html( content );
+							$( '.emergent' ).css( 'display', 'block' );
+					}, 100);
 				}else{
 					alert_scann( "error" );
-					$( '.emergent_content' ).html( dat );
-					$( '.emergent' ).css( 'display', 'block' );
+					setTimeout( function(){
+						$( '.emergent_content' ).html( dat );
+						$( '.emergent' ).css( 'display', 'block' );
+					}, 100);
 				}
 			}
 		});
@@ -333,6 +376,9 @@ email : email,*/
 		}
 		var url = "ajax/db.php?costumer_fl=seek_by_rfc&rfc=" + rfc;
 		var resp = ajaxR( url ).split( "|" );
+
+		$( '#accordion' ).html( '' );
+
 		if( resp[0] != 'ok' ){
 			//console.log( resp[0] );
 			if( rfc_url != false ){
@@ -393,8 +439,6 @@ email : email,*/
 	}
 
 	function getCostumerDB( costumer ){
-
-
 		$( '#street_name_input' ).val( "" );
 		$( '#street_name_input' ).removeAttr( "disabled" );
 		$( '#internal_number_input' ).val( "" );
