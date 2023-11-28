@@ -25,6 +25,7 @@
 <script type="text/javascript">
 	var global_popout = 0;
 	function getDataSat( url_ = null ){
+			//$( '#accordion' ).html( '' );
 			var url = "";
 			if( url_ == '' || url_ == null ){
 				url = $( '#rfc_seeker' ).val().trim();//'https://siat.sat.gob.mx/app/qr/faces/pages/mobile/validadorqr.jsf?D1=10&D2=1&D3=16050344931_HELC720716ME6';
@@ -188,7 +189,7 @@
 					matches ++;
 					if( costumer_regimes.length == 2 ){
 						$( this ).attr( 'selected', true );
-						$( "#regime_input" ).attr( 'disabled', true );
+						//$( "#regime_input" ).attr( 'disabled', true );
 					}
 				}
 			}
