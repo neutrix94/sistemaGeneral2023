@@ -62,7 +62,7 @@ require 'client/registros_sincronizacion_mov_almacen.php';
 require 'client/registros_sincronizacion_mov_p_p.php';
 require 'client/registros_sincronizacion_transferencias.php';
 /*oscar 2023/11/28 para depuracion de registos de sincronizacion*/
-	require( 'client/depurar_sincronizacion.php' );
+	//require( 'client/depurar_sincronizacion.php' );
 /*fin de cambio Oscar 2023/11/28*/
 
 $app->run();
