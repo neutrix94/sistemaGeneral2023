@@ -162,6 +162,20 @@
 					}else if( $result->result[0]->Key == "message" ){
 						$result->result = $result->result[0]->Value;
 					}
+					if( $result->result == "Hace falta información del receptor, Regimen Fiscal" ){
+						$result->result = "Selecciona un régimen fiscal Válido!";
+					}
+					if( $result->result == "CFDI40143 - Este RFC del receptor no existe en la lista de RFC inscritos no cancelados del SAT." 
+						 ){//|| strpos($result->result, 'RFC' ) != false 
+						//die('here');
+						$result->result = "El RFC es Inválido!";
+					}
+					if( $result->result == "CFDI40145 - El campo Nombre del receptor, debe pertenecer al nombre asociado al RFC registrado en el campo Rfc del Receptor." ){
+						$result->result = "El nombre / Razón Social es Inválido!";
+					}
+					if (strpos($result->result, 'DomicilioFiscalReceptor') != false ){
+						$result->result = "El código postal es incorrecto!";
+					}
 					//var_dump( $result );
 					die( "<div class=\"row\">
 						<h2 class=\"text-center text-danger fs-1\">{$result->result}</h2>
