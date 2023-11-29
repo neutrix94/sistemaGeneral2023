@@ -29,27 +29,27 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
   $limit_date = $row['limit_date'];
   $link->autocommit( false );//inicio de trasaccion
 //comienza a ejecutar consultas
-    $sql = "DELETE FROM sys_sincronizacion_registros WHERE status_sincronizacion = 3";   
+    $sql = "DELETE FROM sys_sincronizacion_registros WHERE status_sincronizacion = 3 AND fecha <= '{$limit_date} 23:59:59'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros : {$link->error}" );
-    $sql = "DELETE FROM sys_sincronizacion_devoluciones WHERE id_status_sincronizacion = 3";   
+    $sql = "DELETE FROM sys_sincronizacion_devoluciones WHERE id_status_sincronizacion = 3 AND fecha_alta <= '{$limit_date} 23:59:59'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_devoluciones : {$link->error}" );
-    $sql = "DELETE FROM sys_sincronizacion_movimientos_almacen WHERE id_status_sincronizacion = 3";   
+    $sql = "DELETE FROM sys_sincronizacion_movimientos_almacen WHERE id_status_sincronizacion = 3 AND fecha_alta <= '{$limit_date} 23:59:59'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_movimientos_almacen : {$link->error}" );
     $sql = "DELETE FROM sys_sincronizacion_movimientos_proveedor_producto WHERE id_status_sincronizacion = 3";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_movimientos_proveedor_producto : {$link->error}" );
-    $sql = "DELETE FROM sys_sincronizacion_registros_facturacion WHERE status_sincronizacion = 3";   
+    $sql = "DELETE FROM sys_sincronizacion_registros_facturacion WHERE status_sincronizacion = 3 AND fecha <= '{$limit_date} 23:59:59'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros_facturacion : {$link->error}" );
-    $sql = "DELETE FROM sys_sincronizacion_registros_movimientos_almacen WHERE status_sincronizacion = 3";   
+    $sql = "DELETE FROM sys_sincronizacion_registros_movimientos_almacen WHERE status_sincronizacion = 3 AND fecha <= '{$limit_date} 23:59:59'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros_movimientos_almacen : {$link->error}" );
-    $sql = "DELETE FROM sys_sincronizacion_registros_movimientos_proveedor_producto WHERE status_sincronizacion = 3";   
+    $sql = "DELETE FROM sys_sincronizacion_registros_movimientos_proveedor_producto WHERE status_sincronizacion = 3 AND fecha <= '{$limit_date} 23:59:59'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros_movimientos_proveedor_producto : {$link->error}" );
-    $sql = "DELETE FROM sys_sincronizacion_registros_transferencias WHERE status_sincronizacion = 3";   
+    $sql = "DELETE FROM sys_sincronizacion_registros_transferencias WHERE status_sincronizacion = 3 AND fecha <= '{$limit_date} 23:59:59'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros_transferencias : {$link->error}" );
-    $sql = "DELETE FROM sys_sincronizacion_registros_ventas WHERE status_sincronizacion = 3";   
+    $sql = "DELETE FROM sys_sincronizacion_registros_ventas WHERE status_sincronizacion = 3 AND fecha <= '{$limit_date} 23:59:59'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros_ventas : {$link->error}" );
-    $sql = "DELETE FROM sys_sincronizacion_validaciones_ventas WHERE id_status_sincronizacion = 3";   
+    $sql = "DELETE FROM sys_sincronizacion_validaciones_ventas WHERE id_status_sincronizacion = 3 AND fecha_alta <= '{$limit_date} 23:59:59'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_validaciones_ventas : {$link->error}" );
-    $sql = "DELETE FROM sys_sincronizacion_ventas WHERE id_status_sincronizacion = 3";   
+    $sql = "DELETE FROM sys_sincronizacion_ventas WHERE id_status_sincronizacion = 3 AND fecha_alta <= '{$limit_date} 23:59:59'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_ventas : {$link->error}" );
 
     $sql = "DELETE FROM sys_sincronizacion_peticion WHERE hora_comienzo <= '{$limit_date} 23:59:59'";   
