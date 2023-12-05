@@ -27,6 +27,7 @@ $app->post('/actualiza_peticion', function (Request $request, Response $response
 
   $ok_rows = $request->getParam( "ok_rows" );
   $table = $request->getParam( "table" );
+  $status = $request->getParam( "status" );
   $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $log["response_string"], $log["unique_folio"] );
   if( $ok_rows != "" && $ok_rows != null ){
     switch ( $log["type_update"] ) {
@@ -37,7 +38,6 @@ $app->post('/actualiza_peticion', function (Request $request, Response $response
         }
         $rowsSynchronization = new rowsSynchronization( $link );//instancia clase de sincronizacion de movimientos
         $rowsSynchronization->updateRowSynchronization( $ok_rows, $log["unique_folio"], $table, 3, false );
-
       break;
       
       case 'salesSynchronization' :
@@ -87,7 +87,7 @@ $app->post('/actualiza_peticion', function (Request $request, Response $response
         die( 'Permission denied while trying update Petition on ' . $log["type_update"] . '.' );
       break;
     }
-      
+    $SynchronizationManagmentLog->updateModuleResume( $table, 'bajada', $download_status, $log["destinity_store"] );//actualiza el resumen de modulo/sucursal 
   }
   return json_encode( $resp );
 

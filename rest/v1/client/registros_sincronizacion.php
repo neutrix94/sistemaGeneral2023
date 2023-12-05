@@ -49,8 +49,6 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
 
   $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros' );//consulta registros pendientes de sincronizar
 
-  /*if ( sizeof( $req["rows"] ) > 0 ) {*/
-
     $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );//inserta request
   
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
@@ -83,16 +81,13 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   if( $result->rows_download != '' && $result->rows_download != null ){
     $rows_download = json_decode(json_encode($result->rows_download), true);//json_encode($result->rows_download);
     $log_download = json_decode(json_encode($result->log_download), true );
-  //$request_initial_time = $SynchronizationManagmentLog->getCurrentTime();//obtiene hora actual
-  $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log_download, $request_initial_time );//inserta response
-  $insert_rows = $rowsSynchronization->insertRows( $rows_download );
-     //return json_encode($insert_rows);
-    //echo 'here';
+    $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log_download, $request_initial_time );//inserta response
+    $insert_rows = $rowsSynchronization->insertRows( $rows_download );
+//return json_encode($insert_rows);
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"] );
-      //return json_encode( $resp );//envia peticion para actualiza log de registros descargados
-      $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"], "table"=>"sys_sincronizacion_registros" ), JSON_PRETTY_PRINT);//forma peticion//
-     // return $post_data;
+      //return json_encode( $resp );
+      $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"], "table"=>"sys_sincronizacion_registros", "status"=>"error" ), JSON_PRETTY_PRINT);//forma peticion
       $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data );//envia petición
       //return $result_1;
     }else{
@@ -102,19 +97,14 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"] );
     //envia peticion para actualiza log de registros descargados
       $resp["log"]["type_update"] = "rowsSynchronization";
-      $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"], "table"=>"sys_sincronizacion_registros" ), JSON_PRETTY_PRINT);//forma peticion//
+      $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"], "table"=>"sys_sincronizacion_registros", "status"=>"ok"  ), JSON_PRETTY_PRINT);//forma peticion//
      // return $post_data;
       $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data );//envia petición
       //return $result_1;
     }
-    //echo 'here';
   }
 //liberar el modulo de sincronizacion
   $SynchronizationManagmentLog->release_sinchronization_module( 'sys_sincronizacion_registros' );
-  /*}else if( sizeof( $req["rows"] ) <= 0 ){
-  //regresa respuesta vacía
-    return json_encode( array( "response" => "No hay movimientos por sincronizar" ) );
-  }*/
 //cierra conexion Mysql
   $link->close();
 //regresa respuesta
