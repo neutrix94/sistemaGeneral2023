@@ -22,11 +22,11 @@ $app->post('/inserta_registros_sincronizacion_movs_p_p', function (Request $requ
 //instanca de clases
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $rowsSynchronization = new rowsSynchronization( $link );//instancia clase de sincronizacion de movimientos
-/*valida que las apis no esten bloqueadas*/
+/*valida que las apis no esten bloqueadas
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
   if( $validation != 'ok' ){
     return $validation;
-  }
+  }*/
   
 //variables de respuesta
   $resp = array();

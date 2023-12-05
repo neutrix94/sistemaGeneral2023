@@ -21,11 +21,11 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
 
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $returnsSynchronization = new returnsSynchronization( $link );//instancia clase de sincronizacion de movimientos
-/*valida que las apis no esten bloqueadas*/
+/*valida que las apis no esten bloqueadas
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
   if( $validation != 'ok' ){
     return $validation;
-  }
+  }*/
 
   $resp = array();
   $resp["ok_rows"] = '';
