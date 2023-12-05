@@ -32,6 +32,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
   $resp["error_rows"] = '';
   $resp["rows_download"] = array();
   $resp["log_download"] = array();
+  $resp["status"] = "ok";
 
   $tmp_ok = "";
   $tmp_no = "";
@@ -67,6 +68,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
     if( $insert_returns["error"] != '' && $insert_returns["error"] != null  ){
     //inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_returns["error"], $resp["log"]["unique_folio"] );
+      $resp["status"] = "error : {$insert_returns["error"]}";
     }else{
       $resp["ok_rows"] = $insert_returns["ok_rows"];
       $resp["error_rows"] = $insert_returns["error_rows"];
@@ -101,6 +103,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
   if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'DEVOLUCIONES DESDE LINEA' );
   }
+  $SynchronizationManagmentLog->updateModuleResume( 'ec_devolucion', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   return json_encode( $resp );
 
 });

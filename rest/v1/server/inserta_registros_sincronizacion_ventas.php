@@ -33,6 +33,7 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   $resp["error_rows"] = '';
   $resp["rows_download"] = array();//registros por descargar
   $resp["log_download"] = array();//log de registros por descargar
+  $resp["status"] = "ok";
 
 //variables que llegan
   $rows = $request->getParam( "rows" );

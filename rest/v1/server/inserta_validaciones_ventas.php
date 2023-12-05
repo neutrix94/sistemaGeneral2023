@@ -29,6 +29,7 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
   $resp = array();
   $resp["ok_rows"] = '';
   $resp["error_rows"] = '';
+  $resp["status"] = "ok";
   
   $tmp_ok = "";
   $tmp_no = "";

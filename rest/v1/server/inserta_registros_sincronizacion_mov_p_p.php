@@ -34,6 +34,7 @@ $app->post('/inserta_registros_sincronizacion_movs_p_p', function (Request $requ
   $resp["error_rows"] = '';
   $resp["rows_download"] = array();//registros por descargar
   $resp["log_download"] = array();//log de registros por descargar
+  $resp["status"] = "ok";
 
 //variables que llegan
   $rows = $request->getParam( "rows" );
@@ -63,6 +64,7 @@ $app->post('/inserta_registros_sincronizacion_movs_p_p', function (Request $requ
     $insert_rows = $rowsSynchronization->insertRows( $rows );
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"] );
+      $resp["status"] = "error : {$insert_rows["error"]}";
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
@@ -76,17 +78,18 @@ $app->post('/inserta_registros_sincronizacion_movs_p_p', function (Request $requ
   }
 
 /****************************************** Consulta / Envia ******************************************/
-  $config = $SynchronizationManagmentLog->getSystemConfiguration( 'sys_sincronizacion_registros' );
+  $config = $SynchronizationManagmentLog->getSystemConfiguration( 'ec_movimiento_detalle_proveedor_producto' );
   $path = trim ( $config['value'] );
   $system_store = $config['system_store'];
   $store_prefix = $config['store_prefix'];
   $initial_time = $config['process_initial_date_time'];
   $rows_limit = $config['rows_limit'];
   $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
-    $rows_limit, 'sys_sincronizacion_registros_movimientos_proveedor_producto' );//obtiene registros para descargar
+  $rows_limit, 'sys_sincronizacion_registros_movimientos_proveedor_producto' );//obtiene registros para descargar
   if( sizeof( $resp["rows_download"] ) > 0 ){
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );
   }
+  $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_detalle_proveedor_producto', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   return json_encode( $resp );
 
 });

@@ -32,6 +32,7 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
   $resp["error_rows"] = '';
   $resp["rows_download"] = array();//registros por descargar
   $resp["log_download"] = array();//log de registros por descargar
+  $resp["status"] = "ok";
   
   $tmp_ok = "";
   $tmp_no = "";
@@ -67,6 +68,7 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
     if( $insert_sales["error"] != '' && $insert_sales["error"] != null  ){
     //inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_sales["error"], $resp["log"]["unique_folio"] );
+      $resp["status"] = "error : {$insert_sales["error"]}";
     }else{
       $resp["ok_rows"] = $insert_sales["ok_rows"];
       $resp["error_rows"] = $insert_sales["error_rows"];
@@ -111,6 +113,7 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
   if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'VENTAS DESDE LINEA' );
   }
+  $SynchronizationManagmentLog->updateModuleResume( 'ec_pedidos', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   return json_encode( $resp );
 
 });

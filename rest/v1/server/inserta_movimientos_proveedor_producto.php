@@ -30,6 +30,7 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
   $resp["ok_rows"] = '';
   $resp["error_rows"] = '';
   $resp["log"] = array();
+  $resp["status"] = "ok";
   
   $tmp_ok = "";
   $tmp_no = "";
@@ -65,6 +66,7 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
     if( $insert_validations["error"] != '' && $insert_validations["error"] != null  ){
     //inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_validations["error"], $resp["log"]["unique_folio"] );
+      $resp["status"] = "error : {$insert_validations["error"]}";
     }else{
       $resp["ok_rows"] = $insert_validations["ok_rows"];
       $resp["error_rows"] = $insert_validations["error_rows"];
@@ -80,7 +82,7 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
   }
 
 /****************************************** Consulta / Envia ******************************************/
-  $config = $SynchronizationManagmentLog->getSystemConfiguration( 'sys_sincronizacion_registros' );
+  $config = $SynchronizationManagmentLog->getSystemConfiguration( 'ec_movimiento_detalle_proveedor_producto' );
   $path = trim ( $config['value'] );
   $system_store = $config['system_store'];
   $store_prefix = $config['store_prefix'];
@@ -101,6 +103,7 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA' );
   }
 
+  $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_detalle_proveedor_producto', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   return json_encode( $resp );
 
 });

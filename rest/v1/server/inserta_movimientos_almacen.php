@@ -30,6 +30,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   $resp = array();
   $resp["ok_rows"] = '';
   $resp["error_rows"] = '';
+  $resp["status"] = "ok";
   
   $tmp_ok = "";
   $tmp_no = "";
@@ -65,6 +66,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
     if( $insert_movements["error"] != '' && $insert_movements["error"] != null  ){
     //inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_movements["error"], $resp["log"]["unique_folio"] );
+      $resp["status"] = "error : {$insert_movements["error"]}";
     }else{
       $resp["ok_rows"] = $insert_movements["ok_rows"];
       $resp["error_rows"] = $insert_movements["error_rows"];
@@ -99,6 +101,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA' );
   }
+  $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_almacen', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   return json_encode( $resp );
 
 });
