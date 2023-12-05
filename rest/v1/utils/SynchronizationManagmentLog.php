@@ -24,7 +24,7 @@
 						permite_sincronizar_manualmente AS api_is_locked
 					FROM sys_resumen_sincronizacion_sucursales 
 					WHERE id_sucursal = {$store_id}";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar si las apis de la sucursal estan bloqueadas : {$this->link->error}" );
+			$stm = $this->link->query( $sql ) or die( "Error al consultar si las apis de la sucursal estan bloqueadas : {$sql} {$this->link->error}" );
 			$row = $stm->fetch_assoc();
 			if( $row['api_is_locked'] != 0 ){
 				return 'Las apis de la sucursal estan bloqueadas!';
