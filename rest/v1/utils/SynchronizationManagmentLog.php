@@ -21,12 +21,12 @@
 			}
 		//consulta api especifica de la sucursal
 			$sql = "SELECT 
-						permite_sincronizar_manualmente AS api_is_locked
+						permite_sincronizar_manualmente AS permission
 					FROM sys_resumen_sincronizacion_sucursales 
 					WHERE id_sucursal = {$store_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar si las apis de la sucursal estan bloqueadas : {$sql} {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			if( $row['api_is_locked'] != 1 ){
+			if( $row['permission'] != 1 ){
 				return 'Las apis de la sucursal estan bloqueadas!';
 			}
 		//consulta si puede entrar la sincronizacion de acuerdo al numero de sincronizaciones configuradas

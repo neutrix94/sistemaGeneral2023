@@ -36,6 +36,23 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
 //
   $validations = $request->getParam( "validations" );
   $log = $request->getParam( "log" );
+
+
+
+/*valida que las apis no esten bloqueadas*/
+  $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );
+  if( $validation != 'ok' ){
+    return $validation;
+  } 
+//actualiza indicador de sincronizacion en tabla
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 3 );
+  if( $update_synchronization != 'ok' ){
+    return $update_synchronization;
+  } 
+/**/
+
+
+
 //inserta request
   $request_initial_time = $SynchronizationManagmentLog->getCurrentTime();
   $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log, $request_initial_time );

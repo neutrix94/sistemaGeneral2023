@@ -16,12 +16,12 @@ $app->post('/actualiza_peticion', function (Request $request, Response $response
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
-/*valida que las apis no esten bloqueadas*/
+/*valida que las apis no esten bloqueadas
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
   if( $validation != 'ok' ){
     return $validation;
   }
-  
+  */
   $resp = array();
   $log = $request->getParam( "log" );
 

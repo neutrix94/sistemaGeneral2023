@@ -34,6 +34,7 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
   $rows = $request->getParam( "rows" );
   $log = $request->getParam( "log" );
 
+
 /*valida que las apis no esten bloqueadas*/
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );
   if( $validation != 'ok' ){
@@ -44,6 +45,9 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
   if( $update_synchronization != 'ok' ){
     return $update_synchronization;
   } 
+/**/
+
+
 /****************************************** Recibe / Inserta ******************************************/
   $request_initial_time = $SynchronizationManagmentLog->getCurrentTime();//obtiene hora actual
   $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log, $request_initial_time );//inserta response

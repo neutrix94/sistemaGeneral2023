@@ -20,11 +20,11 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
 
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $productProviderMovementsSynchronization = new productProviderMovementsSynchronization( $link );//instancia clase de sincronizacion de movimientos
-/*valida que las apis no esten bloqueadas*/
+/*valida que las apis no esten bloqueadas
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
   if( $validation != 'ok' ){
     return $validation;
-  }
+  }*/
 
   $resp = array();
   $resp["ok_rows"] = '';
@@ -37,6 +37,23 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
 //
   $product_provider_movements = $request->getParam( "product_provider_movements" );
   $log = $request->getParam( "log" );
+
+
+
+/*valida que las apis no esten bloqueadas*/
+  $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );
+  if( $validation != 'ok' ){
+    return $validation;
+  } 
+//actualiza indicador de sincronizacion en tabla
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 3 );
+  if( $update_synchronization != 'ok' ){
+    return $update_synchronization;
+  } 
+/**/
+
+
+
 //inserta request
   $request_initial_time = $SynchronizationManagmentLog->getCurrentTime();
   $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log, $request_initial_time );
