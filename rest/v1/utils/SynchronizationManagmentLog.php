@@ -262,7 +262,7 @@
 						fecha_hora_ultima_actualizacion_{$action_type} = NOW()
 					WHERE id_modulo = ( SELECT id_modulo FROM sys_limites_sincronizacion WHERE tabla = '{$module}' )
 					AND id_resumen_sincronizacion_sucursal = {$store_id}";
-			$this->link->query( $sql ) or die( "Error al actualizar el resumen de respuesta : {$this->link->error}" );
+			$this->link->query( $sql ) or die( "Error al actualizar el resumen de respuesta : {$sql} {$this->link->error}" );
 			return 'ok';
 		}
 
