@@ -68,7 +68,7 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
     if( $insert_sales["error"] != '' && $insert_sales["error"] != null  ){
     //inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_sales["error"], $resp["log"]["unique_folio"] );
-      $resp["status"] = "error : {$insert_sales["error"]}";
+      $resp["status"] = "error";// : {$insert_sales["error"]}
     }else{
       $resp["ok_rows"] = $insert_sales["ok_rows"];
       $resp["error_rows"] = $insert_sales["error_rows"];

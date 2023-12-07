@@ -63,6 +63,7 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
     $insert_rows = $rowsSynchronization->insertRows( $rows );
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"] );
+      $resp["status"] = "error";
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
