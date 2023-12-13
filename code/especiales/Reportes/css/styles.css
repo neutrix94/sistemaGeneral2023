@@ -1,0 +1,38 @@
+	body{margin: 0;}
+
+	.encabezado{padding:5px;background:#83B141;width:99%;height:80px;top:0;color:white;font-size:25px; 
+		padding-left: 20px;}
+	.footer{position:fixed;bottom:0;width:100%; height : 80px;background:#83B141;}
+
+	.footer_ant{position:fixed;bottom:0;width:100%; height : 80px;background:rgba(225,0,0,.6);}
+	.encabezado_ant{padding:5px;background:rgba(225,0,0,.6);width:99%;height:60px;top:0;color:white;font-size:25px;}
+	
+	.boton{
+		padding:10px;
+		border-radius: 5px;
+	}
+	.filtro{padding:10px;border-radius: 5px;}
+	#reporte{border:2px;background: rgba(0,0,0,.2);width:69%;border-radius: 5px;right: 10px;position: absolute;top:120px;}
+	.fecha{
+		padding:6px;
+		width:30%;
+	}
+	.titulo{
+		font-family:Arial;
+		font-size: 18px;	
+	}
+	.hora{
+		padding: 10px;
+		border-radius: 6px;
+	}
+	#tarjetas{position:absolute;top:80px;width: 30%;}
+	#opciones_arqueo{position: fixed;top:5px;width: 68%;left:30%;}
+	#emergente{position: absolute; z-index:10;background: rgba(0,0,0,.7);width: 100%;height: 100%;top:0;left: 0;display: none;}
+	.td_oculto{display:none;}
+	#referencia_cheque_transferencia{width: 50%; height: 300px;}
+	#listado_cheque_transferencia{top: 0;position: relative;}
+	th{padding: 5px;background:#83B141;color: white;height: 30px;}
+	#res_busc{position:fixed;width: 18%;height:250px;background: white;display: none;}
+	.subtitulo{background: #F39C12;}
+	.btn_add{padding: 6px;border-radius: 50%;color:white;background:#83B141;font-size: 18px; }
+	.btn_eliminar{color:white;background:red;border-radius: 50%;padding: 10px;}
