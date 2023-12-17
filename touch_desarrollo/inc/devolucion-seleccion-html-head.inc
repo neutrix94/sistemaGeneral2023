@@ -1079,6 +1079,8 @@
 /*alert(res); 
 return false;*/
 		aux=res.split('|');
+//console.log( aux );
+//alert( aux );
 		if(aux[0] == 'ok'){
 			var ax=aux[1].split(':');
 			$("#id_pedido").val(ax[1]);
@@ -1087,15 +1089,22 @@ return false;*/
         
 /**/
     //validamos que no sea devolución completa, si lo es ya no se reimprime el ticket
-            if(es_dev_completa==0 && es_apartado==0){
-                url="ajax/ticket-php-head-reimpresion.php?id_ped="+id_pedido+"&id_dev="+aux[2];
-                var reimp=ajaxR(url);
+            if( aux[4] == 0 || aux[4] == '' ){//es_dev_completa==0 && es_apartado==0
+               //oscar 2023-12-15 cambio para reimprimir 
+               /*url="ajax/ticket-php-head-reimpresion.php?id_ped="+id_pedido+"&id_dev="+aux[2];*/
+                var url = "index.php?scr=talon_pago&idp="+id_pedido+"&noImp=1";//&tv="+tipoVenta
+                if( aux[5] != 0 && aux[5] != '' ){
+                    url += "&tv=" + aux[5];
+                }
+                var reimp = ajaxR(url);
+            }else{
+                var url="ajax/ticket-php-head-reimpresion.php?id_ped="+id_pedido+"&id_dev="+aux[2];
+                var reimp = ajaxR(url);
             }  
 
             location.href=aux[3];            
             return false;
-		}
-		else{
+		}else{
 			alert(aux);
 			retval = false;
 		}

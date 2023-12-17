@@ -27,14 +27,15 @@
 				$amount = ( isset( $_GET['amount'] ) ? $_GET['amount'] : $_POST['amount'] );
 				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
 				
+		
 				$validation = $Payments->validate_payment_is_not_bigger( $sale_folio, $amount );
-
 				$terminal_id = ( isset( $_GET['terminal_id'] ) ? $_GET['terminal_id'] : $_POST['terminal_id'] );
 				$counter = ( isset( $_GET['counter'] ) ? $_GET['counter'] : $_POST['counter'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 			//consume servicio de venta
 				$req = $apiNetPay->salePetition( $apiUrl, $amount, $terminal_id, $user_id, 
 					$sucursal_id, $sale_folio, $session_id );
+	//die("here");
 				$resp = json_decode( $req );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
 					$transaction_id = $resp->petition_id;
@@ -175,8 +176,14 @@
 			case 'insertCashPayment' : 
 				$ammount = ( isset( $_GET['ammount'] ) ? $_GET['ammount'] : $_POST['ammount'] );
 				$sale_id = ( isset( $_GET['sale_id'] ) ? $_GET['sale_id'] : $_POST['sale_id'] );
+				$ammount_permission = 0;
+				if( isset( $_GET['ammount_permission'] ) || isset( $_POST['ammount_permission'] ) ){
+					$ammount_permission = ( isset( $_GET['ammount_permission'] ) ? $_GET['ammount_permission'] : $_POST['ammount_permission'] );
+				}
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
-				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
+				if ( $ammount_permission == 0 ) {
+					$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
+				}
 				echo $Payments->insertCashPayment( $ammount, $sale_id, $user_id, $session_id );
 			break;
 
@@ -453,7 +460,6 @@
 			if( $ammount > 0 ){
 				$ammount = $this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
 				$this->insertPayment( $ammount, $sale_id, $user_id, $session_id );
-			//consulta e inserta el restante si es el caso
 			}else{
 				$this->insertReturnPayment( $ammount, $sale_id, $user_id, $session_id );
 			}
@@ -610,7 +616,9 @@
 		   				SUM( IF( d.es_externo = 1, d.monto_devolucion, 0 ) ),
 		   				SUM( IF( d.es_externo = 0, d.monto_devolucion, 0 ) )
 		   			FROM ec_devolucion d
-		   			WHERE d.id_pedido = {$sale_id}";
+		   			WHERE d.id_pedido = {$sale_id}
+		   			AND d.id_cajero = 0
+		   			AND d.id_sesion_caja = 0";
 		    /*$sql="SELECT 
 		            SUM(IF(pp.es_externo=1,pp.monto,0))-IF(ax.devExternos IS NULL,0,ax.devExternos) as externos,
 		            SUM(IF(pp.es_externo=0,pp.monto,0))-IF(ax.devInternos is null,0,ax.devInternos )as internos,
@@ -702,7 +710,7 @@
 			$resp = "";
 			$sql="SELECT 
 					tis.id_terminal_integracion AS afiliation_id,
-					CONCAT( tis.nombre_terminal, ' - terminal : ', tis.numero_serie_terminal, ' - storeId :', rse.store_id_netpay ) AS afiliation_number
+					CONCAT( tis.nombre_terminal, ' - terminal : ', tis.numero_serie_terminal, ' - storeId :', tis.store_id ) AS afiliation_number
 				FROM ec_terminales_integracion_smartaccounts tis
 				LEFT JOIN ec_terminales_cajero_smartaccounts tcs
 				ON tis.id_terminal_integracion = tcs.id_terminal
@@ -712,9 +720,10 @@
 				ON rse.id_razon_social = tss.id_razon_social
 				WHERE tcs.id_cajero = '{$user_id}' 
 				AND tcs.activo = 1
+				AND tss.estado_suc = 1
 				AND tss.id_sucursal = {$store_id}";
 			//$eje=mysql_query($sql)or die("Error al consultar las afiliaciones para este cajero!!!<br>".mysql_error());
-			$stm = $this->link->query( $sql ) or die( "Error al consultar las afiliaciones del cajero" );
+			$stm = $this->link->query( $sql ) or die( "Error al consultar las terminales del cajero : {$this->link->error}" );
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
 			$tarjetas_cajero='';
 			//$c=0;//Tarjeta {$c} : <br> <br>

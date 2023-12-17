@@ -134,7 +134,7 @@
 			//var_dump( $token );
 			//return '';
 			if( sizeof($token) == 0 || $token == null ){
-				$token = $this->requireToken( $terminal['terminal_serie'], 'password', 'Nacional', 'netpay' );
+				$token = $this->requireToken( $terminal['terminal_serie'], 'password', 'smartPos', 'netpay' );
 			}
 			$petition_id = $this->insertNetPetitionRow();
 		//arreglo de prueba
@@ -193,7 +193,7 @@
 		public function saleCancelation( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id ){
 			$token = $this->getToken( $terminal );
 			if( sizeof($token) == 0 || $token == null ){
-				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
+				$token = $this->requireToken( $terminal, 'password', 'smartPos', 'netpay' );
 			}
 			$petition_id = $this->insertNetPetitionRow();
 		//arreglo de prueba
@@ -247,7 +247,7 @@
 		public function saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id ){
 			$token = $this->getToken( $terminal );
 			if( sizeof($token) == 0 || $token == null ){
-				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
+				$token = $this->requireToken( $terminal, 'password', 'smartPos', 'netpay' );
 			}
 			$petition_id = $this->insertNetPetitionRow();
 		//arreglo de prueba

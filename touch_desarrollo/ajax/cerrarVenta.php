@@ -112,6 +112,10 @@
 			throw new Exception ("No se consiguió un nuevo folio ({$tipo_folio}).");
 		}
 /**********************Insertamos los datos reales******************/
+		$initial_amount = 0;
+		if( $es_apartado == 1 ){
+			$initial_amount = $_GET['mon0'];
+		}
 	//Inserta la cabecera del pedido
 		$sql="	INSERT INTO ec_pedidos
 				( /*1*/id_pedido,/*2*/ folio_pedido, /*3*/folio_nv, /*4*/folio_factura, /*5*/folio_cotizacion, 
@@ -122,7 +126,7 @@
 					/*26*/id_tipo_envio,/*27*/descuento,/*28*/id_razon_factura,/*29*/folio_abono,/*30*/correo,
 					/*31*/facebook,/*32*/modificado,/*33*/ultima_sincronizacion,/*34*/ultima_modificacion,/*35*/tipo_pedido,
 					/*36*/id_status_agrupacion,/*37*/id_cajero,/*38*/id_devoluciones,/*39*/venta_validada, 
-					/*40*/id_sesion_caja, /*41*/tipo_sistema )
+					/*40*/id_sesion_caja, /*41*/tipo_sistema, /*42*/monto_pago_inicial )
 					SELECT
 					/*1*/null,
 					/*2*/folio_pedido,
@@ -164,7 +168,8 @@
 					/*38*/{$saldo_favor},/*saldo a favor por devolucion*/
 					/*39*/'0',/*( venta validada )oscar 2022*/
 					/*40*/{$id_sesion_caja},
-					/*41*/'{$system_type}'
+					/*41*/'{$system_type}',
+					/*42*/{$initial_amount}
 					FROM ec_pedidos_back
 					WHERE id_pedido = {$id_pedido}";
 
@@ -598,11 +603,9 @@
 		exit();
 	}
 	//die( "DEvoluciones : {$_GET['id_devoluciones']}" );
-/*Implementacion Osaccr 25.06.2019 para insertar la referencia de las devoluciones en el pedido*/
+/*Implementacion Oscar 25.06.2019 para insertar la referencia de las devoluciones en el pedido*/
 	if( isset( $_GET['id_devoluciones'] ) ){
 		$id_devoluciones = $_GET['id_devoluciones'];
-		$sql="UPDATE ec_pedidos SET id_devoluciones='$id_devoluciones' WHERE id_pedido=$id_pedido_r";
-		$eje=mysql_query($sql)or die("Error al actualizar los ids de devolucion para este pedido!!!\n".mysql_error());
 	//consulta id de pedido original 
 		$tmp_devs = str_replace('~', ',', $id_devoluciones );
 		$devs_array = explode( '~', $id_devoluciones );
@@ -622,6 +625,7 @@
 		$row = mysql_fetch_assoc( $stm );
 		$return_internal_ammount = 0;
 		$return_external_ammount = 0;
+
 	//consulta el monto de la devolucion interna
 		$sql = "SELECT monto_devolucion, es_externo FROM ec_devolucion WHERE id_devolucion IN( $tmp_devs )";
 		$stm_amount = mysql_query( $sql ) or die( "Error al consultar los montos de la devolucion  : " . mysql_error() );
@@ -642,6 +646,12 @@
 			/*5*/{$devs_array[0]}, /*6*/{$return_internal_ammount}, /*7*/{$devs_array[1]}, /*8*/{$return_external_ammount}, 
 			/*9*/{$id_pedido_r}, /*10*/{$new_total}, /*11*/0 )";
 			$stm = mysql_query( $sql ) or die( "Error al insertar la relacion entre pedidos : {$sql} " . mysql_error() );
+			
+			$sql="UPDATE ec_pedidos SET id_devoluciones='$id_devoluciones' WHERE id_pedido=$id_pedido_r";
+			$eje=mysql_query($sql)or die("Error al actualizar los ids de devolucion para este pedido!!!\n".mysql_error());
+		}else{
+			$sql="UPDATE ec_pedidos SET id_devoluciones='0' WHERE id_pedido=$id_pedido_r";
+			$eje=mysql_query($sql)or die("Error al quitar ids de devolucion para este pedido!!!\n".mysql_error());
 		}	
 	}
 /*Fin de cambio Oscar 25.06.2019*/

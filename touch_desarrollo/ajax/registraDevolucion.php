@@ -4,6 +4,7 @@
 	//die('porcDesc: '.$porcDesc);
 	$auxDesc=$porcDesc/100;
 	$porcDesc=$auxDesc;
+    $monto_pagado = 0;
 	//datos +="&idp"+i+"="+tds[0].innerHTML+"&can"+i+"="+tds[3].innerHTML+"&prec"+i+"="+tds[4].innerHTML
     //       +"&desc"+i+"="+tds[5].innerHTML+"$montoDev"+i+"="+tds[6].innerHTML;
 /***********************************************************************************************************************************************************************
@@ -437,6 +438,7 @@ else{
     }
 }//fin de si no esta pagada la nota de venta
 */
+/*deshabilitado por Oscar 2023-12-15
     if($pedido_pagado==1){
     //actualizamos los pagos para anularlos en los cálculos
         $sql="UPDATE ec_pedido_pagos SET referencia = monto WHERE id_pedido = {$idp}";
@@ -447,6 +449,7 @@ else{
             die("Error al actualizar la referencia de los pagos!!!\n\n".$sql."\n\n".$error);
         }
     }
+*/
 //Actualizamos el monto del pedio anterior y generamos el ticket...
     $subTotal="SELECT 
                     SUM(monto),
@@ -467,11 +470,34 @@ else{
     }else{
         $descFinal=$subTotal[1];
     }
+//consulta si tiene saldo a favor Oscar 2023-12-15
+    $sql_pagado = "SELECT
+            SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS pagado,
+            p.tipo_pedido
+        FROM ec_pedidos p
+        LEFT JOIN ec_pedido_pagos pp
+        ON pp.id_pedido = p.id_pedido
+        AND pp.referencia = ''
+        WHERE p.id_pedido = {$idp}";
+    $stm_pagado = mysql_query( $sql_pagado );
+    $row_pagado = mysql_fetch_assoc( $stm_pagado );
+    $monto_pagado = $row_pagado['pagado'];
+    $tipo_pedido = $$row_pagado['tipo_pedido'];
+    $url_recarga = "";
+    if( $monto_pagado > 0 ){
+       // $monto_pagado = $monto_pagado - $totalDev;
+        $extra=str_replace("*", "&", $extra);
+        $url_recarga = "index.php?scr=nueva-venta&s_f_c={$totalDev}{$extra}&abonado={$total_abonado}&id_dev={$id_dev_interna}~{$id_dev_externa}";//$totalDev
+        $sql="UPDATE ec_devolucion SET observaciones='$url_recarga' WHERE id_pedido=$idp";
+        $eje=mysql_query($sql)or die("Error al actualizar observaciones en las devoluciones!!\n\n".mysql_error()."\n\n".$sql);
+    }else if( $monto_pagado == 0 ){
+        $monto_pagado = 0;
+        $url_recarga = "index.php?scr=nueva-venta";
+        $sql="UPDATE ec_devolucion SET observaciones='', status = 3 WHERE id_pedido=$idp";
+        $eje = mysql_query( $sql )or die("Error al marcar como finalizada la(s) devolucion(es) : " . mysql_error() . "\n\n" . $sql );
+    
+    }
 /**/
-    $extra=str_replace("*", "&", $extra);
-    $url_recarga = "index.php?scr=nueva-venta&s_f_c={$totalDev}{$extra}&abonado={$total_abonado}";
-    $sql="UPDATE ec_devolucion SET observaciones='$url_recarga' WHERE id_pedido=$idp";
-    $eje=mysql_query($sql)or die("Error al actualizar observaciones en las devoluciones!!\n\n".mysql_error()."\n\n".$sql);
 /**/
 //actualizamos monto del pedido y marcamos que este fue modificado
     $actPed="UPDATE ec_pedidos SET descuento='$descFinal',subtotal='$subTotal[0]',total=($subTotal[0]-descuento),modificado=1 WHERE id_pedido='$idp'";
@@ -483,10 +509,12 @@ else{
     if(mysql_query("COMMIT")){//autorizamos transacción
     /*Implemetación Oscar 06.03.2019 para que las devoluciones completas si se impriman*/
        // if($es_completa==1){
+        if( $monto_pagado > 0 ){
         //imprimimos el ticket de la devolución
             if(!include('imprimeDev.php')){
     		  die("Error al generar ticket de devolución");
-    	   }
+    	    }
+        }
         //}
     /*Fin de cambio Oscar 06.03.2019*/
     }else{
@@ -494,5 +522,5 @@ else{
     	die("Se generó un Error al completar la transaccion!!!\n\nActualice la pantalla y vuelva a intentar");
     }
 //regresamos el id de la devolución 
-    echo 'ok|'.$id_dev."|".$total_abonado."|".$url_recarga."&id_dev=".$id_dev_interna."~".$id_dev_externa;
+    echo "ok|{$id_dev}|{$total_abonado}|{$url_recarga}|{$monto_pagado}|{$tipo_pedido}";
 ?>

@@ -94,26 +94,65 @@ var total_cobros=0,monto_real=0;
 						alert(dat);return false;
 					}
 				}else{
-					$("#efectivo").val(aux[3]-aux[4]);//oscar 2023
-					$("#monto_total").val(aux[3]);
-					$("#buscador").val(aux[2]);
-					$("#saldo_favor").val(aux[4]);
+					var respuesta = JSON.parse( aux[1] );
+					console.log( respuesta );//return '';
+					$("#monto").val( respuesta.total_venta );
+					$("#buscador").val( respuesta.folio_venta );
+					$("#saldo_favor").val( respuesta.pagos_cobrados );
+					respuesta.por_pagar = respuesta.total_venta - respuesta.pagos_cobrados;
+					//$( '#monto_total' ).val( respuesta.por_pagar );
+					//return null;
+				//	var payment_ammount = ( aux[3]-aux[4] );
+					if( respuesta.por_pagar < 0 ){
+						$( '#efectivo' ).val(respuesta.por_pagar);
+						$( '#efectivo' ).attr( 'readonly', true );
+						$( '#payment_description' ).html( 'Devolver' );
+						$( '#payment_description' ).css( 'color', 'red' );
+						$( '#monto_total' ).css( 'color', 'red' );
+
+						$( '#terminal_qr_input' ).attr( 'disabled', true );
+						$( '.icon-qrcode' ).parent( 'button' ).css( 'display', 'none' );
+						$( '#add_card_btn' ).css( 'display', 'none' );
+						$( '#start_payments_btn' ).css( 'display', 'none' );
+						$( '#card_qr_container' ).css( 'display', 'none' );
+						$( '#cards_container' ).css( 'display', 'none' );
+						$( '#transferencias_cheques_contenedor' ).css( 'display', 'none' );
+						$( '#id_devolucion' ).val(1);
+						$( '#finalizar_cobro_contenedor' ).css( 'display', 'none' );
+						$( '#finalizar_cobro_devolucion_contenedor' ).css( 'display', 'block' );
+						$( '#add_form_btn' ).css( 'display', 'none' );
+					}else{
+						$( '#efectivo' ).val( respuesta.por_pagar );
+						$( '#efectivo' ).removeAttr( 'readonly' );
+						$( '#payment_description' ).html( 'Cobrar' );
+						$( '#payment_description' ).css( 'color', 'black' );
+						$( '#monto_total' ).css( 'color', 'black' );
+						$( '#id_devolucion' ).val(0);
+						$( '#finalizar_cobro_contenedor' ).css( 'display', 'block' );
+						$( '#finalizar_cobro_devolucion_contenedor' ).css( 'display', 'none' );
+						$( '#add_form_btn' ).css( 'display', 'flex' );
+					}
+
+					$( '#monto_total' ).val( Math.abs( respuesta.por_pagar ) );
+					//$("#monto_total").val( payment_ammount );
+					//$("#efectivo").val(payment_ammount);//oscar 2023
+					
 					$("#buscador").attr('disabled','true');
 					$("#res_busc").html('');
 					$("#res_busc").css("display","none");
 					$( '#seeker_btn' ).addClass( 'no_visible' );//oculta boton de buscador
 					$( '#seeker_reset_btn' ).removeClass( 'no_visible' );//muestra boton de reseteo
-					$("#id_venta").val(aux[1]);
+					$("#id_venta").val( respuesta.id_venta );
 					
-					if( aux[3] > 0 ){//pago
+					if( respuesta.por_pagar > 0 ){//pago
 						//$("#t0").val(aux[3]-aux[4]);//oscar 2023
 						$("#venta_pagada").val(pagado);
-						total_cobros=aux[3]-aux[4];
+						total_cobros = respuesta.total_venta - respuesta.pagos_cobrados;
 						//alert(aux[3]);
-						monto_real=aux[3]-aux[4];
+						monto_real = respuesta.pagos_cobrados - respuesta.total_venta;
 					
 					/*implementacion Oscar 2023/10/10 para recuperar los pagos anteriores de la nota de venta*/
-						getHistoricPayment( aux[1] );
+						getHistoricPayment( respuesta.id_venta );
 				/*fin de cambio Oscar 2023/10/10*/
 					}else{//devolucion
 						$( '#cards_container' ).css( 'display', 'none' );
@@ -317,18 +356,24 @@ var cont_cheques_transferencia=0;
 		recalcula();
 	}
 
-		function cobrar(){
+		function cobrar( amount_type ){
 			var sale_id = $( '#id_venta' ).val();
 		//verifica si hay cobro en efectivo a favor
-			if( parseInt( $( '#saldo_favor' ).val() ) != 0 && $( '#saldo_favor' ).val().trim() != '' ){
+			if( parseInt( $( '#efectivo' ).val() ) != 0 && $( '#efectivo' ).val().trim() != '' 
+				&& parseInt( $( '#efectivo' ).val() ) < 0 ){
 			//inserta pago en efectivo
-				var url = "ajax/db.php?fl=insertCashPayment&ammount=" + parseInt( $( '#saldo_favor' ).val() );
+				var url = "ajax/db.php?fl=insertCashPayment&ammount=" + parseInt( $( '#efectivo' ).val() );
 				url += "&session_id=" + $( '#session_id' ).val();
 				url += "&sale_id=" + $( '#id_venta' ).val();
+				url += "&amount_type=" + amount_type;
+				if( amount_type == -1 ){//parseInt( $( '#saldo_favor' ).val() ) < 0
+					url += "&ammount_permission=1";
+				}
 				//alert( url ); return false;
 				var resp = ajaxR( url ).split( '|' );
 				if( resp[0] != 'ok' ){
-					alert( "Error al insertar el pago en Efectivo: " + resp );
+					$( '.emergent_content' ).html( resp );
+					$( '.emergent' ).css( 'display', 'block' );
 					return false;
 				}
 			}
@@ -350,8 +395,22 @@ var cont_cheques_transferencia=0;
 			//alert( url );
 			var resp = ajaxR( url );
 			//alert( url );
-
-			location.reload();
+			var id_corte = $( "#id_venta" ).val();
+			$.ajax({
+				type:'post',
+				url:'cobrosBd.php',
+				cache:false,
+				data:{
+					flag:'cobrar',
+					id_venta:id_corte, 
+					session_id : $( '#session_id' ).val() },
+				success:function(dat){
+					var aux=dat.split("|");
+					//alert(dat);return false;
+					location.reload();
+				}
+			});
+			//location.reload();
 			return false;
 			var id=$("#id_venta").val();
 			//alert(id);
@@ -397,10 +456,11 @@ var cont_cheques_transferencia=0;
 				type:'post',
 				url:'cobrosBd.php',
 				cache:false,
-				data:{flag:'cobrar',efe:efectivo,camb:cambio,recib:recibido,tar:tarjetas,chq:cheques,id_venta:id_corte},
+				data:{flag:'cobrar',efe:efectivo,camb:cambio,recib:recibido,tar:tarjetas,chq:cheques,
+				id_venta:id_corte, session_id : $( '#session_id' ).val() },
 				success:function(dat){
 					var aux=dat.split("|");
-				//	alert(dat);
+					alert(dat);return false;
 					location.reload();
 				}
 			});

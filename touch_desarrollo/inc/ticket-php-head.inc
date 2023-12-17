@@ -596,8 +596,10 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 
 	}else{
 		$ticket->SetFont('Arial','B',$bF+5);
-		$ticket->SetXY(2, $ticket->GetY()+6);
-	    $ticket->Cell(66*0.40, 6, utf8_decode("Resta"), "" ,0, "L");
+		$ticket->SetXY(3, $ticket->GetY()+6);
+	    $ticket->Cell(74, 6, utf8_decode("Resta : $" . number_format($resta, 2) ), "" ,0, "C");
+
+	    /*$ticket->Cell(66*0.40, 6, utf8_decode("Resta"), "" ,0, "L");
 
 		$ticket->SetXY(25, $ticket->GetY());
 		$ticket->Cell(66*0.35, 6, "$" . number_format($resta, 2), "" ,0, "R");
@@ -620,8 +622,8 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 		$ticket->Cell(66, 6, utf8_decode("En apartados NO hay cambios NI devoluciones."), "", 0, 'C');
   		
   		$ticket->SetFont('Arial','B',$bF+3);
-		$ticket->SetXY(1, $ticket->GetY()+8);
-		$ticket->Cell(66, 6, utf8_decode("FOLIO APARTADO: ".$folioA), "", 0, 'C');
+		$ticket->SetXY(5, $ticket->GetY()+8);
+		$ticket->Cell(70, 5, utf8_decode("FOLIO APARTADO: ".$folioA), "", 0, 'C');
 	
 	}
 

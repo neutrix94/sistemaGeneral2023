@@ -12,7 +12,7 @@
 			//$this->NetPayStoreId = $this->getCurrentStoreId();
 			//die( $this->NetPayStoreId );
 		}
-	//obtener el storeId actual
+	/*obtener el storeId actual
 		public function getCurrentStoreId(){
 			$sql = "SELECT
 						rse.store_id_netpay AS storeId
@@ -23,7 +23,7 @@
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el StoreId actual : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
 			return $row['storeId'];
-		}
+		}*/
 	//obtencion de endpoints
 		public function getEndpoint( $terminal_id, $endpoint_type ){
 			$sql = "SELECT 
@@ -38,7 +38,17 @@
 			return $row['endpoint'];
 		}
 	//generacion de token
-		public function requireToken( $terminal_id, $grantType = 'password', $user = 'Nacional', $password = 'netpay' ){
+		public function requireToken( $terminal_id, $grantType = 'password', $user = 'smartPos', $password = 'netpay' ){
+		//consulta el usuario y password de las APIS
+			$sql = "SELECT 
+						usuario_api AS API_USER,
+						password_api AS API_PASSWORD
+					FROM ec_tipos_bancos
+					WHERE id_tipo_banco = 2";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar los parametros de token para API : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			$user = $row['API_USER'];
+			$password = $row['API_PASSWORD'];
 			$apiUrl = $this->getEndpoint( $terminal_id, 'endpoint_token' );//obtiene url de api token
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
@@ -140,7 +150,8 @@
 			$sql = "SELECT 
 						tis.numero_serie_terminal AS terminal_serie,
 						tis.imprimir_ticket AS print_ticket,
-						rse.store_id_netpay AS store_id
+						tis.store_id AS store_id
+						/*rse.store_id_netpay AS store_id*/
 					FROM ec_terminales_integracion_smartaccounts tis
 					LEFT JOIN ec_terminales_sucursales_smartaccounts tss
 					ON tss.id_terminal = tis.id_terminal_integracion
@@ -162,7 +173,7 @@
 			//var_dump( $token );
 			//return '';
 			if( sizeof($token) == 0 || $token == null ){
-				$token = $this->requireToken( $terminal['terminal_serie'], 'password', 'Nacional', 'netpay' );
+				$token = $this->requireToken( $terminal['terminal_serie'], 'password', 'smartPos', 'netpay' );
 			}
 			$petition_id = $this->insertNetPetitionRow();
 		//arreglo de prueba
@@ -230,7 +241,7 @@
 		public function saleCancelation( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id, $store_id_netpay ){
 			$token = $this->getToken( $terminal );
 			if( sizeof($token) == 0 || $token == null ){
-				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
+				$token = $this->requireToken( $terminal, 'password', 'smartPos', 'netpay' );
 			}
 
 			$terminal_data = $this->getTerminal( $terminal, $store_id );
@@ -290,7 +301,7 @@
 		public function saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id, $store_id_netpay ){
 			$token = $this->getToken( $terminal );
 			if( sizeof($token) == 0 || $token == null ){
-				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
+				$token = $this->requireToken( $terminal, 'password', 'smartPos', 'netpay' );
 			}
 			$terminal_data = $this->getTerminal( $terminal, $store_id );
 			$petition_id = $this->insertNetPetitionRow();
@@ -346,7 +357,7 @@
 		public function Reverse( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, $session_id, $store_id_netpay ){
 			$token = $this->getToken( $terminal );
 			if( sizeof($token) == 0 || $token == null ){
-				$token = $this->requireToken( $terminal, 'password', 'Nacional', 'netpay' );
+				$token = $this->requireToken( $terminal, 'password', 'smartPos', 'netpay' );
 			}
 			$terminal_data = $this->getTerminal( $terminal, $store_id );
 			$petition_id = $this->insertNetPetitionRow();

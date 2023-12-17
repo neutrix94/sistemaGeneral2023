@@ -64,6 +64,8 @@
 			return false;
 		}else{
 			$( '#efectivo' ).val( '' );
+			
+			carga_pedido( $( '#id_venta' ).val() );
 			getHistoricPayment( $( '#id_venta' ).val() );//recarga vista de cobros
 			var content = `<div class="text-center">
 				<h2 class="text-success">Pago registrado exitosamente</h2>

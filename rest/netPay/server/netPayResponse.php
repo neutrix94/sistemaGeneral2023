@@ -148,10 +148,11 @@ $app->post('/', function (Request $request, Response $response){
               WHERE folio_nv = '{$traceability['folio_venta']}'
               LIMIT 1
               ) AS sale_id
-              FROM ec_terminales_integracion_smartaccounts t
+            FROM ec_terminales_integracion_smartaccounts t
             LEFT JOIN ec_caja_o_cuenta cc
             ON t.id_caja_cuenta = cc.id_caja_cuenta
-            WHERE t.numero_serie_terminal = '{$terminalId}'";
+            WHERE t.numero_serie_terminal = '{$terminalId}'
+            AND t.store_id = '{$traceability['store_id_netpay']}'";
 
     }else{
       $sql = "SELECT 
@@ -212,8 +213,8 @@ $app->post('/', function (Request $request, Response $response){
       VALUES( {$row['sale_id']}, 7, NOW(), NOW(), {$amount}, '', 1, 1, -1, -1, 0 )";
       $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$link->error}" );*/
 
-//inserta el cobro del cajero si oel cobro fue exitoso
-    $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_afiliacion, 
+//inserta el cobro del cajero si el cobro fue exitoso
+    $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_terminal, 
     /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar ) 
     VALUES ( /*1*/NULL, /*2*/'{$row['sale_id']}', /*3*/'{$traceability['id_cajero']}', /*4*/'{$row['affiliation_id']}', 
     /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1 )";

@@ -5,7 +5,7 @@
 //afiliaciones
 	$tarjetas_cajero = $Arqueo->getAfiliaciones( $user_id, $fecha_sesion, $hora_inicio_sesion, $hora_cierre_sesion );
 //terminales SmartAccounts
-	$terminales_cajero_smartAccounts = $Arqueo->getSmartAccountsTerminals( $user_id, $fecha_sesion, $hora_inicio_sesion, $hora_cierre_sesion );
+	$terminales_cajero_smartAccounts = $Arqueo->getSmartAccountsTerminals( $user_sucursal, $user_id, $fecha_sesion, $hora_inicio_sesion, $hora_cierre_sesion );
 //afiliaciones para cheque o transferencia 
 	$cajas = $Arqueo->getAccounts( $user_sucursal );
 //cheques/transferencias del corte de caja

@@ -102,17 +102,21 @@
 			return $tarjetas_cajero;
 		}
 
-		function getSmartAccountsTerminals( $user_id, $fecha_sesion, $hora_inicio_sesion, $hora_cierre_sesion ){
+		function getSmartAccountsTerminals( $user_sucursal, $user_id, $fecha_sesion, $hora_inicio_sesion, $hora_cierre_sesion ){
 
 			$SmartAccountsTerminals='';
 			$sql="SELECT 
 					tis.id_terminal_integracion,
 					tis.nombre_terminal 
 				FROM ec_terminales_integracion_smartaccounts tis
+				LEFT JOIN ec_terminales_sucursales_smartaccounts tss
+				ON tss.id_terminal = tis.id_terminal_integracion
+				AND tss.id_sucursal = {$user_sucursal}
 				LEFT JOIN ec_terminales_cajero_smartaccounts tcs 
 				ON tcs.id_terminal = tis.id_terminal_integracion
 				WHERE tcs.id_cajero = '{$user_id}' 
 				AND tcs.activo = 1 
+				AND tss.estado_suc = 1
 				AND tis.id_terminal_integracion > 0";
 			$eje = $this->link->query( $sql )or die("Error al consultar las afiliaciones para este cajero!!!<br>{$this->link->error}");
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
@@ -127,7 +131,7 @@
 						AND fecha = '{$fecha_sesion}' 
 						AND hora >= '{$hora_inicio_sesion}' 
 						AND hora <= '{$hora_cierre_sesion}' 
-						AND id_afiliacion = '{$r[0]}'";
+						AND id_terminal = '{$r[0]}'";
 				$eje_tar = $this->link->query($sql)or die("Error al consultar los pagos con tarjetas!!!<br> {$this->link->error}");
 				$r1 = $eje_tar->fetch_row();
 				$total = $r1[0];
