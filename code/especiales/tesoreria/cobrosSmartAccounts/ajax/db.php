@@ -614,11 +614,13 @@
 		//consulta montos internos / externos
 		   	$sql = "SELECT 
 		   				SUM( IF( d.es_externo = 1, d.monto_devolucion, 0 ) ),
-		   				SUM( IF( d.es_externo = 0, d.monto_devolucion, 0 ) )
+		   				SUM( IF( d.es_externo = 0, d.monto_devolucion, 0 ) ),
+		   				SUM( IF( d.id_devolucion IS NULL, 0, d.monto_devolucion ) )
 		   			FROM ec_devolucion d
 		   			WHERE d.id_pedido = {$sale_id}
 		   			AND d.id_cajero = 0
 		   			AND d.id_sesion_caja = 0";
+		   			//die( $sql );
 		    /*$sql="SELECT 
 		            SUM(IF(pp.es_externo=1,pp.monto,0))-IF(ax.devExternos IS NULL,0,ax.devExternos) as externos,
 		            SUM(IF(pp.es_externo=0,pp.monto,0))-IF(ax.devInternos is null,0,ax.devInternos )as internos,
@@ -638,6 +640,10 @@
 		// die($sql);
 		    $eje = $this->link->query($sql) or die( "Error al consultar montos de devolución\n{$sql}\n{$this->link->error}" );
 		    $datos_1 = $eje->fetch_row();
+		    $datos_1[0] = round( $ammount * ( $datos_1[0] / $datos_1[2] ) )*-1;
+		    $datos_1[1] = round( $ammount * ( $datos_1[1] / $datos_1[2] ) )*-1;
+		    //var_dump( $datos_1 );die( '' );
+		$this->link->autocommit( false );
 		//insertamos las devoluciones completas
 		    //externa
 		    if( $datos_1[0]>0 && $id_dev_externa != 0 && $id_dev_externa != '' ){
@@ -666,6 +672,8 @@
 				monto, fecha, hora, observaciones, sincronizar) 
 			VALUES ( NULL, {$sale_id}, {$user_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', 1)";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$this->link->error}" );
+		
+		$this->link->autocommit( true );
 		}
 
 		public function getOrderResponse( $transaction_id, $is_manual = false ){

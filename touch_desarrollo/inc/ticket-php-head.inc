@@ -652,7 +652,8 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 			$ticket->Cell(5, 6, utf8_decode("Total"), "" ,0, "L");
 				
 			$ticket->SetXY(5+66*0.75, $ticket->GetY());
-			$ticket->Cell(66*0.25, 6, "$ " . number_format($total_pagos-$monto_devolucion, 2), "" ,0, "R");
+			//$ticket->Cell(66*0.25, 6, "$ " . number_format($total_pagos-$monto_devolucion, 2), "" ,0, "R");
+			$ticket->Cell(66*0.25, 6, "$ " . number_format($total, 2), "" ,0, "R");
 
 			$V=new EnLetras();
 			$ticket->SetFont('Arial','',$bF-2);

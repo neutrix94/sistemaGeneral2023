@@ -446,14 +446,14 @@
     //generacion de codigo de barras 
       include('../../include/barcode/barcode.php');
       $barcode_name = str_replace(' ', '', $folio_pedido_original );
-      $barcodePath = "../../img/codigos_barra/{$folio_pedido_original}.png";
+      $barcodePath = "../../img/codigos_barra/{$barcode_name}.png";
       if( file_exists( $barcodePath ) ){
         unlink( $barcodePath );
       }
-      barcode( $barcodePath, $folio, '60', 'horizontal', 'code128', true, 1);
-      if(file_exists("../../img/codigos_barra/".$folio_pedido_original.".png")){
+      barcode( $barcodePath, $barcode_name, '60', 'horizontal', 'code128', true, 1);
+      if( file_exists( $barcodePath ) ){
         $ticket->SetXY(5, $ticket->GetY()+10);
-        $ticket->Image("../../img/codigos_barra/".$folio_pedido_original.".png", 15, $ticket->GetY()+5,46);
+        $ticket->Image( $barcodePath, 15, $ticket->GetY()+5,46);
       }
   //  echo $folio_pedido_original;
 /*Fin de cambio oscar 25.06.2019*/    #$ticket->Output();
