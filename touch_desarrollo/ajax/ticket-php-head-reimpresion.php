@@ -279,6 +279,41 @@
 	$ticket->AddPage();
 	
 	$bF=10;
+/*Implementacion Oscar 2023/10/12*/
+	$sql = "SELECT
+                cc.id_cajero_cobro As payment_id,
+                cc.monto AS amount,
+                tp.nombre AS payment_type,
+                CONCAT( cc.fecha, ' ', cc.hora ) AS datetime
+            FROM ec_cajero_cobros cc
+            LEFT JOIN ec_tipos_pago tp
+            ON cc.id_tipo_pago = tp.id_tipo_pago
+            WHERE cc.id_pedido = {$id_pedido}";
+    $stm = mysql_query( $sql ) or die( "Error al consultar pagos para generacion de Ticket : " . mysql_error() );
+    $payments_total = 0;
+
+	$ticket->SetFont('Arial','B',$bF+4);
+	$ticket->SetXY(5, $ticket->GetY()+1);
+
+    while( $row = mysql_fetch_assoc( $stm ) ){
+        /*$ticket->SetXY(7, $ticket->GetY()+6);
+            $ticket->Cell(66, 6, utf8_decode( $row['payment_type'] ), "" ,0, "L");
+        
+            $ticket->SetX(35);
+            $ticket->Cell(20, 6, $row[2], "" ,0, "L");
+        
+            $ticket->SetX(43);
+            $ticket->Cell(30, 6, "$ " . number_format( $row['amount'], 2), "" ,0, "R");*/
+        $payments_total +=  $row['amount'];
+    }
+/*fin de cambio Oscar 2023/10/12*/
+/*Implementacion Oscar 2023/10/12*/
+	if( $payments_total == $total ){
+        $ticket->Image("../../img/especiales/pagado.jpeg", 5, 2, 70);
+		$ticket->SetXY(5, $ticket->GetY()+20);
+	}
+/*fin de cambio Oscar 2023/10/12*/
+
 	if($tv==1){
 		$ticket->SetFont('Arial','B',$bF+4);
 		$ticket->SetXY(5, $ticket->GetY()+1);

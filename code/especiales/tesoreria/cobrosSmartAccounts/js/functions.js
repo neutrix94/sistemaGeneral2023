@@ -93,33 +93,74 @@ var total_cobros=0,monto_real=0;
 					}else{
 						alert(dat);return false;
 					}
-					alert(dat);return false;
 				}else{
-					//$("#efectivo").val(aux[3]-aux[4]);//oscar 2023
-					$("#t0").val(aux[3]-aux[4]);//oscar 2023
-					$("#monto_total").val(aux[3]);
-					$("#buscador").val(aux[2]);
-					$("#id_venta").val(aux[1]);
-					$("#saldo_favor").val(aux[4]);
-					$("#venta_pagada").val(pagado);
+					var respuesta = JSON.parse( aux[1] );
+					console.log( respuesta );//return '';
+					$("#monto").val( respuesta.total_venta );
+					$("#buscador").val( respuesta.folio_venta );
+					$("#saldo_favor").val( respuesta.pagos_cobrados );
+					respuesta.por_pagar = respuesta.total_venta - respuesta.pagos_cobrados;
+					//$( '#monto_total' ).val( respuesta.por_pagar );
+					//return null;
+				//	var payment_ammount = ( aux[3]-aux[4] );
+					if( respuesta.por_pagar < 0 ){
+						$( '#efectivo' ).val(respuesta.por_pagar);
+						$( '#efectivo' ).attr( 'readonly', true );
+						$( '#payment_description' ).html( 'Devolver' );
+						$( '#payment_description' ).css( 'color', 'red' );
+						$( '#monto_total' ).css( 'color', 'red' );
+
+						$( '#terminal_qr_input' ).attr( 'disabled', true );
+						$( '.icon-qrcode' ).parent( 'button' ).css( 'display', 'none' );
+						$( '#add_card_btn' ).css( 'display', 'none' );
+						$( '#start_payments_btn' ).css( 'display', 'none' );
+						$( '#card_qr_container' ).css( 'display', 'none' );
+						$( '#cards_container' ).css( 'display', 'none' );
+						$( '#transferencias_cheques_contenedor' ).css( 'display', 'none' );
+						$( '#id_devolucion' ).val(1);
+						$( '#finalizar_cobro_contenedor' ).css( 'display', 'none' );
+						$( '#finalizar_cobro_devolucion_contenedor' ).css( 'display', 'block' );
+						$( '#add_form_btn' ).css( 'display', 'none' );
+					}else{
+						$( '#efectivo' ).val( respuesta.por_pagar );
+						$( '#efectivo' ).removeAttr( 'readonly' );
+						$( '#payment_description' ).html( 'Cobrar' );
+						$( '#payment_description' ).css( 'color', 'black' );
+						$( '#monto_total' ).css( 'color', 'black' );
+						$( '#id_devolucion' ).val(0);
+						$( '#finalizar_cobro_contenedor' ).css( 'display', 'block' );
+						$( '#finalizar_cobro_devolucion_contenedor' ).css( 'display', 'none' );
+						$( '#add_form_btn' ).css( 'display', 'flex' );
+					}
+
+					$( '#monto_total' ).val( Math.abs( respuesta.por_pagar ) );
+					//$("#monto_total").val( payment_ammount );
+					//$("#efectivo").val(payment_ammount);//oscar 2023
+					
 					$("#buscador").attr('disabled','true');
 					$("#res_busc").html('');
 					$("#res_busc").css("display","none");
-					total_cobros=aux[3]-aux[4];
-					//alert(aux[3]);
-					monto_real=aux[3]-aux[4];
-				
 					$( '#seeker_btn' ).addClass( 'no_visible' );//oculta boton de buscador
 					$( '#seeker_reset_btn' ).removeClass( 'no_visible' );//muestra boton de reseteo
-				/*implementacion Oscar 2023/10/10 para recuperar los pagos anteriores de la nota de venta*/
-					getHistoricPayment( aux[1] );
+					$("#id_venta").val( respuesta.id_venta );
+					
+					if( respuesta.por_pagar > 0 ){//pago
+						//$("#t0").val(aux[3]-aux[4]);//oscar 2023
+						$("#venta_pagada").val(pagado);
+						total_cobros = respuesta.total_venta - respuesta.pagos_cobrados;
+						//alert(aux[3]);
+						monto_real = respuesta.pagos_cobrados - respuesta.total_venta;
+					
+					/*implementacion Oscar 2023/10/10 para recuperar los pagos anteriores de la nota de venta*/
+						getHistoricPayment( respuesta.id_venta );
 				/*fin de cambio Oscar 2023/10/10*/
-
+					}else{//devolucion
+						$( '#cards_container' ).css( 'display', 'none' );
+					}
 				}
 			}		
 		});
 	}
-
 
 	function getHistoricPayment( sale_id ){
 		var url = "ajax/db.php?fl=getHistoricPayment&sale_id=" + sale_id; 
@@ -315,25 +356,61 @@ var cont_cheques_transferencia=0;
 		recalcula();
 	}
 
-		function cobrar(){
-		//verifica si hay cobro en efectivo
-			if( parseInt( $( '#efectivo' ).val() ) > 0 ){
-			//insereta pago en efectivo
+		function cobrar( amount_type ){
+			var sale_id = $( '#id_venta' ).val();
+		//verifica si hay cobro en efectivo a favor
+			if( parseInt( $( '#efectivo' ).val() ) != 0 && $( '#efectivo' ).val().trim() != '' 
+				&& parseInt( $( '#efectivo' ).val() ) < 0 ){
+			//inserta pago en efectivo
 				var url = "ajax/db.php?fl=insertCashPayment&ammount=" + parseInt( $( '#efectivo' ).val() );
 				url += "&session_id=" + $( '#session_id' ).val();
 				url += "&sale_id=" + $( '#id_venta' ).val();
+				url += "&amount_type=" + amount_type;
+				if( amount_type == -1 ){//parseInt( $( '#saldo_favor' ).val() ) < 0
+					url += "&ammount_permission=1";
+				}
 				//alert( url ); return false;
 				var resp = ajaxR( url ).split( '|' );
 				if( resp[0] != 'ok' ){
-					alert( "Error al insertar el pago en Efectivo: " + resp );
+					$( '.emergent_content' ).html( resp );
+					$( '.emergent' ).css( 'display', 'block' );
 					return false;
 				}
 			}
-		//manda impresion del ticket
-			var url = "ticket_pagos.php?id_pedido=" + $( '#id_venta' ).val();
-			var resp = ajaxR( url );
+		//verifica que el total de pagos sea igual al total de venta
+			var url = "ajax/db.php?fl=validatePayments&sale_id=" + sale_id;
+			//alert( url );
+			var resp = ajaxR( url ).split( '|' );
+			if( resp[0] != 'ok' ){
+				$( '.emergent_content' ).html( resp );
+				$( '.emergent' ).css( 'display', 'block' );
+				return false;
+			}
+			//alert( resp );
 
-			location.reload();
+		//manda impresion del ticket
+			//var url = "ticket_pagos.php?id_pedido=" + $( '#id_venta' ).val();
+			//var resp = ajaxR( url );
+			url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( '#id_venta' ).val();
+			//alert( url );
+			var resp = ajaxR( url );
+			//alert( url );
+			var id_corte = $( "#id_venta" ).val();
+			$.ajax({
+				type:'post',
+				url:'cobrosBd.php',
+				cache:false,
+				data:{
+					flag:'cobrar',
+					id_venta:id_corte, 
+					session_id : $( '#session_id' ).val() },
+				success:function(dat){
+					var aux=dat.split("|");
+					//alert(dat);return false;
+					location.reload();
+				}
+			});
+			//location.reload();
 			return false;
 			var id=$("#id_venta").val();
 			//alert(id);
@@ -379,10 +456,11 @@ var cont_cheques_transferencia=0;
 				type:'post',
 				url:'cobrosBd.php',
 				cache:false,
-				data:{flag:'cobrar',efe:efectivo,camb:cambio,recib:recibido,tar:tarjetas,chq:cheques,id_venta:id_corte},
+				data:{flag:'cobrar',efe:efectivo,camb:cambio,recib:recibido,tar:tarjetas,chq:cheques,
+				id_venta:id_corte, session_id : $( '#session_id' ).val() },
 				success:function(dat){
 					var aux=dat.split("|");
-				//	alert(dat);
+					alert(dat);return false;
 					location.reload();
 				}
 			});
@@ -440,6 +518,109 @@ var cont_cheques_transferencia=0;
 		$( '#add_card_btn' ).addClass( 'no_visible' );
 
 	}
+//buscador de la terminal por QR
+	function seekTerminalByQr( e ){
+		if( e.keyCode != 13 && e != 'intro' ){
+			return false;
+		}
+	//obtiene el valor del qr de la terminal
+		var qr_txt = $( '#terminal_qr_input' ).val().trim();
+		if( qr_txt == '' ){
+			alert( "El codigo qr no puede ir vacio!" );
+			$( '#terminal_qr_input' ).focus();
+			return false;
+		}	
+		var url = "ajax/db.php?fl=seekTerminalByQr&qr_txt=" + qr_txt;
+		var resp = ajaxR( url ).split( '|' );
+		if( resp[0] != 'ok' ){
+			alert( "Error : \n" + resp );
+		}else{
+			$( '#terminal_qr_input' ).val( '' );
+			var terminal = JSON.parse( resp[1] );
+			buildEmergentAfiliationPayment( terminal );
+		}
+	}
+
+	function buildEmergentAfiliationPayment(terminal){
+		var content = `<div class="row" style="padding : 15px !important;">
+			<div>
+			<br>
+			Tarjeta : 
+			<select class="form-select" id="afiliation_select_tmp">
+				<option value="${terminal.afiliation_id}">${terminal.afiliation_number}</option>
+			</select>
+			<div>
+			<br>
+				Monto :
+				<input type="text" class="form-control" id="ammount_input_tmp">
+			</div>
+			<div>
+			<br>
+				Numero de autorizacion :
+				<input type="text" class="form-control" id="authorization_input_tmp">
+			</div>
+			<div>
+			<br>
+				<button
+					type="button"
+					class="btn btn-success form-control"
+					onclick="setPaymentWhithouthIntegration();"
+				>
+					<i class="icon-floppy">Registrar cobro</i>
+				</button>
+			</div>
+			<div>
+			<br><br>
+				<button
+					type="button"
+					class="btn btn-danger form-control"
+					onclick="close_emergent();"
+				>
+					<i class="icon-cancel-circled">Cancelar y Salir</i>
+				</button>
+			</div>
+		</div>`;
+		//alert( content );
+		$( '.emergent_content' ).html( content );
+		$( '.emergent' ).css( 'display', 'block' );
+	}
+
+	function setPaymentWhithouthIntegration(){
+		var afiliation_id = $( '#afiliation_select_tmp' ).val();
+		if( afiliation_id == '' || afiliation_id == 0 ){
+			alert( "La afiliacion es invalida!" );
+			$( '#afiliation_select_tmp' ).focus();
+			return false;
+		}
+		var ammount = $( '#ammount_input_tmp' ).val();
+		if( ammount <= 0 ){
+			alert( "El monto debe de ser mayor a cero!" );
+			$( '#ammount_input_tmp' ).focus();
+			return false;
+		}
+		var authorization_number = $( '#authorization_input_tmp' ).val();
+		if( authorization_number <= 0 ){
+			alert( "El número de autorizacion no puede ir vacío!" );
+			$( '#authorization_input_tmp' ).focus();
+			return false;
+		}
+		var url = "ajax/db.php?fl=setPaymentWhithouthIntegration&afiliation_id=" + afiliation_id;
+		url += "&ammount=" + ammount + "&authorization_number=" + authorization_number;
+		url += "&sale_id=" + $( '#id_venta' ).val() + "&session_id=" + $( '#session_id' ).val();
+
+		//alert( url ); return false;
+		var resp = ajaxR( url ).split( '|' );
+		if( resp[0] != 'ok' ){
+			alert( "Error : \n" + resp );
+		}else{
+			//getHistoricPayment( $( '#id_venta' ).val() );
+			carga_pedido( $( '#id_venta' ).val() );
+			alert( resp[1] );
+			close_emergent();
+		}
+	}
+
+
 //lamadas asincronas
 	function ajaxR( url ){
 		if(window.ActiveXObject)

@@ -86,9 +86,14 @@
 	</div>
 
 	<div class="row header bg-primary" style="padding-top : 2px;">
-		<div class="col-12 text-center text-light">
+		<div class="col-1 text-center text-light" style="padding-top : 1%;">
+			<button type="button" class="btn btn-success" onclick="show_reprint_view();" >
+				<i class="icon-print"></i>
+			</button>
+		</div>
+		<div class="col-10 text-center text-light">
 			<h3><b class="">Sucursal:</b> <?php echo $sucursal;?></h3>
-			<h3><b class="">Cajero:</b> <?php echo $usuario;?></h3>	
+			<h3><b class="">Cajero:</b> <?php echo $usuario;?></h3>
 		</div>
 	</div>
 <!-- Cancelaciones /reimpresiones manuales -->
@@ -128,22 +133,43 @@
 					<div id="res_busc"></div>
 				</div>
 			</div>
-			<div class="col-6">
-					<p class="informativo" align="center">Monto:<br>
-						<input type="text" id="monto_total" class="form-control" style="background:white;" disabled></p>
+			<div class="col-4">
+					<p class="informativo" align="center">Total:<br>
+						<input type="text" id="monto" class="form-control text-end" style="background:white;" disabled></p>
 			</div>
-			<div class="col-6">
-					<p class="informativo" align="center">A favor:<br>
-					<input type="text" id="saldo_favor" class="form-control" style="background:white;" disabled></p>
+			<div class="col-4">
+					<p class="informativo" align="center">Pagado:<br>
+					<input type="text" id="saldo_favor" class="form-control text-end" style="background:white;" disabled></p>
+			</div>
+
+			<div class="col-4">
+					<p class="informativo" align="center" ><b id="payment_description">Cobrar:</b>
+					<input type="text" id="monto_total" class="form-control text-end" style="background:white;" disabled></p>
 			</div>
 
 			<input type="hidden" id="id_venta" value="0">
 			<input type="hidden" id="venta_pagada" value="0">
+			<input type="hidden" id="id_devolucion" value="0">
 		</div>
 	<!-- historico dfe pagos -->
 		<div class="row" id="historic_payments"></div>
 	<!-- -->
-		<div class="row">
+		<div class="row" id="card_qr_container">
+			<div class="input-group">
+				<input type="text" id="terminal_qr_input" class="form-control" 
+					placeholder="Escanear /codigo QR de la terminal"
+					onkeyup="seekTerminalByQr( event );"
+				>
+				<button
+					type="button"
+					class="btn btn-success"
+					onclick="seekTerminalByQr( 'intro' );"
+				>
+					<i class="icon-qrcode"></i>
+				</button>
+			</div>		
+		</div>
+		<div class="row" id="cards_container">
 			<h3>Tarjetas 
 				<button
 					type="button"
@@ -180,16 +206,17 @@
 			<div class="col-12 input-group">
 				<!--div align="center"><b>Efectivo:</b></div-->
 				<!--button type="button">Efectivo </button-->
+				<!--onkeydown="prevenir(event);" 
+					onkeyup="valida_tca(this,event,2);calcula_cambio();"-->
 				<input 
 					type="number" 
 					id="efectivo" 
-					class="form-control text-end" 
-					onkeydown="prevenir(event);" 
-					onkeyup="valida_tca(this,event,2);calcula_cambio();">
+					class="form-control text-end" >
 				<button 
 					type="button"
 					class="btn btn-primary"
 					onclick="getCashPaymentForm();"
+					id="add_form_btn"
 				>
 					<i class="icon-plus"></i>
 				</button>
@@ -209,7 +236,7 @@
 			</div>
 		</div>
 		
-		<div class="row" align="center">
+		<div class="row" align="center" id="transferencias_cheques_contenedor">
 			<h3>Cheque o transferencia</h3>
 			<div class="col-7">
 				<?php echo $cajas;?>
@@ -250,6 +277,8 @@
 			</table>
 		</div-->
 
+	<!---->
+	<div class="row" id="finalizar_cobro_contenedor">
 		<table id="listado_cheque_transferencia" class="table table-striped" style="">
 			<thead>
 				<tr>
@@ -260,15 +289,25 @@
 			</thead>
 		</table>
 		<input type="hidden" id="no_cheque_transferencia" value="0">
-	<!---->
-		<div class="row">
 			<div class="col-2"></div>
 			<div class="col-8">
 				<button 
 					type="button"
 					id="cobrar" 
-					class="btn btn-primary form-control"  onclick="cobrar();">
+					class="btn btn-primary form-control"  onclick="cobrar(1);">
 					<i class="icon-floppy">Finalizar cobro</i>
+				</button>
+			</div>
+			<div class="col-2"></div>
+		</div>
+		<div class="row" id="finalizar_cobro_devolucion_contenedor">
+			<div class="col-2"></div>
+			<div class="col-8">
+				<button 
+					type="button"
+					id="devolver" 
+					class="btn btn-danger form-control"  onclick="cobrar(-1);">
+					<i class="icon-floppy">Devolver Efectivo</i>
 				</button>
 			</div>
 			<div class="col-2"></div>

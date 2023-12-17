@@ -148,10 +148,11 @@ $app->post('/', function (Request $request, Response $response){
               WHERE folio_nv = '{$traceability['folio_venta']}'
               LIMIT 1
               ) AS sale_id
-              FROM ec_terminales_integracion_smartaccounts t
+            FROM ec_terminales_integracion_smartaccounts t
             LEFT JOIN ec_caja_o_cuenta cc
             ON t.id_caja_cuenta = cc.id_caja_cuenta
-            WHERE t.numero_serie_terminal = '{$terminalId}'";
+            WHERE t.numero_serie_terminal = '{$terminalId}'
+            AND t.store_id = '{$traceability['store_id_netpay']}'";
 
     }else{
       $sql = "SELECT 
@@ -170,8 +171,50 @@ $app->post('/', function (Request $request, Response $response){
     $stm = $link->query( $sql ) or die( "Error al recuperar datos para insertar el cobro del cajero {$link->error}" );
     $row = $stm->fetch_assoc();
 
-//inserta el cobro del cajero si oel cobro fue exitoso
-    $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_afiliacion, 
+    //consulta entre interno y externo
+        $sql = "SELECT
+                  ROUND( ax.internal/ax.total, 2 ) AS internal_porcent,
+                  ROUND( ax.external/ax.total, 2 ) AS external_porcent
+                FROM(
+                  SELECT
+                    SUM( pd.monto ) AS total,
+                    SUM( IF( sp.es_externo = 0, pd.monto-pd.descuento, 0 ) ) AS internal,
+                    SUM( IF( sp.es_externo = 1, pd.monto-pd.descuento, 0 ) ) AS external
+                  FROM ec_pedidos_detalle pd
+                  LEFT JOIN sys_sucursales_producto sp
+                  ON pd.id_producto = sp.id_producto
+                  WHERE pd.id_pedido = {$row['sale_id']}
+                )ax";
+      $stm = $link->query( $sql ) or die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
+  
+      $payment_row = $stm->fetch_assoc();
+    //inserta pago interno    
+      if( $payment_row['internal_porcent'] > 0 ){
+        $sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
+        id_nota_credito, id_cxc, es_externo, id_cajero, id_sesion_caja )
+        VALUES( {$row['sale_id']}, 7, NOW(), NOW(), ( {$amount}*{$payment_row['internal_porcent']} ), '', 1, 1, -1, -1, 0, 
+          '{$traceability['id_cajero']}', '{$traceability['id_sesion_cajero']}' )";
+        $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$sql} {$link->error}" );
+       //die( $sql );
+
+      }
+    //inserta pago externo    
+      if( $payment_row['external_porcent'] > 0 ){
+        $sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
+        id_nota_credito, id_cxc, es_externo, id_cajero, id_sesion_caja )
+        VALUES( {$row['sale_id']}, 7, NOW(), NOW(), ( {$amount}*{$payment_row['external_porcent']} ), '', 1, 1, -1, -1, 1, 
+          '{$traceability['id_cajero']}', '{$traceability['id_sesion_cajero']}' )";
+        $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$sql} {$link->error}" );
+      }
+
+  /*inserta el cobro del pedido
+      $sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
+      id_nota_credito, id_cxc, es_externo )
+      VALUES( {$row['sale_id']}, 7, NOW(), NOW(), {$amount}, '', 1, 1, -1, -1, 0 )";
+      $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$link->error}" );*/
+
+//inserta el cobro del cajero si el cobro fue exitoso
+    $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_terminal, 
     /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar ) 
     VALUES ( /*1*/NULL, /*2*/'{$row['sale_id']}', /*3*/'{$traceability['id_cajero']}', /*4*/'{$row['affiliation_id']}', 
     /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1 )";

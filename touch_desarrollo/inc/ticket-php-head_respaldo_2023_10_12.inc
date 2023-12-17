@@ -1,5 +1,3 @@
-
-text/x-generic ticket-php-head.inc ( PHP script, UTF-8 Unicode text )
 <?php
 	#header("Content-Type: text/plain;charset=utf-8");
 	//die('here');
@@ -158,48 +156,7 @@ Fin de cambio Oscar 25.06.2019*/
                 	''
               	),
             	IF(s.mostrar_alfanumericos=0,'',CONCAT('Clave: ',ax.clave))
-          )as info,
-          IF( ax.id_producto = 2758
-			OR ax.id_producto = 2854
-			OR ax.id_producto = 2759
-			OR ax.id_producto = 1918
-			OR ax.id_producto = 3317
-			OR ax.id_producto = 1820
-			OR ax.id_producto = 2760
-			OR ax.id_producto = 2761
-			OR ax.id_producto = 2767
-			OR ax.id_producto =	2768
-			OR ax.id_producto = 1956
-			OR ax.id_producto = 3813
-			OR ax.id_producto = 3814
-			OR ax.id_producto = 2769
-			OR ax.id_producto = 3628
-			OR ax.id_producto = 2736
-			OR ax.id_producto = 4118
-			OR ax.id_producto = 2007
-			OR ax.id_producto = 2764
-			OR ax.id_producto = 2008
-			OR ax.id_producto = 2113
-			OR ax.id_producto = 3318
-			OR ax.id_producto = 1826
-			OR ax.id_producto = 2762
-			OR ax.id_producto = 2763
-			OR ax.id_producto = 4104
-			OR ax.id_producto = 4105
-			OR ax.id_producto = 2770
-			OR ax.id_producto = 2771
-			OR ax.id_producto = 2715
-			OR ax.id_producto = 3821
-			OR ax.id_producto = 3822
-			OR ax.id_producto = 2772
-			OR ax.id_producto = 3629
-			OR ax.id_producto = 2735
-			OR ax.id_producto = 4117,
-			( SELECT 
-				DATE_SUB(CURDATE(), INTERVAL -1 DAY) 
-			),
-			'' 
-		) AS is_special
+          )as info
 		/*Fin de cambio 10.10.2018*/
 		FROM(
 			SELECT
@@ -219,7 +176,7 @@ Fin de cambio Oscar 25.06.2019*/
 	    )ax
 		LEFT JOIN sys_sucursales_producto sp ON ax.id_producto=sp.id_producto
 		JOIN sys_sucursales s ON sp.id_sucursal=s.id_sucursal AND s.id_sucursal IN($user_sucursal)";
-	//die( $cs );
+	       
 	$descProds=0;
 	if ($rs = mysql_query($cs))
 	{
@@ -245,10 +202,6 @@ Fin de cambio Oscar 25.06.2019*/
 		/*implementación Oscar 10.10.2018 para imprimir ubicación y calve_proveedor en ticket*/
 			if($dr["infoAdicional"]==1){
 				$lineas_productos+=.8;
-			}
-
-			if($dr["is_special"] != '' ){
-				$lineas_productos+=2;
 			}
 		/*fin de cambio 10.10.2018*/	
 		}
@@ -287,8 +240,7 @@ Fin de cambio Oscar 25.06.2019*/
 		$lineas_dev=5;
 	}
 /*fin de cambio 06.09.2018*/
-
-
+	
 	class TicketPDF extends FPDF {
 		// Members
 		var $sucursal = "";
@@ -332,42 +284,11 @@ Fin de cambio Oscar 25.06.2019*/
 	}
 	
 	//+40+130
-	$ticket = new TicketPDF("P", "mm", array(80,50+$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
+	$ticket = new TicketPDF("P", "mm", array(80,$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
 	
 	$bF=10;
-/*Implementacion Oscar 2023/10/12*/
-	$sql = "SELECT
-                cc.id_cajero_cobro As payment_id,
-                cc.monto AS amount,
-                tp.nombre AS payment_type,
-                CONCAT( cc.fecha, ' ', cc.hora ) AS datetime
-            FROM ec_cajero_cobros cc
-            LEFT JOIN ec_tipos_pago tp
-            ON cc.id_tipo_pago = tp.id_tipo_pago
-            WHERE cc.id_pedido = {$id_pedido}";
-    $stm = mysql_query( $sql ) or die( "Error al consultar pagos para generacion de Ticket : " . mysql_error() );
-    $payments_total = 0;
-
-	$ticket->SetFont('Arial','B',$bF+4);
-	$ticket->SetXY(5, $ticket->GetY()+1);
-	if($pagado == 0){
-		$ticket->SetFont('Arial','B',$bF+4);
-		//$ticket->SetXY(5, $ticket->GetY()+1);
-		$ticket->Cell(66, 3, utf8_decode("ABONO EN APARTADO"), "" ,0, "C");
-	}
-
-    while( $row = mysql_fetch_assoc( $stm ) ){
-        $payments_total +=  $row['amount'];
-    }
-/*fin de cambio Oscar 2023/10/12*/
-/*Implementacion Oscar 2023/10/12*/
-	if( $payments_total == $total ){
-        $ticket->Image("../img/especiales/pagado.jpeg", 5, 2, 70);
-		$ticket->SetXY(5, $ticket->GetY()+20);
-	}
-/*Fin de cambio Oscar 2023/10/12*/
 	if($tv==1){
 		$ticket->SetFont('Arial','B',$bF+4);
 		$ticket->SetXY(5, $ticket->GetY()+1);
@@ -409,12 +330,7 @@ Fin de cambio Oscar 25.06.2019*/
 $ticket->SetFont('Arial','',$bF-2);
 $ticket->SetXY(5, $ticket->GetY()+4);
 //$ticket->MultiCell(66, 6, utf8_decode('datos:'.$datos_fiscales), "" ,0, "C");
-	
-	$ticket->MultiCell(66, 4, utf8_decode( "RFC : " ), "", "L", false);
-	$ticket->SetXY(5, $ticket->GetY()+4);
-	$ticket->MultiCell(66, 4, utf8_decode( "DIRECCION : " ), "", "L", false);
-	$ticket->SetXY(5, $ticket->GetY()+4);
-	$ticket->MultiCell(66, 4, utf8_decode( "OTRO : " ), "", "L", false);
+$ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 	
 	$ticket->SetFont('Arial','',$bF+2);
 	
@@ -475,19 +391,6 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 			$ticket->SetXY(5,($ticket->GetY()-1.5));
 			$ticket->MultiCell(66*0.63, 4, utf8_decode("{$producto["info"]}"), "", "L", false);
 		}
-
-		
-
-		if( $producto["is_special"] != '' ){
-			$ticket->SetXY(5, $ticket->GetY() + 2 );
-			$ticket->MultiCell(35, 4, utf8_decode("Fecha entrega : \n {$producto["is_special"]} 18:30 hrs"), "1", "C", false);
-			$ticket->SetXY(40, $ticket->GetY() - 8 );
-			$ticket->MultiCell(35, 4, utf8_decode("\n\n"), "1", "C", false);
-			$ticket->SetXY(5, $ticket->GetY() + 4 );
-		}
-
-//http://localhost/pruebas_etiquetas/touch_desarrollo/index.php?scr=ticket&idp=425108
-
 		$ticket->SetFont('Arial','',$bF-2);
 	/*fin de cambio 10.10.2018*/
 	}
@@ -504,17 +407,6 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 	
 		$ticket->SetXY(5, $y);
 		$ticket->MultiCell(66*0.63, 4, utf8_decode("{$productoP["producto"]}"), "", "L", false);
-
-
-		
-
-		if( $productoP["is_special"] != '' ){
-			$ticket->SetXY(5, $ticket->GetY() + 4 );
-			$ticket->MultiCell(35, 4, utf8_decode("Fecha entrega"), "", "C", false);
-			$ticket->MultiCell(35, 39, utf8_decode("{$productoP["is_special"]}"), "", "C", false);
-		}
-
-
 
 		
 
@@ -667,10 +559,8 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 
 	}else{
 		$ticket->SetFont('Arial','B',$bF+5);
-		$ticket->SetXY(3, $ticket->GetY()+6);
-	    $ticket->Cell(74, 6, utf8_decode("Resta : $" . number_format($resta, 2) ), "" ,0, "C");
-
-	    /*$ticket->Cell(66*0.40, 6, utf8_decode("Resta"), "" ,0, "L");
+		$ticket->SetXY(2, $ticket->GetY()+6);
+	    $ticket->Cell(66*0.40, 6, utf8_decode("Resta"), "" ,0, "L");
 
 		$ticket->SetXY(25, $ticket->GetY());
 		$ticket->Cell(66*0.35, 6, "$" . number_format($resta, 2), "" ,0, "R");
@@ -693,8 +583,8 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 		$ticket->Cell(66, 6, utf8_decode("En apartados NO hay cambios NI devoluciones."), "", 0, 'C');
   		
   		$ticket->SetFont('Arial','B',$bF+3);
-		$ticket->SetXY(5, $ticket->GetY()+8);
-		$ticket->Cell(70, 5, utf8_decode("FOLIO APARTADO: ".$folioA), "", 0, 'C');
+		$ticket->SetXY(1, $ticket->GetY()+8);
+		$ticket->Cell(66, 6, utf8_decode("FOLIO APARTADO: ".$folioA), "", 0, 'C');
 	
 	}
 
@@ -743,26 +633,11 @@ $ticket->SetXY(5, $ticket->GetY()+4);
     //$ticket->Cell(66, 6, utf8_decode("(escanea el código Qr)"), "" ,0, "C");
     //$ticket->Image("codeQr/qr-code.png", 20, $ticket->GetY()+5,38);
 */
-/*Deshabilitdor por Oscar 2023/10/12 para generacion de codigo de barras cifrado
     if(file_exists("../img/codigos_barra/".$folio.".png")){
     	$ticket->SetXY(5, $ticket->GetY()+3);
     	$ticket->Image("../img/codigos_barra/".$folio.".png", 15, $ticket->GetY()+5,46);
-    }*/
-/*Implementado por Oscar 2023/10/12*/
-	
-    if(  ( $payments_total == $total || $pagado == 0 ) ){//$ticket_was_payed == 1 &&
-    	//die( 'ere' );
-       // $ticket->Image("../../../../img/especiales/pagado.jpeg", 5, 2, 70);
-    //generacion de codigo de barras
-        include('../include/barcode/barcode.php');
-        $barcode_name = str_replace(' ', '', $folio );
-        $barcodePath = "../img/codigos_barra/{$barcode_name}.png";
-        barcode( $barcodePath, base64_encode( $folio ), '60', 'horizontal', 'code128', false, 1);
-    //se incrustra el codigo de barras en el ticket
-        $ticket->Image( $barcodePath, 6, $ticket->GetY()+10, 70);
-   // die( $folio );
     }
-/*fin de cambio Oscar 2023/10/12*/
+    
     if($printPan == 1) {
     	ob_end_clean();
 	   $ticket->Output();
@@ -848,7 +723,7 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 	}
 /*Fin de cambio Oscar 07.03.2019*/
        	
-      //deshabilitado por Oscare 2023/10/12 para no redireccionar	header ("location: index.php?scr=evaluation"); 
+       	header ("location: index.php?scr=evaluation"); 
     }
 		
 	exit (0);
@@ -861,8 +736,7 @@ class EnLetras
   var $Zero = "0";
   var $Neg = "Menos";
 
-	function ValorEnLetras($x, $Moneda ) 
-	{
+	function ValorEnLetras($x, $Moneda ) {
     $s="";
     $Ent="";
     $Frc="";
