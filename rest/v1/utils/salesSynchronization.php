@@ -150,7 +150,7 @@
 							cantidad_surtida, descuento, es_externo, id_precio, folio_unico ) 
 						VALUES ( '{$sale_id}', '{$detail['id_producto']}', '{$detail['cantidad']}', '{$detail['precio']}', '{$detail['monto']}', 
 							'{$detail['cantidad_surtida']}', '{$detail['descuento']}', '{$detail['es_externo']}', '{$detail['id_precio']}', '{$detail['folio_unico']}' )"; 
-						$stm = $this->link->query( $sql ) or die( "Error al insertar detalle de venta : {$sql} {$this->link->error}");
+						$stm = $this->link->query( $sql );// or die( "Error al insertar detalle de venta : {$sql} {$this->link->error}");
 						if( ! $stm ){
 							return array( "error"=>"Error al insertar detalle de venta : {$this->link->error}");
 						  $ok = false;
@@ -168,7 +168,7 @@
 						'{$payment['referencia']}', '{$payment['id_moneda']}', '{$payment['tipo_cambio']}', '{$payment['id_nota_credito']}', 
 						'{$payment['id_cxc']}', '{$payment['exportado']}', '{$payment['es_externo']}',
 						'{$payment['id_cajero']}', '{$payment['folio_unico']}', {$payment['id_sesion_caja']} )"; 
-						$stm = $this->link->query( $sql ) or die( "Error al insertar pago de venta : {$sql} {$this->link->error}" );
+						$stm = $this->link->query( $sql );// or die( "Error al insertar pago de venta : {$sql} {$this->link->error}" );
 						if( ! $stm ){
 							return array( "error"=>"Error al insertar pago de venta : {$sql} {$this->link->error}");
 						  $ok = false;
@@ -222,7 +222,7 @@
 						$sql = str_replace( "'(", "(", $sql );
 						$sql = str_replace( ")'", ")", $sql );
 						
-						$stm = $this->link->query( $sql ) or die( "Error al ejecutar consuta adicional : {$sql} {$this->link->error}" );
+						$stm = $this->link->query( $sql );// or die( "Error al ejecutar consuta adicional : {$sql} {$this->link->error}" );
 						if( ! $stm ){
 							return array( "error"=>"Error al insertar pago de venta : {$sql} {$this->link->error}");
 						  $ok = false;

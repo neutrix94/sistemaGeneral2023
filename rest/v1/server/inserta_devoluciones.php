@@ -21,17 +21,18 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
 
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $returnsSynchronization = new returnsSynchronization( $link );//instancia clase de sincronizacion de movimientos
-/*valida que las apis no esten bloqueadas*/
+/*valida que las apis no esten bloqueadas
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
   if( $validation != 'ok' ){
     return $validation;
-  }
+  }*/
 
   $resp = array();
   $resp["ok_rows"] = '';
   $resp["error_rows"] = '';
   $resp["rows_download"] = array();
   $resp["log_download"] = array();
+  $resp["status"] = "ok";
 
   $tmp_ok = "";
   $tmp_no = "";
@@ -39,6 +40,23 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
 //
   $returns = $request->getParam( "returns" );
   $log = $request->getParam( "log" );
+
+
+
+/*valida que las apis no esten bloqueadas*/
+  $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );
+  if( $validation != 'ok' ){
+    return $validation;
+  } 
+//actualiza indicador de sincronizacion en tabla
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 3 );
+  if( $update_synchronization != 'ok' ){
+    return $update_synchronization;
+  } 
+/**/
+
+
+
 //inserta request
   $request_initial_time = $SynchronizationManagmentLog->getCurrentTime();
   $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log, $request_initial_time );
@@ -50,6 +68,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
     if( $insert_returns["error"] != '' && $insert_returns["error"] != null  ){
     //inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_returns["error"], $resp["log"]["unique_folio"] );
+      $resp["status"] = "error : {$insert_returns["error"]}";
     }else{
       $resp["ok_rows"] = $insert_returns["ok_rows"];
       $resp["error_rows"] = $insert_returns["error_rows"];
@@ -84,6 +103,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
   if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'DEVOLUCIONES DESDE LINEA' );
   }
+  $SynchronizationManagmentLog->updateModuleResume( 'ec_devolucion', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   return json_encode( $resp );
 
 });

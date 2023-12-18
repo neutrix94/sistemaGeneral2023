@@ -21,11 +21,11 @@ $app->post('/inserta_registros_sincronizacion_transferencias', function (Request
 //instanca de clases
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $rowsSynchronization = new rowsSynchronization( $link );//instancia clase de sincronizacion de movimientos
-/*valida que las apis no esten bloqueadas*/
+/*valida que las apis no esten bloqueadas
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
   if( $validation != 'ok' ){
     return $validation;
-  }
+  }*/
   
 //variables de respuesta
   $resp = array();
@@ -33,10 +33,27 @@ $app->post('/inserta_registros_sincronizacion_transferencias', function (Request
   $resp["error_rows"] = '';
   $resp["rows_download"] = array();//registros por descargar
   $resp["log_download"] = array();//log de registros por descargar
+  $resp["status"] = "ok";
 
 //variables que llegan
   $rows = $request->getParam( "rows" );
   $log = $request->getParam( "log" );
+
+
+
+/*valida que las apis no esten bloqueadas*/
+  $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );
+  if( $validation != 'ok' ){
+    return $validation;
+  } 
+//actualiza indicador de sincronizacion en tabla
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 3 );
+  if( $update_synchronization != 'ok' ){
+    return $update_synchronization;
+  } 
+/**/
+
+
 
 /****************************************** Recibe / Inserta ******************************************/
   $request_initial_time = $SynchronizationManagmentLog->getCurrentTime();//obtiene hora actual
@@ -46,6 +63,7 @@ $app->post('/inserta_registros_sincronizacion_transferencias', function (Request
     $insert_rows = $rowsSynchronization->insertRows( $rows );
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"] );
+      $resp["status"] = "error : {$insert_rows["error"]}";
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
@@ -70,6 +88,7 @@ $app->post('/inserta_registros_sincronizacion_transferencias', function (Request
   if( sizeof( $resp["rows_download"] ) > 0 ){
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );
   }
+  $SynchronizationManagmentLog->updateModuleResume( 'sys_sincronizacion_registros', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   return json_encode( $resp );
 
 });
