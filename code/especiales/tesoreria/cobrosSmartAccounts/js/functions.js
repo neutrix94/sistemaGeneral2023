@@ -96,15 +96,16 @@ var total_cobros=0,monto_real=0;
 				}else{
 					var respuesta = JSON.parse( aux[1] );
 					console.log( respuesta );//return '';
-					$("#monto").val( respuesta.total_venta );
+					$("#monto").val( parseInt( respuesta.total_venta ) );
 					$("#buscador").val( respuesta.folio_venta );
-					$("#saldo_favor").val( respuesta.pagos_cobrados );
-					respuesta.por_pagar = respuesta.total_venta - respuesta.pagos_cobrados;
+					respuesta.pagos_cobrados = ( parseInt( respuesta.pagos_cobrados ) - parseInt( respuesta.monto_pagos_devolucion ) );
+					$("#saldo_favor").val( parseInt( respuesta.pagos_cobrados ) );
+					respuesta.por_pagar = parseInt( respuesta.total_venta - respuesta.pagos_cobrados );
 					//$( '#monto_total' ).val( respuesta.por_pagar );
 					//return null;
 				//	var payment_ammount = ( aux[3]-aux[4] );
-					if( respuesta.por_pagar < 0 ){
-						$( '#efectivo' ).val(respuesta.por_pagar);
+					if( parseInt( respuesta.por_pagar ) < 0 ){
+						$( '#efectivo' ).val( parseInt( respuesta.por_pagar ) );
 						$( '#efectivo' ).attr( 'readonly', true );
 						$( '#payment_description' ).html( 'Devolver' );
 						$( '#payment_description' ).css( 'color', 'red' );
@@ -122,7 +123,7 @@ var total_cobros=0,monto_real=0;
 						$( '#finalizar_cobro_devolucion_contenedor' ).css( 'display', 'block' );
 						$( '#add_form_btn' ).css( 'display', 'none' );
 					}else{
-						$( '#efectivo' ).val( respuesta.por_pagar );
+						$( '#efectivo' ).val( parseInt( respuesta.por_pagar ) );
 						$( '#efectivo' ).removeAttr( 'readonly' );
 						$( '#payment_description' ).html( 'Cobrar' );
 						$( '#payment_description' ).css( 'color', 'black' );
@@ -133,7 +134,7 @@ var total_cobros=0,monto_real=0;
 						$( '#add_form_btn' ).css( 'display', 'flex' );
 					}
 
-					$( '#monto_total' ).val( Math.abs( respuesta.por_pagar ) );
+					$( '#monto_total' ).val( Math.abs( parseInt( respuesta.por_pagar ) ) );
 					//$("#monto_total").val( payment_ammount );
 					//$("#efectivo").val(payment_ammount);//oscar 2023
 					
@@ -144,15 +145,15 @@ var total_cobros=0,monto_real=0;
 					$( '#seeker_reset_btn' ).removeClass( 'no_visible' );//muestra boton de reseteo
 					$("#id_venta").val( respuesta.id_venta );
 					
-					if( respuesta.por_pagar > 0 ){//pago
+					if( parseInt( respuesta.por_pagar ) > 0 ){//pago
 						//$("#t0").val(aux[3]-aux[4]);//oscar 2023
-						$("#venta_pagada").val(pagado);
-						total_cobros = respuesta.total_venta - respuesta.pagos_cobrados;
+						$("#venta_pagada").val( parseInt( pagado ) );
+						total_cobros = parseInt( respuesta.total_venta - respuesta.pagos_cobrados );
 						//alert(aux[3]);
-						monto_real = respuesta.pagos_cobrados - respuesta.total_venta;
+						monto_real = parseInt( respuesta.pagos_cobrados - respuesta.total_venta );
 					
 					/*implementacion Oscar 2023/10/10 para recuperar los pagos anteriores de la nota de venta*/
-						getHistoricPayment( respuesta.id_venta );
+						getHistoricPayment( parseInt( respuesta.id_venta ) );
 				/*fin de cambio Oscar 2023/10/10*/
 					}else{//devolucion
 						$( '#cards_container' ).css( 'display', 'none' );
@@ -250,37 +251,41 @@ var total_cobros=0,monto_real=0;
 		var tope_tarjetas=$("#payments_list tr").length;
 		for( var i=0;i <tope_tarjetas; i++ ){
 			if($("#t"+i).val()!=''){
-				total_tarjetas+=parseFloat($("#t"+i).val().replaceAll( ',', '' ));
+				total_tarjetas+=parseInt($("#t"+i).val().replaceAll( ',', '' ));
 			}else{
 				$("#t"+i).val(0);
 			}
 		}
-		total_cobros+=parseFloat(total_tarjetas);
+		total_cobros+=parseInt(total_tarjetas);
 	//	alert(total_tarjetas);
 	//total de pagos con cheque/transferencias
 		var tope_cheques=$("#no_cheque_transferencia").val();
 		for(var i=1;i<=tope_cheques;i++){
 			if($("#monto_"+i).html()!=''){
-				total_cheques+=parseFloat($("#monto_"+i).html());
+				total_cheques+=parseInt($("#monto_"+i).html());
 			}else{
 				$("#monto_"+i).html(0);
 			}
 		}
 		
-		total_cobros=total_cobros+parseFloat(total_cheques);
-
+		total_cobros=total_cobros+parseInt(total_cheques);
+//console.log( "Total cobros : " + total_cobros );
 	//extraemos e monto a favor
 		a_favor=$("#saldo_favor").val();
 		if(a_favor==''){a_favor=0;}
-		a_favor=parseFloat(a_favor);
+		a_favor=parseInt(a_favor);
+//console.log( "a favor :" + a_favor );
 	//extraemos el monto total
 		monto_total=$("#monto_total").val();
 		if(monto_total==''){monto_total=0;}
-		monto_total=parseFloat(monto_total);
+		monto_total=parseInt(monto_total);
+//console.log( "monto total :" + monto_total );
 		//alert(monto_total+'\n'+total_cobros);
-		total=monto_total-(total_cobros+a_favor);
+		total=monto_total-(total_cobros);//+a_favor
+
+//console.log( " total :" + monto_total );
 		//alert('total:'+total);
-		$("#efectivo").val(total);
+		$("#efectivo").val( parseInt( total ) );
 		total_cobros=total_cobros+total;
 		calcula_cambio();
 	}
@@ -292,8 +297,8 @@ var total_cobros=0,monto_real=0;
 		if(recibido<=0){
 			return true;
 		}
-		total_cobros+=parseFloat($("#efectivo").val());
-		$("#efectivo_devolver").val(parseFloat(recibido-total_cobros));
+		total_cobros+=parseInt($("#efectivo").val());
+		$("#efectivo_devolver").val(parseInt(recibido-total_cobros));
 	}
 	
 	/*Agregar cheque o transferencia*/
