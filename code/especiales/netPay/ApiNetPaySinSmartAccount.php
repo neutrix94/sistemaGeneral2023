@@ -151,9 +151,7 @@
 		}
 	//peticion de venta
 		public function salePetition(  $apiUrl, $amount = 0.01, $terminal_id, $user_id, $store_id, $sale_folio, $session_id ){
-			
 			$terminal = $this->getTerminal( $terminal_id );
-			//var_dump( $terminal );
 			$token = $this->getToken( $terminal['terminal_serie'] );
 			//var_dump( $token );
 			//return '';
@@ -176,8 +174,8 @@
 			            "storeId"=>"{$this->NetPayStoreId}",
    						/*"isSmartAccounts"=>"true", deshabilitado por Oscar para version sin SmartAccounts*/
 						"disablePrintAnimation"=> ( $terminal['print_ticket'] == 1 ? false : true ) );
-			//var_dump($data);
-			//die( '' );
+			var_dump($data);
+			die( '' );
 			$post_data = json_encode( $data, true );
 			//echo $post_data;die( '' );
 		//envia peticion

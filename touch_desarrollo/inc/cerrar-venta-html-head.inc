@@ -338,7 +338,9 @@ var emrge_aviso='';
 			if(document.getElementById('ids_de_devoluciones')){
 				ids_dvs+="&id_devoluciones="+$('#ids_de_devoluciones').val();
 			}
+		//alert( datos );return false;
 		/*Fin de cambio Oscar 25.06.2019*/
+		//alert( "ajax/cerrarVenta.php?idp="+id_pedido+"&ap="+es_apartado+"&faceb="+face+"&cor="+correoC+"&"+datos+""+saldo_favor+ids_dvs );return false;
 			$.ajax({
 				async: false,
 				type: 'GET',
@@ -586,7 +588,8 @@ function bloquea_pantalla(){
 			//implementacion Oscar 2023 para eliminar el sessionStorage
   				sessionStorage.clear();
 				//alert('pausa antes del ticket');
-				var u1="index.php?scr=ticket&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
+				//deshabilitado por Oscar 2023/10/12 var u1="index.php?scr=ticket&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
+				var u1="index.php?scr=talon_pago&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
 				//var u2="index.php?scr=ticket&idp="+pedidor+"&noImp=2&tv="+tipoVenta;
 			//agregamos saldos a favor
 				if(s_f!='no'){
@@ -600,6 +603,7 @@ function bloquea_pantalla(){
 				}
 			/*Fin de cambio Oscar 07.03.2019*/
 				//alert(u1);
+				//console.log( u1 ); return false;
 	//fin de cambio
 				$.ajax({
 					async: false,
@@ -635,10 +639,10 @@ function bloquea_pantalla(){
 
 		else if($("#es_apartado").prop("checked")){
 		/*Implementación Oscar 07.03.2019 para actualizar status de devoluciones*/
-			var url_1="";
+			var url_1 = "&initial_payment=" + $( '#monEfe' ).val();
 
 			if(document.getElementById('id_pedido_original')){
-				url_1="&id_pedido_original="+$("#id_pedido_original").val();
+				url_1 +="&id_pedido_original="+$("#id_pedido_original").val();
 			}
 		/*Fin de cambio Oscar 07.03.2019*/
 
@@ -651,7 +655,8 @@ function bloquea_pantalla(){
 					type: 'GET',
 /*Implementación de Oscar 28.02.2019 para que aparezca la leyenda de venta de Mayoreo cuando se trata de un apartado sobre venta de tipo mayoreo
 url: "index.php?scr=ticket&idp="+pedidor+"&noImp=1"*/
-					url: "index.php?scr=ticket&idp="+pedidor+"&tv="+$("#tipo_venta").val()+url_1,
+					url: "index.php?scr=talon_pago&idp="+pedidor+"&tv="+$("#tipo_venta").val()+url_1,
+					//var u1="index.php?scr=talon_pago&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
 		/*Fin de cambio Oscar 28.02.2019*/
 				}).done (function (data) {
 					//alert(data);

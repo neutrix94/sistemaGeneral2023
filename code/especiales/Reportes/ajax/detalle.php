@@ -225,7 +225,7 @@
 	$resAprox+=mysql_num_rows($eje1);
 ?>
 		<div style="height:510px;">
-		<div style="border:1px solid;width:60%;height:80%;background:white;overflow:auto;">
+		<div style="border:1px solid;width:100%;height:80%;background:white;overflow:auto;">
 		<center>
 			<br><hr width="90%;"><p style="font-size:20px;">Ingresos<hr width="90%"></p>
 			<table width="95%" border="0">

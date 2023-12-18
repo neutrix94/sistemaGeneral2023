@@ -1,3 +1,6 @@
+<div class="emergent">
+  <div class="emergent_content"></div>
+</div>
 <div class="row home_container">
   <div class="">
    <div  style="width:400px; margin:0 auto;">
@@ -48,6 +51,15 @@
         id=\"initital_validation_btn\"
       >
         <i class=\"icon-barcode\">Validación Ticket</i>
+      </button>";
+/*implementacion Oscar 2023/11/07 para reimpresion de ticket de cobro*/
+    echo "<button 
+        class=\"btn btn-primary\"
+        style=\"position : absolute; left : 0%; top : 260px; padding : 10px;width : 42%;\"
+        onclick=\"reprint_ticket_list();\"
+        id=\"initital_validation_btn\"
+      >
+        <i class=\"icon-print\">Reimprimir Ticket de Cobro</i>
       </button>
     </div>";
   }
@@ -129,6 +141,24 @@
     background-size: 50%;
     background-color: rgba(0,0,0,.1);
   }
+  .emergent{
+    position: fixed;
+    top : 0;
+    left: 0;
+    width: 100%;
+    height : 100%;
+    background-color : rgba( 0,0,0,.7 );
+    z-index : 9000;
+    display : none; 
+  }
+  .emergent_content{
+    position: relative;
+    width : 80%;
+    height : 70%;
+    top : 10%;
+    left : 10%;
+    background-color: white; 
+  }
 
   @media only screen and (max-width: 600px) {
     #page{
@@ -137,7 +167,138 @@
     .pqt{
       font-size : 50%;
     }
+    .list-container{
+      max-height: 300px !important;
+    }
+    .emergent_content{
+      height: 85% !important;
+    }
+    .tickets_table{
+      font-size : 80% !important;
+    }
   }
 
 </style>
 <!--Fin de implementación Oscar 27.03.2018-->
+
+<script type="text/javascript">
+  function reprint_ticket_list(){
+    var content = `<div class="row" style="padding : 20px;">
+      <div class="col-1 text-end"></div>
+      <div class="col-10 text-end">
+        <h2 class="text-center fs-3">Reimpresion</h2>
+      </div>
+      <div class="col-1 text-end">
+        <button
+          type="button"
+          class="btn btn-light"
+          style="background-color : transparent; border : none;"
+          onclick="close_emergent();"
+        >
+          <i class="text-danger fs-7">X</i>
+        </button>
+      </div>
+      </div>
+      <div class="input-group" style="padding : 5px;">
+        <input type="text" id="tickets_seeker" class="form-control" onkeyup="seek_ticket( event );"  style="box-shadow : 1px 1px 1px rgba( 0,20,0,.5 );" placeholder="Buscar...">
+        <button class="icon-search btn btn-primary" onclick="seek_ticket( 'intro' );"></button>
+      </div>
+      <div style="height : 350px;max-height : 350px; overflow : scroll; position : sticky;" class="list_container">
+        <table class="table table-bordered table-striped tickets_table">
+          <thead style="position : sticky; top : 0; background-color : white;">
+            <tr>
+              <th class="text-center">Vendedor</th>
+              <th class="text-center">Folio</th>
+              <th class="text-center">Monto</th>
+              <th class="text-center">Cliente</th>
+              <th class="text-center">Fecha</th>
+              <th class="text-center">Imprimir</th>
+            </tr>
+          </thead>
+          <tbody id="tickets_results">
+            ${getLastTickets()}
+          </tbody>
+        </table>
+    </div>
+    <!--table>
+      <tfoot>
+        <tr>
+          <th class="text-center">
+            <i class="icon-left-big"></i>
+          </th>
+          <th class="text-center" colspan="2"></th>
+          <th class="text-center">
+            <i class="icon-right-big"></i>
+          </th>
+        </tr>
+      </tfoot>
+    </table-->`;
+    $( '.emergent_content' ).html( content );
+    $( '.emergent' ).css( 'display', 'block' );
+    //alert( '' );
+  }
+
+  function seek_ticket( e ){
+    if( e.keyCode != 13 && e != 'intro' ){
+      return false;
+    }
+  //limpia 
+    $( '#tickets_results' ).empty();
+  //mustra resultados
+    var results = getLastTickets( $( '#tickets_seeker' ).val().trim() );
+    $( '#tickets_results' ).append( results );
+  }
+
+  function getLastTickets( txt = null ){
+    //$(  )
+    var url = "ajax/getTicketsToReprint.php";
+    if( txt != null ){
+      url += "?key=" + txt;
+    }
+
+    var resp = ajaxR( url );
+    //alert( resp );
+    return resp;
+  }
+
+  function close_emergent(){
+    $( '.emergent_content' ).html( '' );
+    $( '.emergent' ).css( 'display', 'none' );
+  }
+
+  function print_ticket( sale_id ){
+    var url = "index.php?scr=talon_pago&idp=" + sale_id + "&noImp=1";
+    var resp = ajaxR( url );
+    $( '.emergent_content' ).html( `<div class="row text-center">
+        <div class="col-1"></div>
+        <div class="col-10 text-center">
+          <br><br><br>
+          <br><br><br>
+          <h3 class="fs-1 text-success text-center">Impresion Generada exitosamente</h3>
+          <br><br>
+          <button
+            type="button"
+            class="btn btn-success"
+            onclick="close_emergent();"
+          >
+            <i class="icon-ok-circled fs-2">Aceptar</i>
+          </button>
+        </div>
+      </div>` );
+    //alert( "Impresion Generada" );
+  }
+
+  function ajaxR(url){
+    if(window.ActiveXObject){       
+        var httpObj = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    else if (window.XMLHttpRequest)
+    {       
+        var httpObj = new XMLHttpRequest(); 
+    }
+    httpObj.open("POST", url , false, "", "");
+    httpObj.send(null);
+    return httpObj.responseText;
+  } 
+
+</script>
