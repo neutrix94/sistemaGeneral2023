@@ -4,7 +4,12 @@
 	/*buscador por folios*/
 	if($fl=='buscador'){
 		$clave=$_POST['valor'];
-		$sql="SELECT id_pedido,folio_nv,pagado FROM ec_pedidos WHERE folio_nv LIKE '%$clave%' AND id_sucursal=$user_sucursal";
+		$sql="SELECT 
+				id_pedido,
+				folio_nv,pagado 
+			FROM ec_pedidos 
+			WHERE folio_nv = '{$clave}' 
+			AND id_sucursal=$user_sucursal";
 		$eje=mysql_query($sql) or die("Error al buscar coincidencias por folio!!!\n".mysql_error());
 		echo 'ok|';
 		if(mysql_num_rows($eje)<=0){
