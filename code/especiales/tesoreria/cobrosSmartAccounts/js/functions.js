@@ -98,9 +98,9 @@ var total_cobros=0,monto_real=0;
 					console.log( respuesta );//return '';
 					$("#monto").val( respuesta.total_venta );
 					$("#buscador").val( respuesta.folio_venta );
-					respuesta.pagos_cobrados = ( isNaN( respuesta.pagos_cobrados ) ? 0 : parseInt( respuesta.pagos_cobrados ) );
+					respuesta.monto_pagos_devolucion = ( ! isNaN( respuesta.monto_pagos_devolucion ) ? 0 : parseInt( respuesta.monto_pagos_devolucion ) );
+					respuesta.pagos_cobrados = ( ! isNaN( respuesta.pagos_cobrados ) ? 0 : parseInt( respuesta.pagos_cobrados ) );
 					respuesta.pagos_cobrados = respuesta.pagos_cobrados - respuesta.monto_pagos_devolucion;
-					respuesta.monto_pagos_devolucion = ( isNaN( respuesta.monto_pagos_devolucion ) ? 0 : parseInt( respuesta.monto_pagos_devolucion ) );
 					$("#saldo_favor").val( respuesta.pagos_cobrados );
 					respuesta.por_pagar = respuesta.total_venta - respuesta.pagos_cobrados;
 					respuesta.monto_pagos_devolucion
