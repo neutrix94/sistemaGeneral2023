@@ -52,6 +52,11 @@
 
 	function addCashPayment( amount ){	
 	//inserta pago en efectivo
+	if( $( '#efectivo_recibido' ).val() == '' || $( '#efectivo_recibido' ).val() <= 0 ){
+		alert( "El monto entregado por el cliente no puede ser menor o igual a cero!" );
+		$( '#efectivo_recibido' ).focus();
+		return false;
+	}
 		var url = "ajax/db.php?fl=insertCashPayment&ammount=" + amount;
 		url += "&session_id=" + $( '#session_id' ).val();
 		url += "&sale_id=" + $( '#id_venta' ).val();
@@ -197,6 +202,13 @@
 	        </div>
 	      </div>` );
     //alert( "Impresion Generada" );
+  	}
+
+  	function removePaymentTmp( counter ){
+  		if( ! confirm( "Realmente deseas eliminar el pago?" ) ){
+  			return false;
+  		}
+  		$( '#card_payment_row_' + counter ).remove();
   	}
 
 	function close_emergent(){

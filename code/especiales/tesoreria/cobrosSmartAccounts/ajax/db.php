@@ -735,7 +735,7 @@
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
 			$tarjetas_cajero='';
 			//$c=0;//Tarjeta {$c} : <br> <br>
-			$resp .= "<tr>
+			$resp .= "<tr id=\"card_payment_row_{$c}\">
 				<td class=\"col-5\">
 					<select id=\"tarjeta_{$c}\" class=\"form-select\">";
 			while($r = $stm->fetch_assoc() ){
@@ -762,8 +762,8 @@
 								<i class=\"icon-print-6\"></i>
 							</button>
 							<button
-								class=\"btn btn-danger no_visible\"
-								onclick=\"cancelPayment( {$c}, {$r['afiliation_id']} );\"
+								class=\"btn btn-danger \"
+								onclick=\"removePaymentTmp( {$c} );\"
 								id=\"cancel_btn_{$c}\"
 							>
 								<i class=\"icon-cancel-circle\"></i>
@@ -774,6 +774,7 @@
 			//	$c++;
 			//}
 			return $resp;
+			//onclick=\"cancelPayment( {$c}, {$r['afiliation_id']} );\" no_visible
 			//echo '<input type="hidden" id="cantidad_tarjetas" value="'.$c.'">';
 		}
 

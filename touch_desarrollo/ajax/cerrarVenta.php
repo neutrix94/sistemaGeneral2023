@@ -210,7 +210,6 @@
 		}//fin de if es diferente de línea
 /*FIN DE CAMBIO 30.08.2018*/
 //fin de cambio 23.02.2018
-
 	//Insertamos el detalle del pedido
 		$sql="	INSERT INTO ec_pedidos_detalle 
 				( /*1*/id_pedido_detalle, /*2*/id_pedido, /*3*/id_producto, /*4*/cantidad, /*5*/precio,
@@ -571,10 +570,18 @@
 				WHERE p.id_pedido=$id_pedido_r";
         $res=mysql_query($sql);
         
-        if(!$res)
+        if(!$res){
             throw new Exception("Imposible almacenar registro (pago). <br><br>$sql<br><br>" . mysql_error());
+        }
         
         $row=mysql_fetch_row($res);
+
+/*implementacion Oscar 2023-12-19 para insertar referencia de la nota de venta y a devolucion*/
+		$sql = "INSERT INTO ec_pedidos_referencia_devolucion ( id_pedido_referencia_devolucion, id_pedido, total_venta, 
+			monto_venta_mas_ultima_devolucion, folio_unico, sincronizar ) VALUES ( NULL, {$id_pedido_r}, {$row[0]}, {$row[0]}, NULL, 1 )";
+		$reference_stm = mysql_query( $sql ) or die( "Error al insertar la referencia de la devolucion : " . mysql_error() );
+/*fin de cambio Oscar 2023-12-19*/
+
         $new_total = $row[0];
         if($row[0] <= $row[1]){
             $sql="UPDATE ec_pedidos SET pagado=1 WHERE id_pedido=$id_pedido_r";

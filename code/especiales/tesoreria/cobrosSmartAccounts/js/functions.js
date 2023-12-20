@@ -98,17 +98,14 @@ var total_cobros=0,monto_real=0;
 					console.log( respuesta );//return '';
 					$("#monto").val( respuesta.total_venta );
 					$("#buscador").val( respuesta.folio_venta );
-					respuesta.monto_pagos_devolucion = ( ! isNaN( respuesta.monto_pagos_devolucion ) ? 0 : parseInt( respuesta.monto_pagos_devolucion ) );
-					respuesta.pagos_cobrados = ( ! isNaN( respuesta.pagos_cobrados ) ? 0 : parseInt( respuesta.pagos_cobrados ) );
-					respuesta.pagos_cobrados = respuesta.pagos_cobrados - respuesta.monto_pagos_devolucion;
 					$("#saldo_favor").val( respuesta.pagos_cobrados );
-					respuesta.por_pagar = respuesta.total_venta - respuesta.pagos_cobrados;
-					respuesta.monto_pagos_devolucion
+					//respuesta.por_pagar = respuesta.total_venta - respuesta.pagos_cobrados;
 					//$( '#monto_total' ).val( respuesta.por_pagar );
 					//return null;
 				//	var payment_ammount = ( aux[3]-aux[4] );
-					if( respuesta.por_pagar < 0 ){
-						$( '#efectivo' ).val(respuesta.por_pagar);
+				//if( respuesta.por_pagar < 0 ){
+					if( respuesta.pagos_pendientes < 0 ){
+						$( '#efectivo' ).val(respuesta.pagos_pendientes);
 						$( '#efectivo' ).attr( 'readonly', true );
 						$( '#payment_description' ).html( 'Devolver' );
 						$( '#payment_description' ).css( 'color', 'red' );
@@ -126,7 +123,7 @@ var total_cobros=0,monto_real=0;
 						$( '#finalizar_cobro_devolucion_contenedor' ).css( 'display', 'block' );
 						$( '#add_form_btn' ).css( 'display', 'none' );
 					}else{
-						$( '#efectivo' ).val( respuesta.por_pagar );
+						$( '#efectivo' ).val( respuesta.pagos_pendientes );
 						$( '#efectivo' ).removeAttr( 'readonly' );
 						$( '#payment_description' ).html( 'Cobrar' );
 						$( '#payment_description' ).css( 'color', 'black' );
@@ -137,7 +134,7 @@ var total_cobros=0,monto_real=0;
 						$( '#add_form_btn' ).css( 'display', 'flex' );
 					}
 
-					$( '#monto_total' ).val( Math.abs( respuesta.por_pagar ) );
+					$( '#monto_total' ).val( Math.abs( respuesta.pagos_pendientes ) );
 					//$("#monto_total").val( payment_ammount );
 					//$("#efectivo").val(payment_ammount);//oscar 2023
 					
@@ -148,7 +145,8 @@ var total_cobros=0,monto_real=0;
 					$( '#seeker_reset_btn' ).removeClass( 'no_visible' );//muestra boton de reseteo
 					$("#id_venta").val( respuesta.id_venta );
 					
-					if( respuesta.por_pagar > 0 ){//pago
+					//if( respuesta.por_pagar > 0 ){//pago
+					if( respuesta.pagos_pendientes > 0 ){
 						//$("#t0").val(aux[3]-aux[4]);//oscar 2023
 						$("#venta_pagada").val(pagado);
 						total_cobros = respuesta.total_venta - respuesta.pagos_cobrados;
@@ -272,21 +270,21 @@ var total_cobros=0,monto_real=0;
 		}
 		
 		total_cobros=total_cobros+parseFloat(total_cheques);
-//console.log( "Total cobros : " + total_cobros );
+console.log( "Total cobros : " + total_cobros );
 	//extraemos e monto a favor
 		a_favor=$("#saldo_favor").val();
 		if(a_favor==''){a_favor=0;}
 		a_favor=parseFloat(a_favor);
-//console.log( "a favor :" + a_favor );
+console.log( "a favor :" + a_favor );
 	//extraemos el monto total
 		monto_total=$("#monto_total").val();
 		if(monto_total==''){monto_total=0;}
 		monto_total=parseFloat(monto_total);
-//console.log( "monto total :" + monto_total );
+console.log( "monto total :" + monto_total );
 		//alert(monto_total+'\n'+total_cobros);
 		total=monto_total-(total_cobros);//+a_favor
 
-//console.log( " total :" + monto_total );
+console.log( " total :" + monto_total );
 		//alert('total:'+total);
 		$("#efectivo").val(total);
 		total_cobros=total_cobros+total;
