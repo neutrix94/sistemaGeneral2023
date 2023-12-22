@@ -1,5 +1,3 @@
-
-text/x-generic ticket-php-head.inc ( PHP script, UTF-8 Unicode text )
 <?php
 	#header("Content-Type: text/plain;charset=utf-8");
 	//die('here');
@@ -20,8 +18,24 @@ text/x-generic ticket-php-head.inc ( PHP script, UTF-8 Unicode text )
 		die("No hay archivo de configuración!!!");
 	}
 /*Fin de cambio Oscar 25.01.2018*/
-    
-    
+    if( isset(  $_GET['id_venta_origen'] ) ){
+		$id_venta_origen = $_GET['id_venta_origen'];
+		$id_sesion_cajero = $_GET['id_sesion_caja'];
+		if( $id_venta_origen != '' && $id_venta_origen != null && $id_venta_origen != 0 ){
+			$sql = "UPDATE ec_pedidos_referencia_devolucion 
+						SET monto_venta_mas_ultima_devolucion = total_venta
+					WHERE id_pedido = {$id_venta_origen}";
+			$stm = mysql_query( $sql ) or die( "Error al actualizar el monto de venta original : " . mysql_error() ); 
+			$sql = "UPDATE ec_devolucion 
+						SET id_cajero = {$user_id}, 
+						id_sesion_caja = {$id_sesion_cajero}
+					WHERE id_pedido = {$id_venta_origen}
+					AND id_cajero = 0
+					AND id_sesion_caja = 0";
+			$stm = mysql_query( $sql ) or die( "Error al actualizar la sesion de caja de devolucion de venta original : " . mysql_error() ); 
+		}
+	}
+
     if(!isset($_GET["noImp"])){
         $_GET["noImp"]=1;
     }
@@ -753,7 +767,7 @@ $ticket->SetXY(5, $ticket->GetY()+4);
     	$ticket->Image("../img/codigos_barra/".$folio.".png", 15, $ticket->GetY()+5,46);
     }*/
 /*Implementado por Oscar 2023/10/12*/
-	
+//echo "{$payments_total} == {$total} || {$pagado} == 0";
     if(  ( $payments_total == $total || $pagado == 0 ) ){//$ticket_was_payed == 1 &&
     	//die( 'ere' );
        // $ticket->Image("../../../../img/especiales/pagado.jpeg", 5, 2, 70);

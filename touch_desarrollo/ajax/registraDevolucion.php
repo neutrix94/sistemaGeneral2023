@@ -492,7 +492,7 @@ else{
         $eje=mysql_query($sql)or die("Error al actualizar observaciones en las devoluciones!!\n\n".mysql_error()."\n\n".$sql);
     }else if( $monto_pagado == 0 ){
         $monto_pagado = 0;
-        $url_recarga = "index.php?scr=nueva-venta";
+        $url_recarga = "index.php?";//scr=nueva-venta
         $sql="UPDATE ec_devolucion SET observaciones='', status = 3 WHERE id_pedido=$idp";
         $eje = mysql_query( $sql )or die("Error al marcar como finalizada la(s) devolucion(es) : " . mysql_error() . "\n\n" . $sql );
     
@@ -506,6 +506,14 @@ else{
     	mysql_query("ROLLBACK");//cancelamos transacción
     	die("Error al actualizar cabecera de Pedido\n\n".$actPed."\n\n".mysql_error());
     }
+
+/*implementacion Oscar 2023-12-19 para actualizar referencia de la nota de venta y a devolucion*/
+        $sql = "UPDATE ec_pedidos_referencia_devolucion 
+                    SET total_venta = ( total_venta - ( {$monto_externos} + {$monto_internos} ) )
+                WHERE id_pedido = {$idp}";
+        $reference_stm = mysql_query( $sql ) or die( "Error al actualizar la referencia de la devolucion : " . mysql_error() );
+/*fin de cambio Oscar 2023-12-19*/
+ 
     if(mysql_query("COMMIT")){//autorizamos transacción
     /*Implemetación Oscar 06.03.2019 para que las devoluciones completas si se impriman*/
        // if($es_completa==1){
@@ -521,6 +529,7 @@ else{
     	mysql_query("ROLLBACK");//cancelamos transacción
     	die("Se generó un Error al completar la transaccion!!!\n\nActualice la pantalla y vuelva a intentar");
     }
+
 //regresamos el id de la devolución 
     echo "ok|{$id_dev}|{$total_abonado}|{$url_recarga}|{$monto_pagado}|{$tipo_pedido}";
 ?>

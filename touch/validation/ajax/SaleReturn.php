@@ -621,7 +621,14 @@
 		//actualizamos monto del pedido y marcamos que este fue modificado
 		    $actPed="UPDATE ec_pedidos SET descuento = '{$descFinal}',subtotal='$subTotal[0]',total=($subTotal[0]-descuento),modificado=1 WHERE id_pedido = '{$this->sale_id}'";
 		    $actualiza = $this->link->query( $actPed ) or die( "Error al actualizar cabecera de Pedido : {$this->link->error}" );
-		    
+		   
+/*implementacion Oscar 2023-12-19 para actualizar referencia de la nota de venta y a devolucion*/
+	        $sql = "UPDATE ec_pedidos_referencia_devolucion 
+	                    SET total_venta = ( total_venta + ( {$internal_return_amount} + {$this->external_return_amount} ) )
+	                WHERE id_pedido = {$this->sale_id}";
+	        $reference_stm = $this->link->query( $sql ) or die( "Error al actualizar la referencia de la devolucion : {$this->link->error}");
+/*fin de cambio Oscar 2023-12-19*/
+
 		    //if(mysql_query("COMMIT")){//autorizamos transacción
 		       // if($es_completa==1){
 		        //imprimimos el ticket de la devolución

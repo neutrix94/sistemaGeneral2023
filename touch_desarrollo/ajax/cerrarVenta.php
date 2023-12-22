@@ -210,7 +210,6 @@
 		}//fin de if es diferente de línea
 /*FIN DE CAMBIO 30.08.2018*/
 //fin de cambio 23.02.2018
-
 	//Insertamos el detalle del pedido
 		$sql="	INSERT INTO ec_pedidos_detalle 
 				( /*1*/id_pedido_detalle, /*2*/id_pedido, /*3*/id_producto, /*4*/cantidad, /*5*/precio,
@@ -571,10 +570,18 @@
 				WHERE p.id_pedido=$id_pedido_r";
         $res=mysql_query($sql);
         
-        if(!$res)
+        if(!$res){
             throw new Exception("Imposible almacenar registro (pago). <br><br>$sql<br><br>" . mysql_error());
+        }
         
         $row=mysql_fetch_row($res);
+
+/*implementacion Oscar 2023-12-19 para insertar referencia de la nota de venta y a devolucion*/
+		$sql = "INSERT INTO ec_pedidos_referencia_devolucion ( id_pedido_referencia_devolucion, id_pedido, total_venta, 
+			monto_venta_mas_ultima_devolucion, folio_unico, sincronizar ) VALUES ( NULL, {$id_pedido_r}, {$row[0]}, {$row[0]}, NULL, 1 )";
+		$reference_stm = mysql_query( $sql ) or die( "Error al insertar la referencia de la devolucion : " . mysql_error() );
+/*fin de cambio Oscar 2023-12-19*/
+
         $new_total = $row[0];
         if($row[0] <= $row[1]){
             $sql="UPDATE ec_pedidos SET pagado=1 WHERE id_pedido=$id_pedido_r";
@@ -613,7 +620,8 @@
 					p.id_pedido AS original_sale_id, 
 					SUM( pp.monto ) AS payments_total, 
 					p.id_sesion_caja AS original_sale_session_id,
-					SUM( d.monto_devolucion ) AS return_amount
+					SUM( d.monto_devolucion ) AS return_amount,
+					p.total
 				FROM ec_pedidos p
 				LEFT JOIN ec_pedido_pagos pp
 				ON p.id_pedido = pp.id_pedido
@@ -621,12 +629,14 @@
 				ON d.id_pedido = p.id_pedido 
 				WHERE d.id_devolucion IN( {$tmp_devs} )
 				GROUP BY p.id_pedido";
+				//die( $sql );
 		$stm = mysql_query( $sql ) or die( "Error al consultar informacion del pedido original : " . mysql_error() );
 		$row = mysql_fetch_assoc( $stm );
 		$return_internal_ammount = 0;
 		$return_external_ammount = 0;
 
-	//consulta el monto de la devolucion interna
+	/*DESHABILITADO POR OSCAR 2023-12-20
+	consulta el monto de la devolucion interna
 		$sql = "SELECT monto_devolucion, es_externo FROM ec_devolucion WHERE id_devolucion IN( $tmp_devs )";
 		$stm_amount = mysql_query( $sql ) or die( "Error al consultar los montos de la devolucion  : " . mysql_error() );
 		while ( $row_amount = mysql_fetch_assoc($stm_amount) ) {
@@ -635,18 +645,55 @@
 			}else if( $row_amount['es_externo'] == 1 ){
 				$return_external_ammount += $row_amount['monto_devolucion'];
 			}
+	*/
+	//consulta los pagos de devolcuiones anteriores
+		$sql = "SELECT 
+					SUM( IF( dp.id_devolucion_pago IS NULL, 0, dp.monto ) ) AS return_payments
+				FROM ec_devolucion_pagos dp
+				LEFT JOIN ec_devolucion d
+				ON dp.id_devolucion = d.id_devolucion
+				WHERE d.id_pedido IN( {$row['original_sale_id']} )";
+		//die( $sql );
+		$stm_dev = mysql_query( $sql ) or die( "Error al consultar los pagos previos de devoluciones : " . mysql_error() );
+		$montos_dev = 0;
+		if( mysql_num_rows($stm_dev) > 0 ){ 
+			$row_dev = mysql_fetch_assoc( $stm_dev );
+			$montos_dev = $row_dev['return_payments'];
 		}
+		$liquidada = 0;
+		$diferencia_entre_pagos = ( $row['payments_total'] - $montos_dev ) - $row['total'];
+	//formula para saber si esta liquidada
+		if( $diferencia_entre_pagos == 0 || $diferencia_entre_pagos == 1 || $diferencia_entre_pagos == -1 ){
+			$liquidada =1;
+		}
+	//consultamnos sis ;la venta esta liquidada
+		if( $liquidada == 1 ){
+			$return_internal_ammount = $row['payments_total'] - $row['total'] - $montos_dev;//OSCAR
+			if( $return_internal_ammount < 0 ){
+				die( "Salio un valor negativo esprando un valor positivo, caso 1 ( liquidada )" );
+			}
+		}else{
+			$return_internal_ammount =  $row['total'] - $row['payments_total'] - $montos_dev;//FERNANDA
+			if( $return_internal_ammount < 0 ){
+				$return_internal_ammount = abs($return_internal_ammount);
+			}else{
+				$return_internal_ammount = 0;
+			}
+		}
+		//die( "CAlculo : (saldo_a_favor){$return_internal_ammount} = (total_pago){$row['payments_total']} -(total_venta){$row['total']} - (pagos_devolucion){$montos_dev}" );
 	//consulta el monto de la devolucion externa
 		if( $row['payments_total'] > 0 ){
-		//inserta la relacion de los pedidos
-			$sql = "INSERT INTO ec_pedidos_relacion_devolucion ( /*1*/id_pedido_relacion_devolucion, /*2*/id_pedido_original, /*3*/monto_pedido_original,
-			/*4*/id_sesion_caja_pedido_orginal, /*5*/id_devolucion_interna, /*6*/monto_devolucion_interna, /*7*/id_devolucion_externa, 
-			/*8*/monto_devolucion_externa, /*9*/id_pedido_relacionado, /*10*/monto_pedido_relacionado, /*11*/id_sesion_caja_pedido_relacionado )
-			VALUES ( /*1*/NULL, /*2*/{$row['original_sale_id']}, /*3*/{$row['payments_total']}, /*4*/{$row['original_sale_session_id']}, 
-			/*5*/{$devs_array[0]}, /*6*/{$return_internal_ammount}, /*7*/{$devs_array[1]}, /*8*/{$return_external_ammount}, 
-			/*9*/{$id_pedido_r}, /*10*/{$new_total}, /*11*/0 )";
-			$stm = mysql_query( $sql ) or die( "Error al insertar la relacion entre pedidos : {$sql} " . mysql_error() );
-			
+			//if( $return_internal_ammount < 0 ){
+//$return_internal_ammount = abs($return_internal_ammount);
+			//inserta la relacion de los pedidos
+				$sql = "INSERT INTO ec_pedidos_relacion_devolucion ( /*1*/id_pedido_relacion_devolucion, /*2*/id_pedido_original, /*3*/monto_pedido_original,
+				/*4*/id_sesion_caja_pedido_orginal, /*5*/id_devolucion_interna, /*6*/monto_devolucion_interna, /*7*/id_devolucion_externa, 
+				/*8*/monto_devolucion_externa, /*9*/id_pedido_relacionado, /*10*/monto_pedido_relacionado, /*11*/id_sesion_caja_pedido_relacionado )
+				VALUES ( /*1*/NULL, /*2*/{$row['original_sale_id']}, /*3*/{$row['payments_total']}, /*4*/{$row['original_sale_session_id']}, 
+				/*5*/{$devs_array[0]}, /*6*/{$return_internal_ammount}, /*7*/{$devs_array[1]}, /*8*/{$return_external_ammount}, 
+				/*9*/{$id_pedido_r}, /*10*/{$new_total}, /*11*/0 )";
+				$stm = mysql_query( $sql ) or die( "Error al insertar la relacion entre pedidos : {$sql} " . mysql_error() );
+			//}
 			$sql="UPDATE ec_pedidos SET id_devoluciones='$id_devoluciones' WHERE id_pedido=$id_pedido_r";
 			$eje=mysql_query($sql)or die("Error al actualizar los ids de devolucion para este pedido!!!\n".mysql_error());
 		}else{

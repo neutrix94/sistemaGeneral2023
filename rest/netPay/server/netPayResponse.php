@@ -215,9 +215,9 @@ $app->post('/', function (Request $request, Response $response){
 
 //inserta el cobro del cajero si el cobro fue exitoso
     $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_terminal, 
-    /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar ) 
+    /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar, /*11*/id_sesion_caja ) 
     VALUES ( /*1*/NULL, /*2*/'{$row['sale_id']}', /*3*/'{$traceability['id_cajero']}', /*4*/'{$row['affiliation_id']}', 
-    /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1 )";
+    /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1, /*11*/{$traceability['id_sesion_cajero']} )";
 //    error_log( $sql );
 //actualiza el cajero de los cobros
     $stm = $link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$link->error}" );

@@ -484,6 +484,13 @@ else{
     	die("Error al actualizar cabecera de Pedido\n\n".$actPed."\n\n".mysql_error());
     }
 
+/*implementacion Oscar 2023-12-19 para actualizar referencia de la nota de venta y a devolucion*/
+        $sql = "UPDATE ec_pedidos_referencia_devolucion 
+                    SET total_venta = ( total_venta - ( {$monto_externos} + {$monto_internos} ) )
+                WHERE id_pedido = {$idp}";
+        $reference_stm = mysql_query( $sql ) or die( "Error al actualizar la referencia de la devolucion : " . mysql_error() );
+/*fin de cambio Oscar 2023-12-19*/
+
     if(mysql_query("COMMIT")){//autorizamos transacción
        // if($es_completa==1){
         //imprimimos el ticket de la devolución
