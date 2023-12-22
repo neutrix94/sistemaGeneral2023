@@ -332,14 +332,14 @@
 			$ticket->Cell(66, 6, utf8_decode("TOTAL"), "" ,0, "C");
 				
 			$ticket->SetXY(5, $ticket->GetY() + 9);
-			$ticket->Cell(66, 6, "$ " . number_format($total, 2), "" ,0, "C");
+			$ticket->Cell(66, 6, "$ " . number_format( abs( $total ), 2), "" ,0, "C");
 		//
 			//$ticket->SetXY(5, $ticket->GetY()+8);
 			$ticket->SetXY(5, $ticket->GetY()+15);
 			$ticket->Cell(5, 6, utf8_decode("Saldo a favor:"), "" ,0, "L");
 
 			$ticket->SetXY(5, $ticket->GetY()+15);/*+66*0.75*/
-			$ticket->Cell(66, 6, "$ " . number_format($s_f_i, 2), "" ,0, "C");/*66*0.25*/
+			$ticket->Cell(66, 6, "$ " . number_format( abs( $s_f_i ), 2), "" ,0, "C");/*66*0.25*/
 
 		//
 			$ticket->SetFont('Arial','B',30);
@@ -347,7 +347,7 @@
 			$ticket->Cell(66, 6, utf8_decode($accion), "" ,0, "C");
 
 			$ticket->SetXY(5, $ticket->GetY()+15);
-			$ticket->Cell(66, 6, "$ ".number_format($s_f_i - $total, 2), "" ,0, "C");//C R
+			$ticket->Cell(66, 6, "$ ".number_format( abs( $s_f_i - $total ), 2), "" ,0, "C");//C R
 
 		}else{
 			$ticket->SetFont('Arial','B',30);
@@ -355,7 +355,7 @@
 			$ticket->Cell(66, 6, utf8_decode("TOTAL"), "" ,0, "C");
 
 			$ticket->SetXY(5, $ticket->GetY()+15);
-			$ticket->Cell(66, 6, "$ " . number_format($total, 2), "" ,0, "C");
+			$ticket->Cell(66, 6, "$ " . number_format( abs( $total ), 2), "" ,0, "C");
 				
 			/*$ticket->SetXY(5+66*0.75, $ticket->GetY() + 8);
 			$ticket->Cell(66, 6, "$ " . number_format($total_pagos-$monto_devolucion, 2), "" ,0, "C");*/
@@ -363,7 +363,7 @@
 			$V=new EnLetras();
 			$ticket->SetFont('Arial','',$bF-2);
 			$ticket->SetXY(5, $ticket->GetY()+8);
-			$ticket->Cell(66, 6, utf8_decode($V->ValorEnLetras($total, "Pesos")), "" ,0, "L");
+			$ticket->Cell(66, 6, utf8_decode($V->ValorEnLetras( abs( $total ), "Pesos")), "" ,0, "L");
 		}
 	//
 		//$ticket->SetFont('Arial','',$bF-2);
@@ -380,7 +380,7 @@
 
 		$ticket->SetFont('Arial','B',32);
 		$ticket->SetXY(5, $ticket->GetY()+15);
-		$ticket->Cell(66, 6, "$ " . number_format($_GET['initial_payment'], 2), "" ,0, "C");
+		$ticket->Cell(66, 6, "$ " . number_format( abs( $_GET['initial_payment'] ), 2), "" ,0, "C");
 			
 		/*$ticket->SetXY(5+66*0.75, $ticket->GetY() + 8);
 		$ticket->Cell(66, 6, "$ " . number_format($total_pagos-$monto_devolucion, 2), "" ,0, "C");*/
@@ -388,14 +388,14 @@
 		$V=new EnLetras();
 		$ticket->SetFont('Arial','',$bF-2);
 		$ticket->SetXY(5, $ticket->GetY()+8);
-		$ticket->Cell(66, 6, utf8_decode($V->ValorEnLetras($total, "Pesos")), "" ,0, "L");
+		$ticket->Cell(66, 6, utf8_decode($V->ValorEnLetras( abs( $total ), "Pesos")), "" ,0, "L");
 
 		$ticket->SetFont('Arial','B',$bF+5);
 		$ticket->SetXY(2, $ticket->GetY()+6);
 	    $ticket->Cell(66*0.40, 6, utf8_decode("Resta"), "" ,0, "L");
 
 		$ticket->SetXY(25, $ticket->GetY());
-		$ticket->Cell(66*0.35, 6, "$" . number_format($resta, 2), "" ,0, "R");
+		$ticket->Cell(66*0.35, 6, "$" . number_format( abs( $resta ), 2), "" ,0, "R");
 	/*
 		$ticket->SetXY(5, $ticket->GetY()+6);
 	    $ticket->Cell(66*0.25, 6, utf8_decode("Resta"), "" ,0, "L");

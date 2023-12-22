@@ -150,6 +150,7 @@
 			<input type="hidden" id="id_venta" value="0">
 			<input type="hidden" id="venta_pagada" value="0">
 			<input type="hidden" id="id_devolucion" value="0">
+			<input type="hidden" id="id_venta_origen" value="0">
 		</div>
 	<!-- historico dfe pagos -->
 		<div class="row" id="historic_payments"></div>

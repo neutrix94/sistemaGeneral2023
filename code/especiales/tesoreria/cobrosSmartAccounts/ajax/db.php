@@ -17,7 +17,7 @@
 		//}
 	//
 		$apiNetPay = new apiNetPay( $link, $sucursal_id );
-		$Payments = new Payments( $link );
+		$Payments = new Payments( $link, $user_sucursal );
 		$action = ( isset( $_GET['fl'] ) ? $_GET['fl'] : $_POST['fl'] );
 		switch ( $action ) {
 			case 'sendPaymentPetition' :
@@ -177,14 +177,22 @@
 				$ammount = ( isset( $_GET['ammount'] ) ? $_GET['ammount'] : $_POST['ammount'] );
 				$sale_id = ( isset( $_GET['sale_id'] ) ? $_GET['sale_id'] : $_POST['sale_id'] );
 				$ammount_permission = 0;
+				$pago_por_saldo_a_favor = 0;
+				$id_venta_origen = 0;
+				if( isset( $_GET['pago_por_saldo_a_favor'] ) || isset( $_POST['pago_por_saldo_a_favor'] ) ){
+					$pago_por_saldo_a_favor = ( isset( $_GET['pago_por_saldo_a_favor'] ) ? $_GET['pago_por_saldo_a_favor'] : $_POST['pago_por_saldo_a_favor'] );
+				}
 				if( isset( $_GET['ammount_permission'] ) || isset( $_POST['ammount_permission'] ) ){
 					$ammount_permission = ( isset( $_GET['ammount_permission'] ) ? $_GET['ammount_permission'] : $_POST['ammount_permission'] );
 				}
-				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
-				if ( $ammount_permission == 0 ) {
-					$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
+				if( isset( $_GET['id_venta_origen'] ) || isset( $_POST['id_venta_origen'] ) ){
+					$id_venta_origen = ( isset( $_GET['id_venta_origen'] ) ? $_GET['id_venta_origen'] : $_POST['id_venta_origen'] );
 				}
-				echo $Payments->insertCashPayment( $ammount, $sale_id, $user_id, $session_id );
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				//if ( $ammount_permission == 0 ) {
+					$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
+				//}
+				echo $Payments->insertCashPayment( $ammount, $sale_id, $user_id, $session_id, $pago_por_saldo_a_favor, $id_venta_origen );
 			break;
 
 			case 'getHistoricPayment' :
@@ -229,9 +237,12 @@
 	class Payments
 	{
 		private $link;
-		function __construct( $connection )
+		private $store_id;
+		function __construct( $connection, $store_id )
 		{
 			$this->link = $connection;
+			$this->store_id = $store_id;
+			
 		}
 
 		public function validate_payment_is_not_bigger( $sale_id, $ammount ){
@@ -249,8 +260,8 @@
 			if( $stm->num_rows <= 0 ){	//busqueda por folio
 			
 				$sql = "SELECT
-						p.total AS sale_total,
-						SUM( pp.monto ) AS payments_total,
+						ROUND( p.total ) AS sale_total,
+						ROUND( SUM( pp.monto ) ) AS payments_total,
 						p.pagado AS was_payed
 					FROM ec_pedidos p
 					LEFT JOIN ec_pedido_pagos pp
@@ -264,10 +275,10 @@
 			}
 
 			$row = $stm->fetch_assoc();
-			$sale_total = $row['sale_total'];
-			$payments_total = $row['payments_total'];
-			$rest = $row['sale_total'] - $row['payments_total'];
-			$tmp_total = $payments_total + $ammount;
+			$sale_total = round( $row['sale_total'] );
+			$payments_total = round( $row['payments_total'] );
+			$rest = round( $row['sale_total'] - $row['payments_total'] );
+			$tmp_total = round( $payments_total + $ammount );
 			if( $sale_total < $tmp_total ){
 				die( "error|<h3 class=\"text-center\">El pago no puede ser mayor al total de la venta!</h3>
 					<div class=\"row text-center\">
@@ -296,17 +307,32 @@
 		}
 
 		public function validatePayments( $sale_id ){
+			$saldo_favor = 0;
+			$sql = "SELECT
+						ROUND( SUM( monto_devolucion_interna ) ) AS a_favor
+					FROM ec_pedidos_relacion_devolucion
+					WHERE id_pedido_relacionado = {$sale_id}
+					AND id_sesion_caja_pedido_relacionado = 0";
+			$stm_1 = $this->link->query( $sql ) or die( "Error al consultar relacion de pedidos y devolucion  ( saldo a favor ): {$this->link->error}" );
+			if( $stm_1->num_rows > 0 ){
+				$tmp_row = $stm_1->fetch_assoc();
+				$saldo_favor = $tmp_row['a_favor'];
+				if( $saldo_favor == '' || $saldo_favor == null ){///asigna valor 0 si el resultado de la consulta er nullo o vacio
+					$saldo_favor = 0;
+				}
+			}
 			$sql = "SELECT
 						p.total AS sale_total,
-						SUM( pp.monto ) AS payments_total,
+						SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) + {$saldo_favor} AS payments_total,
 						p.pagado AS was_payed
 					FROM ec_pedidos p
 					LEFT JOIN ec_pedido_pagos pp
 					ON pp.id_pedido = p.id_pedido
 					WHERE p.id_pedido = {$sale_id}";
+			//die( $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los totales para validar : {$sql} : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			if( $row['was_payed'] == 1 && $row['sale_total'] > $row['payments_total'] ){
+			if( $row['was_payed'] == 1 && round( $row['sale_total'] ) > round( $row['payments_total'] ) ){
 				die( "<div class=\"row\">
 					<h3 class=\"text-center text-danger fs-2\">La venta no esta liquidada, registra todos los pagos y vuelve a intentar</h3>
 					<div class=\"\">
@@ -339,6 +365,7 @@
 		              FROM ec_pedidos_detalle pd
 		              LEFT JOIN sys_sucursales_producto sp
 		              ON pd.id_producto = sp.id_producto
+		              AND sp.id_sucursal = {$this->store_id}
 		              WHERE pd.id_pedido = {$sale_id}
 		            )ax";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
@@ -360,9 +387,9 @@
 			}
 		//inserta los pagos internos/externos
 		//inserta el cobro del cajero en efectivo
-			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_pedido, id_cajero, id_afiliacion, id_banco, id_tipo_pago, 
+			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
 				monto, fecha, hora, observaciones, sincronizar) 
-			VALUES ( NULL, {$sale_id}, {$user_id}, {$afiliation_id}, -1, 7, {$ammount}, NOW(), NOW(), '{$authorization_number}', 1)";
+			VALUES ( NULL, {$sale_id}, {$user_id}, {$session_id}, {$afiliation_id}, -1, 7, {$ammount}, NOW(), NOW(), '{$authorization_number}', 1)";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$this->link->error}" );
 		//actualiza el pago
 			$sql = "UPDATE ec_pedido_pagos 
@@ -437,7 +464,12 @@
 					</thead>
 					<tbody>";
 				while( $row = $stm->fetch_assoc() ){
-					$resp .= "<tr>
+					$color = "";
+					if( $row['amount'] < 0 ){
+						$row['payment_type'] = "Devuelto al cliente";
+						$color = "class=\"text-danger\"";
+					}
+					$resp .= "<tr {$color}>
 						<td>{$row['payment_type']}</td>
 						<td>{$row['amount']}</td>
 						<td>{$row['datetime']}</td>
@@ -455,20 +487,37 @@
 			return "ok|{$resp}";
 		}
 
-		public function insertCashPayment( $ammount, $sale_id, $user_id, $session_id ){
+		public function insertCashPayment( $ammount, $sale_id, $user_id, $session_id, $pago_por_saldo_a_favor = 0, $id_venta_origen = 0 ){
+//die( "Monto : {$ammount} - pago_por_saldo_a_favor : $pago_por_saldo_a_favor - Id_venta Origen : {$id_venta_origen}" );
 			$this->link->autocommit( false );
-			if( $ammount > 0 ){
+			//caso 0 : el cliente tiene saldo a favor, y su nueva nota es menor a su saldo a afavor
+			if( $ammount < 0 && $pago_por_saldo_a_favor > 0 ){//die( 'caso 1' );
+			//insertar pago
+				$this->insertPayment( $pago_por_saldo_a_favor, $sale_id, $user_id, $session_id );
+				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, ( $pago_por_saldo_a_favor * -1 )  );
+				$this->insertReturnPayment( $ammount, $sale_id, $user_id, $session_id, $id_venta_origen );
+
+			}else if( $ammount > 0 ){//die( "caso 2 : cobrar al cliente con dev o sin dev" );
 				$ammount = $this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
 				$this->insertPayment( $ammount, $sale_id, $user_id, $session_id );
-			}else{
+			}else if( $ammount < 0 ){//die( "caso 3 : devolver efectivo al cliente cuando no se agregan productos" );
+				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
+			//insertar pago
 				$this->insertReturnPayment( $ammount, $sale_id, $user_id, $session_id );
+			}else if( $ammount == 0 ){//die( "caso 4 : no se devuleve dinero al cliente ni se cobra pero se inserta pago" );
+				$ammount = $this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
+				if( $ammount != 0 ){
+					$this->insertPayment( $ammount, $sale_id, $user_id, $session_id );
+				}
 			}
 			//$stm = $this->link->query( $sql ) or die( "Error al consultar la suma de los pagos : {$this->link->error}" );
-			$this->link->autocommit( true );
+		$this->link->autocommit( true );
 			return 'ok|';
 		}
 
-		public function insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id ){
+		public function insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, $saldo_especial = 0 ){
+//echo "<br>INSERTPAYMENTDEPENDING<br>";
+			$total_devolver_cajero = 0;
 			$sql = "SELECT
 						id_pedido_relacion_devolucion,
 						id_pedido_original,
@@ -485,7 +534,7 @@
 					WHERE id_pedido_relacionado = {$sale_id}
 					AND id_sesion_caja_pedido_relacionado = 0";
 			$stm_1 = $this->link->query( $sql ) or die( "Error al consultar relacion de pedidos y devolucion : {$this->link->error}" );
-			
+//echo $sql . "<br><br>";
 			if( $stm_1->num_rows == 1 ){
 				$row = $stm_1->fetch_assoc();
 		//verifica que el pedido no sea un apartado
@@ -498,6 +547,7 @@
 						ON p.id_pedido = pp.id_pedido 
 						WHERE p.id_pedido = {$row['id_pedido_relacionado']}";
 				$stm_2 = $this->link->query($sql) or die( "Error al consultar si la venta esta pagada : {$this->link->error}" );
+//echo $sql . "<br><br>";
 				$row_2 = $stm_2->fetch_assoc();
 			//inserta el pago de la devolucion interna
 				if( $row['monto_devolucion_interna'] > 0 ){
@@ -505,6 +555,8 @@
 					id_cajero, id_sesion_caja ) VALUES( NULL, {$row['id_devolucion_interna']}, 1, {$row['monto_devolucion_interna']}, 0, 
 					NOW(), NOW(), {$user_id}, {$session_id} )";
 					$stm_3 = $this->link->query($sql) or die( "Error al insertar pago de devolucion interna : {$this->link->error}" );
+//echo $sql . "<br><br>";
+					$total_devolver_cajero += $row['monto_devolucion_interna'];
 				}
 			//inserta el pago de la devolucion externa
 				if( $row['monto_devolucion_externa'] > 0 ){
@@ -512,7 +564,31 @@
 					id_cajero, id_sesion_caja ) VALUES( NULL, {$row['id_devolucion_externa']}, 1, {$row['monto_devolucion_externa']}, 1, 
 					NOW(), NOW(), {$user_id}, {$session_id} )";
 					$stm_4 = $this->link->query($sql) or die( "Error al insertar pago de devolucion externa : {$this->link->error}" );
+//echo $sql . "<br><br>";
+					$total_devolver_cajero += $row['monto_devolucion_externa'];
 				}
+				$total_devolver_cajero = round( $total_devolver_cajero ) * -1;
+/*inserta el pago por devolucion en el cajero*/
+			//inserta el cobro del cajero en efectivo por devolucion
+				if( $saldo_especial == 0 ){
+					$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
+						monto, fecha, hora, observaciones, sincronizar) 
+					VALUES ( NULL, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, -1, 1, {$total_devolver_cajero}, NOW(), NOW(), '', 1)";
+				}else{
+					$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
+						monto, fecha, hora, observaciones, sincronizar) 
+					VALUES ( NULL, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, -1, 1, {$saldo_especial}, NOW(), NOW(), '', 1)";
+					
+				}
+				$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$this->link->error}" );
+/**/
+//echo $sql . "<br><br>";
+
+				$sql = "UPDATE ec_pedidos_relacion_devolucion 
+					SET id_sesion_caja_pedido_relacionado = {$session_id} 
+				WHERE id_pedido_relacionado = {$row['id_pedido_relacionado']}";
+				$stm = $this->link->query( $sql ) or die( "Error al actualizar ec_pedidos_relacion_devolucion de pagos : {$sql} {$this->link->error}" );
+//echo $sql . "<br><br>";
 			//modifica el monto para hacer cuadrar el pago por devolucion
 				return $row_2['sale_total'];
 			}else{
@@ -523,6 +599,7 @@
 
 		public function insertPayment( $ammount, $sale_id, $user_id, $session_id ){
 			//die( 'insertPayment' );
+//echo "<br>INSERTPAYMENT<br>";
 		//consulta entre interno y externo
 		    $sql = "SELECT
 		              ROUND( ax.internal/ax.total, 2 ) AS internal_porcent,
@@ -535,10 +612,11 @@
 		              FROM ec_pedidos_detalle pd
 		              LEFT JOIN sys_sucursales_producto sp
 		              ON pd.id_producto = sp.id_producto
+		              AND sp.id_sucursal = {$this->store_id}
 		              WHERE pd.id_pedido = {$sale_id}
 		            )ax";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
-	
+//echo $sql . "<br><br>";
 			$row = $stm->fetch_assoc();
 		//inserta pago interno		
 			if( $row['internal_porcent'] > 0 ){
@@ -546,7 +624,7 @@
 				id_nota_credito, id_cxc, es_externo, id_cajero, id_sesion_caja )
 				VALUES( {$sale_id}, 1, NOW(), NOW(), ( {$ammount}*{$row['internal_porcent']} ), '', 1, 1, -1, -1, 0, {$user_id}, {$session_id} )";
 				$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$sql} {$this->link->error}" );
-
+//echo $sql . "<br><br>";
 			}
 		//inserta pago externo		
 			if( $row['external_porcent'] > 0 ){
@@ -554,14 +632,15 @@
 				id_nota_credito, id_cxc, es_externo, id_cajero, id_sesion_caja )
 				VALUES( {$sale_id}, 1, NOW(), NOW(), ( {$ammount}*{$row['external_porcent']} ), '', 1, 1, -1, -1, 1, {$user_id}, {$session_id} )";
 				$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$sql} {$this->link->error}" );
-
+//echo $sql . "<br><br>";
 			}
 		//inserta los pagos internos/externos
 		//inserta el cobro del cajero en efectivo
-			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_pedido, id_cajero, id_afiliacion, id_banco, id_tipo_pago, 
+			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
 				monto, fecha, hora, observaciones, sincronizar) 
-			VALUES ( NULL, {$sale_id}, {$user_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', 1)";
+			VALUES ( NULL, {$sale_id}, {$user_id}, {$session_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', 1)";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$this->link->error}" );
+//echo $sql . "<br><br>";
 		//actualiza el pago
 			$sql = "UPDATE ec_pedido_pagos 
 						SET id_cajero = {$user_id}, 
@@ -569,7 +648,7 @@
 					WHERE id_cajero = 0 AND id_sesion_caja = 0
 					AND id_pedido = {$sale_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al enlazar el cobro al cajero : {$this->link->error}" );
-
+//echo $sql . "<br><br>";
 		//actualiza la venta
 			$sql = "UPDATE ec_pedidos 
 						SET id_cajero = {$user_id}, 
@@ -577,6 +656,7 @@
 					WHERE id_cajero = 0 AND id_sesion_caja = 0
 					AND id_pedido = {$sale_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al enlazar la venta al cajero : {$this->link->error}" );
+//echo $sql . "<br><br>";
 		//actualiza el satus del pedido
 			$sql = "SELECT 
 						SUM( pp.monto ) AS payments,
@@ -586,15 +666,18 @@
 					ON p.id_pedido = pp.id_pedido
 					WHERE pp.id_pedido = {$sale_id}";
 			$stm_2 = $this->link->query( $sql ) or die( "Error al consultar suma de pagos de la venta : {$sql}\n{$this->link->error}" );
+//echo $sql . "<br><br>";
 			$row = $stm_2->fetch_assoc();
 			if( $row['payments'] >= $row['total']  ){
 				$sql = "UPDATE ec_pedidos SET pagado = 1 WHERE id_pedido = {$sale_id}";
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar la cabecera del pedido a pagada : {$this->link->error}" );
+//echo $sql . "<br><br>";
 			}
 		}
 
-		public function insertReturnPayment( $ammount, $sale_id, $user_id, $session_id ){
+		public function insertReturnPayment( $ammount, $sale_id, $user_id, $session_id, $id_venta_origen = 0 ){
 			//die( 'insertReturnPayment' );
+//echo "<br>INSERTRETURNPAYMENT<br>";
 		//dev interna / externa
 			$sql = "(SELECT 
 						id_devolucion
@@ -608,6 +691,7 @@
 		            WHERE id_pedido = {$sale_id}
 		            AND es_externo = 1)";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar devolucion interna/externa : {$this->link->error}" );
+//echo $sql . "<br><br>";
 			$row = $stm->fetch_row();
 			$id_dev_interna = $row[0];
 			$id_dev_externa = $row[1];
@@ -639,22 +723,25 @@
 		        WHERE pp.id_pedido = {$sale_id}";*/
 		// die($sql);
 		    $eje = $this->link->query($sql) or die( "Error al consultar montos de devolución\n{$sql}\n{$this->link->error}" );
+//echo $sql . "<br><br>";
 		    $datos_1 = $eje->fetch_row();
 		    $datos_1[0] = round( $ammount * ( $datos_1[0] / $datos_1[2] ) )*-1;
 		    $datos_1[1] = round( $ammount * ( $datos_1[1] / $datos_1[2] ) )*-1;
 		    //var_dump( $datos_1 );die( '' );
-		$this->link->autocommit( false );
+//$this->link->autocommit( false );
 		//insertamos las devoluciones completas
 		    //externa
 		    if( $datos_1[0]>0 && $id_dev_externa != 0 && $id_dev_externa != '' ){
 		        $sql="INSERT INTO ec_devolucion_pagos ( id_devolucion_pago, id_devolucion, id_tipo_pago, monto,
 		        referencia, es_externo, fecha, hora, id_cajero, id_sesion_caja )
 		        VALUES(null,$id_dev_externa,1,$datos_1[0],'$datos_1[0]',1,now(),now(), {$user_id}, {$session_id} )";//modificacion Oscar 2023/10/12 {$id_cajero}, {$id_sesion_caja}
-		        $eje = $this->link->query($sql) or die( "Error al insertar el pago de la devolución externa\n{$sql}\n{$this->link->error}" );	   		
+		        $eje = $this->link->query($sql) or die( "Error al insertar el pago de la devolución externa\n{$sql}\n{$this->link->error}" );
+//echo $sql . "<br><br>";	   		
 			//actualiza la sesion de la cabecera de devoluciones
 				$sql = "UPDATE ec_devolucion SET id_cajero = {$user_id}, id_sesion_caja = {$session_id} 
 				WHERE id_devolucion = {$id_dev_externa}";
-		    	$eje = $this->link->query($sql) or die( "Error al actualizar cajero de la devolución externa\n{$sql}\n{$this->link->error}" );	   		
+		    	$eje = $this->link->query($sql) or die( "Error al actualizar cajero de la devolución externa\n{$sql}\n{$this->link->error}" );
+//echo $sql . "<br><br>";	   		
 		    }
 		//interna
 		    if( $datos_1[1]>0 && $id_dev_interna != 0 && $id_dev_interna != '' ){
@@ -662,18 +749,24 @@
 		        referencia, es_externo, fecha, hora, id_cajero, id_sesion_caja )
 		        VALUES(null,$id_dev_interna,1,$datos_1[1],'$datos_1[0]',0,now(),now(), {$user_id}, {$session_id} )";//modificacion Oscar 2023/10/12 {$id_cajero}, {$id_sesion_caja}
 		        $eje = $this->link->query( $sql ) or die( "Error al insertar el pago de la devolución interna\n{$sql}\n{$this->link->error}" );
+//echo $sql . "<br><br>";
 		   	//actualiza la sesion de la cabecera de devoluciones
 				$sql = "UPDATE ec_devolucion SET id_cajero = {$user_id}, id_sesion_caja = {$session_id} 
 				WHERE id_devolucion = {$id_dev_interna}";
-		    	$eje = $this->link->query($sql) or die( "Error al actualizar cajero de la devolución interna\n{$sql}\n{$this->link->error}" );	   		
+		    	$eje = $this->link->query($sql) or die( "Error al actualizar cajero de la devolución interna\n{$sql}\n{$this->link->error}" );	
+//echo $sql . "<br><br>";   		
 		    }   
+		    if( $id_venta_origen != 0 ){//si tiene saldo a favor de una venta origen
+		    	$sale_id = 	$id_venta_origen;
+		    }
 		//inserta el cobro del cajero en efectivo por devolucion
-			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_pedido, id_cajero, id_afiliacion, id_banco, id_tipo_pago, 
+			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
 				monto, fecha, hora, observaciones, sincronizar) 
-			VALUES ( NULL, {$sale_id}, {$user_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', 1)";
+			VALUES ( NULL, {$sale_id}, {$user_id}, {$session_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', 1)";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$this->link->error}" );
+//echo $sql . "<br><br>";
 		
-		$this->link->autocommit( true );
+//$this->link->autocommit( true );
 		}
 
 		public function getOrderResponse( $transaction_id, $is_manual = false ){
