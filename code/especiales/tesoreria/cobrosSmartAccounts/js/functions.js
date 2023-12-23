@@ -134,7 +134,6 @@ var respuesta = null;
 						$( '#add_form_btn' ).css( 'display', 'none' );
 					}else{
 						$( '#efectivo' ).val( respuesta.pagos_pendientes );
-						$( '#efectivo' ).removeAttr( 'readonly' );
 						$( '#payment_description' ).html( 'Cobrar' );
 						$( '#payment_description' ).css( 'color', 'black' );
 						$( '#monto_total' ).css( 'color', 'black' );
@@ -145,6 +144,7 @@ var respuesta = null;
 					}
 
 					$( '#monto_total' ).val( Math.abs( respuesta.pagos_pendientes ) );
+					$( '#efectivo' ).attr( 'readonly', true );//solo informativo
 					//$("#monto_total").val( payment_ammount );
 					//$("#efectivo").val(payment_ammount);//oscar 2023
 					
@@ -282,21 +282,21 @@ var respuesta = null;
 		}
 		
 		total_cobros=total_cobros+parseFloat(total_cheques);
-console.log( "Total cobros : " + total_cobros );
+//console.log( "Total cobros : " + total_cobros );
 	//extraemos e monto a favor
 		a_favor=$("#saldo_favor").val();
 		if(a_favor==''){a_favor=0;}
 		a_favor=parseFloat(a_favor);
-console.log( "a favor :" + a_favor );
+//console.log( "a favor :" + a_favor );
 	//extraemos el monto total
 		monto_total=$("#monto_total").val();
 		if(monto_total==''){monto_total=0;}
 		monto_total=parseFloat(monto_total);
-console.log( "monto total :" + monto_total );
+//console.log( "monto total :" + monto_total );
 		//alert(monto_total+'\n'+total_cobros);
 		total=monto_total-(total_cobros);//+a_favor
 
-console.log( " total :" + monto_total );
+//console.log( " total :" + monto_total );
 		//alert('total:'+total);
 		$("#efectivo").val(total);
 		total_cobros=total_cobros+total;
@@ -304,14 +304,22 @@ console.log( " total :" + monto_total );
 	}
 
 	function calcula_cambio(){
-		var total_tarjetas=0,total_cheques=0,total_cobros=0;
-		var recibido=$("#efectivo_recibido").val().replaceAll( ',', '' );
-		var devolver=$("#efectivo_devolver").val();
-		if(recibido<=0){
-			return true;
-		}
-		total_cobros+=parseFloat($("#efectivo").val());
-		$("#efectivo_devolver").val(parseFloat(recibido-total_cobros));
+		var monto_pago = parseInt( $( '#monto_cobro_emergente' ).val() );
+		if( monto_pago > 0 ){
+			var total_tarjetas=0,total_cheques=0,total_cobros=0;
+			var recibido=$("#efectivo_recibido").val().replaceAll( ',', '' );
+			var devolver=$("#efectivo_devolver").val();
+			if(recibido<=0){
+				return true;
+			}
+			//total_cobros += monto_pago;//;parseFloat($("#efectivo").val());
+			$("#efectivo_devolver").val(parseFloat(recibido-monto_pago));//total_cobros
+			//$( '#monto_cobro_emergente' ).val();
+		}else if( monto_pago == 0 || monto_pago == '' || monto_pago < 0 ){
+			alert( "El pago debe de ser mayor a cero!" );
+			$( '#monto_cobro_emergente' ).focus();
+			return false;
+		}		
 	}
 	
 	/*Agregar cheque o transferencia*/
@@ -374,11 +382,15 @@ var cont_cheques_transferencia=0;
 		recalcula();
 	}
 
-		function cobrar( amount_type ){
+		function cobrar( amount_type, permission = false ){
 			var sale_id = $( '#id_venta' ).val();
 			var pago_efectivo =  parseInt( $( '#efectivo' ).val() );
 			if( pago_efectivo == '' || pago_efectivo == null || pago_efectivo == 'undefined' ||  pago_efectivo == undefined ){
 				pago_efectivo = 0;
+			}
+			if( permission == false && pago_efectivo > 0 ){
+				buildPaymentJustCash();
+				return false;
 			}
 		//verifica si hay cobro en efectivo a favor
 			//if( parseInt( $( '#efectivo' ).val() ) != 0 && $( '#efectivo' ).val().trim() != '' 

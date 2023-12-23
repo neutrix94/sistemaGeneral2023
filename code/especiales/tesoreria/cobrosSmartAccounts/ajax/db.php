@@ -280,8 +280,23 @@
 			$rest = round( $row['sale_total'] - $row['payments_total'] );
 			$tmp_total = round( $payments_total + $ammount );
 			if( $sale_total < $tmp_total ){
-				die( "error|<h3 class=\"text-center\">El pago no puede ser mayor al total de la venta!</h3>
-					<div class=\"row text-center\">
+				die( "<div class=\"row\" style=\"padding:15px;\">
+						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta!</h2>
+						<div class=\"col-3\"></div>
+						<div class=\"col-6\">
+							<br>
+							<button
+								type=\"button\"
+								class=\"btn btn-danger form-control\"
+								onclick=\"close_emergent();\"	
+							>
+								<i class=\"icon-ok-circled\">Aceptar</i>
+							</button>
+						</div>
+					</div>" );//error|
+			}
+			/*
+				<div class=\"row text-center\">
 						<div class=\"col-3 text-primary\">
 							Total : {$sale_total}
 						</div>
@@ -294,15 +309,7 @@
 						<div class=\"col-3 text-warning\">
 							Monto Pago : {$ammount}
 						</div>
-						<button
-							type=\"button\"
-							class=\"btn btn-danger\"
-							onclick=\"close_emergent();\"	
-						>
-							<i class=\"icon-ok-circled\">Aceptar</i>
-						</button>
-					</div>" );
-			}
+			*/
 			return 'ok';
 		}
 
