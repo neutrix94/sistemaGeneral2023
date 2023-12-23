@@ -15,36 +15,68 @@
 			$( '#efectivo' ).select();
 			return false;
 		}
+		var pendiente = $( '#efectivo' ).val();
 //onkeyup="valida_tca(this,event,3);calcula_cambio();"
-		var content = `<div>
-			<label class="text-primary">Monto que entrega cliente : </label>
-			<input 
-					type="text" 
-					id="efectivo_recibido" 
-					class="form-control" 
-					onkeydown="prevenir(event);" 
-					onkeyup="calcula_cambio();"
+		var content = `<div class="row" style="padding : 15px;">
+			<div class="col-6">
+				<label class="text-primary">Monto de pago: </label>
+				<input 
+						type="text" 
+						id="monto_cobro_emergente" 
+						class="form-control" 
+						onkeydown="prevenir(event);" 
+						onkeyup="calcula_cambio();"
+					>
+			</div>
+			<div class="col-6">
+				<label class="text-primary">Pendiente: </label>
+				<input 
+						type="text" 
+						id="monto_pendiente_emergente" 
+						class="form-control" 
+						value="${pendiente}"
+						readonly
+					>
+				<br>
+			</div>
+			<div class="col-6">
+				<label class="text-primary">Monto que entrega cliente : </label>
+				<input 
+						type="text" 
+						id="efectivo_recibido" 
+						class="form-control" 
+						onkeydown="prevenir(event);" 
+						onkeyup="calcula_cambio();"
+					>
+			</div>
+			<div class="col-6">
+				<label class="text-primary">Monto de cambio : </label>
+				<input type="text" id="efectivo_devolver" class="form-control" readonly>
+			</div>
+
+			<div class="col-3"></div>
+			<div class="col-6">
+				<br>
+				<br>
+				<button
+					type="button"
+					class="btn btn-success form-control"
+					onclick="addCashPayment( ${amount} );"
 				>
-			<br>
-			<label class="text-primary">Monto de cambio : </label>
-			<input type="text" id="efectivo_devolver" class="form-control" style="background: white;" disabled>
-			<br>
-			<button
-				type="button"
-				class="btn btn-success form-control"
-				onclick="addCashPayment( ${amount} );"
-			>
-				<i class="icon-plus">Agregar cobro</i>
-			</button>
-			<br>
-			<br>
-			<button
-				type="button"
-				class="btn btn-danger form-control"
-				onclick="close_emergent();"
-			>
-				<i class="icon-cancel-circled">Cancelar</i>
-			</button>
+					<i class="icon-plus">Agregar cobro</i>
+				</button>
+				<br>
+				<br>
+				<button
+					type="button"
+					class="btn btn-danger form-control"
+					onclick="close_emergent();"
+				>
+					<i class="icon-cancel-circled">Cancelar</i>
+				</button>
+				<br>
+				<br>
+			</div>
 		</div>`;
 		$( '.emergent_content' ).html( content );
 		$( '.emergent' ).css( 'display', 'block' );
@@ -52,11 +84,23 @@
 
 	function addCashPayment( amount ){	
 	//inserta pago en efectivo
-	if( $( '#efectivo_recibido' ).val() == '' || $( '#efectivo_recibido' ).val() <= 0 ){
-		alert( "El monto entregado por el cliente no puede ser menor o igual a cero!" );
-		$( '#efectivo_recibido' ).focus();
-		return false;
-	}
+		amount = $( '#monto_cobro_emergente' ).val();
+		if( amount <= 0 ){
+			alert( "El monto del pago debe de ser mayor a cero!" );
+			$( '#monto_cobro_emergente' ).focus();
+			return false;
+		}
+		if( amount > parseInt( $( '#monto_pendiente_emergente' ).val() ) ){
+			alert( "El monto del pago no puede ser mayor al monto pendiente de pagar" );
+			$( '#monto_cobro_emergente' ).select();
+			return false;
+		}
+		/*if( $( '#efectivo_recibido' ).val() == '' || $( '#efectivo_recibido' ).val() <= 0 ){
+			alert( "El monto entregado por el cliente no puede ser menor o igual a cero!" );
+			$( '#efectivo_recibido' ).focus();
+			return false;
+		}*/
+
 		var url = "ajax/db.php?fl=insertCashPayment&ammount=" + amount;
 		url += "&session_id=" + $( '#session_id' ).val();
 		url += "&sale_id=" + $( '#id_venta' ).val();
@@ -202,6 +246,32 @@
 	        </div>
 	      </div>` );
     //alert( "Impresion Generada" );
+  	}
+
+  	function buildPaymentJustCash(){
+  		var content = `<div class="row" style="padding : 20px;">
+  			<h2 class="text-center text-primary">Estas seguro de cobrar todo el pago en efectivo?</h2>
+  			<div class="col-6 text-center">
+  				<button 
+  					type="button"
+  					class="btn btn-success"
+  					onclick="cobrar(1, true);"
+  				>
+  					<i class="icon-ok-circled">Confirmar</i>
+  				</button>
+  			</div>
+  			<div class="col-6 text-center">
+  				<button 
+  					type="button"
+  					class="btn btn-danger"
+  					onclick="close_emergent();"
+  				>
+  					<i class="icon-ok-cancel">Cancelar</i>
+  				</button>
+  			</div>
+  		</div>`;
+  		$( '.emergent_content' ).html( content );
+  		$( '.emergent' ).css( 'display', 'block' );
   	}
 
   	function removePaymentTmp( counter ){

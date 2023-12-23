@@ -765,7 +765,8 @@ $ticket->SetXY(5, $ticket->GetY()+4);
     }*/
 /*Implementado por Oscar 2023/10/12*/
 //echo "{$payments_total} == {$total} || {$pagado} == 0";
-    if(  ( $payments_total == $total || $pagado == 0 ) ){//$ticket_was_payed == 1 &&
+    $comprobacion_cobro = round( $total - $payments_total );
+    if( ( $comprobacion_cobro == 1 || $comprobacion_cobro == 0 || $comprobacion_cobro == -1 ) || $pagado == 0 ){//$ticket_was_payed == 1 &&
     	//die( 'ere' );
        // $ticket->Image("../../../../img/especiales/pagado.jpeg", 5, 2, 70);
     //generacion de codigo de barras

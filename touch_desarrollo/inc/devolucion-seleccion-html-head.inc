@@ -1076,8 +1076,8 @@
 /*alert(url);return false;*/
 		
         var res=ajaxR(url);
-/*alert(res); 
-return false;*/
+alert(res); 
+/*return false;*/
 		aux=res.split('|');
 //console.log( aux );
 //alert( aux );

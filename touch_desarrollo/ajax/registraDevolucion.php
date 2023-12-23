@@ -473,7 +473,8 @@ else{
 //consulta si tiene saldo a favor Oscar 2023-12-15
     $sql_pagado = "SELECT
             SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS pagado,
-            p.tipo_pedido
+            p.tipo_pedido,
+            p.total AS total_venta
         FROM ec_pedidos p
         LEFT JOIN ec_pedido_pagos pp
         ON pp.id_pedido = p.id_pedido
@@ -482,15 +483,52 @@ else{
     $stm_pagado = mysql_query( $sql_pagado );
     $row_pagado = mysql_fetch_assoc( $stm_pagado );
     $monto_pagado = $row_pagado['pagado'];
-    $tipo_pedido = $$row_pagado['tipo_pedido'];
+    $tipo_pedido = $row_pagado['tipo_pedido'];
+    $monto_nuevo_venta = $row_pagado['total_venta']; 
     $url_recarga = "";
-    if( $monto_pagado > 0 ){
+
+//consulta pagos de devoluciones anteriores
+    $sql_devolucion = "SELECT
+            SUM( IF( dp.id_devolucion_pago IS NULL, 0, dp.monto ) ) AS return_payments
+        FROM ec_devolucion_pagos dp
+        LEFT JOIN ec_devolucion d
+        ON dp.id_devolucion = d.id_devolucion
+        WHERE d.id_pedido = {$idp}";
+    $stm_devolucion = mysql_query( $sql_devolucion );
+    $pagos_devolucion = 0;
+    if( mysql_num_rows( $stm_devolucion ) ){
+        $row_devolucion = mysql_fetch_assoc( $stm_devolucion );
+        if( $row_devolucion['return_payments'] != 0 && $row_devolucion['return_payments'] != '' && $row_devolucion['return_payments'] != null ){
+            $pagos_devolucion = $row_devolucion['return_payments'];
+        }
+    }
+    $monto_nuevo_venta -= $totalDev;
+//implementacion Oscar 2023-12-22 para tomar el saldo a favor correcto
+    $saldoFavor = 0;
+    $comprobacion_pagado = $monto_nuevo_venta - ( $monto_pagado - $pagos_devolucion );
+    if( $comprobacion_pagado == -1 || $comprobacion_pagado == 0 || $comprobacion_pagado == 1 ){
+    //die( "1 : {$saldoFavor} = {$monto_pagado} - (  {$monto_nuevo_venta} - {$pagos_devolucion} )" );
+        $saldoFavor = $monto_pagado - $pagos_devolucion - $monto_nuevo_venta;
+        if( $saldoFavor < 0 ){
+            $saldoFavor = 0;//abs( $saldoFavor );
+        }
+    }else{
+        $saldoFavor = $monto_nuevo_venta - ( $monto_pagado - $pagos_devolucion );
+    //die( "2 : {$saldoFavor} = {$monto_nuevo_venta} - ( {$monto_pagado} - {$pagos_devolucion} )" );
+        if( $saldoFavor < 0 ){
+            $saldoFavor = abs( $saldoFavor );
+        }else{
+            $saldoFavor = 0; 
+        }
+    }
+/*fin de cambio Oscar 2023-12-22*/
+    if( $monto_pagado > 0 && $saldoFavor > 0 ){
        // $monto_pagado = $monto_pagado - $totalDev;
         $extra=str_replace("*", "&", $extra);
-        $url_recarga = "index.php?scr=nueva-venta&s_f_c={$totalDev}{$extra}&abonado={$total_abonado}&id_dev={$id_dev_interna}~{$id_dev_externa}";//$totalDev
+        $url_recarga = "index.php?scr=nueva-venta&s_f_c={$saldoFavor}{$extra}&abonado={$total_abonado}&id_dev={$id_dev_interna}~{$id_dev_externa}";//$totalDev
         $sql="UPDATE ec_devolucion SET observaciones='$url_recarga' WHERE id_pedido=$idp";
         $eje=mysql_query($sql)or die("Error al actualizar observaciones en las devoluciones!!\n\n".mysql_error()."\n\n".$sql);
-    }else if( $monto_pagado == 0 ){
+    }else{//if( $monto_pagado == 0 )
         $monto_pagado = 0;
         $url_recarga = "index.php?";//scr=nueva-venta
         $sql="UPDATE ec_devolucion SET observaciones='', status = 3 WHERE id_pedido=$idp";
@@ -515,6 +553,7 @@ else{
 /*fin de cambio Oscar 2023-12-19*/
  
     if(mysql_query("COMMIT")){//autorizamos transacción
+//if( 1 == 1 ){
     /*Implemetación Oscar 06.03.2019 para que las devoluciones completas si se impriman*/
        // if($es_completa==1){
         if( $monto_pagado > 0 ){
