@@ -347,7 +347,7 @@ var emrge_aviso='';
 				url: "ajax/cerrarVenta.php?idp="+id_pedido+"&ap="+es_apartado+"&faceb="+face+"&cor="+correoC+"&"+datos+""+saldo_favor+ids_dvs
 			}).done (function (data) {
 
-alert(data);//con este alert mostramos error
+//alert(data);//con este alert mostramos error
 				ax = data.split('|');
 		/*implementación Oscar 2019 para código de barras*/
 			$.post( "inc/img_codigo.php", {text:ax[3]});

@@ -652,6 +652,7 @@ console.log( resp );
 
 		//alert( url ); return false;
 		var resp = ajaxR( url ).split( '|' );
+		//alert( resp);
 		if( resp[0] != 'ok' ){
 			alert( "Error : \n" + resp );
 		}else{
@@ -659,6 +660,21 @@ console.log( resp );
 			carga_pedido( $( '#id_venta' ).val() );
 			alert( resp[1] );
 			close_emergent();
+		}
+	}
+
+	function delete_payment_saved( payment_id, sale_id ){
+		if( !confirm( "Realmente deseas eliminar el pago?" ) ){
+			return false;
+		}
+		var url = "ajax/db.php?fl=delete_payment_saved&payment_id=" + payment_id;
+		var resp = ajaxR( url );
+		if( resp != 'ok' ){
+			alert( "Error al eliminar el pago : " + resp );
+		}else{
+			alert( "El pago fue eliminado exitosamente!" );
+			carga_pedido( sale_id );
+			//setTimeout( function(){recalcula();}, 500 );
 		}
 	}
 

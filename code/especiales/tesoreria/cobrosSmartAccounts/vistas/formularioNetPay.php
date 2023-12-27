@@ -39,6 +39,9 @@
         			$( '#cancel_btn_' + emergent_count_tmp ).attr( 'onclick', 'cancelByOrderId( <?php echo $resp->petition_id;?> )' );
         			
         			$( '#payment_btn_' + emergent_count_tmp ).addClass( 'no_visible' );
+					
+					$( '#cancel_btn_' + emergent_count_tmp ).remove();	
+					carga_pedido( $( '#id_venta' ).val() );
         		}
         	}, 2000
     		);
