@@ -632,7 +632,7 @@
 				
 				$sql = "UPDATE ec_devolucion_pagos 
 							SET id_cajero_cobro = {$id_cajero_cobro} 
-						WHERE id_devolucion_pagos IN( {$devolucion_interna}, {$devolucion_externa} )";
+						WHERE id_devolucion_pago IN( {$devolucion_interna}, {$devolucion_externa} )";
 				$stm_update = $this->link->query( $sql ) or die( "Error al actualizar las devoluciones : {$this->link->error}" );
 /**/			
 //echo $sql . "<br><br>";
