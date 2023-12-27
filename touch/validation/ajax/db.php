@@ -596,7 +596,7 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 				$difference = round( $row_aux['payments_total'] ) - round( $row['total'] );
 				if( ( $difference == -1 || $difference == 0 || $difference == -1 ) && $row['pagado'] == 1 ){//venta no liquidada $row_aux['payments_total'] < $row['total']
 					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no ah sido liquidada<br>Verifica y vuelve a intentar!</p>";
-					$resp .= "<h5>{$row_aux['payments_total']} VS {$row['total']}</h5>";
+					$resp .= "<h5>{$row_aux['payments_total']} VS {$row['total']} = {$difference}</h5>";
 					$resp .= "<div class=\"row\">";
 						$resp .= "<div class=\"col-2\"></div>";
 						$resp .= "<div class=\"col-8\">";
