@@ -103,7 +103,7 @@
 			WHERE id_pedido = {$clave}";//die( $sql );
 		$reference_stm = mysql_query( $sql ) or die( "Error al consultar la referencia de la venta y devolucion  : " . mysql_error() );
 		$reference_row = mysql_fetch_assoc( $reference_stm );
-		$r['total_real'] = $r['total_nota'];
+		$r['total_real'] = round( $r['total_nota'] );
 		$r['total_nota'] = $reference_row['monto_venta_mas_ultima_devolucion'];
 
 	//checamos si hay devoluciones que dependan de este pedido y no esten pagadas
