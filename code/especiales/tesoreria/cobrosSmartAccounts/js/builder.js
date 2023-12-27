@@ -106,6 +106,7 @@
 		url += "&sale_id=" + $( '#id_venta' ).val();
 		//alert( url ); return false;
 		var resp = ajaxR( url ).split( '|' );
+		alert( "Respuesta : " + resp );
 		if( resp[0] != 'ok' ){
 			//alert( "Error al insertar el pago en Efectivo: " + resp );
 			$( '.emergent_content' ).html( resp[1] );
