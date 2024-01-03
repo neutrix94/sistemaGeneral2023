@@ -102,6 +102,9 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA' );
   }
   $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_almacen', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
+  
+//desbloquea indicador de sincronizacion en tabla
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
   return json_encode( $resp );
 
 });

@@ -36,7 +36,7 @@
 					FROM sys_resumen_sincronizacion_sucursales";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar si las apis de la sucursal estan bloqueadas : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			if( $row['currently_synchronization'] >= $row['synchronization_limit'] ){
+			if( $row['currently_synchronization'] > $row['synchronization_limit'] ){
 				return "Se llegó al límite de las sincronizaciones; limite : {$row['currently_synchronization']}; Sucursales sincronizando : {$row['synchronization_limit']}";
 			}
 			return 'ok';
