@@ -8,39 +8,39 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Descripción: Consulta parametros de sincronizacion
 */
 $app->post('/obtener_registros_restantes', function (Request $request, Response $response){
-  $origin_store_id = $request->getParam( "store_id" );
+  $store_id = $request->getParam( "store_id" );
   //die( "Store : {$origin_store_id}" );
   $resp = array();
 //incluye librerias die('here');
   if ( ! include( '../../conexionMysqli.php' ) ){
     die( 'No se incluyó conexion' );
   }
-//consulta la sucursal del sistema
+/*consulta la sucursal del sistema
   $sql = "SELECT id_sucursal AS store_id FROM sys_sucursales WHERE acceso = 1";
   $stm = $link->query( $sql ) or die( "Error al consultar la sucursal de acceso : {$link->error}" );
   $row = $stm->fetch_assoc();
-  $store_id = $row['store_id'];
+  $store_id = $row['store_id'];*/
 /*Subida*/
 //registros de sincronizacion
-  $sql = "( SELECT 'sys_sincronizacion_registros', COUNT( * ) FROM sys_sincronizacion_registros WHERE id_sucursal_destino = -1 AND status_sincronizacion = 1)
+  $sql = "( SELECT 'sys_sincronizacion_registros', COUNT( * ) FROM sys_sincronizacion_registros WHERE id_sucursal_destino = {$store_id} AND status_sincronizacion = 1)
           UNION
-          ( SELECT 'sys_sincronizacion_ventas', COUNT( * ) FROM sys_sincronizacion_ventas WHERE id_sucursal_destino = -1 AND id_status_sincronizacion = 1)
+          ( SELECT 'sys_sincronizacion_ventas', COUNT( * ) FROM sys_sincronizacion_ventas WHERE id_sucursal_destino = {$store_id} AND id_status_sincronizacion = 1)
           UNION
-          ( SELECT 'sys_sincronizacion_registros_ventas', COUNT( * ) FROM sys_sincronizacion_registros_ventas WHERE id_sucursal_destino = -1 AND status_sincronizacion = 1)
+          ( SELECT 'sys_sincronizacion_registros_ventas', COUNT( * ) FROM sys_sincronizacion_registros_ventas WHERE id_sucursal_destino = {$store_id} AND status_sincronizacion = 1)
           UNION
-          ( SELECT 'sys_sincronizacion_devoluciones', COUNT( * ) FROM sys_sincronizacion_devoluciones WHERE id_sucursal_destino = -1 AND id_status_sincronizacion = 1)
+          ( SELECT 'sys_sincronizacion_devoluciones', COUNT( * ) FROM sys_sincronizacion_devoluciones WHERE id_sucursal_destino = {$store_id} AND id_status_sincronizacion = 1)
           UNION
-          ( SELECT 'sys_sincronizacion_movimientos_almacen', COUNT( * ) FROM sys_sincronizacion_movimientos_almacen WHERE id_sucursal_destino = -1 AND id_status_sincronizacion = 1)
+          ( SELECT 'sys_sincronizacion_movimientos_almacen', COUNT( * ) FROM sys_sincronizacion_movimientos_almacen WHERE id_sucursal_destino = {$store_id} AND id_status_sincronizacion = 1)
           UNION
-          ( SELECT 'sys_sincronizacion_registros_movimientos_almacen', COUNT( * ) FROM sys_sincronizacion_registros_movimientos_almacen WHERE id_sucursal_destino = -1 AND status_sincronizacion = 1)
+          ( SELECT 'sys_sincronizacion_registros_movimientos_almacen', COUNT( * ) FROM sys_sincronizacion_registros_movimientos_almacen WHERE id_sucursal_destino = {$store_id} AND status_sincronizacion = 1)
           UNION
-          ( SELECT 'sys_sincronizacion_validaciones_ventas', COUNT( * ) FROM sys_sincronizacion_validaciones_ventas WHERE id_sucursal_destino = -1 AND id_status_sincronizacion = 1)
+          ( SELECT 'sys_sincronizacion_validaciones_ventas', COUNT( * ) FROM sys_sincronizacion_validaciones_ventas WHERE id_sucursal_destino = {$store_id} AND id_status_sincronizacion = 1)
           UNION
-          ( SELECT 'sys_sincronizacion_movimientos_proveedor_producto', COUNT( * ) FROM sys_sincronizacion_movimientos_proveedor_producto WHERE id_sucursal_destino = -1 AND id_status_sincronizacion = 1)
+          ( SELECT 'sys_sincronizacion_movimientos_proveedor_producto', COUNT( * ) FROM sys_sincronizacion_movimientos_proveedor_producto WHERE id_sucursal_destino = {$store_id} AND id_status_sincronizacion = 1)
           UNION
-          ( SELECT 'sys_sincronizacion_registros_movimientos_proveedor_producto', COUNT( * ) FROM sys_sincronizacion_registros_movimientos_proveedor_producto WHERE id_sucursal_destino = -1 AND status_sincronizacion = 1)
+          ( SELECT 'sys_sincronizacion_registros_movimientos_proveedor_producto', COUNT( * ) FROM sys_sincronizacion_registros_movimientos_proveedor_producto WHERE id_sucursal_destino = {$store_id} AND status_sincronizacion = 1)
           UNION
-          ( SELECT 'sys_sincronizacion_registros_transferencias', COUNT( * ) FROM sys_sincronizacion_registros_transferencias WHERE id_sucursal_destino = -1 AND status_sincronizacion = 1)";
+          ( SELECT 'sys_sincronizacion_registros_transferencias', COUNT( * ) FROM sys_sincronizacion_registros_transferencias WHERE id_sucursal_destino = {$store_id} AND status_sincronizacion = 1)";
   $stm = $link->query( $sql ) or die( "Error al consultar registros de sincronizacion : {$link->error}" );
   $counter = 0;
   while ( $row = $stm->fetch_row() ) {

@@ -42,7 +42,7 @@ $app->get('/consultar_registros_restantes', function (Request $request, Response
   $row = $stm->fetch_assoc();
   $api_path = $row['api_path'];
 //consulta registros locales
-  $crl = curl_init( "localhost/{$local_path}/rest/crones/obtener_registros_restantes?store_id=1" );
+  $crl = curl_init( "localhost/{$local_path}/rest/crones/obtener_registros_restantes?store_id=-1" );
   curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($crl, CURLINFO_HEADER_OUT, true);
   curl_setopt($crl, CURLOPT_POST, true);
@@ -57,7 +57,7 @@ $app->get('/consultar_registros_restantes', function (Request $request, Response
   curl_close($crl);
 
 //consulta registros linea
-  $crl = curl_init( "{$api_path}/rest/crones/obtener_registros_restantes?store_id=1" );
+  $crl = curl_init( "{$api_path}/rest/crones/obtener_registros_restantes?store_id={$store_id}" );
 //die( "{$api_path}/rest/crones/obtener_registros_restantes?store_id=1" );
   curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($crl, CURLINFO_HEADER_OUT, true);
