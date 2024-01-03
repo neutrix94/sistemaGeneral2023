@@ -4,7 +4,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 /*
 * Endpoint: inserta_registros_sincronizacion
 * Path: /inserta_registros_sincronizacion
-* Método: GET
+* Método: POST
 * Descripción: Insercion de registros de sincronizacion
 */
 $app->post('/inserta_registros_sincronizacion_ventas', function (Request $request, Response $response){
@@ -21,22 +21,25 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
 //instanca de clases
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $rowsSynchronization = new rowsSynchronization( $link );//instancia clase de sincronizacion de movimientos
-/*valida que las apis no esten bloqueadas*/
-  $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
-  if( $validation != 'ok' ){
-    return $validation;
-  }
-  
 //variables de respuesta
   $resp = array();
   $resp["ok_rows"] = '';
   $resp["error_rows"] = '';
   $resp["rows_download"] = array();//registros por descargar
   $resp["log_download"] = array();//log de registros por descargar
-
+  $resp["status"] = "ok";
 //variables que llegan
   $rows = $request->getParam( "rows" );
   $log = $request->getParam( "log" );
+  $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );/*valida que las apis no esten bloqueadas*/
+  if( $validation != 'ok' ){
+    return $validation;
+  } 
+
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 3 );//actualiza indicador de sincronizacion en tabla
+  if( $update_synchronization != 'ok' ){
+    return $update_synchronization;
+  } 
 
 /****************************************** Recibe / Inserta ******************************************/
   $request_initial_time = $SynchronizationManagmentLog->getCurrentTime();//obtiene hora actual
@@ -46,15 +49,14 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
     $insert_rows = $rowsSynchronization->insertRows( $rows );
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"] );
+      $resp["status"] = "error";
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
-    //inserta respuesta exitosa
-      $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"] );
+      $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"] );//inserta respuesta exitosa
     }
   }else{
-  //inserta excepcion controlada
-    $response_string = "No llegaron registros de sincronizacion, posiblemente tengas que bajar el limite de registros de sincronizacion!";
+    $response_string = "No llegaron registros de sincronizacion, posiblemente tengas que bajar el limite de registros de sincronizacion de ventas!";//inserta excepcion controlada
     $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $response_string, $resp["log"]["unique_folio"] );
   }
 
@@ -70,6 +72,9 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   if( sizeof( $resp["rows_download"] ) > 0 ){
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );
   }
+  
+//desbloquea indicador de sincronizacion en tabla
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
   return json_encode( $resp );
 
 });

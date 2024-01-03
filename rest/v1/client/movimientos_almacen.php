@@ -1,7 +1,6 @@
 <?php
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
-//ini_set('max_execution_time', 1);
 /*
 * Endpoint: obtener_movimientos_almacen
 * Path: /obtener_movimientos_almacen
@@ -26,12 +25,6 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
 
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $movementsSynchronization = new movementsSynchronization( $link );//instancia clase de sincronizacion de movimientos
-
-/*verfifica que no este sincronizando / marca sincronizando
-  $check = $SynchronizationManagmentLog->block_sinchronization_module( 'ec_movimiento_almacen' );
-  if( $check != 'ok' ){
-    return json_encode( array( "response"=>$check ) );
-  }*/
 
 //consulta path del sistema central
   $config = $SynchronizationManagmentLog->getSystemConfiguration( 'ec_movimiento_almacen' );

@@ -8,19 +8,45 @@
 			$this->link = $connection;
 		}
 //verificar si las APIS estan bloqueadas
-		public function validate_apis_are_not_locked(){
+		public function validate_apis_are_not_locked( $store_id ){
+		//consulta apis generales
 			$sql = "SELECT 
 						bloquear_apis_sincronizacion AS apis_are_locked
 					FROM sys_configuracion_sistema 
 					WHERE id_configuracion_sistema = 1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar si las apis estan bloqueadas : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			if( $row['apis_are_locked'] == 0 ){
-				return 'ok';
-			}else{
-				return 'Las apis del servidor estan bloqueadas!';
+			if( $row['apis_are_locked'] != 0 ){
+				return 'Las apis del servidor estan bloqueadas de manera general!';
 			}
+		//consulta api especifica de la sucursal
+			$sql = "SELECT 
+						permite_sincronizar_manualmente AS permission
+					FROM sys_resumen_sincronizacion_sucursales 
+					WHERE id_sucursal = {$store_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar si las apis de la sucursal estan bloqueadas : {$sql} {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			if( $row['permission'] != 1 ){
+				return 'Las apis de la sucursal estan bloqueadas!';
+			}
+		//consulta si puede entrar la sincronizacion de acuerdo al numero de sincronizaciones configuradas
+			$sql = "SELECT 
+						SUM( IF( permite_sincronizacion_automaticamente = 3, 1, 0 ) ) AS currently_synchronization,
+						( SELECT limite_sincronizaciones_simultaneas FROM sys_configuracion_sistema ) AS synchronization_limit
+					FROM sys_resumen_sincronizacion_sucursales";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar si las apis de la sucursal estan bloqueadas : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			if( $row['currently_synchronization'] > $row['synchronization_limit'] ){
+				return "Se llegó al límite de las sincronizaciones; limite : {$row['currently_synchronization']}; Sucursales sincronizando : {$row['synchronization_limit']}";
+			}
+			return 'ok';
 		}
+//indicador de sucursal en sincronizacion
+		public function updateSynchronizationStatus( $store_id, $type ){
+			$sql = "UPDATE sys_resumen_sincronizacion_sucursales SET permite_sincronizacion_automaticamente = {$type} WHERE id_sucursal = {$store_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al actualizar status de sincronización en sucursal : {$this->link->error}" );
+			return 'ok';
+		} 			
 //bloquear modulo de sincronizacion
 		public function block_sinchronization_module( $table ){
 			$sql = "SELECT sincronizando AS synchronizing FROM sys_limites_sincronizacion WHERE tabla = '{$table}'";
@@ -226,6 +252,18 @@
 					}
 				}
 			}
+		}
+
+		public function updateModuleResume( $module, $action_type, $response, $store_id ){//subida, bajada
+		//actualiza el resumen del modulo
+			$sql = "UPDATE sys_resumen_sincronizacion_sucursales_detalle 
+						SET 
+						contenido_ultima_respuesta_{$action_type} = '{$response}',
+						fecha_hora_ultima_actualizacion_{$action_type} = NOW()
+					WHERE id_modulo = ( SELECT id_modulo FROM sys_limites_sincronizacion WHERE tabla = '{$module}' )
+					AND id_resumen_sincronizacion_sucursal = {$store_id}";
+			$this->link->query( $sql ) or die( "Error al actualizar el resumen de respuesta : {$sql} {$this->link->error}" );
+			return 'ok';
 		}
 
 	}

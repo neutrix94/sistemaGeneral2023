@@ -53,7 +53,7 @@
 					<input type="text" id="costumer_name_input_${position}" 
 						value="${contact == null ? '' : contact.name}" class="form-control" 
 						onblur="changeToUpperCase( this );"
-						onkeyup="change_accordion_header( 'name', ${position}, this );"
+						onkeyup="validate_is_just_text( event, this );change_accordion_header( 'name', ${position}, this );"
 					>
 					</div>
 					<!--div class="col-sm-6">

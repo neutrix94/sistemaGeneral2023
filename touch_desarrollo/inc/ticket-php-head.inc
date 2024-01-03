@@ -235,6 +235,8 @@ Fin de cambio Oscar 25.06.2019*/
 		JOIN sys_sucursales s ON sp.id_sucursal=s.id_sucursal AND s.id_sucursal IN($user_sucursal)";
 	//die( $cs );
 	$descProds=0;
+//implementacion Oscar 2023/12/03 para imprimir ticket de productos que se entregan al dia siguiente
+	$special_products = 0;
 	if ($rs = mysql_query($cs))
 	{
 	//Sumamos descuentos de productos Oscar(04-11-2017)
@@ -263,6 +265,7 @@ Fin de cambio Oscar 25.06.2019*/
 
 			if($dr["is_special"] != '' ){
 				$lineas_productos+=2;
+				$special_products ++;//implementacion Oscar 2023/12/03 para imprimir ticket de productos que se entregan al dia siguiente
 			}
 		/*fin de cambio 10.10.2018*/	
 		}
@@ -815,6 +818,11 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 
     		}
     	$ticket->Output("../cache/ticket/".$nombre_ticket, "F");
+    	//sleep( 2 );
+    	if( $special_products > 0 ){
+	    	$ticket = null;
+    		include( 'ajax/ticket_dia_siguiente.php' );
+    	}
     /*fin de cambio Oscar 25.01.2019*/
     	}//fin de for $cont
 /*fin de cambio Oscar 17.09.2018*/
