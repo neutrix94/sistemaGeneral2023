@@ -91,7 +91,7 @@ $app->post('/inserta_registros_sincronizacion_movimientos_almacen', function (Re
   $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_almacen', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   
 //desbloquea indicador de sincronizacion en tabla
-  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
+//$update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
   return json_encode( $resp );
 
 });

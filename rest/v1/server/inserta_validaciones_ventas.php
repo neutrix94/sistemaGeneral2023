@@ -85,7 +85,7 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
   }
   
 //desbloquea indicador de sincronizacion en tabla
-  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
+//$update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
   return json_encode( $resp );
 });
 
