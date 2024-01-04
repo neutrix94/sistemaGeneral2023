@@ -44,11 +44,13 @@ $app->post('/inserta_registros_sincronizacion_transferencias', function (Request
 /*valida que las apis no esten bloqueadas*/
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );
   if( $validation != 'ok' ){
+    $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
     return $validation;
   } 
 //actualiza indicador de sincronizacion en tabla
   $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 3 );
   if( $update_synchronization != 'ok' ){
+//desbloquea indicador de sincronizacion en tabla
     return $update_synchronization;
   } 
 /**/
