@@ -36,10 +36,13 @@
 					FROM sys_resumen_sincronizacion_sucursales";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar si las apis de la sucursal estan bloqueadas : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
+			if( $row['synchronization_limit'] == 0 ){
+				return "El limite de sincronización es CERO!";
+			}
 			if( $row['currently_synchronization'] > $row['synchronization_limit'] ){
 				return "Se llegó al límite de las sincronizaciones; limite : {$row['synchronization_limit']}; Sucursales sincronizando : {$row['currently_synchronization']}";
 			}
-			return 'ok' ;
+			return 'ok';
 		}
 //indicador de sucursal en sincronizacion
 		public function updateSynchronizationStatus( $store_id, $type ){
