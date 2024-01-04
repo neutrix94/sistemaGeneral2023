@@ -33,8 +33,9 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   $log = $request->getParam( "log" );
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );/*valida que las apis no esten bloqueadas*/
   if( $validation != 'ok' ){
+    $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
     return $validation;
-  } 
+  }
 
   $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 3 );//actualiza indicador de sincronizacion en tabla
   if( $update_synchronization != 'ok' ){
@@ -74,7 +75,7 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   }
   
 //desbloquea indicador de sincronizacion en tabla
-//$update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
+$update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
   return json_encode( $resp );
 
 });

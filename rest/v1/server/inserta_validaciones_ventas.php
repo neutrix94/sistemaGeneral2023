@@ -35,6 +35,7 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
 
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );/*valida que las apis no esten bloqueadas*/
   if( $validation != 'ok' ){
+    $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
     return $validation;
   } 
 
@@ -85,7 +86,7 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
   }
   
 //desbloquea indicador de sincronizacion en tabla
-//$update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
+$update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
   return json_encode( $resp );
 });
 
