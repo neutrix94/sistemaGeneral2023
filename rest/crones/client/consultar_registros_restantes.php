@@ -71,7 +71,7 @@ $app->get('/consultar_registros_restantes', function (Request $request, Response
   );
   $resp[1] = curl_exec($crl);//envia peticion
   curl_close($crl);
-  die( "{$resp[0]},"."{$resp[1]}" );
+  die( "{$resp[0]},"."{$resp[1]},{$api_path}" );
 });
 
 ?>
