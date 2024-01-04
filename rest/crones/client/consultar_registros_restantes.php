@@ -71,7 +71,27 @@ $app->get('/consultar_registros_restantes', function (Request $request, Response
   );
   $resp[1] = curl_exec($crl);//envia peticion
   curl_close($crl);
-  die( "{$resp[0]},"."{$resp[1]},{$api_path}" );
+//consulta limite de registros por modulo
+  $sql = "( SELECT 'sys_sincronizacion_registros', limite FROM sys_limites_sincronizacion WHERE tabla = 'sys_sincronizacion_registros' )
+          UNION
+          ( SELECT 'ec_pedidos', limite FROM sys_limites_sincronizacion WHERE tabla = 'ec_pedidos' )
+          UNION
+          ( SELECT 'ec_devolucion', limite FROM sys_limites_sincronizacion WHERE tabla = 'ec_devolucion' )
+          UNION
+          ( SELECT 'ec_movimiento_almacen', limite FROM sys_limites_sincronizacion WHERE tabla = 'ec_movimiento_almacen' )
+          UNION
+          ( SELECT 'ec_pedidos_validacion_usuarios', limite FROM sys_limites_sincronizacion WHERE tabla = 'ec_pedidos_validacion_usuarios' )
+          UNION
+          ( SELECT 'ec_movimiento_detalle_proveedor_producto', limite FROM sys_limites_sincronizacion WHERE tabla = 'ec_movimiento_detalle_proveedor_producto' )
+          UNION
+          ( SELECT 'ec_transferencias', limite FROM sys_limites_sincronizacion WHERE tabla = 'ec_transferencias' )";
+  $stm = $link->query( $sql ) or die( "Error al consultar los limites de sinbcronizacion : {$link->error}" );
+  $resp[2] = "";
+  while ( $row = $stm->fetch_assoc() ) {
+    $resp[2] .= ( $resp[2] == "" ? "" : "," );
+    $resp[2] .= $row['limite'];
+  }
+  die( "{$resp[0]},"."{$resp[1]},{$api_path},{$resp[2]}" );
 });
 
 ?>
