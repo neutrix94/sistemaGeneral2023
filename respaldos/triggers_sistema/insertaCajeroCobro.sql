@@ -1,7 +1,7 @@
 DROP TRIGGER IF EXISTS insertaCajeroCobro|
 DELIMITER $$
 CREATE TRIGGER insertaCajeroCobro
-AFTER INSERT ON ec_cajero_cobros
+BEFORE INSERT ON ec_cajero_cobros
 FOR EACH ROW
 BEGIN
     DECLARE store_id INTEGER;
