@@ -1,6 +1,6 @@
 DROP PROCEDURE IF EXISTS generaRegistroSincronizacionPagoVenta| 
 DELIMITER $$
-CREATE PROCEDURE generaRegistroSincronizacionPagoVenta( IN sale_payment_id BIGINT, IN teller_session_id INT, IN sale_unique_folio VARCHAR( 30 ), IN origin_store_id INTEGER(11) )/*IN folio_unico_movimiento_almacen VARCHAR( 30 )*/
+CREATE PROCEDURE generaRegistroSincronizacionPagoVenta( IN sale_payment_id BIGINT, IN teller_session_id INT, IN sale_unique_folio VARCHAR( 30 ), IN origin_store_id INTEGER(11), IN teller_payment_unique_folio VARCHAR( 30 ) )/*IN folio_unico_movimiento_almacen VARCHAR( 30 )*/
 BEGIN
 	DECLARE done INT DEFAULT FALSE;
 	DECLARE client_unique_folio VARCHAR( 30 );
@@ -26,7 +26,10 @@ BEGIN
 			'{',
 				'"action_type" : "insert",',
 				'"table_name" : "ec_pedido_pagos",\n',
+				'"primary_key" : "folio_unico",',
+				'"primary_key_value" : "', pp.folio_unico, '",',
 				'"id_pedido" : "( SELECT id_pedido FROM ec_pedidos WHERE folio_unico = \'', sale_unique_folio ,'\' )",\n',
+				'"id_cajero_cobro" : "( SELECT id_cajero_cobro FROM ec_cajero_cobros WHERE folio_unico = \'', teller_payment_unique_folio ,'\')",',
 				'"id_tipo_pago" : "', pp.id_tipo_pago, '",',
 				'"fecha" : "', pp.fecha, '",',
 				'"hora" : "', pp.hora, '",',
@@ -39,11 +42,8 @@ BEGIN
 				'"exportado" : "', pp.exportado, '",',
 				'"es_externo" : "', pp.es_externo, '",',
 				'"id_cajero" : "', pp.id_cajero, '",',
-				'"folio_unico" : "', IF( pp.folio_unico IS NULL, '', pp.folio_unico ), '",',
-                IF( pp.id_sesion_caja != 0, 
-                    CONCAT( '"id_sesion_caja" : "( SELECT id_sesion_caja FROM ec_sesion_caja WHERE folio_unico = \'', teller_session_unique_folio, '\' LIMIT 1 )",\n' ),
-                    ''
-                ),
+				'"folio_unico" : "', pp.folio_unico, '",',
+				'"id_sesion_caja" : "( SELECT id_sesion_caja FROM ec_sesion_caja WHERE folio_unico = \'', teller_session_unique_folio, '\' LIMIT 1 )",',
 				'"sincronizar" : "0"',
 			'}'
 		),
