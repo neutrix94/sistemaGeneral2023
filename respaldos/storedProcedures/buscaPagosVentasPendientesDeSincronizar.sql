@@ -19,8 +19,6 @@ BEGIN
 		ON p.id_pedido = pp.id_pedido
 		LEFT JOIN ec_cajero_cobros cc
 		ON cc.id_cajero_cobro = pp.id_cajero_cobro
-		LEFT JOIN ec_cajero_cobros cc
-		ON cc.id_cajero_cobro = pp.id_cajero_cobro
 		WHERE p.id_sucursal = store_id
 		AND p.folio_unico IS NOT NULL
 		AND pp.folio_unico IS NULL
