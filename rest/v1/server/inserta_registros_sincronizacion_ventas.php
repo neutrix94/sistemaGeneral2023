@@ -18,8 +18,8 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-  if( ! include( 'utils/returnsSynchronization.php' ) ){
-    die( "No se incluyó : returnsSynchronization.php" );
+  if( ! include( 'utils/salesSynchronization.php' ) ){
+    die( "No se incluyó : salesSynchronization.php" );
   }
 //instanca de clases
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
