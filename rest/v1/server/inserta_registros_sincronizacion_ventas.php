@@ -18,9 +18,13 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
+  if( ! include( 'utils/returnsSynchronization.php' ) ){
+    die( "No se incluyó : returnsSynchronization.php" );
+  }
 //instanca de clases
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $rowsSynchronization = new rowsSynchronization( $link );//instancia clase de sincronizacion de movimientos
+  $returnsSynchronization = new returnsSynchronization( $link );
 //variables de respuesta
   $resp = array();
   $resp["ok_rows"] = '';
@@ -68,6 +72,13 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   $store_prefix = $config['store_prefix'];
   $initial_time = $config['process_initial_date_time'];
   $rows_limit = $config['rows_limit'];
+
+  $setPayments = $returnsSynchronization->setNewSynchronizationReturns( $log['origin_store'], $system_store, $store_prefix, $rows_limit );//ejecuta el procedure para generar registros de sincronizacion de pagos
+  if( $setPayments != 'ok' ){
+    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_devolucion' );//liberar el modulo de sincronizacion
+    return json_encode( array( "response" => $setPayments ) );
+  }
+
   $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
     $rows_limit, 'sys_sincronizacion_registros_ventas' );//obtiene registros para descargar
   if( sizeof( $resp["rows_download"] ) > 0 ){
