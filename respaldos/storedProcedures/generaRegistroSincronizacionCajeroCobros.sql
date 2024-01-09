@@ -22,7 +22,7 @@ BEGIN
 		CONCAT(
 			'{',
 				'"action_type" : "insert",',
-				'"table_name" : "ec_cajeros_cobros",\n',
+				'"table_name" : "ec_cajero_cobros",\n',
 				'"primary_key" : "folio_unico",\n',				
 				'"primary_key_value" : "', cc.folio_unico, '",\n',				
 				'"id_sucursal" : "', cc.id_sucursal, '",',

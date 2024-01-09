@@ -1,6 +1,6 @@
 DROP PROCEDURE IF EXISTS buscaCajeroCobrosPendientesDeSincronizar|
 DELIMITER $$
-CREATE PROCEDURE buscaCajeroCobrosPendientesDeSincronizar( IN store_id INTEGER(11), IN origin_store_id INTEGER(11), IN origin_store_prefix VARCHAR(10), IN system_limit INTEGER(11)  )
+CREATE PROCEDURE buscaCajeroCobrosPendientesDeSincronizar( IN store_id INTEGER(11), IN origin_store_id INTEGER(11), IN origin_store_prefix VARCHAR(10), IN system_limit INTEGER(11) )
 BEGIN
 	DECLARE done INT DEFAULT FALSE;
 	DECLARE payment_id BIGINT DEFAULT NULL;
