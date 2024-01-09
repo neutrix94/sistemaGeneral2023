@@ -73,9 +73,9 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   $initial_time = $config['process_initial_date_time'];
   $rows_limit = $config['rows_limit'];
 
-  $setPayments = $returnsSynchronization->setNewSynchronizationReturns( $log['origin_store'], $system_store, $store_prefix, $rows_limit );//ejecuta el procedure para generar registros de sincronizacion de pagos
+  $setPayments = $returnsSynchronization->setNewSynchronizationPayments( $log['origin_store'], $system_store, $store_prefix, $rows_limit );//ejecuta el procedure para generar registros de sincronizacion de pagos
   if( $setPayments != 'ok' ){
-    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_devolucion' );//liberar el modulo de sincronizacion
+    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos' );//liberar el modulo de sincronizacion
     return json_encode( array( "response" => $setPayments ) );
   }
 
