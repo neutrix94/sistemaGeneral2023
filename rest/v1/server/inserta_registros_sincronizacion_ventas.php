@@ -24,7 +24,7 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
 //instanca de clases
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $rowsSynchronization = new rowsSynchronization( $link );//instancia clase de sincronizacion de movimientos
-  $returnsSynchronization = new returnsSynchronization( $link );
+  $salesSynchronization = new salesSynchronization( $link );
 //variables de respuesta
   $resp = array();
   $resp["ok_rows"] = '';
@@ -73,7 +73,7 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   $initial_time = $config['process_initial_date_time'];
   $rows_limit = $config['rows_limit'];
 
-  $setPayments = $returnsSynchronization->setNewSynchronizationPayments( $log['origin_store'], $system_store, $store_prefix, $rows_limit );//ejecuta el procedure para generar registros de sincronizacion de pagos
+  $setPayments = $salesSynchronization->setNewSynchronizationPayments( $log['origin_store'], $system_store, $store_prefix, $rows_limit );//ejecuta el procedure para generar registros de sincronizacion de pagos
   if( $setPayments != 'ok' ){
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos' );//liberar el modulo de sincronizacion
     return json_encode( array( "response" => $setPayments ) );
