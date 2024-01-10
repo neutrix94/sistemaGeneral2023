@@ -883,7 +883,7 @@
 				AND tcs.activo = 1
 				AND tss.estado_suc = 1
 				AND tss.id_sucursal = {$store_id}";
-				die( $sql );
+				//die( $sql );
 			//$eje=mysql_query($sql)or die("Error al consultar las afiliaciones para este cajero!!!<br>".mysql_error());
 			$stm = $this->link->query( $sql ) or die( "Error al consultar las terminales del cajero : {$this->link->error}" );
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
