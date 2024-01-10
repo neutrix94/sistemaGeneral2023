@@ -21,6 +21,7 @@ BEGIN
 		ON cc.id_cajero_cobro = pp.id_cajero_cobro
 		WHERE p.id_sucursal = store_id
 		AND p.folio_unico IS NOT NULL
+		AND ( cc.folio_unico IS NOT NULL AND cc.folio_unico != '' )
 		AND pp.folio_unico IS NULL
 		GROUP BY pp.id_pedido_pago
 		LIMIT system_limit;
