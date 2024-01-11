@@ -18,8 +18,6 @@ BEGIN
 
     IF( store_id = -1 AND new.sincronizar = 1 )
     THEN
-
-        SET new.folio_unico = CONCAT( prefix, '_CFDI_', row_id );
         
         INSERT INTO sys_sincronizacion_registros ( id_sincronizacion_registro, sucursal_de_cambio,
         id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
