@@ -28,7 +28,8 @@ START TRANSACTION;
 			SET status_agrupacion=1 
 		WHERE id_tipo_movimiento = contador_tipos_movimiento
 		AND id_movimiento_detalle_proveedor_producto !=-1
-		AND status_agrupacion=-1 
+		AND status_agrupacion=-1
+		AND folio_unico IS NOT NULL 
 		AND fecha_registro LIKE CONCAT('%',fecha_agrupacion,'%');
 	/*declaramos en 1 id de almacen*/
 		SET num_almacenes=1;
@@ -43,6 +44,7 @@ START TRANSACTION;
 				WHERE mdpp.id_tipo_movimiento = contador_tipos_movimiento
 				AND mdpp.status_agrupacion=1
 				AND mdpp.id_almacen=num_almacenes
+				AND mdpp.folio_unico IS NOT NULL 
 				AND mdpp.fecha_registro LIKE CONCAT('%', fecha_agrupacion,'%');
 	
 			/*IF(verif_almacen=1 AND verif_almacen_detalle>0)	
@@ -65,25 +67,69 @@ START TRANSACTION;
 					mdpp.id_tipo_movimiento,
 					id_almacen_tmp,
 					-1,
-					0,
-					'N/A'
+					1,
+					NULL
 				FROM ec_movimiento_detalle_proveedor_producto mdpp
 				WHERE mdpp.id_tipo_movimiento = contador_tipos_movimiento
 				AND mdpp.status_agrupacion = 1
 				AND mdpp.id_almacen = id_almacen_tmp
 				AND mdpp.id_proveedor_producto IS NOT NULL
 				AND mdpp.fecha_registro LIKE CONCAT('%', fecha_agrupacion ,'%')
+				AND mdpp.folio_unico IS NOT NULL
 				GROUP BY mdpp.id_proveedor_producto;
 
 			/*eliminamos los movimientos de almacen despues de haberlos agrupado*/
 				IF(tipo_agrupacion=4)
 				THEN
-					DELETE FROM ec_movimiento_detalle_proveedor_producto WHERE id_almacen=id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento = contador_tipos_movimiento
-					AND fecha_registro <= CONCAT( fecha_agrupacion, ' 23:59:59' );/*AND id_equivalente!=0*/
+/*aqui insertar instruccion para eliminar movimientos de almacen y su detalle por folio unico Oscar 2023-01-11*/
+					INSERT INTO sys_sincronizacion_registros_movimientos_almacen( id_sincronizacion_registro, sucursal_de_cambio, id_sucursal_destino, datos_json, fecha, tipo,
+						folio_unico_peticion, status_sincronizacion )
+					SELECT
+						NULL, 
+						-1,
+						mdpp.id_sucursal,
+						CONCAT('{',
+			                '"action_type" : "sql_instruction",',
+			                '"sql_instruction" : "DELETE FROM ec_movimiento_detalle_proveedor_producto WHERE folio_unico IN( ', GROUP_CONCAT( CONCAT( '\'', mdpp.folio_unico, '\'' ) SEPARATOR ',' ), ' )"',
+		                '}'
+						),
+						NOW(),
+						'agrupaMovimientosProveedorProductoCRON',
+						1
+					FROM ec_movimiento_detalle_proveedor_producto mdpp
+					WHERE mdpp.id_almacen = id_almacen_tmp 
+					AND mdpp.status_agrupacion=1 
+					AND mdpp.id_tipo_movimiento = contador_tipos_movimiento
+					AND mdpp.fecha_registro <= CONCAT( fecha_agrupacion, ' 23:59:59' )
+					AND mdpp.folio_unico IS NOT NULL;
 
-				ELSE
 					DELETE FROM ec_movimiento_detalle_proveedor_producto WHERE id_almacen=id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento = contador_tipos_movimiento
-					AND fecha_registro LIKE CONCAT( '%', fecha_agrupacion, '%' );/*AND id_equivalente!=0*/
+					AND fecha_registro <= CONCAT( fecha_agrupacion, ' 23:59:59' ) AND folio_unico IS NOT NULL;
+				ELSE
+/*aqui insertar instruccion para eliminar movimientos de almacen y su detalle por folio unico Oscar 2023-01-11*/
+					INSERT INTO sys_sincronizacion_registros_movimientos_almacen( id_sincronizacion_registro, sucursal_de_cambio, id_sucursal_destino, datos_json, fecha, tipo,
+						folio_unico_peticion, status_sincronizacion )
+					SELECT
+						NULL, 
+						-1,
+						mdpp.id_sucursal,
+						CONCAT('{',
+			                '"action_type" : "sql_instruction",',
+			                '"sql_instruction" : "DELETE FROM ec_movimiento_detalle_proveedor_producto WHERE folio_unico IN( ', GROUP_CONCAT( CONCAT( '\'', mdpp.folio_unico, '\'' ) SEPARATOR ',' ), ' )"',
+		                '}'
+						),
+						NOW(),
+						'agrupaMovimientosProveedorProductoCRON',
+						1
+					FROM ec_movimiento_detalle_proveedor_producto mdpp
+					WHERE mdpp.id_almacen=id_almacen_tmp 
+					AND mdpp.status_agrupacion=1 
+					AND mdpp.id_tipo_movimiento = contador_tipos_movimiento
+					AND mdpp.folio_unico IS NOT NULL
+					AND mdpp.fecha_registro LIKE CONCAT( '%', fecha_agrupacion, '%' );
+
+					DELETE FROM ec_movimiento_detalle_proveedor_producto WHERE id_almacen = id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento = contador_tipos_movimiento
+					AND fecha_registro LIKE CONCAT( '%', fecha_agrupacion, '%' ) AND folio_unico IS NOT NULL;
 				END IF;
 			/*END IF;*/
 			
@@ -94,7 +140,7 @@ START TRANSACTION;
 		SET contador_tipos_movimiento = contador_tipos_movimiento+1;
 	END WHILE;
 	INSERT INTO sys_prueba_mantenimiento (  id_mantenimiento, tipo, mov_por_agrupar, fecha, fecha_alta ) VALUES (null,( 10+tipo_agrupacion ),
-		(SELECT COUNT(*) FROM ec_movimiento_detalle_proveedor_producto WHERE id_movimiento_detalle_proveedor_producto != -1 /*AND id_equivalente!=0 */AND fecha_registro LIKE CONCAT( '%', fecha_agrupacion_auxiliar, '%' ) ),
+		(SELECT COUNT(*) FROM ec_movimiento_detalle_proveedor_producto WHERE id_movimiento_detalle_proveedor_producto != -1 AND folio_unico IS NOT NULL AND fecha_registro LIKE CONCAT( '%', fecha_agrupacion_auxiliar, '%' ) ),
 		(SELECT max(fecha_registro) FROM ec_movimiento_detalle_proveedor_producto WHERE fecha_registro like CONCAT('%',fecha_agrupacion,'%')),now());
 COMMIT;
 END $$

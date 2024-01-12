@@ -10,6 +10,7 @@ BEGIN
 		WHERE fecha<=(SELECT date_add(CURRENT_DATE(), INTERVAL (intervalo_dias*-1) DAY))
 		AND id_movimiento_almacen!=-1
 		AND status_agrupacion = -1
+		AND folio_unico IS NOT NULL
 		GROUP BY fecha;    
 		DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 -- Se abre el cursor
@@ -24,4 +25,6 @@ BEGIN
 		END LOOP;
 -- cerramos el cursor
 	CLOSE recorre;   
+/*mandamos llamar procedure que recalcula inventario a nivel producto*/
+	CALL recalculaInventariosAlmacen();
 END $$

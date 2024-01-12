@@ -26,4 +26,5 @@ BEGIN
 		END LOOP;
 -- cerramos el cursor
 	CLOSE recorre;   
+	CALL recalculaInventarioAlmacenProveedorProducto();
 END $$

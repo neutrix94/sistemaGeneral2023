@@ -28,6 +28,7 @@ START TRANSACTION;
 		WHERE id_tipo_movimiento=contador 
 		AND id_movimiento_almacen!=-1 /*AND id_equivalente!=0*/
 		AND status_agrupacion=-1 
+		AND folio_unico IS NOT NULL
 		AND fecha LIKE CONCAT('%',fecha_agrupacion,'%');
 
 		SET num_almacenes=1;/*declaramos en 1 id de almacen*/
@@ -43,7 +44,8 @@ START TRANSACTION;
 				LEFT JOIN ec_movimiento_almacen ma ON md.id_movimiento=ma.id_movimiento_almacen
 				WHERE ma.id_tipo_movimiento=contador
 				AND ma.status_agrupacion=1
-				AND ma.id_almacen=num_almacenes;
+				AND ma.id_almacen=num_almacenes
+				AND ma.folio_unico IS NOT NULL;
 	
 			IF(verif_almacen=1 AND verif_almacen_detalle>0 AND contador != 1 )/*si el almacen existe*/			
 			THEN		
@@ -52,9 +54,9 @@ START TRANSACTION;
 			/*insertamos la cabecera del movimiento de almacen*/
 				INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, 
 				id_almacen, status_agrupacion, id_equivalente, ultima_sincronizacion, ultima_actualizacion, folio_unico )
-				VALUES(null,contador,1,id_sucursal_tmp,
+				VALUES( NULL, contador, 1, id_sucursal_tmp,
 					IF(tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion)/*now()*/,now(),'AGRUPACION DE MOVIMIENTOS DE ALMACEN',-1,-1,'',-1,-1,
-					id_almacen_tmp,tipo_agrupacion, -1, '0000-00-00 00:00:00', now(), 'N/A');
+					id_almacen_tmp,tipo_agrupacion, -1, '0000-00-00 00:00:00', now(), NULL );
 
 				SELECT LAST_INSERT_ID() INTO movimiento_insertado;
 				/*SET movimiento_insertado=251641;*/
@@ -73,7 +75,7 @@ START TRANSACTION;
 					NULL,/*md.id_proveedor_producto*/
 					0,
 					0,
-					'N/A'
+					NULL
 				FROM ec_productos p
 				LEFT JOIN ec_movimiento_detalle md ON md.id_producto=p.id_productos
 				LEFT JOIN ec_movimiento_almacen ma ON md.id_movimiento=ma.id_movimiento_almacen
@@ -81,14 +83,36 @@ START TRANSACTION;
 				WHERE ma.id_tipo_movimiento=contador
 				AND ma.status_agrupacion=1
 				AND ma.id_almacen=id_almacen_tmp
+				AND ma.folio_unico IS NOT NULL
 				GROUP BY md.id_producto;
+/*aqui insertar instruccion para eliminar movimientos de almacen y su detalle por folio unico Oscar 2023-01-11*/
+					INSERT INTO sys_sincronizacion_registros_movimientos_almacen( id_sincronizacion_registro, sucursal_de_cambio, id_sucursal_destino, datos_json, fecha, tipo,
+						folio_unico_peticion, status_sincronizacion )
+					SELECT
+						NULL, 
+						-1,
+						ma.id_sucursal,
+						CONCAT('{',
+			                '"action_type" : "sql_instruction",',
+			                '"sql_instruction" : "DELETE FROM ec_movimiento_almacen WHERE folio_unico IN( ', GROUP_CONCAT( CONCAT( '\'', ma.folio_unico, '\'' ) SEPARATOR ',' ), ' )"',
+		                '}'
+						),
+						NOW(),
+						'agrupaMovimientosProveedorProductoCRON',
+						1
+					FROM ec_movimiento_almacen ma
+					WHERE ma.id_almacen = id_almacen_tmp 
+					AND ma.status_agrupacion = 1 
+					AND ma.id_tipo_movimiento = contador_tipos_movimiento
+					AND ma.fecha LIKE CONCAT( '%', fecha_agrupacion, '%' )
+					AND ma.folio_unico IS NOT NULL;
 
 				DELETE FROM ec_movimiento_almacen WHERE id_almacen=id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento=contador
-				AND fecha LIKE CONCAT('%',fecha_agrupacion,'%') /*AND id_equivalente!=0*/;
+				AND fecha LIKE CONCAT('%',fecha_agrupacion,'%') AND ma.folio_unico IS NOT NULL;
 
 			END IF;
 			
-			SET num_almacenes=num_almacenes+1;
+			SET num_almacenes = num_almacenes+1;
 		
 		END WHILE;
 	/*aumentamos 1 al contador*/
