@@ -104,7 +104,7 @@ START TRANSACTION;
 				SELECT id_almacen,id_sucursal INTO id_almacen_tmp,id_sucursal_tmp FROM ec_almacen WHERE id_almacen IN(num_almacenes);
 			/*insertamos la cabecera del movimiento de almacen*/
 				INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, 
-				id_orden_compra, lote, id_maquila, id_tranferencia, id_almacen, status_agrupacion, id_equivalente, ultima_sincronizacion, ultima_actualizacion, 
+				id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, status_agrupacion, id_equivalente, ultima_sincronizacion, ultima_actualizacion, 
 				sincronizar, folio_unico ) 
 				VALUES(null,contador,1,id_sucursal_tmp,
 					IF(tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion)/*now()*/,now(),'AGRUPACION DE MOVIMIENTOS DE ALMACEN',-1,-1,'',-1,-1,
