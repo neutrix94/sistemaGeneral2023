@@ -98,7 +98,7 @@ START TRANSACTION;
 				AND ma.id_almacen=num_almacenes
 				AND ma.folio_unico IS NOT NULL;
 	
-			IF(verif_almacen=1 AND verif_almacen_detalle>0)/*si el almacen existe*/			
+			IF(verif_almacen=1 AND verif_almacen_detalle>0)/*si el almacen existe*/		
 			THEN		
 			/*extraemos datos del almacen*/
 				SELECT id_almacen,id_sucursal INTO id_almacen_tmp,id_sucursal_tmp FROM ec_almacen WHERE id_almacen IN(num_almacenes);
@@ -136,16 +136,25 @@ START TRANSACTION;
 					AND ma.status_agrupacion=1
 					AND ma.id_almacen=id_almacen_tmp
 					AND ma.folio_unico IS NOT NULL
+					AND IF( tipo_agrupacion=4, fecha <= fecha_agrupacion, fecha LIKE CONCAT('%',fecha_agrupacion,'%') )
 					GROUP BY md.id_producto;
 
 			/*eliminamos los movimientos de almacen despues de haberlos agrupado*/
 				IF(tipo_agrupacion=4)
 				THEN
-					DELETE FROM ec_movimiento_almacen WHERE id_almacen=id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento=contador
-					AND fecha <=fecha_agrupacion AND folio_unico IS NOT NULL;
+					DELETE FROM ec_movimiento_almacen 
+					WHERE id_almacen=id_almacen_tmp 
+					AND status_agrupacion=1 
+					AND id_tipo_movimiento=contador
+					AND fecha <=fecha_agrupacion 
+					AND folio_unico IS NOT NULL;
 				ELSE
-					DELETE FROM ec_movimiento_almacen WHERE id_almacen=id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento=contador
-					AND fecha LIKE CONCAT('%',fecha_agrupacion,'%') AND folio_unico IS NOT NULL;
+					DELETE FROM ec_movimiento_almacen 
+					WHERE id_almacen=id_almacen_tmp 
+					AND status_agrupacion=1 
+					AND id_tipo_movimiento=contador
+					AND fecha LIKE CONCAT('%',fecha_agrupacion,'%') 
+					AND folio_unico IS NOT NULL;
 
 				END IF;
 			END IF;

@@ -10,7 +10,7 @@ BEGIN
 -- La variable que declararemos para concatenar los resultados
 	DECLARE fecha_base VARCHAR(10);
 /*sacamos la fecha restando los días*/
-/*Recorre se llma la variable CURSOR que recorre en base a la consulta*/
+/*Recorre se llama la variable CURSOR que recorre en base a la consulta*/
 	DECLARE recorre CURSOR FOR
 		SELECT DATE_FORMAT(fecha_alta,'%Y') 
 		FROM ec_pedidos
