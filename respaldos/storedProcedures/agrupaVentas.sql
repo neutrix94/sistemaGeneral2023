@@ -90,8 +90,8 @@ START TRANSACTION;
 			/*8*/id_moneda, /*9*/fecha_alta, /*10*/fecha_factura, /*11*/id_direccion, /*12*/direccion, /*13*/id_razon_social, /*14*/subtotal, /*15*/iva, /*16*/ieps, 
 			/*17*/total, /*18*/dias_proximo, /*19*/pagado, /*20*/surtido, /*21*/enviado, /*22*/id_sucursal, /*23*/id_usuario, /*24*/fue_cot, /*25*/facturado, 
 			/*26*/id_tipo_envio, /*27*/descuento, /*28*/id_razon_factura, /*29*/folio_abono, /*30*/correo, /*31*/facebook, /*32*/modificado, /*33*/ultima_sincronizacion, 
-			/*34*/ultima_actualizacion, /*35*/tipo_pedido, /*36*/id_status_agrupacion, /*37*/id_cajero, /*38*/id_devoluciones, /*39*/venta_validada, /*40*/folio_unico,
-			/*41*/id_sesion_caja, /*42*/tipo_sistema, /*43*/monto_pago_inicial, /*44*/monto_venta_mas_ultima_devolucion )
+			/*34*/ultima_modificacion, /*35*/tipo_pedido, /*36*/id_status_agrupacion, /*37*/id_cajero, /*38*/id_devoluciones, /*39*/venta_validada, /*40*/folio_unico,
+			/*41*/id_sesion_caja, /*42*/tipo_sistema, /*43*/monto_pago_inicial ) /*44,monto_venta_mas_ultima_devolucion*/
 				SELECT
 				/*1*/null,
 				/*2*/'agrupacion',
@@ -135,8 +135,8 @@ START TRANSACTION;
 				/*40*/'Agrupacion',
 				/*41*/-1,
 				/*42*/-1,
-				/*43*/0,
-				/*44*/0
+				/*43*/0
+				/*44,0*/
 				FROM ec_pedidos
 				WHERE id_sucursal=cont_sucursales
 				/*AND fecha_alta LIKE CONCAT('%',fecha_agrupacion,'%')*/
@@ -217,7 +217,7 @@ START TRANSACTION;
 			THEN
 			/*agrupamos las devoluciones internas*/
 				INSERT INTO ec_devolucion ( /*1*/id_devolucion, /*2*/id_usuario, /*3*/id_sucursal, /*4*/fecha, /*5*/hora, /*6*/id_pedido, /*7*/folio, 
-					/*8*/monto_devolucion, /*9*/es_externo, /*10*/id_cajero, /*11*/sesion_caja, /*12*/status, /*13*/observaciones, /*14*/tipo_sistema, 
+					/*8*/monto_devolucion, /*9*/es_externo, /*10*/id_cajero, /*11*/id_sesion_caja, /*12*/status, /*13*/observaciones, /*14*/tipo_sistema, 
 					/*15*/id_status_agrupacion, /*16*/folio_unico, /*17*/sincronizar )
 					SELECT
 						null,/*1*/
@@ -336,7 +336,7 @@ START TRANSACTION;
 			THEN
 			/*agrupamos las devoluciones internas*/
 				INSERT INTO ec_devolucion ( /*1*/id_devolucion, /*2*/id_usuario, /*3*/id_sucursal, /*4*/fecha, /*5*/hora, /*6*/id_pedido, /*7*/folio, 
-					/*8*/monto_devolucion, /*9*/es_externo, /*10*/id_cajero, /*11*/sesion_caja, /*12*/status, /*13*/observaciones, /*14*/tipo_sistema, 
+					/*8*/monto_devolucion, /*9*/es_externo, /*10*/id_cajero, /*11*/id_sesion_caja, /*12*/status, /*13*/observaciones, /*14*/tipo_sistema, 
 					/*15*/id_status_agrupacion, /*16*/folio_unico, /*17*/sincronizar )
 					SELECT
 						null,/*1*/

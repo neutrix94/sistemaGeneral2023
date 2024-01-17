@@ -15,7 +15,7 @@ $app = new \Slim\App;
 */
 /*oscar 2023/11/28 para depuracion de registos de sincronizacion*/
 	require( 'client/depurar_sincronizacion.php' );
-	//require( 'client/agrupacion_por_dia.php' );
+	require( 'client/agrupacion_por_dia.php' );
 	//require( 'client/obtenerInformacionSincronizacion.php' );
 	require( 'client/consultar_registros_restantes.php' );
 

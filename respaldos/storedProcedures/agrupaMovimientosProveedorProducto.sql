@@ -124,9 +124,9 @@ START TRANSACTION;
 				IF(tipo_agrupacion=4)
 				THEN
 					DELETE FROM ec_movimiento_detalle_proveedor_producto 
-					WHERE id_tipo_movimiento = contador_tipos_movimientop 
+					WHERE id_tipo_movimiento = contador_tipos_movimiento 
 					AND status_agrupacion=1 
-					AND id_almacen=id_almacen_tm
+					AND id_almacen=id_almacen_tmp
 					AND id_proveedor_producto IS NOT NULL
 					AND fecha_registro <= CONCAT( fecha_agrupacion, ' 23:59:59' ) 
 					AND folio_unico IS NOT NULL;
