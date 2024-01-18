@@ -634,7 +634,7 @@
 								nombre_archivo='{$file_name}',
 								ruta_origen='{$ruta_or}/{$key}',
 								ruta_destino='$key',
-								id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$store_id'),
+								id_sucursal={$this->store_id},
 								id_usuario='$user_id',
 								observaciones=''";
 						$inserta_reg_arch=$this->link->query( $sql_arch )or die( "Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n". $this->link->error . "\n\n" . $sql_arch );
