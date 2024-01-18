@@ -67,11 +67,11 @@ $app->post('/', function (Request $request, Response $response){
   if( $traceability['petition_id'] != null && $traceability['petition_id'] != '' ){
     $transactionId_internal = $traceability['petition_id'];
   }
-
   //traceability
  // $traceability['']
 
 //$file = fopen("archivo.txt", "w");
+  $link->autocommit( false );
 //inserta la respuesta de la transaccion
   $sql = "INSERT INTO vf_transacciones_netpay ( /*1*/id_transaccion_netpay, /*2*/affiliation,/*3*/applicationLabel,/*4*/arqc,/*5*/aid,/*6*/amount,
     /*7*/authCode,/*8*/bin,/*9*/bankName,/*10*/cardExpDate,/*11*/cardType,/*12*/cardTypeName,/*13*/cityName,/*14*/responseCode,/*15*/folioNumber,
@@ -183,11 +183,16 @@ $app->post('/', function (Request $request, Response $response){
                   FROM ec_pedidos_detalle pd
                   LEFT JOIN sys_sucursales_producto sp
                   ON pd.id_producto = sp.id_producto
+                  AND sp.id_sucursal = {$traceability['id_sucursal']}
                   WHERE pd.id_pedido = {$row['sale_id']}
                 )ax";
+//die( $sql );
       $stm = $link->query( $sql ) or die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
   
+//die( "here 1.5" );
       $payment_row = $stm->fetch_assoc();
+      $internal_payment_id = '0';
+      $external_payment_id = '0';
     //inserta pago interno    
       if( $payment_row['internal_porcent'] > 0 ){
         $sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
@@ -196,15 +201,23 @@ $app->post('/', function (Request $request, Response $response){
           '{$traceability['id_cajero']}', '{$traceability['id_sesion_cajero']}' )";
         $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$sql} {$link->error}" );
        //die( $sql );
-
+        $sql = "SELECT MAX( id_pedido_pago ) AS last_sale_payment_id FROM ec_pedido_pagos LIMIT 1";
+        $aux_stm = $link->query( $sql ) or die( "Error al consultar el ultimo pago insertado (interno) : {$link->error}" );
+        $aux_row = $aux_stm->fetch_assoc();
+        $internal_payment_id = $aux_row['last_sale_payment_id'];
+       //$internal_payment_id = $link->insert_id;
       }
     //inserta pago externo    
       if( $payment_row['external_porcent'] > 0 ){
-        $sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
+        $sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_sucursal, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
         id_nota_credito, id_cxc, es_externo, id_cajero, id_sesion_caja )
-        VALUES( {$row['sale_id']}, 7, NOW(), NOW(), ( {$amount}*{$payment_row['external_porcent']} ), '', 1, 1, -1, -1, 1, 
+        VALUES( {$row['sale_id']}, '{$traceability['id_sucursal']}', 7, NOW(), NOW(), ( {$amount}*{$payment_row['external_porcent']} ), '', 1, 1, -1, -1, 1, 
           '{$traceability['id_cajero']}', '{$traceability['id_sesion_cajero']}' )";
         $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$sql} {$link->error}" );
+        $sql = "SELECT MAX( id_pedido_pago ) AS last_sale_payment_id FROM ec_pedido_pagos LIMIT 1";
+        $aux_stm = $link->query( $sql ) or die( "Error al consultar el ultimo pago insertado (externo) : {$link->error}" );
+        $aux_row = $aux_stm->fetch_assoc();
+        $external_payment_id = $aux_row['last_sale_payment_id'];
       }
 
   /*inserta el cobro del pedido
@@ -214,9 +227,9 @@ $app->post('/', function (Request $request, Response $response){
       $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$link->error}" );*/
 
 //inserta el cobro del cajero si el cobro fue exitoso
-    $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_terminal, 
+    $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, id_sucursal, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_terminal, 
     /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar, /*11*/id_sesion_caja, /*12*/id_tipo_pago ) 
-    VALUES ( /*1*/NULL, /*2*/'{$row['sale_id']}', /*3*/'{$traceability['id_cajero']}', /*4*/'{$row['affiliation_id']}', 
+    VALUES ( /*1*/NULL, '{$traceability['id_sucursal']}', /*2*/'{$row['sale_id']}', /*3*/'{$traceability['id_cajero']}', /*4*/'{$row['affiliation_id']}', 
     /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1, 
     /*11*/{$traceability['id_sesion_cajero']}, /*12*/7 )";
 //    error_log( $sql );
@@ -229,12 +242,20 @@ $app->post('/', function (Request $request, Response $response){
               WHERE id_transaccion_netpay = '{$folioNumber}'";
       $stm = $link->query( $sql ) or die( "Error al actualizar el cobro del cajero en la peticion : {$sql} {$link->error}" );
           
-  //actualiza el id de cajero que cobro el pago*/
+  //actualiza en la venta el id de cajero que cobro el pago*/
     if( $row['sale_id'] != null && $row['sale_id'] != '' ){
       $sql="UPDATE ec_pedidos 
               SET id_cajero = '{$traceability['id_cajero']}' 
               WHERE id_pedido = {$row['sale_id']}";
       $stm = $link->query( $sql ) or die( "Error al actualizar el pedido para este cajero : {$sql} {$link->error}" );
+
+  //actualiza en el pago el id de cajero que cobro el pago Oscar 2023-01-10*/
+    //if( $row['sale_id'] != null && $row['sale_id'] != '' ){
+      $sql="UPDATE ec_pedido_pagos 
+              SET id_cajero_cobro = '{$paymet_id}' 
+              WHERE id_pedido_pago IN( {$internal_payment_id}, {$external_payment_id} )";
+      $stm = $link->query( $sql ) or die( "Error al actualizar el pedido para este cajero : {$sql} {$link->error}" );
+
     //actualiza el id de cajero que cobro el pago*/
       $sql="UPDATE ec_pedido_pagos 
               SET id_cajero = '{$traceability['id_cajero']}',
@@ -247,12 +268,13 @@ $app->post('/', function (Request $request, Response $response){
 /*$fp = fopen('data.txt', 'w');
 fwrite($fp, $sql );
 fclose($fp);*/
-
   }
+  $link->autocommit( true );
   $resp = array(
     "code"=>"00",
     "message"=>$message
   );
   return json_encode( $resp );
+  die('');
 });
 ?>

@@ -15,6 +15,7 @@ BEGIN
 		SELECT DATE_FORMAT(fecha,'%Y') FROM ec_movimiento_almacen 
 		WHERE fecha<=(SELECT date_add(CURRENT_DATE(), INTERVAL (minimo_dias*-1) DAY))
 		AND id_movimiento_almacen!=-1/*'2019-05-15'*/
+		AND folio_unico IS NOT NULL
 		GROUP BY DATE_FORMAT(fecha,'%Y');    
 -- Se declara un manejador para saber cuando se tiene que detener
 		DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -36,4 +37,6 @@ BEGIN
 		END LOOP;
 -- cerramos el cursor
 	CLOSE recorre;  
+/*mandamos llamar procedure que recalcula inventario a nivel producto*/
+	CALL recalculaInventariosAlmacen();
 END $$

@@ -46,6 +46,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
 /*valida que las apis no esten bloqueadas*/
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );
   if( $validation != 'ok' ){
+    $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
     return $validation;
   } 
 //actualiza indicador de sincronizacion en tabla
@@ -104,6 +105,9 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'DEVOLUCIONES DESDE LINEA' );
   }
   $SynchronizationManagmentLog->updateModuleResume( 'ec_devolucion', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
+  
+//desbloquea indicador de sincronizacion en tabla
+$update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
   return json_encode( $resp );
 
 });

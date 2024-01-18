@@ -30,7 +30,7 @@ START TRANSACTION;
 	SELECT COUNT(*) INTO tope_tipos_movimiento FROM ec_tipos_movimiento;
 /*SELECT tope_tipos_movimiento;*/
 /*extraemos el id maximo de almacenes*/
-	SELECT MAX(id_almacen) INTO tope_almacenes FROM ec_almacen WHERE id_almacen>0;
+	SELECT MAX(id_almacen) INTO tope_almacenes FROM ec_almacen WHERE id_almacen > 0;
 /*SELECT tope_almacenes;*/
 /*inicializamos el contador en ceros*/
 	SET contador_tipos_movimiento = 1;
@@ -45,7 +45,8 @@ START TRANSACTION;
 			WHERE id_tipo_movimiento = contador_tipos_movimiento
 			AND id_movimiento_detalle_proveedor_producto !=-1
 			AND status_agrupacion=-1 
-			AND fecha_registro LIKE CONCAT('%',fecha_agrupacion,'%');
+			AND fecha_registro LIKE CONCAT('%',fecha_agrupacion,'%')
+			AND folio_unico IS NOT NULL;
 		END IF;
 
 		IF(tipo_agrupacion=3)/*por ano*/
@@ -55,7 +56,8 @@ START TRANSACTION;
 			WHERE id_tipo_movimiento = contador_tipos_movimiento
 			AND id_movimiento_detalle_proveedor_producto !=-1
 			AND status_agrupacion = 2 
-			AND fecha_registro LIKE CONCAT('%',fecha_agrupacion,'%');
+			AND fecha_registro LIKE CONCAT('%',fecha_agrupacion,'%')
+			AND folio_unico IS NOT NULL;
 		END IF;
 
 		IF(tipo_agrupacion=4)/*por historico*/
@@ -65,7 +67,8 @@ START TRANSACTION;
 			WHERE id_tipo_movimiento = contador_tipos_movimiento
 			AND id_movimiento_detalle_proveedor_producto !=-1
 			AND status_agrupacion = 3 
-			AND fecha_registro LIKE CONCAT('%',fecha_agrupacion,'%');
+			AND fecha_registro LIKE CONCAT('%',fecha_agrupacion,'%')
+			AND folio_unico IS NOT NULL;
 		END IF;	
 
 	/*declaramos en 1 id de almacen*/
@@ -82,7 +85,9 @@ START TRANSACTION;
 				WHERE mdpp.id_tipo_movimiento = contador_tipos_movimiento
 				AND mdpp.status_agrupacion=1
 				AND mdpp.id_almacen=num_almacenes
-				AND mdpp.fecha_registro LIKE CONCAT('%', fecha_agrupacion,'%');
+				AND mdpp.id_proveedor_producto IS NOT NULL
+				AND mdpp.fecha_registro LIKE CONCAT('%', fecha_agrupacion,'%')
+				AND mdpp.folio_unico IS NOT NULL;
 	
 			/*IF(verif_almacen=1 AND verif_almacen_detalle>0)	
 			THEN/*	
@@ -91,8 +96,8 @@ START TRANSACTION;
 /*SELECT id_almacen,id_sucursal FROM ec_almacen WHERE id_almacen IN(num_almacenes);*/
 
 				INSERT INTO ec_movimiento_detalle_proveedor_producto ( id_movimiento_detalle_proveedor_producto, id_movimiento_almacen_detalle, 
-					id_proveedor_producto, cantidad, fecha_registro, id_sucursal, id_equivalente, status_agrupacion, id_tipo_movimiento, id_almacen,
-					id_pedido_validacion, sincronizar )
+					id_proveedor_producto, cantidad, fecha_registro, id_sucursal, status_agrupacion, id_tipo_movimiento, id_almacen,
+					id_pedido_validacion, sincronizar, folio_unico )
 				SELECT
 					NULL,
 					NULL,
@@ -100,29 +105,39 @@ START TRANSACTION;
 					SUM( IF( mdpp.id_movimiento_detalle_proveedor_producto IS NULL, 0, mdpp.cantidad ) ),
 					CONCAT( fecha_agrupacion, ' 00:00:01' ),
 					id_sucursal_tmp,
-					0,
 					tipo_agrupacion,
 					mdpp.id_tipo_movimiento,
 					id_almacen_tmp,
 					-1,
-					0
+					1,
+					NULL
 				FROM ec_movimiento_detalle_proveedor_producto mdpp
 				WHERE mdpp.id_tipo_movimiento = contador_tipos_movimiento
 				AND mdpp.status_agrupacion = 1
 				AND mdpp.id_almacen = id_almacen_tmp
 				AND mdpp.id_proveedor_producto IS NOT NULL
 				AND mdpp.fecha_registro LIKE CONCAT('%', fecha_agrupacion ,'%')
+				AND mdpp.folio_unico IS NOT NULL
 				GROUP BY mdpp.id_proveedor_producto;
 
 			/*eliminamos los movimientos de almacen despues de haberlos agrupado*/
 				IF(tipo_agrupacion=4)
 				THEN
-					DELETE FROM ec_movimiento_detalle_proveedor_producto WHERE id_almacen=id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento = contador_tipos_movimiento
-					AND fecha_registro <= CONCAT( fecha_agrupacion, ' 23:59:59' );/*AND id_equivalente!=0*/
-
+					DELETE FROM ec_movimiento_detalle_proveedor_producto 
+					WHERE id_tipo_movimiento = contador_tipos_movimiento 
+					AND status_agrupacion=1 
+					AND id_almacen=id_almacen_tmp
+					AND id_proveedor_producto IS NOT NULL
+					AND fecha_registro <= CONCAT( fecha_agrupacion, ' 23:59:59' ) 
+					AND folio_unico IS NOT NULL;
 				ELSE
-					DELETE FROM ec_movimiento_detalle_proveedor_producto WHERE id_almacen=id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento = contador_tipos_movimiento
-					AND fecha_registro LIKE CONCAT( '%', fecha_agrupacion, '%' );/*AND id_equivalente!=0*/
+					DELETE FROM ec_movimiento_detalle_proveedor_producto 
+					WHERE id_tipo_movimiento = contador_tipos_movimiento
+					AND status_agrupacion=1 
+					AND id_almacen=id_almacen_tmp				
+					AND id_proveedor_producto IS NOT NULL 
+					AND fecha_registro LIKE CONCAT( '%', fecha_agrupacion, '%' ) 
+					AND folio_unico IS NOT NULL;
 				END IF;
 			/*END IF;*/
 			

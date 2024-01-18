@@ -7,16 +7,21 @@ BEGIN
 	DECLARE sale_unique_folio VARCHAR(30);
 	DECLARE teller_session_id INT DEFAULT NULL;
 	DECLARE fecha_base VARCHAR(10);
+	DECLARE teller_payment_unique_folio VARCHAR(30);
 	DECLARE recorre CURSOR FOR
 		SELECT 
 			pp.id_pedido_pago,
 			p.folio_unico,
-			pp.id_sesion_caja
+			pp.id_sesion_caja,
+			cc.folio_unico
 		FROM ec_pedido_pagos pp
 		LEFT JOIN ec_pedidos p
 		ON p.id_pedido = pp.id_pedido
+		LEFT JOIN ec_cajero_cobros cc
+		ON cc.id_cajero_cobro = pp.id_cajero_cobro
 		WHERE p.id_sucursal = store_id
 		AND p.folio_unico IS NOT NULL
+		AND ( cc.folio_unico IS NOT NULL AND cc.folio_unico != '' )
 		AND pp.folio_unico IS NULL
 		GROUP BY pp.id_pedido_pago
 		LIMIT system_limit;
@@ -26,7 +31,7 @@ BEGIN
 		SET sale_unique_folio = NULL;
 		SET teller_session_id = NULL;
 		loop_recorre: LOOP  	
-				FETCH recorre INTO sale_payment_id, sale_unique_folio, teller_session_id;
+				FETCH recorre INTO sale_payment_id, sale_unique_folio, teller_session_id, teller_payment_unique_folio;
 			IF done THEN
 				LEAVE loop_recorre;
 			END IF;
@@ -35,7 +40,7 @@ BEGIN
 					SET pp.folio_unico = CONCAT( origin_store_prefix, '_VTAPAG_', pp.id_pedido_pago ),/*actualiza folio_unico de pago*/
 					pp.sincronizar = 0
 				WHERE pp.id_pedido_pago = sale_payment_id;
-				CALL generaRegistroSincronizacionPagoVenta( sale_payment_id, teller_session_id, sale_unique_folio, origin_store_id );
+				CALL generaRegistroSincronizacionPagoVenta( sale_payment_id, teller_session_id, sale_unique_folio, origin_store_id, teller_payment_unique_folio );
 			COMMIT;
 		END LOOP;
 	CLOSE recorre;   

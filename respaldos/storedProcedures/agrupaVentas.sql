@@ -37,22 +37,37 @@ START TRANSACTION;
 		IF(id_tipo_agrupacion=2)/*por día*/
 		THEN
 		/*Ponemos las cabeceras en status de agrupacion "agrupando"*/
-			UPDATE ec_pedidos SET id_status_agrupacion=1 WHERE id_sucursal=cont_sucursales AND id_pedido!=-1 /*AND id_equivalente!=0*/
-			AND id_status_agrupacion=-1 AND pagado=1 AND fecha_alta LIKE CONCAT('%',fecha_agrupacion,'%');
+			UPDATE ec_pedidos SET id_status_agrupacion=1 
+			WHERE id_sucursal=cont_sucursales 
+			AND id_pedido != -1 
+			AND id_status_agrupacion=-1 
+			AND pagado=1 
+			AND fecha_alta LIKE CONCAT('%',fecha_agrupacion,'%')
+			AND folio_unico IS NOT NULL;
 		END IF;
 
 		IF(id_tipo_agrupacion=3)/*por ano*/
 		THEN
 		/*Ponemos las cabeceras en status de agrupacion "agrupando"*/
-			UPDATE ec_pedidos SET id_status_agrupacion=1 WHERE id_sucursal=cont_sucursales AND id_pedido!=-1 /*AND id_equivalente!=0*/
-			AND id_status_agrupacion=2 AND pagado=1 AND fecha_alta LIKE CONCAT('%',fecha_agrupacion,'%');
+			UPDATE ec_pedidos SET id_status_agrupacion=1 
+			WHERE id_sucursal=cont_sucursales 
+			AND id_pedido!=-1 /*AND id_equivalente!=0*/
+			AND id_status_agrupacion=2 
+			AND pagado=1 
+			AND fecha_alta LIKE CONCAT('%',fecha_agrupacion,'%')
+			AND folio_unico IS NOT NULL;
 		END IF;
 
 		IF(id_tipo_agrupacion=4)/*por historico*/
 		THEN
 		/*Ponemos las cabeceras en status de agrupacion "agrupando"*/
-			UPDATE ec_pedidos SET id_status_agrupacion=1 WHERE id_sucursal=cont_sucursales AND id_pedido!=-1 /*AND id_equivalente!=0*/
-			AND id_status_agrupacion IN(3,4) AND pagado=1 AND fecha_alta<=CONCAT(fecha_agrupacion,' 23:59:59');
+			UPDATE ec_pedidos SET id_status_agrupacion=1 
+			WHERE id_sucursal=cont_sucursales 
+			AND id_pedido!=-1 /*AND id_equivalente!=0*/
+			AND id_status_agrupacion IN(3,4) 
+			AND pagado=1 
+			AND fecha_alta<=CONCAT(fecha_agrupacion,' 23:59:59')
+			AND folio_unico IS NOT NULL;
 		END IF;	
 	/*reseteamos variables de ids nuevos*/
 		SET id_cabecera_pedido=0,id_cabecera_devolucion_interna=0,id_cabecera_devolucion_externa=0,verif_dev_int=0,verif_dev_ext=0,contador_detalles_dev_int=0,
@@ -71,7 +86,12 @@ START TRANSACTION;
 		/*ponemos en status de agrupacion temporal las ventas que pertenencen al día y sucursal*
 			UPDATE ec_pedidos SET id_status_agrupacion=1 WHERE fecha_alta LIKE CONCAT('%',fecha_agrupacion,'%') AND id_sucursal=cont_sucursales AND id_equivalente!=0;
 */
-			INSERT INTO ec_pedidos 
+			INSERT INTO ec_pedidos ( /*1*/id_pedido, /*2*/folio_pedido, /*3*/folio_nv, /*4*/folio_factura, /*5*/folio_cotizacion, /*6*/id_cliente, /*7*/id_estatus,
+			/*8*/id_moneda, /*9*/fecha_alta, /*10*/fecha_factura, /*11*/id_direccion, /*12*/direccion, /*13*/id_razon_social, /*14*/subtotal, /*15*/iva, /*16*/ieps, 
+			/*17*/total, /*18*/dias_proximo, /*19*/pagado, /*20*/surtido, /*21*/enviado, /*22*/id_sucursal, /*23*/id_usuario, /*24*/fue_cot, /*25*/facturado, 
+			/*26*/id_tipo_envio, /*27*/descuento, /*28*/id_razon_factura, /*29*/folio_abono, /*30*/correo, /*31*/facebook, /*32*/modificado, /*33*/ultima_sincronizacion, 
+			/*34*/ultima_modificacion, /*35*/tipo_pedido, /*36*/id_status_agrupacion, /*37*/id_cajero, /*38*/id_devoluciones, /*39*/venta_validada, /*40*/folio_unico,
+			/*41*/id_sesion_caja, /*42*/tipo_sistema, /*43*/monto_pago_inicial ) /*44,monto_venta_mas_ultima_devolucion*/
 				SELECT
 				/*1*/null,
 				/*2*/'agrupacion',
@@ -104,25 +124,31 @@ START TRANSACTION;
 				/*29*/null,
 				/*30*/'-',
 				/*31*/'-',
-				/*32*/-1,
-				/*33*/0,
-				/*34*/'0000-00-00 00:00:00',
-				/*35*/NOW(),
-				/*36*/0,
-				/*37*/id_tipo_agrupacion,
-				/*38*/id_cajero,
-				/*39*/id_devoluciones,
-				/*40*/'1'
+				/*32*/0,
+				/*33*/'0000-00-00 00:00:00',
+				/*34*/NOW(),
+				/*35*/0,
+				/*36*/id_tipo_agrupacion,
+				/*37*/id_cajero,
+				/*38*/id_devoluciones,
+				/*39*/'1',
+				/*40*/'Agrupacion',
+				/*41*/-1,
+				/*42*/-1,
+				/*43*/0
+				/*44,0*/
 				FROM ec_pedidos
 				WHERE id_sucursal=cont_sucursales
 				/*AND fecha_alta LIKE CONCAT('%',fecha_agrupacion,'%')*/
 				AND id_status_agrupacion=1
+				AND folio_unico IS NOT NULL
 /*				AND id_equivalente!=0*/
 				GROUP BY id_sucursal;
 		/*obtenemos el id insertado en la cabecera de pedido*/
 			SELECT LAST_INSERT_ID() INTO id_cabecera_pedido;
 		/*agrupamos el detalle*/
-			INSERT INTO ec_pedidos_detalle
+			INSERT INTO ec_pedidos_detalle ( /*1*/id_pedido_detalle, /*2*/id_pedido, /*3*/id_producto, /*4*/cantidad, /*5*/precio,
+				/*6*/monto, /*7*/iva, /*8*/ieps, /*9*/cantidad_surtida, /*10*/descuento, /*11*/modificado, /*12*/es_externo, /*13*/id_precio, /*14*/folio_unico )
 				SELECT
 					/*1*/null,
 					/*2*/id_cabecera_pedido,
@@ -137,7 +163,7 @@ START TRANSACTION;
 					/*11*/0,
 					/*12*/pd.es_externo,
 					/*13*/pd.id_precio,
-					/*14*/0
+					/*14*/'AGRUPACION'
 				FROM ec_pedidos_detalle pd
 				LEFT JOIN ec_pedidos ped ON pd.id_pedido=ped.id_pedido
 				WHERE ped.id_status_agrupacion=1
@@ -146,11 +172,13 @@ START TRANSACTION;
 				GROUP BY pd.id_producto,pd.es_externo;
 
 		/*agrupamos los pagos*/
-			INSERT INTO ec_pedido_pagos
+			INSERT INTO ec_pedido_pagos ( /*1*/id_pedido_pago, /*2*/id_pedido, /*3*/id_cajero_cobro, /*4*/id_tipo_pago, /*5*/fecha, /*6*/hora, /*7*/monto, /*8*/referencia, 
+				/*9*/id_moneda, /*10*/tipo_cambio, /*11*/id_nota_credito, /*12*/id_cxc, /*13*/exportado, /*14*/es_externo, /*15*/id_cajero, /*16*/folio_unico,
+				/*17*/sincronizar, /*18*/id_sesion_caja )
 				SELECT 
 					/*1*/NULL,
-					/*2*/-1,
-					/*3*/id_cabecera_pedido,
+					/*2*/id_cabecera_pedido,
+					/*3*/-1,
 					/*4*/1,
 					/*5*/IF(id_tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion),
 					/*6*/now(),
@@ -162,7 +190,10 @@ START TRANSACTION;
 					/*12*/-1,
 					/*13*/0,
 					/*14*/pp.es_externo,
-					/*15*/pp.id_cajero
+					/*15*/-1,
+					/*16*/'AGRUPACION',
+					/*17*/1,
+					/*18*/-1
 				FROM ec_pedido_pagos pp
 				LEFT JOIN ec_pedidos ped ON pp.id_pedido=ped.id_pedido
 				WHERE /*ped.fecha_alta LIKE CONCAT('%',fecha_agrupacion,'%')
@@ -185,21 +216,27 @@ START TRANSACTION;
 			IF(verif_dev_ext>0)
 			THEN
 			/*agrupamos las devoluciones internas*/
-				INSERT INTO ec_devolucion 
+				INSERT INTO ec_devolucion ( /*1*/id_devolucion, /*2*/id_usuario, /*3*/id_sucursal, /*4*/fecha, /*5*/hora, /*6*/id_pedido, /*7*/folio, 
+					/*8*/monto_devolucion, /*9*/es_externo, /*10*/id_cajero, /*11*/id_sesion_caja, /*12*/status, /*13*/observaciones, /*14*/tipo_sistema, 
+					/*15*/id_status_agrupacion, /*16*/folio_unico, /*17*/sincronizar )
 					SELECT
 						null,/*1*/
 						-1,/*2*/
-						1,/*3*/
-						cont_sucursales,/*4*/
-						IF(id_tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion),/*5*/
-						now(),/*6*/
-						id_cabecera_pedido,/*7*/
-						'AGRUP',/*8*/
+						cont_sucursales,/*3*/
+						IF(id_tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion),/*4*/
+						now(),/*5*/
+						id_cabecera_pedido,/*6*/
+						'AGRUP',/*7*/
+						SUM( dev.monto_devolucion ),/*8*/
 						dev.es_externo,/*9*/
-						dev.status,/*10*/
-						'AGRUPACION',/*11*/
-						dev.tipo_sistema,/*12*/
-						id_tipo_agrupacion/*13*/
+						-1,/*10*/
+						-1,/*11*/
+						dev.status,/*12*/
+						'AGRUPACION',/*13*/
+						dev.tipo_sistema,/*14*/
+						id_tipo_agrupacion,/*15*/
+						'AGRUPACION',/*16*/
+						1/*17*/
 					FROM ec_devolucion dev
 					LEFT JOIN ec_pedidos ped ON dev.id_pedido=ped.id_pedido
 					WHERE /*ped.fecha_alta LIKE CONCAT('%',fecha_agrupacion,'%')
@@ -224,15 +261,16 @@ START TRANSACTION;
 			IF(contador_detalles_dev_ext>0)
 			THEN
 			/*agrupamos detalle de las devoluciones internas*/
-				INSERT INTO ec_devolucion_detalle ( id_devolucion_detalle, id_devolucion, id_pedido_detalle, id_producto, 
-					id_proveedor_producto, cantidad )
+				INSERT INTO ec_devolucion_detalle ( /*1*/id_devolucion_detalle, /*2*/id_devolucion, /*3*/id_pedido_detalle, /*4*/id_producto, 
+					/*5*/id_proveedor_producto, /*6*/cantidad, /*7*/folio_unico )
 					SELECT 
-						null,
-						id_cabecera_devolucion_externa,
-						0,
-						dd.id_producto,
-						0,
-						SUM(dd.cantidad)
+						/*1*/null,
+						/*2*/id_cabecera_devolucion_externa,
+						/*3*/0,
+						/*4*/dd.id_producto,
+						/*5*/0,
+						/*6*/SUM(dd.cantidad),
+						/*7*/'AGRUPACION'
 					FROM ec_devolucion_detalle dd
 					LEFT JOIN ec_devolucion dev ON dd.id_devolucion=dev.id_devolucion
 					LEFT JOIN ec_pedidos ped ON ped.id_pedido=dev.id_pedido
@@ -246,25 +284,32 @@ START TRANSACTION;
 		/*verificamos si hay pagos de devolucion externos*/
 			SELECT COUNT(dp.id_devolucion_pago) INTO contador_pagos_dev_ext
 			FROM ec_devolucion_pagos dp
-					LEFT JOIN ec_devolucion dev ON dp.id_devolucion=dev.id_devolucion
-					LEFT JOIN ec_pedidos ped ON dev.id_pedido=ped.id_pedido
-					WHERE ped.id_sucursal=cont_sucursales
-					AND ped.id_status_agrupacion=1
-					AND dp.es_externo=1;
+			LEFT JOIN ec_devolucion dev 
+			ON dp.id_devolucion = dev.id_devolucion
+			LEFT JOIN ec_pedidos ped 
+			ON dev.id_pedido = ped.id_pedido
+			WHERE ped.id_sucursal = cont_sucursales
+			AND ped.id_status_agrupacion = 1
+			AND dp.es_externo = 1;
 			IF(contador_pagos_dev_ext>0)
 			THEN
 			/*agrupammos  pago de devoluciones externas*/
-				INSERT INTO ec_devolucion_pagos
+				INSERT INTO ec_devolucion_pagos ( /*1*/id_devolucion_pago, /*2*/id_devolucion, /*3*/id_cajero_cobro, /*4*/id_tipo_pago, /*5*/monto, 
+					/*6*/referencia, /*7*/es_externo, /*8*/fecha, /*9*/hora, /*10*/id_cajero, /*11*/folio_unico, /*12*/sincronizar, /*13*/id_sesion_caja )
 					SELECT 
-						null,
-						id_cabecera_devolucion_externa,
-						1,
-						SUM(dp.monto),
-						'',
-						dp.es_externo,
-						IF(id_tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion),
-						now(),
-						dp.id_cajero
+						/*1*/null,
+						/*2*/id_cabecera_devolucion_externa,
+						/*3*/-1,
+						/*4*/1,
+						/*5*/SUM(dp.monto),
+						/*6*/'',
+						/*7*/dp.es_externo,
+						/*8*/IF(id_tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion),
+						/*9*/now(),
+						/*10*/dp.id_cajero,
+						/*11*/'AGRUPACION',
+						/*12*/1,
+						/*13*/-1
 					FROM ec_devolucion_pagos dp
 					LEFT JOIN ec_devolucion dev ON dp.id_devolucion=dev.id_devolucion
 					LEFT JOIN ec_pedidos ped ON dev.id_pedido=ped.id_pedido
@@ -290,21 +335,27 @@ START TRANSACTION;
 			IF(verif_dev_int>0)
 			THEN
 			/*agrupamos las devoluciones internas*/
-				INSERT INTO ec_devolucion 
+				INSERT INTO ec_devolucion ( /*1*/id_devolucion, /*2*/id_usuario, /*3*/id_sucursal, /*4*/fecha, /*5*/hora, /*6*/id_pedido, /*7*/folio, 
+					/*8*/monto_devolucion, /*9*/es_externo, /*10*/id_cajero, /*11*/id_sesion_caja, /*12*/status, /*13*/observaciones, /*14*/tipo_sistema, 
+					/*15*/id_status_agrupacion, /*16*/folio_unico, /*17*/sincronizar )
 					SELECT
 						null,/*1*/
 						-1,/*2*/
-						1,/*3*/
-						cont_sucursales,/*4*/
-						IF(id_tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion),/*5*/
-						now(),/*6*/
-						id_cabecera_pedido,/*7*/
-						'AGRUP',/*8*/
+						cont_sucursales,/*3*/
+						IF(id_tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion),/*4*/
+						now(),/*5*/
+						id_cabecera_pedido,/*6*/
+						'AGRUP',/*7*/
+						SUM( dev.monto_devolucion ),/*8*/
 						dev.es_externo,/*9*/
-						dev.status,/*10*/
-						'AGRUPACION',/*11*/
-						dev.tipo_sistema,/*12*/
-						id_tipo_agrupacion/*13*/
+						-1,/*10*/
+						-1,/*11*/
+						dev.status,/*12*/
+						'AGRUPACION',/*13*/
+						dev.tipo_sistema,/*14*/
+						id_tipo_agrupacion,/*15*/
+						'AGRUPACION',/*16*/
+						1/*17*/
 					FROM ec_devolucion dev
 					LEFT JOIN ec_pedidos ped ON dev.id_pedido=ped.id_pedido
 					WHERE /*ped.fecha_alta LIKE CONCAT('%',fecha_agrupacion,'%')
@@ -330,14 +381,15 @@ START TRANSACTION;
 			THEN
 			/*agrupamos detalle de las devoluciones internas*/
 				INSERT INTO ec_devolucion_detalle ( id_devolucion_detalle, id_devolucion, id_pedido_detalle, id_producto, 
-					id_proveedor_producto, cantidad )
+					id_proveedor_producto, cantidad, folio_unico )
 					SELECT 
 						null,
 						id_cabecera_devolucion_interna,
 						0,
 						dd.id_producto,
 						0,
-						SUM(dd.cantidad)
+						SUM(dd.cantidad),
+						'AGRUPACION'
 					FROM ec_devolucion_detalle dd
 					LEFT JOIN ec_devolucion dev ON dd.id_devolucion=dev.id_devolucion
 					LEFT JOIN ec_pedidos ped ON ped.id_pedido=dev.id_pedido
@@ -360,17 +412,22 @@ START TRANSACTION;
 			IF(contador_pagos_dev_int>0)
 			THEN
 			/*agrupammos  pago de devoluciones externas*/
-				INSERT INTO ec_devolucion_pagos
+				INSERT INTO ec_devolucion_pagos ( /*1*/id_devolucion_pago, /*2*/id_devolucion, /*3*/id_cajero_cobro, /*4*/id_tipo_pago, /*5*/monto, 
+					/*6*/referencia, /*7*/es_externo, /*8*/fecha, /*9*/hora, /*10*/id_cajero, /*11*/folio_unico, /*12*/sincronizar, /*13*/id_sesion_caja )
 					SELECT 
-						null,
-						id_cabecera_devolucion_interna,
-						1,
-						SUM(dp.monto),
-						'',
-						dp.es_externo,
-						IF(id_tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion),
-						now(),
-						dp.id_cajero
+						/*1*/null,
+						/*2*/id_cabecera_devolucion_interna,
+						/*3*/-1,
+						/*4*/1,
+						/*5*/SUM(dp.monto),
+						/*6*/'',
+						/*7*/dp.es_externo,
+						/*8*/IF(id_tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion),
+						/*9*/now(),
+						/*10*/dp.id_cajero,
+						/*11*/'AGRUPACION',
+						/*12*/1,
+						/*13*/-1
 					FROM ec_devolucion_pagos dp
 					LEFT JOIN ec_devolucion dev ON dp.id_devolucion=dev.id_devolucion
 					LEFT JOIN ec_pedidos ped ON dev.id_pedido=ped.id_pedido

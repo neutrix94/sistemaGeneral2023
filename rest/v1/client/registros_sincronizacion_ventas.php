@@ -17,6 +17,9 @@ $app->get('/obtener_registros_sincronizacion_ventas', function (Request $request
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
+  if( ! include( 'utils/salesSynchronization.php' ) ){
+    die( "No se incluyó : salesSynchronization.php" );
+  }
 //variables
   $req = [];
   $req["rows"] = array(); 
@@ -24,7 +27,8 @@ $app->get('/obtener_registros_sincronizacion_ventas', function (Request $request
 
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $rowsSynchronization = new rowsSynchronization( $link );//instancia clase de sincronizacion de movimientos
-
+  $salesSynchronization = new salesSynchronization( $link );
+  
   $config = $SynchronizationManagmentLog->getSystemConfiguration( 'ec_pedidos' );//consulta path del sistema central
   $path = trim ( $config['value'] );
   $system_store = $config['system_store'];
@@ -36,6 +40,13 @@ $app->get('/obtener_registros_sincronizacion_ventas', function (Request $request
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos' );//liberar el modulo de sincronizacion
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
   }
+
+  $setPayments = $salesSynchronization->setNewSynchronizationPayments( $system_store, $system_store, $store_prefix, $rows_limit );//ejecuta el procedure para generar registros de sincronizacion de pagos
+  if( $setPayments != 'ok' ){
+    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos' );//liberar el modulo de sincronizacion
+    return json_encode( array( "response" => $setPayments ) );
+  }
+
   $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros_ventas' );//consulta registros pendientes de sincronizar
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );//inserta request
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
