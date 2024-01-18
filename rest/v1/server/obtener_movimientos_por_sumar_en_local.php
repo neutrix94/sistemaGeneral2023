@@ -83,6 +83,9 @@ $app->post('/obtener_movimientos_por_sumar', function (Request $request, Respons
   if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
   //$resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA' );
   }
+  
+//desbloquea indicador de sincronizacion en tabla
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
   return json_encode( $resp );
 
 });

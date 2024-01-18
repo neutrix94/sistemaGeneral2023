@@ -12,9 +12,11 @@ BEGIN
 /*sacamos la fecha restando los días*/
 /*Recorre se llma la variable CURSOR que recorre en base a la consulta*/
 	DECLARE recorre CURSOR FOR
-		SELECT DATE_FORMAT(fecha_alta,'%Y-%m-%d') FROM ec_pedidos
+		SELECT DATE_FORMAT(fecha_alta,'%Y-%m-%d') 
+		FROM ec_pedidos
 		WHERE fecha_alta<=(SELECT date_add(CURRENT_DATE(), INTERVAL (minimo_dias*-1) DAY))
 		AND id_pedido!=-1
+		AND folio_unico IS NOT NULL
 		GROUP BY DATE_FORMAT(fecha_alta,'%Y-%m-%d');
 -- Se declara un manejador para saber cuando se tiene que detener
 		DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;

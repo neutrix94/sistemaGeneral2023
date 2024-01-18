@@ -10,6 +10,7 @@ BEGIN
 		FROM ec_movimiento_detalle_proveedor_producto
 		WHERE fecha_registro <= ( SELECT date_add(CURRENT_DATE(), INTERVAL (minimo_dias*-1) DAY) )
 		AND id_movimiento_detalle_proveedor_producto!=-1/*'2019-05-15'*/
+		AND folio_unico IS NOT NULL
 		GROUP BY DATE_FORMAT(fecha_registro,'%Y');    
 		DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 		OPEN recorre;
@@ -22,4 +23,5 @@ BEGIN
 			CALL agrupaMovimientosProveedorProducto(3,fecha_tmp);
 		END LOOP;
 	CLOSE recorre;  
+	CALL recalculaInventarioAlmacenProveedorProducto();
 END $$

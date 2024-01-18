@@ -6,7 +6,7 @@
 		function __construct( $connection ){
 			$this->link = $connection;
 		}
-//hacer jsons de movimientos de almacen
+//hacer jsons de rgistros de ventas
 		public function setNewSynchronizationSales( $store_id, $system_store, $origin_store_prefix, $limit ){
 			$sql = "CALL buscaVentasPendientesDeSincronizar( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
 			$stm = $this->link->query( $sql );
@@ -18,7 +18,7 @@
 			if( ! $stm ){
 				return "Error al generar registros de detalle de ventas : {$this->link->error} {$sql}";
 			}
-			$sql = "CALL buscaPagosVentasPendientesDeSincronizar( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
+			/*$sql = "CALL buscaPagosVentasPendientesDeSincronizar( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
 			$stm = $this->link->query( $sql );
 			if( ! $stm ){
 				return "Error al generar registros de pagos de ventas : {$this->link->error} {$sql}";
@@ -28,6 +28,22 @@
 			if( ! $stm ){
 				return "Error al generar registros de ventas : {$this->link->error} {$sql}";
 			}*/
+			return 'ok';
+		}
+
+//hacer jsons de registros de cobros / pagos
+		public function setNewSynchronizationPayments( $store_id, $system_store, $origin_store_prefix, $limit ){
+			//buscaCajeroCobrosPendientesDeSincronizar( IN store_id INTEGER(11), IN origin_store_id INTEGER(11), IN origin_store_prefix VARCHAR(10), IN system_limit INTEGER(11)  )
+			$sql = "CALL buscaCajeroCobrosPendientesDeSincronizar( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
+			$stm = $this->link->query( $sql );
+			if( ! $stm ){
+				return "Error al generar registros de cobros pendientes de sincronizar : {$this->link->error} {$sql}";
+			}
+			$sql = "CALL buscaPagosVentasPendientesDeSincronizar( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
+			$stm = $this->link->query( $sql );
+			if( ! $stm ){
+				return "Error al generar registros de pagos de ventas pendientes de sincronizar : {$this->link->error} {$sql}";
+			}
 			return 'ok';
 		}
 //hacer / obtener jsons de movimientos de almacen

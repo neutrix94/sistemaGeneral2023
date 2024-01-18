@@ -84,7 +84,7 @@ BEGIN
 			FROM ec_pedidos_detalle ped_det
 			WHERE ped_det.id_pedido = ped.id_pedido
 			),
-			(SELECT
+			/*(SELECT
 				IF( ped_pag.id_pedido_pago IS NOT NULL,
 					CONCAT( ', "sale_payments" : [\n',
 						GROUP_CONCAT(
@@ -117,7 +117,7 @@ BEGIN
 				)
 			FROM ec_pedido_pagos ped_pag
 			WHERE ped_pag.id_pedido = ped.id_pedido
-			),
+			),*/
 			'}'
 		),
 		'ec_pedidos',
