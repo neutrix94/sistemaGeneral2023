@@ -26,6 +26,9 @@ $app->post('/get_print_files', function (Request $request, Response $response){
 			ORDER BY id_archivo DESC
 			LIMIT 10";
 	$stm = $link->query( $sql ) or die( "Error al consultar los archivos por descargar : {$sql} {$link->error}" );
+	if( $stm->num_rows <= 0 ){
+		return 'ok';
+	}
 	while ( $row = $stm->fetch_assoc() ) {
 		$files[] = $row;
 	}
