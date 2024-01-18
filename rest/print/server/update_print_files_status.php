@@ -14,9 +14,10 @@ $app->post('/actualizar_status_archivos', function (Request $request, Response $
 	$files = $request->getParam( 'ok_rows' );
 	$files_ok = explode(',', $files );
 	foreach ($files_ok as $key => $file_id) {
-		echo $file_id . '<br>';
+		$sql = "UPDATE sys_archivos_descarga SET descargado = '1' WHERE id_archivo = {$file_id}";
+		$stm = $link->query( $sql ) or die( "Error al actualizar status de archivo : {$sql} {$link->error}" );
 	}
-	die('');
+	die('ok');
 //recibe id de la sucursal
 //	$store_id = $request->getParam( 'destinity_store_id' );
 //obtiene los archivos pendientes de descargar
