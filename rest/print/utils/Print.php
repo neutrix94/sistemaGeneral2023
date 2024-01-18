@@ -1,17 +1,5 @@
 <?php
-// Uso de la función para descargar archivos
-	/*include( '../../../conexionMysqli.php' );
-
-	$Print = new PrintApi( $link, '../../../' );
-	$ruta_origen = "http://www.casadelasluces.com.mx/sys_Linea/pruebas_oscar_2018/cache/ticket/ticket_4_20180927110148_folio_17CS45833_1.pdf";
-	$ruta_origen = "https://sistemageneralcasa.com/produccion_linea_2023/cache/ticket/tags/pieces/";
-	$ruta_destino = "cache/ticket/tags/pieces/";
-	$nombre = "2023_09_18_10_51_18_650880060f853.txt";
-
-	$resultado = $Print->files_download($ruta_origen, $ruta_destino, $nombre);
-	echo $resultado;
-
-	//die( 'here' );*/
+/*actualizado desde rama api_busqueda_archivos 2024-01-18*/
 	class PrintApi
 	{	
 		private $link;

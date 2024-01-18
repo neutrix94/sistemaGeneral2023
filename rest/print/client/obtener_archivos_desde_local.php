@@ -1,4 +1,5 @@
 <?php
+/*actualizado desde rama api_busqueda_archivos 2024-01-18*/
     use Psr\Http\Message\ResponseInterface as Response;
     use Psr\Http\Message\ServerRequestInterface as Request;
     use Slim\Factory\AppFactory;
