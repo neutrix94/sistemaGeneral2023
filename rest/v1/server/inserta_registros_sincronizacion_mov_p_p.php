@@ -36,7 +36,7 @@ $app->post('/inserta_registros_sincronizacion_movs_p_p', function (Request $requ
   $resp["log_download"] = array();//log de registros por descargar
   $resp["status"] = "ok";
 
-//variables que llegan
+//variables que llegan 
   $rows = $request->getParam( "rows" );
   $log = $request->getParam( "log" );
 
@@ -45,6 +45,7 @@ $app->post('/inserta_registros_sincronizacion_movs_p_p', function (Request $requ
 /*valida que las apis no esten bloqueadas*/
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );
   if( $validation != 'ok' ){
+    $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
     return $validation;
   } 
 //actualiza indicador de sincronizacion en tabla
@@ -90,6 +91,9 @@ $app->post('/inserta_registros_sincronizacion_movs_p_p', function (Request $requ
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );
   }
   $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_detalle_proveedor_producto', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
+
+//desbloquea indicador de sincronizacion en tabla
+$update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
   return json_encode( $resp );
 
 });

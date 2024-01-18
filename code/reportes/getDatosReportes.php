@@ -449,7 +449,7 @@
 		
 	$res=mysql_query($sql) or die("Error 2 en:<br>$sql<br><br>Descripcion:<br>".mysql_error().$sql);
 
-echo $sql;
+//echo $sql;
 	
 	$num=mysql_num_rows($res);
 	

@@ -52,7 +52,8 @@ START TRANSACTION;
 			WHERE id_tipo_movimiento=contador 
 			AND id_movimiento_almacen!=-1 /*AND id_equivalente!=0*/
 			AND status_agrupacion=-1 
-			AND fecha LIKE CONCAT('%',fecha_agrupacion,'%');
+			AND fecha LIKE CONCAT('%',fecha_agrupacion,'%')
+			AND folio_unico IS NOT NULL;
 
 		END IF;
 
@@ -64,7 +65,8 @@ START TRANSACTION;
 			WHERE id_tipo_movimiento=contador 
 			AND id_movimiento_almacen!=-1 /*AND id_equivalente!=0*/
 			AND status_agrupacion=2 
-			AND fecha LIKE CONCAT('%',fecha_agrupacion,'%');
+			AND fecha LIKE CONCAT('%',fecha_agrupacion,'%')
+			AND folio_unico IS NOT NULL;
 		END IF;
 
 		IF(tipo_agrupacion=4)/*por historico*/
@@ -75,7 +77,8 @@ START TRANSACTION;
 			WHERE id_tipo_movimiento=contador 
 			AND id_movimiento_almacen!=-1 /*AND id_equivalente!=0*/
 			AND status_agrupacion IN( 3,4 ) 
-			AND fecha<=fecha_agrupacion;
+			AND fecha<=fecha_agrupacion
+			AND folio_unico IS NOT NULL;
 		END IF;	
 
 	/*declaramos en 1 id de almacen*/
@@ -92,23 +95,27 @@ START TRANSACTION;
 				LEFT JOIN ec_movimiento_almacen ma ON md.id_movimiento=ma.id_movimiento_almacen
 				WHERE ma.id_tipo_movimiento=contador
 				AND ma.status_agrupacion=1
-				AND ma.id_almacen=num_almacenes;
+				AND ma.id_almacen=num_almacenes
+				AND ma.folio_unico IS NOT NULL;
 	
-			IF(verif_almacen=1 AND verif_almacen_detalle>0)/*si el almacen existe*/			
+			IF(verif_almacen=1 AND verif_almacen_detalle>0)/*si el almacen existe*/		
 			THEN		
 			/*extraemos datos del almacen*/
 				SELECT id_almacen,id_sucursal INTO id_almacen_tmp,id_sucursal_tmp FROM ec_almacen WHERE id_almacen IN(num_almacenes);
 			/*insertamos la cabecera del movimiento de almacen*/
-				INSERT INTO ec_movimiento_almacen VALUES(null,contador,1,id_sucursal_tmp,
+				INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, 
+				id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, status_agrupacion, id_equivalente, ultima_sincronizacion, ultima_actualizacion, 
+				sincronizar, folio_unico ) 
+				VALUES(null,contador,1,id_sucursal_tmp,
 					IF(tipo_agrupacion=3,fecha_agrupacion_auxiliar,fecha_agrupacion)/*now()*/,now(),'AGRUPACION DE MOVIMIENTOS DE ALMACEN',-1,-1,'',-1,-1,
-					id_almacen_tmp,tipo_agrupacion,-1,'0000-00-00 00:00:00',now());
+					id_almacen_tmp, tipo_agrupacion, -1, '0000-00-00 00:00:00', now(), 1, NULL );
 
 				SELECT LAST_INSERT_ID() INTO movimiento_insertado;
 				/*SET movimiento_insertado=251641;*/
 			
 			/*insertamos el detalle del movimiento de almacen*/
 				INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
-				id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar )
+				id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico )
 					SELECT
 						null,
 						movimiento_insertado,
@@ -118,8 +125,9 @@ START TRANSACTION;
 						-1,
 						-1,
 						NULL,/*md.id_proveedor_producto*/
-						0,
-						0
+						-1,
+						1,
+						NULL
 					FROM ec_productos p
 					LEFT JOIN ec_movimiento_detalle md ON md.id_producto=p.id_productos
 					LEFT JOIN ec_movimiento_almacen ma ON md.id_movimiento=ma.id_movimiento_almacen
@@ -127,49 +135,26 @@ START TRANSACTION;
 					WHERE ma.id_tipo_movimiento=contador
 					AND ma.status_agrupacion=1
 					AND ma.id_almacen=id_almacen_tmp
+					AND ma.folio_unico IS NOT NULL
+					AND IF( tipo_agrupacion=4, fecha <= fecha_agrupacion, fecha LIKE CONCAT('%',fecha_agrupacion,'%') )
 					GROUP BY md.id_producto;
-
-				/*INSERT INTO ec_movimiento_detalle_proveedor_producto ( id_movimiento_detalle_proveedor_producto, id_movimiento_almacen_detalle, 
-					id_proveedor_producto, cantidad, fecha_registro, id_sucursal, id_equivalente, status_agrupacion, id_tipo_movimiento, id_almacen,
-					id_pedido_validacion, sincronizar )
-				SELECT
-					NULL,
-					NULL,
-					mdpp.id_proveedor_producto,
-					SUM( IF( mdpp.id_movimiento_detalle_proveedor_producto IS NULL, 0, mdpp.cantidad ) ),
-					CONCAT( fecha_agrupacion, ' 00:00:01' ),
-					id_sucursal_tmp,
-					0,
-					tipo_agrupacion,
-					mdpp.id_tipo_movimiento,
-					id_almacen_tmp,
-					-1,
-					0
-				FROM ec_movimiento_detalle_proveedor_producto mdpp
-				WHERE mdpp.id_tipo_movimiento = contador
-				AND mdpp.status_agrupacion = 1
-				AND mdpp.id_almacen = id_almacen_tmp
-				AND mdpp.id_proveedor_producto IS NOT NULL
-				AND mdpp.fecha_registro LIKE CONCAT('%', fecha_agrupacion ,'%')
-				GROUP BY mdpp.id_proveedor_producto;*/
 
 			/*eliminamos los movimientos de almacen despues de haberlos agrupado*/
 				IF(tipo_agrupacion=4)
 				THEN
-				/*QUE BORRE EN CASCADA*/
-					/*DELETE FROM ec_movimiento_detalle_proveedor_producto WHERE id_almacen=id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento = contador
-					AND fecha_registro <= CONCAT( fecha_agrupacion, ' 23:59:59' );AND id_equivalente!=0*/
-
-					DELETE FROM ec_movimiento_almacen WHERE id_almacen=id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento=contador
-					AND fecha <=fecha_agrupacion /*AND id_equivalente!=0*/;
-
+					DELETE FROM ec_movimiento_almacen 
+					WHERE id_almacen=id_almacen_tmp 
+					AND status_agrupacion=1 
+					AND id_tipo_movimiento=contador
+					AND fecha <=fecha_agrupacion 
+					AND folio_unico IS NOT NULL;
 				ELSE
-
-					/*DELETE FROM ec_movimiento_detalle_proveedor_producto WHERE id_almacen=id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento = contador
-					AND fecha_registro LIKE CONCAT( '%', fecha_agrupacion, '%' );AND id_equivalente!=0*/
-
-					DELETE FROM ec_movimiento_almacen WHERE id_almacen=id_almacen_tmp AND status_agrupacion=1 AND id_tipo_movimiento=contador
-					AND fecha LIKE CONCAT('%',fecha_agrupacion,'%') /*AND id_equivalente!=0*/;
+					DELETE FROM ec_movimiento_almacen 
+					WHERE id_almacen=id_almacen_tmp 
+					AND status_agrupacion=1 
+					AND id_tipo_movimiento=contador
+					AND fecha LIKE CONCAT('%',fecha_agrupacion,'%') 
+					AND folio_unico IS NOT NULL;
 
 				END IF;
 			END IF;

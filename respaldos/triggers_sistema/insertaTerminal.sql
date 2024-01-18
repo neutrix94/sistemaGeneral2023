@@ -5,7 +5,7 @@ AFTER INSERT ON ec_terminales_integracion_smartaccounts
 FOR EACH ROW
 BEGIN
     DECLARE store_id INTEGER;
-
+/*inserta las terminales por sucursal*/
 	INSERT INTO ec_terminales_sucursales_smartaccounts ( id_terminal_sucursal, id_terminal, id_sucursal, estado_suc, 
         id_razon_social, sincronizar )
     	SELECT 
@@ -17,8 +17,8 @@ BEGIN
     	1
 	FROM sys_sucursales
 	WHERE id_sucursal>0;
-
-    /*SELECT id_sucursal INTO store_id FROM sys_sucursales WHERE acceso=1;
+/*registros de sincronizacion*/
+    SELECT id_sucursal INTO store_id FROM sys_sucursales WHERE acceso=1;
     IF( store_id = -1 AND new.sincronizar = 1 )
     THEN
         INSERT INTO sys_sincronizacion_registros ( id_sincronizacion_registro, sucursal_de_cambio,
@@ -28,22 +28,26 @@ BEGIN
             store_id,
             id_sucursal,
             CONCAT('{',
-                '"table_name" : "ec_afiliaciones",',
+                '"table_name" : "ec_terminales_integracion_smartaccounts",',
                 '"action_type" : "insert",',
-                '"primary_key" : "id_afiliacion",',
-                '"primary_key_value" : "', new.id_afiliacion, '",',
-                '"id_afiliacion" : "', new.id_afiliacion, '",',
-                '"id_banco" : "', new.id_banco, '",',
-                '"no_afiliacion" : "', new.no_afiliacion, '",',
+                '"primary_key" : "id_terminal_integracion",',
+                '"primary_key_value" : "', new.id_terminal_integracion, '",',
+                '"id_terminal_integracion" : "', new.id_terminal_integracion, '",',
+                '"id_caja_cuenta" : "', new.id_caja_cuenta, '",',
+                '"nombre_terminal" : "', new.nombre_terminal, '",',
                 '"observaciones" : "', new.observaciones, '",',
+                '"id_tipo_terminal" : "', new.id_tipo_terminal, '",',
+                '"numero_serie_terminal" : "', new.numero_serie_terminal, '",',
+                '"store_id" : "', new.store_id, '",',
+                '"imprimir_ticket" : "', new.imprimir_ticket, '",',
                 '"fecha_alta" : "', new.fecha_alta, '",',
                 '"sincronizar" : "0"',
                 '}'
             ),
             NOW(),
-            'insertaAfiliacion',
+            'insertaTerminal',
             1
         FROM sys_sucursales 
         WHERE id_sucursal > 0;
-    END IF;*/
+    END IF;
 END $$

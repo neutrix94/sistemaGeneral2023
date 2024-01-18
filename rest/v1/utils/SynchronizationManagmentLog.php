@@ -1,5 +1,5 @@
 <?php
-
+/**/
 	class SynchronizationManagmentLog
 	{
 		private $link;
@@ -29,15 +29,18 @@
 			if( $row['permission'] != 1 ){
 				return 'Las apis de la sucursal estan bloqueadas!';
 			}
-		//consulta si puede entrar la sincronizacion de acuerdo al numero de sincronizaciones configuradas
+		//consulta si puede entrar la sincronizacion de acuerdo al numero de sincronizaciones configuradas 
 			$sql = "SELECT 
 						SUM( IF( permite_sincronizacion_automaticamente = 3, 1, 0 ) ) AS currently_synchronization,
 						( SELECT limite_sincronizaciones_simultaneas FROM sys_configuracion_sistema ) AS synchronization_limit
 					FROM sys_resumen_sincronizacion_sucursales";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar si las apis de la sucursal estan bloqueadas : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			if( $row['currently_synchronization'] >= $row['synchronization_limit'] ){
-				return "Se llegó al límite de las sincronizaciones; limite : {$row['currently_synchronization']}; Sucursales sincronizando : {$row['synchronization_limit']}";
+			if( $row['synchronization_limit'] == 0 ){
+				return "El limite de sincronización es CERO!";
+			}
+			if( $row['currently_synchronization'] > $row['synchronization_limit'] ){
+				return "Se llegó al límite de las sincronizaciones; limite : {$row['synchronization_limit']}; Sucursales sincronizando : {$row['currently_synchronization']}";
 			}
 			return 'ok';
 		}

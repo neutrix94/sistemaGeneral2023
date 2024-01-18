@@ -13,6 +13,9 @@ $app->post('/agrupacion_por_dia', function (Request $request, Response $response
   if ( ! include( '../../conexionMysqli.php' ) ){
     die( 'No se incluyó conexion' );
   }
+//bloqueo de APIS de sincronizacion
+  $sql = "UPDATE sys_configuracion_sistema SET bloquear_apis_sincronizacion = 1";
+  $stm = $link->query( $sql ) or die( "Error al bloquear APIS : {$link->error}" );
 //elimina triggers cabeceras movimientos almacen
   $sql = "DROP TRIGGER IF EXISTS insertaMovimientoAlmacen";
   $stm = $link->query( $sql ) or die( "Error al eliminar insertaMovimientoAlmacen : {$link->error}" );
@@ -42,7 +45,7 @@ $app->post('/agrupacion_por_dia', function (Request $request, Response $response
   $stm = $link->query( $sql ) or die( "Error al consultar los dias de intervalo de agrupacion por dia en el CRON : {$link->error}" );
   $row = $stm->fetch_assoc();
   $interval_days = $row['minimo_dias_agrupacion_movimientos_dia_cron'];
-  
+  //die( "Intervalo : {$interval_days}" );
 //ejecuta el procedure por dia proveedor producto
   $sql = "CALL parametrosAgrupaMovimientosAlmacenProveedorProductoPorDiaCRON( 2, {$interval_days} )";
   $stm = $link->query( $sql ) or die( "Error al llamar parametrosAgrupaMovimientosAlmacenProveedorProductoPorDiaCRON : {$link->error}" );
@@ -50,7 +53,14 @@ $app->post('/agrupacion_por_dia', function (Request $request, Response $response
 //ejecuta el procedure por dia producto
   $sql = "CALL parametrosAgrupaMovimientosAlmacenPorDiaCron( {$interval_days} )";
   $stm = $link->query( $sql ) or die( "Error al llamar parametrosAgrupaMovimientosAlmacenPorDiaCron : {$link->error}" );
+
+
+//desbloqueo de APIS de sincronizacion
+  $sql = "UPDATE sys_configuracion_sistema SET bloquear_apis_sincronizacion = 0";
+  $stm = $link->query( $sql ) or die( "Error al bloquear APIS : {$link->error}" );
+
   return 'ok';
+  die( 'ok' );
 });
 
 ?>

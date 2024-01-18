@@ -8,13 +8,21 @@
 		}
 //hacer jsons de movimientos de almacen
 		public function setNewSynchronizationReturns( $store_id, $system_store, $origin_store_prefix, $limit ){
+		//crea JSONS de devoluciones
 			$sql = "CALL buscaDevolucionesPendientesDeSincronizar( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
 			$stm = $this->link->query( $sql );
 			if( ! $stm ){
-				return "Error al generar registros de validaciones de ventas por sincronizar : {$this->link->error} {$sql}";
+				return "Error al generar registros de devoluciones pendientes de sincronizar : {$this->link->error} {$sql}";
+			}
+		//crea JSONS de pagos de devoluciones
+			$sql = "CALL buscaPagosDevolucionesPendientesDeSincronizar( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
+			$stm = $this->link->query( $sql );
+			if( ! $stm ){
+				return "Error al generar registros de pagos de devolucion pendientes de sincronizar : {$this->link->error} {$sql}";
 			}
 			return 'ok';
 		}
+
 //hacer / obtener jsons de movimientos de almacen
 		public function getSynchronizationReturns( $system_store, $limit ){
 			$resp = array();

@@ -10,12 +10,12 @@ BEGIN
 -- La variable que declararemos para concatenar los resultados
 	DECLARE fecha_base VARCHAR(10);
 /*sacamos la fecha restando los días*/
-/*Recorre se llma la variable CURSOR que recorre en base a la consulta*/
 	DECLARE recorre CURSOR FOR
 		SELECT DATE_FORMAT(fecha,'%Y-%m-%d') FROM ec_movimiento_almacen 
 		WHERE fecha<=(SELECT date_add(CURRENT_DATE(), INTERVAL (minimo_dias*-1) DAY))
 		AND id_movimiento_almacen!=-1
 		AND status_agrupacion = -1/*Implemetado por Oscar 2023 para que solo tome las fechas con movimientos*/
+		AND folio_unico IS NOT NULL
 		GROUP BY fecha;    
 -- Se declara un manejador para saber cuando se tiene que detener
 		DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -31,4 +31,6 @@ BEGIN
 		END LOOP;
 -- cerramos el cursor
 	CLOSE recorre;   
+/*mandamos llamar procedure que recalcula inventario a nivel producto*/
+	CALL recalculaInventariosAlmacen();
 END $$
