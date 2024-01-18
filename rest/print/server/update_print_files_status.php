@@ -2,15 +2,14 @@
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 /*
-* Endpoint: enviar archivos
-* Path: /send_file
+* Endpoint: enviar actualizar_status_archivos
+* Path: /actualizar_status_archivos
 * Método: POST
-* Descripción: Envia los archivos al servidor destino
+* Descripción: Actualiza status de archivos
 */
 $app->post('/actualizar_status_archivos', function (Request $request, Response $response){
 	include( '../../conexionMysqli.php' );
 	$file = array();
-	//die( 'one' );
 	$files = $request->getParam( 'ok_rows' );
 	$files_ok = explode(',', $files );
 	foreach ($files_ok as $key => $file_id) {
@@ -18,16 +17,5 @@ $app->post('/actualizar_status_archivos', function (Request $request, Response $
 		$stm = $link->query( $sql ) or die( "Error al actualizar status de archivo : {$sql} {$link->error}" );
 	}
 	die('ok');
-//recibe id de la sucursal
-//	$store_id = $request->getParam( 'destinity_store_id' );
-//obtiene los archivos pendientes de descargar
-	$sql = "";
-	//$stm = $link->query( $sql ) or die( "Error al consultar los archivos por descargar : {$sql} {$link->error}" );
-	//while ( $row = $stm->fetch_assoc() ) {
-	//	$files[] = $row;
-	//}
-//codifica el arreglo de jsons
-	$post_data = json_encode( array( "files"=>$files ) );
-	return $post_data;
 });
 ?>
