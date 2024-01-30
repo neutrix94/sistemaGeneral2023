@@ -208,10 +208,10 @@ $app->post('/', function (Request $request, Response $response){
        //$internal_payment_id = $link->insert_id;
       }
     //inserta pago externo    
-      if( $payment_row['external_porcent'] > 0 ){
-        $sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_sucursal, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
+      if( $payment_row['external_porcent'] > 0 ){//aqui se modificó error de netPay ( solo externos ) Oscar 30-01-2024 desde development2024
+        $sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
         id_nota_credito, id_cxc, es_externo, id_cajero, id_sesion_caja )
-        VALUES( {$row['sale_id']}, '{$traceability['id_sucursal']}', 7, NOW(), NOW(), ( {$amount}*{$payment_row['external_porcent']} ), '', 1, 1, -1, -1, 1, 
+        VALUES( {$row['sale_id']}, 7, NOW(), NOW(), ( {$amount}*{$payment_row['external_porcent']} ), '', 1, 1, -1, -1, 1, 
           '{$traceability['id_cajero']}', '{$traceability['id_sesion_cajero']}' )";
         $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$sql} {$link->error}" );
         $sql = "SELECT MAX( id_pedido_pago ) AS last_sale_payment_id FROM ec_pedido_pagos LIMIT 1";
