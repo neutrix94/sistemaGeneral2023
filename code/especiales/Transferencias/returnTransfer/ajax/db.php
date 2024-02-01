@@ -431,7 +431,7 @@
 					WHERE acceso = 1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$this->link->error}" );
 			$system_type = $stm->fetch_row();
-		//genera registro de descarga 
+		//genera registro de descarga
 			if( $system_type[0] == -1 ){
 		//die( 'Here' );
 			/*cambio Oscar 2024-02-01*/
