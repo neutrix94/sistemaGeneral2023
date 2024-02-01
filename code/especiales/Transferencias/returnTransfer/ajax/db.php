@@ -435,8 +435,8 @@
 			if( $system_type[0] == -1 ){
 		//die( 'Here' );
 			/*cambio Oscar 2024-02-01*/
-				$ruta_or .= '/cache/ticket/';
-				$ruta_or = str_replace( '//', '/', $ruta_or );
+				$ruta_or .= 'cache/ticket/';
+				//$ruta_or = str_replace( '//', '/', $ruta_or );
 			/*fin de cambio Oscar 2024-02-01*/
 				$sql_arch="INSERT INTO sys_archivos_descarga SET 
 						id_archivo=null,
