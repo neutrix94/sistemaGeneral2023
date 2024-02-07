@@ -434,12 +434,16 @@
 		//genera registro de descarga
 			if( $system_type[0] == -1 ){
 		//die( 'Here' );
+			/*cambio Oscar 2024-02-01*/
+				$ruta_or .= 'cache/ticket/';
+				//$ruta_or = str_replace( '//', '/', $ruta_or );
+			/*fin de cambio Oscar 2024-02-01*/
 				$sql_arch="INSERT INTO sys_archivos_descarga SET 
 						id_archivo=null,
 						tipo_archivo='txt',
 						nombre_archivo='{$file_name}',
-						ruta_origen='$ruta_or',
-						ruta_destino='$ruta_des',
+						ruta_origen='{$ruta_or}',
+						ruta_destino='cache/ticket/',/*cambio Oscar 2024-02-01*/
 						id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$store_id'),
 						id_usuario='$user_id',
 						observaciones=''";
