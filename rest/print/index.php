@@ -14,5 +14,6 @@ require 'client/obtener_archivos_desde_local.php';
 require 'server/getPrints.php';
 require 'server/obtener_archivos_desde_linea.php';
 require 'server/update_print_files_status.php';
+require 'server/obtenerConfiguracionesImpresiones.php';
 
 $app->run();
