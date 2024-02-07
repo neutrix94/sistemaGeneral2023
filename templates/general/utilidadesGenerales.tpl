@@ -2,7 +2,21 @@
 {literal}
 	<script type="text/javascript">
 	var global_is_repeat = 0;
+/*implementacion Oscar 2024-01-26*/
+	function UsersPrintsModulesValidation(){
+		return true;
+	}
+/*implementacion Oscar 2024-01-26*/
+/*implementacion Oscar 2024-01-26*/
+	function getPrintersEmergent(){
+		var url = '../especiales/administrador_de_carpetas/index.php';
+		var resp = ajaxR( url );
+		$( '#ventana_emergente_global' ).css( 'display', 'block' );
 
+		$( '#contenido_emergente_global' ).css( 'background', 'white' );
+		$( '#contenido_emergente_global' ).html( resp );
+	}
+/*fin de cambio Oscar 2024-01-19*/
 	function getRenewProductProviderBarcodePrefix(){
 		var url = "../especiales/Etiquetas/barcodes/ajax/db.php?fl=validateBarcodesSeriesUpdate&since_content=1";
 		var response = ajaxR( url );//alert( response );

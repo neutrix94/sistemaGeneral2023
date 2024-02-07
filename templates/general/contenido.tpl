@@ -720,6 +720,15 @@
 															{html_options values=$campos2[indice][25][0] output=$campos2[indice][25][1] selected=$campos2[indice][10]}
 														{/if}
 													</select>
+													{if $campos2[indice][0] eq 914}
+														<button 
+															type="button"
+															class="btn btn-primary"
+															onclick="getPrintersEmergent();"
+														>
+															<i class="icon-tools">Carpetas</i>
+														</button>
+													{/if}
 													<input type="hidden" name="{$campos2[indice][2]}" id="{$campos2[indice][2]}" value="{if $tipo eq 0}{$campos2[indice][9]}{else}{$campos2[indice][10]}{/if}"/>
 												{else}
 
@@ -2249,8 +2258,17 @@
 							var disGrid='{$gridArray[x][2]}';
 
 							{literal}
-
-
+<!-- Implementacion Oscar 2024-26-01 -->
+							if (nomGrid == 'UsersPrintsModules'){
+								var validation = UsersPrintsModulesValidation();
+								if( UsersPrintsModulesValidation != true ){
+									alert( validation );
+									$( '#emerge' ).css( 'display', 'none' );
+									//return false;
+								}
+								//alert( 'here' );
+							}
+<!-- Implementacion Oscar 2024-26-01 -->
 
 							if (nomGrid == 'sucursalProducto')
 							{
