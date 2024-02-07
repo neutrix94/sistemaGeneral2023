@@ -207,23 +207,40 @@
 		$ticket->SetXY(4, $ticket->GetY()+3);
 		$ticket->Cell(62, 6, utf8_decode($rw[3]), "" ,0, "L");
 	}
+    /*instancia clases*/
+	include( '../../../../conexionMysqli.php' );
+	include( '../../../../code/especiales/controladores/SysArchivosDescarga.php' );
+	$SysArchivosDescarga = new SysArchivosDescarga( $link );
+	include( '../../../../code/especiales/controladores/SysModulosImpresionUsuarios.php' );
+	$SysModulosImpresionUsuarios = new SysModulosImpresionUsuarios( $link );
+	include( '../../../../code/especiales/controladores/SysModulosImpresion.php' );
+	$SysModulosImpresion = new SysModulosImpresion( $link );
+
+	$ruta_salida = '';
+	$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 1 );//ventas pedientes de validar
+	if( $ruta_salida == 'no' ){
+		$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 1 );//ventas pedientes de validar
+	}
+    $ticket->Output("../../../../{$ruta_salida}/{$nombre_ticket}", "F");
+
 /*implementación Oscar 25.01.2019 para la sincronización de tickets*/
-    if($user_tipo_sistema=='linea'){
-		$sql_arch="INSERT INTO sys_archivos_descarga SET 
+    if($user_tipo_sistema == 'linea'){
+    	$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+		/*$sql_arch="INSERT INTO sys_archivos_descarga SET 
 					id_archivo=null,
 					tipo_archivo='pdf',
 					nombre_archivo='$nombre_ticket',
 					ruta_origen='$ruta_or',
 					ruta_destino='$ruta_des',
-      			/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
+      			/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*
           			id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$user_sucursal'),
-        		/*Fin de Cambio Oscar 03.03.2019*/
+        		/*Fin de Cambio Oscar 03.03.2019*
 					id_usuario='$user_id',
 					observaciones=''";
-		$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);
+		$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);*/
 
     }
-    $ticket->Output("../../../../cache/ticket/".$nombre_ticket, "F");
+/*implementacion Oscar 2024-02-01 para ruta especifica de ticket*/
     /*fin de cambio Oscar 25.01.2019*/
     die( 'ok|' );
 

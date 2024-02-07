@@ -541,10 +541,30 @@
 	$ticket->SetXY(4, $ticket->GetY()+4);
 	$ticket->Cell(62, 6, "", "" ,0, "L");
 */
+/*implementacion Oscar 2024-02-01 para ruta especifica de ticket*/
+	/*instancia clases*/
+	include( '../../controladores/SysArchivosDescarga.php' );
+	$SysArchivosDescarga = new SysArchivosDescarga( $link );
+	include( '../../controladores/SysModulosImpresionUsuarios.php' );
+	$SysModulosImpresionUsuarios = new SysModulosImpresionUsuarios( $link );
+	include( '../../controladores/SysModulosImpresion.php' );
+	$SysModulosImpresion = new SysModulosImpresion( $link );
+	
 	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_".$folio."_$noImp.pdf";
 	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".$folio_sesion_caja.".pdf";
 
-/*implementación Oscar 25.01.2019 para la sincronización de tickets*/
+	$ruta_salida = '';
+	$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 9 );//cotizacion de ventas
+	if( $ruta_salida == 'no' ){
+		$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 9 );//cotizacion de ventas
+	}
+	$ticket->Output( "../../../../{$ruta_salida}/{$nombre_ticket}", "F" );
+/*Sincronización remota de tickets*/
+	if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
+		$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+	}
+
+/*implementación Oscar 25.01.2019 para la sincronización de tickets
     if($user_tipo_sistema=='linea'){
 		$sql_arch="INSERT INTO sys_archivos_descarga SET 
 					id_archivo=null,
@@ -552,15 +572,13 @@
 					nombre_archivo='$nombre_ticket',
 					ruta_origen='$ruta_or',
 					ruta_destino='$ruta_des',
-      			/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
           			id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$user_sucursal'),
-        		/*Fin de Cambio Oscar 03.03.2019*/
 					id_usuario='$user_id',
 					observaciones=''";
 		$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);
 
     }
-    $ticket->Output("../../../../cache/ticket/".$nombre_ticket, "F");
+   //$ticket->Output("../../../../cache/ticket/".$nombre_ticket, "F");
     /*fin de cambio Oscar 25.01.2019*/
 
 /*Implementacion Oscar 2021 para enviar avisos de correo en diferencia de dinero en caja*/

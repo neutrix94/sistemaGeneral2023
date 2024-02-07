@@ -440,9 +440,28 @@ class TicketPDF extends FPDF {
 	$ticket->SetXY(4, $ticket->GetY()+4);
 	$ticket->Cell(62, 6, "", "" ,0, "L");
 
-	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_".$folio."_$noImp.pdf";
+	include( '../../../../../conexionMysqli.php' );
+	include( '../../../controladores/SysArchivosDescarga.php' );
+	$SysArchivosDescarga = new SysArchivosDescarga( $link );
+	include( '../../../controladores/SysModulosImpresionUsuarios.php' );
+	$SysModulosImpresionUsuarios = new SysModulosImpresionUsuarios( $link );
+	include( '../../../controladores/SysModulosImpresion.php' );
+	$SysModulosImpresion = new SysModulosImpresion( $link );
 
-/*implementación Oscar 25.01.2019 para la sincronización de tickets*/
+	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_".$folio."_$noImp.pdf";
+	
+	$ruta_salida = '';
+	$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 10 );//cotizacion de ventas
+	if( $ruta_salida == 'no' ){
+		$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 10 );//cotizacion de ventas
+	}
+	$ticket->Output( "../../../../../{$ruta_salida}/{$nombre_ticket}", "F" );
+/*Sincronización remota de tickets*/
+	if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
+		$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+	}
+
+/*implementación Oscar 25.01.2019 para la sincronización de tickets
     if($user_tipo_sistema=='linea'){
 		$sql_arch="INSERT INTO sys_archivos_descarga SET 
 					id_archivo=null,
@@ -450,9 +469,9 @@ class TicketPDF extends FPDF {
 					nombre_archivo='$nombre_ticket',
 					ruta_origen='$ruta_or',
 					ruta_destino='$ruta_des',
-      			/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
+      			/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal
           			id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE IF('$user_sucursal'='-1',id_sucursal='1',id_sucursal='$user_sucursal')),
-        		/*Fin de Cambio Oscar 03.03.2019*/
+        		/*Fin de Cambio Oscar 03.03.2019
 					id_usuario='$user_id',
 					observaciones=''";
 		$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);
@@ -462,6 +481,6 @@ class TicketPDF extends FPDF {
     /*fin de cambio Oscar 25.01.2019*/
 
    //$ticket->Output($nombre_tkt, "F");
-    echo 'ok|../../../../cache/ticket/'.$nombre_ticket; 
+    echo "ok|../../../../{$ruta_salida}/{$nombre_ticket}";
 /*Fin de cambio Oscar 18.06.2019*/
 ?>
