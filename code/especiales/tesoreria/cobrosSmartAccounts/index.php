@@ -52,7 +52,11 @@
 	<script type="text/javascript" src="js/builder.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../../../css/bootstrap/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="../../../../css/icons/css/fontello.css">
-	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<link rel="stylesheet" type="text/css" href="css/styles.css">    
+	<script src="../../../../js/highlight/highlight.min.js"></script>
+	<link rel="stylesheet" href="../../../../js/highlight/styles/default.min.css">
+    <script>hljs.highlightAll();</script>
+
 </head>
 <body onload="document.getElementById('buscador').focus();">
 <div class="global">

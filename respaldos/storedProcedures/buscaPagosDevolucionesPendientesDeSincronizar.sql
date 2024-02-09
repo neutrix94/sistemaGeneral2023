@@ -11,7 +11,7 @@ BEGIN
 	DECLARE recorre CURSOR FOR
 		SELECT 
 			dp.id_devolucion_pago,
-			d.id_devolucion,
+			d.folio_unico,
 			dp.id_sesion_caja,
 			cc.folio_unico
 		FROM ec_devolucion_pagos dp

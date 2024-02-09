@@ -36,7 +36,7 @@ BEGIN
 				'"hora" : "', dp.hora, '",',
 				'"id_cajero" : "', dp.id_cajero, '",',
 				'"folio_unico" : "', dp.folio_unico, '",',
-				'"id_sesion_caja" : "( SELECT id_sesion_caja FROM ec_sesion_caja WHERE folio_unico = \'', teller_session_id ,'\' )",',
+				'"id_sesion_caja" : "( SELECT id_sesion_caja FROM ec_sesion_caja WHERE folio_unico = \'', teller_session_unique_folio ,'\' )",',
 				'"sincronizar" : "0"',
 			'}'
 		),
