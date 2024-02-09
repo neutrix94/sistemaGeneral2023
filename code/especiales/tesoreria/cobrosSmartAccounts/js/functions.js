@@ -169,7 +169,24 @@ var respuesta = null;
 					}else{//devolucion
 						$( '#cards_container' ).css( 'display', 'none' );
 					}
+/*Oscar 2024-02-08*/
+aux[1] = aux[1].replaceAll(`\r\n\t\t\t\t\t`, `\n`);
+aux[1] = aux[1].replaceAll(`\r\n\t\t\t\t`, `\n`);
+aux[1] = aux[1].replaceAll(`\r\n\t\t\t`, `\n`);
+aux[1] = aux[1].replaceAll(`\\t`, `    `);
+aux[1] = aux[1].replaceAll(`\\r\\n`, `\n`);
+aux[1] = aux[1].replaceAll(`,"`, `,\n"`);
+aux[1] = aux[1].replaceAll(`,{`, `,\n{`);
 
+//aux[1] = JSON.stringify(aux[1],null,'\t');
+
+
+
+$(".emergent_content").html(`<button onclick="close_emergent();">X</button><br><pre><code class="json">${aux[1]}</code></pre>`);
+$(".emergent").css("display","block");
+hljs.highlightAll();
+//hljs.initHighlightingOnLoad();
+/**/
 						getHistoricPayment( respuesta.id_venta );
 				}
 			}		
