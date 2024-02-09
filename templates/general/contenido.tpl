@@ -22,6 +22,18 @@
 	</div>
 <!-- Fin de cambio Oscar 2023/11/15 -->
 
+<!-- Cambio Oscar 2024-02-09 para el boton de administracion de carpetas especificas-->
+{if $tabla eq 'sys_users' && $no_tabla eq '0'}
+	<button 
+		type="button"
+		class="btn btn-primary"
+		onclick="getPrintersEmergent();"
+		style="position : fixed; top : 70%; right : 10px;"
+	>
+		<i class="icon-tools">Carpetas</i>
+	</button>
+{/if}
+<!-- Fin de cambio Oscar 2024-02-09 -->
 <!-- Excepcion 1: Implementacion para botones de exportacion de ubicaciones desde la configuracion de la sucursal -->
 {if $tabla eq 'ec_configuracion_sucursal' && $no_tabla eq '0'}
 	<table style="position:absolute;bottom:30%;">
@@ -720,15 +732,6 @@
 															{html_options values=$campos2[indice][25][0] output=$campos2[indice][25][1] selected=$campos2[indice][10]}
 														{/if}
 													</select>
-													{if $campos2[indice][0] eq 914}
-														<button 
-															type="button"
-															class="btn btn-primary"
-															onclick="getPrintersEmergent();"
-														>
-															<i class="icon-tools">Carpetas</i>
-														</button>
-													{/if}
 													<input type="hidden" name="{$campos2[indice][2]}" id="{$campos2[indice][2]}" value="{if $tipo eq 0}{$campos2[indice][9]}{else}{$campos2[indice][10]}{/if}"/>
 												{else}
 
