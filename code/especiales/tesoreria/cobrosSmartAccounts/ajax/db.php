@@ -824,7 +824,6 @@
 			$sql = "UPDATE ec_devolucion_pagos 
 						SET id_cajero_cobro = {$id_cajero_cobro} 
 					WHERE id_devolucion_pago IN( {$devolucion_interna}, {$devolucion_externa} )";
-			$eje = $this->link->query($sql) or die( "Error al actualizar cajero cobro en devolucion : \n{$sql}\n{$this->link->error}" );	
 //echo $sql . "<br><br>";
 		
 //$this->link->autocommit( true );
