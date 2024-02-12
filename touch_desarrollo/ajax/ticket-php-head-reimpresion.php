@@ -627,9 +627,9 @@
     		$nombre_ticket="ticket_".$user_sucursal."_" . date("YmdHis") . "_" . strtolower($tipofolio) . "_" . $folio . "_".$cont.".pdf";
     		
     		$ruta_salida = '';
-	        $ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 5 );//Devolución antes de validación
+	        $ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 4 );//Devolución antes de validación
 	        if( $ruta_salida == 'no' ){
-	            $ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 5 );//Devolución antes de validación
+	            $ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 4 );//Devolución antes de validación
 	        }
 	        $ticket->Output( "../../{$ruta_salida}/{$nombre_ticket}", "F" );
 	        /*Sincronización remota de tickets*/
@@ -662,8 +662,8 @@
 
     		}
     	//$ticket->Output("../../cache/ticket/".$nombre_ticket, "F");
-    /*fin de cambio Oscar 25.01.2019
-    	}*/
+    /*fin de cambio Oscar 25.01.2019 */
+    	}
 /*fin de cambio Oscar 17.09.2018*/
 /*implementacion Oscar 2023/09/20 para enviar impresion remota*/
 	if($user_tipo_sistema=='linea'){
@@ -673,7 +673,7 @@
 				$file = fopen($archivo_path,"r");
 				$line=fgets($file);
 				fclose($file);
-			    $config=explode("<>",$line);
+			    $config=explode("<>",$line);Q
 			    $tmp=explode("~",$config[0]);
 			    $ruta_des=base64_decode( $tmp[1] );
 				$url = "localhost/{$ruta_des}/rest/print/send_file";
