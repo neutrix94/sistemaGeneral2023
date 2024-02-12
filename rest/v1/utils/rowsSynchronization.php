@@ -87,6 +87,14 @@
 							array_push( $queries, "UPDATE {$row['table_name']} SET sincronizar = 0 {$condition}" );
 						}
 						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
+
+/*Implementacion Oscar 2024-02-12 para crear carpetas mediante la sincronizacion*/
+						if( $row['table_name'] == 'sys_carpetas' ){
+							mkdir( "../../{$row['`path`']}/{$row['nombre_carpeta']}" , 0777);
+							chmod( "../../{$row['`path`']}/{$row['nombre_carpeta']}" , 0777 );
+						}
+/*fin de cambio Oscar 2024-02-12*/
+
 					break;
 					case 'update' :
 						$sql = "UPDATE {$row['table_name']} SET ";
