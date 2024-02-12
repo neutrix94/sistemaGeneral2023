@@ -90,8 +90,8 @@
 
 /*Implementacion Oscar 2024-02-12 para crear carpetas mediante la sincronizacion*/
 						if( $row['table_name'] == 'sys_carpetas' ){
-							mkdir( "../../../{$row['path']}/{$row['nombre_carpeta']}" , 0777);
-							chmod( "../../../{$row['nombre_carpeta']}/{$row['']}" , 0777 );
+							mkdir( "../../{$row['`path`']}/{$row['nombre_carpeta']}" , 0777);
+							chmod( "../../{$row['`path`']}/{$row['nombre_carpeta']}" , 0777 );
 						}
 /*fin de cambio Oscar 2024-02-12*/
 
