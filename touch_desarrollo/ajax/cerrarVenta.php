@@ -635,8 +635,7 @@
 		$return_internal_ammount = 0;
 		$return_external_ammount = 0;
 
-	/*DESHABILITADO POR OSCAR 2023-12-20
-	consulta el monto de la devolucion interna
+//consulta el monto de la devolucion interna
 		$sql = "SELECT monto_devolucion, es_externo FROM ec_devolucion WHERE id_devolucion IN( $tmp_devs )";
 		$stm_amount = mysql_query( $sql ) or die( "Error al consultar los montos de la devolucion  : " . mysql_error() );
 		while ( $row_amount = mysql_fetch_assoc($stm_amount) ) {
@@ -645,8 +644,10 @@
 			}else if( $row_amount['es_externo'] == 1 ){
 				$return_external_ammount += $row_amount['monto_devolucion'];
 			}
-	*/
-	//consulta los pagos de devolcuiones anteriores
+		}
+
+/*DESHABILITADO POR OSCAR 2024-12-20*/
+	/*consulta los pagos de devolcuiones anteriores
 		$sql = "SELECT 
 					SUM( IF( dp.id_devolucion_pago IS NULL, 0, dp.monto ) ) AS return_payments
 				FROM ec_devolucion_pagos dp
@@ -679,7 +680,7 @@
 			}else{
 				$return_internal_ammount = 0;
 			}
-		}
+		}*/
 		//die( "CAlculo : (saldo_a_favor){$return_internal_ammount} = (total_pago){$row['payments_total']} -(total_venta){$row['total']} - (pagos_devolucion){$montos_dev}" );
 	//consulta el monto de la devolucion externa
 		if( $row['payments_total'] > 0 ){
