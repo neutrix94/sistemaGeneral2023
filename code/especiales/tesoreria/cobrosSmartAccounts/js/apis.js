@@ -15,6 +15,7 @@
 		}
 		var url = "ajax/db.php?fl=sendPaymentPetition&amount=" + amount;
 		url += "&terminal_id=" + $( '#tarjeta_' + counter ).val();
+		url += "&sale_id=" + sale_id;
 		url += "&sale_folio=" + sale_folio;
         url += "&counter=" + counter;
 		url += "&session_id=" + $( '#session_id' ).val();
