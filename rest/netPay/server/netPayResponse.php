@@ -173,8 +173,8 @@ $app->post('/', function (Request $request, Response $response){
 
     //consulta entre interno y externo
         $sql = "SELECT
-                  ROUND( ax.internal/ax.total, 2 ) AS internal_porcent,
-                  ROUND( ax.external/ax.total, 2 ) AS external_porcent
+                  ROUND( ax.internal/ax.total, 6 ) AS internal_porcent,
+                  ROUND( ax.external/ax.total, 6 ) AS external_porcent
                 FROM(
                   SELECT
                     SUM( pd.monto ) AS total,

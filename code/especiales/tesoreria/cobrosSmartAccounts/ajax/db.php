@@ -391,8 +391,8 @@
 			$id_cajero_cobro = $this->link->insert_id;//die( 'here' );
 		//consulta entre interno y externo
 		    $sql = "SELECT
-						ROUND( ax.internal/ax.total, 2 ) AS internal_porcent,
-						ROUND( ax.external/ax.total, 2 ) AS external_porcent
+						ROUND( ax.internal/ax.total, 6 ) AS internal_porcent,
+						ROUND( ax.external/ax.total, 6 ) AS external_porcent
 		            FROM(
 		            	SELECT
 			                SUM( pd.monto ) AS total,
@@ -678,8 +678,8 @@
 
 		//consulta entre interno y externo
 		    $sql = "SELECT
-		              ROUND( ax.internal/ax.total, 2 ) AS internal_porcent,
-		              ROUND( ax.external/ax.total, 2 ) AS external_porcent
+		              ROUND( ax.internal/ax.total, 6 ) AS internal_porcent,
+		              ROUND( ax.external/ax.total, 6 ) AS external_porcent
 		            FROM(
 		              SELECT
 		                SUM( pd.monto ) AS total,
@@ -796,8 +796,8 @@
 		    $eje = $this->link->query($sql) or die( "Error al consultar montos de devolución\n{$sql}\n{$this->link->error}" );
 //echo $sql . "<br><br>";
 		    $datos_1 = $eje->fetch_row();
-		    $datos_1[0] = round( $ammount * ( $datos_1[0] / $datos_1[2] ), 2 )*-1;
-		    $datos_1[1] = round( $ammount * ( $datos_1[1] / $datos_1[2] ), 2 )*-1;
+		    $datos_1[0] = round( $ammount * ( $datos_1[0] / $datos_1[2] ), 6 )*-1;
+		    $datos_1[1] = round( $ammount * ( $datos_1[1] / $datos_1[2] ), 6 )*-1;
 		    //var_dump( $datos_1 );die( '' );
 //$this->link->autocommit( false );
 		//insertamos las devoluciones completas
