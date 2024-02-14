@@ -613,10 +613,14 @@
 /*Implementacion Oscar 25.06.2019 para insertar la referencia de las devoluciones en el pedido*/
 	if( isset( $_GET['id_devoluciones'] ) ){
 		$id_devoluciones = $_GET['id_devoluciones'];
-	//consulta id de pedido original 
 		$tmp_devs = str_replace('~', ',', $id_devoluciones );
 		$devs_array = explode( '~', $id_devoluciones );
-		$sql = "SELECT 
+	//consulta id de pedido original 
+		$sql = "SELECT id_pedido FROM ec_devolucion WHERE id_devolucion IN( {$tmp_devs} )";
+		$stm = mysql_query( $sql ) or die( "Error al consultar el id de la venta original : " . mysql_error() );
+		$row = mysql_fetch_assoc( $stm );
+	//consulta pagos de venta original
+		/*$sql = "SELECT 
 					p.id_pedido AS original_sale_id, 
 					SUM( pp.monto ) AS payments_total, 
 					p.id_sesion_caja AS original_sale_session_id,
@@ -628,7 +632,27 @@
 				LEFT JOIN ec_devolucion d
 				ON d.id_pedido = p.id_pedido 
 				WHERE d.id_devolucion IN( {$tmp_devs} )
-				GROUP BY p.id_pedido";
+				GROUP BY p.id_pedido";*/
+		$sql = "SELECT
+					ax.original_sale_id, 
+					SUM( pp.monto ) AS payments_total, 
+					ax.original_sale_session_id,
+					ax.return_amount,
+					ax.total
+				FROM(
+					SELECT 
+						p.id_pedido AS original_sale_id, 
+						p.id_sesion_caja AS original_sale_session_id,
+						SUM( d.monto_devolucion ) AS return_amount,
+						p.total
+					FROM ec_pedidos p
+					LEFT JOIN ec_devolucion d
+					ON d.id_pedido = p.id_pedido 
+					WHERE d.id_devolucion IN( {$tmp_devs} )
+					GROUP BY p.id_pedido
+				)ax
+				LEFT JOIN ec_pedido_pagos pp 
+				ON ax.original_sale_id = pp.id_pedido";
 				//die( $sql );
 		$stm = mysql_query( $sql ) or die( "Error al consultar informacion del pedido original : " . mysql_error() );
 		$row = mysql_fetch_assoc( $stm );
