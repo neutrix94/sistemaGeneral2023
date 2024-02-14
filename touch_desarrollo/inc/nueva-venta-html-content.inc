@@ -514,6 +514,7 @@ var packsCatalogue = new Array();
 <!--Implementación de oscar 24-12-2017-->
   <?php
     if(isset($s_f_c)){
+      $s_f_c = round( $s_f_c, 2 );
   ?>
     <div style="width:300px;" style="border:0;position:fixed;right:30px;">
       <table style="border:0;position:absolute;width:100%;background:transparent;margin:0;border-spacing : 0;">
