@@ -212,11 +212,11 @@ hljs.highlightAll();
 	function valida_tca(obj,e,flag,num){
 		const regex = /^[0-9]+$/; // Expresión regular que permite solo números
 		var value = $(obj).val();
-		if ( value.includes('.') ) {
+		/*if ( value.includes('.') ) {
 			alert( "No se admiten numeros decimales!" );
     		value.replace('.', '');
     		$( obj ).val( value );
-  		}
+  		}*/
   		if (!regex.test(value)) {
     		$( obj ).val( value.replace(/[^\d]/g, '') );
   		}
