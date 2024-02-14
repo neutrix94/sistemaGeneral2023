@@ -104,13 +104,13 @@ $CONSULTA_PAGOS_PENDIENTES_DE_COBRAR = $sql;
 
 $CONSULTAS_SQL[] = array( "CONSULTA_PAGOS_PENDIENTES_DE_COBRAR"=>$CONSULTA_PAGOS_PENDIENTES_DE_COBRAR, "RESULTADO"=>$r );
 		$sql = "SELECT 
-				ROUND( total_venta ) AS total_venta,
-				ROUND( monto_venta_mas_ultima_devolucion ) AS monto_venta_mas_ultima_devolucion
+				ROUND( total_venta, 2 ) AS total_venta,
+				ROUND( monto_venta_mas_ultima_devolucion, 2 ) AS monto_venta_mas_ultima_devolucion
 			FROM ec_pedidos_referencia_devolucion
 			WHERE id_pedido = {$clave}";//die( $sql );
 		$reference_stm = mysql_query( $sql ) or die( "Error al consultar la referencia de la venta y devolucion  : " . mysql_error() );
 		$reference_row = mysql_fetch_assoc( $reference_stm );
-		$r['total_real'] = round( $r['total_nota'] );
+		$r['total_real'] = round( $r['total_nota'], 2 );
 		$r['total_nota'] = $reference_row['monto_venta_mas_ultima_devolucion'];
 
 $CONSULTA_REFERENCIA_DEVOLUCION = $sql;
@@ -133,8 +133,8 @@ $CONSULTAS_SQL[] = array( "CONSULTA_REFERENCIA_DEVOLUCION"=>$CONSULTA_REFERENCIA
 	/*verifica si tiene una devolucion relacionada y el status de esta*/
 		$sql="SELECT 
 					IF( d.id_devolucion IS NULL, 0, d.id_devolucion ) As id_devolucion,
-					ROUND( SUM( IF( d.id_devolucion IS NULL, 0, d.monto_devolucion ) ) ) AS monto_devolucion,
-					ROUND( SUM( IF( dp.id_devolucion IS NULL ,0, dp.monto ) ) ) AS pagos_devolucion,
+					ROUND( SUM( IF( d.id_devolucion IS NULL, 0, d.monto_devolucion ) ), 2 ) AS monto_devolucion,
+					ROUND( SUM( IF( dp.id_devolucion IS NULL ,0, dp.monto ) ), 2 ) AS pagos_devolucion,
 					IF( d.id_devolucion IS NULL, '', d.status ) AS status
 				FROM ec_devolucion d
 				LEFT JOIN ec_devolucion_pagos dp
@@ -216,15 +216,15 @@ $CONSULTAS_SQL[] = array( "CONSULTA_DEVOLUCION_RELACIONADA"=>$CONSULTA_DEVOLUCIO
 		$resp = json_encode( 
 				array( 'id_venta'=>$r['id_venta'], 
 					'folio_venta'=>$r['folio_venta'], 
-					'total_venta'=>round( $r['total_nota'] ),
-					'pagos_cobrados'=>round( $r['pagos_registrados'] ), 
+					'total_venta'=>round( $r['total_nota'], 2 ),
+					'pagos_cobrados'=>round( $r['pagos_registrados'], 2 ), 
 					'FORMULA_PAGOS_COBRADOS'=>$FORMULA_PAGOS_COBRADOS,
 					
 					'id_devolucion'=>$return_row['id_devolucion'], 
-					'monto_devolucion'=>round( $return_row['monto_devolucion'] ), 
-					'monto_pagos_devolucion'=>round( $return_row['monto_pagos_devolucion'] ),
-					'monto_saldo_a_favor'=>round( $monto_saldo_a_favor ),
-					'pagos_pendientes'=>round( $r['pagos_pendientes'] ), 
+					'monto_devolucion'=>round( $return_row['monto_devolucion'], 2 ), 
+					'monto_pagos_devolucion'=>round( $return_row['monto_pagos_devolucion'], 2 ),
+					'monto_saldo_a_favor'=>round( $monto_saldo_a_favor, 2 ),
+					'pagos_pendientes'=>( ($r['pagos_pendientes'] >= -1 && $r['pagos_pendientes'] <= 1) ? '0' : $r['pagos_pendientes'] ), 
 					'FORMULA_PAGOS_PENDIENTES'=>"(pagos_pendientes){$r['pagos_pendientes']} = (total_nota){$r['total_nota']} - ( (pagos_registrados){$r['pagos_registrados']} - (monto_pagos_devolucion){$return_row['monto_pagos_devolucion']} - (monto_saldo_tomado){$monto_saldo_tomado} ) - (monto_devolucion){$return_row['monto_devolucion']} - (monto_saldo_a_favor){$monto_saldo_a_favor}",
 					
 					'total_real'=>$r['total_real'],
