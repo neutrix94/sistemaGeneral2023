@@ -218,7 +218,7 @@ hljs.highlightAll();
     		$( obj ).val( value );
   		}*/
   		if (!regex.test(value)) {
-    		$( obj ).val( value.replace(/[^\d]/g, '') );
+    		//$( obj ).val( value.replace(/[^\d]/g, '') );
   		}
   		/*var valorFormateado = parseFloat(value).toLocaleString('es', {
 		    style: 'currency',
@@ -227,7 +227,7 @@ hljs.highlightAll();
 		});*/
 		//formatear numero
 		value = value.replace(',','');
-		var valorFormateado = Mascara('###,###,###,###', value);
+		//var valorFormateado = Mascara('###,###,###,###', value);
 		/*var aux_counter = 0;
 		value = value.replace(',', '');
 		for (var i = 0; i <= value.length - 1; i++) {
@@ -239,7 +239,7 @@ hljs.highlightAll();
 			}
 		};*/
 
-		$( obj ).val( valorFormateado );
+		$( obj ).val( value );
 	//sacamos el id del objeto
 	//sacamos el evento
 		var tca=e.keyCode;
