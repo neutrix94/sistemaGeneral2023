@@ -99,7 +99,7 @@ var respuesta = null;
 					console.log( respuesta );//return '';
 					$("#monto").val( respuesta.total_real );
 					$("#buscador").val( respuesta.folio_venta );
-					$("#saldo_favor").val( parseInt( respuesta.pagos_cobrados ) + parseInt( respuesta.monto_saldo_a_favor ) );
+					$("#saldo_favor").val( parseFloat( respuesta.pagos_cobrados ) + parseFloat( respuesta.monto_saldo_a_favor ) );
 					$( "#id_venta_origen" ).val( respuesta.id_venta_origen );
 					//respuesta.por_pagar = respuesta.total_venta - respuesta.pagos_cobrados;
 					//$( '#monto_total' ).val( respuesta.por_pagar );
@@ -321,7 +321,7 @@ hljs.highlightAll();
 	}
 
 	function calcula_cambio(){
-		var monto_pago = parseInt( $( '#monto_cobro_emergente' ).val() );
+		var monto_pago = parseFloat( $( '#monto_cobro_emergente' ).val() );
 		if( monto_pago > 0 ){
 			var total_tarjetas=0,total_cheques=0,total_cobros=0;
 			var recibido=$("#efectivo_recibido").val().replaceAll( ',', '' );
@@ -401,7 +401,7 @@ var cont_cheques_transferencia=0;
 
 		function cobrar( amount_type, permission = false ){
 			var sale_id = $( '#id_venta' ).val();
-			var pago_efectivo =  parseInt( $( '#efectivo' ).val() );
+			var pago_efectivo =  parseFloat( $( '#efectivo' ).val() );
 			if( pago_efectivo == '' || pago_efectivo == null || pago_efectivo == 'undefined' ||  pago_efectivo == undefined ){
 				pago_efectivo = 0;
 			}
@@ -420,8 +420,8 @@ var cont_cheques_transferencia=0;
 				if( amount_type == -1 ){//parseInt( $( '#saldo_favor' ).val() ) < 0
 					url += "&ammount_permission=1";
 				}
-				if( respuesta.monto_saldo_a_favor > parseInt( respuesta.total_real ) ){
-					url += "&pago_por_saldo_a_favor=" + parseInt( respuesta.total_real );
+				if( respuesta.monto_saldo_a_favor > parseFloat( respuesta.total_real ) ){
+					url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
 				}
 				url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
 //alert( url ); //return false;
@@ -542,18 +542,18 @@ console.log( resp );
 	}
 //habilitar pagos
 	function enable_payments(){
-		var amount_total = parseInt( $( '#monto_total' ).val() );
+		var amount_total = parseFloat( $( '#monto_total' ).val() );
 		var amount_sum = 0;
 		var stop = false;
 		//var stop = false;
 	//verifica que todos lo pagos esten lleno y sumen la cantidad del monto total
 		$( '#payments_list tr' ).each( function( index ){
 			//$( '#payment_btn_' + index ).removeClass( 'no_visible' );
-			if( parseInt( $( '#t' + index ).val() ) <= 0 ){
+			if( parseFloat( $( '#t' + index ).val() ) <= 0 ){
 				stop = index;
 				return false;
 			}
-			amount_sum += parseInt( $( '#t' + index ).val().replaceAll( ',', '' ) );
+			amount_sum += parseFloat( $( '#t' + index ).val().replaceAll( ',', '' ) );
 		});
 		if( stop != false ){
 			alert( "Hay cobros con tarjeta sin monto, verfica y vuelve a intentar!" );
@@ -561,7 +561,7 @@ console.log( resp );
 			return false;
 		}
 		if( $( '#efectivo' ).val() != '' ){
-			amount_sum += parseInt( $( '#efectivo' ).val() );
+			amount_sum += parseFloat( $( '#efectivo' ).val() );
 		}
 		if( amount_sum != amount_total ){
 			alert( "La suma de los montos es diferente del total!" );

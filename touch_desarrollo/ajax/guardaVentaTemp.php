@@ -672,7 +672,8 @@
 			//die("entra aqui: ".$pedido_total."---->pedido_descuento".$pedido);
 		}
 
-/*Implementación Oscar 05.11.2018 para redondear hacia arriba los valores de la cabecera de la tabla temporal de ventas*/
+/*DESHABILITADO POR OSCAR 2024-02-13
+Implementación Oscar 05.11.2018 para redondear hacia arriba los valores de la cabecera de la tabla temporal de ventas
 		$pedido_subtotal=CEIL($pedido_subtotal);
 		$pedido_total=CEIL($pedido_total);
 		$pedido_descuento=CEIL($pedido_descuento);
@@ -694,12 +695,12 @@
 	}
 /*Fin de cambio Oscar 06.11.2018*/
 
-		# Actualizar los valores pendientes del encabezado
+		# Actualizar los valores pendientes del encabezado  $pedido_total//OSCAR 2024-02-13
 		$cs = "UPDATE ec_pedidos_back SET " .
 			"subtotal = '{$pedido_subtotal}', " .
 			"iva = '0', " .
 			"ieps = '0', " .
-			"total = '{$pedido_total}', " .
+			"total = '{$_GET['totalPed']}', " .
 			"descuento = '{$pedido_descuento}' " .
 			"WHERE id_pedido = '{$id_pedido}' ";
 		//die($cs);

@@ -76,7 +76,7 @@
         $num=mysql_num_rows($res);
         if($num > 0){
             $row=mysql_fetch_row($res);
-            $precioIni=round($row[0], 2);
+            $precioIni=$row[0];//round($row[0], 2);//deshabilitado por Oscar 2024-02-13
         }else{
             $precioIni=-1;
         }
@@ -209,7 +209,7 @@
                 mysql_data_seek($res, $i);
                 $row=mysql_fetch_row($res);
                 
-                $row[3]=round($row[3], 2);
+                $row[3]=$row[3];//round($row[3], 2);//deshabilitado por Oscar 2024-02-13
                 
                 //echo $row[3]." - ".$precioIni."\n";
                 
@@ -298,7 +298,7 @@
         if($vars[$productos[$i]] == 'NO')
             echo "NO";
         else
-            echo "$".number_format($precio);
+            echo "$".($precio);//number_format//deshabilitado por Oscar 2024-02-13
         
         echo "~";
         
@@ -306,7 +306,7 @@
         if($vars[$productos[$i]] == 'NO')
             echo "NO";
         else
-            echo "$".number_format($precio*$cantidades[$i]);
+            echo "$".($precio*$cantidades[$i]);//number_format//deshabilitado por Oscar 2024-02-13
         
         
         echo "~";

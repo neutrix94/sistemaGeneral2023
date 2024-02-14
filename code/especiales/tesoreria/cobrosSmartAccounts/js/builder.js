@@ -90,7 +90,7 @@
 			$( '#monto_cobro_emergente' ).focus();
 			return false;
 		}
-		if( amount > parseInt( $( '#monto_pendiente_emergente' ).val() ) ){
+		if( amount > parseFloat( $( '#monto_pendiente_emergente' ).val() ) ){
 			alert( "El monto del pago no puede ser mayor al monto pendiente de pagar" );
 			$( '#monto_cobro_emergente' ).select();
 			return false;

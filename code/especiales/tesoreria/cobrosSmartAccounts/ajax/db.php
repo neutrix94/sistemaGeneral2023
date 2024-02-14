@@ -265,8 +265,8 @@
 			if( $stm->num_rows <= 0 ){	//busqueda por folio
 			
 				$sql = "SELECT
-						ROUND( p.total ) AS sale_total,
-						ROUND( SUM( pp.monto ) ) AS payments_total,
+						ROUND( p.total, 2 ) AS sale_total,
+						ROUND( SUM( pp.monto ), 2 ) AS payments_total,
 						p.pagado AS was_payed
 					FROM ec_pedidos p
 					LEFT JOIN ec_pedido_pagos pp
@@ -280,13 +280,27 @@
 			}
 
 			$row = $stm->fetch_assoc();
-			$sale_total = round( $row['sale_total'] );
-			$payments_total = round( $row['payments_total'] );
-			$rest = round( $row['sale_total'] - $row['payments_total'] );
-			$tmp_total = round( $payments_total + $ammount );
-			if( $sale_total < $tmp_total ){
+			$sale_total = $row['sale_total'];//round( $row['sale_total'] );
+			$payments_total = $row['payments_total'];//round( $row['payments_total'] );
+			//$rest = round( $row['sale_total'] - $row['payments_total'] );
+		//consulta los pagos por devolucion
+			$sql = "SELECT 
+						SUM( dp.monto ) AS pagos_devolucion
+					FROM ec_devolucion_pagos dp
+					LEFT JOIN ec_devolucion d
+					ON dp.id_devolucion = d.id_devolucion
+					WHERE d.id_pedido IN( {$sale_id} )";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar pagos por devolucion para comprobacion : {$this->link->error}" );
+			$devolucion_row = $stm->fetch_assoc();
+			$pagos_dev = $devolucion_row = $devolucion_row['pagos_devolucion'];
+			$tmp_total =  $payments_total + $ammount - $pagos_dev;//round()
+			$rest = ($sale_total - $tmp_total);
+			//if( $sale_total < $tmp_total ){
+			if( $rest >= -1 && $rest <=1 ){
+
+			}else{
 				die( "<div class=\"row\" style=\"padding:15px;\">
-						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta!</h2>
+						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta! {$sale_total} - {$tmp_total} = {$rest}</h2>
 						<div class=\"col-3\"></div>
 						<div class=\"col-6\">
 							<br>
@@ -321,7 +335,7 @@
 		public function validatePayments( $sale_id ){
 			$saldo_favor = 0;
 			$sql = "SELECT
-						ROUND( SUM( monto_devolucion_interna ) ) AS a_favor
+						ROUND( SUM( monto_devolucion_interna ), 2 ) AS a_favor
 					FROM ec_pedidos_relacion_devolucion
 					WHERE id_pedido_relacionado = {$sale_id}
 					AND id_sesion_caja_pedido_relacionado = 0";
@@ -344,7 +358,7 @@
 			//die( $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los totales para validar : {$sql} : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			if( $row['was_payed'] == 1 && round( $row['sale_total'] ) > round( $row['payments_total'] ) ){
+			if( $row['was_payed'] == 1 && round( $row['sale_total'], 2 ) > round( $row['payments_total'], 2 ) ){
 				die( "<div class=\"row\">
 					<h3 class=\"text-center text-danger fs-2\">La venta no esta liquidada, registra todos los pagos y vuelve a intentar</h3>
 					<div class=\"\">
@@ -614,7 +628,7 @@
 					$devolucion_externa = $this->link->insert_id;
 					$total_devolver_cajero += $row['monto_devolucion_externa'];
 				}
-				$total_devolver_cajero = round( $total_devolver_cajero ) * -1;
+				$total_devolver_cajero = round( $total_devolver_cajero, 2 ) * -1;
 /*inserta el pago por devolucion en el cajero*/
 			//inserta el cobro del cajero en efectivo por devolucion
 				if( $saldo_especial == 0 ){
@@ -779,8 +793,8 @@
 		    $eje = $this->link->query($sql) or die( "Error al consultar montos de devolución\n{$sql}\n{$this->link->error}" );
 //echo $sql . "<br><br>";
 		    $datos_1 = $eje->fetch_row();
-		    $datos_1[0] = round( $ammount * ( $datos_1[0] / $datos_1[2] ) )*-1;
-		    $datos_1[1] = round( $ammount * ( $datos_1[1] / $datos_1[2] ) )*-1;
+		    $datos_1[0] = round( $ammount * ( $datos_1[0] / $datos_1[2] ), 2 )*-1;
+		    $datos_1[1] = round( $ammount * ( $datos_1[1] / $datos_1[2] ), 2 )*-1;
 		    //var_dump( $datos_1 );die( '' );
 //$this->link->autocommit( false );
 		//insertamos las devoluciones completas
