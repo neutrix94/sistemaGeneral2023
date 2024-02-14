@@ -620,19 +620,6 @@
 		$stm = mysql_query( $sql ) or die( "Error al consultar el id de la venta original : " . mysql_error() );
 		$row = mysql_fetch_assoc( $stm );
 	//consulta pagos de venta original
-		/*$sql = "SELECT 
-					p.id_pedido AS original_sale_id, 
-					SUM( pp.monto ) AS payments_total, 
-					p.id_sesion_caja AS original_sale_session_id,
-					SUM( d.monto_devolucion ) AS return_amount,
-					p.total
-				FROM ec_pedidos p
-				LEFT JOIN ec_pedido_pagos pp
-				ON p.id_pedido = pp.id_pedido
-				LEFT JOIN ec_devolucion d
-				ON d.id_pedido = p.id_pedido 
-				WHERE d.id_devolucion IN( {$tmp_devs} )
-				GROUP BY p.id_pedido";*/
 		$sql = "SELECT
 					ax.original_sale_id, 
 					SUM( pp.monto ) AS payments_total, 
