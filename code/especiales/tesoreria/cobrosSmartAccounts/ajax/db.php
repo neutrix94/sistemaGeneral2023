@@ -25,10 +25,11 @@
 				//die( 'here : ' . $apiUrl );
 			//recibe variables
 				$amount = ( isset( $_GET['amount'] ) ? $_GET['amount'] : $_POST['amount'] );
+				$sale_id = ( isset( $_GET['sale_id'] ) ? $_GET['sale_id'] : $_POST['sale_id'] );
 				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
 				
 		
-				$validation = $Payments->validate_payment_is_not_bigger( $sale_folio, $amount );
+				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $amount );
 				$terminal_id = ( isset( $_GET['terminal_id'] ) ? $_GET['terminal_id'] : $_POST['terminal_id'] );
 				$counter = ( isset( $_GET['counter'] ) ? $_GET['counter'] : $_POST['counter'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
@@ -292,14 +293,15 @@
 					WHERE d.id_pedido IN( {$sale_id} )";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar pagos por devolucion para comprobacion : {$this->link->error}" );
 			$devolucion_row = $stm->fetch_assoc();
-			$pagos_dev = $devolucion_row = $devolucion_row['pagos_devolucion'];
+			$pagos_dev = $devolucion_row['pagos_devolucion'];
 			$tmp_total =  $payments_total + $ammount - $pagos_dev;//round()
 			$rest = ($sale_total - $tmp_total);
 			//if( $sale_total < $tmp_total ){
 			if( $rest >= -1 && $rest <=1 ){
 
 			}else{
-				die( "<div class=\"row\" style=\"padding:15px;\">
+				if( $tmp_total > $sale_total ){
+					die( "<div class=\"row\" style=\"padding:15px;\">
 						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta! {$sale_total} - {$tmp_total} = {$rest}</h2>
 						<div class=\"col-3\"></div>
 						<div class=\"col-6\">
@@ -313,6 +315,7 @@
 							</button>
 						</div>
 					</div>" );//error|
+				}
 			}
 			/*
 				<div class=\"row text-center\">
