@@ -327,7 +327,7 @@
 		    	$sql = "SELECT pd.cantidad,
 		                        pd.id_pedido_detalle,
 		                        pd.es_externo,
-		                        ROUND(((pd.monto-pd.descuento)/pd.cantidad)-IF(pd.descuento>0,0,(pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100))*{$product['return_quantity']}, 4)
+		                        ROUND(((pd.monto-pd.descuento)/pd.cantidad)-IF(pd.descuento>0,0,(pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100)),4)*{$product['return_quantity']}
 		                        FROM ec_pedidos_detalle pd
 		                        LEFT JOIN ec_pedidos pe ON pd.id_pedido=pe.id_pedido 
 		                        WHERE pd.id_pedido_detalle ='{$product['sale_detail_id']}'
