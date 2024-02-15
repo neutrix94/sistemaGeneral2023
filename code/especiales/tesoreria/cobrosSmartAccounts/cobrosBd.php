@@ -35,7 +35,8 @@ $CONSULTAS_SQL = array();
 		$id_venta_origen = 0;
 	//consulta si tiene saldo a favor
 		$sql = "SELECT
-				SUM( monto_devolucion_interna + monto_devolucion_externa ) AS monto_saldo_a_favor,
+				/*SUM( monto_devolucion_interna + monto_devolucion_externa )*/
+				SUM(saldo_a_favor) AS monto_saldo_a_favor,
 				id_pedido_original AS id_venta_origen
 			FROM ec_pedidos_relacion_devolucion
 			WHERE id_pedido_relacionado = {$clave}
@@ -65,7 +66,8 @@ $CONSULTAS_SQL[] = array( "CONSULTA_VENTA_RELACIONADA"=>$CONSULTA_VENTA_RELACION
 		}
 	//consulta si tiene saldo tomado
 		$sql = "SELECT
-				SUM( monto_devolucion_interna + monto_devolucion_externa ) AS monto_saldo_tomado,
+				/*SUM( monto_devolucion_interna + monto_devolucion_externa )*/
+				SUM(saldo_a_favor) AS monto_saldo_tomado,
 				id_pedido_original AS id_venta_origen
 			FROM ec_pedidos_relacion_devolucion
 			WHERE id_pedido_original = {$clave}
