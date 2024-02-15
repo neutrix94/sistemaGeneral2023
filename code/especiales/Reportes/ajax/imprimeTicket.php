@@ -154,7 +154,15 @@
 			AND id_sucursal = {$sucursal_id}";//
 	$stm = $link->query( $sql ) or die( "Error al consultar ventas pendientes de validar : {$link->error}" );
 	$sales_number = $stm->num_rows;
-
+/*implementacion Oscar 2024-02-14 para habilitar / deshabilitar impresion de validaciones en ticket de corte*/
+	$sql = "SELECT imprimir_validaciones_pendientes FROM ec_configuracion_sucursal WHERE id_sucursal = {$sucursal_id}";
+	$stm_config = $link->query( $sql ) or die( "Error al consultar la configuracion de impresion de sucursales : {$link->error}" );
+	$row_config = $stm_config->fetch_assoc();
+	$imprimir_validaciones_pendientes = $row_config['imprimir_validaciones_pendientes'];
+	if( $imprimir_validaciones_pendientes == 0 ){
+		$sales_number = 0;
+	}
+/*fin de cambio Oscar 2024-02-14*/
 
 /*implementacion Oscar 21.11.2019 para meter el segundo corte cuando la hora es mayor a las 12:00:00*
 	if($insertar_corte==1){
@@ -279,7 +287,7 @@
 	}
 	//120+
 	//aqui cambia largo Oscar 26-11-2017
-	$ticket = new TicketPDF("P", "mm", array(80, 20 + ($sales_number * 9 ) + ($resAprox*9)+5+$contador_ingresos+$tam_gastos+$tam_descuentos) , "{$sucursal}", "{$folio}", 10);
+	$ticket = new TicketPDF("P", "mm", array(80, 50 + ($sales_number * 11 ) + ($resAprox*9)+5+$contador_ingresos+$tam_gastos+$tam_descuentos) , "{$sucursal}", "{$folio}", 10);
 	//echo 'res:'.$resAprox;
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
@@ -300,7 +308,7 @@
 			$consultaHora.=$hr2;
 		}*/
 
-//genearmos encabezado
+//generamos encabezado
 	$ticket->SetFont('Arial','B',$bF+4);
 	$ticket->SetXY(8, 5);//$ticket->GetY()+3
 	$ticket->Cell(60, 6, utf8_decode("Folio: ".$folio_sesion_caja), "" ,0, "R");
@@ -350,45 +358,50 @@
 	$ticket->SetXY(7, $ticket->GetY()+4);
 	$ticket->Cell(66, 6, utf8_decode($datos_cajero), "" ,0, "C");
 
-//tickets pendientes de validar
-	$sql = "SELECT 
-				p.folio_nv AS folio, 
-				p.total AS amount,
-				DATE_FORMAT( p.fecha_alta, '%d/%m/%Y' ) AS date,
-				CONCAT( 'Vendedor : ', u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno )
-			FROM ec_pedidos p
-			LEFT JOIN sys_users u
-			ON u.id_usuario = p.id_usuario
-			WHERE p.venta_validada = 0 
-			AND p.fecha_alta LIKE '%{$current_year['year']}%'
-			AND p.id_sucursal = {$sucursal_id}";//
-	$eje=mysql_query($sql) or die( "Error\n{$sql} " . mysql_error() );
-//encabezado
-	$ticket->SetXY(4, $ticket->GetY()+8);
-	$ticket->SetXY(7, $ticket->GetY());
-	$ticket->Cell(62, 6, utf8_decode( "Ventas pendientes de validar" ), "" ,0, "C");
-
-	$ticket->SetXY(4, $ticket->GetY()+5);
-	$ticket->Cell(62, 6, utf8_decode( "Folio" ), "" ,0, "L");
-	$ticket->SetXY(7, $ticket->GetY());
-	$ticket->Cell(62, 6, utf8_decode( "Monto" ), "" ,0, "C");
-	$ticket->SetXY(10, $ticket->GetY());
-	$ticket->Cell(62, 6, utf8_decode( "Fecha" ), "" ,0, "R");
 	
-	while($rw=mysql_fetch_row($eje)){
-		$ticket->SetFont('Arial','',$bF-2);
-		$ticket->SetXY(4, $ticket->GetY()+6);
-		$ticket->Cell(62, 6, utf8_decode($rw[0]), "" ,0, "L");
+/*implementacion Oscar 2024-02-14 para habilitar / deshabilitar impresion de validaciones en ticket de corte*/
+	if( $imprimir_validaciones_pendientes == 1 ){
+	//tickets pendientes de validar
+		$sql = "SELECT 
+					p.folio_nv AS folio, 
+					p.total AS amount,
+					DATE_FORMAT( p.fecha_alta, '%d/%m/%Y' ) AS date,
+					CONCAT( 'Vendedor : ', u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno )
+				FROM ec_pedidos p
+				LEFT JOIN sys_users u
+				ON u.id_usuario = p.id_usuario
+				WHERE p.venta_validada = 0 
+				AND p.fecha_alta LIKE '%{$current_year['year']}%'
+				AND p.id_sucursal = {$sucursal_id}";//
+		$eje=mysql_query($sql) or die( "Error\n{$sql} " . mysql_error() );
+	//encabezado
+		$ticket->SetXY(4, $ticket->GetY()+8);
 		$ticket->SetXY(7, $ticket->GetY());
-		$ticket->Cell(62, 6, utf8_decode($rw[1]), "" ,0, "C");
-		$ticket->SetXY(10, $ticket->GetY());
-		$ticket->Cell(62, 6, utf8_decode($rw[2]), "" ,0, "R");
+		$ticket->Cell(62, 6, utf8_decode( "Ventas pendientes de validar" ), "" ,0, "C");
 
-		$ticket->SetFont('Arial','', $bF-3 );
-		$ticket->SetXY(4, $ticket->GetY()+3);
-		$ticket->Cell(62, 6, utf8_decode($rw[3]), "" ,0, "L");
+		$ticket->SetXY(4, $ticket->GetY()+5);
+		$ticket->Cell(62, 6, utf8_decode( "Folio" ), "" ,0, "L");
+		$ticket->SetXY(7, $ticket->GetY());
+		$ticket->Cell(62, 6, utf8_decode( "Monto" ), "" ,0, "C");
+		$ticket->SetXY(10, $ticket->GetY());
+		$ticket->Cell(62, 6, utf8_decode( "Fecha" ), "" ,0, "R");
+		
+		while($rw=mysql_fetch_row($eje)){
+			$ticket->SetFont('Arial','',$bF-2);
+			$ticket->SetXY(4, $ticket->GetY()+6);
+			$ticket->Cell(62, 6, utf8_decode($rw[0]), "" ,0, "L");
+			$ticket->SetXY(7, $ticket->GetY());
+			$ticket->Cell(62, 6, utf8_decode($rw[1]), "" ,0, "C");
+			$ticket->SetXY(10, $ticket->GetY());
+			$ticket->Cell(62, 6, utf8_decode($rw[2]), "" ,0, "R");
+
+			$ticket->SetFont('Arial','', $bF-3 );
+			$ticket->SetXY(4, $ticket->GetY()+3);
+			$ticket->Cell(62, 6, utf8_decode($rw[3]), "" ,0, "L");
+		}
 	}
-	
+/*Fin de cambio Oscar 2024-02-14*/	
+
 /*	$ticket->SetFont('Arial','',$bF);
 	
 	$ticket->SetXY(7, $ticket->GetY()+4.5);
