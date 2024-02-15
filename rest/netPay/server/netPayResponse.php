@@ -13,6 +13,9 @@ $app->post('/', function (Request $request, Response $response){
   if( ! include( '../../conexionMysqli.php' ) ){
     die( "Error al incluir libreria de conexion!" );
   }
+  /*if( ! include( '../../code/especiales/tesoreria/cobrosSmartAccounts/ajax/db.php' ) ){//oscar 2024-02-15
+    die( "Error al incluir libreria de cobros!" );
+  }*/
 //obtener el json en txt 
   $body = $request->getBody();
   $file = fopen("test.txt","w");
@@ -191,6 +194,11 @@ $app->post('/', function (Request $request, Response $response){
   
 //die( "here 1.5" );
       $payment_row = $stm->fetch_assoc();
+      
+//pagos de saldo a favor Oscar 2024-02-15
+      $Payments = new Payments( $link, $traceability['id_sucursal'] );
+      $Payments->insertPaymentsDepending( $amount, $row['sale_id'], $traceability['id_cajero'], $traceability['id_sesion_cajero'] );// $pago_por_saldo_a_favor
+  
       $internal_payment_id = '0';
       $external_payment_id = '0';
     //inserta pago interno    
