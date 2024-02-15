@@ -641,6 +641,61 @@ console.log( resp );
 		$( '.emergent_content' ).html( content );
 		$( '.emergent' ).css( 'display', 'block' );
 	}
+	
+	function addCashPayment( amount ){	
+		//inserta pago en efectivo
+			amount = $( '#monto_cobro_emergente' ).val();
+			if( amount <= 0 ){
+				alert( "El monto del pago debe de ser mayor a cero!" );
+				$( '#monto_cobro_emergente' ).focus();
+				return false;
+			}
+			if( amount > parseFloat( $( '#monto_pendiente_emergente' ).val() ) ){
+				alert( "El monto del pago no puede ser mayor al monto pendiente de pagar" );
+				$( '#monto_cobro_emergente' ).select();
+				return false;
+			}
+			/*if( $( '#efectivo_recibido' ).val() == '' || $( '#efectivo_recibido' ).val() <= 0 ){
+				alert( "El monto entregado por el cliente no puede ser menor o igual a cero!" );
+				$( '#efectivo_recibido' ).focus();
+				return false;
+			}*/
+	
+			var url = "ajax/db.php?fl=insertCashPayment&ammount=" + amount;
+			url += "&session_id=" + $( '#session_id' ).val();
+			url += "&sale_id=" + $( '#id_venta' ).val();
+			if( respuesta.monto_saldo_a_favor > parseFloat( respuesta.total_real ) ){//tomar saldo a
+				url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
+			}
+			//alert( respuesta.monto_saldo_a_favor + " > " + respuesta.total_real );
+			url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
+			//alert( url ); return false;
+			var resp = ajaxR( url ).split( '|' );
+			alert( "Respuesta : " + resp );
+			if( resp[0] != 'ok' ){
+				//alert( "Error al insertar el pago en Efectivo: " + resp );
+				$( '.emergent_content' ).html( resp[1] );
+				$( '.emergent' ).css( 'display', 'block' );
+				return false;
+			}else{
+			//recarga vista de cobros
+				$( '#efectivo' ).val( '' );
+				carga_pedido( $( '#id_venta' ).val() );
+				getHistoricPayment( $( '#id_venta' ).val() );
+				var content = `<div class="text-center">
+					<h2 class="text-success">Pago registrado exitosamente</h2>
+					<button
+						type="button"
+						class="btn btn-success"
+						onclick="close_emergent();"
+					>
+						<i class="icon-ok-circle">Aceptar</i>
+					</button>
+				</div>`;
+				$( '.emergent_content' ).html( content );
+				$( '.emergent' ).css( 'display', 'block' );
+			}
+		}
 
 	function setPaymentWhithouthIntegration(){
 		var afiliation_id = $( '#afiliation_select_tmp' ).val();
@@ -664,7 +719,11 @@ console.log( resp );
 		var url = "ajax/db.php?fl=setPaymentWhithouthIntegration&afiliation_id=" + afiliation_id;
 		url += "&ammount=" + ammount + "&authorization_number=" + authorization_number;
 		url += "&sale_id=" + $( '#id_venta' ).val() + "&session_id=" + $( '#session_id' ).val();
-
+		//alert( respuesta.monto_saldo_a_favor + " > " + respuesta.total_real );
+		if( respuesta.monto_saldo_a_favor > parseFloat( respuesta.total_real ) ){//tomar saldo a
+			url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
+		}
+		url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
 		//alert( url ); return false;
 		var resp = ajaxR( url ).split( '|' );
 		//alert( resp);

@@ -82,63 +82,6 @@
 		$( '.emergent' ).css( 'display', 'block' );
 	}
 
-	function addCashPayment( amount ){	
-	//inserta pago en efectivo
-		amount = $( '#monto_cobro_emergente' ).val();
-		if( amount <= 0 ){
-			alert( "El monto del pago debe de ser mayor a cero!" );
-			$( '#monto_cobro_emergente' ).focus();
-			return false;
-		}
-		if( amount > parseFloat( $( '#monto_pendiente_emergente' ).val() ) ){
-			alert( "El monto del pago no puede ser mayor al monto pendiente de pagar" );
-			$( '#monto_cobro_emergente' ).select();
-			return false;
-		}
-		/*if( $( '#efectivo_recibido' ).val() == '' || $( '#efectivo_recibido' ).val() <= 0 ){
-			alert( "El monto entregado por el cliente no puede ser menor o igual a cero!" );
-			$( '#efectivo_recibido' ).focus();
-			return false;
-		}*/
-
-		var url = "ajax/db.php?fl=insertCashPayment&ammount=" + amount;
-		url += "&session_id=" + $( '#session_id' ).val();
-		url += "&sale_id=" + $( '#id_venta' ).val();
-		//alert( url ); return false;
-		var resp = ajaxR( url ).split( '|' );
-		alert( "Respuesta : " + resp );
-		if( resp[0] != 'ok' ){
-			//alert( "Error al insertar el pago en Efectivo: " + resp );
-			$( '.emergent_content' ).html( resp[1] );
-			$( '.emergent' ).css( 'display', 'block' );
-			return false;
-		}else{
-			$( '#efectivo' ).val( '' );
-			
-			carga_pedido( $( '#id_venta' ).val() );
-			getHistoricPayment( $( '#id_venta' ).val() );//recarga vista de cobros
-			var content = `<div class="text-center">
-				<h2 class="text-success">Pago registrado exitosamente</h2>
-				<button
-					type="button"
-					class="btn btn-success"
-					onclick="close_emergent();"
-				>
-					<i class="icon-ok-circle">Aceptar</i>
-				</button>
-			</div>`;
-			$( '.emergent_content' ).html( content );
-			$( '.emergent' ).css( 'display', 'block' );
-		}
-		/*var content = `<tr>
-			<td>Efectivo</td>
-			<td>Efectivo</td>
-			<td>${amount}</td>
-		</tr>`;
-		$( '#payments_list' ).append( content );
-		close_emergent();*/
-	}
-
 	function get_reverse_form(){
 		var content = `<div class="row">
 			<input type="text" class="form-control" id="reverse_input">
