@@ -169,7 +169,7 @@ var respuesta = null;
 					}else{//devolucion
 						$( '#cards_container' ).css( 'display', 'none' );
 					}
-/*Oscar 2024-02-08*
+/*Oscar 2024-02-08*/
 aux[1] = aux[1].replaceAll(`\r\n\t\t\t\t\t`, `\n`);
 aux[1] = aux[1].replaceAll(`\r\n\t\t\t\t`, `\n`);
 aux[1] = aux[1].replaceAll(`\r\n\t\t\t`, `\n`);
