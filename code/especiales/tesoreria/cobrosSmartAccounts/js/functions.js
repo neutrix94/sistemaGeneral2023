@@ -422,7 +422,7 @@ var cont_cheques_transferencia=0;
 					url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
 				}
 				url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
-//alert( url ); //return false;
+//alert( url ); return false;
 				var resp = ajaxR( url ).split( '|' );
 console.log( resp );
 //alert( resp );
@@ -482,12 +482,6 @@ console.log( resp );
 			var cantidad_cheque=$("#no_cheque_transferencia").val();
 			var id_corte=$("#id_venta").val();
 			var tarjetas='',cheques='',efectivo=0,cambio=0,recibido=0;
-		//no dejamos crrrar venta si el pago es menor a el monto total y la venta no es apartado
-			/*if(total_cobros<$("#monto_total").val() && $("#venta_pagada").val()==1 ){
-				alert("Esta nota debe ser saldada!!!");
-				$("#efectivo").focus();
-				return false;
-			}*/
 		//extraemos los valores de las tarjetas
 			for(var i=1;i<=cantidad_tarjetas;i++){
 				if($("#t"+i).val()!=0){
@@ -543,7 +537,6 @@ console.log( resp );
 		var amount_total = parseFloat( $( '#monto_total' ).val() );
 		var amount_sum = 0;
 		var stop = false;
-		//var stop = false;
 	//verifica que todos lo pagos esten lleno y sumen la cantidad del monto total
 		$( '#payments_list tr' ).each( function( index ){
 			//$( '#payment_btn_' + index ).removeClass( 'no_visible' );
@@ -565,7 +558,7 @@ console.log( resp );
 			alert( "La suma de los montos es diferente del total!" );
 			return false;
 		}
-	//mustra los botones para enviar la peticion
+	//muestra los botones para enviar la peticion
 		$( '#payments_list tr' ).each( function( index ){
 			$( '#payment_btn_' + index ).removeClass( 'no_visible' );//muestra boton para cobrar
 			$( '#t' + index ).attr( 'readonly', true );
@@ -655,25 +648,16 @@ console.log( resp );
 				$( '#monto_cobro_emergente' ).select();
 				return false;
 			}
-			/*if( $( '#efectivo_recibido' ).val() == '' || $( '#efectivo_recibido' ).val() <= 0 ){
-				alert( "El monto entregado por el cliente no puede ser menor o igual a cero!" );
-				$( '#efectivo_recibido' ).focus();
-				return false;
-			}*/
-	
 			var url = "ajax/db.php?fl=insertCashPayment&ammount=" + amount;
 			url += "&session_id=" + $( '#session_id' ).val();
 			url += "&sale_id=" + $( '#id_venta' ).val();
 			if( respuesta.monto_saldo_a_favor > parseFloat( respuesta.total_real ) ){//tomar saldo a
 				url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
 			}
-			//alert( respuesta.monto_saldo_a_favor + " > " + respuesta.total_real );
 			url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
-			//alert( url ); return false;
 			var resp = ajaxR( url ).split( '|' );
 			alert( "Respuesta : " + resp );
 			if( resp[0] != 'ok' ){
-				//alert( "Error al insertar el pago en Efectivo: " + resp );
 				$( '.emergent_content' ).html( resp[1] );
 				$( '.emergent' ).css( 'display', 'block' );
 				return false;
@@ -719,18 +703,14 @@ console.log( resp );
 		var url = "ajax/db.php?fl=setPaymentWhithouthIntegration&afiliation_id=" + afiliation_id;
 		url += "&ammount=" + ammount + "&authorization_number=" + authorization_number;
 		url += "&sale_id=" + $( '#id_venta' ).val() + "&session_id=" + $( '#session_id' ).val();
-		//alert( respuesta.monto_saldo_a_favor + " > " + respuesta.total_real );
 		if( respuesta.monto_saldo_a_favor > parseFloat( respuesta.total_real ) ){//tomar saldo a
 			url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
 		}
 		url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
-		//alert( url ); return false;
 		var resp = ajaxR( url ).split( '|' );
-		//alert( resp);
 		if( resp[0] != 'ok' ){
 			alert( "Error : \n" + resp );
 		}else{
-			//getHistoricPayment( $( '#id_venta' ).val() );
 			carga_pedido( $( '#id_venta' ).val() );
 			alert( resp[1] );
 			close_emergent();
@@ -748,7 +728,6 @@ console.log( resp );
 		}else{
 			alert( "El pago fue eliminado exitosamente!" );
 			carga_pedido( sale_id );
-			//setTimeout( function(){recalcula();}, 500 );
 		}
 	}
 
