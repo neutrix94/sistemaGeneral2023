@@ -575,7 +575,7 @@
 			//caso 0 : el cliente tiene saldo a favor, y su nueva nota es menor a su saldo a afavor
 			if( $ammount < 0 && $pago_por_saldo_a_favor > 0 ){//die( 'caso 1' );
 			//insertar pago
-				$this->insertPayment( $pago_por_saldo_a_favor, $sale_id, $user_id, $session_id );
+				//desahabilitado por Oscar 2024-02-16$this->insertPayment( $pago_por_saldo_a_favor, $sale_id, $user_id, $session_id );
 				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, ( $pago_por_saldo_a_favor * -1 )  );
 				$this->insertReturnPayment( $ammount, $sale_id, $user_id, $session_id, $id_venta_origen );
 
@@ -587,7 +587,7 @@
 				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
 			//insertar pago
 				$this->insertReturnPayment( $ammount, $sale_id, $user_id, $session_id );
-			}else if( $ammount == 0 ){//die( "caso 4 : no se devuleve dinero al cliente ni se cobra pero se inserta pago" );
+			}else if( $ammount == 0 ){//die( "caso 4 : no se devulve dinero al cliente ni se cobra pero se inserta pago" );
 				//$ammount = 
 				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
 				if( $ammount != 0 ){
@@ -632,7 +632,8 @@
 						id_pedido_relacionado,
 						monto_pedido_relacionado,
 						id_sesion_caja_pedido_relacionado,
-						saldo_a_favor
+						saldo_a_favor,
+						monto_devolucion_tomado_a_favor
 					FROM ec_pedidos_relacion_devolucion
 					WHERE id_pedido_relacionado = {$sale_id}
 					AND id_sesion_caja_pedido_relacionado = 0";
@@ -686,8 +687,8 @@
 					
 				}
 
-				if( $row['saldo_a_favor'] > 0 ){
-					$this->insertPayment( $row['saldo_a_favor'], $sale_id, $user_id, $session_id, 2 );
+				if( $row['monto_devolucion_tomado_a_favor'] > 0 ){
+					$this->insertPayment( $row['monto_devolucion_tomado_a_favor'], $sale_id, $user_id, $session_id, 2 );
 				}
 				$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero en insertPaymentsDepending : {$this->link->error}" );
 				$id_cajero_cobro = $this->link->insert_id;
