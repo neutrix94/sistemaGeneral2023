@@ -695,17 +695,20 @@
 		//die( "CAlculo : (saldo_a_favor){$return_internal_ammount} = (total_pago){$row['payments_total']} -(total_venta){$row['total']} - (pagos_devolucion){$montos_dev}" );
 	//consulta el monto de la devolucion externa
 		if( $row['payments_total'] > 0 ){
-			//if( $return_internal_ammount < 0 ){
 //$return_internal_ammount = abs($return_internal_ammount);
-			//inserta la relacion de los pedidos
-				$sql = "INSERT INTO ec_pedidos_relacion_devolucion ( /*1*/id_pedido_relacion_devolucion, /*2*/id_pedido_original, /*3*/monto_pedido_original,
-				/*4*/id_sesion_caja_pedido_orginal, /*5*/id_devolucion_interna, /*6*/monto_devolucion_interna, /*7*/id_devolucion_externa, 
-				/*8*/monto_devolucion_externa, /*9*/id_pedido_relacionado, /*9.1*/saldo_a_favor, /*10*/monto_pedido_relacionado, /*11*/id_sesion_caja_pedido_relacionado )
-				VALUES ( /*1*/NULL, /*2*/{$row['original_sale_id']}, /*3*/{$row['payments_total']}, /*4*/{$row['original_sale_session_id']}, 
-				/*5*/{$devs_array[0]}, /*6*/{$return_internal_ammount}, /*7*/{$devs_array[1]}, /*8*/{$return_external_ammount}, 
-				/*9*/{$id_pedido_r}, /*9.1*/$saldo_favor, /*10*/{$new_total}, /*11*/0 )";
-				$stm = mysql_query( $sql ) or die( "Error al insertar la relacion entre pedidos : {$sql} " . mysql_error() );
-			//}
+			$monto_devolucion_tomado_a_favor = ( $new_total >= $saldo_favor ? $saldo_favor : $new_total );
+			$monto_devolucion_por_devolver = ( $new_total >= $saldo_favor ? 0 : ( $saldo_favor - $new_total ) );
+		//inserta la relacion de los pedidos
+			$sql = "INSERT INTO ec_pedidos_relacion_devolucion ( /*1*/id_pedido_relacion_devolucion, /*2*/id_pedido_original, /*3*/monto_pedido_original,
+			/*4*/id_sesion_caja_pedido_orginal, /*5*/id_devolucion_interna, /*6*/monto_devolucion_interna, /*7*/id_devolucion_externa, 
+			/*8*/monto_devolucion_externa, /*9*/id_pedido_relacionado, /*10*/monto_pedido_relacionado, /*11*/id_sesion_caja_pedido_relacionado, 
+			/*12*/saldo_a_favor, /*13*/monto_devolucion_tomado_a_favor, /*14*/monto_devolucion_por_devolver )
+			VALUES ( /*1*/NULL, /*2*/{$row['original_sale_id']}, /*3*/{$row['payments_total']}, /*4*/{$row['original_sale_session_id']}, 
+			/*5*/{$devs_array[0]}, /*6*/{$return_internal_ammount}, /*7*/{$devs_array[1]}, /*8*/{$return_external_ammount}, 
+			/*9*/{$id_pedido_r}, /*10*/{$new_total}, /*11*/0, /*12*/{$saldo_favor}, /*13*/{$monto_devolucion_tomado_a_favor}, 
+			/*14*/{$monto_devolucion_por_devolver} )";
+			$stm = mysql_query( $sql ) or die( "Error al insertar la relacion entre pedidos : {$sql} " . mysql_error() );
+
 			$sql="UPDATE ec_pedidos SET id_devoluciones='$id_devoluciones' WHERE id_pedido=$id_pedido_r";
 			$eje=mysql_query($sql)or die("Error al actualizar los ids de devolucion para este pedido!!!\n".mysql_error());
 		}else{
@@ -716,34 +719,6 @@
 /*Fin de cambio Oscar 25.06.2019*/
 	mysql_query("commit");
 	echo 'ok|'.$id_pedido_r."|";
-/*implementacion Oscar 02.11.2018 para validar que no pase de la pantalla de cerrar ventas si el monto de pagos es menor al monto de la venta*
-	$sql="SELECT
-				p.total,
-				ROUND(SUM(IF(pp.monto is null,0,pp.monto))),
-				p.pagado
-			FROM ec_pedidos p 
-			LEFT JOIN ec_pedido_pagos pp ON p.id_pedido=pp.id_pedido
-		WHERE p.id_pedido=$id_pedido_r";
-	$eje=mysql_query($sql)or die("Error al comparar detalles de pago y monto de pago!!!");
-	$r=mysql_fetch_row($eje);
-
-	if($r[0]>$r[1] && $r[2]==1){//si el monto es mayor a los pagos y la nota está como pagada
-		//insertamos el error
-		$eje=mysql_query($sql)or die("Error al insertar error!!!".$sql."\n\n".mysql_error());
-	//guardaos el error
-		$sql="UPDATE ec_pedidos SET pagado=0 WHERE id_pedido=$id_pedido_r";//actualizamos a no pagada la nota de venta
-		$eje=mysql_query($sql)or die("Error al marcar la nota de venta como no pagada!!!\n\n".mysql_error());
-	//armamos datos de la emergente
-		echo '<p align="center" style="font-size:30px;"><b>';
-			echo 'Monitoreo en el funcionamiento del sistema, Favor de enviar una fotografía de esta pantalla a sistemas!!!';
-			//echo '<br>Monto: $'.$r[0].'<br>Pagos: $'.$r[1];
-			echo '<br>Pida al encargado que ingrese su contraseña y el Proceso continuará de forma normal<br>';
-			echo '<input type="text" id="pass_enc_1" onkeydown="cambiar(this,event,\'pass_enc\');" style="padding:10px;">';
-			echo '<input type="hidden" id="pass_enc" value="">';
-			echo '<br><button onclick="recargar_por_error();" style="padding:10px;">Aceptar</button>';
-		echo '</b></p>';
-	}
-/*Fin de cambio 02.11.2018*/
 	
 
 
