@@ -792,25 +792,32 @@
 		public function insertReturnPayment( $ammount, $sale_id, $user_id, $session_id, $id_venta_origen = 0 ){
 			$devolucion_interna = 0;
 			$devolucion_externa = 0;
+			$id_dev_interna = '';
+			$id_dev_externa = '';
 			//die( 'insertReturnPayment' );
 //echo "<br>INSERTRETURNPAYMENT<br>";
-		//dev interna / externa
+		//dev interna
 			$sql = "(SELECT 
 						id_devolucion
 		               FROM ec_devolucion dev
 		            WHERE id_pedido = {$sale_id}
-		            AND es_externo = 0)
-		            UNION
-		            (SELECT 
+		            AND es_externo = 0)";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar devolucion interna : {$this->link->error}" );
+			if( $stm->num_rows > 0 ){
+				$row = $stm->fetch_row();
+				$id_dev_interna = $row[0];
+			}
+		//dev externa
+			$sql = "(SELECT 
 						id_devolucion
 		               FROM ec_devolucion dev
 		            WHERE id_pedido = {$sale_id}
 		            AND es_externo = 1)";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar devolucion interna/externa : {$this->link->error}" );
-//echo $sql . "<br><br>";
-			$row = $stm->fetch_row();
-			$id_dev_interna = $row[0];
-			$id_dev_externa = $row[1];
+			$stm = $this->link->query( $sql ) or die( "Error al consultar devolucion externa : {$this->link->error}" );
+			if( $stm->num_rows > 0 ){
+				$row = $stm->fetch_row();
+				$id_dev_externa = $row[0];
+			}
 		//consulta montos internos / externos
 		   	$sql = "SELECT 
 		   				SUM( IF( d.es_externo = 1, d.monto_devolucion, 0 ) ),
@@ -864,7 +871,7 @@
 		    if( $datos_1[1]>0 && $id_dev_interna != 0 && $id_dev_interna != '' ){
 		        $sql="INSERT INTO ec_devolucion_pagos ( id_devolucion_pago, id_devolucion, id_tipo_pago, monto,
 		        referencia, es_externo, fecha, hora, id_cajero, id_sesion_caja )
-		        VALUES(null,$id_dev_interna,1,$datos_1[1],'$datos_1[0]',0,now(),now(), {$user_id}, {$session_id} )";//modificacion Oscar 2023/10/12 {$id_cajero}, {$id_sesion_caja}
+		        VALUES(null,$id_dev_interna,1,$datos_1[1],'$datos_1[1]',0,now(),now(), {$user_id}, {$session_id} )";//modificacion Oscar 2023/10/12 {$id_cajero}, {$id_sesion_caja}
 		        $eje = $this->link->query( $sql ) or die( "Error al insertar el pago de la devolución interna\n{$sql}\n{$this->link->error}" );
 		        $devolucion_interna = $this->link->insert_id;
 //echo $sql . "<br><br>";
