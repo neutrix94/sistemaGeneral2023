@@ -626,8 +626,8 @@
 						monto_pedido_original,
 						id_sesion_caja_pedido_orginal, 
 						id_devolucion_interna,
-						monto_devolucion_interna,
-						id_devolucion_externa,
+						monto_interno_por_devolver,
+						monto_externo_por_devolver,
 						monto_devolucion_externa,
 						id_pedido_relacionado,
 						monto_pedido_relacionado,
@@ -654,24 +654,24 @@
 //echo $sql . "<br><br>";
 				$row_2 = $stm_2->fetch_assoc();
 			//inserta el pago de la devolucion interna
-				if( $row['monto_devolucion_interna'] > 0 ){
+				if( $row['monto_interno_por_devolver'] > 0 ){
 					$sql = "INSERT INTO ec_devolucion_pagos( id_devolucion_pago, id_devolucion, id_tipo_pago, monto, es_externo, fecha, hora,
-					id_cajero, id_sesion_caja ) VALUES( NULL, {$row['id_devolucion_interna']}, 1, {$row['monto_devolucion_interna']}, 0, 
+					id_cajero, id_sesion_caja ) VALUES( NULL, {$row['id_devolucion_interna']}, 1, {$row['monto_interno_por_devolver']}, 0, 
 					NOW(), NOW(), {$user_id}, {$session_id} )";
 					$stm_3 = $this->link->query($sql) or die( "Error al insertar pago de devolucion interna : {$this->link->error}" );
 //echo $sql . "<br><br>";
 					$devolucion_interna = $this->link->insert_id;
-					$total_devolver_cajero += $row['monto_devolucion_interna'];
+					$total_devolver_cajero += $row['monto_interno_por_devolver'];
 				}
 			//inserta el pago de la devolucion externa
-				if( $row['monto_devolucion_externa'] > 0 ){
+				if( $row['monto_externo_por_devolver'] > 0 ){
 					$sql = "INSERT INTO ec_devolucion_pagos( id_devolucion_pago, id_devolucion, id_tipo_pago, monto, es_externo, fecha, hora,
-					id_cajero, id_sesion_caja ) VALUES( NULL, {$row['id_devolucion_externa']}, 1, {$row['monto_devolucion_externa']}, 1, 
+					id_cajero, id_sesion_caja ) VALUES( NULL, {$row['id_devolucion_externa']}, 1, {$row['monto_externo_por_devolver']}, 1, 
 					NOW(), NOW(), {$user_id}, {$session_id} )";
 					$stm_4 = $this->link->query($sql) or die( "Error al insertar pago de devolucion externa : {$this->link->error}" );
 //echo $sql . "<br><br>";
 					$devolucion_externa = $this->link->insert_id;
-					$total_devolver_cajero += $row['monto_devolucion_externa'];
+					$total_devolver_cajero += $row['monto_externo_por_devolver'];
 				}
 				$total_devolver_cajero = round( $total_devolver_cajero, 2 ) * -1;
 /*inserta el pago por devolucion en el cajero*/

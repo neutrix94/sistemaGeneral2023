@@ -23,7 +23,7 @@ BEGIN
 		AND d.folio_unico IS NOT NULL
 		AND dp.folio_unico IS NULL
 /*implementacion Oscar 2024-02-12 para solo sincronizar devoluciones con pago de cajero sincronizado*/
-		AND cc.id_cajero_cobro != ''
+		AND cc.folio_unico != ''
 /*fin de cambio Oscar 2024-02-12*/
 		GROUP BY dp.id_devolucion_pago
 		LIMIT system_limit;

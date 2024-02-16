@@ -615,6 +615,7 @@
 		$id_devoluciones = $_GET['id_devoluciones'];
 		$tmp_devs = str_replace('~', ',', $id_devoluciones );
 		$devs_array = explode( '~', $id_devoluciones );
+		$id_venta_original = '';
 	//consulta id de pedido original 
 		$sql = "SELECT id_pedido FROM ec_devolucion WHERE id_devolucion IN( {$tmp_devs} )";
 		$stm = mysql_query( $sql ) or die( "Error al consultar el id de la venta original : " . mysql_error() );
@@ -698,15 +699,34 @@
 //$return_internal_ammount = abs($return_internal_ammount);
 			$monto_devolucion_tomado_a_favor = ( $new_total >= $saldo_favor ? $saldo_favor : $new_total );
 			$monto_devolucion_por_devolver = ( $new_total >= $saldo_favor ? 0 : ( $saldo_favor - $new_total ) );
+		//separa el monto de saldo a favor en interno y externo
+			$total_monto_devuelto = $return_internal_ammount + $return_external_ammount;
+			$porcentaje_interno = $return_internal_ammount / $total_monto_devuelto;
+			if( round( porcentaje_interno, 2 ) >= 0.99 ){
+				$porcentaje_interno = 1;
+				$porcentaje_externo = 0;
+			}
+			$porcentaje_externo = $return_external_ammount / $total_monto_devuelto;
+			if( round( porcentaje_externo, 2 ) >= 0.99 ){
+				$porcentaje_externo = 1;
+				$porcentaje_interno = 0;
+			}
+			$monto_saldo_devolver_interno = round( ( $saldo_favor * $porcentaje_interno ) );
+			$monto_saldo_devolver_externo = round( ( $saldo_favor * $porcentaje_externo ) );
+			/*$sql = "SELECT 
+						
+					FROM ec_devolucion
+					WHERE id_devolucion IN(  )";*/
+			
 		//inserta la relacion de los pedidos
 			$sql = "INSERT INTO ec_pedidos_relacion_devolucion ( /*1*/id_pedido_relacion_devolucion, /*2*/id_pedido_original, /*3*/monto_pedido_original,
 			/*4*/id_sesion_caja_pedido_orginal, /*5*/id_devolucion_interna, /*6*/monto_devolucion_interna, /*7*/id_devolucion_externa, 
 			/*8*/monto_devolucion_externa, /*9*/id_pedido_relacionado, /*10*/monto_pedido_relacionado, /*11*/id_sesion_caja_pedido_relacionado, 
-			/*12*/saldo_a_favor, /*13*/monto_devolucion_tomado_a_favor, /*14*/monto_devolucion_por_devolver )
+			/*12*/saldo_a_favor, /*13*/monto_devolucion_tomado_a_favor, /*14*/monto_interno_por_devolver, /*15*/monto_externo_por_devolver )
 			VALUES ( /*1*/NULL, /*2*/{$row['original_sale_id']}, /*3*/{$row['payments_total']}, /*4*/{$row['original_sale_session_id']}, 
 			/*5*/{$devs_array[0]}, /*6*/{$return_internal_ammount}, /*7*/{$devs_array[1]}, /*8*/{$return_external_ammount}, 
 			/*9*/{$id_pedido_r}, /*10*/{$new_total}, /*11*/0, /*12*/{$saldo_favor}, /*13*/{$monto_devolucion_tomado_a_favor}, 
-			/*14*/{$monto_devolucion_por_devolver} )";
+			/*14*/{$monto_saldo_devolver_interno}, /*15*/{$monto_saldo_devolver_externo} )";
 			$stm = mysql_query( $sql ) or die( "Error al insertar la relacion entre pedidos : {$sql} " . mysql_error() );
 
 			$sql="UPDATE ec_pedidos SET id_devoluciones='$id_devoluciones' WHERE id_pedido=$id_pedido_r";
@@ -719,9 +739,5 @@
 /*Fin de cambio Oscar 25.06.2019*/
 	mysql_query("commit");
 	echo 'ok|'.$id_pedido_r."|";
-	
-
-
-//echo '|<img src="../include/barcode/barcode.php?filepath=../../img/codigos_barra/'.$folio.'.png&text='.$folio.'&size=60&orientation=horizontal&codeType=Code30&print=true">';
 	echo '|'.$folio;//
 ?>
