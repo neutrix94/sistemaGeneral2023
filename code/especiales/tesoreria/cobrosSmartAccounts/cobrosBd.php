@@ -92,7 +92,7 @@ $CONSULTAS_SQL[] = array( "CONSULTA_SALDO_TOMADO"=>$CONSULTA_SALDO_TOMADO );
 					FROM ec_cajero_cobros cc
 					WHERE cc.id_pedido = p.id_pedido 
 				)*/ 
-				SUM( IF( pp.id_pedido_pago IS NULL or pp.referencia != '', 0, pp.monto ) ) AS pagos_registrados/*Oscar 2023/10/10*//*4*/,
+				SUM( IF( pp.id_pedido_pago IS NULL , 0, pp.monto ) ) AS pagos_registrados/*Oscar 2023/10/10 or pp.referencia != ''*//*4*/,
 				p.total AS total_nota/*5*/
 			FROM ec_pedidos p
 			LEFT JOIN ec_pedido_pagos pp 
@@ -239,7 +239,7 @@ $CONSULTAS_SQL[] = array( "CONSULTA_DEVOLUCION_RELACIONADA"=>$CONSULTA_DEVOLUCIO
 	}
 	
 	if($fl=='cobrar'){
-		mysql_query("BEGIN");//maarcamos el inicio de la transacción
+		mysql_query("BEGIN");//marcamos el inicio de la transacción
 		$id_pedido=$_POST['id_venta'];
 		$tarjetas=$_POST['tar'];	
 		$cheques=$_POST['chq'];	
