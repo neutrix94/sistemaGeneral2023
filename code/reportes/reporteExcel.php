@@ -426,9 +426,12 @@
 	if($id_reporte == 32)
 	{
 		$sql="	SELECT DISTINCT
-				id_empleado
+				rn.id_empleado
 				FROM ec_registro_nomina rn
+				LEFT JOIN sys_users u
+				ON u.id_usuario = rn.id_empleado
 				WHERE 1 ".$condiciones;
+		$sql .= "ORDER BY CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) ASC";//Implementacion Oscar 2024-02-19 para ordenamento por nombre
 				
 				
 		//die($sql);		
