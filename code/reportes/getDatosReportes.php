@@ -548,7 +548,14 @@
 						SUM(ROUND(TIME_FORMAT(TIMEDIFF(rn.hora_salida, rn.hora_entrada), '%H') +(TIME_FORMAT(TIMEDIFF(rn.hora_salida, rn.hora_entrada), '%i')/60),2)) Horas,
 					/*Deshabilitado por Oscar 08.11.2018 (Ya no sirve para nada lo dejo comentado por si en un futuro se quiere agarrar este cálculo anterior de Base)*/
 					/*SUM(ROUND((TIME_FORMAT(TIMEDIFF(rn.hora_salida, rn.hora_entrada), '%H') +(TIME_FORMAT(TIMEDIFF(rn.hora_salida, rn.hora_entrada), '%i')/60))*u.pago_hora)) Sueldo*/
+					/*DESHABILITADO POR OSCAR 2024-02-18 PARA CORREGIR ORDENAMIENTO DE HORAS DE ENTRADA Y SALIDA EN EL CAMPO DETALLE
 						GROUP_CONCAT('DE  ',rn.hora_entrada,'  A  ',rn.hora_salida SEPARATOR '<br>') as detalleHoras
+					*/	
+						GROUP_CONCAT(
+							CONCAT('DE ', rn.hora_entrada, ' A ', rn.hora_salida) 
+							ORDER BY rn.hora_entrada, rn.hora_salida 
+							SEPARATOR '\n'
+						) AS detalleHoras
 						FROM ec_registro_nomina rn
 						JOIN sys_users u ON rn.id_empleado = u.id_usuario
 						WHERE rn.id_empleado = ".$row[0]."
