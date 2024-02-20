@@ -554,7 +554,7 @@
 						GROUP_CONCAT(
 							CONCAT('DE ', rn.hora_entrada, ' A ', rn.hora_salida) 
 							ORDER BY rn.hora_entrada, rn.hora_salida 
-							SEPARATOR '\n'
+							SEPARATOR '<br>'
 						) AS detalleHoras
 						FROM ec_registro_nomina rn
 						JOIN sys_users u ON rn.id_empleado = u.id_usuario
