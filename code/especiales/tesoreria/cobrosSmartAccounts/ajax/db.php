@@ -626,6 +626,7 @@
 						monto_pedido_original,
 						id_sesion_caja_pedido_orginal, 
 						id_devolucion_interna,
+						id_devolucion_externa,
 						monto_interno_por_devolver,
 						monto_externo_por_devolver,
 						monto_devolucion_externa,
