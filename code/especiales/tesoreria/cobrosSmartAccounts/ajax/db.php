@@ -949,13 +949,16 @@
 			$sql = "SELECT
 					ROUND( ax.internal/ax.total, 6 ) AS internal_porcent,
 					ROUND( ax.external/ax.total, 6 ) AS external_porcent,
-					ax.total
+					ROUND( ax.total * porcentaje, 2 ) AS total
 				FROM(
 					SELECT
 						SUM( pd.monto ) AS total,
+						ROUND( p.total / p.subtotal, 6 ) AS porcentaje,
 						SUM( IF( sp.es_externo = 0, pd.monto-pd.descuento, 0 ) ) AS internal,
 						SUM( IF( sp.es_externo = 1, pd.monto-pd.descuento, 0 ) ) AS external
 					FROM ec_pedidos_detalle pd
+					LEFT JOIN ec_pedidos p
+					ON p.id_pedido = pd.id_pedido
 					LEFT JOIN sys_sucursales_producto sp
 					ON pd.id_producto = sp.id_producto
 					AND sp.id_sucursal = {$this->store_id}
