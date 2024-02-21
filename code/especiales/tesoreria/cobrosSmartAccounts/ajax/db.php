@@ -251,6 +251,30 @@
 				echo $Payments->delete_payment_saved( $payment_id );
 			break;
 
+			case 'obtenerListaAfiliaciones' :
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				echo $Payments->obtenerListaAfiliaciones( $session_id, $user_id );
+			break;
+
+			case 'obtenerListaAfiliacionesActuales':
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				echo $Payments->obtenerListaAfiliacionesActuales( $session_id );
+			break;
+
+			case 'checkTerminalSesion' : 				
+				$enabled = ( isset( $_GET['enabled'] ) ? $_GET['enabled'] : $_POST['enabled'] );
+				$session_terminal_id = ( isset( $_GET['session_terminal_id'] ) ? $_GET['session_terminal_id'] : $_POST['session_terminal_id'] );
+				echo $Payments->checkTerminalSesion( $enabled, $session_terminal_id );
+			break;
+
+			case 'agregarAfiliacionSesion' :
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				$mannager_password = ( isset( $_GET['mannager_password'] ) ? $_GET['mannager_password'] : $_POST['mannager_password'] );
+				$id_afiliacion = ( isset( $_GET['id_afiliacion'] ) ? $_GET['id_afiliacion'] : $_POST['id_afiliacion'] );
+				$check_password = $Payments->check_mannager_password( $sucursal_id, $mannager_password );
+				echo $Payments->agregarAfiliacionSesion( $session_id, $user_id, $id_afiliacion );
+			break;
+			
 			default :
 				die( "Access denied on '{$action}'" );
 			break;
@@ -642,7 +666,7 @@
 //echo $sql . "<br><br>";
 			if( $stm_1->num_rows == 1 ){
 				$row = $stm_1->fetch_assoc();
-				$this->reinsertaPagosPorDevolucion( $row['id_pedido_original'], $user_id, $session_id, '$folio_devolucion' );
+				$this->reinsertaPagosPorDevolucion( $row['id_pedido_original'], $user_id, $session_id, '$folio_devolucion', $row['monto_interno_por_devolver'], $row['monto_externo_por_devolver'] );
 		//verifica que el pedido no sea un apartado
 				$sql = "SELECT 
 							p.pagado AS was_payed, 
@@ -792,7 +816,7 @@
 			}
 		}
 
-		public function reinsertaPagosPorDevolucion( $id_venta, $id_cajero, $id_sesion_caja, $folio_devolucion ){
+		public function reinsertaPagosPorDevolucion( $id_venta, $id_cajero, $id_sesion_caja, $folio_devolucion, $monto_dev_interna, $monto_dev_externa ){
 			$sql = "SELECT * FROM ec_pedido_pagos WHERE id_pedido = {$id_venta} AND monto > 0 AND referencia = ''";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los pagos anteriores : {$this->link->error}" );
 			$this->link->autocommit(false);
@@ -810,7 +834,7 @@
 			}
 		
 		//inserta los pagos de acuerdo a la devolucion interna 
-			$sql = "SELECT 
+			/*$sql = "SELECT 
 						d.monto_devolucion
 					FROM ec_devolucion d
 					LEFT JOIN ec_devolucion_pagos dp
@@ -818,19 +842,20 @@
 					WHERE dp.es_externo = 0
 					AND id_pedido = {$id_venta}";
 			$stm_aux = $this->link->query( $sql ) or die( "Error al consltar devolucion interna : {$this->link->error}" );
-			if( $stm_aux->num_rows > 0 ){
+			if( $stm_aux->num_rows > 0 ){*/
+			if( $monto_dev_interna > 0 ){
 				$row_aux = $stm_aux->fetch_assoc();
 			//inserta los pagos de acuerdo a la devolucion interna
 				$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, id_moneda, tipo_cambio, 
 				id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja, referencia )
-				VALUES ( '{$id_venta}', '{$row['id_cajero_cobro']}', '1', now(), now(), ROUND( {$row_aux['monto_devolucion']}, 4 ), '1', '-1', 
+				VALUES ( '{$id_venta}', '{$row['id_cajero_cobro']}', '1', now(), now(), ROUND( {$monto_dev_interna}, 4 ), '1', '-1', 
 				'-1', '-1', '{$row['exportado']}', '0', '{$id_cajero}', '{$row['folio_unico']}', '{$row['sincronizar']}', '{$id_sesion_caja}', 
 				'Devolucion interna {$folio_devolucion}')";
 				$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero en relacion a la devolucion : {$this->link->error}" );
 			}
 
 		//inserta los pagos de acuerdo a la devolucion externa
-			$sql = "SELECT 
+			/*$sql = "SELECT 
 						d.monto_devolucion
 					FROM ec_devolucion d
 					LEFT JOIN ec_devolucion_pagos dp
@@ -838,12 +863,13 @@
 					WHERE dp.es_externo = 1
 					AND id_pedido = {$id_venta}";
 			$stm_aux = $this->link->query( $sql ) or die( "Error al consltar devolucion interna : {$this->link->error}" );
-			if( $stm_aux->num_rows > 0 ){
+			if( $stm_aux->num_rows > 0 ){*/
+			if( $monto_dev_externa > 0 ){
 				$row_aux = $stm_aux->fetch_assoc();
-			//inserta los pagos de acuerdo a la devolucion interna
+			//inserta los pagos de acuerdo a la devolucion externa
 				$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, id_moneda, tipo_cambio, 
 				id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja, referencia )
-				VALUES ( '{$id_venta}', '{$row['id_cajero_cobro']}', '1', now(), now(),  ROUND( {$row_aux['monto_devolucion']}, 4 ), '', '1', '-1', 
+				VALUES ( '{$id_venta}', '{$row['id_cajero_cobro']}', '1', now(), now(),  ROUND( {$monto_dev_externa}, 4 ), '1', '-1', 
 				'-1', '-1', '{$row['exportado']}', '1', '{$id_cajero}', '{$row['folio_unico']}', '{$row['sincronizar']}', '{$id_sesion_caja}', 
 				'Devolucion externa {$folio_devolucion}')";
 				$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro externo del cajero en relacion a la devolucion : {$this->link->error}" );
@@ -1000,7 +1026,7 @@
 				$row_dev = $dev_stm->fetch_assoc();
 				//die( "entra reinsertaPagosPorDevolucion" );
 		    	$sale_id = 	$id_venta_origen;
-				$this->reinsertaPagosPorDevolucion( $row_dev['id_pedido'], $user_id, $session_id, $folio_devolucion );
+				$this->reinsertaPagosPorDevolucion( $row_dev['id_pedido'], $user_id, $session_id, $folio_devolucion, $datos_1[0], $datos_1[1] );
 		    }else{
 				//die( "no entra en reinsertaPagosPorDevolucion" );
 			}
@@ -1233,6 +1259,73 @@
 			$tm = $this->link->query( $sql ) or die( "Error al eliminar el cobro del cajero : {$this->link->error}" );
 			die( 'ok' );
 		}
+
+		public function obtenerListaAfiliaciones( $session_id, $user_id ){
+			$resp = "<select class=\"form-select\" id=\"afiliacion_combo_tmp\">
+			<option value=\"0\">--Seleccionar--</option>";
+			$sql = "SELECT 
+					a.id_afiliacion AS afiliation_id,
+					a.no_afiliacion AS afiliation_number
+				FROM ec_afiliaciones a
+				LEFT JOIN ec_afiliaciones_cajero ac 
+				ON ac.id_afiliacion=a.id_afiliacion
+				LEFT JOIN ec_sesion_caja_afiliaciones sca
+				ON sca.id_afiliacion = a.id_afiliacion
+				WHERE ac.id_cajero='{$user_id}'
+				AND sca.id_afiliacion IS NULL 
+				AND ac.activo=1";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar las terminales : {$this->link->error}" );
+			while( $row = $stm->fetch_assoc() ){
+				$resp .= "<option value=\"{$row['afiliation_id']}\">{$row['afiliation_number']}</option>";
+			}
+			$resp .= "</select>";
+			return $resp;
+		}
+
+		public function obtenerListaAfiliacionesActuales( $session_id ){
+			$resp = "<table class=\"table fs-5\">
+				<thead>
+					<tr>
+						<th class=\"text-center\">Terminal</th>
+						<th class=\"text-center\">Habilitada</th>
+					</tr>
+				<thead>
+				<tbody>";
+			$sql = "SELECT
+						a.id_afiliacion AS afiliation_id,
+						a.no_afiliacion AS afiliation_number,
+						sca.habilitado AS enabled
+					FROM ec_sesion_caja_afiliaciones sca
+					LEFT JOIN ec_afiliaciones a
+					ON a.id_afiliacion = sca.id_afiliacion
+					WHERE sca.id_sesion_caja = {$session_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar afiliaciones de la sesion acual : {$this->link->error} {$sql}" );
+			while( $row = $stm->fetch_assoc() ){
+				$enabled = ( $row['enabled'] == 1 ? 'checked' : '');
+				$resp .= "<tr>
+					<td class=\"text-center\">{$row['afiliation_number']}</td>
+					<td class=\"text-center\"><input type=\"checkbox\" {$enabled} onclick=\"checkTerminalSesion( this, {$row['afiliation_id']} );\"></td>
+				</tr>";
+			}
+			$resp .= "</tbody>
+			</table>";
+			//die($resp);
+			return $resp;
+		}
+
+		public function agregarAfiliacionSesion( $session_id, $user_id, $afiliation_id, $es_error = 0  ){
+			$sql = "INSERT INTO ec_sesion_caja_afiliaciones ( id_sesion_caja, id_cajero, id_afiliacion, habilitado, insertada_por_error_en_cobro )
+			VALUES ( '{$session_id}', '{$user_id}', '{$afiliation_id}', 1, {$es_error} )";
+			$stm = $this->link->query( $sql ) or die( "Error al agregar afiliacion a la sesion de caja actual : {$this->link->error}" );
+		}
+
+		public function checkTerminalSesion( $enabled, $session_terminal_id ){
+			$sql = "UPDATE ec_sesion_caja_afiliaciones SET habilitado = '{$enabled}' WHERE id_sesion_caja_afiliaciones = {$session_terminal_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al actualizar el satatus de afiliacion en la sesion de caja : {$this->link->error}" );
+			return "Status de terminal actualizado exitsamente.";
+		}
+		
+		
 
 	}
 
