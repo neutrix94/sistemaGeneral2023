@@ -229,3 +229,72 @@
 		$( '.emergent_content' ).html( '' );
 		$( '.emergent' ).css( 'display', 'none' );
 	}
+
+
+//obtener lista de terminales sin integracion
+	function getAfiliacionesForm(){
+		var session_id = $( '#session_id' ).val();
+		var url = "ajax/db.php?fl=obtenerListaAfiliaciones&session_id=" + session_id;
+		var resp = ajaxR( url );
+		var url = "ajax/db.php?fl=obtenerListaAfiliacionesActuales&session_id=" + session_id;
+		var afiliaciones = ajaxR( url );
+		var content = `<div>
+			<div class="row">
+				<div class="col-2"></div>
+				<div class="col-8">
+					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
+					<div class="input-group">
+						${resp}
+						<input type="checkbox" id="afiliacion_por_error" style="display:none">
+						Error : 
+						<label for="error" class="icon-toggle-off text-success fs-3"></label>
+					</div>
+					<br>
+					<h2>Pide al encargado que ingrese su contraseña para continuar : </h2>
+					<input type="password" id="mannager_password" class="form-control">
+					<br>
+					<button class="btn btn-success form-control" onclick="agregarAfiliacionSesion();">
+						<i class="icon-plus">Agregar</i>
+					</button>
+					<h1>Afiliaciones activas : </h1>
+					${afiliaciones}
+				</div>
+			</div>
+		</div>`;
+		$( '.emergent_content' ).html( content );
+		$( '.emergent' ).css( 'display', 'block' );
+	}
+
+//obtener lista de terminales con integracion
+	function getTerminalesForm(){
+		var session_id = $( '#session_id' ).val();
+		var url = "ajax/db.php?fl=obtenerListaTerminales&session_id=" + session_id;
+		var resp = ajaxR( url );
+		var url = "ajax/db.php?fl=obtenerListaTerminalesActuales&session_id=" + session_id;
+		var afiliaciones = ajaxR( url );
+		var content = `<div>
+			<div class="row">
+				<div class="col-2"></div>
+				<div class="col-8">
+					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
+					<div class="input-group">
+						${resp}
+						<input type="checkbox" id="afiliacion_por_error" style="display:none">
+						Error : 
+						<label for="error" class="icon-toggle-off text-success fs-3"></label>
+					</div>
+					<br>
+					<h2>Pide al encargado que ingrese su contraseña para continuar : </h2>
+					<input type="password" id="mannager_password" class="form-control">
+					<br>
+					<button class="btn btn-success form-control" onclick="agregarTerminalSesion();">
+						<i class="icon-plus">Agregar</i>
+					</button>
+					<h1>Afiliaciones activas : </h1>
+					${afiliaciones}
+				</div>
+			</div>
+		</div>`;
+		$( '.emergent_content' ).html( content );
+		$( '.emergent' ).css( 'display', 'block' );
+	}

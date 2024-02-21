@@ -127,9 +127,26 @@ else if($multicajero==1){
 			mysql_query("ROLLBACK");//cancelamos la transacción
 			die("Error al insertar el registro de inicio de sesión de caja!!!\n".$error);
 		}
+	//inserta afiliacion(es)
+		
+	//inserta terminal(es)
 
 /*Cambio Oscar 2021 para mandar aviso si la caja no corresponde a un corte anterior*/
 		$new_id = mysql_insert_id();
+//inserta afiliaciones
+		$afiliaciones = explode( ",", $_POST['afiliaciones'] );
+		foreach ($afiliaciones as $key => $afiliacion) {
+			$sql = "INSERT INTO ec_sesion_caja_afiliaciones ( id_sesion_caja, id_cajero, id_afiliacion, habilitado, insertada_por_error_en_cobro )
+			VALUES ( '{$new_id}', '{$user_id}', '{$afiliacion}', 1, 0 )";
+			$stm = mysql_query( $sql ) or die( "Error al insertar afiliacion en sesion de caja : " . mysql_error() );
+		}
+//inserta terminales
+		$terminales = explode( ",", $_POST['terminales'] );
+		foreach ($terminales as $key => $terminal) {
+			$sql = "INSERT INTO ec_sesion_caja_terminales ( id_sesion_caja, id_cajero, id_terminal, habilitado, insertada_por_error_en_cobro )
+			VALUES ( '{$new_id}', '{$user_id}', '{$terminal}', 1, 0 )";
+			$stm = mysql_query( $sql ) or die( "Error al insertar terminal en sesion de caja : " . mysql_error() );
+		}
 		$sql = "SELECT 
 				sc.caja_final,
 				s.nombre

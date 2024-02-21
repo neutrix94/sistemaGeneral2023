@@ -172,10 +172,25 @@
 				>
 					<i class="icon-qrcode"></i>
 				</button>
+				<button
+					type="button"
+					class="btn btn-warning"
+					onclick="getAfiliacionesForm();"
+				>
+					<i class="icon-tools"></i>
+				</button>
 			</div>		
 		</div>
 		<div class="row" id="cards_container">
-			<h3>Tarjetas 
+			<h3>
+				<button
+					type="button"
+					class="btn btn-warning"
+					onclick="getTerminalesForm();"
+				>
+					<i class="icon-tools"></i>
+				</button>
+				Tarjetas 
 				<button
 					type="button"
 					id="add_card_btn"

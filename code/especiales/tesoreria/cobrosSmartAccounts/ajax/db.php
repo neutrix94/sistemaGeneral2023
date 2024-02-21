@@ -250,7 +250,7 @@
 				$payment_id = $_GET['payment_id'];
 				echo $Payments->delete_payment_saved( $payment_id );
 			break;
-
+//afiliaciones
 			case 'obtenerListaAfiliaciones' :
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				echo $Payments->obtenerListaAfiliaciones( $session_id, $user_id );
@@ -261,10 +261,10 @@
 				echo $Payments->obtenerListaAfiliacionesActuales( $session_id );
 			break;
 
-			case 'checkTerminalSesion' : 				
+			case 'checkAfiliationSesion' : 				
 				$enabled = ( isset( $_GET['enabled'] ) ? $_GET['enabled'] : $_POST['enabled'] );
 				$session_terminal_id = ( isset( $_GET['session_terminal_id'] ) ? $_GET['session_terminal_id'] : $_POST['session_terminal_id'] );
-				echo $Payments->checkTerminalSesion( $enabled, $session_terminal_id );
+				echo $Payments->checkAfiliationSesion( $enabled, $session_terminal_id );
 			break;
 
 			case 'agregarAfiliacionSesion' :
@@ -272,7 +272,58 @@
 				$mannager_password = ( isset( $_GET['mannager_password'] ) ? $_GET['mannager_password'] : $_POST['mannager_password'] );
 				$id_afiliacion = ( isset( $_GET['id_afiliacion'] ) ? $_GET['id_afiliacion'] : $_POST['id_afiliacion'] );
 				$check_password = $Payments->check_mannager_password( $sucursal_id, $mannager_password );
+				$error = ( isset( $_GET['error'] ) ? $_GET['error'] : $_POST['error'] );
 				echo $Payments->agregarAfiliacionSesion( $session_id, $user_id, $id_afiliacion );
+			break;
+//afiliaciones
+			case 'obtenerListaAfiliaciones' :
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				echo $Payments->obtenerListaAfiliaciones( $session_id, $user_id );
+			break;
+
+			case 'obtenerListaAfiliacionesActuales':
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				echo $Payments->obtenerListaAfiliacionesActuales( $session_id );
+			break;
+
+			case 'checkAfiliationSesion' : 				
+				$enabled = ( isset( $_GET['enabled'] ) ? $_GET['enabled'] : $_POST['enabled'] );
+				$session_terminal_id = ( isset( $_GET['session_terminal_id'] ) ? $_GET['session_terminal_id'] : $_POST['session_terminal_id'] );
+				echo $Payments->checkAfiliationSesion( $enabled, $session_terminal_id );
+			break;
+
+			case 'agregarAfiliacionSesion' :
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				$mannager_password = ( isset( $_GET['mannager_password'] ) ? $_GET['mannager_password'] : $_POST['mannager_password'] );
+				$id_afiliacion = ( isset( $_GET['id_afiliacion'] ) ? $_GET['id_afiliacion'] : $_POST['id_afiliacion'] );
+				$check_password = $Payments->check_mannager_password( $sucursal_id, $mannager_password );
+				$error = ( isset( $_GET['error'] ) ? $_GET['error'] : $_POST['error'] );
+				echo $Payments->agregarAfiliacionSesion( $session_id, $user_id, $id_afiliacion );
+			break;
+	//terminales
+			case 'obtenerListaTerminales' :
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				echo $Payments->obtenerListaTerminales( $session_id, $user_id );
+			break;
+
+			case 'obtenerListaTerminalesActuales':
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				echo $Payments->obtenerListaTerminalesActuales( $session_id );
+			break;
+
+			case 'checkTerminalSesion' : 				
+				$enabled = ( isset( $_GET['enabled'] ) ? $_GET['enabled'] : $_POST['enabled'] );
+				$session_terminal_id = ( isset( $_GET['session_terminal_id'] ) ? $_GET['session_terminal_id'] : $_POST['session_terminal_id'] );
+				echo $Payments->checkTerminalSesion( $enabled, $session_terminal_id );
+			break;
+
+			case 'agregarTerminalSesion' :
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				$mannager_password = ( isset( $_GET['mannager_password'] ) ? $_GET['mannager_password'] : $_POST['mannager_password'] );
+				$id_terminal = ( isset( $_GET['id_terminal'] ) ? $_GET['id_terminal'] : $_POST['id_terminal'] );
+				$check_password = $Payments->check_mannager_password( $sucursal_id, $mannager_password );
+				$error = ( isset( $_GET['error'] ) ? $_GET['error'] : $_POST['error'] );
+				echo $Payments->agregarTerminalSesion( $session_id, $user_id, $id_afiliacion );
 			break;
 			
 			default :
@@ -1276,7 +1327,7 @@
 			$tm = $this->link->query( $sql ) or die( "Error al eliminar el cobro del cajero : {$this->link->error}" );
 			die( 'ok' );
 		}
-
+//Afiliaciones
 		public function obtenerListaAfiliaciones( $session_id, $user_id ){
 			$resp = "<select class=\"form-select\" id=\"afiliacion_combo_tmp\">
 			<option value=\"0\">--Seleccionar--</option>";
@@ -1330,20 +1381,87 @@
 			return $resp;
 		}
 
-		public function agregarAfiliacionSesion( $session_id, $user_id, $afiliation_id, $es_error = 0  ){
+		public function agregarAfiliacionSesion( $session_id, $user_id, $afiliation_id, $es_error = 0 ){
 			$sql = "INSERT INTO ec_sesion_caja_afiliaciones ( id_sesion_caja, id_cajero, id_afiliacion, habilitado, insertada_por_error_en_cobro )
-			VALUES ( '{$session_id}', '{$user_id}', '{$afiliation_id}', 1, {$es_error} )";
+			VALUES ( '{$session_id}', '{$user_id}', '{$afiliation_id}', 1, '{$es_error}' )";
 			$stm = $this->link->query( $sql ) or die( "Error al agregar afiliacion a la sesion de caja actual : {$this->link->error}" );
+			return 'ok';
 		}
 
-		public function checkTerminalSesion( $enabled, $session_terminal_id ){
+		public function checkAfiliationSesion( $enabled, $session_terminal_id ){
 			$sql = "UPDATE ec_sesion_caja_afiliaciones SET habilitado = '{$enabled}' WHERE id_sesion_caja_afiliaciones = {$session_terminal_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al actualizar el satatus de afiliacion en la sesion de caja : {$this->link->error}" );
 			return "Status de terminal actualizado exitsamente.";
 		}
-		
-		
 
+	//Terminales
+		public function obtenerListaTerminales( $session_id, $user_id ){
+			$resp = "<select class=\"form-select\" id=\"terminal_combo_tmp\">
+			<option value=\"0\">--Seleccionar--</option>";
+			$sql = "SELECT 
+					tis.id_terminal_integracion AS teminal_id,
+					tis.nombre_terminal AS terminal_name
+				FROM ec_terminales_integracion_smartaccounts tis
+				LEFT JOIN ec_terminales_cajero_smartaccounts tcs 
+				ON tis.id_terminal_integracion = tcs.id_terminal
+				LEFT JOIN ec_sesion_caja_terminales sct
+				ON sct.id_terminal = tis.id_terminal_integracion
+				WHERE sct.id_cajero = '{$user_id}'
+				AND sct.id_sesion_caja = '{$session_id}'
+				AND sct.id_terminal IS NULL";//AND ts.activo=1
+			//die($sql);
+			$stm = $this->link->query( $sql ) or die( "Error al consultar las terminales : {$this->link->error}" );
+			while( $row = $stm->fetch_assoc() ){
+				$resp .= "<option value=\"{$row['teminal_id']}\">{$row['terminal_name']}</option>";
+			}
+			$resp .= "</select>";
+			return $resp;
+		}
+
+		public function obtenerListaTerminalesActuales( $session_id ){
+			$resp = "<table class=\"table fs-5\">
+				<thead>
+					<tr>
+						<th class=\"text-center\">Terminal</th>
+						<th class=\"text-center\">Habilitada</th>
+					</tr>
+				<thead>
+				<tbody>";
+			$sql = "SELECT
+						sct.id_sesion_caja_terminales AS terminal_session_id,
+						tis.id_terminal_integracion AS terminal_id,
+						tis.nombre_terminal AS terminal_name,
+						sct.habilitado AS enabled
+					FROM ec_sesion_caja_terminales sct
+					LEFT JOIN ec_terminales_integracion_smartaccounts tis
+					ON tis.id_terminal_integracion = sct.id_terminal
+					WHERE sct.id_sesion_caja = {$session_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar afiliaciones de la sesion actual : {$this->link->error} {$sql}" );
+			while( $row = $stm->fetch_assoc() ){
+				$enabled = ( $row['enabled'] == 1 ? 'checked' : '');
+				$resp .= "<tr>
+					<td class=\"text-center\">{$row['terminal_name']}</td>
+					<td class=\"text-center\"><input type=\"checkbox\" {$enabled} onclick=\"checkTerminalSesion( this, {$row['terminal_session_id']} );\"></td>
+				</tr>";
+			}
+			$resp .= "</tbody>
+			</table>";
+			//die($resp);
+			return $resp;
+		}
+
+		public function agregarTerminalSesion( $session_id, $user_id, $terminal_id, $es_error = 0 ){
+			$sql = "INSERT INTO ec_sesion_caja_terminales ( id_sesion_caja, id_cajero, id_terminal, habilitado )
+			VALUES ( '{$session_id}', '{$user_id}', '{$terminal_id}', 1 )";
+			$stm = $this->link->query( $sql ) or die( "Error al agregar terminal a la sesion de caja actual : {$this->link->error}" );
+			return 'ok';
+		}
+
+		public function checkTerminalSesion( $enabled, $session_terminal_id ){
+			$sql = "UPDATE ec_sesion_caja_terminales SET habilitado = '{$enabled}' WHERE id_sesion_caja_terminales = {$session_terminal_id}";//die($sql);
+			$stm = $this->link->query( $sql ) or die( "Error al actualizar el status de terminal en la sesion de caja : {$this->link->error}" );
+			return "Status de terminal actualizado exitsamente.";
+		}
 	}
 
 ?>

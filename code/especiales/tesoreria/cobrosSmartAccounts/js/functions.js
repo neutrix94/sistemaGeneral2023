@@ -731,6 +731,79 @@ console.log( resp );
 		}
 	}
 
+//agregar afiliacion 
+	function agregarAfiliacionSesion(){
+		var session_id = $( '#session_id' ).val();
+		var password = $( '#mannager_password' ).val();
+		var afiliation_id = $( '#afiliacion_combo_tmp' ).val();
+		if( afiliation_id == '' || afiliation_id == null || afiliation_id == 0 || afiliation_id == '0' ){
+			alert( "Pimero elije una afiliación válida!" );
+			return false;
+		}	
+		if( password.length <= 0 ){
+			alert( "La contraseña del encargado no puede ir vacía!" );
+			return false;
+		}
+		var url = "ajax/db.php?fl=agregarAfiliacionSesion&session_id=" + session_id;
+		url += "&mannager_password=" + password;
+		url += "&id_afiliacion=" + afiliation_id;
+		var resp = ajaxR( url );
+		if( resp != 'ok' ){
+			alert( resp );
+		}else{
+			alert( "Afiliacion agregada exitosamente." );
+			getAfiliacionesForm();//recarga emergente de afiliaciones
+		}
+	}
+
+	function checkAfiliationSesion( obj, session_terminal_id ){
+		var enabled = 1;
+		//var session_id = $( '#session_id' ).val();
+		if( ! $(obj).prop('checked') ){
+			enabled = 0;
+		}	
+		var url = 'ajax/db.php?fl=checkAfiliationSesion&enabled=' + enabled + '&session_terminal_id=' + session_terminal_id;
+		alert( url );
+		alert( ajaxR( url ) );
+		return false;
+	}
+//agregar afiliacion 
+	function agregarTerminalSesion(){
+		var session_id = $( '#session_id' ).val();
+		var password = $( '#mannager_password' ).val();
+		var afiliation_id = $( '#afiliacion_combo_tmp' ).val();
+		if( afiliation_id == '' || afiliation_id == null || afiliation_id == 0 || afiliation_id == '0' ){
+			alert( "Pimero elije una afiliación válida!" );
+			return false;
+		}	
+		if( password.length <= 0 ){
+			alert( "La contraseña del encargado no puede ir vacía!" );
+			return false;
+		}
+		var url = "ajax/db.php?fl=agregarTerminalSesion&session_id=" + session_id;
+		url += "&mannager_password=" + password;
+		url += "&id_terminal=" + afiliation_id;
+		var resp = ajaxR( url );
+		if( resp != 'ok' ){
+			alert( resp );
+		}else{
+			alert( "Terminal agregada exitosamente." );
+			getAfiliacionesForm();//recarga emergente de afiliaciones
+		}
+	}
+
+	function checkTerminalSesion( obj, session_terminal_id ){
+		var enabled = 1;
+		//var session_id = $( '#session_id' ).val();
+		if( ! $(obj).prop('checked') ){
+			enabled = 0;
+		}	
+		var url = 'ajax/db.php?fl=checkTerminalSesion&enabled=' + enabled + '&session_terminal_id=' + session_terminal_id;
+		//alert( url );
+		alert( ajaxR( url ) );
+		return false;
+	}
+
 
 //lamadas asincronas
 	function ajaxR( url ){
