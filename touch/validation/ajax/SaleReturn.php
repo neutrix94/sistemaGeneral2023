@@ -624,7 +624,7 @@
 		   
 /*implementacion Oscar 2023-12-19 para actualizar referencia de la nota de venta y a devolucion*/
 	        $sql = "UPDATE ec_pedidos_referencia_devolucion 
-	                    SET total_venta = ( total_venta + ( {$internal_return_amount} + {$this->external_return_amount} ) )
+	                    SET total_venta = ( total_venta - ( {$this->internal_return_amount} + {$this->external_return_amount} ) )
 	                WHERE id_pedido = {$this->sale_id}";
 	        $reference_stm = $this->link->query( $sql ) or die( "Error al actualizar la referencia de la devolucion : {$this->link->error}");
 /*fin de cambio Oscar 2023-12-19*/
