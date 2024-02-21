@@ -616,7 +616,7 @@
 			if( $ammount < 0 && $pago_por_saldo_a_favor > 0 ){//die( 'caso 1' );
 			//insertar pago
 				//desahabilitado por Oscar 2024-02-16$this->insertPayment( $pago_por_saldo_a_favor, $sale_id, $user_id, $session_id );
-				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, ( $pago_por_saldo_a_favor * -1 )  );
+				$sale_id = $this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, ( $pago_por_saldo_a_favor * -1 )  );
 				$this->insertReturnPayment( $ammount, $sale_id, $user_id, $session_id, $id_venta_origen );
 
 			}else if( $ammount > 0 ){//die( "caso 2 : cobrar al cliente con dev o sin dev" );
@@ -747,7 +747,8 @@
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar ec_pedidos_relacion_devolucion de pagos : {$sql} {$this->link->error}" );
 //echo $sql . "<br><br>";
 			//modifica el monto para hacer cuadrar el pago por devolucion
-				return $amount;
+				return $row['id_pedido_original'];
+				//return $amount;
 			}else{
 				return $ammount;
 			}
