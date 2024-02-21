@@ -674,8 +674,9 @@
 				//$ammount = 
 				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
 				$this->insertPayment( $ammount, $sale_id, $user_id, $session_id );
-			}else if( $ammount < 0 ){//die( "caso 3 : devolver efectivo al cliente cuando no se agregan productos" );
-				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
+			}else if( $ammount < 0 ){
+				//die( "caso 3 : devolver efectivo al cliente cuando no se agregan productos : {$sale_id}" );
+				//$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
 			//insertar pago
 				$this->insertReturnPayment( $ammount, $sale_id, $user_id, $session_id );
 			}else if( $ammount == 0 ){//die( "caso 4 : no se devulve dinero al cliente ni se cobra pero se inserta pago" );
@@ -801,7 +802,7 @@
 				return $row['id_pedido_original'];
 				//return $amount;
 			}else{
-				return $ammount;
+				return $sale_id;
 			}
 		}
 
@@ -1093,7 +1094,7 @@
 			if( $dev_stm->num_rows > 0 ){//si tiene saldo a favor de una venta origen
 				$row_dev = $dev_stm->fetch_assoc();
 				//die( "entra reinsertaPagosPorDevolucion" );
-		    	$sale_id = 	$id_venta_origen;
+		    	$sale_id = ( $id_venta_origen > 0 ? $id_venta_origen : $sale_id );
 				$this->reinsertaPagosPorDevolucion( $row_dev['id_pedido'], $user_id, $session_id, $folio_devolucion, $datos_1[0], $datos_1[1] );
 		    }else{
 				//die( "no entra en reinsertaPagosPorDevolucion" );
@@ -1409,7 +1410,7 @@
 				WHERE sct.id_cajero = '{$user_id}'
 				AND sct.id_sesion_caja = '{$session_id}'
 				AND sct.id_terminal IS NULL";//AND ts.activo=1
-			//die($sql);
+			die($sql);
 			$stm = $this->link->query( $sql ) or die( "Error al consultar las terminales : {$this->link->error}" );
 			while( $row = $stm->fetch_assoc() ){
 				$resp .= "<option value=\"{$row['teminal_id']}\">{$row['terminal_name']}</option>";
