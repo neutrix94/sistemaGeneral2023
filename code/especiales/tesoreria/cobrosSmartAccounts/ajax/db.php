@@ -676,7 +676,7 @@
 				$this->insertPayment( $ammount, $sale_id, $user_id, $session_id );
 			}else if( $ammount < 0 ){
 				//die( "caso 3 : devolver efectivo al cliente cuando no se agregan productos : {$sale_id}" );
-				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
+				//$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
 			//insertar pago
 				$this->insertReturnPayment( $ammount, $sale_id, $user_id, $session_id );
 			}else if( $ammount == 0 ){//die( "caso 4 : no se devulve dinero al cliente ni se cobra pero se inserta pago" );
