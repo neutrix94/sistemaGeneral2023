@@ -294,6 +294,22 @@
 			
 		}
 
+		public function check_mannager_password( $sucursal_id, $mannager_password ){
+			$sql = "SELECT 
+						u.id_usuario 
+					FROM sys_users u
+					LEFT JOIN sys_sucursales s
+					ON s.id_encargado = u.id_usuario
+					WHERE s.id_sucursal = {$sucursal_id}
+					AND u.contrasena = md5( '{$mannager_password}' )";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar si el password de encargado es corecto : {$this->link->error}" );
+			if( $stm->num_rows > 0 ){
+				return 'ok';
+			}else{
+				die( "La contraseña del encargado es incorrecta : {$this->link->error}" );
+			}
+		}
+
 		public function validate_payment_is_not_bigger( $sale_id, $ammount ){
 		//busqueda por id
 			$sql = "SELECT
@@ -844,7 +860,7 @@
 			$stm_aux = $this->link->query( $sql ) or die( "Error al consltar devolucion interna : {$this->link->error}" );
 			if( $stm_aux->num_rows > 0 ){*/
 			if( $monto_dev_interna > 0 ){
-				$row_aux = $stm_aux->fetch_assoc();
+				//$row_aux = $stm_aux->fetch_assoc();
 			//inserta los pagos de acuerdo a la devolucion interna
 				$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, id_moneda, tipo_cambio, 
 				id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja, referencia )
@@ -865,7 +881,7 @@
 			$stm_aux = $this->link->query( $sql ) or die( "Error al consltar devolucion interna : {$this->link->error}" );
 			if( $stm_aux->num_rows > 0 ){*/
 			if( $monto_dev_externa > 0 ){
-				$row_aux = $stm_aux->fetch_assoc();
+				//$row_aux = $stm_aux->fetch_assoc();
 			//inserta los pagos de acuerdo a la devolucion externa
 				$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, id_moneda, tipo_cambio, 
 				id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja, referencia )
@@ -904,7 +920,7 @@
 				$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
 					id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
 					VALUES ( '{$id_venta}', '{$row['id_cajero_cobro']}', '1', now(), now(), ROUND( {$row['total']}*{$row['internal_porcent']}, 4 ), '', '1', '-1', 
-					'-1', '-1', '{$row['exportado']}', '{$row['es_externo']}', '{$id_cajero}', '{$row['folio_unico']}', '{$row['sincronizar']}', '{$id_sesion_caja}')";
+					'-1', '-1', '{$row['exportado']}', '0', '{$id_cajero}', '{$row['folio_unico']}', '{$row['sincronizar']}', '{$id_sesion_caja}')";
 				$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero : {$this->link->error}" );
 			}
 			if( $row['external_porcent'] > 0 ){
@@ -915,7 +931,7 @@
 				$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
 					id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
 					VALUES ( '{$id_venta}', '{$row['id_cajero_cobro']}', '1', now(), now(), ROUND( {$row['total']}*{$row['external_porcent']}, 4 ), '', '1', '-1', 
-					'-1', '-1', '{$row['exportado']}', '{$row['es_externo']}', '{$id_cajero}', '{$row['folio_unico']}', '{$row['sincronizar']}', '{$id_sesion_caja}')";
+					'-1', '-1', '{$row['exportado']}', '1', '{$id_cajero}', '{$row['folio_unico']}', '{$row['sincronizar']}', '{$id_sesion_caja}')";
 				$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero : {$this->link->error}" );
 			}
 			//die( "here" );
