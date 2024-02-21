@@ -2051,7 +2051,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 /*implementacion Oscar 2023 para redireccionar siu hay devolucion*/
 		public function get_url_from_return( $sale_id ){
 			$sql = "SELECT 
-						ROUND( 1 - (total/subtotal), 2 ) AS discount
+						ROUND( 1 - (total/subtotal), 6 ) AS discount
 					FROM ec_pedidos
 					WHERE id_pedido = {$this->sale_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar descuento del ticket : {$sql} {$this->link->error}" );
