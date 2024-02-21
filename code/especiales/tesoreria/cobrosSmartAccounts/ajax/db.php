@@ -1095,7 +1095,7 @@
 				$row_dev = $dev_stm->fetch_assoc();
 				//die( "entra reinsertaPagosPorDevolucion" );
 		    	$sale_id = ( $id_venta_origen > 0 ? $id_venta_origen : $sale_id );
-				$this->reinsertaPagosPorDevolucion( $row_dev['id_pedido'], $user_id, $session_id, $folio_devolucion, $datos_1[0], $datos_1[1] );
+				$this->reinsertaPagosPorDevolucion( $row_dev['id_pedido'], $user_id, $session_id, $folio_devolucion, $datos_1[1], $datos_1[0] );
 		    }else{
 				//die( "no entra en reinsertaPagosPorDevolucion" );
 			}
