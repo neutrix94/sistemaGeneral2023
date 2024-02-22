@@ -771,8 +771,8 @@ console.log( resp );
 	function agregarTerminalSesion(){
 		var session_id = $( '#session_id' ).val();
 		var password = $( '#mannager_password' ).val();
-		var afiliation_id = $( '#afiliacion_combo_tmp' ).val();
-		if( afiliation_id == '' || afiliation_id == null || afiliation_id == 0 || afiliation_id == '0' ){
+		var terminal_id = $( '#terminal_combo_tmp' ).val();
+		if( terminal_id == '' || terminal_id == null || terminal_id == 0 || terminal_id == '0' ){
 			alert( "Pimero elije una afiliación válida!" );
 			return false;
 		}	
@@ -782,7 +782,7 @@ console.log( resp );
 		}
 		var url = "ajax/db.php?fl=agregarTerminalSesion&session_id=" + session_id;
 		url += "&mannager_password=" + password;
-		url += "&id_terminal=" + afiliation_id;
+		url += "&id_terminal=" + terminal_id;
 		var resp = ajaxR( url );
 		if( resp != 'ok' ){
 			alert( resp );

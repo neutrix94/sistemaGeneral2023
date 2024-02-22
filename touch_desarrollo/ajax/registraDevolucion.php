@@ -478,7 +478,7 @@ else{
         FROM ec_pedidos p
         LEFT JOIN ec_pedido_pagos pp
         ON pp.id_pedido = p.id_pedido
-        AND pp.referencia = ''
+       /* AND pp.referencia = ''*/
         WHERE p.id_pedido = {$idp}";
     $stm_pagado = mysql_query( $sql_pagado );
     $row_pagado = mysql_fetch_assoc( $stm_pagado );

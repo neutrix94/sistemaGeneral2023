@@ -70,7 +70,8 @@
 			case 'getTerminals' :
 				$user_id = ( isset( $_GET['user_id'] ) ? $_GET['user_id'] : $_POST['user_id'] );
 				$counter = ( isset( $_GET['counter'] ) ? $_GET['counter'] : $_POST['counter'] );
-				echo $Payments->getTerminals( $user_id, $counter, $user_sucursal );
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				echo $Payments->getTerminals( $user_id, $counter, $user_sucursal, $session_id );
 			break;
 
 			case 'cancelEvents' :
@@ -323,7 +324,7 @@
 				$id_terminal = ( isset( $_GET['id_terminal'] ) ? $_GET['id_terminal'] : $_POST['id_terminal'] );
 				$check_password = $Payments->check_mannager_password( $sucursal_id, $mannager_password );
 				$error = ( isset( $_GET['error'] ) ? $_GET['error'] : $_POST['error'] );
-				echo $Payments->agregarTerminalSesion( $session_id, $user_id, $id_afiliacion );
+				echo $Payments->agregarTerminalSesion( $session_id, $user_id, $id_terminal );
 			break;
 			
 			default :
@@ -668,7 +669,7 @@
 			//insertar pago
 				//desahabilitado por Oscar 2024-02-16$this->insertPayment( $pago_por_saldo_a_favor, $sale_id, $user_id, $session_id );
 				$sale_id = $this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, ( $pago_por_saldo_a_favor * -1 )  );
-				$this->insertReturnPayment( $ammount, $sale_id, $user_id, $session_id, $id_venta_origen );
+				$this->insertReturnPayment( $ammount, $sale_id, $user_id, $session_id, $id_venta_origen, true );
 
 			}else if( $ammount > 0 ){//die( "caso 2 : cobrar al cliente con dev o sin dev" );
 				//$ammount = 
@@ -994,7 +995,7 @@
 			$this->link->autocommit(true);
 		}
 
-		public function insertReturnPayment( $ammount, $sale_id, $user_id, $session_id, $id_venta_origen = 0 ){
+		public function insertReturnPayment( $ammount, $sale_id, $user_id, $session_id, $id_venta_origen = 0, $recalcular_por_devolucion = true ){
 			$devolucion_interna = 0;
 			$devolucion_externa = 0;
 			$id_dev_interna = '';
@@ -1098,8 +1099,10 @@
 				$row_dev = $dev_stm->fetch_assoc();
 				//die( "entra reinsertaPagosPorDevolucion" );
 		    	$sale_id = ( $id_venta_origen > 0 ? $id_venta_origen : $sale_id );
-				$this->reinsertaPagosPorDevolucion( $row_dev['id_pedido'], $user_id, $session_id, $folio_devolucion, $datos_1[1], $datos_1[0] );
-		    }else{
+				if( $recalcular_por_devolucion ){
+					$this->reinsertaPagosPorDevolucion( $row_dev['id_pedido'], $user_id, $session_id, $folio_devolucion, $datos_1[1], $datos_1[0] );
+				}
+			}else{
 				//die( "no entra en reinsertaPagosPorDevolucion" );
 			}
 		//inserta el cobro del cajero en efectivo por devolucion
@@ -1155,7 +1158,7 @@
 			return 'ok';
 		}
 
-		public function getTerminals( $user_id, $c = 0, $store_id = 1 ){
+		public function getTerminals( $user_id, $c = 0, $store_id = 1, $session_id ){
 			$resp = "";
 			$sql="SELECT 
 					tis.id_terminal_integracion AS afiliation_id,
@@ -1167,10 +1170,14 @@
 				ON tss.id_terminal = tcs.id_terminal
 				LEFT JOIN vf_razones_sociales_emisores rse
 				ON rse.id_razon_social = tss.id_razon_social
+				LEFT JOIN ec_sesion_caja_terminales sct
+				ON sct.id_terminal = tis.id_terminal_integracion
 				WHERE tcs.id_cajero = '{$user_id}' 
 				AND tcs.activo = 1
 				AND tss.estado_suc = 1
-				AND tss.id_sucursal = {$store_id}";
+				AND tss.id_sucursal = {$store_id}
+				AND sct.id_sesion_caja = {$session_id}
+				AND sct.habilitado = 1";
 				//die( $sql );
 			//$eje=mysql_query($sql)or die("Error al consultar las afiliaciones para este cajero!!!<br>".mysql_error());
 			$stm = $this->link->query( $sql ) or die( "Error al consultar las terminales del cajero : {$this->link->error}" );
@@ -1402,7 +1409,7 @@
 		public function obtenerListaTerminales( $session_id, $user_id ){
 			$resp = "<select class=\"form-select\" id=\"terminal_combo_tmp\">
 			<option value=\"0\">--Seleccionar--</option>";
-			$sql = "SELECT 
+			/*$sql = "SELECT 
 					tis.id_terminal_integracion AS teminal_id,
 					tis.nombre_terminal AS terminal_name
 				FROM ec_terminales_integracion_smartaccounts tis
@@ -1413,7 +1420,16 @@
 				WHERE sct.id_cajero = '{$user_id}'
 				AND sct.id_sesion_caja = '{$session_id}'
 				AND sct.id_terminal IS NULL";//AND ts.activo=1
-			die($sql);
+			die($sql);*/
+			$sql = "SELECT
+						tis.id_terminal_integracion AS teminal_id,
+						tis.nombre_terminal AS terminal_name
+					FROM ec_terminales_integracion_smartaccounts tis
+					LEFT JOIN ec_terminales_cajero_smartaccounts tcs 
+					ON tis.id_terminal_integracion = tcs.id_terminal
+					WHERE tis.id_terminal_integracion NOT IN( SELECT id_terminal FROM ec_sesion_caja_terminales WHERE id_sesion_caja = '{$session_id}' )
+					AND tcs.id_cajero = '{$user_id}'
+					AND tcs.activo = 1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar las terminales : {$this->link->error}" );
 			while( $row = $stm->fetch_assoc() ){
 				$resp .= "<option value=\"{$row['teminal_id']}\">{$row['terminal_name']}</option>";

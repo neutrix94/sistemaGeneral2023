@@ -1,5 +1,7 @@
 <?php
-	require('../../../../../conect.php');
+/*version casa 1.0*/
+	require('../../../../conect.php');
+
 //consultamos las tarjetas
 	$sql="SELECT SUM(IF(cc.id_cajero_cobro IS NULL,0,cc.monto)) 
 		FROM ec_afiliaciones_cajero ac 
@@ -10,7 +12,7 @@
 /*Implementación Oscar 17.06.2019 para el buscador de folios*/
 	if(isset($_POST['flag']) && $_POST['flag']=='buscador'){//die('here');
 		$clave=$_POST['valor'];
-		$sql="SELECT id_sesion_caja,folio,verificado FROM ec_sesion_caja WHERE folio like '%$clave%' AND IF($user_sucursal=-1,id_sucursal>0,id_sucursal=$user_sucursal)";
+		$sql="SELECT id_sesion_caja,folio FROM ec_sesion_caja WHERE folio like '%$clave%' AND IF($user_sucursal=1,id_sucursal>0,id_sucursal=$user_sucursal)";
 		$eje=mysql_query($sql)or die("Error al consultar coincidencias de folio");
 		echo 'ok|';
 		if(mysql_num_rows($eje)<=0){
@@ -21,7 +23,7 @@
 	//listamos resultados
 		while($r=mysql_fetch_row($eje)){
 			$c++;//incrementamos contador
-			echo '<tr id="opc_'.$c.'" tabindex="'.$c.'" onclick="carga_folio('.$r[0].','.$r[2].');" onkeyup="valida_tca_opc(event,'.$c.');" onfocus="marca('.$c.');" onblur="desmarca('.$c.');">';
+			echo '<tr id="opc_'.$c.'" tabindex="'.$c.'" onclick="carga_folio('.$r[0].');" onkeyup="valida_tca_opc(event,'.$c.');" onfocus="marca('.$c.');" onblur="desmarca('.$c.');">';
 				echo '<td class="opc_buscador">'.$r[1].'</td>';
 			echo '<tr>';
 		}
@@ -41,39 +43,127 @@
 	$t1=0;
 	$t2=0;
 	$resAprox=0;
-	extract($_POST);
-	//die($corte);
-//inicio:hora_inicio,fin:hora_fin
-	$h1=$inicio;
-	$h2=$fin;
-	$total_montos_entregados=0;
-/*sacamos el id de cajero*/
-	$sql="SELECT id_cajero,fecha,id_sucursal FROM ec_sesion_caja WHERE id_sesion_caja=$corte";
-	$eje=mysql_query($sql)or die("Error al consultar el cajero!!!");
-	$cajero=mysql_fetch_row($eje);
-	$fecha1=$cajero[1];
-	$sucursal_corte=$cajero[2];
+	/**/
+	$password_md5=md5($_POST['pss']);
+	$sql="SELECT count(id_usuario) FROM sys_users WHERE id_usuario=$user_id AND contrasena='$password_md5'";
+	$eje=mysql_query($sql) or die("Error al comparar la contraseña!!!\n".mysql_error());
+	$r=mysql_fetch_row($eje);
+	if($r[0]!=1){
+		die("<br><br><p>La contraseña no concide a este cajero!!!\nVerifique su contraseña y vuelva a intentar</p>");
+	}/**/
 
+	extract($_POST);
+	$teller_session_id = $_POST['corte'];
+	//inicio:hora_inicio,fin:hora_final
+	echo '<input type="hidden" id="fechaFinal" value="'.$fecha.'">';
+	echo '<input type="hidden" id="horaFinal" value="'.$hrs.'">';
+	//die($corte);
+	//die($hrs);
+	//	if($hrs==0){
+		$h1=$inicio;
+		$h2=$fin;
+	/*}else{
+		$auxH=explode("~",$hrs);
+		$auxH2=explode("|",$auxH[0]);
+	//fijamos hora 1
+		$h1=$auxH2[0].':'.$auxH2[1].':00';
+		$auxH2=explode("|",$auxH[1]);
+	//fijamos hora 2
+		$h2=$auxH2[0].':'.$auxH2[1].':00';
+
+	}*/
+/*implementación Oscar 18.11.2018 para que las asistencias salgan con la fecha correcta en línea*/
   //sacamos la fecha desde el mysql
     $sql_fecha=mysql_query("SELECT current_date")or die("Error al consultar la fecha desde mysql!!!\n\n".mysql_error());
     $fecha_array=mysql_fetch_row($sql_fecha);
-
-	echo '<input type="hidden" id="fechaFinal" value="'.$fecha.'">';
-	echo '<input type="hidden" id="horaFinal" value="'.$hrs.'">';
     //$fecha=$fecha_array[0];
     //$hora_reg=$fecha_array[1];
-	$condicion1=" WHERE pp.fecha='$fcha_corte' AND (pp.hora BETWEEN '$h1' AND '$h2')";/*AND p.id_sucursal='".$user_sucursal."'*/
-	$condicion2=" WHERE dp.fecha='$fcha_corte' AND (dp.hora BETWEEN '$h1' AND '$h2')";/*AND d.id_sucursal='".$user_sucursal."'*/
-	
+/*Fin de cambio Oscar 18.11.2018*/
 
+	if($fecha==-1){
+		$fecha1=$fecha_array[0];//aqui se cambia
+		$ax=explode("-",$fecha1);
+		/*auxiliar de fecha 1
+		$fechaLim1=$ax[0]."-".$ax[1]."-";
+		if($ax[2]<=9){
+			$fechaLim1.='0'.($ax[2]+1);
+		}else{
+			$fechaLim1.=($ax[2]+1);
+		}
+		if($fecha1=='2018-11-30'){
+			$fechaLim1='2018-12-01';
+		}
+		//if($fecha=='2017-11-30'){
+		//	$fechaLim1='2017-12-01';
+		//}*/
+		$condicion1=" WHERE pp.fecha='$fcha_corte' AND (pp.hora BETWEEN '$h1' AND '$h2') AND p.id_sucursal='{$user_sucursal}'";
+		$condicion2=" WHERE dp.fecha='$fcha_corte' AND (dp.hora BETWEEN '$h1' AND '$h2') AND d.id_sucursal='{$user_sucursal}'";
+	}
+//cambio del 14-12-2017
+	//if($fecha==1){
+	//declaramos fecha limite
+		$fecha1=$fecha_array[0];
+		$ax=explode("-",$fecha1);
+	//declaramos fecha inicial
+		/*$fechaLim1=$ax[0]."-".$ax[1]."-";
+		if($ax[2]<=9){
+			$fechaLim1.='0'.($ax[2]-1);
+		}else{
+			$fechaLim1.=($ax[2]-1);
+		}
+		if($fecha1=='2018-12-01'){
+			$fechaLim1='2018-11-30';
+		}*/
+		$fecha1=$fcha_corte;
+
+		$condicion1=" WHERE pp.fecha='$fcha_corte' AND (pp.hora BETWEEN '$h1' AND '$h2') AND p.id_sucursal='".$user_sucursal."'";
+		$condicion2=" WHERE dp.fecha='$fcha_corte' AND (dp.hora BETWEEN '$h1' AND '$h2') AND d.id_sucursal='".$user_sucursal."'";
+	/*}//fin del cambio
+	if($fecha!=-1 && $fecha!=1){
+		$aux=explode("|",$fecha);
+		$fecha1=$aux[0];
+	//auxiliar de fecha 1
+		$ax=explode("-",$fecha1);
+		$fechaLim1=$ax[0]."-".$ax[1]."-";
+		if($ax[2]<=9){
+			$fechaLim1.=($ax[2]);
+		}else{
+			$fechaLim1.=($ax[2]);
+		}
+		if($fecha1=='2018-11-30'){
+			//$fechaLim1='2018-12-01';
+		}
+		$fecha2=$aux[1];
+		$ax=explode("-",$fecha2);
+		$fechaLim2=$ax[0]."-".$ax[1]."-";
+		if($ax[2]<=9){
+			$fechaLim2.=($ax[2]);
+		}else{
+			$fechaLim2.=($ax[2]);
+		}
+		if($fecha2=='2018-11-30'){
+			$fechaLim2='2018-12-01';
+		}
+		$condicion1=" WHERE (CONCAT(pp.fecha,' ',pp.hora) BETWEEN '".$fecha1.' '.$h1."' AND '".$fechaLim2.' '.$h2."') AND p.id_sucursal='".$user_sucursal."'";
+		$condicion2=" WHERE (CONCAT(dp.fecha,' ',dp.hora) BETWEEN '".$fecha1.' '.$h1."' AND '".$fechaLim2.' '.$h2."') AND d.id_sucursal='".$user_sucursal."'";
+	}
+	//die('fecha'.$fecha);
+*/
+//consultamos 
+	$sql="SELECT id_devolucion FROM ec_devolucion WHERE status=0 AND id_sucursal=$user_sucursal AND fecha='$fecha1'";
+	$eje=mysql_query($sql)or die("Error al consultar devoluciones incompletas!!!\n".mysql_error());
+	if(mysql_num_rows($eje)>0){
+		die("Hay devoluciones pendientes de terminar<br>Terminalas y vuelve a intentar!!!");
+	}
 //sacamos total de pagos
 	$sql="SELECT 
 			SUM(IF(pp.es_externo=0,pp.monto,0)) as pagosPedro,
 			SUM(IF(pp.es_externo=1,pp.monto,0)) as pagosExternos
 			FROM ec_pedido_pagos pp
-			JOIN ec_pedidos p on pp.id_pedido=p.id_pedido".$condicion1;
-
-	$sql.=" AND pp.id_cajero=".$cajero[0];
+			JOIN ec_pedidos p on pp.id_pedido=p.id_pedido
+			{$condicion1}
+			AND pp.id_cajero={$user_id}
+			AND pp.id_sesion_caja = {$teller_session_id}";
 //echo $sql.'<br>';	
 	$eje=mysql_query($sql) or die("Error1!!!\n".mysql_error().$sql);
 	$rw=mysql_fetch_row($eje);
@@ -86,9 +176,10 @@
 			SUM(IF(dp.es_externo=0,dp.monto,0)) as devolucionesPedro,
 			SUM(IF(dp.es_externo=1,dp.monto,0)) as devolucionesExternas
 			FROM ec_devolucion_pagos dp
-			JOIN ec_devolucion d ON dp.id_devolucion=d.id_devolucion".$condicion2;
-	
-	$sql.=" AND dp.id_cajero=".$cajero[0];
+			JOIN ec_devolucion d ON dp.id_devolucion=d.id_devolucion
+			{$condicion2}
+			AND dp.id_cajero = {$user_id}
+			AND dp.id_sesion_caja = {$teller_session_id}";
 //echo '<br>'.$sql;	
 	$eje=mysql_query($sql) or die("Error1!!!\n".mysql_error());
 	$rw=mysql_fetch_row($eje);
@@ -101,9 +192,6 @@
 	$sql="SELECT g.id_usuario,g.fecha,g.hora,cg.nombre,g.observaciones,g.monto
 			FROM ec_gastos g 
 			JOIN ec_conceptos_gastos cg ON cg.id_concepto=g.id_concepto";
-
-	$sql.=" AND g.id_cajero=".$cajero[0];
-
 	if($fecha==-1){
 		$condicion=" WHERE fecha='$fecha1' AND (hora BETWEEN '$h1' AND '$h2')";
 	}
@@ -113,7 +201,7 @@
 	if($fecha!=-1 && $fecha!=1){
 		$condicion=" WHERE (CONCAT(g.fecha,' ',g.hora) BETWEEN '".$fecha1.' '.$h1."' AND '".$fecha1.' '.$h2."')";
 	}
-	$sql.=$condicion;/*." AND g.id_sucursal='".$user_sucursal."'"*/
+	$sql.= $condicion . " AND g.id_sucursal= {$user_sucursal} AND g.id_cajero = {$user_id} AND g.id_sesion_caja = {$teller_session_id}";
 
 //echo $sql."<br>";
 	$eje=mysql_query($sql) or die("Error...!!!".mysql_error().$sql);
@@ -121,16 +209,23 @@
 	$resAprox+=$res;
 	$gastoTotal=0;
 //sacamos los descuentos
-	$sql="SELECT fecha_alta,folio_nv,total,descuento FROM ec_pedidos WHERE descuento!=0 AND id_sucursal='$sucursal_corte'";
-	$sql.=" AND fecha_alta BETWEEN '".$fecha1.' '.$h1."' AND '".$fecha1.' '.$h2."'";
-	//}
-	//$sql.=$condicion2;/*." AND id_sucursal='".$user_sucursal."'"*/
-//echo 'Descuentos: '.$sql."<br>";
+	$sql="SELECT fecha_alta,folio_nv,total,descuento FROM ec_pedidos WHERE descuento!=0";
+	if($fecha==-1){
+		$condicion2=" AND fecha_alta BETWEEN '".$fecha1.' '.$h1."' AND '".$fecha1.' '.$h2."'";
+	}
+	if($fecha==1){
+		$condicion2=" AND fecha_alta BETWEEN '".$fechaLim1.' '.$h1."' AND '".$fecha1.' '.$h2."'";
+	}
+	if($fecha!=-1 && $fecha!=1){
+		$condicion2=" AND fecha_alta BETWEEN '".$fecha1.' '.$h1."' AND '".$fecha1.' '.$h2."'";
+	}
+	$sql.=$condicion2." AND id_sucursal='".$user_sucursal."' AND id_sesion_caja = {$teller_session_id}";
+//echo 'Descuentos $ '.$sql."<br>";
 	$eje1=mysql_query($sql)or die("Error!!!\n".mysql_error().$sql);
 	$resAprox+=mysql_num_rows($eje1);
 ?>
 		<div style="height:510px;">
-		<div style="border:1px solid;width:60%;height:80%;background:white;overflow:auto;">
+		<div style="border:1px solid;width:100%;height:80%;background:white;overflow:auto;">
 		<center>
 			<br><hr width="90%;"><p style="font-size:20px;">Ingresos<hr width="90%"></p>
 			<table width="95%" border="0">
@@ -162,6 +257,7 @@
 				</tr>
 		<?php
 		/**/
+		//die($tar);
 			$suma_tarjetas=0;
 			$tarjetas=explode("°",$tar);
 			$cont_tar=0;
@@ -170,11 +266,9 @@
 				$aux=explode("~", $tarjetas[$i]);
 				$suma_tarjetas+=$aux[1];
 				echo '<tr>';
-					echo '<td align="right">Tarjeta '.$cont_tar.':</td>';
-					echo '<td align="right" id="ta'.$cont_tar.'">'.$aux[1].'</td>';
+					echo '<td align="right">'.$aux[2].'</td>';//Tarjeta
+					echo '<td align="right" id="ta'.($cont_tar).'">'.$aux[1].'</td>';
 				echo '</tr>';
-			//sumamos al total de ingresos
-				$total_montos_entregados+=$aux[1];
 			}
 		/**/
 			$cheques=explode("°",$cheq_trans);
@@ -188,19 +282,15 @@
 					echo '<td align="right">'.$aux[2].'</td>';
 					echo '<td align="right">'.$aux[1].'</td>';
 				echo '</tr>';
-			//sumamos al total de ingresos
-				$total_montos_entregados+=$aux[1];
 			}
-		//sumamos el efectivo al total ingresos
-			$total_montos_entregados+=$ingreso_efect;
 		?>
 
 				<tr><td><br></td></tr>
 				<tr>
 					<td align="right"><b>Ingresos en Efectivo:</b></td>
-					<td align="right"><b id=""><?php
+					<td align="right"><b id="subtotal_ing_efect"><?php
 											$subT=($entrada+$entrada_externa)-($suma_cheques+$suma_tarjetas);	
-											 echo $subT;/*echo $ingreso_efect;*/?></b></td>
+											 echo $subT;?></b></td>
 				</tr>
 			</table>
 
@@ -238,12 +328,8 @@
 					<td align="right"><?php echo '-'.$gastoTotal;?></td>
 				</tr>
 				<tr>
-					<td align="right" colspan="4"><b>Efectivo entregado:</b></td>
-					<td align="right"><b><?php echo round($ingreso_efect,2);?></b></td>
-				</tr>
-				<tr>
-					<td align="right" colspan="4" style="color:red;font-size:28px;"><b>Diferencia:</b></td>
-					<td align="right" style="color:red;font-size:28px;"><b><?php echo round($total_montos_entregados-(($entrada+$entrada_externa)-$gastoTotal),2);?></b></td>
+					<td align="right" colspan="4"><b>Efectivo en caja:</b></td>
+					<td align="right"><b id="ingreso_final_efectivo"><?php echo round($subT-$gastoTotal,2);?></b></td>
 				</tr>
 			</table>
 
@@ -291,22 +377,15 @@
 			<input type="hidden" id="regist" value="<?php echo $resAprox;?>">
 		</center>
 		</div>
-<?php
-	$sql="SELECT verificado FROM ec_sesion_caja WHERE id_sesion_caja=$corte";
-	$eje=mysql_query($sql)or die("Error al cinsultar si el corte ya fue verificado!!!".mysql_error()."<br>".$sql);
-	$vals=mysql_fetch_row($eje);
-	$validado=$vals[0];
-//validamos que el perfil tenga el permiso
-	$sql="SELECT modificar FROM sys_permisos WHERE id_perfil=$perfil_usuario AND id_menu=189";
-	$eje=mysql_query($sql)or die("Error al consultar si el usuario tiene el permiso!!!".mysql_error()."<br>".$sql);
-	$perm=mysql_fetch_row($eje);
-	$permite_actualizar=$perm[0];
-
-	if($validado==0 || ($permite_actualizar==1 && $validado==1) ){
-?>
-	<input type="button" id="btn_cierra_caja" value="Validar corte e Imprimir" class="boton" onclick="seleccionar_banco_caja();">
-<?php
-	}
-?>
+			<div style="width : 60%;">
+				<div style="width:50%; float : left; text-align : center;">
+					<input type="number" 
+						id="cambio_caja" placeholder="Monto de cambio en Caja" style="padding:10px; width : 100%;">
+				</div>
+				<div style="width:50%; float : right; ">
+					<input type="button" id="btn_cierra_caja" value="Cerrar caja e Imprimir" 
+					class="boton" style="width:100%;" onclick="generaTicket();">
+				</div>
+			</div>
 		</div>
 	</center>
