@@ -1057,7 +1057,7 @@ return false;*/
 /**/
     //validamos que no sea devolución completa, si lo es ya no se reimprime el ticket
             if(es_dev_completa==0 && es_apartado==0){
-                url="ajax/ticket-php-head-reimpresion.php?id_ped="+id_pedido+"&id_dev="+aux[2];
+                url="../touch_desarrollo/ajax/ticket-php-head-reimpresion.php?id_ped="+id_pedido+"&id_dev="+aux[2];
                 var reimp=ajaxR(url);
             }  
 
