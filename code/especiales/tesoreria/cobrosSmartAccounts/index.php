@@ -1,17 +1,17 @@
 <?php
 	include('../../../../conectMin.php');
 	include('../../../../conexionMysqli.php');
-	//verifica si esta habilitada la funcion de SmartAccounts
-		$sql = "SELECT 
-					habilitar_smartaccounts_netpay AS is_smart_accounts
-				FROM sys_sucursales s
-				WHERE id_sucursal = {$sucursal_id}";
-		$stm = $link->query( $sql ) or die( "Error al consultar si esta habilitado SmartAccounts : {$link->error}" );
-		$row = $stm->fetch_assoc();
-		$is_smart_accounts = $row['is_smart_accounts'];
-		if( $row['is_smart_accounts'] == 0 ){
-			die( "<script>location.href=\"../cobros/index.php\";</script>" );
-		}
+//verifica si esta habilitada la funcion de SmartAccounts
+	$sql = "SELECT 
+				habilitar_smartaccounts_netpay AS is_smart_accounts
+			FROM sys_sucursales s
+			WHERE id_sucursal = {$sucursal_id}";
+	$stm = $link->query( $sql ) or die( "Error al consultar si esta habilitado SmartAccounts : {$link->error}" );
+	$row = $stm->fetch_assoc();
+	$is_smart_accounts = $row['is_smart_accounts'];
+	if( $row['is_smart_accounts'] == 0 ){
+		die( "<script>location.href=\"../cobros/index.php\";</script>" );
+	}
 	include('ajax/db.php');
 	/*if($perfil_usuario!=7){
 		die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla!!!\nContacte al administrador desl sistema!!!");location.href="../../../../index.php?";</script>');
@@ -64,7 +64,7 @@
 	<input type="hidden" id="session_id" value="<?php echo $session_id;?>">
 <!--emergentes -->
 	<div class="emergent" style="z-index : 20;">
-		<div style="position: relative; top : 120px; left: 90%; z-index:1; display:none;">
+		<div class="text-end" style=" position: relative; top : 120px;right: 1%;z-index:1;"><!-- position: relative; top : 120px; left: 90%; z-index:1; display:none; -->
 			<button 
 				class="btn btn-danger"
 				onclick="close_emergent();"
