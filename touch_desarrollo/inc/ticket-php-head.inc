@@ -380,7 +380,10 @@ Fin de cambio Oscar 25.06.2019*/
     }
 /*fin de cambio Oscar 2023/10/12*/
 /*Implementacion Oscar 2023/10/12*/
-	if( $payments_total == $total ){
+
+    $comprobacion_cobro = round( $total - $payments_total );
+    if( ( $comprobacion_cobro == 1 || $comprobacion_cobro == 0 || $comprobacion_cobro == -1 ) || $pagado == 0 ){
+	//if( $payments_total == $total ){
         $ticket->Image("../img/especiales/pagado.jpeg", 5, 2, 70);
 		$ticket->SetXY(5, $ticket->GetY()+20);
 	}
@@ -578,7 +581,7 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 	$ticket->Cell(66*0.3, 6, utf8_decode("Total"), "" ,0, "L");
 	
 	$ticket->SetXY(5+66*0.75, $ticket->GetY());
-	$ticket->Cell(66*0.25, 6, "$ " . number_format( round( $total ), 2), "" ,0, "R");
+	$ticket->Cell(66*0.25, 6, "$ " . number_format( round( $total, 2 ), 2), "" ,0, "R");
 	
 	/*$ticket->SetY($ticket->GetY()+4);
 	$ticket->SetXY(7+66*0.40, $ticket->GetY()+3);
