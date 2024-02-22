@@ -1,4 +1,5 @@
 <?php
+/*version casa 1.0*/
 	require('../../../../../conect.php');
 //consultamos las tarjetas
 	$sql="SELECT SUM(IF(cc.id_cajero_cobro IS NULL,0,cc.monto)) 
@@ -42,17 +43,26 @@
 	$t2=0;
 	$resAprox=0;
 	extract($_POST);
+	$teller_session_id = $_POST['corte'];
 	//die($corte);
 //inicio:hora_inicio,fin:hora_fin
 	$h1=$inicio;
 	$h2=$fin;
 	$total_montos_entregados=0;
 /*sacamos el id de cajero*/
-	$sql="SELECT id_cajero,fecha,id_sucursal FROM ec_sesion_caja WHERE id_sesion_caja=$corte";
+	$sql="SELECT 
+			id_cajero, 
+			fecha, 
+			id_sucursal, 
+			caja_inicio, 
+			caja_final 
+		FROM ec_sesion_caja WHERE id_sesion_caja=$corte";
 	$eje=mysql_query($sql)or die("Error al consultar el cajero!!!");
 	$cajero=mysql_fetch_row($eje);
 	$fecha1=$cajero[1];
 	$sucursal_corte=$cajero[2];
+	$cambio_inicial = $cajero[3];
+	$cambio_final = $cajero[4];
 
   //sacamos la fecha desde el mysql
     $sql_fecha=mysql_query("SELECT current_date")or die("Error al consultar la fecha desde mysql!!!\n\n".mysql_error());
@@ -71,9 +81,10 @@
 			SUM(IF(pp.es_externo=0,pp.monto,0)) as pagosPedro,
 			SUM(IF(pp.es_externo=1,pp.monto,0)) as pagosExternos
 			FROM ec_pedido_pagos pp
-			JOIN ec_pedidos p on pp.id_pedido=p.id_pedido".$condicion1;
-
-	$sql.=" AND pp.id_cajero=".$cajero[0];
+			JOIN ec_pedidos p on pp.id_pedido=p.id_pedido
+			{$condicion1}
+			AND pp.id_cajero = {$cajero[0]}
+			AND pp.id_sesion_caja = {$teller_session_id}";
 //echo $sql.'<br>';	
 	$eje=mysql_query($sql) or die("Error1!!!\n".mysql_error().$sql);
 	$rw=mysql_fetch_row($eje);
@@ -86,9 +97,10 @@
 			SUM(IF(dp.es_externo=0,dp.monto,0)) as devolucionesPedro,
 			SUM(IF(dp.es_externo=1,dp.monto,0)) as devolucionesExternas
 			FROM ec_devolucion_pagos dp
-			JOIN ec_devolucion d ON dp.id_devolucion=d.id_devolucion".$condicion2;
-	
-	$sql.=" AND dp.id_cajero=".$cajero[0];
+			JOIN ec_devolucion d ON dp.id_devolucion=d.id_devolucion
+			{$condicion2}
+			AND dp.id_cajero = {$cajero[0]}
+			AND dp.id_sesion_caja = {$teller_session_id}";
 //echo '<br>'.$sql;	
 	$eje=mysql_query($sql) or die("Error1!!!\n".mysql_error());
 	$rw=mysql_fetch_row($eje);
@@ -102,8 +114,6 @@
 			FROM ec_gastos g 
 			JOIN ec_conceptos_gastos cg ON cg.id_concepto=g.id_concepto";
 
-	$sql.=" AND g.id_cajero=".$cajero[0];
-
 	if($fecha==-1){
 		$condicion=" WHERE fecha='$fecha1' AND (hora BETWEEN '$h1' AND '$h2')";
 	}
@@ -113,7 +123,7 @@
 	if($fecha!=-1 && $fecha!=1){
 		$condicion=" WHERE (CONCAT(g.fecha,' ',g.hora) BETWEEN '".$fecha1.' '.$h1."' AND '".$fecha1.' '.$h2."')";
 	}
-	$sql.=$condicion;/*." AND g.id_sucursal='".$user_sucursal."'"*/
+	$sql.=" {$condicion} AND id_sesion_caja = {$teller_session_id}  AND g.id_cajero = {$cajero[0]}";/*." AND g.id_sucursal='".$user_sucursal."'"*/
 
 //echo $sql."<br>";
 	$eje=mysql_query($sql) or die("Error...!!!".mysql_error().$sql);
@@ -122,7 +132,7 @@
 	$gastoTotal=0;
 //sacamos los descuentos
 	$sql="SELECT fecha_alta,folio_nv,total,descuento FROM ec_pedidos WHERE descuento!=0 AND id_sucursal='$sucursal_corte'";
-	$sql.=" AND fecha_alta BETWEEN '".$fecha1.' '.$h1."' AND '".$fecha1.' '.$h2."'";
+	$sql.=" AND fecha_alta BETWEEN '{$fecha1} {$h1}' AND '{$fecha1} {$h2}' AND id_sesion_caja = {$teller_session_id}";
 	//}
 	//$sql.=$condicion2;/*." AND id_sucursal='".$user_sucursal."'"*/
 //echo 'Descuentos: '.$sql."<br>";
@@ -244,6 +254,12 @@
 				<tr>
 					<td align="right" colspan="4" style="color:red;font-size:28px;"><b>Diferencia:</b></td>
 					<td align="right" style="color:red;font-size:28px;"><b><?php echo round($total_montos_entregados-(($entrada+$entrada_externa)-$gastoTotal),2);?></b></td>
+				</tr>
+				<tr>
+					<td colspan="2">Monto de cambio Inicial en caja : $ <b><?php echo $cambio_inicial;?></b></td>
+				</tr>
+				<tr>
+					<td colspan="2">Monto de cambio Final en caja : $ <b><?php echo $cambio_final;?></b></td>
 				</tr>
 			</table>
 

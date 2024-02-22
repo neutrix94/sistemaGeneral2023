@@ -1,7 +1,9 @@
 <?php
+/*version casa 1.1*/
 	define('FPDF_FONTPATH','../../../../include/fpdf153/font/');
 	include("../../../../include/fpdf153/fpdf.php");
 	include("../../../../conect.php");
+	include("../../../../conexionMysqli.php");
 /*implementación Oscar 18.06.2019 para guardar el detalle de la sesion de caja*/
 	//tar:tarjetas,cheq_trans:cheques,fecha:fF,hrs:horas,corte:id_corte,pss:password,fcha_corte:fecha_ultimo_corte
 	$id_sesion_cajero=$_POST['corte'];
@@ -132,7 +134,8 @@
 							hora_fin
 						),
 			total_monto_ventas=$total_ingresos,
-			observaciones=REPLACE(observaciones,'1___','')/*quitamos el indicador de corte pendiente de imprimir*/ 
+			observaciones=REPLACE(observaciones,'1___',''),/*quitamos el indicador de corte pendiente de imprimir*/ 
+			caja_final = '{$_POST['cambio']}'
 			WHERE id_sesion_caja=$id_sesion_cajero";
 	$eje=mysql_query($sql);
 	if(!$eje){
@@ -140,7 +143,28 @@
 		mysql_query("ROLLBACK");//cancelamos la transacción
 		die("Error al cerrar las sesión de caja!!!\n".$error);
 	}
-/*implementacion Oscar 21.11.2019 para meter el segundo corte cuando la hora es mayor a las 12:00:00*/
+
+	$sql = "SELECT 
+				folio_nv AS folio, 
+				total AS amount,
+				DATE_FORMAT( fecha_alta, '%d/%m/%Y' )AS date
+			FROM ec_pedidos 
+			WHERE venta_validada = 0 
+			AND fecha_alta LIKE '%{$current_year['year']}%'
+			AND id_sucursal = {$sucursal_id}";//
+	$stm = $link->query( $sql ) or die( "Error al consultar ventas pendientes de validar : {$link->error}" );
+	$sales_number = $stm->num_rows;
+/*implementacion Oscar 2024-02-14 para habilitar / deshabilitar impresion de validaciones en ticket de corte*/
+	$sql = "SELECT imprimir_validaciones_pendientes FROM ec_configuracion_sucursal WHERE id_sucursal = {$sucursal_id}";
+	$stm_config = $link->query( $sql ) or die( "Error al consultar la configuracion de impresion de sucursales : {$link->error}" );
+	$row_config = $stm_config->fetch_assoc();
+	$imprimir_validaciones_pendientes = $row_config['imprimir_validaciones_pendientes'];
+	if( $imprimir_validaciones_pendientes == 0 ){
+		$sales_number = 0;
+	}
+/*fin de cambio Oscar 2024-02-14*/
+
+/*implementacion Oscar 21.11.2019 para meter el segundo corte cuando la hora es mayor a las 12:00:00*
 	if($insertar_corte==1){
 	//consultamos el tipo de sistema
 		$sql="SELECT id_sucursal FROM sys_sucursales WHERE acceso=1";
@@ -261,9 +285,9 @@
 			return false;
 		}
 	}
-	
+	//120+
 	//aqui cambia largo Oscar 26-11-2017
-	$ticket = new TicketPDF("P", "mm", array(80, (120+$resAprox*9)+5+$contador_ingresos+$tam_gastos+$tam_descuentos) , "{$sucursal}", "{$folio}", 10);
+	$ticket = new TicketPDF("P", "mm", array(80, 50 + ($sales_number * 11 ) + ($resAprox*9)+5+$contador_ingresos+$tam_gastos+$tam_descuentos) , "{$sucursal}", "{$folio}", 10);
 	//echo 'res:'.$resAprox;
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
@@ -284,20 +308,25 @@
 			$consultaHora.=$hr2;
 		}*/
 
-//genearmos encabezado
+//generamos encabezado
 	$ticket->SetFont('Arial','B',$bF+4);
 	$ticket->SetXY(8, 5);//$ticket->GetY()+3
 	$ticket->Cell(60, 6, utf8_decode("Folio: ".$folio_sesion_caja), "" ,0, "R");
 
 	$ticket->SetFont('Arial','B',$bF);
 	$ticket->SetXY(8, $ticket->GetY()+5);
-	$ticket->Cell(60, 6, utf8_decode("Fecha y hora de corte:"), "" ,0, "L");
+	$ticket->Cell(60, 6, utf8_decode("Fecha y hora de corte:"), "" ,0, "R");
 	/*$ticket->SetXY(10, $ticket->GetY()+3);//
-	$ticket->Cell(58, 6, utf8_decode(date("d/m/Y H:i:s")), "" ,0, "");*/
+	$ticket->Cell(58, 6, utf8_decode(date("d/m/Y H:i:s")), "" ,0, "R");*/
 	
 /*Implementacion Oscar 04.12.2019 para meter el intervalo del corte de caja*/
-	$sql="SELECT CONCAT('Apertura: ',fecha,' ',hora_inicio),CONCAT('Cierre     : ',fecha,' ',hora_fin) 
-	FROM ec_sesion_caja WHERE id_sesion_caja=$id_sesion_cajero";
+	$sql="SELECT 
+			CONCAT('Apertura: ',fecha,' ',hora_inicio),
+			CONCAT('Cierre     : ',fecha,' ',hora_fin),
+			caja_inicio,
+			caja_final 
+		FROM ec_sesion_caja 
+		WHERE id_sesion_caja=$id_sesion_cajero";
 	$eje_crte=mysql_query($sql)or die("Error al consultar datos del corte de caja!!!");
 	$r_crte=mysql_fetch_row($eje_crte);
 	$ticket->SetXY(7, $ticket->GetY()+3);
@@ -306,7 +335,7 @@
 	$ticket->SetXY(7, $ticket->GetY()+3);
 	$ticket->Cell(66, 6, utf8_decode($r_crte[1]), "" ,0, "L");
 /*Fin de cambio Oscar 04.12.2019*/
-
+	
 
 	$ticket->SetXY(7, 20);
 	$ticket->Cell(66, 6, utf8_decode("CASA DE LAS LUCES"), "" ,0, "C");
@@ -314,7 +343,6 @@
 	$ticket->SetFont('Arial','B',8);
 	$ticket->SetXY(7, 25);
 	$ticket->Cell(66, 6, utf8_decode("Arqueo de caja ".$complemeto), "" ,0, "C");
-
 	$ticket->SetXY(7, $ticket->GetY()+5);
 	//$ticket->Cell(66, 6, utf8_decode($consultaHora), "" ,0, "C");
 
@@ -329,24 +357,68 @@
 	$ticket->SetFont('Arial','B',$bF+2);
 	$ticket->SetXY(7, $ticket->GetY()+4);
 	$ticket->Cell(66, 6, utf8_decode($datos_cajero), "" ,0, "C");
+
 	
-	$ticket->SetFont('Arial','',$bF);
+/*implementacion Oscar 2024-02-14 para habilitar / deshabilitar impresion de validaciones en ticket de corte*/
+	if( $imprimir_validaciones_pendientes == 1 ){
+	//tickets pendientes de validar
+		$sql = "SELECT 
+					p.folio_nv AS folio, 
+					p.total AS amount,
+					DATE_FORMAT( p.fecha_alta, '%d/%m/%Y' ) AS date,
+					CONCAT( 'Vendedor : ', u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno )
+				FROM ec_pedidos p
+				LEFT JOIN sys_users u
+				ON u.id_usuario = p.id_usuario
+				WHERE p.venta_validada = 0 
+				AND p.fecha_alta LIKE '%{$current_year['year']}%'
+				AND p.id_sucursal = {$sucursal_id}";//
+		$eje=mysql_query($sql) or die( "Error\n{$sql} " . mysql_error() );
+	//encabezado
+		$ticket->SetXY(4, $ticket->GetY()+8);
+		$ticket->SetXY(7, $ticket->GetY());
+		$ticket->Cell(62, 6, utf8_decode( "Ventas pendientes de validar" ), "" ,0, "C");
+
+		$ticket->SetXY(4, $ticket->GetY()+5);
+		$ticket->Cell(62, 6, utf8_decode( "Folio" ), "" ,0, "L");
+		$ticket->SetXY(7, $ticket->GetY());
+		$ticket->Cell(62, 6, utf8_decode( "Monto" ), "" ,0, "C");
+		$ticket->SetXY(10, $ticket->GetY());
+		$ticket->Cell(62, 6, utf8_decode( "Fecha" ), "" ,0, "R");
+		
+		while($rw=mysql_fetch_row($eje)){
+			$ticket->SetFont('Arial','',$bF-2);
+			$ticket->SetXY(4, $ticket->GetY()+6);
+			$ticket->Cell(62, 6, utf8_decode($rw[0]), "" ,0, "L");
+			$ticket->SetXY(7, $ticket->GetY());
+			$ticket->Cell(62, 6, utf8_decode($rw[1]), "" ,0, "C");
+			$ticket->SetXY(10, $ticket->GetY());
+			$ticket->Cell(62, 6, utf8_decode($rw[2]), "" ,0, "R");
+
+			$ticket->SetFont('Arial','', $bF-3 );
+			$ticket->SetXY(4, $ticket->GetY()+3);
+			$ticket->Cell(62, 6, utf8_decode($rw[3]), "" ,0, "L");
+		}
+	}
+/*Fin de cambio Oscar 2024-02-14*/	
+
+/*	$ticket->SetFont('Arial','',$bF);
 	
 	$ticket->SetXY(7, $ticket->GetY()+4.5);
 	$ticket->Cell(66, 6, utf8_decode(), "" ,0, "C");
 
 //detalles de dinero
-	/*ineas*/
+	//ineas
 	$ticket->SetXY(7, $ticket->GetY()+5);
 	$ticket->Cell(66, 5, "", "TB" ,0, "C");
 	$ticket->SetXY(7, $ticket->GetY());
 	$ticket->Cell(66, 6, utf8_decode("Ingresos"), "" ,0, "C");
-/*sepramos los datos*/
+//separa los datos
 	$dat=explode("|",$datos);
 
 	$ticket->SetFont('Arial','',$bF);
 
-/*separación de ingresos (implementado por Oscar 15.08.2018)*/	
+//separación de ingresos (implementado por Oscar 15.08.2018)	
 	$ticket->SetXY(10, $ticket->GetY()+5);
 	$ticket->Cell(60, 6, utf8_decode("Ingreso Interno: $ ".round($arr_ingresos[0])), "" ,0, "R");//-$dat[6])
 	$ticket->SetFont('Arial','',$bF);
@@ -358,7 +430,6 @@
 		//$ticket->SetFont('Arial','',$bF);
 	//echo $arr_ingresos[1];
 	}
-/*Fin de cambio*/
 
 	$ticket->SetFont('Arial','B',$bF);
 	$ticket->SetXY(10, $ticket->GetY()+5);
@@ -389,7 +460,7 @@
 	$ticket->SetFont('Arial','',$bF);
 
 //gastos
-	/*ineas*/
+	//ineas
 	$ticket->SetXY(7, $ticket->GetY()+10);
 	$ticket->Cell(66, 5, "", "TB" ,0, "C");
 	$ticket->SetXY(7, $ticket->GetY()-1);
@@ -468,9 +539,7 @@
 	$ticket->Cell(60, 6, utf8_decode("Descuento"), "" ,0, "R");
 
 
-//	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_".$folio."_$noImp.pdf";
-	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".$folio_sesion_caja.".pdf";
-
+//	
 	$eje=mysql_query($sql) or die("Error\n".mysql_error());
 	while($rw=mysql_fetch_row($eje_desc)){
 		$ticket->SetXY(4, $ticket->GetY()+4);
@@ -484,8 +553,31 @@
 	$ticket->Cell(62, 6, "", "" ,0, "L");
 	$ticket->SetXY(4, $ticket->GetY()+4);
 	$ticket->Cell(62, 6, "", "" ,0, "L");
+*/
+/*implementacion Oscar 2024-02-01 para ruta especifica de ticket*/
+	/*instancia clases*/
+	include( '../../controladores/SysArchivosDescarga.php' );
+	$SysArchivosDescarga = new SysArchivosDescarga( $link );
+	include( '../../controladores/SysModulosImpresionUsuarios.php' );
+	$SysModulosImpresionUsuarios = new SysModulosImpresionUsuarios( $link );
+	include( '../../controladores/SysModulosImpresion.php' );
+	$SysModulosImpresion = new SysModulosImpresion( $link );
+	
+	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_".$folio."_$noImp.pdf";
+	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".$folio_sesion_caja.".pdf";
 
-/*implementación Oscar 25.01.2019 para la sincronización de tickets*/
+	$ruta_salida = '';
+	$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 9 );//cotizacion de ventas
+	if( $ruta_salida == 'no' ){
+		$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 9 );//cotizacion de ventas
+	}
+	$ticket->Output( "../../../../{$ruta_salida}/{$nombre_ticket}", "F" );
+/*Sincronización remota de tickets*/
+	if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
+		$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+	}
+
+/*implementación Oscar 25.01.2019 para la sincronización de tickets
     if($user_tipo_sistema=='linea'){
 		$sql_arch="INSERT INTO sys_archivos_descarga SET 
 					id_archivo=null,
@@ -493,16 +585,27 @@
 					nombre_archivo='$nombre_ticket',
 					ruta_origen='$ruta_or',
 					ruta_destino='$ruta_des',
-      			/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
           			id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$user_sucursal'),
-        		/*Fin de Cambio Oscar 03.03.2019*/
 					id_usuario='$user_id',
 					observaciones=''";
 		$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);
 
     }
-    $ticket->Output("../../../../cache/ticket/".$nombre_ticket, "F");
+   //$ticket->Output("../../../../cache/ticket/".$nombre_ticket, "F");
     /*fin de cambio Oscar 25.01.2019*/
+
+/*Implementacion Oscar 2021 para enviar avisos de correo en diferencia de dinero en caja*/
+//comprueba en comparación al corte anterior
+	if( $r_crte[2] != $r_crte[3] ){
+		include('../../plugins/sendMail.php');
+		$mail = new sendMail( '../../../../' );
+		$mails = $mail->getSystemEmails( 'ec_sesion_caja' );
+		$email_content = "<p>El monto de cambio en caja es diferente en la sucursal : {$rw[0]}</p>";
+		$email_content .= "<p>Monto de caja inicial : $ <b>{$r_crte[2]}</b></p>";
+		$email_content .= "<p>Monto de caja final : $ <b>{$r_crte[3]}</b></p>";
+		$mail->sendMailTo( "Diferencia de cambio en caja durante el Corte de Caja en  {$rw[0]} {$r_crte[1]} ", $email_content, $mails, null );
+	}
+/*Fin de cambio Oscar 2021*/
 
    //$ticket->Output($nombre_tkt, "F");
     echo 'ok'; 

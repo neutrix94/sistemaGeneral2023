@@ -271,7 +271,7 @@
 		var url = "ajax/db.php?fl=obtenerListaTerminales&session_id=" + session_id;
 		var resp = ajaxR( url );
 		var url = "ajax/db.php?fl=obtenerListaTerminalesActuales&session_id=" + session_id;
-		var afiliaciones = ajaxR( url );
+		var terminales = ajaxR( url );
 		var content = `<div>
 			<div class="row">
 				<div class="col-2"></div>
@@ -279,9 +279,6 @@
 					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
 					<div class="input-group">
 						${resp}
-						<input type="checkbox" id="afiliacion_por_error" style="display:none">
-						Error : 
-						<label for="error" class="icon-toggle-off text-success fs-3"></label>
 					</div>
 					<br>
 					<h2>Pide al encargado que ingrese su contraseña para continuar : </h2>
@@ -291,7 +288,7 @@
 						<i class="icon-plus">Agregar</i>
 					</button>
 					<h1>Afiliaciones activas : </h1>
-					${afiliaciones}
+					${terminales}
 				</div>
 			</div>
 		</div>`;

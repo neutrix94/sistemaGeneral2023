@@ -1,5 +1,5 @@
 <?php
-/*version 30.10.2019*/
+/*version casa 1.0*/
 	define('FPDF_FONTPATH','../../../../../include/fpdf153/font/');
 	include("../../../../../include/fpdf153/fpdf.php");
 	include("../../../../../conectMin.php");
@@ -18,7 +18,8 @@
 	$monto_total_ingreso=$arr_ingresos[0]+$arr_ingresos[1];
 
 //obtenemos el folio del arqueo de caja
-	$sql="SELECT folio,fecha,hora_inicio,hora_fin,id_cajero,id_sucursal FROM ec_sesion_caja WHERE id_sesion_caja=$id_sesion_cajero";
+	$sql="SELECT folio,fecha,hora_inicio,hora_fin,id_cajero,id_sucursal 
+			FROM ec_sesion_caja WHERE id_sesion_caja=$id_sesion_cajero";
 	$eje=mysql_query($sql)or die("Error al consultar la sesion de caja!!!\n".mysql_error()."\n".$sql);
 	$r=mysql_fetch_row($eje);
 	$folio_sesion_caja=$r[0];
@@ -179,7 +180,7 @@ class TicketPDF extends FPDF {
 	}
 	
 	//aqui cambia largo Oscar 26-11-2017
-	$ticket = new TicketPDF("P", "mm", array(80,(120+$resAprox*9)+5+$contador_ingresos+$tam_gastos+$tam_descuentos), "{$sucursal}", "{$folio}", 10);
+	$ticket = new TicketPDF("P", "mm", array(80,(120+$resAprox*9)+30+$contador_ingresos+$tam_gastos+$tam_descuentos), "{$sucursal}", "{$folio}", 10);
 	//echo 'res:'.$resAprox;
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
@@ -212,7 +213,7 @@ class TicketPDF extends FPDF {
 			$consultaHora.=$hr2;
 		}
 
-//genearmos encabezado
+//generamos encabezado
 	$ticket->SetFont('Arial','B',$bF+4);
 	$ticket->SetXY(8, 5);//$ticket->GetY()+3
 	$ticket->Cell(60, 6, utf8_decode("Folio: ".$folio_sesion_caja), "" ,0, "R");
@@ -222,13 +223,20 @@ class TicketPDF extends FPDF {
 	$ticket->Cell(60, 6, utf8_decode("Fecha y hora de corte:"), "" ,0, "R");
 	/*$ticket->SetXY(10, $ticket->GetY()+3);//
 	$ticket->Cell(58, 6, utf8_decode(date("d/m/Y H:i:s")), "" ,0, "R");*/
-
-
+	
 /*Implementacion Oscar 04.12.2019 para meter el intervalo del corte de caja*/
-	$sql="SELECT CONCAT('Apertura: ',fecha,' ',hora_inicio),CONCAT('Cierre     : ',fecha,' ',hora_fin) 
+	$sql="SELECT 
+			CONCAT('Apertura: ',fecha,' ',hora_inicio),
+			CONCAT('Cierre     : ',fecha,' ',hora_fin),
+			caja_inicio,
+			caja_final
 	FROM ec_sesion_caja WHERE id_sesion_caja=$id_sesion_cajero";
 	$eje_crte=mysql_query($sql)or die("Error al consultar datos del corte de caja!!!");
 	$r_crte=mysql_fetch_row($eje_crte);
+
+	$cambio_inicial = $r_crte[2];
+	$cambio_final = $r_crte[3];
+
 	$ticket->SetXY(7, $ticket->GetY()+3);
 	$ticket->Cell(66, 6, utf8_decode($r_crte[0]), "" ,0, "L");
 
@@ -395,6 +403,15 @@ class TicketPDF extends FPDF {
 	}
 
 	$ticket->SetFont('Arial','',$bF);
+//referencias de corte de caja
+	$ticket->SetXY(7, $ticket->GetY() + 10);
+	$ticket->Cell(66, 5, "", "TB" ,0, "C");
+	$ticket->SetXY(7, $ticket->GetY() + 4);
+	$ticket->Cell(66, 6, utf8_decode("Monto inicial de cambio en caja : $ {$cambio_inicial}"), "" ,0, "C");
+	$ticket->SetXY(7, $ticket->GetY() + 4);
+	$ticket->Cell(66, 6, utf8_decode("Monto final de cambio en caja : $ {$cambio_final}"), "" ,0, "C");
+	
+	//$cambio_final
 //descuentos
 	$ticket->SetXY(7, $ticket->GetY()+10);
 	$ticket->Cell(66, 5, "", "TB" ,0, "C");
@@ -423,9 +440,28 @@ class TicketPDF extends FPDF {
 	$ticket->SetXY(4, $ticket->GetY()+4);
 	$ticket->Cell(62, 6, "", "" ,0, "L");
 
-	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_".$folio."_$noImp.pdf";
+	include( '../../../../../conexionMysqli.php' );
+	include( '../../../controladores/SysArchivosDescarga.php' );
+	$SysArchivosDescarga = new SysArchivosDescarga( $link );
+	include( '../../../controladores/SysModulosImpresionUsuarios.php' );
+	$SysModulosImpresionUsuarios = new SysModulosImpresionUsuarios( $link );
+	include( '../../../controladores/SysModulosImpresion.php' );
+	$SysModulosImpresion = new SysModulosImpresion( $link );
 
-/*implementación Oscar 25.01.2019 para la sincronización de tickets*/
+	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_".$folio."_$noImp.pdf";
+	
+	$ruta_salida = '';
+	$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 10 );//cotizacion de ventas
+	if( $ruta_salida == 'no' ){
+		$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 10 );//cotizacion de ventas
+	}
+	$ticket->Output( "../../../../../{$ruta_salida}/{$nombre_ticket}", "F" );
+/*Sincronización remota de tickets*/
+	if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
+		$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+	}
+
+/*implementación Oscar 25.01.2019 para la sincronización de tickets
     if($user_tipo_sistema=='linea'){
 		$sql_arch="INSERT INTO sys_archivos_descarga SET 
 					id_archivo=null,
@@ -433,9 +469,9 @@ class TicketPDF extends FPDF {
 					nombre_archivo='$nombre_ticket',
 					ruta_origen='$ruta_or',
 					ruta_destino='$ruta_des',
-      			/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
+      			/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal
           			id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE IF('$user_sucursal'='-1',id_sucursal='1',id_sucursal='$user_sucursal')),
-        		/*Fin de Cambio Oscar 03.03.2019*/
+        		/*Fin de Cambio Oscar 03.03.2019
 					id_usuario='$user_id',
 					observaciones=''";
 		$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);
@@ -445,6 +481,6 @@ class TicketPDF extends FPDF {
     /*fin de cambio Oscar 25.01.2019*/
 
    //$ticket->Output($nombre_tkt, "F");
-    echo 'ok|../../../../cache/ticket/'.$nombre_ticket; 
+    echo "ok|../../../../{$ruta_salida}/{$nombre_ticket}";
 /*Fin de cambio Oscar 18.06.2019*/
 ?>

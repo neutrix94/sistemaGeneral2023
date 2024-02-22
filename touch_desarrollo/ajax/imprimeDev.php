@@ -487,7 +487,7 @@
             $sql="UPDATE ec_devolucion SET status=3,observaciones='Dinero regresado al cliente' WHERE id_pedido=$id_pedido_original";
             $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
            //echo $sql;
-          }
+        }
 /*Fin de cambio Oscar 03.03.2019*/
       //$ticket->Output("../../cache/ticket/".$nombre_ticket, "F");
 

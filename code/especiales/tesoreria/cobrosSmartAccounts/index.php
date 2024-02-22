@@ -13,10 +13,6 @@
 			die( "<script>location.href=\"../cobros/index.php\";</script>" );
 		}
 	include('ajax/db.php');
-	$Payments = new Payments( $link );//instancia clase de pagos
-	$Payments->checkAccess( $user_id );//verifica permisos
-	$tarjetas_cajero = $Payments->getTerminals( $user_id, 0, $user_sucursal );//afiliaciones por cajero
-	$cajas = $Payments->getBoxesMoney( $sucursal_id );//cheque o transferencia 
 	/*if($perfil_usuario!=7){
 		die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla!!!\nContacte al administrador desl sistema!!!");location.href="../../../../index.php?";</script>');
 	}*/
@@ -39,6 +35,11 @@
 	$usuario = $r[0];
 	$sucursal = $r[1];
 	$session_id = $r[2];
+	
+	$Payments = new Payments( $link );//instancia clase de pagos
+	$Payments->checkAccess( $user_id );//verifica permisos
+	$tarjetas_cajero = $Payments->getTerminals( $user_id, 0, $user_sucursal, $session_id );//afiliaciones por cajero
+	$cajas = $Payments->getBoxesMoney( $sucursal_id );//cheque o transferencia 
 ?>
 <!DOCTYPE html>
 <html>

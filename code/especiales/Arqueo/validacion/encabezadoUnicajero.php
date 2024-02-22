@@ -1,4 +1,5 @@
 <?php
+/*version casa 1.0*/
 //cargamos pagos con tarjeta
 	$sql="SELECT scd.id_sesion_caja_detalle,a.no_afiliacion,scd.monto 
 		FROM ec_sesion_caja_detalle scd

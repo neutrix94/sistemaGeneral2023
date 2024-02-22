@@ -1,4 +1,5 @@
 <?php
+/*version casa 1.0*/
 	require('../../../../conect.php');
 
 //consultamos las tarjetas
@@ -52,6 +53,7 @@
 	}/**/
 
 	extract($_POST);
+	$teller_session_id = $_POST['corte'];
 	//inicio:hora_inicio,fin:hora_final
 	echo '<input type="hidden" id="fechaFinal" value="'.$fecha.'">';
 	echo '<input type="hidden" id="horaFinal" value="'.$hrs.'">';
@@ -94,8 +96,8 @@
 		//if($fecha=='2017-11-30'){
 		//	$fechaLim1='2017-12-01';
 		//}*/
-		$condicion1=" WHERE pp.fecha='$fcha_corte' AND (pp.hora BETWEEN '$h1' AND '$h2') AND p.id_sucursal='".$user_sucursal."'";
-		$condicion2=" WHERE dp.fecha='$fcha_corte' AND (dp.hora BETWEEN '$h1' AND '$h2') AND d.id_sucursal='".$user_sucursal."'";
+		$condicion1=" WHERE pp.fecha='$fcha_corte' AND (pp.hora BETWEEN '$h1' AND '$h2') AND p.id_sucursal='{$user_sucursal}'";
+		$condicion2=" WHERE dp.fecha='$fcha_corte' AND (dp.hora BETWEEN '$h1' AND '$h2') AND d.id_sucursal='{$user_sucursal}'";
 	}
 //cambio del 14-12-2017
 	//if($fecha==1){
@@ -151,16 +153,17 @@
 	$sql="SELECT id_devolucion FROM ec_devolucion WHERE status=0 AND id_sucursal=$user_sucursal AND fecha='$fecha1'";
 	$eje=mysql_query($sql)or die("Error al consultar devoluciones incompletas!!!\n".mysql_error());
 	if(mysql_num_rows($eje)>0){
-		die("Hay devoluciones pendientes de terminar<br>Terminelas y vuelva a intentar!!!");
+		die("Hay devoluciones pendientes de terminar<br>Terminalas y vuelve a intentar!!!");
 	}
 //sacamos total de pagos
 	$sql="SELECT 
 			SUM(IF(pp.es_externo=0,pp.monto,0)) as pagosPedro,
 			SUM(IF(pp.es_externo=1,pp.monto,0)) as pagosExternos
 			FROM ec_pedido_pagos pp
-			JOIN ec_pedidos p on pp.id_pedido=p.id_pedido".$condicion1;
-
-	$sql.=" AND pp.id_cajero=".$user_id;
+			JOIN ec_pedidos p on pp.id_pedido=p.id_pedido
+			{$condicion1}
+			AND pp.id_cajero={$user_id}
+			AND pp.id_sesion_caja = {$teller_session_id}";
 //echo $sql.'<br>';	
 	$eje=mysql_query($sql) or die("Error1!!!\n".mysql_error().$sql);
 	$rw=mysql_fetch_row($eje);
@@ -173,9 +176,10 @@
 			SUM(IF(dp.es_externo=0,dp.monto,0)) as devolucionesPedro,
 			SUM(IF(dp.es_externo=1,dp.monto,0)) as devolucionesExternas
 			FROM ec_devolucion_pagos dp
-			JOIN ec_devolucion d ON dp.id_devolucion=d.id_devolucion".$condicion2;
-	
-	$sql.=" AND dp.id_cajero=".$user_id;
+			JOIN ec_devolucion d ON dp.id_devolucion=d.id_devolucion
+			{$condicion2}
+			AND dp.id_cajero = {$user_id}
+			AND dp.id_sesion_caja = {$teller_session_id}";
 //echo '<br>'.$sql;	
 	$eje=mysql_query($sql) or die("Error1!!!\n".mysql_error());
 	$rw=mysql_fetch_row($eje);
@@ -188,8 +192,6 @@
 	$sql="SELECT g.id_usuario,g.fecha,g.hora,cg.nombre,g.observaciones,g.monto
 			FROM ec_gastos g 
 			JOIN ec_conceptos_gastos cg ON cg.id_concepto=g.id_concepto";
-
-	$sql.=" AND g.id_cajero=".$user_id;
 	if($fecha==-1){
 		$condicion=" WHERE fecha='$fecha1' AND (hora BETWEEN '$h1' AND '$h2')";
 	}
@@ -199,7 +201,7 @@
 	if($fecha!=-1 && $fecha!=1){
 		$condicion=" WHERE (CONCAT(g.fecha,' ',g.hora) BETWEEN '".$fecha1.' '.$h1."' AND '".$fecha1.' '.$h2."')";
 	}
-	$sql.=$condicion." AND g.id_sucursal='".$user_sucursal."'";
+	$sql.= $condicion . " AND g.id_sucursal= {$user_sucursal} AND g.id_cajero = {$user_id} AND g.id_sesion_caja = {$teller_session_id}";
 
 //echo $sql."<br>";
 	$eje=mysql_query($sql) or die("Error...!!!".mysql_error().$sql);
@@ -217,13 +219,13 @@
 	if($fecha!=-1 && $fecha!=1){
 		$condicion2=" AND fecha_alta BETWEEN '".$fecha1.' '.$h1."' AND '".$fecha1.' '.$h2."'";
 	}
-	$sql.=$condicion2." AND id_sucursal='".$user_sucursal."'";
+	$sql.=$condicion2." AND id_sucursal='".$user_sucursal."' AND id_sesion_caja = {$teller_session_id}";
 //echo 'Descuentos $ '.$sql."<br>";
 	$eje1=mysql_query($sql)or die("Error!!!\n".mysql_error().$sql);
 	$resAprox+=mysql_num_rows($eje1);
 ?>
 		<div style="height:510px;">
-		<div style="border:1px solid;width:60%;height:80%;background:white;overflow:auto;">
+		<div style="border:1px solid;width:100%;height:80%;background:white;overflow:auto;">
 		<center>
 			<br><hr width="90%;"><p style="font-size:20px;">Ingresos<hr width="90%"></p>
 			<table width="95%" border="0">
@@ -374,6 +376,15 @@
 			<input type="hidden" id="regist" value="<?php echo $resAprox;?>">
 		</center>
 		</div>
-		<input type="button" id="btn_cierra_caja" value="Cerrar caja e Imprimir" class="boton" onclick="generaTicket();">
+			<div style="width : 60%;">
+				<div style="width:50%; float : left; text-align : center;">
+					<input type="number" 
+						id="cambio_caja" placeholder="Monto de cambio en Caja" style="padding:10px; width : 100%;">
+				</div>
+				<div style="width:50%; float : right; ">
+					<input type="button" id="btn_cierra_caja" value="Cerrar caja e Imprimir" 
+					class="boton" style="width:100%;" onclick="generaTicket();">
+				</div>
+			</div>
 		</div>
 	</center>
