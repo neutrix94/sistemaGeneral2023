@@ -60,7 +60,8 @@
 			$sql="SELECT 
 					a.id_afiliacion,
 					a.no_afiliacion,
-					sca.insertada_por_error_en_cobro 
+					sca.insertada_por_error_en_cobro,
+					CONCAT( a.observaciones )/*a.no_afiliacion, ' ', */
 				FROM ec_afiliaciones a
 				LEFT JOIN ec_afiliaciones_cajero ac 
 				ON ac.id_afiliacion = a.id_afiliacion
@@ -96,7 +97,7 @@
 				}
 				$this->cards_counter++;
 				$tarjetas_cajero.='<tr class="informative_row">';
-					$tarjetas_cajero.='<td colspan="2" class="bg-warning"><p style="font-size:20px;margin:0;" align="center">Tarjeta '.$this->cards_counter.':</p></td>';
+					$tarjetas_cajero.='<td colspan="2" class="bg-warning"><p style="font-size:20px;margin:0;" align="center" id="card_description_' . $this->cards_counter . '">' . $this->cards_counter . '.- ' . $r[3] . ':</p></td>';//
 				$tarjetas_cajero.='</tr>';
 				$tarjetas_cajero.='<tr class="is_card_row">';
 					$tarjetas_cajero.='<td align="center">';
@@ -115,7 +116,8 @@
 			$SmartAccountsTerminals='';
 			$sql="SELECT 
 					tis.id_terminal_integracion,
-					tis.nombre_terminal 
+					tis.nombre_terminal,
+					nombre_terminal
 				FROM ec_terminales_integracion_smartaccounts tis
 				LEFT JOIN ec_terminales_sucursales_smartaccounts tss
 				ON tss.id_terminal = tis.id_terminal_integracion
@@ -151,7 +153,7 @@
 				}
 				$this->cards_counter++;
 				$SmartAccountsTerminals .= '<tr class="informative_row">';
-					$SmartAccountsTerminals .= '<td colspan="2" class="bg-warning"><p style="font-size:20px;margin:0;" align="center">Terminal '.$this->cards_counter.':</p></td>';
+					$SmartAccountsTerminals .= '<td colspan="2" class="bg-warning"><p style="font-size:20px;margin:0;" align="center" id="card_description_' . $this->cards_counter . '">' . $r[2] . '</p></td>';//Terminal :'.$this->cards_counter.'
 				$SmartAccountsTerminals .= '</tr>';
 				$SmartAccountsTerminals .= '<tr class="is_card_row">';
 					$SmartAccountsTerminals .= '<td align="center">';

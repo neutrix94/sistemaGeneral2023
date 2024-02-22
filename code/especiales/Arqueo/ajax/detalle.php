@@ -257,6 +257,7 @@
 				</tr>
 		<?php
 		/**/
+		//die($tar);
 			$suma_tarjetas=0;
 			$tarjetas=explode("°",$tar);
 			$cont_tar=0;
@@ -265,7 +266,7 @@
 				$aux=explode("~", $tarjetas[$i]);
 				$suma_tarjetas+=$aux[1];
 				echo '<tr>';
-					echo '<td align="right">Tarjeta '.$cont_tar.':</td>';
+					echo '<td align="right">'.$aux[2].'</td>';//Tarjeta
 					echo '<td align="right" id="ta'.($cont_tar).'">'.$aux[1].'</td>';
 				echo '</tr>';
 			}
