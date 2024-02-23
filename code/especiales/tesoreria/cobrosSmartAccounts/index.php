@@ -184,13 +184,14 @@
 		</div>
 		<div class="row" id="cards_container">
 			<h3>
-				<button
+				<!--button
 					type="button"
 					class="btn btn-warning"
-					onclick="getTerminalesForm();"
-				>
-					<i class="icon-tools"></i>
-				</button>
+-->
+					<i class="icon-tools text-secondary"
+						onclick="getTerminalesForm();"
+					></i>
+				<!--/button-->
 				Tarjetas 
 				<button
 					type="button"
