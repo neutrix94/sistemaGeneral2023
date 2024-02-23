@@ -1031,12 +1031,13 @@
 
 		//inserta pagos de acuerdo al nuevo porcentaje entre internos y externos
 			$sql = "SELECT
-					ROUND( ax.internal/ax.total, 6 ) AS internal_porcent,
-					ROUND( ax.external/ax.total, 6 ) AS external_porcent,
+					ROUND( ax.internal/ax.total_nota, 6 ) AS internal_porcent,
+					ROUND( ax.external/ax.total_nota, 6 ) AS external_porcent,
 					ROUND( ax.total * porcentaje, 2 ) AS total
 				FROM(
 					SELECT
 						{$total_pagado} AS total,
+						p.total AS total_nota,
 						ROUND( p.total / p.subtotal, 6 ) AS porcentaje,
 						SUM( IF( pp.es_externo = 0, pd.monto-pd.descuento, 0 ) ) AS internal,
 						SUM( IF( sp.es_externo = 1, pd.monto-pd.descuento, 0 ) ) AS external
