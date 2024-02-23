@@ -980,8 +980,8 @@
 			$stm = $this->link->query( $sql ) or die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
 			$row = $stm->fetch_assoc();
 			
-			$sql = "SELECT id_cajero_cobro, monto FROM ec_cajero_cobros WHERE id_pedido = {$id_venta}";
-			$stm_cc = $this->link->query( $sql ) or die( "Error al consultar los cajeros cobros en reinsertaPagosPorDevolucionCaso2 : {$this->link->error}" );
+			$sql = "SELECT id_cajero_cobro, monto FROM ec_cajero_cobros WHERE id_pedido = {$id_venta}";//die( $sql );
+			$stm_cc = $this->link->query( $sql ) or die( "Error al consultar los cajeros cobros en reinsertaPagosPorDevolucion : {$this->link->error}" );
 			while( $row_cc = $stm_cc->fetch_assoc() ){
 				if( $row['internal_porcent'] > 0 ){
 				//die( "inserta pagos internos" );
