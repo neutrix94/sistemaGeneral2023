@@ -1039,7 +1039,7 @@
 						{$total_pagado} AS total,
 						p.total AS total_nota,
 						ROUND( p.total / p.subtotal, 6 ) AS porcentaje,
-						SUM( IF( pp.es_externo = 0, pd.monto-pd.descuento, 0 ) ) AS internal,
+						SUM( IF( sp.es_externo = 0, pd.monto-pd.descuento, 0 ) ) AS internal,
 						SUM( IF( sp.es_externo = 1, pd.monto-pd.descuento, 0 ) ) AS external
 					FROM ec_pedidos_detalle pd
 					LEFT JOIN ec_pedidos p
@@ -1047,8 +1047,6 @@
 					LEFT JOIN sys_sucursales_producto sp
 					ON pd.id_producto = sp.id_producto
 					AND sp.id_sucursal = {$this->store_id}
-					LEFT JOIN ec_pedido_pagos pp
-					ON pp.id_pedido = p.id_pedido
 					WHERE pd.id_pedido = {$id_venta}
 				)ax";
 			//echo($sql);
