@@ -24,7 +24,26 @@
 				echo '<td class="opc_buscador">'.$r[1].'</td>';
 			echo '<tr>';
 		}
-		die('</table>');
+		echo '</table>';
+	//implementacion Oscar 2024-02-23 para refrescar id de sesion
+		$sql = "SELECT 
+			id_sesion_caja,
+			hora_fin
+		FROM ec_sesion_caja 
+		WHERE id_cajero = {$user_id}
+		ORDER BY id_sesion_caja DESC
+		LIMIT 1";
+		$stm = mysql_query( $sql ) or die( "Error al consultar la sesion del cajero : "  . mysql_error());
+		if( mysql_num_rows( $stm ) <= 0 ){
+			die("|sin_sesion");
+		}else{
+			$row = mysql_fetch_assoc( $stm );
+			if( $row['hora_fin'] != '00:00:00' ){
+				die("|sin_sesion");
+			}
+			die("|{$row['id_sesion_caja']}");
+		}
+		die('');
 	}
 	
 	if($fl=='carga_datos'){

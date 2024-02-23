@@ -42,7 +42,7 @@ var respuesta = null;
 		/*if(e.keyCode==40){
 			$("#opc_1").focus();return true;
 		}*/
-		var txt=$("#buscador").val();
+		var txt=$("#buscador").val().trim();
 		if(txt.length<=2){
 			$("#res_busc").html("");
 			$("#res_busc").css("display","none");
@@ -61,6 +61,14 @@ var respuesta = null;
 					if(aux[0]!='ok'){
 						alert(dat);return false;
 					}else{
+						if( aux[2] == 'sin_sesion' ){
+							alert( "No hay sesion de cajero activa, inicia sesion para continuar!" );
+							location.reload();
+							return false;
+						}else{
+							$( '#session_id' ).val( aux[2] );//actualiza el id de la sesion
+						}
+						//alert( dat );
 						$("#res_busc").html(aux[1]);
 						$("#res_busc").css("display","block");
 						if( e.keyCode==13 ){
@@ -110,7 +118,7 @@ var respuesta = null;
 						$( '#efectivo' ).val(respuesta.pagos_pendientes);
 						$( '#efectivo' ).attr( 'readonly', true );
 						if( respuesta.pagos_pendientes == 0 ){
-							$( '#payment_description' ).html( 'Sin Diferencia' );
+							$( '#payment_description' ).html( 'Sin Dif.' );
 							$( '#payment_description' ).css( 'color', 'green' );
 							$( '#monto_total' ).css( 'color', 'green' );
 							$( '#finalizar_cobro_contenedor' ).css( 'display', 'block' );
@@ -422,6 +430,9 @@ var cont_cheques_transferencia=0;
 					url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
 				}
 				url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
+				if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
+					url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
+				}
 //alert( url ); return false;
 				var resp = ajaxR( url ).split( '|' );
 console.log( resp );
@@ -655,6 +666,9 @@ console.log( resp );
 				url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
 			}
 			url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
+			if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
+				url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
+			}
 			var resp = ajaxR( url ).split( '|' );
 			alert( "Respuesta : " + resp );
 			if( resp[0] != 'ok' ){
