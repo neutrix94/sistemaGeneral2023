@@ -226,7 +226,7 @@
                 pd.id_pedido_detalle,
                 pd.es_externo,
                 /*ROUND(((pd.precio-pd.descuento)*{$_GET["can{$i}"]})-(({$_GET["can{$i}"]}*pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100))) */
-                ROUND(((pd.monto-pd.descuento)/pd.cantidad)-IF(pd.descuento>0,0,(pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100)),2)*{$get_quantity}
+                ROUND(((pd.monto-pd.descuento)/pd.cantidad)-IF(pd.descuento>0,0,(pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100)),4)*{$get_quantity}
                 FROM ec_pedidos_detalle pd
                 LEFT JOIN ec_pedidos pe ON pd.id_pedido=pe.id_pedido 
                 WHERE pe.id_pedido='$idp' 
@@ -478,7 +478,7 @@ else{
         FROM ec_pedidos p
         LEFT JOIN ec_pedido_pagos pp
         ON pp.id_pedido = p.id_pedido
-        AND pp.referencia = ''
+       /* AND pp.referencia = ''*/
         WHERE p.id_pedido = {$idp}";
     $stm_pagado = mysql_query( $sql_pagado );
     $row_pagado = mysql_fetch_assoc( $stm_pagado );

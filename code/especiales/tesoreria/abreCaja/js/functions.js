@@ -13,7 +13,7 @@
 //funcion que valida login
 	function abrir_caja(){
 		//validamos datos
-		var log, contra, cambio, terminales = "";
+		var log, contra, cambio, afiliaciones = "", terminales = "";
 		log=$("#user").val();
 		if(log.length<=0){
 			alert("El campo de cajero no puede ir vacío!!!");
@@ -32,15 +32,27 @@
 			$("#cambio_caja").focus();
 			return false;
 		}
+//obtiene arreglo de afiliaciones
+		$( '#afiliations_list tr' ).each( function(index){
+			$( this ).children( 'td' ).each( function ( index2 ){
+				if( index2 == 0 ){
+					afiliaciones += ( afiliaciones == "" ? "" : "," );
+					afiliaciones += $(this).html().trim();//id de afiliacion
+
+				}
+			});
+		});
 //obtiene arreglo de terminales
 		$( '#terminals_list tr' ).each( function(index){
 			$( this ).children( 'td' ).each( function ( index2 ){
 				if( index2 == 0 ){
 					terminales += ( terminales == "" ? "" : "," );
-
+					terminales += $(this).html().trim();//id de terminal
 				}
 			});
 		});
+
+//alert( `Afiliaciones : ${afiliaciones} \n Terminales : ${terminales}` );return false;
 	//enviamos datos por ajax
 		$.ajax({
 			type:'post',
@@ -50,7 +62,8 @@
 				login : log,
 				contrasena : contra,
 				cambio_caja : cambio,
-				terminales : terminales
+				terminales : terminales,
+				afiliaciones : afiliaciones
 			},
 			success:function(dat){
 				if(dat!='ok'){
@@ -120,7 +133,7 @@
 			var exists = false;
 			$( '#afiliations_list tr' ).each( function( index ){
 				$( this ).children( 'td' ).each( function ( index2 ){
-					if( index2 == 0 && $( this ).html().trim() == terminal_txt ){
+					if( index2 == 1 && $( this ).html().trim() == terminal_txt ){
 						exists = true;
 						return false;
 					}
@@ -130,14 +143,15 @@
 			if( exists ){
 				alert( "Esta terminal ya fue agregada para este usuario!" );
 			}else{
-				$( '#afiliations_list' ).append( build_afiliation_row( terminal_txt ) );
+				$( '#afiliations_list' ).append( build_afiliation_row( terminal_id, terminal_txt ) );
 			}
 			$( '#principal_terminal' ).val( '' );
 		}
 	}
 
-	function build_afiliation_row( terminal ){
+	function build_afiliation_row( terminal_id, terminal ){
 		var content = `<tr>
+			<td style="display:none;">${terminal_id}</td>
 			<td>${terminal}</td>
 			<td>
 				<button 
@@ -168,7 +182,7 @@
 			var exists = false;
 			$( '#terminals_list tr' ).each( function( index ){
 				$( this ).children( 'td' ).each( function ( index2 ){
-					if( index2 == 0 && $( this ).html().trim() == terminal_txt ){
+					if( index2 == 1 && $( this ).html().trim() == terminal_txt ){
 						exists = true;
 						return false;
 					}
@@ -178,14 +192,15 @@
 			if( exists ){
 				alert( "Esta terminal ya fue agregada para este usuario!" );
 			}else{
-				$( '#terminals_list' ).append( build_terminal_row( terminal_txt ) );
+				$( '#terminals_list' ).append( build_terminal_row( terminal_id, terminal_txt ) );
 			}
 			$( '#principal_terminal_smartAccounts' ).val( '' );
 		}
 	}
 
-	function build_terminal_row( terminal ){
+	function build_terminal_row( terminal_id, terminal ){
 		var content = `<tr>
+			<td style="display:none;">${terminal_id}</td>
 			<td>${terminal}</td>
 			<td>
 				<button 

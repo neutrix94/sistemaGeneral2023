@@ -194,6 +194,9 @@
     }
     
     function redondea05($val){
+
+      return $val;//oscar 2024-02-13
+
     	$aux = truncate($val);
     	$dif = $val - $aux;
     	

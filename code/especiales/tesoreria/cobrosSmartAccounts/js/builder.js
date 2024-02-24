@@ -82,63 +82,6 @@
 		$( '.emergent' ).css( 'display', 'block' );
 	}
 
-	function addCashPayment( amount ){	
-	//inserta pago en efectivo
-		amount = $( '#monto_cobro_emergente' ).val();
-		if( amount <= 0 ){
-			alert( "El monto del pago debe de ser mayor a cero!" );
-			$( '#monto_cobro_emergente' ).focus();
-			return false;
-		}
-		if( amount > parseInt( $( '#monto_pendiente_emergente' ).val() ) ){
-			alert( "El monto del pago no puede ser mayor al monto pendiente de pagar" );
-			$( '#monto_cobro_emergente' ).select();
-			return false;
-		}
-		/*if( $( '#efectivo_recibido' ).val() == '' || $( '#efectivo_recibido' ).val() <= 0 ){
-			alert( "El monto entregado por el cliente no puede ser menor o igual a cero!" );
-			$( '#efectivo_recibido' ).focus();
-			return false;
-		}*/
-
-		var url = "ajax/db.php?fl=insertCashPayment&ammount=" + amount;
-		url += "&session_id=" + $( '#session_id' ).val();
-		url += "&sale_id=" + $( '#id_venta' ).val();
-		//alert( url ); return false;
-		var resp = ajaxR( url ).split( '|' );
-		alert( "Respuesta : " + resp );
-		if( resp[0] != 'ok' ){
-			//alert( "Error al insertar el pago en Efectivo: " + resp );
-			$( '.emergent_content' ).html( resp[1] );
-			$( '.emergent' ).css( 'display', 'block' );
-			return false;
-		}else{
-			$( '#efectivo' ).val( '' );
-			
-			carga_pedido( $( '#id_venta' ).val() );
-			getHistoricPayment( $( '#id_venta' ).val() );//recarga vista de cobros
-			var content = `<div class="text-center">
-				<h2 class="text-success">Pago registrado exitosamente</h2>
-				<button
-					type="button"
-					class="btn btn-success"
-					onclick="close_emergent();"
-				>
-					<i class="icon-ok-circle">Aceptar</i>
-				</button>
-			</div>`;
-			$( '.emergent_content' ).html( content );
-			$( '.emergent' ).css( 'display', 'block' );
-		}
-		/*var content = `<tr>
-			<td>Efectivo</td>
-			<td>Efectivo</td>
-			<td>${amount}</td>
-		</tr>`;
-		$( '#payments_list' ).append( content );
-		close_emergent();*/
-	}
-
 	function get_reverse_form(){
 		var content = `<div class="row">
 			<input type="text" class="form-control" id="reverse_input">
@@ -285,4 +228,70 @@
 	function close_emergent(){
 		$( '.emergent_content' ).html( '' );
 		$( '.emergent' ).css( 'display', 'none' );
+	}
+
+
+//obtener lista de terminales sin integracion
+	function getAfiliacionesForm(){
+		var session_id = $( '#session_id' ).val();
+		var url = "ajax/db.php?fl=obtenerListaAfiliaciones&session_id=" + session_id;
+		var resp = ajaxR( url );
+		var url = "ajax/db.php?fl=obtenerListaAfiliacionesActuales&session_id=" + session_id;
+		var afiliaciones = ajaxR( url );
+		var content = `<div>
+			<div class="row">
+				<div class="col-2"></div>
+				<div class="col-8">
+					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
+					<div class="input-group">
+						${resp}
+						<input type="checkbox" id="afiliacion_por_error" style="display:none">
+						Error : 
+						<label for="error" class="icon-toggle-off text-success fs-3"></label>
+					</div>
+					<br>
+					<h2>Pide al encargado que ingrese su contraseña para continuar : </h2>
+					<input type="password" id="mannager_password" class="form-control">
+					<br>
+					<button class="btn btn-success form-control" onclick="agregarAfiliacionSesion();">
+						<i class="icon-plus">Agregar</i>
+					</button>
+					<h1>Afiliaciones activas : </h1>
+					${afiliaciones}
+				</div>
+			</div>
+		</div>`;
+		$( '.emergent_content' ).html( content );
+		$( '.emergent' ).css( 'display', 'block' );
+	}
+
+//obtener lista de terminales con integracion
+	function getTerminalesForm(){
+		var session_id = $( '#session_id' ).val();
+		var url = "ajax/db.php?fl=obtenerListaTerminales&session_id=" + session_id;
+		var resp = ajaxR( url );
+		var url = "ajax/db.php?fl=obtenerListaTerminalesActuales&session_id=" + session_id;
+		var terminales = ajaxR( url );
+		var content = `<div>
+			<div class="row">
+				<div class="col-2"></div>
+				<div class="col-8">
+					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
+					<div class="input-group">
+						${resp}
+					</div>
+					<br>
+					<h2>Pide al encargado que ingrese su contraseña para continuar : </h2>
+					<input type="password" id="mannager_password" class="form-control">
+					<br>
+					<button class="btn btn-success form-control" onclick="agregarTerminalSesion();">
+						<i class="icon-plus">Agregar</i>
+					</button>
+					<h1>Afiliaciones activas : </h1>
+					${terminales}
+				</div>
+			</div>
+		</div>`;
+		$( '.emergent_content' ).html( content );
+		$( '.emergent' ).css( 'display', 'block' );
 	}

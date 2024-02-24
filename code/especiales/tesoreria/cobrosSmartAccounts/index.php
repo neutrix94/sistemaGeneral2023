@@ -1,22 +1,18 @@
 <?php
 	include('../../../../conectMin.php');
 	include('../../../../conexionMysqli.php');
-	//verifica si esta habilitada la funcion de SmartAccounts
-		$sql = "SELECT 
-					habilitar_smartaccounts_netpay AS is_smart_accounts
-				FROM sys_sucursales s
-				WHERE id_sucursal = {$sucursal_id}";
-		$stm = $link->query( $sql ) or die( "Error al consultar si esta habilitado SmartAccounts : {$link->error}" );
-		$row = $stm->fetch_assoc();
-		$is_smart_accounts = $row['is_smart_accounts'];
-		if( $row['is_smart_accounts'] == 0 ){
-			die( "<script>location.href=\"../cobros/index.php\";</script>" );
-		}
+//verifica si esta habilitada la funcion de SmartAccounts
+	$sql = "SELECT 
+				habilitar_smartaccounts_netpay AS is_smart_accounts
+			FROM sys_sucursales s
+			WHERE id_sucursal = {$sucursal_id}";
+	$stm = $link->query( $sql ) or die( "Error al consultar si esta habilitado SmartAccounts : {$link->error}" );
+	$row = $stm->fetch_assoc();
+	$is_smart_accounts = $row['is_smart_accounts'];
+	if( $row['is_smart_accounts'] == 0 ){
+		die( "<script>location.href=\"../cobros/index.php\";</script>" );
+	}
 	include('ajax/db.php');
-	$Payments = new Payments( $link );//instancia clase de pagos
-	$Payments->checkAccess( $user_id );//verifica permisos
-	$tarjetas_cajero = $Payments->getTerminals( $user_id, 0, $user_sucursal );//afiliaciones por cajero
-	$cajas = $Payments->getBoxesMoney( $sucursal_id );//cheque o transferencia 
 	/*if($perfil_usuario!=7){
 		die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla!!!\nContacte al administrador desl sistema!!!");location.href="../../../../index.php?";</script>');
 	}*/
@@ -39,6 +35,11 @@
 	$usuario = $r[0];
 	$sucursal = $r[1];
 	$session_id = $r[2];
+	
+	$Payments = new Payments( $link );//instancia clase de pagos
+	$Payments->checkAccess( $user_id );//verifica permisos
+	$tarjetas_cajero = $Payments->getTerminals( $user_id, 0, $user_sucursal, $session_id );//afiliaciones por cajero
+	$cajas = $Payments->getBoxesMoney( $sucursal_id );//cheque o transferencia 
 ?>
 <!DOCTYPE html>
 <html>
@@ -52,14 +53,18 @@
 	<script type="text/javascript" src="js/builder.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../../../css/bootstrap/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="../../../../css/icons/css/fontello.css">
-	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<link rel="stylesheet" type="text/css" href="css/styles.css">    
+	<script src="../../../../js/highlight/highlight.min.js"></script>
+	<link rel="stylesheet" href="../../../../js/highlight/styles/default.min.css">
+    <script>hljs.highlightAll();</script>
+
 </head>
 <body onload="document.getElementById('buscador').focus();">
 <div class="global">
 	<input type="hidden" id="session_id" value="<?php echo $session_id;?>">
 <!--emergentes -->
 	<div class="emergent" style="z-index : 20;">
-		<div style="position: relative; top : 120px; left: 90%; z-index:1; display:none;">
+		<div class="text-end" style=" position: relative; top : 120px;right: 1%;z-index:1;"><!-- position: relative; top : 120px; left: 90%; z-index:1; display:none; -->
 			<button 
 				class="btn btn-danger"
 				onclick="close_emergent();"
@@ -168,10 +173,26 @@
 				>
 					<i class="icon-qrcode"></i>
 				</button>
+				<button
+					type="button"
+					class="btn btn-warning"
+					onclick="getAfiliacionesForm();"
+				>
+					<i class="icon-tools"></i>
+				</button>
 			</div>		
 		</div>
 		<div class="row" id="cards_container">
-			<h3>Tarjetas 
+			<h3>
+				<!--button
+					type="button"
+					class="btn btn-warning"
+-->
+					<i class="icon-tools text-secondary"
+						onclick="getTerminalesForm();"
+					></i>
+				<!--/button-->
+				Tarjetas 
 				<button
 					type="button"
 					id="add_card_btn"

@@ -582,10 +582,13 @@ function enlista_paquete(arreglo){
 
             var verificar_montos=verificaTotales();
 //   
-            $("#total").val("$"+Math.ceil(tot));//moneyFormat
+            //tot = redondea05( tot );
+            $("#total").val("$"+(tot));//$("#total").val("$"+Math.ceil(tot));//moneyFormat
    
-            if(Math.ceil(verificar_montos)==Math.ceil(tot)){
- //               $("#total").val("$"+Math.ceil(tot));//moneyFormat
+            //deshabilitado por Oscar 2023-02-13 if(Math.ceil(verificar_montos)==Math.ceil(tot)){
+            if( verificar_montos == tot ){
+ //               //deshabilitado por Oscar 2023-02-13 $("#total").val("$"+Math.ceil(tot));//moneyFormat
+                $("#total").val("$"+(tot));
             }else{
                 /*alert("Hay una diferencia en los montos!!! \nProceso_1:"+tot+"\nValidacion:"+verificar_montos);
                 var msg='<br><br><p align="center" align="center" style="font-size:30px;color:white;">Ah ocurrido un error en el monto de esta venta!!!</p>';
@@ -608,6 +611,24 @@ function enlista_paquete(arreglo){
             }
       	return false;
       }
+    
+    function redondea05( numero ){
+        var numero_redondeado = numero;
+
+        var $aux = Math.trunc( numero );
+    	var $dif = numero - $aux;
+    	
+    	if ($dif == 0){
+            return numero;
+        }else if ($dif < 0.25){
+           return $aux; 
+        }else if ($dif < 0.75){
+            return $aux+0.5;    
+        }else{
+            return $aux+1;
+        } 
+        //return numero_redondeado;
+    }
 
 /*Implementación Oscar 07.11.2018*/
     function verificaTotales(){
@@ -1317,7 +1338,7 @@ var hay_paquete=0;
             can2=can.value;
         }
         
-        
+        console.log(aux);
         if( global_last_pieces_array.indexOf( aux[1] ) != -1 && ventaTipo != 1 ){//aux[1] == '1808'
             var precio=null;
             if( product_price == null ){
@@ -1337,13 +1358,13 @@ var hay_paquete=0;
                 aux[5]=precio;
                 aux[7]=precio*can2;
                 aux[4]=Mascara('$#,###.##', precio)
-                aux[6]=Mascara('$#,###.##', precio*can2)
+                aux[6]=precio*can2;//Mascara('$#,###.##', precio*can2)
             }else{//modificacion Oscar 2023 para que no pida el precio si se recarga la pantalla
                precio = parseFloat(product_price);
                 aux[5]=precio;
                 aux[7]=precio*cant;
                 aux[4]=Mascara('$#,###.##', precio)
-                aux[6]=Mascara('$#,###.##', precio*cant)
+                aux[6]=precio*cant;//Mascara('$#,###.##', precio*cant)
                //alert( precio ); 
             }
         }

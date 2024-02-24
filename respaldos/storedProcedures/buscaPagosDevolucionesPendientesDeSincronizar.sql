@@ -11,7 +11,7 @@ BEGIN
 	DECLARE recorre CURSOR FOR
 		SELECT 
 			dp.id_devolucion_pago,
-			d.id_devolucion,
+			d.folio_unico,
 			dp.id_sesion_caja,
 			cc.folio_unico
 		FROM ec_devolucion_pagos dp
@@ -22,6 +22,9 @@ BEGIN
 		WHERE d.id_sucursal = store_id
 		AND d.folio_unico IS NOT NULL
 		AND dp.folio_unico IS NULL
+/*implementacion Oscar 2024-02-12 para solo sincronizar devoluciones con pago de cajero sincronizado*/
+		AND cc.folio_unico != ''
+/*fin de cambio Oscar 2024-02-12*/
 		GROUP BY dp.id_devolucion_pago
 		LIMIT system_limit;
 		DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;

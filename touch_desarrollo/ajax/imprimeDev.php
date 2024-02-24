@@ -460,45 +460,40 @@
     if($printPan == 1) {
        $ticket->Output();
     }else{
-      $nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_devolucion_".$folio."_1.pdf";
-      $nombre_ticket=str_replace(" ","", $nombre_ticket);
-        
-    /*implementación Oscar 25.01.2019 para la sincronización de tickets*/
-        if($user_tipo_sistema=='linea'){
-/*implementacion Oscar 2023/09/20 para impresion remota*/
-          $sql = "SELECT 
-          dominio_sucursal AS store_dns
-          FROM ec_configuracion_sucursal
-          WHERE id_sucursal = ( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 )";
-          $stm = mysql_query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
-          $row = mysql_fetch_assoc( $stm );
-          $ruta_or = $row['store_dns'];
-          $sql_arch="INSERT INTO sys_archivos_descarga SET 
-              id_archivo=null,
-              tipo_archivo='pdf',
-              nombre_archivo='$nombre_ticket',
-              ruta_origen='{$ruta_or}/cache/ticket/',
-              ruta_destino='cache/ticket/',
-            /*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
-              id_sucursal='$user_sucursal',
-            /*Fin de Cambio Oscar 03.03.2019*/
-              id_usuario='$user_id',
-              observaciones=''";
-          $inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de Devolución!!!\n\n".mysql_error()."\n\n".$sql_arch);
+/*implementacion Oscar 2024-02-01 para ruta especifica de ticket*/
+    /*instancia clases*/
+        include( '../../conexionMysqli.php' );
+        include( '../../code/especiales/controladores/SysArchivosDescarga.php' );
+        $SysArchivosDescarga = new SysArchivosDescarga( $link );
+        include( '../../code/especiales/controladores/SysModulosImpresionUsuarios.php' );
+        $SysModulosImpresionUsuarios = new SysModulosImpresionUsuarios( $link );
+        include( '../../code/especiales/controladores/SysModulosImpresion.php' );
+        $SysModulosImpresion = new SysModulosImpresion( $link );
 
+        $nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_devolucion_".$folio."_1.pdf";
+        $nombre_ticket=str_replace(" ","", $nombre_ticket);
+        
+        $ruta_salida = '';
+        $ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 4 );//Devolución antes de validación
+        if( $ruta_salida == 'no' ){
+            $ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 4 );//Devolución antes de validación
         }
-/*implementacion Oscar 03.03.2019 para actualizar el status de la devolución como terminada*/
-      if(isset($id_pedido_original) && $flag_tkt=='devuelve_efectivo'){
-        $sql="UPDATE ec_devolucion SET status=3,observaciones='Dinero regresado al cliente' WHERE id_pedido=$id_pedido_original";
-        $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
-       //echo $sql;
-      }
+        $ticket->Output( "../../{$ruta_salida}/{$nombre_ticket}", "F" );
+        /*Sincronización remota de tickets*/
+        if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
+            $registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+        }
+        if(isset($id_pedido_original) && $flag_tkt=='devuelve_efectivo'){
+            $sql="UPDATE ec_devolucion SET status=3,observaciones='Dinero regresado al cliente' WHERE id_pedido=$id_pedido_original";
+            $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
+           //echo $sql;
+        }
 /*Fin de cambio Oscar 03.03.2019*/
-      $ticket->Output("../../cache/ticket/".$nombre_ticket, "F");
+      //$ticket->Output("../../cache/ticket/".$nombre_ticket, "F");
 
       
 /*implementacion Oscar 2023/09/20 para enviar impresion remota*/
-      if($user_tipo_sistema=='linea'){
+      if($user_tipo_sistema=='linea'){/*
         $archivo_path = "../../conexion_inicial.txt";
         $url = "";
           if(file_exists($archivo_path)){
@@ -532,7 +527,7 @@
         //decodifica el json de respuesta
           $result = json_decode(json_encode($resp), true);
           $result = json_decode( $result );
-          //return $result;
+          //return $result;*/
       }
 /*fin de cambio Oscar 2023*/
   //die('here');

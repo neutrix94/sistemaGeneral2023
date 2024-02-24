@@ -380,7 +380,10 @@ Fin de cambio Oscar 25.06.2019*/
     }
 /*fin de cambio Oscar 2023/10/12*/
 /*Implementacion Oscar 2023/10/12*/
-	if( $payments_total == $total ){
+
+    $comprobacion_cobro = round( $total - $payments_total );
+    if( ( $comprobacion_cobro == 1 || $comprobacion_cobro == 0 || $comprobacion_cobro == -1 ) || $pagado == 0 ){
+	//if( $payments_total == $total ){
         $ticket->Image("../img/especiales/pagado.jpeg", 5, 2, 70);
 		$ticket->SetXY(5, $ticket->GetY()+20);
 	}
@@ -578,7 +581,7 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 	$ticket->Cell(66*0.3, 6, utf8_decode("Total"), "" ,0, "L");
 	
 	$ticket->SetXY(5+66*0.75, $ticket->GetY());
-	$ticket->Cell(66*0.25, 6, "$ " . number_format( round( $total ), 2), "" ,0, "R");
+	$ticket->Cell(66*0.25, 6, "$ " . number_format( round( $total, 2 ), 2), "" ,0, "R");
 	
 	/*$ticket->SetY($ticket->GetY()+4);
 	$ticket->SetXY(7+66*0.40, $ticket->GetY()+3);
@@ -786,49 +789,44 @@ $ticket->SetXY(5, $ticket->GetY()+4);
     	ob_end_clean();
 	   $ticket->Output();
     }else{
+/*implementacion Oscar 2024-02-01 para ruta especifica de ticket*/
+	/*instancia clases*/
+		include( '../conexionMysqli.php' );
+		include( '../code/especiales/controladores/SysArchivosDescarga.php' );
+		$SysArchivosDescarga = new SysArchivosDescarga( $link );
+		include( '../code/especiales/controladores/SysModulosImpresionUsuarios.php' );
+		$SysModulosImpresionUsuarios = new SysModulosImpresionUsuarios( $link );
+		include( '../code/especiales/controladores/SysModulosImpresion.php' );
+		$SysModulosImpresion = new SysModulosImpresion( $link );
+
 /*implementación Oscar 17.09.2018 para impresión de tickets de acuerdo a la configuración de la sucursal*/
     	$sql="SELECT IF($pagado=1,ticket_venta,ticket_apartado) FROM sys_sucursales WHERE id_sucursal=$user_sucursal";
     	$eje=mysql_query($sql)or die("Error al consultar número de impresiones!!!\n\n".$sql."\n\n".mysql_error());	
     	$numero=mysql_fetch_row($eje);
     	for($cont=1;$cont<=$numero[0];$cont++){
     		$nombre_ticket="ticket_".$user_sucursal."_" . date("YmdHis") . "_" . strtolower($tipofolio) . "_" . $folio . "_".$cont.".pdf";
-        /*implementación Oscar 25.01.2019 para la sincronización de tickets*/
-    		if($user_tipo_sistema=='linea'){
-/*implementacion Oscar 2023/09/20 para impresion remota*/
-    			$sql = "SELECT 
-					dominio_sucursal AS store_dns
-				FROM ec_configuracion_sucursal
-				WHERE id_sucursal = ( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 )";
-				$stm = mysql_query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
-				$row = mysql_fetch_assoc( $stm );
-				$ruta_or = $row['store_dns'];
-    			$sql_arch="INSERT INTO sys_archivos_descarga SET 
-    					id_archivo=null,
-    					tipo_archivo='pdf',
-    					nombre_archivo='$nombre_ticket',
-    					ruta_origen='{$ruta_or}/cache/ticket/',
-    					ruta_destino='cache/ticket/',
-    				/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*/
-    					id_sucursal='$user_sucursal',
-    				/*Fin de Cambio Oscar 03.03.2019*/
-    					
-    					id_usuario='$user_id',
-    					observaciones=''";
-    			$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);
 
+			$ruta_salida = '';
+			$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 5 );//ticket de impresion
+			if( $ruta_salida == 'no' ){
+				$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 5 );//ticket de impresion
+			}
+	    	$ticket->Output( "../{$ruta_salida}/{$nombre_ticket}", "F" );
+        /*Sincronización remota de tickets*/
+    		if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
+				$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
     		}
-    	$ticket->Output("../cache/ticket/".$nombre_ticket, "F");
-    	//sleep( 2 );
-    	if( $special_products > 0 ){
-	    	$ticket = null;
-    		include( 'ajax/ticket_dia_siguiente.php' );
-    	}
+	    	if( $special_products > 0 ){
+		    	$ticket = null;
+	    		include( 'ajax/ticket_dia_siguiente.php' );
+	    	}
     /*fin de cambio Oscar 25.01.2019*/
     	}//fin de for $cont
+    	//die( "here" );
 /*fin de cambio Oscar 17.09.2018*/
 /*implementacion Oscar 2023/09/20 para enviar impresion remota*/
 	if($user_tipo_sistema=='linea'){
-		$archivo_path = "../conexion_inicial.txt";
+		/*$archivo_path = "../conexion_inicial.txt";
 		$url = "";
 			if(file_exists($archivo_path)){
 				$file = fopen($archivo_path,"r");
@@ -861,7 +859,7 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 		//decodifica el json de respuesta
 			$result = json_decode(json_encode($resp), true);
 			$result = json_decode( $result );
-			//return $result;
+			//return $result;*/
 	}
 /*fin de cambio Oscar 2023*/
 

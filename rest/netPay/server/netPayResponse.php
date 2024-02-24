@@ -13,6 +13,9 @@ $app->post('/', function (Request $request, Response $response){
   if( ! include( '../../conexionMysqli.php' ) ){
     die( "Error al incluir libreria de conexion!" );
   }
+  if( ! include( '../../code/especiales/tesoreria/cobrosSmartAccounts/ajax/db.php' ) ){//oscar 2024-02-15
+    die( "Error al incluir libreria de cobros!" );
+  }
 //obtener el json en txt 
   $body = $request->getBody();
   $file = fopen("test.txt","w");
@@ -173,8 +176,8 @@ $app->post('/', function (Request $request, Response $response){
 
     //consulta entre interno y externo
         $sql = "SELECT
-                  ROUND( ax.internal/ax.total, 2 ) AS internal_porcent,
-                  ROUND( ax.external/ax.total, 2 ) AS external_porcent
+                  ROUND( ax.internal/ax.total, 6 ) AS internal_porcent,
+                  ROUND( ax.external/ax.total, 6 ) AS external_porcent
                 FROM(
                   SELECT
                     SUM( pd.monto ) AS total,
@@ -190,7 +193,11 @@ $app->post('/', function (Request $request, Response $response){
       $stm = $link->query( $sql ) or die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
   
 //die( "here 1.5" );
-      $payment_row = $stm->fetch_assoc();
+      $payment_row = $stm->fetch_assoc();//pagos de saldo a favor Oscar 2024-02-15
+  
+      $Payments = new Payments( $link, $traceability['id_sucursal'] );
+      $Payments->insertPaymentsDepending( $amount, $row['sale_id'], $traceability['id_cajero'], $traceability['id_sesion_cajero'] );// $pago_por_saldo_a_favor
+  
       $internal_payment_id = '0';
       $external_payment_id = '0';
     //inserta pago interno    
@@ -208,10 +215,10 @@ $app->post('/', function (Request $request, Response $response){
        //$internal_payment_id = $link->insert_id;
       }
     //inserta pago externo    
-      if( $payment_row['external_porcent'] > 0 ){
-        $sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_sucursal, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
+      if( $payment_row['external_porcent'] > 0 ){//aqui se modificó error de netPay ( solo externos ) Oscar 30-01-2024 desde development2024
+        $sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
         id_nota_credito, id_cxc, es_externo, id_cajero, id_sesion_caja )
-        VALUES( {$row['sale_id']}, '{$traceability['id_sucursal']}', 7, NOW(), NOW(), ( {$amount}*{$payment_row['external_porcent']} ), '', 1, 1, -1, -1, 1, 
+        VALUES( {$row['sale_id']}, 7, NOW(), NOW(), ( {$amount}*{$payment_row['external_porcent']} ), '', 1, 1, -1, -1, 1, 
           '{$traceability['id_cajero']}', '{$traceability['id_sesion_cajero']}' )";
         $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$sql} {$link->error}" );
         $sql = "SELECT MAX( id_pedido_pago ) AS last_sale_payment_id FROM ec_pedido_pagos LIMIT 1";

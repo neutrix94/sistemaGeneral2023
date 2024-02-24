@@ -593,7 +593,18 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 						WHERE pp.id_pedido = {$row['row_id']}";
 				$stm_aux = $this->link->query( $sql ) or die( "Error al consultar los pagos del pedido : {$this->link->error}" );
 				$row_aux = $stm_aux->fetch_assoc();
-				$difference = round( $row_aux['payments_total'] ) - round( $row['total'] );
+			//consulta los pagos por devolucion
+				$sql = "SELECT 
+							SUM( dp.monto ) AS pagos_devolucion
+						FROM ec_devolucion_pagos dp
+						LEFT JOIN ec_devolucion d
+						ON dp.id_devolucion = d.id_devolucion
+						WHERE d.id_pedido IN( {$row['row_id']} )";
+				$stm = $this->link->query( $sql ) or die( "Error al consultar pagos por devolucion para comprobacion : {$this->link->error}" );
+				$devolucion_row = $stm->fetch_assoc();
+				$pagos_dev = $devolucion_row['pagos_devolucion'];
+
+				$difference = round( $row_aux['payments_total'] - $pagos_dev ) - round( $row['total'] );
 				if( ( $difference != -1 && $difference != 0 && $difference != -1 ) && $row['pagado'] == 1 ){//venta no liquidada $row_aux['payments_total'] < $row['total']
 					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no ah sido liquidada<br>Verifica y vuelve a intentar!</p>";
 					$resp .= "<h5>{$row_aux['payments_total']} VS {$row['total']} = {$difference}, {$row['pagado']}</h5>";
@@ -2040,7 +2051,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 /*implementacion Oscar 2023 para redireccionar siu hay devolucion*/
 		public function get_url_from_return( $sale_id ){
 			$sql = "SELECT 
-						ROUND( 1 - (total/subtotal), 2 ) AS discount
+						ROUND( 1 - (total/subtotal), 6 ) AS discount
 					FROM ec_pedidos
 					WHERE id_pedido = {$this->sale_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar descuento del ticket : {$sql} {$this->link->error}" );

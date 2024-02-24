@@ -134,7 +134,6 @@
 								type="button"
 								class="btn btn-success"
 								onclick="setAfiliation();"
-								disabled
 							>
 								<i class="icon-plus"></i>
 							</button>

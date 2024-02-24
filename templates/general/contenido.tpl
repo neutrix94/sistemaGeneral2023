@@ -22,6 +22,18 @@
 	</div>
 <!-- Fin de cambio Oscar 2023/11/15 -->
 
+<!-- Cambio Oscar 2024-02-09 para el boton de administracion de carpetas especificas-->
+{if $tabla eq 'sys_users' && $no_tabla eq '0'}
+	<button 
+		type="button"
+		class="btn btn-primary"
+		onclick="getPrintersEmergent();"
+		style="position : fixed; top : 70%; right : 10px;"
+	>
+		<i class="icon-tools">Carpetas</i>
+	</button>
+{/if}
+<!-- Fin de cambio Oscar 2024-02-09 -->
 <!-- Excepcion 1: Implementacion para botones de exportacion de ubicaciones desde la configuracion de la sucursal -->
 {if $tabla eq 'ec_configuracion_sucursal' && $no_tabla eq '0'}
 	<table style="position:absolute;bottom:30%;">
@@ -2249,8 +2261,17 @@
 							var disGrid='{$gridArray[x][2]}';
 
 							{literal}
-
-
+<!-- Implementacion Oscar 2024-26-01 -->
+							if (nomGrid == 'UsersPrintsModules'){
+								var validation = UsersPrintsModulesValidation();
+								if( UsersPrintsModulesValidation != true ){
+									alert( validation );
+									$( '#emerge' ).css( 'display', 'none' );
+									//return false;
+								}
+								//alert( 'here' );
+							}
+<!-- Implementacion Oscar 2024-26-01 -->
 
 							if (nomGrid == 'sucursalProducto')
 							{

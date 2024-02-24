@@ -672,21 +672,26 @@
 			//die("entra aqui: ".$pedido_total."---->pedido_descuento".$pedido);
 		}
 
-/*Implementación Oscar 05.11.2018 para redondear hacia arriba los valores de la cabecera de la tabla temporal de ventas*/
+/*DESHABILITADO POR OSCAR 2024-02-13
+Implementación Oscar 05.11.2018 para redondear hacia arriba los valores de la cabecera de la tabla temporal de ventas
 		$pedido_subtotal=CEIL($pedido_subtotal);
 		$pedido_total=CEIL($pedido_total);
 		$pedido_descuento=CEIL($pedido_descuento);
 /*Fin de cambio Oscar 05.11.2018*/
 	
 /*Implementación Oscar 06.11.2018 para verificar la autorización del descuento*/
-	$sql="SELECT direccion FROm ec_pedidos_back WHERE id_pedido={$id_pedido}";
+	$sql="SELECT direccion FROM ec_pedidos_back WHERE id_pedido={$id_pedido}";
 	$eje=mysql_query($sql)or die("Error al verificar la autorización del descuento!!!\n\n".$sql."\n\n".mysql_error());
 	$aut=mysql_fetch_row($eje);
 	if($aut[0]!=1){
-		$pedido_subtotal=CEIL($pedido_subtotal);
-		$pedido_total=CEIL($pedido_subtotal);
+	/*deshabilitado por Oscar 2024-02-22
+		//$pedido_subtotal=CEIL($pedido_subtotal);
+		//$pedido_total=CEIL($pedido_subtotal);
+		//$pedido_descuento=0;
+	*/
+		$pedido_subtotal=$pedido_subtotal;
+		$pedido_total=$pedido_subtotal;
 		$pedido_descuento=0;
-
 	//insertamos el error
 		$sql="INSERT INTO sys_bitacora_errores ( id_error, id_sucursal, descripcion, fecha_error, id_usuario, observaciones, visto, id_equivalente, sincronizar ) VALUES 
 		(null,$user_sucursal,'Se activó un descuento sin autorizacion en pedido $id_pedido, folio: $folio',now(),$user_id,'','0', 0, 1 )";
@@ -694,12 +699,12 @@
 	}
 /*Fin de cambio Oscar 06.11.2018*/
 
-		# Actualizar los valores pendientes del encabezado
+		# Actualizar los valores pendientes del encabezado  $pedido_total//OSCAR 2024-02-13
 		$cs = "UPDATE ec_pedidos_back SET " .
 			"subtotal = '{$pedido_subtotal}', " .
 			"iva = '0', " .
 			"ieps = '0', " .
-			"total = '{$pedido_total}', " .
+			"total = '{$_GET['totalPed']}', " .
 			"descuento = '{$pedido_descuento}' " .
 			"WHERE id_pedido = '{$id_pedido}' ";
 		//die($cs);

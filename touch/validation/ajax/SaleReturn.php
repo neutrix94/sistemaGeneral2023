@@ -327,7 +327,7 @@
 		    	$sql = "SELECT pd.cantidad,
 		                        pd.id_pedido_detalle,
 		                        pd.es_externo,
-		                        ROUND(((pd.monto-pd.descuento)/pd.cantidad)-IF(pd.descuento>0,0,(pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100)),2)*{$product['return_quantity']}
+		                        ROUND(((pd.monto-pd.descuento)/pd.cantidad)-IF(pd.descuento>0,0,(pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100)),6)*{$product['return_quantity']}
 		                        FROM ec_pedidos_detalle pd
 		                        LEFT JOIN ec_pedidos pe ON pd.id_pedido=pe.id_pedido 
 		                        WHERE pd.id_pedido_detalle ='{$product['sale_detail_id']}'
@@ -405,7 +405,7 @@
 		    				pd.cantidad,
 	                        pd.id_pedido_detalle,
 	                        pd.es_externo,
-	                        ROUND(((pd.monto-pd.descuento)/pd.cantidad)-IF(pd.descuento>0,0,(pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100)),2)*{$product['return_quantity']}
+	                        ROUND(((pd.monto-pd.descuento)/pd.cantidad)-IF(pd.descuento>0,0,(pd.precio)*(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100)),6)*{$product['return_quantity']}
 	                    FROM ec_pedidos_detalle pd
 	                    LEFT JOIN ec_pedidos pe ON pd.id_pedido=pe.id_pedido 
 	                    WHERE pd.id_pedido_detalle ='{$product['sale_detail_id']}'";
@@ -562,7 +562,7 @@
 
 		public function finishReturn(){
 			$sql = "SELECT 
-						ROUND( 1 - (total/subtotal), 2 ) AS discount
+						ROUND( 1 - (total/subtotal), 6 ) AS discount
 					FROM ec_pedidos
 					WHERE id_pedido = {$this->sale_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar descuento del ticket : {$sql} {$this->link->error}" );
@@ -607,7 +607,7 @@
 	
 			$extra = "&es_apart={$row['is_not_payed']}&id_ped={$row['sale_id']}&dsc={$row['discount']}"; 
 			$extra .= "&id_dev=" . $row['returns_ids'] . $row['sale_type'];//implementacion Oscar 2023 para que respete el precio de lista si es mayoreo
-			$row['amount'] = round( $this->internal_return_amount + $this->external_return_amount );
+			$row['amount'] = round( $this->internal_return_amount + $this->external_return_amount, 6 );
 			$extra=str_replace("*", "&", $extra);
     		$url_recarga = '../../touch_desarrollo/index.php?scr=nueva-venta&s_f_c=' . $row['amount'];
     		$url_recarga .= $extra . "&abonado=".$this->total_abonado;
@@ -624,7 +624,7 @@
 		   
 /*implementacion Oscar 2023-12-19 para actualizar referencia de la nota de venta y a devolucion*/
 	        $sql = "UPDATE ec_pedidos_referencia_devolucion 
-	                    SET total_venta = ( total_venta + ( {$internal_return_amount} + {$this->external_return_amount} ) )
+	                    SET total_venta = ( total_venta - ( {$this->internal_return_amount} + {$this->external_return_amount} ) )
 	                WHERE id_pedido = {$this->sale_id}";
 	        $reference_stm = $this->link->query( $sql ) or die( "Error al actualizar la referencia de la devolucion : {$this->link->error}");
 /*fin de cambio Oscar 2023-12-19*/
