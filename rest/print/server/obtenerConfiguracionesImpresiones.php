@@ -31,7 +31,7 @@ $app->post('/obtener_configuracion_impresion', function (Request $request, Respo
 				REPLACE( s.nombre, ' ', '_' ) AS usuario,
 			    CONCAT( c.path, '/', c.nombre_carpeta ) AS ruta,
 			    i.nombre_impresora AS impresora,
-			    mis.comando_impresion,
+			    ci.comando_impresion,
 			    mis.extension_archivo,
 			    '0' AS habilitado,
 			    mis.endpoint_api_destino
@@ -44,6 +44,8 @@ $app->post('/obtener_configuracion_impresion', function (Request $request, Respo
 			ON c.id_carpeta = mis.id_carpeta
 			LEFT JOIN sys_impresoras_sucursales i
 			ON i.id_impresora_sucursal = mis.id_impresora_sucursal
+			LEFT JOIN sys_comandos_impresion ci
+			ON ci.id_comando_impresion = mis.id_comando_impresion
 			WHERE mis.id_sucursal = {$sucursal}";
 	$stm = $link->query( $sql ) or die( "Error al consultar modulos y sus carpetas : {$link->error}" );
 	while ( $row = $stm->fetch_assoc() ) {
@@ -55,7 +57,7 @@ $app->post('/obtener_configuracion_impresion', function (Request $request, Respo
 				CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS usuario,
 			    CONCAT( c.path, '/', c.nombre_carpeta ) AS ruta,
 			    i.nombre_impresora AS impresora,
-			    miu.comando_impresion,
+			    ci.comando_impresion,
 			    miu.extension_archivo,
 			    '0' AS habilitado,
 			    miu.endpoint_api_destino
@@ -67,7 +69,9 @@ $app->post('/obtener_configuracion_impresion', function (Request $request, Respo
 			LEFT JOIN sys_carpetas c
 			ON c.id_carpeta = miu.id_carpeta
 			LEFT JOIN sys_impresoras_sucursales i
-			ON i.id_impresora_sucursal = miu.id_impresora_sucursal";
+			ON i.id_impresora_sucursal = miu.id_impresora_sucursal
+			LEFT JOIN sys_comandos_impresion ci
+			ON ci.id_comando_impresion = miu.id_comando_impresion";
 	$stm = $link->query( $sql ) or die( "Error al consultar modulos de impresion por usuarios y sus carpetas : {$link->error}" );
 	while ( $row = $stm->fetch_assoc() ) {
 		array_push( $resp['modulos'], $row );
