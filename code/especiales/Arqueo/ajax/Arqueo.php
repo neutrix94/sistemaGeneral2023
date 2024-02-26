@@ -33,7 +33,7 @@
 			if($llave=='0'){
 				$sql.="id_cajero='".$user_id."' AND ( hora_fin='00:00:00' OR (hora_fin='23:59:59' AND observaciones like '%1___%') )";
 			}else{
-				$sql.="id_sesion_caja=".$llave;
+				$sql.="id_sesion_caja = '{$llave}'";
 			}
 			$sql.=" ORDER BY id_sesion_caja DESC LIMIT 1";
 			
@@ -70,7 +70,7 @@
 				WHERE ac.id_cajero='{$user_id}' 
 				AND ac.activo=1 
 				AND a.id_afiliacion>0
-				AND sca.id_sesion_caja = {$id_sesion_caja}";
+				AND sca.id_sesion_caja = '{$id_sesion_caja}'";
 			$eje = $this->link->query( $sql )or die("Error al consultar las afiliaciones para este cajero!!!<br>{$this->link->error}");
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
 			$tarjetas_cajero='';
@@ -130,7 +130,7 @@
 				AND tcs.activo = 1 
 				AND tss.estado_suc = 1
 				AND tis.id_terminal_integracion > 0
-				AND sct.id_sesion_caja = {$id_sesion_caja}";
+				AND sct.id_sesion_caja = '{$id_sesion_caja}'";
 			$eje = $this->link->query( $sql )or die("Error al consultar las afiliaciones para este cajero!!!<br>{$this->link->error}");
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
 			$SmartAccountsTerminals='';
