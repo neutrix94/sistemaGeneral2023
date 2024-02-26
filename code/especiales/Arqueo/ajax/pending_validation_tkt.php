@@ -6,6 +6,9 @@
 	include("../../../../conexionMysqli.php");
 	//consulta el año actual
 	$data = array();
+	$pendientes_pago = array();
+	$espacio_ventas_pendientes_cobro = 0;
+
 	$sql = "SELECT DATE_FORMAT( NOW(), '%Y' ) AS year";
 	$stm = $link->query( $sql ) or die( "Error al consultar el año actual : {$this->link->error}" );
 	$current_year = $stm->fetch_assoc();
@@ -19,14 +22,78 @@
 			AND id_sucursal = {$sucursal_id}";//
 	$stm = $link->query( $sql ) or die( "Error al consultar ventas pendientes de validar : {$link->error}" );
 	$sales_number = $stm->num_rows;
+//implementacion Oscar 2024-02-23 para listar ventas pendientes de validar
+	$sql_2 = "SELECT
+				ax.dateTime,
+				ax.folio, 
+				ax.amount,
+				ax.username,
+				ax.pagado
+			FROM(
+				SELECT 
+					p.fecha_alta AS dateTime,
+					p.folio_nv AS folio, 
+					p.total AS amount,
+					CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS username,
+					SUM( cc.monto ) AS pagado
+				FROM ec_pedidos p
+				LEFT JOIN ec_cajero_cobros cc
+				ON cc.id_pedido = p.id_pedido
+				LEFT JOIN sys_users u
+				ON u.id_usuario = p.id_usuario
+				WHERE p.pagado = 1 
+				AND p.fecha_alta LIKE '%{$current_year['year']}%'
+				AND p.id_sucursal = {$sucursal_id}
+				GROUP BY p.id_pedido
+			)ax
+			WHERE ROUND( ax.pagado ) < ROUND( ax.amount )";//
+			//die($sql_2);
+	$stm_2 = $link->query( $sql_2 ) or die( "Error al consultar las ventas pendientes de pago : {$link->error}" );
+	$sales_without_payment = $stm_2->num_rows;
+	if( $sales_without_payment > 0 ){
+		$espacio_ventas_pendientes_cobro = ( $sales_without_payment * 8.8 ) + 20;
+	}
 	if( $_POST['flag'] == 'seek_pending_to_validate' ){
 		$resp = "ok|";
+		if( $sales_without_payment > 0 ){//ventas pendientes de pago
+
+			$resp .= "<div class=\"row\" style=\"background-color : white; max-height : 60%; overflow : auto; position : relative; top : 100px;\">
+						<div class=\"col-2\"></div>
+						<div class=\"col-8\">
+							<h5 class=\"text-danger\">Las siguientes ventas estan pendientes de pago : </h5>
+							<table class=\"table table-striped table-bordered\">
+								<thead class=\"btn-warning\" style=\"position : sticky; top : 0;\">
+									<tr>
+										<th class=\"text-center\">#</th>
+										<th class=\"text-center\">Fecha/hora</th>
+										<th class=\"text-center\">Folio</th>
+										<th class=\"text-center\">Monto</th>
+										<th class=\"text-center\">Vendedor</th>
+									</tr>
+								</thead>
+								<tbody>";
+			$counter = 0;
+			while( $row_2 = $stm_2->fetch_assoc() ){
+				$counter ++;
+				$resp .= "<tr>
+							<td class=\"text-center\">{$counter}</td>
+							<td class=\"text-center\">{$row_2['dateTime']}</td>
+							<td class=\"text-center\">{$row_2['folio']}</td>
+							<td class=\"text-center\">$ {$row_2['amount']}</td>
+							<td class=\"text-center\">{$row_2['username']}</td>
+						</tr>";
+			}
+			$resp .= "</tbody></table>
+			</div><br><br>";
+
+		}
+		
 		if( $sales_number > 0 ){
 
 			$resp .= "<div class=\"row\" style=\"background-color : white; max-height : 60%; overflow : auto; position : relative; top : 100px;\">
 						<div class=\"col-2\"></div>
 						<div class=\"col-8\">
-							<h5>Las siguientes ventas estan pendientes de validar : </h5>
+							<h5 class=\"text-warning\">Las siguientes ventas estan pendientes de validar : </h5>
 							<table class=\"table table-striped table-bordered\">
 								<thead class=\"btn-warning\" style=\"position : sticky; top : 0;\">
 									<tr>
@@ -44,13 +111,13 @@
 							<td class=\"text-center\">{$counter}</td>
 							<td class=\"text-center\">{$row['folio']}</td>
 							<td class=\"text-center\">$ {$row['amount']}</td>
-							<td class=\"text-center\">$ {$row['date']}</td>
+							<td class=\"text-center\">{$row['date']}</td>
 						</tr>";
 			}
 			$resp .= "</tbody></table></div>
 						<div class=\"col-2\">
-							<i class=\"icon-down-open btn btn-light\" 
-								style=\"position : fixed; top : 65% !important; border-radius : 50%; border : 1px solid green; \"></i>
+							<!--i class=\"icon-down-open btn btn-light\" 
+								style=\"position : fixed; top : 65% !important; border-radius : 50%; border : 1px solid green; \"></i-->
 						</div>
 						<div class=\"col-2\"></div>
 						<div class=\"col-8 text-center\">
@@ -68,6 +135,10 @@
 		while( $row = $stm->fetch_assoc() ){
 			$counter ++;
 			array_push( $data, $row);
+		}
+		while( $row_2 = $stm_2->fetch_assoc() ){
+			$counter ++;
+			array_push( $pendientes_pago, $row_2);
 		}
 	}
 
@@ -133,7 +204,7 @@
 	}
 	
 	//aqui cambia largo Oscar 26-11-2017
-	$ticket = new TicketPDF("P", "mm", array(80, (80+$sales_number*8)) , "{$sucursal_id}", "{$folio}", 10);
+	$ticket = new TicketPDF("P", "mm", array( 80, ( 80 + ( $sales_number * 8.8 ) + $espacio_ventas_pendientes_cobro ) ) , "{$sucursal_id}", "{$folio}", 10);
 	//echo 'res:'.$resAprox;
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
@@ -171,7 +242,20 @@
 	
 	$ticket->SetXY(7, $ticket->GetY()+4.5);
 	$ticket->Cell(66, 6, utf8_decode(), "" ,0, "C");
-
+/*Implementacion Oscar 2024-02-23 para imprimir*/
+//encabezado
+	$ticket->SetXY(4, $ticket->GetY()+2);
+	$ticket->Cell(62, 6, utf8_decode( "Fec/hr" ), "" ,0, "C");
+	$ticket->SetXY(7, $ticket->GetY());
+	$ticket->Cell(62, 6, utf8_decode( "Folio" ), "" ,0, "C");
+	$ticket->SetXY(7, $ticket->GetY());
+	$ticket->Cell(62, 6, utf8_decode( "Monto" ), "" ,0, "C");
+	$ticket->SetXY(10, $ticket->GetY());
+	$ticket->Cell(62, 6, utf8_decode( "Vendedor" ), "" ,0, "R");
+	foreach ($pendientes_pago as $key => $value) {
+		# code...
+	}
+/*Fin de cambio Oscar 2024-02-23*/
 //	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_".$folio."_$noImp.pdf";
 	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".$folio_sesion_caja.".pdf";
 	$sql = "SELECT 
