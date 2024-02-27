@@ -976,6 +976,22 @@
 			Muestraerror($smarty, "", "3", mysql_error(), $sql, "contenido.php");
 		}
 	}
+	
+/*Sincronizacion de carpetas Oscar 2024-02-26*/
+	if( $tabla == 'sys_impresoras_sucursales' ){
+		include( '../especiales/controladores/SysImpresorasSucursales.php' );
+		$SysImpresorasSucursales = new SysImpresorasSucursales( $link );
+		if( $accion == 'insertar' ){
+			$SysImpresorasSucursales->crearRegistrosSincronizacionImpresorasSucursales( 'insert', 'sys_impresoras_sucursales', $llave, $link );
+		}
+		if( $accion == 'actualizar' ){
+			$SysImpresorasSucursales->crearRegistrosSincronizacionImpresorasSucursales( 'update', 'sys_impresoras_sucursales', $llave, $link );
+		}
+		if( $accion == 'eliminar' ){
+			$SysImpresorasSucursales->crearRegistrosSincronizacionImpresorasSucursales( 'delete', 'sys_impresoras_sucursales', $llave, $link );
+		}
+	}
+/*Fin de Sincronizacion de carpetas Oscar 2024-02-26*/
 
 /*15. Actualiza prefijo de etiquetas de proveedores producto ( Oscar 2022 )
 	if($tabla == 'sys_configuracion_sistema' && $accion == 'actualizar'){
