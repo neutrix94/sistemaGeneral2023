@@ -976,7 +976,25 @@
 			Muestraerror($smarty, "", "3", mysql_error(), $sql, "contenido.php");
 		}
 	}
-
+/**/
+	if( $tabla == 'sys_impresoras_sucursales' ){
+		include( '../../conexionMysqli.php' );
+		include( '../especiales/controladores/SysImpresorasSucursales.php' );
+		$link->autocommit( false );
+		$SysImpresorasSucursales = new SysImpresorasSucursales( $link );
+		if( $accion == 'insertar' ){
+			$id = mysql_insert_id();
+			$SysImpresorasSucursales->crearRegistrosSincronizacionImpresorasSucursales( 'insert', 'sys_impresoras_sucursales', $id );
+		}
+		if( $accion == 'actualizar' ){
+			$SysImpresorasSucursales->crearRegistrosSincronizacionImpresorasSucursales( 'update', 'sys_impresoras_sucursales', $llave );
+		}
+		if( $accion == 'eliminar' ){
+			$SysImpresorasSucursales->crearRegistrosSincronizacionImpresorasSucursales( 'delete', 'sys_impresoras_sucursales', $llave );
+		}
+		$link->autocommit( true );
+	}
+/**/
 /*15. Actualiza prefijo de etiquetas de proveedores producto ( Oscar 2022 )
 	if($tabla == 'sys_configuracion_sistema' && $accion == 'actualizar'){
 		$sql = "UPDATE ec_proveedor_producto 
