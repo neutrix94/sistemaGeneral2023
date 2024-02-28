@@ -1037,7 +1037,7 @@
 				FROM(
 					SELECT
 						{$total_pagado} AS total,
-						p.total AS total_nota,
+						p.subtotal AS total_nota,
 						ROUND( p.total / p.subtotal, 6 ) AS porcentaje,
 						SUM( IF( sp.es_externo = 0, pd.monto-pd.descuento, 0 ) ) AS internal,
 						SUM( IF( sp.es_externo = 1, pd.monto-pd.descuento, 0 ) ) AS external
@@ -1049,7 +1049,7 @@
 					AND sp.id_sucursal = {$this->store_id}
 					WHERE pd.id_pedido = {$id_venta}
 				)ax";
-			//echo($sql);
+			//die($sql);
 			$stm = $this->link->query( $sql ) or die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
 			$row = $stm->fetch_assoc();
 			//$sql = "SELECT id_cajero_cobro, monto FROM ec_cajero_cobros WHERE id_pedido = {$id_venta}";
