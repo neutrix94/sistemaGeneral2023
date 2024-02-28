@@ -1364,13 +1364,13 @@ var hay_paquete=0;
                 aux[5]=precio;
                 aux[7]=precio*can2;
                 aux[4]=Mascara('$#,###.##', precio)
-                aux[6]=precio*can2;//Mascara('$#,###.##', precio*can2)
+                aux[6]=Mascara('$#,###.##', precio*can2);//habilitado de nuevo posr Oscar 2024-02-28 precio*can2;//Mascara('$#,###.##', precio*can2)
             }else{//modificacion Oscar 2023 para que no pida el precio si se recarga la pantalla
                precio = parseFloat(product_price);
                 aux[5]=precio;
                 aux[7]=precio*cant;
                 aux[4]=Mascara('$#,###.##', precio)
-                aux[6]=precio*cant;//Mascara('$#,###.##', precio*cant)
+                aux[6]=Mascara('$#,###.##', precio*cant);//precio*cant;//Mascara('$#,###.##', precio*cant)
                //alert( precio ); 
             }
         }
