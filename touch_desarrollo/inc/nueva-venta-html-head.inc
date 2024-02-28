@@ -540,9 +540,15 @@ function enlista_paquete(arreglo){
             for(i=0;i<filas.length-1;i++){
                 var monto="";
                 var celdas=filas[i+1].getElementsByTagName('td');
-                var aux=celdas[5].innerHTML.split('$');
-                var aux2=aux[1].split(",");            
-                
+                var aux = celdas[5].innerHTML.split('$');
+    /*Implementacion Oscar 2024-02-28 para correccion de error al agregar producto de ultimas piezas*/
+                var aux2;
+                if( celdas[5].innerHTML.includes( '$' ) ){
+                    aux2 = aux[1].split(",");            
+                }else{
+                    aux2 = aux[0].split(",");
+                }
+    /*fin de cambio Oscar 2024-02-28 para correccion de error al agregar producto de ultimas piezas*/
                 //alert("valor de celda: "+celdas[5].innerHTML+"celda_oculta_monto"+celdas[8].valor);
                 for(var j=0;j<aux2.length;j++){
                     monto+=""+aux2[j];   
