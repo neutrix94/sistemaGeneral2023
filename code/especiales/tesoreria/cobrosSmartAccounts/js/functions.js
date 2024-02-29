@@ -592,6 +592,7 @@ console.log( resp );
 			return false;
 		}	
 		var url = "ajax/db.php?fl=seekTerminalByQr&qr_txt=" + qr_txt;
+		url += "&session_id=" + $( '#session_id' ).val();
 		var resp = ajaxR( url ).split( '|' );
 		if( resp[0] != 'ok' ){
 			alert( "Error : \n" + resp );
