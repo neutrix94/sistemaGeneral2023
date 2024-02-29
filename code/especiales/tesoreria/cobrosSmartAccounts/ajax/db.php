@@ -217,7 +217,8 @@
 
 			case 'seekTerminalByQr' :
 				$qr_txt = ( isset( $_GET['qr_txt'] ) ? $_GET['qr_txt'] : $_POST['qr_txt'] );
-				echo $Payments->seekTerminalByQr( $qr_txt, $sucursal_id );
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				echo $Payments->seekTerminalByQr( $qr_txt, $sucursal_id, $session_id );
 
 			break;
 
@@ -573,17 +574,20 @@
 			return "ok|Pago registrado exitosamente!";
 		}
 
-		public function seekTerminalByQr( $qr_txt, $sucursal_id ){
+		public function seekTerminalByQr( $qr_txt, $sucursal_id, $session_id ){
 			$sql = "SELECT
 						a.id_afiliacion AS afiliation_id,
 						a.no_afiliacion AS afiliation_number
 					FROM ec_afiliaciones a
 					LEFT JOIN ec_afiliacion_sucursal afs
 					ON a.id_afiliacion = afs.id_afiliacion
-					WHERE a.no_afiliacion = '{$qr_txt}'";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar la afil;iacion  : {$this->link->error}" );
+					LEFT JOIN ec_sesion_caja_afiliaciones sca
+					ON sca.id_afiliacion = a.id_afiliacion
+					WHERE a.no_afiliacion = '{$qr_txt}'
+					AND sca.id_sesion_caja = {$session_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar la afiliacion en la sesion : {$this->link->error}" );
 			if( $stm->num_rows <= 0 ){
-				die( "La terminal '{$qr_txt}' no fue encontrada!" );
+				die( "La terminal '{$qr_txt}' no fue encontrada en la sesion de cajero actual, verifica y vuelve a intentar!" );
 			}else{
 				$row = $stm->fetch_assoc();
 				return "ok|" . json_encode( $row );
