@@ -635,7 +635,23 @@ include( '../especiales/plugins/inventory.php' );//implementación Oscar 2022
 							{
 								mysql_query("ROLLBACK");
 								Muestraerror($smarty, "", "3", mysql_error(), $sqGrids[$j], "contenido.php");
-							}/*else if( $subArray_madpp[1] != '' && $subArray_madpp[1] != null ){
+							}else if( $gridArray[$i][0] == 91 && $j > 0 ){
+								//die('here' . $sqGrids[$j] . " id : " . $id_modulo_usuario);
+								if(strpos( $sqGrids[$j], "INSERT" ) === 0 || strpos( $sqGrids[$j], "insert" ) === 0){//insercion
+									//echo 'entra';
+									$id_modulo_usuario = mysql_insert_id();
+									$sql_procedure = "CALL SincronizacionSysModulosImpresionUsuarios( 'insert', $id_modulo_usuario, $user_sucursal)";
+									mysql_query( $sql_procedure ) or die( "Error al insertar registro de sincronizacion por insercion : " . mysql_error() );
+								}else if(strpos( $sqGrids[$j], "UPDATE" ) === 0 || strpos( $sqGrids[$j], "update" ) === 0){//insercion
+									//echo 'here';
+									$tmp_upd_proc = explode( 'WHERE id_modulo_impresion_usuario=', $sqGrids[$j] );
+									$id_modulo_usuario = $tmp_upd_proc[1];
+									$sql_procedure = "CALL SincronizacionSysModulosImpresionUsuarios( 'update', $id_modulo_usuario, $user_sucursal)";
+									mysql_query( $sql_procedure ) or die( "Error al insertar registro de sincronizacion por actualizacion : " . mysql_error() );
+								}//die('here');
+							}
+							
+							/*else if( $subArray_madpp[1] != '' && $subArray_madpp[1] != null ){
 								if ( $subArray_madpp[1] == 'insert' ){
 									$eje_det_mov_alm_det = mysql_query( "SELECT last_insert_id()" );
 									$det_mov_alm_det = mysql_fetch_row( $eje_det_mov_alm_det );
