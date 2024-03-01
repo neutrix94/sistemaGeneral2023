@@ -295,3 +295,9 @@
 		$( '.emergent_content' ).html( content );
 		$( '.emergent' ).css( 'display', 'block' );
 	}
+//debug de Json Oscar 2024-03-1
+	function show_debug_json(){
+		$(".emergent_content").html(`<button onclick="close_emergent();">X</button><br><pre><code class="json">${debug_json}</code></pre>`);
+		$(".emergent").css("display","block");
+		hljs.highlightAll();
+	}
