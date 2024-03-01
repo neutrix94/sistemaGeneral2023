@@ -103,6 +103,15 @@
 	</div>
 <!-- Cancelaciones /reimpresiones manuales -->
 	<div class="reverse_form_btn">
+		
+		<button
+			type="button"
+			class="btn btn-info"
+			onclick="show_debug_json();"
+		>
+			<i class="icon-file-code"></i>
+		</button>
+
 		<button
 			type="button"
 			class="btn btn-success"
