@@ -672,6 +672,8 @@ console.log( resp );
 			if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
 				url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
 			}
+
+alert( url );
 			var resp = ajaxR( url ).split( '|' );
 			alert( "Respuesta : " + resp );
 			if( resp[0] != 'ok' ){
