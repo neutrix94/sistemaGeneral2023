@@ -679,7 +679,7 @@
 				$sale_id = $this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, ( $pago_por_saldo_a_favor * -1 )  );
 				$this->insertReturnPayment( $ammount, $sale_id, $user_id, $session_id, $id_venta_origen, true );
 
-			}else if( $ammount > 0 ){//die( "caso 2 : cobrar al cliente con dev o sin dev" );
+			}else if( $ammount > 0 ){
 			//	die( "Entra en este caso" );
 				//$ammount = 
 				if( $id_devolucion_relacionada != 0 ){
@@ -687,7 +687,7 @@
 					//die( "Entra en este caso" );
 				}else{
 					//die( "NO Entra en este caso" );
-				}
+				}//die( "caso 2 : cobrar al cliente con dev o sin dev" );
 				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
 				$this->insertPayment( $ammount, $sale_id, $user_id, $session_id );
 			}else if( $ammount < 0 ){
@@ -1086,6 +1086,12 @@
 		//actualiza la sesion de cabecera de devolucion
 			$sql = "UPDATE ec_devolucion SET id_cajero = {$id_cajero}, id_sesion_caja = {$id_sesion_caja} WHERE id_pedido = {$id_venta}";
 			$stm = $this->link->query( $sql ) or die( "Error al actualizar las cabeceras de devolucion : {$this->link->error}"  );
+		//actualiza la referencia de la devolucion 
+			$sql = "UPDATE ec_pedidos_referencia_devolucion SET monto_venta_mas_ultima_devolucion = total_venta WHERE id_pedido = {$id_venta}";
+			//echo ( $sql );
+			$stm = $this->link->query( $sql ) or die( "Error al actualizar la referencia de devolucion : {$this->link->error}"  );
+
+
 			$this->link->autocommit(true);
 		}
 
@@ -1208,7 +1214,7 @@
 			$sql = "UPDATE ec_devolucion_pagos 
 						SET id_cajero_cobro = {$id_cajero_cobro} 
 					WHERE id_devolucion_pago IN( {$devolucion_interna}, {$devolucion_externa} )";
-			$eje = $this->link->query($sql) or die( "Error al actualizar cajero cobro en devolucion : \n{$sql}\n{$this->link->error}" );	
+			$eje = $this->link->query($sql) or die( "Error al actualizar cajero cobro en devolucion : \n{$sql}\n{$this->link->error}" );
 //echo $sql . "<br><br>";
 		
 //$this->link->autocommit( true );
