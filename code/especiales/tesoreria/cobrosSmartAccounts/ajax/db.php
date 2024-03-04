@@ -229,6 +229,10 @@
 				$sale_id = ( isset( $_GET['sale_id'] ) ? $_GET['sale_id'] : $_POST['sale_id'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
+				$id_devolucion_relacionada = 0;
+				if( isset( $_GET['id_devolucion_relacionada'] ) || isset( $_POST['id_devolucion_relacionada'] ) ){
+					$id_devolucion_relacionada = ( isset( $_GET['id_devolucion_relacionada'] ) ? $_GET['id_devolucion_relacionada'] : $_POST['id_devolucion_relacionada'] );
+				}
 
 				$pago_por_saldo_a_favor = 0;
 				$id_venta_origen = 0;
@@ -239,7 +243,7 @@
 					$id_venta_origen = ( isset( $_GET['id_venta_origen'] ) ? $_GET['id_venta_origen'] : $_POST['id_venta_origen'] );
 				}
 
-				echo $Payments->setPaymentWhithouthIntegration( $afiliation_id, $ammount, $authorization_number, $sale_id, $session_id, $user_id, $pago_por_saldo_a_favor, $id_venta_origen );
+				echo $Payments->setPaymentWhithouthIntegration( $afiliation_id, $ammount, $authorization_number, $sale_id, $session_id, $user_id, $pago_por_saldo_a_favor, $id_venta_origen, $id_devolucion_relacionada );
 			break;
 
 			case 'getTicketsToReprint' :
@@ -497,8 +501,14 @@
 			die( 'ok|' );
 		}
 
-		public function setPaymentWhithouthIntegration( $afiliation_id, $ammount, $authorization_number, $sale_id, $session_id, $user_id, $pago_por_saldo_a_favor = 0, $id_venta_origen = 0 ){	
+		public function setPaymentWhithouthIntegration( $afiliation_id, $ammount, $authorization_number, $sale_id, $session_id, $user_id, $pago_por_saldo_a_favor = 0, $id_venta_origen = 0, $id_devolucion_relacionada = 0 ){	
 			$this->link->autocommit( false );
+				if( $id_devolucion_relacionada > 0 ){
+					//die( "Entra en reinsertaPagosPorDevolucionCaso2" );
+					$this->reinsertaPagosPorDevolucionCaso2( $sale_id, $user_id, $session_id, 'n/a', 0, 0 );
+				}else{
+					//die( "No Entra en reinsertaPagosPorDevolucionCaso2" );
+				}
 			//if( $pago_por_saldo_a_favor > 0 ){
 				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, $pago_por_saldo_a_favor );
 			//}

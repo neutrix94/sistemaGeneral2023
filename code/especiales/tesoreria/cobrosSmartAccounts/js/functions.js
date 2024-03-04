@@ -673,9 +673,9 @@ console.log( resp );
 				url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
 			}
 
-alert( url );
+//alert( url );
 			var resp = ajaxR( url ).split( '|' );
-			alert( "Respuesta : " + resp );
+//alert( "Respuesta : " + resp );
 			if( resp[0] != 'ok' ){
 				$( '.emergent_content' ).html( resp[1] );
 				$( '.emergent' ).css( 'display', 'block' );
@@ -726,6 +726,12 @@ alert( url );
 			url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
 		}
 		url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
+
+		if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
+			url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
+		}
+
+//alert( url );
 		var resp = ajaxR( url ).split( '|' );
 		if( resp[0] != 'ok' ){
 			alert( "Error : \n" + resp );
