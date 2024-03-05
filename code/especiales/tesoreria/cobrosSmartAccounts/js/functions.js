@@ -349,6 +349,23 @@ hljs.highlightAll();
 	
 	/*Agregar cheque o transferencia*/
 	function agrega_cheque_transferencia(){
+		//var url = "ajax/db.php?fl=";
+		var amount = $( '#monto_cheque_transferencia' ).val();
+		if( amount <= 0 ){
+			alert( "El monto no puede ir vacio!" );
+			return false;
+		}
+		var url = "ajax/db.php?fl=insertCashPayment&ammount=" + amount + "&tipo_pago=8";
+		url += "&session_id=" + $( '#session_id' ).val();
+		url += "&sale_id=" + $( '#id_venta' ).val();
+		if( respuesta.monto_saldo_a_favor > parseFloat( respuesta.total_real ) ){//tomar saldo a
+			url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
+		}
+		url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
+		if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
+			url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
+		}
+		alert( url ); return false;
 	//obtenemos el valor de la caja
 		var id_caja=$("#caja_o_cuenta").val();
 		if(id_caja==0){

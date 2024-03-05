@@ -42,9 +42,11 @@
 				$terminal_id = ( isset( $_GET['terminal_id'] ) ? $_GET['terminal_id'] : $_POST['terminal_id'] );
 				$counter = ( isset( $_GET['counter'] ) ? $_GET['counter'] : $_POST['counter'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				$id_devolucion_relacionada = 0;
+				$id_devolucion_relacionada = ( isset( $_GET['id_devolucion_relacionada'] ) ? $_GET['id_devolucion_relacionada'] : $_POST['id_devolucion_relacionada'] );
 			//consume servicio de venta
 				$req = $apiNetPay->salePetition( $apiUrl, $amount, $terminal_id, $user_id, 
-					$sucursal_id, $sale_folio, $session_id );
+					$sucursal_id, $sale_folio, $session_id, $id_devolucion_relacionada );
 	//die("here");
 				$resp = json_decode( $req );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
@@ -191,6 +193,7 @@
 				$pago_por_saldo_a_favor = 0;
 				$id_venta_origen = 0;
 				$id_devolucion_relacionada = 0;
+				$tipo_pago = 1;
 				if( isset( $_GET['pago_por_saldo_a_favor'] ) || isset( $_POST['pago_por_saldo_a_favor'] ) ){
 					$pago_por_saldo_a_favor = ( isset( $_GET['pago_por_saldo_a_favor'] ) ? $_GET['pago_por_saldo_a_favor'] : $_POST['pago_por_saldo_a_favor'] );
 				}
@@ -203,11 +206,14 @@
 				if( isset( $_GET['id_devolucion_relacionada'] ) || isset( $_POST['id_devolucion_relacionada'] ) ){
 					$id_devolucion_relacionada = ( isset( $_GET['id_devolucion_relacionada'] ) ? $_GET['id_devolucion_relacionada'] : $_POST['id_devolucion_relacionada'] );
 				}
+				if( isset( $_GET['tipo_pago'] ) || isset( $_POST['tipo_pago'] ) ){
+					$tipo_pago = ( isset( $_GET['tipo_pago'] ) ? $_GET['tipo_pago'] : $_POST['tipo_pago'] );
+				}
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				//if ( $ammount_permission == 0 ) {
 					$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
 				//}
-				echo $Payments->insertCashPayment( $ammount, $sale_id, $user_id, $session_id, $pago_por_saldo_a_favor, $id_venta_origen, $id_devolucion_relacionada );
+				echo $Payments->insertCashPayment( $ammount, $sale_id, $user_id, $session_id, $pago_por_saldo_a_favor, $id_venta_origen, $id_devolucion_relacionada, $tipo_pago );
 			break;
 
 			case 'getHistoricPayment' :
@@ -679,7 +685,7 @@
 			return "ok|{$resp}";
 		}
 
-		public function insertCashPayment( $ammount, $sale_id, $user_id, $session_id, $pago_por_saldo_a_favor = 0, $id_venta_origen = 0, $id_devolucion_relacionada = 0 ){
+		public function insertCashPayment( $ammount, $sale_id, $user_id, $session_id, $pago_por_saldo_a_favor = 0, $id_venta_origen = 0, $id_devolucion_relacionada = 0, $tipo_pago = 1 ){
 //die( "Monto : {$ammount} - pago_por_saldo_a_favor : $pago_por_saldo_a_favor - Id_venta Origen : {$id_venta_origen}" );
 			$this->link->autocommit( false );
 			//caso 0 : el cliente tiene saldo a favor, y su nueva nota es menor a su saldo a afavor
@@ -699,7 +705,7 @@
 					//die( "NO Entra en este caso" );
 				}//die( "caso 2 : cobrar al cliente con dev o sin dev" );
 				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
-				$this->insertPayment( $ammount, $sale_id, $user_id, $session_id );
+				$this->insertPayment( $ammount, $sale_id, $user_id, $session_id, $tipo_pago );
 			}else if( $ammount < 0 ){
 				//die( "caso 3 : devolver efectivo al cliente cuando no se agregan productos : {$sale_id}" );
 				//$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
@@ -709,7 +715,7 @@
 				//$ammount = 
 				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
 				if( $ammount != 0 ){
-					$this->insertPayment( $ammount, $sale_id, $user_id, $session_id );
+					$this->insertPayment( $ammount, $sale_id, $user_id, $session_id, $tipo_pago );
 				}
 			}
 			//$stm = $this->link->query( $sql ) or die( "Error al consultar la suma de los pagos : {$this->link->error}" );
