@@ -745,7 +745,7 @@
 			//$sql = "INSERT INTO ec_cajero_cobros";
 		}*/
 
-		public function insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, $saldo_especial = 0 ){
+		public function insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, $saldo_especial = 0, $id_caja_cuenta = -1 ){
 //echo "<br>INSERTPAYMENTDEPENDING<br>";
 			$total_devolver_cajero = 0;
 			$devolucion_interna = 0;
