@@ -194,6 +194,7 @@
 				$id_venta_origen = 0;
 				$id_devolucion_relacionada = 0;
 				$tipo_pago = 1;
+				$id_caja_cuenta = -1;
 				if( isset( $_GET['pago_por_saldo_a_favor'] ) || isset( $_POST['pago_por_saldo_a_favor'] ) ){
 					$pago_por_saldo_a_favor = ( isset( $_GET['pago_por_saldo_a_favor'] ) ? $_GET['pago_por_saldo_a_favor'] : $_POST['pago_por_saldo_a_favor'] );
 				}
@@ -209,11 +210,15 @@
 				if( isset( $_GET['tipo_pago'] ) || isset( $_POST['tipo_pago'] ) ){
 					$tipo_pago = ( isset( $_GET['tipo_pago'] ) ? $_GET['tipo_pago'] : $_POST['tipo_pago'] );
 				}
+				if( isset( $_GET['id_caja_cuenta'] ) || isset( $_POST['id_caja_cuenta'] ) ){
+					$id_caja_cuenta = ( isset( $_GET['id_caja_cuenta'] ) ? $_GET['id_caja_cuenta'] : $_POST['id_caja_cuenta'] );
+				}
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				//if ( $ammount_permission == 0 ) {
 					$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
 				//}
-				echo $Payments->insertCashPayment( $ammount, $sale_id, $user_id, $session_id, $pago_por_saldo_a_favor, $id_venta_origen, $id_devolucion_relacionada, $tipo_pago );
+				echo $Payments->insertCashPayment( $ammount, $sale_id, $user_id, $session_id, $pago_por_saldo_a_favor, $id_venta_origen, 
+					$id_devolucion_relacionada, $tipo_pago, $id_caja_cuenta );
 			break;
 
 			case 'getHistoricPayment' :
@@ -685,7 +690,8 @@
 			return "ok|{$resp}";
 		}
 
-		public function insertCashPayment( $ammount, $sale_id, $user_id, $session_id, $pago_por_saldo_a_favor = 0, $id_venta_origen = 0, $id_devolucion_relacionada = 0, $tipo_pago = 1 ){
+		public function insertCashPayment( $ammount, $sale_id, $user_id, $session_id, $pago_por_saldo_a_favor = 0, $id_venta_origen = 0, 
+			$id_devolucion_relacionada = 0, $tipo_pago = 1, $id_caja_cuenta = -1 ){
 //die( "Monto : {$ammount} - pago_por_saldo_a_favor : $pago_por_saldo_a_favor - Id_venta Origen : {$id_venta_origen}" );
 			$this->link->autocommit( false );
 			//caso 0 : el cliente tiene saldo a favor, y su nueva nota es menor a su saldo a afavor
@@ -705,7 +711,7 @@
 					//die( "NO Entra en este caso" );
 				}//die( "caso 2 : cobrar al cliente con dev o sin dev" );
 				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
-				$this->insertPayment( $ammount, $sale_id, $user_id, $session_id, $tipo_pago );
+				$this->insertPayment( $ammount, $sale_id, $user_id, $session_id, $tipo_pago, $id_caja_cuenta );
 			}else if( $ammount < 0 ){
 				//die( "caso 3 : devolver efectivo al cliente cuando no se agregan productos : {$sale_id}" );
 				//$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
@@ -715,7 +721,7 @@
 				//$ammount = 
 				$this->insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id );
 				if( $ammount != 0 ){
-					$this->insertPayment( $ammount, $sale_id, $user_id, $session_id, $tipo_pago );
+					$this->insertPayment( $ammount, $sale_id, $user_id, $session_id, $tipo_pago, $id_caja_cuenta );
 				}
 			}
 			//$stm = $this->link->query( $sql ) or die( "Error al consultar la suma de los pagos : {$this->link->error}" );
@@ -805,11 +811,11 @@
 				if( $saldo_especial == 0 ){
 					$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
 						monto, fecha, hora, observaciones, sincronizar) 
-					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, -1, 1, {$total_devolver_cajero}, NOW(), NOW(), '', 1)";
+					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$total_devolver_cajero}, NOW(), NOW(), '', 1)";
 				}else{
 					$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
 						monto, fecha, hora, observaciones, sincronizar) 
-					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, -1, 1, {$saldo_especial}, NOW(), NOW(), '', 1)";
+					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$saldo_especial}, NOW(), NOW(), '', 1)";
 					
 				}
 
@@ -838,14 +844,14 @@
 			}
 		}
 
-		public function insertPayment( $ammount, $sale_id, $user_id, $session_id, $type = 1 ){//$type = 1 ( efectivo )
+		public function insertPayment( $ammount, $sale_id, $user_id, $session_id, $type = 1, $id_caja_cuenta = -1 ){//$type = 1 ( efectivo )
 			//die( 'insertPayment' );
 //echo "<br>INSERTPAYMENT<br>";
 //echo $sql . "<br><br>";
 		//inserta el cobro del cajero en efectivo
 			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
 				monto, fecha, hora, observaciones, sincronizar ) 
-			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, -1, {$type}, {$ammount}, NOW(), NOW(), '', 1 )";
+			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, {$type}, {$ammount}, NOW(), NOW(), '', 1 )";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero en insertPayment : {$this->link->error}" );
 			$id_cajero_cobro = $this->link->insert_id;
 
@@ -1377,9 +1383,12 @@
 
 		public function getBoxesMoney( $store_id ){	
 			$resp = "";
-			$sql="SELECT bc.id_caja_cuenta,bc.nombre 
+			$sql="SELECT 
+					bc.id_caja_cuenta,
+					bc.nombre 
 				FROM ec_caja_o_cuenta bc
-				LEFT JOIN ec_caja_o_cuenta_sucursal bcs ON bc.id_caja_cuenta=bcs.id_caja_o_cuenta 
+				LEFT JOIN ec_caja_o_cuenta_sucursal bcs 
+				ON bc.id_caja_cuenta=bcs.id_caja_o_cuenta 
 				WHERE bcs.estado_suc=1
 				AND bcs.id_sucursal = '{$store_id}'";
 			//$eje=mysql_query( $sql )or die("Error al listar los bancos o cajas!!!<br>".mysql_error());
