@@ -23,6 +23,10 @@
             url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
         }
         url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
+        
+        if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
+			url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
+		}
         //alert( url );return false;
 		//url += "&user_id=" + user_id;
 		//alert( url );

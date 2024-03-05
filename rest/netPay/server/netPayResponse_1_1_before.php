@@ -1,5 +1,4 @@
 <?php
-header('Content-Type: text/html; charset=utf-8');
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 /*
@@ -17,21 +16,11 @@ $app->post('/', function (Request $request, Response $response){
   if( ! include( '../../code/especiales/tesoreria/cobrosSmartAccounts/ajax/db.php' ) ){//oscar 2024-02-15
     die( "Error al incluir libreria de cobros!" );
   }
-  //die( "here" );
 //obtener el json en txt 
-  /*$body = $request->getBody();
+  $body = $request->getBody();
   $file = fopen("test.txt","w");
   fwrite($file,"{$body}");
-  fclose($file);*/
-  //try{
-    $body = $request->getBody();
-    //var_dump( $body );
-    $file = fopen("archivo.txt", "w");
-    fwrite($file,"{$body}");
-    fclose($file);
-  //}catch( Exception e ){
-  //  die( "Error al escribir archivo txt : {$e}" );
-  //}
+  fclose($file);
 //respuesta
   $response_message = "Transaccion exitosa!";
 //recibe los parametros de netPay
@@ -52,14 +41,7 @@ $app->post('/', function (Request $request, Response $response){
   $hasPin = $request->getParam( "hasPin" );//15
   $hexSign = $request->getParam( "hexSign" );//16
   $isQps = $request->getParam( "isQps" );//17
-  
-  $message_ = $request->getParam( "message" );//utf8_encode($request->getParam( "message" ));//18
-  $message_ = str_replace( 'á', 'a', $message_ );
-  $message_ = str_replace( 'é', 'e', $message_ );
-  $message_ = str_replace( 'í', 'i', $message_ );
-  $message_ = str_replace( 'ó', 'o', $message_ );
-  $message_ = str_replace( 'ú', 'u', $message_ );
-  
+  $message = $request->getParam( "message" );//18
   $isRePrint = $request->getParam( "isRePrint" );//19
   $moduleCharge = $request->getParam( "moduleCharge" );//20
   $moduleLote = $request->getParam( "moduleLote" );//21
@@ -102,7 +84,7 @@ $app->post('/', function (Request $request, Response $response){
     /*41*/transactionId, /*42*/id_sucursal, /*43*/id_cajero, /*44*/folio_venta )
       VALUES( /*1*/NULL, /*2*/'{$affiliation}',/*3*/'{$applicationLabel}',/*4*/'{$arqc}',/*5*/'{$aid}',/*6*/'{$amount}',
     /*7*/'{$authCode}',/*8*/'{$bin}',/*9*/'{$bankName}',/*10*/'{$cardExpDate}',/*11*/'{$cardType}',/*12*/'{$cardTypeName}',/*13*/'{$cityName}',
-    /*14*/'{$responseCode}',/*15*/'{$folioNumber}',/*16*/'{$hasPin}',/*17*/'{$hexSign}',/*18*/'{$isQps}',/*19*/'{$message_}',/*20*/'{$isRePrint}',
+    /*14*/'{$responseCode}',/*15*/'{$folioNumber}',/*16*/'{$hasPin}',/*17*/'{$hexSign}',/*18*/'{$isQps}',/*19*/'{$message}',/*20*/'{$isRePrint}',
     /*21*/'{$moduleCharge}',/*22*/'{$moduleLote}',/*23*/'{$customerName}',/*24*/'{$terminalId}',/*25*/'{$orderId}',/*26*/'{$preAuth}',
     /*27*/'{$preStatus}',/*28*/'{$promotion}',/*29*/'{$rePrintDate}',/*30*/'{$rePrintMark}',/*31*/'{$reprintModule}',/*32*/'{$cardNumber}',
     /*33*/'{$storeName}',/*34*/'{$streetName}',/*35*/'{$ticketDate}',/*36*/'{$tipAmount}',/*37*/'{$tipLessAmount}',/*38*/'{$transDate}',
@@ -127,7 +109,7 @@ $app->post('/', function (Request $request, Response $response){
             /*16*/hasPin = '{$hasPin}',
             /*17*/hexSign = '{$hexSign}',
             /*18*/isQps = '{$isQps}',
-            /*19*/message = '{$message_}',
+            /*19*/message = '{$message}',
             /*20*/isRePrint = '{$isRePrint}',
             /*21*/moduleCharge = '{$moduleCharge}',
             /*22*/moduleLote = '{$moduleLote}',
@@ -157,11 +139,10 @@ $app->post('/', function (Request $request, Response $response){
             /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
           WHERE id_transaccion_netpay = '{$transactionId_internal}'";//$folioNumber
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
-  if( trim($message_) == 'Transaccion exitosa' ){
+  if( trim($message) == 'Transacción exitosa' ){
   //consulta los datos en relacion al numero de serie de la terminal
     $sql = "";
     if( isset( $traceability['smart_accounts'] ) && $traceability['smart_accounts'] == true ){
-      
       $sql = "SELECT
               t.id_terminal_integracion AS affiliation_id,
               cc.id_caja_cuenta AS bank_id,
@@ -177,7 +158,6 @@ $app->post('/', function (Request $request, Response $response){
             AND t.store_id = '{$traceability['store_id_netpay']}'";
 
     }else{
-    //  die( "here 1" );
       $sql = "SELECT 
                 a.id_afiliacion AS affiliation_id,
                 cc.id_caja_cuenta AS bank_id,
@@ -191,9 +171,9 @@ $app->post('/', function (Request $request, Response $response){
               ON a.id_banco = cc.id_caja_cuenta
               WHERE a.numero_serie_terminal = '{$terminalId}'";
     }
-  //  die( $sql );
-    $stm = $link->query( $sql ) or die( "Error al recuperar datos para insertar el cobro del cajero {$this->link->error}" );
+    $stm = $link->query( $sql ) or die( "Error al recuperar datos para insertar el cobro del cajero {$link->error}" );
     $row = $stm->fetch_assoc();
+
     //consulta entre interno y externo
         $sql = "SELECT
                   ROUND( ax.internal/ax.total, 6 ) AS internal_porcent,
@@ -210,17 +190,14 @@ $app->post('/', function (Request $request, Response $response){
                   WHERE pd.id_pedido = {$row['sale_id']}
                 )ax";
 //die( $sql );
-      $stm = $link->query( $sql ) or die( "Error al consultar porcentajes de pagos : {$sql} {$link->error}" );
+      $stm = $link->query( $sql ) or die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
   
-//die( "here2" );
 //die( "here 1.5" );
       $payment_row = $stm->fetch_assoc();//pagos de saldo a favor Oscar 2024-02-15
   
       $Payments = new Payments( $link, $traceability['id_sucursal'] );
       $Payments->insertPaymentsDepending( $amount, $row['sale_id'], $traceability['id_cajero'], $traceability['id_sesion_cajero'] );// $pago_por_saldo_a_favor
-      if( $traceability['id_devolucion_relacionada'] != 0 && $traceability['id_devolucion_relacionada'] != '' && $traceability['id_devolucion_relacionada'] != null ){
-        $Payments->reinsertaPagosPorDevolucionCaso2( $row['sale_id'], $traceability['id_cajero'], $traceability['id_sesion_cajero'], 'n/a', 0, 0 );
-      }
+  
       $internal_payment_id = '0';
       $external_payment_id = '0';
     //inserta pago interno    
@@ -302,9 +279,9 @@ fclose($fp);*/
   $link->autocommit( true );
   $resp = array(
     "code"=>"00",
-    "message"=>$message_
+    "message"=>$message
   );
   return json_encode( $resp );
-  //die('');
+  die('');
 });
 ?>

@@ -165,8 +165,7 @@
 			return $row;
 		}
 	//peticion de venta
-		public function salePetition(  $apiUrl, $amount = 0.01, $terminal_id, $user_id, $store_id, $sale_folio, $session_id ){
-			
+		public function salePetition(  $apiUrl, $amount = 0.01, $terminal_id, $user_id, $store_id, $sale_folio, $session_id, $id_devolucion_relacionada = 0 ){
 			$terminal = $this->getTerminal( $terminal_id, $store_id );
 			//var_dump( $terminal );
 			$token = $this->getToken( $terminal['terminal_serie'] );
@@ -184,7 +183,8 @@
 							"folio_venta"=>"{$sale_folio}", 
 							"id_sesion_cajero"=>"{$session_id}",
 							"smart_accounts"=>true,
-							"store_id_netpay"=>"{$terminal['store_id']}"
+							"store_id_netpay"=>"{$terminal['store_id']}",
+							"id_devolucion_relacionada"=>$id_devolucion_relacionada
 						),
 			            "serialNumber"=>"{$terminal['terminal_serie']}",
 			            "amount"=> $amount,
@@ -197,6 +197,11 @@
 			//var_dump($data);
 			//die( '' );
 			$post_data = json_encode( $data, true );
+/*Escribir json en txt*/
+$file = fopen("debug.txt", "w");
+fwrite($file, $post_data);
+fclose($file);
+/**/
 		//envia peticion
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
@@ -228,7 +233,7 @@
 					$sql = "DELETE FROM vf_tokens_terminales_netpay";
 					$stm = $this->link->query( $sql ) or die( "Error al eliminar tokens : {$this->link->error}" );
 					return $this->salePetition( $apiUrl, $amount = 0.01, $terminal['terminal_serie'], $user_id, 
-										$store_id, $sale_folio, $session_id );
+										$store_id, $sale_folio, $session_id, $id_devolucion_relacionada );
 					return false;
 				}
 			}
