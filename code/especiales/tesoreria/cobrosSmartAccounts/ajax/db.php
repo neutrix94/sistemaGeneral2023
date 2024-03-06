@@ -1503,7 +1503,7 @@
 			$stm = $this->link->query( $sql ) or die( "Error al re-insertar el cobro {$this->link->error}" );
 			$cobro_id = $this->link->insert_id;
 		//inserta cobro por anulacion
-			$sql = "UPDATE ec_pedido_pagos SET pago_cancelado = 1 WHERE id_cajero_cobro = {$payment_id}";
+			$sql = "UPDATE ec_pedido_pagos SET pago_cancelado = 1, referencia = 'Pago anulado por el usario' WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al anular el pago : {$this->link->error}" );
 			$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
 				id_nota_credito, id_cxc, exportado, es_externo, id_cajero, sincronizar, id_sesion_caja, pago_cancelado )
