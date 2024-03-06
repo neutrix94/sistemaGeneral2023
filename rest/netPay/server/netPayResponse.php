@@ -192,7 +192,7 @@ $app->post('/', function (Request $request, Response $response){
               WHERE a.numero_serie_terminal = '{$terminalId}'";
     }
   //  die( $sql );
-    $stm = $link->query( $sql ) or die( "Error al recuperar datos para insertar el cobro del cajero {$this->link->error}" );
+    $stm = $link->query( $sql ) or die( "Error al recuperar datos para insertar el cobro del cajero {$link->error}" );
     $row = $stm->fetch_assoc();
     //consulta entre interno y externo
         $sql = "SELECT
@@ -263,6 +263,9 @@ $app->post('/', function (Request $request, Response $response){
     /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1, 
     /*11*/{$traceability['id_sesion_cajero']}, /*12*/7 )";
 //    error_log( $sql );
+//actualiza el id de sesion de caja del pedido 
+    $sql = "UPDATE ec_pedidos SET id_cajero = {$traceability['id_cajero']}, id_sesion_caja = {$traceability['id_sesion_cajero']} WHERE id_pedido = {$row['sale_id']}";
+    $stm_pedido = $link->query( $sql ) or die( "Error al actualizar ids de cajero y sesion de caja desde Webhook : {$link->error}" );
 //actualiza el cajero de los cobros
     $stm = $link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$link->error}" );
     $paymet_id = $link->insert_id;
