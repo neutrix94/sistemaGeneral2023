@@ -618,13 +618,19 @@
 		public function getHistoricPayment( $sale_id ){
 			$resp = "";
 			$amount_payed = 0;
+		//verifica si el cobro fue finalizado
+			$sql = "SELECT cobro_finalizado FROM ec_pedidos WHERE id_pedido = {$sale_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar status de cobro en pedido : {$this->link->error}" );
+			$sale_row = $stm->fetch_assoc();
 			$sql = "SELECT
 						cc.id_cajero_cobro AS payment_id,
 						cc.monto AS amount,
 						tp.nombre AS payment_type,
 						CONCAT( cc.fecha, ' ', cc.hora ) AS datetime,
 						cc.id_terminal AS terminal_id,
-						cc.observaciones
+						cc.observaciones,
+						cc.cobro_cancelado,
+						cc.id_tipo_pago
 					FROM ec_cajero_cobros cc
 					LEFT JOIN ec_tipos_pago tp
 					ON cc.id_tipo_pago = tp.id_tipo_pago
@@ -644,16 +650,28 @@
 				while( $row = $stm->fetch_assoc() ){
 					$color = "";
 					$aux_row = array();
+					$disabled = "";
+					if( $row['cobro_cancelado'] == 1 ){
+						$disabled = "disabled";
+					}
+					$onclick = "delete_payment_saved( {$row['payment_id']}, {$sale_id} );";
+					if( $sale_row['cobro_finalizado'] == 1 || $sale_row['cobro_finalizado'] == '1' ){
+						$onclick = "alert( 'El cobro ya fue finalizado y no es posible eliminar pagos!' );return false;";
+					}
 					$button = "<button
 								type=\"button\"
 								class=\"btn btn-danger\"
-								onclick=\"delete_payment_saved( {$row['payment_id']}, {$sale_id} );\"
+								onclick=\"{$onclick}\"
 								style=\"padding : 0px !important;\"
+								{$disabled}
 							>
 								<i class=\"icon-cancel-circle\"></i>
 							</button>";
 					if( $row['amount'] < 0 ){
-						$row['payment_type'] = "Devuelto al cliente";
+						if( $row['id_tipo_pago'] != 3 ){
+							$row['payment_type'] = "Devuelto al cliente";
+						}
+							
 						$color = "class=\"text-danger\"";
 					}
 					if( $row['terminal_id'] > 0 ){
@@ -1457,10 +1475,59 @@
 		}
 
 		public function delete_payment_saved( $payment_id ){
-			$sql = "DELETE FROM ec_pedido_pagos WHERE id_cajero_cobro = {$payment_id}";
-			$tm = $this->link->query( $sql ) or die( "Error al eliminar pago : {$this->link->error}" );
-			$sql = "DELETE FROM ec_cajero_cobros WHERE id_cajero_cobro = {$payment_id}";
-			$tm = $this->link->query( $sql ) or die( "Error al eliminar el cobro del cajero : {$this->link->error}" );
+			$this->link->autocommit( false );
+				//	$sql = "DELETE FROM ec_pedido_pagos WHERE id_cajero_cobro = {$payment_id}";
+				//$sql = "DELETE FROM ec_cajero_cobros WHERE id_cajero_cobro = {$payment_id}";
+		//anula cobro
+			$sql = "UPDATE ec_cajero_cobros SET cobro_cancelado = 1 WHERE id_cajero_cobro = {$payment_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al anular el cobro del cajero : {$this->link->error}" );
+			$sql = "INSERT INTO ec_cajero_cobros ( id_sucursal, id_pedido, id_devolucion, id_cajero, id_sesion_caja, id_afiliacion, id_terminal, id_banco, id_tipo_pago, 
+				monto, fecha, hora, observaciones, cobro_cancelado, sincronizar ) 
+				SELECT 
+					id_sucursal, 
+					id_pedido, 
+					id_devolucion, 
+					id_cajero, 
+					id_sesion_caja, 
+					id_afiliacion, 
+					id_terminal, 
+					id_banco, 
+					3, 
+					(monto*-1), 
+					NOW(), 
+					NOW(), 
+					CONCAT( 'Cobro para anular el cobro ', id_cajero_cobro ), 
+					1, 
+					1
+				FROM ec_cajero_cobros WHERE id_cajero_cobro = {$payment_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al re-insertar el cobro {$this->link->error}" );
+			$cobro_id = $this->link->insert_id;
+		//inserta cobro por anulacion
+			$sql = "UPDATE ec_pedido_pagos SET pago_cancelado = 1 WHERE id_cajero_cobro = {$payment_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al anular el pago : {$this->link->error}" );
+			$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
+				id_nota_credito, id_cxc, exportado, es_externo, id_cajero, sincronizar, id_sesion_caja, pago_cancelado )
+				SELECT
+					id_pedido, 
+					{$cobro_id}, 
+					3, 
+					NOW(), 
+					NOW(), 
+					(monto * -1), 
+					CONCAT( 'Pago para anular el pago ', id_pedido_pago ), 
+					id_moneda, 
+					tipo_cambio, 
+					id_nota_credito, 
+					id_cxc, 
+					exportado, 
+					es_externo, 
+					id_cajero, 
+					sincronizar, 
+					id_sesion_caja, 
+					1
+				FROM ec_pedido_pagos WHERE id_cajero_cobro = {$payment_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al re-insertar el pago {$this->link->error}" );
+			$this->link->autocommit( true );
 			die( 'ok' );
 		}
 //Afiliaciones
