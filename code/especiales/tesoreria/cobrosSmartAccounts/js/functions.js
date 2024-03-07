@@ -848,7 +848,7 @@ console.log( resp );
 			alert( resp );
 		}else{
 			alert( "Terminal agregada exitosamente." );
-			getAfiliacionesForm();//recarga emergente de afiliaciones
+			getTerminalesForm();//recarga emergente de afiliaciones
 		}
 	}
 

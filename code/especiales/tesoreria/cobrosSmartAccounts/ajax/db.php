@@ -274,7 +274,7 @@
 //afiliaciones
 			case 'obtenerListaAfiliaciones' :
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
-				echo $Payments->obtenerListaAfiliaciones( $session_id, $user_id );
+				echo $Payments->obtenerListaAfiliaciones( $session_id, $user_id, $user_sucursal );
 			break;
 
 			case 'obtenerListaAfiliacionesActuales':
@@ -324,7 +324,7 @@
 	//terminales
 			case 'obtenerListaTerminales' :
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
-				echo $Payments->obtenerListaTerminales( $session_id, $user_id );
+				echo $Payments->obtenerListaTerminales( $session_id, $user_id, $user_sucursal );
 			break;
 
 			case 'obtenerListaTerminalesActuales':
@@ -1304,17 +1304,17 @@
 					tis.id_terminal_integracion AS afiliation_id,
 					CONCAT( tis.nombre_terminal, ' - terminal : ', tis.numero_serie_terminal, ' - storeId :', tis.store_id ) AS afiliation_number
 				FROM ec_terminales_integracion_smartaccounts tis
-				LEFT JOIN ec_terminales_cajero_smartaccounts tcs
-				ON tis.id_terminal_integracion = tcs.id_terminal
+				/*LEFT JOIN ec_terminales_cajero_smartaccounts tcs
+				ON tis.id_terminal_integracion = tcs.id_terminal*/
 				LEFT JOIN ec_terminales_sucursales_smartaccounts tss
-				ON tss.id_terminal = tcs.id_terminal
+				ON tss.id_terminal = tis.id_terminal_integracion
 				LEFT JOIN vf_razones_sociales_emisores rse
 				ON rse.id_razon_social = tss.id_razon_social
 				LEFT JOIN ec_sesion_caja_terminales sct
 				ON sct.id_terminal = tis.id_terminal_integracion
-				WHERE tcs.id_cajero = '{$user_id}' 
+				WHERE /*tcs.id_cajero = '{$user_id}' 
 				AND tcs.activo = 1
-				AND tss.estado_suc = 1
+				AND */tss.estado_suc = 1
 				AND tss.id_sucursal = {$store_id}
 				AND sct.id_sesion_caja = {$session_id}
 				AND sct.habilitado = 1";
@@ -1503,7 +1503,7 @@
 			$stm = $this->link->query( $sql ) or die( "Error al re-insertar el cobro {$this->link->error}" );
 			$cobro_id = $this->link->insert_id;
 		//inserta cobro por anulacion
-			$sql = "UPDATE ec_pedido_pagos SET pago_cancelado = 1, referencia = 'Pago anulado por el usario' WHERE id_cajero_cobro = {$payment_id}";
+			$sql = "UPDATE ec_pedido_pagos SET pago_cancelado = 1, referencia = 'Pago anulado por el usuario' WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al anular el pago : {$this->link->error}" );
 			$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
 				id_nota_credito, id_cxc, exportado, es_externo, id_cajero, sincronizar, id_sesion_caja, pago_cancelado )
@@ -1531,20 +1531,24 @@
 			die( 'ok' );
 		}
 //Afiliaciones
-		public function obtenerListaAfiliaciones( $session_id, $user_id ){
+		public function obtenerListaAfiliaciones( $session_id, $user_id, $store_id ){
 			$resp = "<select class=\"form-select\" id=\"afiliacion_combo_tmp\">
 			<option value=\"0\">--Seleccionar--</option>";
 			$sql = "SELECT 
 					a.id_afiliacion AS afiliation_id,
 					a.no_afiliacion AS afiliation_number
 				FROM ec_afiliaciones a
-				LEFT JOIN ec_afiliaciones_cajero ac 
-				ON ac.id_afiliacion=a.id_afiliacion
+				/*LEFT JOIN ec_afiliaciones_cajero ac 
+				ON ac.id_afiliacion=a.id_afiliacion*/
+				LEFT JOIN ec_afiliacion_sucursal afs
+				ON afs.id_afiliacion = a.id_afiliacion
 				LEFT JOIN ec_sesion_caja_afiliaciones sca
 				ON sca.id_afiliacion = a.id_afiliacion
-				WHERE ac.id_cajero='{$user_id}'
-				AND sca.id_afiliacion IS NULL 
-				AND ac.activo=1";
+				AND sca.id_sesion_caja = {$session_id}
+				WHERE /*ac.id_cajero='{$user_id}'
+				AND */sca.id_afiliacion IS NULL 
+				AND afs.estado_suc=1
+				AND afs.id_sucursal = {$store_id}";//echo $sql;
 			$stm = $this->link->query( $sql ) or die( "Error al consultar las terminales : {$this->link->error}" );
 			while( $row = $stm->fetch_assoc() ){
 				$resp .= "<option value=\"{$row['afiliation_id']}\">{$row['afiliation_number']}</option>";
@@ -1598,30 +1602,21 @@
 		}
 
 	//Terminales
-		public function obtenerListaTerminales( $session_id, $user_id ){
+		public function obtenerListaTerminales( $session_id, $user_id, $store_id ){
 			$resp = "<select class=\"form-select\" id=\"terminal_combo_tmp\">
 			<option value=\"0\">--Seleccionar--</option>";
-			/*$sql = "SELECT 
-					tis.id_terminal_integracion AS teminal_id,
-					tis.nombre_terminal AS terminal_name
-				FROM ec_terminales_integracion_smartaccounts tis
-				LEFT JOIN ec_terminales_cajero_smartaccounts tcs 
-				ON tis.id_terminal_integracion = tcs.id_terminal
-				LEFT JOIN ec_sesion_caja_terminales sct
-				ON sct.id_terminal = tis.id_terminal_integracion
-				WHERE sct.id_cajero = '{$user_id}'
-				AND sct.id_sesion_caja = '{$session_id}'
-				AND sct.id_terminal IS NULL";//AND ts.activo=1
-			die($sql);*/
 			$sql = "SELECT
 						tis.id_terminal_integracion AS teminal_id,
 						tis.nombre_terminal AS terminal_name
 					FROM ec_terminales_integracion_smartaccounts tis
-					LEFT JOIN ec_terminales_cajero_smartaccounts tcs 
-					ON tis.id_terminal_integracion = tcs.id_terminal
+					LEFT JOIN ec_terminales_sucursales_smartaccounts tss
+					ON tss.id_terminal = tis.id_terminal_integracion
+					/*LEFT JOIN ec_terminales_cajero_smartaccounts tcs 
+					ON tis.id_terminal_integracion = tcs.id_terminal*/
 					WHERE tis.id_terminal_integracion NOT IN( SELECT id_terminal FROM ec_sesion_caja_terminales WHERE id_sesion_caja = '{$session_id}' )
-					AND tcs.id_cajero = '{$user_id}'
-					AND tcs.activo = 1";
+					/*AND tcs.id_cajero = '{$user_id}'*/
+					AND tss.estado_suc = 1
+					AND tss.id_sucursal = {$store_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar las terminales : {$this->link->error}" );
 			while( $row = $stm->fetch_assoc() ){
 				$resp .= "<option value=\"{$row['teminal_id']}\">{$row['terminal_name']}</option>";
