@@ -267,6 +267,9 @@ $CONSULTAS_SQL[] = array( "CONSULTA_DEVOLUCION_RELACIONADA"=>$CONSULTA_DEVOLUCIO
 		$cambio=$_POST['camb'];
 		$monto_total_pagos=0;
 		$session_id = $_POST['session_id'];
+	//actualiza a cobro finalizado
+		$sql = "UPDATE ec_pedidos SET cobro_finalizado = 1 WHERE id_pedido = {$id_pedido}";
+		$stm = mysql_query( $sql ) or die( "Error al actual;izar venta a cobro finalizado : " . mysql_error() );
 	//actualiza devolucion si es el caso
 		$sql_dev = "SELECT id_devolucion FROM ec_devolucion WHERE id_pedido = {$id_pedido} AND id_sesion_caja = 0";
 

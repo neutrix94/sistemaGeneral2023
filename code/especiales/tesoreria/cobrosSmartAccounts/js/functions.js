@@ -1,6 +1,8 @@
 
 var total_cobros=0,monto_real=0;
 var respuesta = null;
+var debug_json = "";
+
 	function link(flag){
 		if(flag==1 && confirm("Realmente desea regresar al panel?")==true){
 			location.href='../../../../index.php?';
@@ -177,7 +179,7 @@ var respuesta = null;
 					}else{//devolucion
 						$( '#cards_container' ).css( 'display', 'none' );
 					}
-/*Oscar 2024-02-08*
+/*Oscar 2024-02-08*/
 aux[1] = aux[1].replaceAll(`\r\n\t\t\t\t\t`, `\n`);
 aux[1] = aux[1].replaceAll(`\r\n\t\t\t\t`, `\n`);
 aux[1] = aux[1].replaceAll(`\r\n\t\t\t`, `\n`);
@@ -186,9 +188,9 @@ aux[1] = aux[1].replaceAll(`\\r\\n`, `\n`);
 aux[1] = aux[1].replaceAll(`,"`, `,\n"`);
 aux[1] = aux[1].replaceAll(`,{`, `,\n{`);
 
+debug_json = aux[1];
 
-
-$(".emergent_content").html(`<button onclick="close_emergent();">X</button><br><pre><code class="json">${aux[1]}</code></pre>`);
+/*$(".emergent_content").html(`<button onclick="close_emergent();">X</button><br><pre><code class="json">${aux[1]}</code></pre>`);
 $(".emergent").css("display","block");
 hljs.highlightAll();
 //hljs.initHighlightingOnLoad();
@@ -347,6 +349,41 @@ hljs.highlightAll();
 	
 	/*Agregar cheque o transferencia*/
 	function agrega_cheque_transferencia(){
+		var id_caja_cuenta = $( '#caja_o_cuenta' ).val();
+		if( id_caja_cuenta <= 0 ){
+			alert( "Es necesario que elijas una caja o cuenta correcta para continuar!" );
+			$( '#tarjeta_0' ).focus();
+			return false;
+		}
+		var amount = $( '#monto_cheque_transferencia' ).val();
+		if( amount <= 0 ){
+			alert( "El monto no puede ir vacio!" );
+			return false;
+		}
+		var url = "ajax/db.php?fl=insertCashPayment&ammount=" + amount + "&tipo_pago=8";
+		url += "&id_caja_cuenta=" + id_caja_cuenta;
+		url += "&session_id=" + $( '#session_id' ).val();
+		url += "&sale_id=" + $( '#id_venta' ).val();
+		if( respuesta.monto_saldo_a_favor > parseFloat( respuesta.total_real ) ){//tomar saldo a
+			url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
+		}
+		url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
+		if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
+			url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
+		}
+		url += "&tipo_pago=8";
+		//alert( url );return false;
+		var resp = ajaxR( url );
+		//alert( resp );
+		if( resp == 'ok|' ){
+			alert( "Pago agregado con exito!" );
+			carga_pedido(  $( '#id_venta' ).val()  );
+			$( '#caja_o_cuenta' ).val( '' );
+		}else{
+			alert( "Error : " + resp );
+		}
+		return false;
+		//lert( url ); return false;
 	//obtenemos el valor de la caja
 		var id_caja=$("#caja_o_cuenta").val();
 		if(id_caja==0){
@@ -592,6 +629,7 @@ console.log( resp );
 			return false;
 		}	
 		var url = "ajax/db.php?fl=seekTerminalByQr&qr_txt=" + qr_txt;
+		url += "&session_id=" + $( '#session_id' ).val();
 		var resp = ajaxR( url ).split( '|' );
 		if( resp[0] != 'ok' ){
 			alert( "Error : \n" + resp );
@@ -669,8 +707,10 @@ console.log( resp );
 			if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
 				url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
 			}
+
+//alert( url );
 			var resp = ajaxR( url ).split( '|' );
-			alert( "Respuesta : " + resp );
+//alert( "Respuesta : " + resp );
 			if( resp[0] != 'ok' ){
 				$( '.emergent_content' ).html( resp[1] );
 				$( '.emergent' ).css( 'display', 'block' );
@@ -721,6 +761,12 @@ console.log( resp );
 			url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
 		}
 		url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
+
+		if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
+			url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
+		}
+
+//alert( url );
 		var resp = ajaxR( url ).split( '|' );
 		if( resp[0] != 'ok' ){
 			alert( "Error : \n" + resp );
@@ -802,7 +848,7 @@ console.log( resp );
 			alert( resp );
 		}else{
 			alert( "Terminal agregada exitosamente." );
-			getAfiliacionesForm();//recarga emergente de afiliaciones
+			getTerminalesForm();//recarga emergente de afiliaciones
 		}
 	}
 
