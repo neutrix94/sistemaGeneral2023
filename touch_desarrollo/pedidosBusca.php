@@ -414,4 +414,15 @@
        die( 'ok' );
     }
 
+    if( $tipo == 8 ){
+      $id_pedido = $_GET['id_pedido'];
+      $sql = "SELECT id_devolucion FROM ec_devolucion WHERE id_pedido = {$id_pedido} AND id_cajero = 0 AND id_sesion_caja = 0";
+      $stm = mysql_query( $sql ) or die( "Error al consultar si hay devolucion pendiente : " . mysql_error() );
+      if( mysql_num_rows( $stm ) > 0 ){
+        die( "Esta venta tiene una devolucion pendiente, ve a cobrarla para continuar con la siguiente devolucion para esta venta!" );
+      }else{
+        die( "ok" );
+      }
+    }
+
 ?>

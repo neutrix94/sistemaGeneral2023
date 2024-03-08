@@ -228,7 +228,13 @@
                 alert('Debe elegir un pedido primero');
                 return false;
             }
-            
+          /*implementacion Oscar 2024-03-07 para validar que no se haga devolucion sobre una misma nota cuya devolucion no ah pasado por pantalla de cobros*/
+            var url = "pedidosBusca.php?tipo=8&id_pedido=" + id_pedido;
+            var resp = ajaxR( url );
+            if( resp.trim() != 'ok' ){
+              alert( resp );
+              return false;
+            }
             was_validated = ( $( '#notasDev_5_0'  ).attr( 'valor' ) == "<i class='icon-cancel-circled' style='color : red;'></i>" ? 0 : 1 );
             var num=NumFilas('pagosDev');
             var dets="";
