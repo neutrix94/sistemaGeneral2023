@@ -586,11 +586,11 @@
         }
         $ticket->Output( "../../{$ruta_salida}/{$nombre_ticket}", "F" );
         /*Sincronización remota de tickets*/
-    		if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
+    		/*if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota
           $registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
           }else{//impresion por red local
           $enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( $tipo_modulo, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id );
-        }
+        }*/
         /*Sincronización remota de tickets*
         if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota
             $registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
@@ -602,7 +602,7 @@
         }
 /*Fin de cambio Oscar 03.03.2019*/
       //$ticket->Output("../../cache/ticket/".$nombre_ticket, "F");
-        die( 'ok' );
+       // die( 'ok' );
       
 /*implementacion Oscar 2023/09/20 para enviar impresion remota*/
       if($user_tipo_sistema=='linea'){/*
