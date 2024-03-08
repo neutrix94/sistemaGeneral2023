@@ -6,18 +6,18 @@
     define('FPDF_FONTPATH','../../include/fpdf153/font/');
     
     include("../../include/fpdf153/fpdf.php");
-    
-
+    $devoluciones = array();
+  
 /*implementación Oscar 25.01.2019 para sacar rutas de tickets*/
   $archivo_path = "../../conexion_inicial.txt";
   if(file_exists($archivo_path)){
     $file = fopen($archivo_path,"r");
     $line=fgets($file);
     fclose($file);
-      $config=explode("<>",$line);
-      $tmp=explode("~",$config[2]);
-      $ruta_or=$tmp[0];
-      $ruta_des=$tmp[1];
+    $config=explode("<>",$line);
+    $tmp=explode("~",$config[2]);
+    $ruta_or=$tmp[0];
+    $ruta_des=$tmp[1];
   }else{
     die("No hay archivo de configuración!!!");
   }
@@ -30,10 +30,13 @@
   }
 /*implementación Oscar 2021 para validar contraseña al devolver efectivo*/
   if ( isset( $password_encargado ) ){
-    $sql="SELECT COUNT(u.id_usuario) 
-        FROM sys_users u 
-        LEFT JOIN sys_sucursales suc ON u.id_usuario=suc.id_encargado
-              WHERE suc.id_sucursal=$user_sucursal AND u.contrasena=md5('$password_encargado')";
+    $sql="SELECT 
+            COUNT(u.id_usuario) 
+          FROM sys_users u 
+          LEFT JOIN sys_sucursales suc 
+          ON u.id_usuario = suc.id_encargado
+          WHERE suc.id_sucursal = {$user_sucursal} 
+          AND u.contrasena = md5( '{$password_encargado}' )";
              // die($sql);
     $eje=mysql_query($sql)or die("Error al consultar verificación de usuario!!!\n\n".$sql."\n\n".mysql_error());
     $r=mysql_fetch_row($eje);
@@ -233,15 +236,88 @@
         mysql_free_result($rs);
     }
   }//fin de si no existe variable de devolucion
-
 /*implementacion Oscar 25.06.2019 para generar folio del ticket original devolucion*/
   else{
+  //consulta si tiene devolucion pendientes de pasar por la pantalla de cobros
+    $sql = "SELECT
+      d.folio AS folio_devolucion,
+      p.folio_nv AS folio_venta_original,
+      CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS vendedor
+    FROM ec_devolucion d
+    LEFT JOIN ec_devolucion_detalle dd
+    ON dd.id_devolucion = d.id_devolucion
+    LEFT JOIN ec_pedidos p 
+    ON p.id_pedido = d.id_pedido
+    LEFT JOIN sys_users u 
+    ON u.id_usuario = p.id_usuario
+    WHERE d.id_pedido = '{$_GET['id_pedido_original']}'
+    AND d.id_cajero = 0
+    AND d.id_sesion_caja = 0
+    GROUP BY d.id_pedido";
+    $stm = mysql_query( $sql ) or die( "Error al consultar si hay devolucion pendiente : " . mysql_error() );
+    
+    if( mysql_num_rows( $stm ) > 0 ){
+      $id_pedido_devolucion = $_GET['id_pedido_original'];
+      $row = mysql_fetch_assoc( $stm );
+      $devolucion = $row;
+    //consulta el detalle
+      $dev_detail = "SELECT 
+        aux.id_producto,
+        aux.producto,
+        aux.cantidad,
+        aux.precio,
+        aux.monto,
+        aux.descuento,
+        aux.porc_desc,
+        IF(s.mostrar_ubicacion=1 Or s.mostrar_alfanumericos=1,1,0) as infoAdicional,
+        CONCAT(
+        IF(s.mostrar_ubicacion=1 AND sp.ubicacion_almacen_sucursal!='',CONCAT('Ubicación: ',sp.ubicacion_almacen_sucursal,' | '),''),
+          IF(s.mostrar_alfanumericos=1,CONCAT('Clave: ',aux.clave),'')
+        ) as info
+      FROM(
+        SELECT
+        P.id_productos AS id_producto,
+        P.nombre AS producto,
+        P.clave,
+        IF(prd.id_producto IS NULL, dd.cantidad , ROUND( dd.cantidad / prd.cantidad ) ) AS cantidad,
+        dp.precio AS precio,
+        ( IF(prd.id_producto IS NULL, dd.cantidad , ROUND( dd.cantidad / prd.cantidad ) )*dp.precio)
+          -((IF(prd.id_producto IS NULL, dd.cantidad , ROUND( dd.cantidad / prd.cantidad ) )*dp.precio)
+          *
+          (IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100)) AS monto,
+        IF(dp.descuento=0,0,dp.descuento/dp.cantidad) AS descuento,
+        (IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal)/100)*(dd.cantidad*dp.precio)) AS porc_desc
+        FROM ec_devolucion_detalle dd 
+        INNER JOIN ec_devolucion d  
+        ON dd.id_devolucion = d.id_devolucion
+        INNER JOIN ec_pedidos_detalle dp  
+        ON dp.id_pedido_detalle = dd.id_pedido_detalle
+        LEFT JOIN ec_pedidos pe ON pe.id_pedido=dp.id_pedido
+        INNER JOIN  ec_productos P
+        ON dp.id_producto = P.id_productos
+        LEFT JOIN ec_productos_detalle prd
+        ON prd.id_producto = dp.id_producto
+        WHERE d.id_pedido IN( {$id_pedido_devolucion} )
+        AND d.id_sesion_caja = 0
+        AND d.id_cajero = 0
+      )aux
+      LEFT JOIN sys_sucursales_producto sp ON aux.id_producto=sp.id_producto
+      JOIN sys_sucursales s ON sp.id_sucursal=s.id_sucursal AND sp.id_sucursal={$user_sucursal}";
+      $dev_stm = mysql_query( $dev_detail ) or die( "Error al consultar el detalle de los prouctos devueltos : " . mysql_error() );
+      if( mysql_num_rows( $dev_stm ) > 0 ){
+        $devolucion['detail'] = array();
+        while( $dev_row = mysql_fetch_assoc( $dev_stm ) ){
+          array_push( $devolucion['detail'], $dev_row );
+        }
+        //$dev_row['detail']
+      }
+    }
   //extraemos el folio del pedido original
-        $qry_fol_pd=mysql_query("SELECT p.folio_nv,p.pagado FROM ec_pedidos p WHERE p.id_pedido IN($id_pedido_original) LIMIT 1")or die("Error al consultar folio de pedido!!!\n\n".mysql_error());
-        $row_fol=mysql_fetch_row($qry_fol_pd);
-        $folio_pedido_original=$row_fol[0];
-        $pedido_pagado=$row_fol[1];
-     //   die($folio_pedido_original);
+    $qry_fol_pd=mysql_query("SELECT p.folio_nv,p.pagado FROM ec_pedidos p WHERE p.id_pedido IN($id_pedido_original) LIMIT 1")or die("Error al consultar folio de pedido!!!\n\n".mysql_error());
+    $row_fol=mysql_fetch_row($qry_fol_pd);
+    $folio_pedido_original=$row_fol[0];
+    $pedido_pagado=$row_fol[1];
+  //   die($folio_pedido_original);
 /*Fin de cambio Oscar 25.06.2019*/
   }
 
@@ -367,6 +443,31 @@
         
         $ticket->SetXY(7, $y);
         $ticket->MultiCell(66*0.63, 4, utf8_decode("{$producto["producto"]}"), "", "L", false);
+  /*implementación Oscar 10.10.2018 para imprimir ubicación y clave_proveedor en ticket*/
+      if($producto['infoAdicional']==1){
+        $ticket->SetFont('Arial','',$bF-3.5);
+        $ticket->SetXY(5,($ticket->GetY()-1.5));
+        $ticket->MultiCell(66*0.63, 4, utf8_decode("{$producto["info"]}"), "", "L", false);
+      }
+      $ticket->SetFont('Arial','',$bF-2);
+  /*fin de cambio 10.10.2018*/
+      
+      $total_de_devolucion+=$producto["monto"];
+  }
+//itera los productos de la devolucion
+  foreach ($devolucion['detail'] as $producto) {
+        $y = $ticket->GetY();
+        
+        $ticket->SetXY(7+66*0.75, $y);
+        $totReal+=$producto["monto"];
+        
+        $ticket->MultiCell(66*0.25, 4, "$ " . number_format($producto["monto"], 2), "", "R", false);
+        
+        $ticket->SetXY(7+66*0.63, $y);
+        $ticket->MultiCell(66*0.12, 4, $producto["cantidad"], "", "C", false);
+        
+        $ticket->SetXY(7, $y);
+        $ticket->MultiCell(66*0.63, 4, utf8_decode("{$producto["producto"]}"), "", "L", false);
   /*implementación Oscar 10.10.2018 para imprimir ubicación y calve_proveedor en ticket*/
       if($producto['infoAdicional']==1){
         $ticket->SetFont('Arial','',$bF-3.5);
@@ -377,9 +478,9 @@
   /*fin de cambio 10.10.2018*/
       
       $total_de_devolucion+=$producto["monto"];
-    }
+  }
 
-    $ticket->SetY($ticket->GetY()-2);
+  $ticket->SetY($ticket->GetY()-2);
 	$ticket->SetXY(7+66*0.40, $ticket->GetY()+3);
 	$ticket->Cell(66*0.32, 2, "", "T" ,0, "C");
 	
@@ -404,8 +505,8 @@
 }*/
     
     $ticket->SetFont('Arial','B',$bF+2);
-  $ticket->SetXY(7+66*0.4, $ticket->GetY()+5);
-	$sql="SELECT id_pedido FROM ec_pedidos ";
+    $ticket->SetXY(7+66*0.4, $ticket->GetY()+5);
+    $sql="SELECT id_pedido FROM ec_pedidos ";
     $ticket->Cell(66*0.3, 6, utf8_decode("Total"), "" ,0, "L");
 	
 	  $ticket->SetXY(7+66*0.75, $ticket->GetY());
@@ -473,16 +574,27 @@
         $nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_devolucion_".$folio."_1.pdf";
         $nombre_ticket=str_replace(" ","", $nombre_ticket);
         
+        $tipo_modulo = 4;
+        if( isset( $_GET['id_pedido_original'] ) ){
+          $tipo_modulo = 2;
+        }
+
         $ruta_salida = '';
-        $ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 4 );//Devolución antes de validación
+        $ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, $tipo_modulo );//Devolución antes de validación
         if( $ruta_salida == 'no' ){
-            $ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 4 );//Devolución antes de validación
+            $ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, $tipo_modulo );//Devolución antes de validación
         }
         $ticket->Output( "../../{$ruta_salida}/{$nombre_ticket}", "F" );
         /*Sincronización remota de tickets*/
-        if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
-            $registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+    		if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
+          $registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+          }else{//impresion por red local
+          $enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( $tipo_modulo, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id );
         }
+        /*Sincronización remota de tickets*
+        if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota
+            $registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+        }*/
         if(isset($id_pedido_original) && $flag_tkt=='devuelve_efectivo'){
             $sql="UPDATE ec_devolucion SET status=3,observaciones='Dinero regresado al cliente' WHERE id_pedido=$id_pedido_original";
             $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
@@ -490,7 +602,7 @@
         }
 /*Fin de cambio Oscar 03.03.2019*/
       //$ticket->Output("../../cache/ticket/".$nombre_ticket, "F");
-
+        die( 'ok' );
       
 /*implementacion Oscar 2023/09/20 para enviar impresion remota*/
       if($user_tipo_sistema=='linea'){/*

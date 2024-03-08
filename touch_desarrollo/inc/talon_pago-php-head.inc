@@ -19,11 +19,108 @@
 	}
 /*Fin de cambio Oscar 25.01.2018*/
     
+	$devolucion = array();
     
     if(!isset($_GET["noImp"])){
         $_GET["noImp"]=1;
     }
-
+	//if( isset( $_GET['id_pedido_original'] ) ){
+//consulta si tiene devolucion pendientes de pasar por la pantalla de cobros
+		$sql = "SELECT
+					d.folio AS folio_devolucion,
+					p.folio_nv AS folio_venta_original,
+					CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS vendedor
+				FROM ec_devolucion d
+				LEFT JOIN ec_devolucion_detalle dd
+				ON dd.id_devolucion = d.id_devolucion
+				LEFT JOIN ec_pedidos p 
+				ON p.id_pedido = d.id_pedido
+				LEFT JOIN sys_users u 
+				ON u.id_usuario = p.id_usuario
+				WHERE d.id_pedido = '{$_GET['id_pedido_original']}'
+				AND d.id_cajero = 0
+				AND d.id_sesion_caja = 0
+				GROUP BY d.id_pedido";
+		$stm = mysql_query( $sql ) or die( "Error al consultar si hay devolucion pendiente : " . mysql_error() );
+		if( mysql_num_rows( $stm ) <= 0 ){
+			$sql = "SELECT
+						d.folio AS folio_devolucion,
+						p.folio_nv AS folio_venta_original,
+						CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS vendedor
+					FROM ec_devolucion d
+					LEFT JOIN ec_devolucion_detalle dd
+					ON dd.id_devolucion = d.id_devolucion
+					LEFT JOIN ec_pedidos p 
+					ON p.id_pedido = d.id_pedido
+					LEFT JOIN sys_users u 
+					ON u.id_usuario = p.id_usuario
+					WHERE d.id_pedido = '{$_GET['idp']}'
+					AND d.id_cajero = 0
+					AND d.id_sesion_caja = 0
+					GROUP BY d.id_pedido";//die( $sql );
+			$stm = mysql_query( $sql ) or die( "Error al consultar si hay devolucion pendientes : " . mysql_error() );
+			$id_pedido_devolucion = $_GET['idp'];
+		}else{
+			$id_pedido_devolucion = $_GET['id_pedido_original'];
+		}
+		if( mysql_num_rows( $stm ) > 0 ){
+			$row = mysql_fetch_assoc( $stm );
+			$devolucion = $row;
+		//consulta el detalle
+			$dev_detail = "SELECT 
+					aux.id_producto,
+					aux.producto,
+					aux.cantidad,
+					aux.precio,
+					aux.monto,
+					aux.descuento,
+					aux.porc_desc,
+					IF(s.mostrar_ubicacion=1 Or s.mostrar_alfanumericos=1,1,0) as infoAdicional,
+					CONCAT(
+					IF(s.mostrar_ubicacion=1 AND sp.ubicacion_almacen_sucursal!='',CONCAT('Ubicación: ',sp.ubicacion_almacen_sucursal,' | '),''),
+						IF(s.mostrar_alfanumericos=1,CONCAT('Clave: ',aux.clave),'')
+					) as info
+				FROM(
+					SELECT
+					P.id_productos AS id_producto,
+					P.nombre AS producto,
+					P.clave,
+					IF(prd.id_producto IS NULL, dd.cantidad , ROUND( dd.cantidad / prd.cantidad ) ) AS cantidad,
+					dp.precio AS precio,
+					( IF(prd.id_producto IS NULL, dd.cantidad , ROUND( dd.cantidad / prd.cantidad ) )*dp.precio)
+						-((IF(prd.id_producto IS NULL, dd.cantidad , ROUND( dd.cantidad / prd.cantidad ) )*dp.precio)
+						*
+						(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal))/100)) AS monto,
+					IF(dp.descuento=0,0,dp.descuento/dp.cantidad) AS descuento,
+					(IF(pe.descuento=0,0,(pe.descuento*100/pe.subtotal)/100)*(dd.cantidad*dp.precio)) AS porc_desc
+					FROM ec_devolucion_detalle dd 
+					INNER JOIN ec_devolucion d  
+					ON dd.id_devolucion = d.id_devolucion
+					INNER JOIN ec_pedidos_detalle dp  
+					ON dp.id_pedido_detalle = dd.id_pedido_detalle
+					LEFT JOIN ec_pedidos pe ON pe.id_pedido=dp.id_pedido
+					INNER JOIN  ec_productos P
+					ON dp.id_producto = P.id_productos
+					LEFT JOIN ec_productos_detalle prd
+					ON prd.id_producto = dp.id_producto
+					WHERE d.id_pedido IN( {$id_pedido_devolucion} )
+					AND d.id_sesion_caja = 0
+					AND d.id_cajero = 0
+				)aux
+				LEFT JOIN sys_sucursales_producto sp ON aux.id_producto=sp.id_producto
+				JOIN sys_sucursales s ON sp.id_sucursal=s.id_sucursal AND sp.id_sucursal={$user_sucursal}";
+			$dev_stm = mysql_query( $dev_detail ) or die( "Error al consultar el detalle de los prouctos devueltos : " . mysql_error() );
+			if( mysql_num_rows( $dev_stm ) > 0 ){
+				$devolucion['detail'] = array();
+				while( $dev_row = mysql_fetch_assoc( $dev_stm ) ){
+					array_push( $devolucion['detail'], $dev_row );
+				}
+				//$dev_row['detail']
+			}
+		}
+	//}
+//var_dump( $devolucion );
+//die(json_encode( $devolucion ));
 //implementado por Oscar 29-12-2017
     $diferencia='';
     $s_f_i=0;
@@ -253,9 +350,8 @@
 	$ticket->SetXY(5, $ticket->GetY()+6);
 	$ticket->Cell(66, 6, utf8_decode("VENDEDOR:"), "" ,0, "C");
 	$ticket->SetXY(5, $ticket->GetY()+8);
-	$ticket->SetFont('Arial','B',$bF+10);
+	$ticket->SetFont('Arial','B',$bF+8);
 	$ticket->Cell(66, 6, utf8_decode("{$vendedor}"), "" ,0, "C");
-
 
 	$ticket->SetFont('Arial','B',$bF);
 	$ticket->SetXY(5, $ticket->GetY()+12);
@@ -283,6 +379,69 @@
 	$ticket->SetXY(5, $ticket->GetY()+5.5);
 	$ticket->Cell(66, 3, "", "TB" ,0, "C");
 	
+/*implementacion Oscar 2024-03-07 para adjuntar devolucion en ticket de talon de pago*/
+	if( sizeof($devolucion) > 0 ){
+		$ticket->SetFont('Arial','B',$bF+8);
+		$ticket->SetXY(5, $ticket->GetY()+6);
+		$ticket->Cell(66, 6, utf8_decode("DEVOLUCION:"), "" ,0, "C");
+		$ticket->SetFont('Arial','B',$bF );
+		$ticket->SetXY(5, $ticket->GetY()+4);
+		$ticket->Cell(66, 6, utf8_decode("Folio devolución : {$devolucion['folio_devolucion']}"), "" ,0, "L");
+		$ticket->SetFont('Arial','B',$bF );
+		$ticket->SetXY(5, $ticket->GetY()+4);
+		$ticket->Cell(66, 6, utf8_decode("Folio pedido : {$devolucion['folio_venta_original']}"), "" ,0, "L");
+	//tabla de productos devueltos
+		$ticket->SetXY(7, $ticket->GetY()+5.5);
+		$ticket->Cell(66, 3, "", "TB" ,0, "C");
+		
+		$ticket->SetFont('Arial','',$bF);
+		
+		$ticket->SetXY(7, $ticket->GetY()+6);
+		$ticket->Cell(66*0.63, 6, utf8_decode("DESCRIPCIÓN"), "B" ,0, "L");
+		$ticket->SetXY(7+66*0.63, $ticket->GetY());
+		$ticket->Cell(66*0.12, 6, utf8_decode("CANT"), "B" ,0, "L");
+		$ticket->SetXY(7+66*0.75, $ticket->GetY());
+		$ticket->Cell(66*0.25, 6, utf8_decode("PRECIO"), "B" ,0, "R");		
+		$ticket->SetFont('Arial','',$bF-2);
+		$ticket->SetXY(7, $ticket->GetY()+8);
+  
+		$total_de_devolucion=0;
+		foreach ($devolucion['detail'] as $producto) {
+				$y = $ticket->GetY();
+				
+				$ticket->SetXY(7+66*0.75, $y);
+				$totReal+=$producto["monto"];
+				
+				$ticket->MultiCell(66*0.25, 4, "$ " . number_format($producto["monto"], 2), "", "R", false);
+				
+				$ticket->SetXY(7+66*0.63, $y);
+				$ticket->MultiCell(66*0.12, 4, $producto["cantidad"], "", "C", false);
+				
+				$ticket->SetXY(7, $y);
+				$ticket->MultiCell(66*0.63, 4, utf8_decode("{$producto["producto"]}"), "", "L", false);
+		/*implementación Oscar 10.10.2018 para imprimir ubicación y clave_proveedor en ticket*/
+			if($producto['infoAdicional']==1){
+				$ticket->SetFont('Arial','',$bF-3.5);
+				$ticket->SetXY(5,($ticket->GetY()-1.5));
+				$ticket->MultiCell(66*0.63, 4, utf8_decode("{$producto["info"]}"), "", "L", false);
+			}
+			$ticket->SetFont('Arial','',$bF-2);
+		/*fin de cambio 10.10.2018*/
+			$total_de_devolucion+=$producto["monto"];
+		}
+		/*$ticket->SetXY(7+66*0.40, $ticket->GetY()+3);
+		$ticket->Cell(66*0.32, 2, "", "T" ,0, "C");*/
+		$ticket->SetFont('Arial','',$bF);
+		$ticket->SetXY(7+66*0.40, $ticket->GetY()+3);
+		$ticket->Cell(100*0.40, 2, "", "T" ,0, "C");
+		$ticket->SetXY(7+66*0.40, $ticket->GetY()+1);
+		$ticket->Cell(100*0.40, 6, "Total Devolucion : $ " . number_format(round($total_de_devolucion,2), 2), "" ,0, "R");  
+		//die( "here" );
+	}else{
+		//die( "not_here" );
+	}
+/*Fin de implementacion Oscar 2024-03-07 para adjuntar devolucion en ticket de talon de pago*/
+
 	$ticket->SetFont('Arial','',$bF);
 
 	/*$ticket->SetY($ticket->GetY()-2);
@@ -471,7 +630,9 @@
         /*Sincronización remota de tickets*/
     		if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 				$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
-    		}
+    		}else{//impresion por red local
+				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 2, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id );
+			}
     	}//fin de for $cont
 	/*fin de cambio Oscar 17.09.2018*/
 	/*implementacion Oscar 2023/09/20 para enviar impresion remota*/
@@ -519,8 +680,8 @@
 	        $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
 		}
 /*Fin de cambio Oscar 07.03.2019*/
-       	
-       	header ("location: index.php?scr=evaluation"); 
+       	die( "ok" );
+       	//header ("location: index.php?scr=evaluation"); 
     }
 		
 	exit (0);
