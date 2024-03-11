@@ -651,7 +651,25 @@
 								</button>
 				    		</div>
 				    		<div class="col-4">
-			    			
+								<?php
+									$sql = "SELECT IF( permite_sincronizar_manualmente != 1, 'locked', 'unlocked' ) AS permite_sincronizar FROM sys_resumen_sincronizacion_sucursales WHERE id_sucursal = {$user_sucursal}";
+									$stm = $link->query( $sql ) or die( "Error al consultar si la sincronizacion de la sucursal esta bloqueada : {$link->error}" );
+									$api_locked = $stm->fetch_assoc();
+									if( $api_locked['permite_sincronizar'] == 'unlocked' ){
+								?>
+									<button class="btn btn-danger form-control" onclick="insertaProcedures('pause_sinchronization_apis_store');">
+										<i class="icon-pause">Pausar sincronizacion de la Sucursal</i>
+									</button>
+								<?php
+									}else{
+								?>
+									<button class="btn btn-success form-control" onclick="insertaProcedures('renew_sinchronization_apis_store');">
+										<i class="icon-play">Reanudar sincronizacion de la Sucursal</i>
+									</button>
+								<?php
+									}
+								?>
+									
 			    			</div>
 			    		</div>
 			    	</div>
@@ -950,6 +968,13 @@
 		}
 		if( fl == 'renew_sinchronization_apis' ){
 			confirmacion = "Las APIS fueron reanudadas exitosamente.";
+		}
+		if( fl == 'pause_sinchronization_apis_store' ){
+			confirmacion = "Las sincronizacion de la sucursal fue pausada exitosamente.";
+
+		}
+		if( fl == 'renew_sinchronization_apis_store' ){
+			confirmacion = "Las sincronizacion de la sucursal fue reanudada exitosamente.";
 		}
 	
 		if(! confirm( "Desea continuar con esta operación?" )){
