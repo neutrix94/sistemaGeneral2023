@@ -607,6 +607,5 @@
             $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
            //echo $sql;
         }
-        die('ok|')
     }
 ?>
