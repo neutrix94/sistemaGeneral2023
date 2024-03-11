@@ -314,7 +314,7 @@
 		//consulta pagos
 			$sql = "SELECT
             SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS total_pedido_pagos,
-            SUM( IF( dp.id_pedido_pago IS NULL, 0, dp.monto ) ) AS total_devolucion_pagos
+            SUM( IF( dp.id_devolucion_pago IS NULL, 0, dp.monto ) ) AS total_devolucion_pagos
           FROM ec_pedidos p
           LEFT JOIN ec_pedido_pagos pp
           ON pp.id_pedido = p.id_pedido
@@ -325,8 +325,8 @@
           WHERE p.id_pedido = {$id_pedido_devolucion}
           GROUP BY p.id_pedido";
       $payment_stm = mysql_query( $sql ) or die( "Error al consultar monto pagado : " . mysql_error() );
-      $payment_row = $payment_stm;
-      $devolucion['pagos_realizados'] = $row['total_pedido_pagos'] - $row['total_devolucion_pagos'];
+      $payment_row = mysql_fetch_assoc( $payment_stm );
+      $devolucion['pagos_realizados'] = $payment_row['total_pedido_pagos'] - $payment_row['total_devolucion_pagos'];
     }
   //extraemos el folio del pedido original
     $qry_fol_pd=mysql_query("SELECT p.folio_nv,p.pagado FROM ec_pedidos p WHERE p.id_pedido IN($id_pedido_original) LIMIT 1")or die("Error al consultar folio de pedido!!!\n\n".mysql_error());
@@ -514,7 +514,15 @@
     $ticket->SetXY(7+66*0.4, $ticket->GetY()+5);
     $sql="SELECT id_pedido FROM ec_pedidos ";
     $ticket->Cell(66*0.3, 6, utf8_decode("Total"), "" ,0, "L");
-
+//die("here : { $devolucion['pagos_realizados']}");
+    if( $devolucion['pagos_realizados'] > 0 ){
+      $ticket->SetFont('Arial','B',$bF+2);
+      $ticket->SetXY(5, $ticket->GetY()+6);
+      $ticket->Cell(66, 6, utf8_decode("TOTAL PAGADO : $ {$devolucion['pagos_realizados']}"), "" ,0, "L");
+      $ticket->SetXY(5, $ticket->GetY()+6);
+      $ticket->Cell(66, 6, utf8_decode("NUEVO TOTAL : {$devolucion['total_actual']}"), "" ,0, "L");
+    }
+    
     $ticket->SetXY(7+66*0.75, $ticket->GetY());
     if(!isset($monto_devolucion)){
     if($pedido_pagado==1){
@@ -599,5 +607,6 @@
             $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
            //echo $sql;
         }
+        die('ok|')
     }
 ?>
