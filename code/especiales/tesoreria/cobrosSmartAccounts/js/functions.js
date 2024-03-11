@@ -573,6 +573,7 @@ console.log( resp );
 		}
 		var url = 'ajax/db.php?fl=getTerminals&user_id=' + user_id;
 		url += '&counter=' + $( '#payments_list tr' ).length;
+		url += '&session_id=' + $( '#session_id' ).val(); 
 		//alert( url );
 		if( $( '#payments_list' ).length == 1 ){
 			$( '#t0' ).val( '' );
