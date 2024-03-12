@@ -231,6 +231,8 @@
 		/*Sincronización remota de tickets*/
 			if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 				$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+			}else{//impresion por red local
+				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 11, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id );
 			}
     	}
 	if($impresa==0){

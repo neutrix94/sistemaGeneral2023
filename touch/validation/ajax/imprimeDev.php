@@ -477,32 +477,11 @@
       }
       $ticket->Output( "../../../{$ruta_salida}/{$nombre_ticket}", "F" );
       /*Sincronización remota de tickets*/
-      if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
+        if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
           $registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
-      }
-    /*implementación Oscar 25.01.2019 para la sincronización de tickets*
-        if( $user_tipo_sistema == 'linea' ){
-          $sql = "SELECT 
-          dominio_sucursal AS store_dns
-          FROM ec_configuracion_sucursal
-          WHERE id_sucursal = ( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 )";
-          $stm = mysql_query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
-          $row = mysql_fetch_assoc( $stm );
-          $ruta_or = $row['store_dns'];
-          $sql_arch="INSERT INTO sys_archivos_descarga SET 
-              id_archivo=null,
-              tipo_archivo='pdf',
-              nombre_archivo='$nombre_ticket',
-              ruta_origen='{$ruta_or}/cache/ticket/',
-              ruta_destino='cache/ticket/',
-            /*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal*
-              id_sucursal='$user_sucursal',
-            /*Fin de Cambio Oscar 03.03.2019*
-              id_usuario='$user_id',
-              observaciones=''";
-          $inserta_reg_arch=$this->link->query($sql_arch)or die( "Error al guardar el registro de sincronización del ticket de Devolución : {$this->link->error}" );
-
-        }*/
+        }else{//impresion por red local
+          $enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 4, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id );
+        }
 /*implementacion Oscar 03.03.2019 para actualizar el status de la devolución como terminada*/
       if(isset($id_pedido_original) && $flag_tkt=='devuelve_efectivo'){
         $sql="UPDATE ec_devolucion SET status=3,observaciones='Dinero regresado al cliente' WHERE id_pedido=$id_pedido_original";
@@ -510,46 +489,6 @@
        //echo $sql;
       }
 /*Fin de cambio Oscar 03.03.2019*/
-      //$ticket->Output("../../../cache/ticket/".$nombre_ticket, "F");
-    /*fin de cambio Oscar 25.01.2019*/
-    /*implementacion Oscar 2023/09/20 para enviar impresion remota*/
-      if($user_tipo_sistema=='linea'){
-        /*$archivo_path = "../../../conexion_inicial.txt";
-        $url = "";
-          if(file_exists($archivo_path)){
-            $file = fopen($archivo_path,"r");
-            $line=fgets($file);
-            fclose($file);
-              $config=explode("<>",$line);
-              $tmp=explode("~",$config[0]);
-              $ruta_des=base64_decode( $tmp[1] );
-            $url = "localhost/{$ruta_des}/rest/print/send_file";
-          }else{
-            die("No hay archivo de configuración!!!");
-          }
-          //die( $url );
-          $post_data = json_encode( array( "destinity_store_id"=>$user_sucursal ) );
-          $crl = curl_init( $url );
-          curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
-          curl_setopt($crl, CURLINFO_HEADER_OUT, true);
-          curl_setopt($crl, CURLOPT_POST, true);
-          curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
-          //curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-          curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
-          curl_setopt($crl, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/json',
-            'token: ' . $token)
-          );
-          $resp = curl_exec($crl);//envia peticion
-          //var_dump( $resp );
-          curl_close($crl);
-          //var_dump($resp);
-        //decodifica el json de respuesta
-          $result = json_decode(json_encode($resp), true);
-          $result = json_decode( $result );
-          //return $result;*/
-      }
-/*fin de cambio Oscar 2023*/
        //$ticket->Output("../../../cache/ticket/ticket_".$this->store_id."_" . date("YmdHis") . "_" . strtolower($tipofolio) . "_devolucion_" . $folio . "_2.pdf", "F");
        //header ("location: index.php?scr=home"); 
     }   

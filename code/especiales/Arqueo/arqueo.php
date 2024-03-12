@@ -87,7 +87,7 @@
 <!-- implementacion Oscar 2023 para que salgan o no salgan los tickets de validaciones pendientes -->
 <?php
 	$row = $Arqueo->getStoreConfig( $user_sucursal );
-	if( $row['print_pending_validations'] == 11 ){
+	if( $row['print_pending_validations'] == 1 ){
 ?>
 	<script type="text/javascript">
 		pending_sales_validation();
