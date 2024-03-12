@@ -572,27 +572,13 @@
 		$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 9 );//cotizacion de ventas
 	}
 	$ticket->Output( "../../../../{$ruta_salida}/{$nombre_ticket}", "F" );
+
 /*Sincronización remota de tickets*/
 	if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 		$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+	}else{//impresion por red local
+		$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 9, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id );
 	}
-
-/*implementación Oscar 25.01.2019 para la sincronización de tickets
-    if($user_tipo_sistema=='linea'){
-		$sql_arch="INSERT INTO sys_archivos_descarga SET 
-					id_archivo=null,
-					tipo_archivo='pdf',
-					nombre_archivo='$nombre_ticket',
-					ruta_origen='$ruta_or',
-					ruta_destino='$ruta_des',
-          			id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$user_sucursal'),
-					id_usuario='$user_id',
-					observaciones=''";
-		$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);
-
-    }
-   //$ticket->Output("../../../../cache/ticket/".$nombre_ticket, "F");
-    /*fin de cambio Oscar 25.01.2019*/
 
 /*Implementacion Oscar 2021 para enviar avisos de correo en diferencia de dinero en caja*/
 //comprueba en comparación al corte anterior

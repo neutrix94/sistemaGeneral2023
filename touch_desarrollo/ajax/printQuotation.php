@@ -682,54 +682,15 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 				$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 3 );//cotizacion de ventas
 			}
 	    	$ticket->Output( "../../{$ruta_salida}/{$nombre_ticket}", "F" );
-
-        /*Sincronización remota de tickets*/
-    		if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
+		/*Sincronización remota de tickets*/
+			if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 				$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
-    		}
+			}else{//impresion por red local
+				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 3, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id );
+			}
     /*fin de cambio Oscar 25.01.2019*/
     	}//fin de for $cont
 /*fin de cambio Oscar 17.09.2018*/
-	
-
-/*implementacion Oscar 2023/09/28 para enviar impresion remota*/
-      if($user_tipo_sistema=='linea'){
-        /*$archivo_path = "../../conexion_inicial.txt";
-        $url = "";
-          if(file_exists($archivo_path)){
-            $file = fopen($archivo_path,"r");
-            $line=fgets($file);
-            fclose($file);
-              $config=explode("<>",$line);
-              $tmp=explode("~",$config[0]);
-              $ruta_des=base64_decode( $tmp[1] );
-            $url = "localhost/{$ruta_des}/rest/print/send_file";
-          }else{
-            die("No hay archivo de configuración!!!");
-          }
-          //die( $url );
-          $post_data = json_encode( array( "destinity_store_id"=>$user_sucursal ) );
-          $crl = curl_init( $url );
-          curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
-          curl_setopt($crl, CURLINFO_HEADER_OUT, true);
-          curl_setopt($crl, CURLOPT_POST, true);
-          curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
-          //curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-          curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
-          curl_setopt($crl, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/json',
-            'token: ' . $token)
-          );
-          $resp = curl_exec($crl);//envia peticion
-          //var_dump( $resp );
-          curl_close($crl);
-          //var_dump($resp);
-        //decodifica el json de respuesta
-          $result = json_decode(json_encode($resp), true);
-          $result = json_decode( $result );
-          //return $result;*/
-      }
-/*fin de cambio Oscar 2023/09/28*/
 
 /*Implementación Oscar 07.03.2019 para finalzar el satus de la devolución*/
     if(isset($_GET["id_pedido_original"]) || $_GET['es_apartado']==1){
