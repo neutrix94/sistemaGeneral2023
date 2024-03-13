@@ -20,16 +20,18 @@
 */
 
 /*implementacion Oscar 2021 para no pedir autorización de descuento*/
-	$sql = "SELECT 
-				IF( p.ver = 1 OR p.modificar = 1 OR p.eliminar = 1 OR p.nuevo = 1 OR p.generar = 1, 1 , 0)
-			FROM sys_permisos p
-			LEFT JOIN sys_users_perfiles up ON up.id_perfil = p.id_perfil
-			LEFT JOIN sys_users u ON u.tipo_perfil = up.id_perfil
-			WHERE u.id_usuario = '{$user_id}'
-			AND p.id_menu = 227";
-	$eje_discount = mysql_query( $sql ) or die ( "Error al consultar permiso especial : " . mysql_error() );
-	$row_discount = mysql_fetch_row( $eje_discount );
-	echo '<input type="hidden" id="discount_without_password" value="' . $row_discount[0] . '" />';
+	if( $_GET['scr'] != "talon_pago" ){//die("ere");
+		$sql = "SELECT 
+					IF( p.ver = 1 OR p.modificar = 1 OR p.eliminar = 1 OR p.nuevo = 1 OR p.generar = 1, 1 , 0)
+				FROM sys_permisos p
+				LEFT JOIN sys_users_perfiles up ON up.id_perfil = p.id_perfil
+				LEFT JOIN sys_users u ON u.tipo_perfil = up.id_perfil
+				WHERE u.id_usuario = '{$user_id}'
+				AND p.id_menu = 227";
+		$eje_discount = mysql_query( $sql ) or die ( "Error al consultar permiso especial : " . mysql_error() );
+		$row_discount = mysql_fetch_row( $eje_discount );
+		echo '<input type="hidden" id="discount_without_password" value="' . $row_discount[0] . '" />';
+	}
 /*fin de cambio Oscar 2021*/
 
 	$sql="SELECT id_sucursal FROM sys_sucursales WHERE acceso=1
