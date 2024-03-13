@@ -10,6 +10,7 @@ $app = new \Slim\App;
 //cliente
 require 'client/sendFile.php';
 require 'client/obtener_archivos_desde_local.php';
+require 'client/enviarArchivoRedLocal.php';
 //servidor
 require 'server/getPrints.php';
 require 'server/obtener_archivos_desde_linea.php';

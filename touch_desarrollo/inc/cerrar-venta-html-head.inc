@@ -19,6 +19,48 @@
 ?>
 //fin de cambio
 
+	function reenviar_archivo_ws( file_id ){
+		var url = "../code/especiales/controladores/SysArchivosDescarga.php?fl_archivo_descarga=sendSpecificFile&file_id=" + file_id + "&module_id=2";
+		//var resp = ajaxR( url );
+		//alert( resp );
+
+		$.ajax({
+			type:'post',
+			url: url,
+			cache:false,
+			success:function(dat){
+				alert( dat );
+			}
+		});
+	}
+
+	function build_ws_again( file_id ){
+		var content = `<div class="row">
+			<div class="col-12 text-center" style="font-size : 200% !important;"><br>
+				<h2 class="text-danger">Hubo un error al enviar el archivo por WebService, deseas volver a intentar?</h2>
+			</div>
+			<div class="col-6 text-end"><br>
+				<button 
+					type="button"
+					class="btn btn-success"
+					onclick="reenviar_archivo_ws( ${file_id} );"
+				>
+					Volver a intentar
+				</button>
+			</div>
+			<div class="col-6 text-start"><br>
+				<button 
+					class="btn btn-warning"
+				>
+					Enviar a carpeta de modulo
+				</button>
+			</div>
+		</div>`;
+		$("#cont_emergente").html(content);//cargamos respuesta 
+		$("#emergente_cerrar").css("display","block");//hacemos visible la emergente
+	}
+
+
 /*Implementación Oscar 12.11.2018 para redireccionar a index de ventas cuando sale el error de apartado pagado*/
 	function recargar_por_error(){
 		var pss_enc=$("#pass_enc").val();
@@ -605,12 +647,15 @@ function bloquea_pantalla(){
 				//alert(u1);
 				//console.log( u1 ); return false;
 	//fin de cambio
+				var servicio_ok = "";
 				$.ajax({
 					async: false,
 					type: 'GET',
 					url: u1
 				}).done (function (data){
-//alert('here:'+data);
+					servicio_ok = data.trim();
+//console.log( data );
+alert('here:'+data);
 					return true;
 				});
 
@@ -628,7 +673,14 @@ function bloquea_pantalla(){
 					$("#cont_emergente").html(emrge_aviso);//cargamos respuesta 
 					$("#emergente_cerrar").css("display","block");//hacemos visible la emergente
 				}else{
-					location.href = "index.php?";//scr=evaluation  deshabilitado por Oscar 2022 ( Habilitar evaluacion de vendedores en ventas )
+					if( servicio_ok == "ok" ){
+						location.href = "index.php?";//scr=evaluation  deshabilitado por Oscar 2022 ( Habilitar evaluacion de vendedores en ventas )
+					}else{
+						var TMP_WS = servicio_ok.split( '|' ); 
+						build_ws_again( TMP_WS[1] );
+						//alert("here_here : " + TMP_WS[1] );
+						return false;
+					}
 				}      
 		/*03.11.2018*/		
 			}else{
