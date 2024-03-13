@@ -14,6 +14,15 @@
 		die( 'ok' );
 		//renew_sinchronization_apis
 	}
+	if( $fl == 'pause_sinchronization_apis_store' || $fl == 'renew_sinchronization_apis_store' ){
+		$value = ( $fl == 'pause_sinchronization_apis_store' ? 0 : 1 );
+		$action = ( $fl == 'pause_sinchronization_apis_store' ? 'bloquear' : 'desbloquear' );
+		$sql = "UPDATE sys_resumen_sincronizacion_sucursales SET permite_sincronizar_manualmente = {$value}";
+		//die($sql);
+		$stm = $link->query( $sql ) or die( "Error al {$action} sincronizacion de la sucursal: {$sql} {$link->error}" );
+		die( 'ok' );
+		//renew_sinchronization_apis
+	}
 
 	if( $fl == 'restoration_mode' ){//{$user_id}
 	//consulta si las apis estan bloqueadas

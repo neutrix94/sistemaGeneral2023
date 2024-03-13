@@ -6,6 +6,7 @@
 	include("../include/fpdf153/fpdf.php");
 /*implementación Oscar 25.01.2019 para sacar rutas de tickets*/
 	$archivo_path = "../conexion_inicial.txt";
+	$carpeta_path = "";
 	if(file_exists($archivo_path)){
 		$file = fopen($archivo_path,"r");
 		$line=fgets($file);
@@ -14,9 +15,12 @@
 	    $tmp=explode("~",$config[2]);
 	    $ruta_or=$tmp[0];
 	    $ruta_des=$tmp[1];
+	    $tmp_=explode("~",$config[0]);
+		$carpeta_path = base64_decode( $tmp_[1] );
 	}else{
 		die("No hay archivo de configuración!!!");
 	}
+	//die( "here : {$ruta_or_}" );
 /*Fin de cambio Oscar 25.01.2018*/
     
 	$devolucion = array();
@@ -29,6 +33,7 @@
 		$sql = "SELECT
 					d.folio AS folio_devolucion,
 					p.folio_nv AS folio_venta_original,
+					p.total AS total_actual,
 					CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS vendedor
 				FROM ec_devolucion d
 				LEFT JOIN ec_devolucion_detalle dd
@@ -117,6 +122,22 @@
 				}
 				//$dev_row['detail']
 			}
+		//consulta pagos
+			$sql = "SELECT
+						SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS total_pedido_pagos,
+						SUM( IF( dp.id_devolucion_pago IS NULL, 0, dp.monto ) ) AS total_devolucion_pagos
+					FROM ec_pedidos p
+					LEFT JOIN ec_pedido_pagos pp
+					ON pp.id_pedido = p.id_pedido
+					LEFT JOIN ec_devolucion d
+					ON d.id_pedido = p.id_pedido
+					LEFT JOIN ec_devolucion_pagos dp
+					ON dp.id_devolucion = d.id_devolucion
+					WHERE p.id_pedido = {$id_pedido_devolucion}
+					GROUP BY p.id_pedido";
+			$payment_stm = mysql_query( $sql ) or die( "Error al consultar monto pagado : " . mysql_error() );
+			$payment_row = mysql_fetch_assosc( $payment_stm );
+			$devolucion['pagos_realizados'] =$payment_row['total_pedido_pagos'] - $payment_row['total_devolucion_pagos'];
 		}
 	//}
 //var_dump( $devolucion );
@@ -492,6 +513,14 @@
 				
 			$ticket->SetXY(5, $ticket->GetY() + 9);
 			$ticket->Cell(66, 6, "$ " . number_format( abs( $total ), 2), "" ,0, "C");
+			
+			if( $devolucion['pagos_realizados'] > 0 ){
+				$ticket->SetFont('Arial','B',$bF+2);
+				$ticket->SetXY(5, $ticket->GetY()+6);
+				$ticket->Cell(66, 6, utf8_decode("TOTAL PAGADO : $ {$devolucion['pagos_realizados']}"), "" ,0, "L");
+				$ticket->SetXY(5, $ticket->GetY()+6);
+				$ticket->Cell(66, 6, utf8_decode("NUEVO TOTAL : {$devolucion['total_actual']}"), "" ,0, "L");
+			}
 		//
 			//$ticket->SetXY(5, $ticket->GetY()+8);
 			$ticket->SetXY(5, $ticket->GetY()+15);
@@ -631,7 +660,7 @@
     		if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 				$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
     		}else{//impresion por red local
-				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 2, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id );
+				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 2, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path );
 			}
     	}//fin de for $cont
 	/*fin de cambio Oscar 17.09.2018*/

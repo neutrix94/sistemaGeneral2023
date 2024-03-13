@@ -117,6 +117,7 @@
 	mysql_query("COMMIT");//autorizamos la transacción
 /*implementación Oscar 25.01.2019 para sacar rutas de tickets*/
     $archivo_path = "../../../../../conexion_inicial.txt";
+	$carpeta_path = "";
     if(file_exists($archivo_path)){
         $file = fopen($archivo_path,"r");
         $line=fgets($file);
@@ -125,6 +126,8 @@
         $tmp=explode("~",$config[2]);
         $ruta_or=$tmp[0];
         $ruta_des=$tmp[1];
+	    $tmp_=explode("~",$config[0]);
+		$carpeta_path = base64_decode( $tmp_[1] );
     }else{
         die("No hay archivo de configuración!!!");
     }
@@ -456,30 +459,14 @@ class TicketPDF extends FPDF {
 		$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 10 );//cotizacion de ventas
 	}
 	$ticket->Output( "../../../../../{$ruta_salida}/{$nombre_ticket}", "F" );
+
 /*Sincronización remota de tickets*/
 	if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 		$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+	}else{//impresion por red local
+		$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 10, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path );
 	}
-
-/*implementación Oscar 25.01.2019 para la sincronización de tickets
-    if($user_tipo_sistema=='linea'){
-		$sql_arch="INSERT INTO sys_archivos_descarga SET 
-					id_archivo=null,
-					tipo_archivo='pdf',
-					nombre_archivo='$nombre_ticket',
-					ruta_origen='$ruta_or',
-					ruta_destino='$ruta_des',
-      			/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal
-          			id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE IF('$user_sucursal'='-1',id_sucursal='1',id_sucursal='$user_sucursal')),
-        		/*Fin de Cambio Oscar 03.03.2019
-					id_usuario='$user_id',
-					observaciones=''";
-		$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);
-
-    }
-    $ticket->Output("../../../../../cache/ticket/".$nombre_ticket, "F");
-    /*fin de cambio Oscar 25.01.2019*/
-
+	
    //$ticket->Output($nombre_tkt, "F");
     echo "ok|../../../../{$ruta_salida}/{$nombre_ticket}";
 /*Fin de cambio Oscar 18.06.2019*/
