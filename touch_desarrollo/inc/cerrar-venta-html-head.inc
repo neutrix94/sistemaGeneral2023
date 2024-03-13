@@ -655,7 +655,7 @@ function bloquea_pantalla(){
 				}).done (function (data){
 					servicio_ok = data.trim();
 //console.log( data );
-//alert('here:'+data);
+alert('here:'+data);
 					return true;
 				});
 
