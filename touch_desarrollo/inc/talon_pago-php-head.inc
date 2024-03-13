@@ -13,10 +13,10 @@
 		fclose($file);
 	    $config=explode("<>",$line);
 	    $tmp=explode("~",$config[2]);
-	    $tmp_=explode("~",$config[0]);
-		$carpeta_path = base64_decode( $tmp_[1] );
 	    $ruta_or=$tmp[0];
 	    $ruta_des=$tmp[1];
+	    $tmp_=explode("~",$config[0]);
+		$carpeta_path = base64_decode( $tmp_[1] );
 	}else{
 		die("No hay archivo de configuración!!!");
 	}

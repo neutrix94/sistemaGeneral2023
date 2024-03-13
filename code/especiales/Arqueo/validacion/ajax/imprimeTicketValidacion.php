@@ -117,6 +117,7 @@
 	mysql_query("COMMIT");//autorizamos la transacción
 /*implementación Oscar 25.01.2019 para sacar rutas de tickets*/
     $archivo_path = "../../../../../conexion_inicial.txt";
+	$carpeta_path = "";
     if(file_exists($archivo_path)){
         $file = fopen($archivo_path,"r");
         $line=fgets($file);
@@ -125,6 +126,8 @@
         $tmp=explode("~",$config[2]);
         $ruta_or=$tmp[0];
         $ruta_des=$tmp[1];
+	    $tmp_=explode("~",$config[0]);
+		$carpeta_path = base64_decode( $tmp_[1] );
     }else{
         die("No hay archivo de configuración!!!");
     }
@@ -460,7 +463,7 @@ class TicketPDF extends FPDF {
 	if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 		$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
 	}else{//impresion por red local
-		$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 10, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id );
+		$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 10, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path );
 	}
 
 /*implementación Oscar 25.01.2019 para la sincronización de tickets
