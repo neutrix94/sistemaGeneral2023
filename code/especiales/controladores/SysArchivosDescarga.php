@@ -61,8 +61,7 @@
 			return $this->link->insert_id;
 		}
 
-		function crea_registros_sincronizacion_archivo_por_red_local( $id_modulo, $tipo, $nombre_ticket, $ruta_origen, $ruta_salida, $store_id, $user_id ){
-			
+		function crea_registros_sincronizacion_archivo_por_red_local( $id_modulo, $tipo, $nombre_ticket, $ruta_origen, $ruta_salida, $store_id, $user_id, $carpeta_path ){
 		//consulta si tiene endpoint especifico local por usuario
 			$url_base = "";
 			$sql = "SELECT
@@ -97,7 +96,7 @@
 											) 
 										);
 										//die( $post_data );
-				$url = "http://localhost/desarrollo_cobros_e_impresion/rest/print/enviar_archivo_red_local";
+				$url = "http://localhost/{$carpeta_path}/rest/print/enviar_archivo_red_local";
 				$enviar_archivo = $this->sendPetition( $url, $post_data );
 				if( $enviar_archivo != "ok" ){
 					die( "Error al consumir el WebService en Red Local : {$enviar_archivo}|{$id}" );
