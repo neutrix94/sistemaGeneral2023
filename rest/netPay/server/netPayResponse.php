@@ -93,22 +93,7 @@ $app->post('/', function (Request $request, Response $response){
 
 //$file = fopen("archivo.txt", "w");
   $link->autocommit( false );
-//inserta la respuesta de la transaccion
-  $sql = "INSERT INTO vf_transacciones_netpay ( /*1*/id_transaccion_netpay, /*2*/affiliation,/*3*/applicationLabel,/*4*/arqc,/*5*/aid,/*6*/amount,
-    /*7*/authCode,/*8*/bin,/*9*/bankName,/*10*/cardExpDate,/*11*/cardType,/*12*/cardTypeName,/*13*/cityName,/*14*/responseCode,/*15*/folioNumber,
-    /*16*/hasPin,/*17*/hexSign,/*18*/isQps,/*19*/message,/*20*/isRePrint,/*21*/moduleCharge,/*22*/moduleLote,/*23*/customerName,/*24*/terminalId,
-    /*25*/orderId,/*26*/preAuth,/*27*/preStatus,/*28*/promotion,/*29*/rePrintDate,/*30*/rePrintMark,/*31*/reprintModule,/*32*/cardNumber,
-    /*33*/storeName,/*34*/streetName,/*35*/ticketDate,/*36*/tipAmount,/*37*/tipLessAmount,/*38*/transDate,/*39*/transType,/*40*/transactionCertificate,
-    /*41*/transactionId, /*42*/id_sucursal, /*43*/id_cajero, /*44*/folio_venta )
-      VALUES( /*1*/NULL, /*2*/'{$affiliation}',/*3*/'{$applicationLabel}',/*4*/'{$arqc}',/*5*/'{$aid}',/*6*/'{$amount}',
-    /*7*/'{$authCode}',/*8*/'{$bin}',/*9*/'{$bankName}',/*10*/'{$cardExpDate}',/*11*/'{$cardType}',/*12*/'{$cardTypeName}',/*13*/'{$cityName}',
-    /*14*/'{$responseCode}',/*15*/'{$folioNumber}',/*16*/'{$hasPin}',/*17*/'{$hexSign}',/*18*/'{$isQps}',/*19*/'{$message_}',/*20*/'{$isRePrint}',
-    /*21*/'{$moduleCharge}',/*22*/'{$moduleLote}',/*23*/'{$customerName}',/*24*/'{$terminalId}',/*25*/'{$orderId}',/*26*/'{$preAuth}',
-    /*27*/'{$preStatus}',/*28*/'{$promotion}',/*29*/'{$rePrintDate}',/*30*/'{$rePrintMark}',/*31*/'{$reprintModule}',/*32*/'{$cardNumber}',
-    /*33*/'{$storeName}',/*34*/'{$streetName}',/*35*/'{$ticketDate}',/*36*/'{$tipAmount}',/*37*/'{$tipLessAmount}',/*38*/'{$transDate}',
-    /*39*/'{$transType}',/*40*/'{$transactionCertificate}',/*41*/'{$transactionId}',/*42*/'{$traceability['id_sucursal']}', 
-    /*43*/'{$traceability['id_cajero']}', /*44*/'{$traceability['folio_venta']}' )";
-  
+//actualiza la respuesta de la transaccion
   $sql = "UPDATE vf_transacciones_netpay SET 
             /*2*/affiliation = '{$affiliation}',
             /*3*/applicationLabel = '{$applicationLabel}',
@@ -157,7 +142,7 @@ $app->post('/', function (Request $request, Response $response){
             /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
           WHERE id_transaccion_netpay = '{$transactionId_internal}'";//$folioNumber
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
-  if( trim($message_) == 'Transaccion exitosa' ){
+  if( trim($message_) == 'Transaccion exitosa' && $transType == 'A' ){
   //consulta los datos en relacion al numero de serie de la terminal
     $sql = "";
     if( isset( $traceability['smart_accounts'] ) && $traceability['smart_accounts'] == true ){
