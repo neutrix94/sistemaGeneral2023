@@ -10,6 +10,63 @@
 		<i class="icon-cancel-circled">Cancelar y cerrar</i>
 	</button>
 </div>	
+
+	<!--script>
+        const serverUrl = 'ajax/server_events.php?transaction_id=<?php echo $resp->petition_id;?>';
+        const emergentCountTmp = <?php echo $counter;?>;
+
+        // Crear un nuevo Web Worker
+        const myWorker = new Worker('js/webWorker.js');
+
+        // Manejar mensajes del Web Worker
+        myWorker.addEventListener('message', function (e) {
+            // Este código se ejecutará cuando el Web Worker envíe un mensaje de vuelta
+            const result = e.data;
+            console.log('Resultado del Web Worker:', result);
+
+            // Puedes realizar acciones adicionales con el resultado aquí
+        });
+
+        // Crea una nueva conexión SSE
+        var eventSource = new EventSource(serverUrl);
+
+        // Define una función para manejar los mensajes entrantes del SSE
+        eventSource.onmessage = function(event) {
+            const messageContainer = document.getElementById('message-container');
+            if (event.data !== '' && event.data !== null) {
+                $( '.emergent_content' ).html(`<h2 class="text-success text-center">${event.data}</h2>`);
+                eventSource.close(); // Cierra la conexión SSE
+
+                // Envía un mensaje al Web Worker con la información relevante
+                myWorker.postMessage({
+                    eventData: event.data,
+                    emergentCountTmp: emergentCountTmp
+                });
+
+                // Continúa con el resto del código aquí si es necesario
+            }
+        };
+
+		function stop_server_events( petition_id ){
+            $( '.emergent_content' ).html(`<h2 class="text-success text-center">Cancelado desde 'stop_server_events'</h2>`);
+			eventSource.close();
+			close_emergent();
+			/*if( ! confirm( "Realmente deseas cancelar el cobro?" ) ){
+				return false;
+			}
+			/*var url = "ajax/db.php?fl=cancelEvents&transaction_id=" + petition_id;
+			alert( url );
+			var resp = ajaxR( url ).trim();
+			alert( resp );
+			/*if( resp != 'ok' ){
+				alert( "Error : \n" + resp );
+			}*/
+			/*myWorker.postMessage({
+						eventData: event.data,
+						emergentCountTmp: emergentCountTmp
+					}); // Cierra la conexión SSE*/
+		}
+    </script-->
 <script>
 	// Crea una nueva conexión SSE
 	var server_url = 'ajax/server_events.php?transaction_id=<?php echo $resp->petition_id;?>';
@@ -32,7 +89,7 @@
         		//var url = "ajax/dp.php?fl=getOrderId&transaction_id=<?php echo $resp->petition_id;?>";
         		//var resp = ajaxR( url );
 
-        		if( event.data.trim() == 'Transacción exitosa' ){
+        		if( event.data.trim() == 'Transacción exitosa' || event.data.trim() == 'Transaccion exitosa' ){
         			$( '#reprint_btn_' + emergent_count_tmp ).removeClass( 'no_visible' );
         			$( '#reprint_btn_' + emergent_count_tmp ).attr( 'onclick', 'rePrintByOrderId( <?php echo $resp->petition_id;?> )' );
         			$( '#cancel_btn_' + emergent_count_tmp ).removeClass( 'no_visible' );
@@ -42,6 +99,7 @@
 					
 					$( '#cancel_btn_' + emergent_count_tmp ).remove();	
 					carga_pedido( $( '#id_venta' ).val() );
+						getHistoricPayment( respuesta.id_venta );
         		}
         	}, 2000
     		);
@@ -53,6 +111,7 @@
 			return false;
 		}
 		var url = "ajax/db.php?fl=cancelEvents&transaction_id=" + petition_id;
+		alert( url );
 		var resp = ajaxR( url ).trim();
 		alert( resp );
 		if( resp != 'ok' ){
