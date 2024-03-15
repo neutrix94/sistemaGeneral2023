@@ -164,6 +164,7 @@
 				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_cancelacion' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/cancel";//"http://nubeqa.netpay.com.mx:3334/integration-service/transactions/cancel";
 				$cancel = $apiNetPay->saleCancelation( $apiUrl, $data['orderId'], $data['terminalId'],
 										$user_id, $sucursal_id, $sale_folio, $session_id, $store_id_netpay );
+			//	die("pasa : {$cancel}");
 				$resp = json_decode( $cancel );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
 					$counter = 'null';
@@ -685,7 +686,15 @@
 								onclick=\"rePrintByOrderId( '{$aux_row['id_transaccion_netpay']}' );\"
 							>
 								<i class=\"icon-print-3\"></i>
-							</button>";
+							</button>
+							<button
+							type=\"button\"
+							class=\"btn btn-danger\"
+							style=\"padding : 0px !important;\"
+							onclick=\"cancelByOrderId( '{$aux_row['id_transaccion_netpay']}' );\"
+						>
+							<i class=\"icon-cancel-circled\"></i>
+						</button>";
 					}
 					$resp .= "<tr {$color}>
 						<td class=\"text-center\">{$row['payment_type']}</td>
