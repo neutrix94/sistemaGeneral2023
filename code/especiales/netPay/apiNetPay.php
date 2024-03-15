@@ -198,7 +198,7 @@
 			//die( '' );
 			$post_data = json_encode( $data, true );
 /*Escribir json en txt*/
-$file = fopen("debug.txt", "w");
+$file = fopen("salePetition.txt", "w");
 fwrite($file, $post_data);
 fclose($file);
 /**/
@@ -270,6 +270,9 @@ fclose($file);
 						"disablePrintAnimation"=>false
 					);
 			$post_data = json_encode( $data, true );
+			$file = fopen("cancel.txt", "w");
+			fwrite($file, $post_data);
+			fclose($file);
 		//envia peticion
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
@@ -330,6 +333,9 @@ fclose($file);
 					);
 			//var_dump( $data );return '';
 			$post_data = json_encode( $data, true );
+			$file = fopen("reprint.txt", "w");
+			fwrite($file, $post_data);
+			fclose($file);
 		//envia peticion
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
