@@ -368,8 +368,14 @@ function enlista_paquete(arreglo){
         if(flag==1){
         //enviamos la impresión del ticket
 /*Implementación Oscar 02.03.2019 para el status de la devolucion cuando se devuelve efectivo*/
-            var imp_dev=ajaxR("ajax/imprimeDev.php?monto_devolucion="+$("#saldoAFavor").val()+"&id_pedido_original="+$("#id_de_pedido_original").val()+"&flag_tkt=devuelve_efectivo"+
-                "&ids_devoluciones="+$("#id_de_devoluciones").val() + "&password_encargado=" + $("#passWord_1").val() );
+            var url = "ajax/imprimeDev.php?monto_devolucion="+$("#saldoAFavor").val()+"&id_pedido_original="+$("#id_de_pedido_original").val()+"&flag_tkt=devuelve_efectivo"+
+            "&ids_devoluciones="+$("#id_de_devoluciones").val() + "&password_encargado=" + $("#passWord_1").val();
+            //alert( url );
+            //var url = "index.php?scr=talon_pago&idp=" + $("#id_de_pedido_original").val();
+            //"index.php?scr=talon_pago&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
+            //u1+="&sald_fav_cl="+s_f+"&favOrig="+s_f_o;
+            var imp_dev=ajaxR( url );
+            //alert( imp_dev );return false;
             if( imp_dev == 'no' ){
                 alert( "La contraseña del encargado es incorrecta!");
                 return false;

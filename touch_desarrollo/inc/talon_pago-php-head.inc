@@ -20,7 +20,6 @@
 	}else{
 		die("No hay archivo de configuración!!!");
 	}
-	//die( "here : {$ruta_or_}" );
 /*Fin de cambio Oscar 25.01.2018*/
     
 	$devolucion = array();
@@ -136,9 +135,10 @@
 					WHERE p.id_pedido = {$id_pedido_devolucion}
 					GROUP BY p.id_pedido";
 			$payment_stm = mysql_query( $sql ) or die( "Error al consultar monto pagado : " . mysql_error() );
-			$payment_row = mysql_fetch_assosc( $payment_stm );
+			$payment_row = mysql_fetch_assoc( $payment_stm );
 			$devolucion['pagos_realizados'] =$payment_row['total_pedido_pagos'] - $payment_row['total_devolucion_pagos'];
 		}
+		//die( "here : {$ruta_or}" );
 	//}
 //var_dump( $devolucion );
 //die(json_encode( $devolucion ));
@@ -627,7 +627,6 @@
   		$ticket->SetFont('Arial','B',$bF+3);
 		$ticket->SetXY(1, $ticket->GetY()+40);
 		$ticket->Cell(66, 6, utf8_decode("PASE A CAJA A PAGAR"), "", 0, 'C');
-    
     if($printPan == 1) {
     	ob_end_clean();
 	   $ticket->Output();
@@ -660,7 +659,7 @@
     		if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 				$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
     		}else{//impresion por red local
-				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 2, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path );
+				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 2, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path, '../', 'location="index.php?";' );
 			}
     	}//fin de for $cont
 	/*fin de cambio Oscar 17.09.2018*/
