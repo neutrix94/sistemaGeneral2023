@@ -15,12 +15,23 @@
 												"id_modulo_impresion"=>"{$id_modulo}"
 											) 
 										);
-										var_dump( $post_data );
+				//var_dump( $post_data );
 				$enviar_archivo = $SysArchivosDescarga->sendPetition( $url, $post_data );
 				if( $enviar_archivo != "ok" ){
 					die( "Error al consumir el WebService en Red Local : {$enviar_archivo}|{$id}" );
 				}//die( "here_2" );
 				die( "sendSpecificFile Case" );
+			break;
+
+			case 'resend_petiton_file_view' : 
+				echo $SysArchivosDescarga->resend_petiton_file_view();
+			break;
+
+			case 'move_file_to_generic_folder' : 
+				$file_id = ( isset( $_GET['file_id'] ) ? $_GET['file_id'] : $_POST['file_id'] );
+				$path = ( isset( $_GET['path'] ) ? $_GET['path'] : $_POST['path'] );
+				$id_modulo = ( isset( $_GET['id_modulo'] ) ? $_GET['id_modulo'] : $_POST['id_modulo'] );
+				echo $SysArchivosDescarga->move_file_to_generic_folder( $file_id, $path, $id_modulo, $user_sucursal );
 			break;
 			
 			default:
@@ -61,7 +72,8 @@
 			return $this->link->insert_id;
 		}
 
-		function crea_registros_sincronizacion_archivo_por_red_local( $id_modulo, $tipo, $nombre_ticket, $ruta_origen, $ruta_salida, $store_id, $user_id, $carpeta_path ){
+		function crea_registros_sincronizacion_archivo_por_red_local( $id_modulo, $tipo, $nombre_ticket, $ruta_origen, $ruta_salida, $store_id, $user_id, $carpeta_path, 
+			$path = '../', $action_after = '' ){
 		//consulta si tiene endpoint especifico local por usuario
 			$url_base = "";
 			$sql = "SELECT
@@ -99,13 +111,107 @@
 				$url = "http://localhost/{$carpeta_path}/rest/print/enviar_archivo_red_local";
 				$enviar_archivo = $this->sendPetition( $url, $post_data );
 				if( $enviar_archivo != "ok" ){
-					die( "Error al consumir el WebService en Red Local : {$enviar_archivo}|{$id}" );
+					die( $this->build_error_view( $id, $store_id, $id_modulo, $path, $action_after ) );
+					//die( "Error al consumir el WebService en Red Local : {$enviar_archivo}|{$id}" );
 				}//die( "here_2" );
 				//die( "No hay APIS destino para este modulo. {$sql}" );
 			}else{
 				return 'ok';
 			}
 			
+		}
+		
+		function build_error_view( $file_id, $store_id, $id_modulo, $path, $action_after ){
+			$resp = "<div class=\"row\">
+				<div class=\"col-12 text-center\" style=\"font-size : 200% !important;\"><br>
+					<h2 class=\"text-danger\">Hubo un error al enviar el archivo por WebService, deseas volver a intentar?</h2>
+				</div>
+				<div class=\"col-6 text-end\"><br>
+					<button 
+						type=\"button\"
+						class=\"btn btn-success\"
+						onclick=\"reenviar_archivo_ws( path = '../', {$file_id}, {$id_modulo} );\"
+					>
+						Volver a intentar
+					</button>
+				</div>
+				<div class=\"col-6 text-start\"><br>
+					<button 
+						type=\"button\"
+						class=\"btn btn-warning\"
+						onclick=\"enviar_archivo_carpeta_modulo( path = '../', {$file_id}, {$id_modulo} );\"
+					>
+						Enviar a carpeta de modulo
+					</button>
+				</div>
+			</div>
+			<script type=\"text/javascript\">
+				function reenviar_archivo_ws( file_id ){
+					var url = \"{$path}code/especiales/controladores/SysArchivosDescarga.php?fl_archivo_descarga=sendSpecificFile&file_id=\" + {$file_id} + \"&module_id={$id_modulo}\";
+					//var resp = ajaxR( url );
+					//alert( resp );
+					$.ajax({
+						type:'post',
+						url: url,
+						cache:false,
+						success:function(dat){
+							if( dat == 'ok' ){
+								{$action_after}
+							}else{
+								alert( \"Error : \" + dat );
+							}
+							//alert( dat );
+						}
+					});
+				}
+				function enviar_archivo_carpeta_modulo( file_id ){
+					var url = \"{$path}code/especiales/controladores/SysArchivosDescarga.php?fl_archivo_descarga=move_file_to_generic_folder&file_id=\" + {$file_id} + \"&module_id={$id_modulo}\";
+					$.ajax({
+						type:'post',
+						url: url,
+						cache:false,
+						success:function(dat){
+							if( dat == 'ok' ){
+								{$action_after}
+							}else{
+								alert( \"Error : \" + dat );
+							}
+							//alert( dat );
+						}
+					});
+				}
+			</script>";
+			return $resp;
+		}
+
+		function move_file_to_generic_folder( $file_id, $path, $id_modulo, $store_id ){
+		//consulta los datos del archivo
+			$sql = "SELECT 
+						nombre_archivo,
+						ruta_origen
+					FROM sys_archivos_descarga
+					WHERE id_archivo = {$file_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar informacion del archivo en move_file_to_generic_folder : {$this->link->error}" );
+			$file_row = $stm->fetch_assoc();
+			$origin_file_path = "../../..{$file_row['ruta_origen']}{$file_row['nombre_archivo']}";//ruta origen
+		//consulta la ruta origen en relacion al modulo y sucursal
+			
+
+			$destinity_file_path = "../../..{$file_row['ruta_origen']}{$file_row['nombre_archivo']}";
+			
+			$moved = false;
+			if(is_file($origin_file_path)){
+				$moved = rename($origin_file_path, $destinity_file_path);
+			}
+			if($moved){
+				return 'ok';
+			}else{
+				die( "Error al mover el archivo de {$origin_file_path} a {$destinity_file_path}" );
+			}
+		}
+
+		function resend_petiton_file_view( $file_id, $path ){
+
 		}
 
 		function sendPetition( $url, $json ){
