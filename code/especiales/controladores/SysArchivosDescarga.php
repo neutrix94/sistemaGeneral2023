@@ -6,7 +6,8 @@
 		$SysArchivosDescarga = new SysArchivosDescarga( $link );
 		switch ($action) {
 			case 'sendSpecificFile' :
-				$url = "http://localhost/desarrollo_cobros_e_impresion/rest/print/enviar_archivo_red_local";
+				$carpeta_path = ( isset( $_GET['carpeta'] ) ? $_GET['carpeta'] : $_POST['carpeta'] );
+				$url = "http://localhost/{$carpeta_path}/rest/print/enviar_archivo_red_local";
 				$id = ( isset( $_GET['file_id'] ) ? $_GET['file_id'] : $_POST['file_id'] );
 				$id_modulo = ( isset( $_GET['module_id'] ) ? $_GET['module_id'] : $_POST['module_id'] );
 				$post_data = json_encode( array( "id_archivo"=>"{$id}",
@@ -111,7 +112,7 @@
 				$url = "http://localhost/{$carpeta_path}/rest/print/enviar_archivo_red_local";
 				$enviar_archivo = $this->sendPetition( $url, $post_data );
 				if( $enviar_archivo != "ok" ){
-					die( $this->build_error_view( $id, $store_id, $id_modulo, $path, $action_after ) );
+					die( $this->build_error_view( $id, $store_id, $id_modulo, $path, $action_after, $carpeta_path ) );
 					//die( "Error al consumir el WebService en Red Local : {$enviar_archivo}|{$id}" );
 				}//die( "here_2" );
 				//die( "No hay APIS destino para este modulo. {$sql}" );
@@ -121,7 +122,7 @@
 			
 		}
 		
-		function build_error_view( $file_id, $store_id, $id_modulo, $path, $action_after ){
+		function build_error_view( $file_id, $store_id, $id_modulo, $path, $action_after, $carpeta_path ){
 			$resp = "<div class=\"row\">
 				<div class=\"col-12 text-center\" style=\"font-size : 200% !important;\"><br>
 					<h2 class=\"text-danger\">Hubo un error al enviar el archivo por WebService, deseas volver a intentar?</h2>
@@ -148,6 +149,7 @@
 			<script type=\"text/javascript\">
 				function reenviar_archivo_ws( file_id ){
 					var url = \"{$path}code/especiales/controladores/SysArchivosDescarga.php?fl_archivo_descarga=sendSpecificFile&file_id=\" + {$file_id} + \"&module_id={$id_modulo}\";
+					url += \"&carpeta={$carpeta_path}\";
 					//var resp = ajaxR( url );
 					//alert( resp );
 					$.ajax({
@@ -166,6 +168,7 @@
 				}
 				function enviar_archivo_carpeta_modulo( file_id ){
 					var url = \"{$path}code/especiales/controladores/SysArchivosDescarga.php?fl_archivo_descarga=move_file_to_generic_folder&file_id=\" + {$file_id} + \"&module_id={$id_modulo}\";
+					url += \"&carpeta={$carpeta_path}\";
 					$.ajax({
 						type:'post',
 						url: url,
