@@ -21,7 +21,8 @@
 				if( $enviar_archivo != "ok" ){
 					die( "Error al consumir el WebService en Red Local : {$enviar_archivo}|{$id}" );
 				}//die( "here_2" );
-				die( "sendSpecificFile Case" );
+				die( 'ok' );
+				//die( "sendSpecificFile Case" );
 			break;
 
 			case 'resend_petiton_file_view' : 
