@@ -4,6 +4,7 @@
 	include("../../../../include/fpdf153/fpdf.php");
 	include("../../../../conect.php");
 	include("../../../../conexionMysqli.php");
+	$absolute_path = $_POST['absolute_path'];
 	//consulta el año actual
 	$data = array();
 	$pendientes_pago = array();
@@ -303,13 +304,12 @@
 	include( '../../../../code/especiales/controladores/SysModulosImpresion.php' );
 	$SysModulosImpresion = new SysModulosImpresion( $link );
 
-	$absolute_path = $_POST['absolute_path'];
 	$ruta_salida = '';
 	$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 1 );//ventas pedientes de validar
 	if( $ruta_salida == 'no' ){
 		$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 1 );//ventas pedientes de validar
 	}
-    $ticket->Output("{$abslute_path}{$ruta_salida}/{$nombre_ticket}", "F");
+    $ticket->Output("{$absolute_path}{$ruta_salida}/{$nombre_ticket}", "F");
 
 /*Sincronización remota de tickets*/
 	if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
