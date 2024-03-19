@@ -397,7 +397,7 @@
 	//$ticket->Cell(66, 6, utf8_decode("CASA DE LAS LUCES"), "" ,0, "C");
 	if(!isset($monto_devolucion)){
 	 $ticket->SetFont('Arial','',$bF+1);
-	 $ticket->SetXY(0, $ticket->GetY()+6);
+	 $ticket->SetXY(0, $ticket->GetY()+10);
 	 $ticket->Cell(66, 6, utf8_decode("Folio devolución: "), "" ,0, "C");
 	
 	 $ticket->SetFont('Arial','',$bF+2);
