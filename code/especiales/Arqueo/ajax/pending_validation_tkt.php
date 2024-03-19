@@ -35,7 +35,7 @@
 					p.folio_nv AS folio, 
 					p.total AS amount,
 					CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS username,
-					SUM( cc.monto ) AS pagado
+					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) AS pagado
 				FROM ec_pedidos p
 				LEFT JOIN ec_cajero_cobros cc
 				ON cc.id_pedido = p.id_pedido
@@ -314,7 +314,10 @@
 	if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 		$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
 	}else{//impresion por red local
-		$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 1, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path );
+		$absolute_path = $_POST['absolute_path'];
+		//die("HERE : {$absolute_path}");
+		$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 1, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal,  $user_id, 
+		$carpeta_path, $absolute_path, 'alert("Impresion de cotizacion exitosa!");close_emergent();' );
 	}
     die( 'ok|' );
 
