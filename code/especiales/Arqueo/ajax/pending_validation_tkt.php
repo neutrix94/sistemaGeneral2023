@@ -35,7 +35,7 @@
 					p.folio_nv AS folio, 
 					p.total AS amount,
 					CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS username,
-					SUM( cc.monto ) AS pagado
+					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) AS pagado
 				FROM ec_pedidos p
 				LEFT JOIN ec_cajero_cobros cc
 				ON cc.id_pedido = p.id_pedido
