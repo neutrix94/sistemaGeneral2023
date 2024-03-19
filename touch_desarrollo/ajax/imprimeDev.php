@@ -245,7 +245,8 @@
     $sql = "SELECT
       d.folio AS folio_devolucion,
       p.folio_nv AS folio_venta_original,
-      CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS vendedor
+      CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS vendedor,
+      p.total AS total_actual
     FROM ec_devolucion d
     LEFT JOIN ec_devolucion_detalle dd
     ON dd.id_devolucion = d.id_devolucion
@@ -514,19 +515,19 @@
     $ticket->SetY($ticket->GetY()-5);
 
     $ticket->SetFont('Arial','B',$bF+2);
-    $ticket->SetXY(7+66*0.4, $ticket->GetY()+5);
+    $ticket->SetXY(15+66*0.4, $ticket->GetY()+5);
     $sql="SELECT id_pedido FROM ec_pedidos ";
-    $ticket->Cell(66*0.3, 6, utf8_decode("Total"), "" ,0, "L");
+    $ticket->Cell(66*0.3, 6, utf8_decode("Total :   $ {$total_de_devolucion}"), "" ,0, "L");
 //die("here : { $devolucion['pagos_realizados']}");
     if( $devolucion['pagos_realizados'] > 0 ){
       $ticket->SetFont('Arial','B',$bF+2);
       $ticket->SetXY(5, $ticket->GetY()+6);
       $ticket->Cell(66, 6, utf8_decode("TOTAL PAGADO : $ {$devolucion['pagos_realizados']}"), "" ,0, "L");
-      $ticket->SetXY(5, $ticket->GetY()+6);
-      $ticket->Cell(66, 6, utf8_decode("NUEVO TOTAL : {$devolucion['total_actual']}"), "" ,0, "L");
+      $ticket->SetXY(5, $ticket->GetY()+8);
+      $ticket->Cell(66, 6, utf8_decode("NUEVO TOTAL : $ {$devolucion['total_actual']}"), "" ,0, "L");
     }
     
-    $ticket->SetXY(7+66*0.75, $ticket->GetY());
+    /*$ticket->SetXY(7+66*0.75, $ticket->GetY());
     if(!isset($monto_devolucion)){
     if($pedido_pagado==1){
       //$ticket->Cell(66*0.25, 6, "$ " . number_format(round($total,2), 2), "" ,0, "R");
@@ -538,7 +539,7 @@
     }else{
         //$ticket->Cell(66*0.25, 6, "$ " . number_format(round($monto_devolucion,2), 2), "" ,0, "R");
         $ticket->Cell(66*0.25, 6, "$ " . number_format(round($monto_devolucion,2), 2), "" ,0, "R");    
-    }
+    }*/
 
     $ticket->SetFont('Arial','',$bF);
     $ticket->SetXY(7, $ticket->GetY()+6);
@@ -575,6 +576,11 @@
     if($printPan == 1) {
        $ticket->Output();
     }else{
+      if(isset($id_pedido_original) && $flag_tkt=='devuelve_efectivo'){
+          $sql="UPDATE ec_devolucion SET status=3,observaciones='Dinero regresado al cliente' WHERE id_pedido=$id_pedido_original";
+          $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
+         //echo $sql;
+      }
 /*implementacion Oscar 2024-02-01 para ruta especifica de ticket*/
     /*instancia clases*/
         include( '../../conexionMysqli.php' );
@@ -605,11 +611,6 @@
         }else{//impresion por red local
           $enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( $tipo_modulo, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, 
           $carpeta_path, '../', 'location="index.php?";' );
-        }
-        if(isset($id_pedido_original) && $flag_tkt=='devuelve_efectivo'){
-            $sql="UPDATE ec_devolucion SET status=3,observaciones='Dinero regresado al cliente' WHERE id_pedido=$id_pedido_original";
-            $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
-           //echo $sql;
         }
     }
 ?>

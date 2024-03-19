@@ -374,14 +374,21 @@ function enlista_paquete(arreglo){
             //var url = "index.php?scr=talon_pago&idp=" + $("#id_de_pedido_original").val();
             //"index.php?scr=talon_pago&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
             //u1+="&sald_fav_cl="+s_f+"&favOrig="+s_f_o;
-            var imp_dev=ajaxR( url );
+            var imp_dev = ajaxR( url );
             //alert( imp_dev );return false;
-            if( imp_dev == 'no' ){
+            if( imp_dev != 'ok ' ){
+                $('#emergente_1').html( imp_dev );
+                $('#emergente_1').css('display','block');
+                return false;
+            }else{
+                location.href = "index.php?";
+            }
+            /*if( imp_dev == 'no' ){
                 alert( "La contraseña del encargado es incorrecta!");
                 return false;
-            }
+            }*/
            //alert(imp_dev);return true;
-            location.href="index.php?";//scr=nueva-venta
+            ;//scr=nueva-venta
 /*Fin de Cambio Oscar 02.03.2019*/
         }
     //si se llama a la función desde el botón de cancelar
