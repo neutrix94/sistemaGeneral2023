@@ -1,0 +1,32 @@
+{
+    "affiliation": "455311",
+    "amount": "1498.0",
+    "bankName": "",
+    "bin": "",
+    "cardType": "",
+    "cardTypeName": "VISA",
+    "cityName": "OTHON P. BLANCO QUINTANA ROO",
+    "responseCode": "02",
+    "folioNumber": "71",
+    "internalNumber": "",
+    "isRePrint": false,
+    "message": "Cancelado por el Usuario",
+    "moduleCharge": "454",
+    "moduleLote": "6",
+    "terminalId": "1494113052",
+    "rePrintDate": "1.3.10.2.p.p_20231005",
+    "cardNumber": "7580",
+    "storeId": "455311",
+    "streetName": "AV. INSURGENTES  KM 5.025",
+    "tableId": "",
+    "ticketDate": "MAR. 05, 24 16:50:36 ",
+    "traceability": {
+        "id_sesion_cajero": "3058",
+        "smart_accounts": true,
+        "id_cajero": "1432",
+        "folio_venta": "24CS132",
+        "store_id_netpay": "455311",
+        "id_sucursal": "4"
+    },
+    "transType": "A"
+}

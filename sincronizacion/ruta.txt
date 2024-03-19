@@ -1,1 +1,1 @@
-/Applications/XAMPP/htdocs/General2022/conexion_inicial.txt
+/Applications/XAMPP/htdocs/desarrollo_cobros_e_impresion/conexion_inicial.txt

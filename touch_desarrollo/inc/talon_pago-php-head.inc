@@ -406,7 +406,7 @@
 		$ticket->SetXY(5, $ticket->GetY()+6);
 		$ticket->Cell(66, 6, utf8_decode("DEVOLUCION:"), "" ,0, "C");
 		$ticket->SetFont('Arial','B',$bF );
-		$ticket->SetXY(5, $ticket->GetY()+4);
+		$ticket->SetXY(5, $ticket->GetY()+6);
 		$ticket->Cell(66, 6, utf8_decode("Folio devolución : {$devolucion['folio_devolucion']}"), "" ,0, "L");
 		$ticket->SetFont('Arial','B',$bF );
 		$ticket->SetXY(5, $ticket->GetY()+4);
@@ -504,7 +504,13 @@
 	
 	$ticket->SetFont('Arial','',$bF-2);
 	if($pagado == 1) {
-	//implementado por Oscar 29-12-2017
+			if( $devolucion['pagos_realizados'] > 0 ){
+				$ticket->SetFont('Arial','B',$bF+2);
+				$ticket->SetXY(5, $ticket->GetY()+6);
+				$ticket->Cell(66, 6, utf8_decode("TOTAL PAGADO : $ {$devolucion['pagos_realizados']}"), "" ,0, "L");
+				$ticket->SetXY(5, $ticket->GetY()+6);
+				$ticket->Cell(66, 6, utf8_decode("NUEVO TOTAL : {$devolucion['total_actual']}"), "" ,0, "L");
+			}
 		if($diferencia!=''){
 		//
 			$ticket->SetFont('Arial','B',$bF+20);
@@ -514,13 +520,6 @@
 			$ticket->SetXY(5, $ticket->GetY() + 9);
 			$ticket->Cell(66, 6, "$ " . number_format( abs( $total ), 2), "" ,0, "C");
 			
-			if( $devolucion['pagos_realizados'] > 0 ){
-				$ticket->SetFont('Arial','B',$bF+2);
-				$ticket->SetXY(5, $ticket->GetY()+6);
-				$ticket->Cell(66, 6, utf8_decode("TOTAL PAGADO : $ {$devolucion['pagos_realizados']}"), "" ,0, "L");
-				$ticket->SetXY(5, $ticket->GetY()+6);
-				$ticket->Cell(66, 6, utf8_decode("NUEVO TOTAL : {$devolucion['total_actual']}"), "" ,0, "L");
-			}
 		//
 			//$ticket->SetXY(5, $ticket->GetY()+8);
 			$ticket->SetXY(5, $ticket->GetY()+15);

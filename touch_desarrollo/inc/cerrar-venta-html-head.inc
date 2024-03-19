@@ -667,8 +667,20 @@ function bloquea_pantalla(){
 				}).done (function (data){
 					servicio_ok = data.trim();
 //console.log( data );
-//alert('here:'+data);
-					return true;
+alert('here:'+data);
+					setTimeout( function(){ 
+						if( data != 'ok' ){
+							alert(1);
+							$("#cont_emergente").html(data);//cargamos respuesta 
+							$("#emergente_cerrar").css("display","block");
+							return false;
+						}else{
+							alert(2);
+							location.href = "index.php?";
+							return false;
+						}
+						return true;
+					}, 300);
 				});
 
             /*                   
