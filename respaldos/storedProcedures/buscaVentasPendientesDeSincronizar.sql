@@ -36,10 +36,10 @@ BEGIN
 				UPDATE ec_pedidos_detalle pd
 					SET pd.folio_unico = CONCAT( origin_store_prefix, '_VTADET_', pd.id_pedido_detalle )/*actualiza folio_unico de detalle(s)*/
 				WHERE pd.id_pedido = sale_header_id;
-			/*Genera los folios unicos ( pagos )
-				UPDATE ec_pedido_pagos pp
-					SET pp.folio_unico = CONCAT( origin_store_prefix, '_VTAPAG_', pp.id_pedido_pago )actualiza folio_unico de pago(s)
-				WHERE pp.id_pedido = sale_header_id;*/
+			/*Genera los folios unicos ( referencia devolucion )*/
+				UPDATE ec_pedidos_referencia_devolucion prd
+					SET prd.folio_unico = CONCAT( origin_store_prefix, '_REFDEV_', prd.id_pedido_referencia_devolucion )/*actualiza folio_unico de referencia devolucion*/
+				WHERE prd.id_pedido = sale_header_id;
 
 				CALL generaRegistroSincronizacionVenta( sale_header_id, teller_session_id, origin_store_id );
 			COMMIT;

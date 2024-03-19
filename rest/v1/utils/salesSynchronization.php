@@ -173,7 +173,22 @@
 						}
 					}
 				}
-			//iniserta pago(s) 
+			//inserta la referencia de la devolucion
+				$return_reference = $sale['return_reference'];
+				foreach ($return_reference as $key2 => $reference) {
+					if( $ok == true ){
+						$sql = "INSERT INTO ec_pedidos_referencia_devolucion ( id_pedido, total_venta, monto_venta_mas_ultima_devolucion, saldo_a_favor, folio_unico, sincronizar )  
+						VALUES ( '{$sale_id}', '{$reference['total_venta']}', '{$reference['monto_venta_mas_ultima_devolucion']}', '{$reference['saldo_a_favor']}', 
+							'{$reference['folio_unico']}', 1 )"; 
+						$stm = $this->link->query( $sql );// or die( "Error al insertar detalle de venta : {$sql} {$this->link->error}");
+						if( ! $stm ){
+							return array( "error"=>"Error al insertar referencia devolucion de venta : {$this->link->error}");
+						  $ok = false;
+						}
+					}
+				}
+
+			/*inserta pago(s) 
 				$sale_payments = $sale['sale_payments'];
 				foreach ($sale_payments as $key2 => $payment) {
 					if( $ok == true ){
@@ -190,7 +205,7 @@
 						  $ok = false;
 						}
 					}
-				}
+				}*/
 				if( $ok == true ){
 					$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$sale['folio_unico']}'";
 					$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$sale['folio_unico']}'";
