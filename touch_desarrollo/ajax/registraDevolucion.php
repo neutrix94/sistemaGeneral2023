@@ -558,9 +558,9 @@ else{
        // if($es_completa==1){
         if( $monto_pagado > 0 ){
         //imprimimos el ticket de la devolución
-            if(!include('imprimeDev.php')){
+          /*  if(!include('imprimeDev.php')){
     		  die("Error al generar ticket de devolución");
-    	    }
+    	    }*/
         }
         //}
     /*Fin de cambio Oscar 06.03.2019*/

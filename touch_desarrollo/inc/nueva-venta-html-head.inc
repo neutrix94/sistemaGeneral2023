@@ -2269,21 +2269,32 @@ var hay_paquete=0;
         if( pdf ){
             url += "&show_pdf=true";
         }
-        var resp = ajaxR( url );
+        var resp = ajaxR( url ).split( '|' );
         if( pdf ){
-            resp = resp.replace( '../../', '../' );
-            var obj = `<embed src="${resp}" type="application/pdf" width="100%" height="400px" />`;
-            obj = `<iframe src="${resp}" height="400px" width="100%"></iframe>`;
+            //alert(resp);
+            resp[1] = resp[1].replace( '../../', '../' );
+            var obj = `<embed src="${resp[1]}" type="application/pdf" width="100%" height="400px" />`;
+            obj = `<iframe src="${resp[1]}" height="400px" width="100%"></iframe>`;
             //obj = `<object data="${resp}" height="400px" width="100%"></object>`;
             $( '#quotation_container' ).html( obj );
         }else{
-            alert( resp );
-            $( '#contEmerge' ).html( '' );
-            $( '#emergePermisos' ).css( 'display', 'none' );
+            if( resp[0] != 'ok' ){
+                $( '#contEmerge' ).html( resp );
+                $( '#emergePermisos' ).css( 'display', 'block' );
+            }else{
+                alert( resp[1] );
+                $( '#contEmerge' ).html( '' );
+                $( '#emergePermisos' ).css( 'display', 'none' );
+            }
         }
        // alert( resp );
     }
 /*fin de cambio Oscar 2023*/
+
+    function close_emergent(){
+        $( '#contEmerge' ).html( '' );
+        $( '#emergePermisos' ).css( 'display', 'none' );
+    }
 
 /*implementación Oscar 2017*/
     function verificaPass(){
