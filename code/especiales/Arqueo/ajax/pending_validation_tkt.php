@@ -309,7 +309,7 @@
 	if( $ruta_salida == 'no' ){
 		$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 1 );//ventas pedientes de validar
 	}
-    $ticket->Output("{$absolute_path}{$ruta_salida}/{$nombre_ticket}", "F");
+    $ticket->Output("../../../../{$ruta_salida}/{$nombre_ticket}", "F");
 
 /*Sincronización remota de tickets*/
 	if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
