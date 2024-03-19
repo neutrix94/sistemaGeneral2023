@@ -1,5 +1,5 @@
 <?php
-/*version casa 1.1*/
+/*version casa 1.2*/
 	define('FPDF_FONTPATH','../../../../include/fpdf153/font/');
 	include("../../../../include/fpdf153/fpdf.php");
 	include("../../../../conect.php");
