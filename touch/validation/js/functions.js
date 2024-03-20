@@ -275,7 +275,9 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 			//alert( url ); return  false;
 			var response = ajaxR( url ).trim().split( '|' );
 			if( response[0] != 'ok' ){
-				alert( "Error : " + response[0] );
+				$( '.emergent_content' ).html( response );
+				$( '.emergent' ).css( 'display', 'block' );
+				//alert( "Error : " + response[0] );
 				return false;
 			}
 
