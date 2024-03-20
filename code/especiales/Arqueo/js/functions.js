@@ -366,6 +366,7 @@
 			type : 'post',
 			url : 'ajax/pending_validation_tkt.php',
 			cache : false,
+			
 			data : { flag : 'print_pending_to_validate', absolute_path : '../../../' },
 			success : function( dat ){
 				var aux = dat.split("|");

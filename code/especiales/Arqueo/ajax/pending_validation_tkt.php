@@ -1,9 +1,10 @@
 <?php
-/*version casa 1.1*/
+/*version casa 1.2*/
 	define('FPDF_FONTPATH','../../../../include/fpdf153/font/');
 	include("../../../../include/fpdf153/fpdf.php");
 	include("../../../../conect.php");
 	include("../../../../conexionMysqli.php");
+	$absolute_path = $_POST['absolute_path'];
 	//consulta el año actual
 	$data = array();
 	$pendientes_pago = array();
@@ -314,7 +315,6 @@
 	if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 		$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
 	}else{//impresion por red local
-		$absolute_path = $_POST['absolute_path'];
 		//die("HERE : {$absolute_path}");
 		$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 1, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal,  $user_id, 
 		$carpeta_path, $absolute_path, 'alert("Impresion de cotizacion exitosa!");close_emergent();' );
