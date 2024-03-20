@@ -324,9 +324,9 @@
 			return false;
 		}
 	}
-	
+	$espacio_devolucion = ( $devolucion['folio_devolucion'] != null ? 30 : 0 );
 	//+40+130
-	$ticket = new TicketPDF("P", "mm", array(80,80+$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
+	$ticket = new TicketPDF("P", "mm", array(80,80+$espacio_devolucion+$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
 	
@@ -406,7 +406,7 @@
 		$ticket->SetXY(5, $ticket->GetY()+6);
 		$ticket->Cell(66, 6, utf8_decode("DEVOLUCION:"), "" ,0, "C");
 		$ticket->SetFont('Arial','B',$bF );
-		$ticket->SetXY(5, $ticket->GetY()+6);
+		$ticket->SetXY(5, $ticket->GetY()+8);
 		$ticket->Cell(66, 6, utf8_decode("Folio devolución : {$devolucion['folio_devolucion']}"), "" ,0, "L");
 		$ticket->SetFont('Arial','B',$bF );
 		$ticket->SetXY(5, $ticket->GetY()+4);
@@ -630,6 +630,11 @@
     	ob_end_clean();
 	   $ticket->Output();
     }else{
+	/*Implementación Oscar 07.03.2019 para finalzar el satus de la devolución*/
+		if(isset($_GET["id_pedido_original"]) || $_GET['es_apartado']==1){
+			$sql="UPDATE ec_devolucion SET status=3,observaciones='$mensaje_nota' WHERE id_pedido=$id_pedido_original";
+			$eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
+		}
 /*implementacion Oscar 2024-02-01 para ruta especifica de ticket*/
 	/*instancia clases*/
 		include( '../conexionMysqli.php' );
@@ -662,51 +667,6 @@
 			}
     	}//fin de for $cont
 	/*fin de cambio Oscar 17.09.2018*/
-	/*implementacion Oscar 2023/09/20 para enviar impresion remota*/
-		if($user_tipo_sistema=='linea'){
-			/*$archivo_path = "../conexion_inicial.txt";
-			$url = "";
-				if(file_exists($archivo_path)){
-					$file = fopen($archivo_path,"r");
-					$line=fgets($file);
-					fclose($file);
-				    $config=explode("<>",$line);
-				    $tmp=explode("~",$config[0]);
-				    $ruta_des=base64_decode( $tmp[1] );
-					$url = "localhost/{$ruta_des}/rest/print/send_file";
-				}else{
-					die("No hay archivo de configuración!!!");
-				}
-				//die( $url );
-				$post_data = json_encode( array( "destinity_store_id"=>$user_sucursal ) );
-				$crl = curl_init( $url );
-				curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($crl, CURLINFO_HEADER_OUT, true);
-				curl_setopt($crl, CURLOPT_POST, true);
-				curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
-				//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-				curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
-				curl_setopt($crl, CURLOPT_HTTPHEADER, array(
-				  'Content-Type: application/json',
-				  'token: ' . $token)
-				);
-				$resp = curl_exec($crl);//envia peticion
-				//var_dump( $resp );
-				curl_close($crl);
-				//var_dump($resp);
-			//decodifica el json de respuesta
-				$result = json_decode(json_encode($resp), true);
-				$result = json_decode( $result );
-				//return $result;*/
-		}
-	/*fin de cambio Oscar 2023*/
-
-	/*Implementación Oscar 07.03.2019 para finalzar el satus de la devolución*/
-	    if(isset($_GET["id_pedido_original"]) || $_GET['es_apartado']==1){
-	    	$sql="UPDATE ec_devolucion SET status=3,observaciones='$mensaje_nota' WHERE id_pedido=$id_pedido_original";
-	        $eje=mysql_query($sql)or die("Error al actualizar el status de la devolución\n\n".mysql_error()."\n\n".$sql);
-		}
-/*Fin de cambio Oscar 07.03.2019*/
        	die( "ok" );
        	//header ("location: index.php?scr=evaluation"); 
     }
