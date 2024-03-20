@@ -35,7 +35,7 @@
 					p.fecha_alta AS dateTime,
 					p.folio_nv AS folio, 
 					p.total AS amount,
-					CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS username,
+					CONCAT( u.nombre ) AS username,/*, ' ', u.apellido_paterno, ' ', u.apellido_materno*/
 					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) AS pagado
 				FROM ec_pedidos p
 				LEFT JOIN ec_cajero_cobros cc
@@ -52,7 +52,7 @@
 	$stm_2 = $link->query( $sql_2 ) or die( "Error al consultar las ventas pendientes de pago : {$link->error}" );
 	$sales_without_payment = $stm_2->num_rows;
 	if( $sales_without_payment > 0 ){
-		$espacio_ventas_pendientes_cobro = ( $sales_without_payment * 8.8 ) + 20;
+		$espacio_ventas_pendientes_cobro = ( $sales_without_payment * 5.4 ) + 20;
 	}
 	if( $_POST['flag'] == 'seek_pending_to_validate' ){
 		$resp = "ok|";
@@ -216,8 +216,8 @@
 	$bF=10;
 //genearmos encabezado
 	$ticket->SetFont('Arial','B',$bF+4);
-	$ticket->SetXY(8, 5);//$ticket->GetY()+3
-	$ticket->Cell(60, 6, utf8_decode("Ventas Pendientes de validar: ".$folio_sesion_caja), "" ,0, "C");
+	$ticket->SetXY(2, 5);//$ticket->GetY()+3
+	$ticket->Cell(66, 6, utf8_decode("IMPORTANTE : "), "" ,0, "C");
 
 	$ticket->SetFont('Arial','B',$bF);
 	$ticket->SetXY(8, $ticket->GetY()+5);
@@ -244,20 +244,31 @@
 	
 	$ticket->SetFont('Arial','',$bF);
 	
-	$ticket->SetXY(7, $ticket->GetY()+4.5);
-	$ticket->Cell(66, 6, utf8_decode(), "" ,0, "C");
+	$ticket->SetXY(6, $ticket->GetY()+4.5);
+	//$ticket->Cell(66, 6, utf8_decode(), "" ,0, "C");
 /*Implementacion Oscar 2024-02-23 para imprimir*/
 //encabezado
-	$ticket->SetXY(4, $ticket->GetY()+2);
-	$ticket->Cell(62, 6, utf8_decode( "Fec/hr" ), "" ,0, "C");
-	$ticket->SetXY(7, $ticket->GetY());
-	$ticket->Cell(62, 6, utf8_decode( "Folio" ), "" ,0, "C");
-	$ticket->SetXY(7, $ticket->GetY());
-	$ticket->Cell(62, 6, utf8_decode( "Monto" ), "" ,0, "C");
-	$ticket->SetXY(10, $ticket->GetY());
-	$ticket->Cell(62, 6, utf8_decode( "Vendedor" ), "" ,0, "R");
-	foreach ($pendientes_pago as $key => $value) {
-		# code...
+	$ticket->SetFont('Arial','B',$bF+4);
+	$ticket->Cell(60, 6, utf8_decode("Ventas Pendientes de Cobrar :"), "" ,0, "C");
+	$ticket->SetFont('Arial','B',$bF);
+	$ticket->SetXY(1, $ticket->GetY()+6);
+	$ticket->Cell(25, 6, utf8_decode( "Fec/hr" ), "true" ,0, "L");
+	$ticket->SetXY(25, $ticket->GetY());
+	$ticket->Cell(15, 6, utf8_decode( "Folio" ), "" ,0, "L");
+	$ticket->SetXY(40, $ticket->GetY());
+	$ticket->Cell(15, 6, utf8_decode( "Monto" ), "" ,0, "L");
+	$ticket->SetXY(55, $ticket->GetY());
+	$ticket->Cell(20, 6, utf8_decode( "Vendedor" ), "" ,0, "L");
+	foreach ($pendientes_pago as $key => $pendiente) {
+		$ticket->SetFont('Arial','B',$bF-4);
+		$ticket->SetXY(1, $ticket->GetY()+5);
+		$ticket->Cell(25, 6, utf8_decode( "{$pendiente['dateTime']}" ), "" ,0, "L");
+		$ticket->SetXY(25, $ticket->GetY());
+		$ticket->Cell(15, 6, utf8_decode( "{$pendiente['folio']}" ), "" ,0, "C");
+		$ticket->SetXY(40, $ticket->GetY());
+		$ticket->Cell(15, 6, utf8_decode( "{$pendiente['amount']}" ), "" ,0, "C");
+		$ticket->SetXY(55, $ticket->GetY());
+		$ticket->Cell(20, 6, utf8_decode( "{$pendiente['username']}" ), "" ,0, "L");
 	}
 /*Fin de cambio Oscar 2024-02-23*/
 //	$nombre_ticket="ticket_".$user_sucursal."_".date("YmdHis")."_".strtolower($tipofolio)."_".$folio."_$noImp.pdf";
@@ -275,7 +286,12 @@
 			AND p.id_sucursal = {$sucursal_id}";//
 	$eje=mysql_query($sql) or die( "Error\n{$sql} " . mysql_error() );
 //encabezado
-	$ticket->SetXY(4, $ticket->GetY()+2);
+	$ticket->SetXY(6, $ticket->GetY()+10);
+	$ticket->SetFont('Arial','B',$bF+4);
+	$ticket->Cell(60, 6, utf8_decode("Ventas Pendientes de Validar :"), "" ,0, "C");
+	$ticket->SetXY(1, $ticket->GetY()+6);
+	$ticket->SetFont('Arial','B',$bF+2);
+	//$ticket->SetXY(4, $ticket->GetY()+10);
 	$ticket->Cell(62, 6, utf8_decode( "Folio" ), "" ,0, "L");
 	$ticket->SetXY(7, $ticket->GetY());
 	$ticket->Cell(62, 6, utf8_decode( "Monto" ), "" ,0, "C");
