@@ -687,7 +687,7 @@
 							>
 								<i class=\"icon-print-3\"></i>
 							</button>";
-					/*
+					/*deshabilitado por Oscar 2024-03-22
 						<button
 							type=\"button\"
 							class=\"btn btn-danger\"
