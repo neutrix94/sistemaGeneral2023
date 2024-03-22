@@ -686,15 +686,17 @@
 								onclick=\"rePrintByOrderId( '{$aux_row['id_transaccion_netpay']}' );\"
 							>
 								<i class=\"icon-print-3\"></i>
-							</button>
-							<button
+							</button>";
+					/*
+						<button
 							type=\"button\"
 							class=\"btn btn-danger\"
 							style=\"padding : 0px !important;\"
 							onclick=\"cancelByOrderId( '{$aux_row['id_transaccion_netpay']}' );\"
 						>
 							<i class=\"icon-cancel-circled\"></i>
-						</button>";
+						</button>
+					*/
 					}
 					$resp .= "<tr {$color}>
 						<td class=\"text-center\">{$row['payment_type']}</td>
