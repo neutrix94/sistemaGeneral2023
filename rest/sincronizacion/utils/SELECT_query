@@ -1,0 +1,57 @@
+SELECT
+	ax1.ID,
+	ax1.FECHA,
+	ax1.FOLIO,
+	ax1.CAJERO,
+	ax1.SUBTOTAL,
+	ax1.TOTAL,
+	ax1.VENTAS,
+	ax1.APARTADOS,
+	ax1.ABONOS,
+	ax1.DESCUENTO,
+	SUM( IF( g.id_gastos IS NULL, 0, g.monto) ) AS GASTOS
+FROM(
+	SELECT
+		ax.ID,
+		ax.FECHA,
+		ax.FOLIO,
+		ax.id_cajero,
+		ax.CAJERO,
+		SUM( IF( p.id_pedido IS NULL, 0, p.subtotal ) ) AS SUBTOTAL,
+		SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS TOTAL,
+		SUM( IF( p.pagado = 1, p.total, 0 ) ) AS VENTAS,
+		SUM( IF( p.pagado = 0, p.total, 0 ) ) AS APARTADOS,
+		SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS ABONOS,
+		SUM( IF( p.id_pedido IS NULL, 0, p.descuento ) ) AS DESCUENTO
+	FROM(
+		SELECT 
+			sc.id_sesion_caja AS ID,
+			sc.fecha AS FECHA,
+			sc.folio AS FOLIO,
+			sc.id_cajero,
+			CONCAT( u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno ) AS CAJERO,
+			sc.hora_inicio,
+			sc.hora_fin
+		FROM ec_sesion_caja sc
+		LEFT JOIN ec_sesion_caja_detalle scd
+		ON scd.id_corte_caja = sc.id_sesion_caja
+		LEFT JOIN sys_users u
+		ON u.id_usuario = sc.id_cajero
+		WHERE sc.id_sucursal = $_SUCURSAL
+		AND ( sc.fecha BETWEEN '$FECHA_1' AND '$FECHA_2' )
+		GROUP BY sc.id_sesion_caja
+	)ax
+	LEFT JOIN ec_pedido_pagos pp
+	ON pp.id_cajero = ax.id_cajero
+	AND pp.id_cajero = ax.id_cajero
+	AND pp.fecha = ax.FECHA
+	LEFT JOIN ec_pedidos p
+	ON pp.id_pedido = p.id_pedido
+	AND p.id_sucursal = $_SUCURSAL
+	AND ( pp.hora BETWEEN ax.hora_inicio AND ax.hora_fin )
+	GROUP BY ax.ID
+)ax1
+LEFT JOIN ec_gastos g
+ON g.id_cajero = ax1.id_cajero
+AND ( g.fecha BETWEEN '$FECHA_1' AND '$FECHA_2' )
+GROUP BY ax1.ID
