@@ -42,9 +42,9 @@ $app->add(function (Request $request, Response $response, $next) {
 require 'server/netPayResponse.php';
 
 require 'server/verificaTokenValido.php';//verifica validez de Token
-require 'server/obtenerInformacionRespuesta.php';//obtener respuesta de servidor linea a local
+require 'server/actualizar.php';//obtener respuesta de servidor linea a local
 require 'server/recuperarRespuestas.php';//obtener respuesta de servidor linea a local
-require 'server/actualizarSatusRespuesta.php';//obtener respuesta de servidor linea a local
+require 'server/actualizarStatusRespuesta.php';//obtener respuesta de servidor linea a local
 //require 'server/test.php';
 
 $app->run();
