@@ -8,8 +8,14 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Instancia accesos BD
 */
 require '../vendor/autoload.php';
-//require '../src/config/db.php';         // DB Connect CL
+require '../src/config/db.php';         // DB Connect CL
 //require '../src/config/dbFact.php';     // DB Connect Fact
+/*
+* Instancia utilities
+*/
+require '../v1/utils/manageResponse.php';
+require '../v1/utils/validaToken.php';
+
 $config = [
     'settings' => [
         'displayErrorDetails' => true, // Solo para desarrollo
@@ -20,12 +26,25 @@ $config = [
     ],
 ];
 $app = new \Slim\App( $config );
+//configuracion de CORS
+$app->add(function (Request $request, Response $response, $next) {
+    $response = $next($request, $response);
+    return $response
+        ->withHeader('Access-Control-Allow-Origin', '*') // Permite solicitudes de cualquier origen
+        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Métodos HTTP permitidos
+});
 
 //cliente
 //require 'client/domain_test.php';
 
 //servidordie('okok');
 require 'server/netPayResponse.php';
+
+require 'server/verificaTokenValido.php';//verifica validez de Token
+require 'server/obtenerInformacionRespuesta.php';//obtener respuesta de servidor linea a local
+require 'server/recuperarRespuestas.php';//obtener respuesta de servidor linea a local
+require 'server/actualizarSatusRespuesta.php';//obtener respuesta de servidor linea a local
 //require 'server/test.php';
 
 $app->run();
