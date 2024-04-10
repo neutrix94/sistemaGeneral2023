@@ -15,6 +15,14 @@ $app = new \Slim\App;
 */
 require 'utils/manageResponse.php';
 require 'utils/validaToken.php';
+//CORS
+$app->add(function (Request $request, Response $response, $next) {
+    $response = $next($request, $response);
+    return $response
+        ->withHeader('Access-Control-Allow-Origin', '*') // Permite solicitudes de cualquier origen
+        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Métodos HTTP permitidos
+});
 
 /*
 * Instancia servicios por exponer
