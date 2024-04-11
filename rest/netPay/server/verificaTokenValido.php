@@ -8,7 +8,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Descripción: Verifica validez de Token
 */
 
-$app->post('/verifica_token', function (Request $request, Response $response){
+$app->post('/valida_token', function (Request $request, Response $response){
     
     $db = new db();
     $db = $db->conectDB();
@@ -31,6 +31,6 @@ $app->post('/verifica_token', function (Request $request, Response $response){
             return $rs->errorMessage($request->getParsedBody(),$response, 'CL_Error', $e->getMessage(), 500);
         }
     }
-    return json_encode( array( "status"=>200, "message"=>"token válido" ) );
+    return json_encode( array( "status"=>200, "message"=>"Token válido" ) );
 });
 ?>

@@ -8,7 +8,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Descripción: Obtener datos de respuestas de NetPay que no fueron entregadas al usuario
 */
 
-$app->post('/recuperar_respuestas', function (Request $request, Response $response){
+$app->post('/recuperar_respuestas_transacciones', function (Request $request, Response $response){
     $db = new db();
     $db = $db->conectDB();
     $rs = new manageResponse();
@@ -33,18 +33,18 @@ $app->post('/recuperar_respuestas', function (Request $request, Response $respon
     if( !include( '../../conexionMysqli.php' ) ){
         die( "No se pudo incluir el archivo de conexion!" );
     }
-    $user_id = $request->getParam( "user_id" );
+    $user_id = $request->getParam( "id_usuario" );
 //consulta los datos de folio unico
-    $responses = array();
+    $transacciones = array();
     $sql = "SELECT * FROM vf_transacciones_netpay WHERE id_cajero = '{$user_id}' AND `message` != '' AND notificacion_vista = 0";
     $stm = $link->query( $sql ) or die( "Error al consultar respuesta de la transaccion : {$link->error}" );
     //if( $stm->num_rows <= 0 ){
       //  return json_encode( array( "status"=>400, "message"=>"La transaccion con el folio unico {$user_id} no existe, verifica y vuelve a intentar!" ) );
     //}else{
     while( $row = $stm->fetch_assoc() ){
-        $responses[] = $row;
+        $transacciones[] = $row;
     }  
-    return json_encode( array( "status"=>200, "responses"=>$responses) );
+    return json_encode( array( "status"=>200, "transacciones"=>$transacciones) );
     //}
     //die('ok');
 });
