@@ -42,7 +42,8 @@
     require 'server/netPayResponse.php';
     //endpoints de websockets
     require 'server/verificaTokenValido.php';//verifica validez de Token
-    require 'server/insertarTransaccionNetpay.php';//insertar solicitudes de peticiones de servidor local a linea
+    require 'server/insertarTransaccionNetpay.php';//insertar solicitudes de peticiones netPay
+    require 'server/actualizarDatosTransacciones.php';//actualizar informacion de peticiones netPay
     require 'server/recuperarRespuestas.php';//recuperar respuestas que no han sido entregadas al usuario
     require 'server/actualizarStatusRespuesta.php';//obtener respuesta de servidor linea a local
     //require 'server/test.php';
