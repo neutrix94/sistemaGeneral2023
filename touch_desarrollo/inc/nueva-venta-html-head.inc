@@ -374,6 +374,7 @@ function enlista_paquete(arreglo){
             //var url = "index.php?scr=talon_pago&idp=" + $("#id_de_pedido_original").val();
             //"index.php?scr=talon_pago&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
             //u1+="&sald_fav_cl="+s_f+"&favOrig="+s_f_o;
+            $('#emergente_1').html( '<img src="../img/img_casadelasluces/load.gif">' );
             var imp_dev = ajaxR( url );
             //alert( imp_dev );return false;
             if( imp_dev != 'ok ' ){

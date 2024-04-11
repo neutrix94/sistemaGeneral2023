@@ -15,14 +15,6 @@ $app = new \Slim\App;
 */
 require 'utils/manageResponse.php';
 require 'utils/validaToken.php';
-//CORS
-$app->add(function (Request $request, Response $response, $next) {
-    $response = $next($request, $response);
-    return $response
-        ->withHeader('Access-Control-Allow-Origin', '*') // Permite solicitudes de cualquier origen
-        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Métodos HTTP permitidos
-});
 
 /*
 * Instancia servicios por exponer
@@ -69,4 +61,7 @@ require 'client/registros_sincronizacion_ventas.php';
 require 'client/registros_sincronizacion_mov_almacen.php';
 require 'client/registros_sincronizacion_mov_p_p.php';
 require 'client/registros_sincronizacion_transferencias.php';
+
+require 'client/verificacion_registros_pendientes.php';//comprobacion de los registros pendientes
+require 'server/verificacion_registros.php';//comprobacion de los registros pendientes
 $app->run();
