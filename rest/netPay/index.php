@@ -43,7 +43,7 @@ require 'server/netPayResponse.php';
 
 require 'server/verificaTokenValido.php';//verifica validez de Token
 require 'server/subirPeticionNetPay.php';//obtener respuesta de servidor linea a local
-//require 'server/recuperarRespuestas.php';//obtener respuesta de servidor linea a local
+require 'server/recuperarRespuestas.php';//obtener respuesta de servidor linea a local
 //require 'server/actualizarSatusRespuesta.php';//obtener respuesta de servidor linea a local
 //require 'server/test.php';
 
