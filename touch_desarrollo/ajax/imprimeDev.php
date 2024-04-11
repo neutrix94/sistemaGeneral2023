@@ -613,4 +613,5 @@
           $carpeta_path, '../', 'location="index.php?";' );
         }
     }
+    die('ok');
 ?>
