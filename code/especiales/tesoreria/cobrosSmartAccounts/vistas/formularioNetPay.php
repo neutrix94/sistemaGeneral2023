@@ -5,14 +5,14 @@
 	</div>
 	<button
 		class="btn btn-danger"
-		onclick="stop_server_events(<?php echo $resp->petition_id;?>);"
+		onclick="stop_server_events(<?php echo $resp->folio_unico_peticion;?>);"
 	>
 		<i class="icon-cancel-circled">Cancelar y cerrar</i>
 	</button>
 </div>	
 
 	<!--script>
-        const serverUrl = 'ajax/server_events.php?transaction_id=<?php echo $resp->petition_id;?>';
+        const serverUrl = 'ajax/server_events.php?transaction_id=<?php echo $resp->folio_unico_peticion;?>';
         const emergentCountTmp = <?php echo $counter;?>;
 
         // Crear un nuevo Web Worker
@@ -69,7 +69,7 @@
     </script-->
 <script>
 	// Crea una nueva conexión SSE
-	var server_url = 'ajax/server_events.php?transaction_id=<?php echo $resp->petition_id;?>';
+	var server_url = 'ajax/server_events.php?transaction_id=<?php echo $resp->folio_unico_transaccion;?>';
 	var emergent_count_tmp = <?php echo $counter;?>;
 	//alert( server_url );
 	const eventSource = new EventSource( server_url );
@@ -86,14 +86,14 @@
         		$( '.emergent_content' ).html( '' );
         		$( '.emergent' ).css( 'display', 'none' );
         		//obtiene el ordenId para los botones
-        		//var url = "ajax/dp.php?fl=getOrderId&transaction_id=<?php echo $resp->petition_id;?>";
+        		//var url = "ajax/dp.php?fl=getOrderId&transaction_id=<?php echo $resp->folio_unico_transaccion;?>";
         		//var resp = ajaxR( url );
 
         		if( event.data.trim() == 'Transacción exitosa' || event.data.trim() == 'Transaccion exitosa' ){
         			$( '#reprint_btn_' + emergent_count_tmp ).removeClass( 'no_visible' );
-        			$( '#reprint_btn_' + emergent_count_tmp ).attr( 'onclick', 'rePrintByOrderId( <?php echo $resp->petition_id;?> )' );
+        			$( '#reprint_btn_' + emergent_count_tmp ).attr( 'onclick', 'rePrintByOrderId( \'<?php echo $resp->folio_unico_transaccion;?>\' )' );
         			$( '#cancel_btn_' + emergent_count_tmp ).removeClass( 'no_visible' );
-        			$( '#cancel_btn_' + emergent_count_tmp ).attr( 'onclick', 'cancelByOrderId( <?php echo $resp->petition_id;?> )' );
+        			$( '#cancel_btn_' + emergent_count_tmp ).attr( 'onclick', 'cancelByOrderId( \'<?php echo $resp->folio_unico_transaccion;?>\' )' );
         			
         			$( '#payment_btn_' + emergent_count_tmp ).addClass( 'no_visible' );
 					

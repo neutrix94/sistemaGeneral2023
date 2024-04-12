@@ -491,9 +491,10 @@
 					ON pp.id_pedido = p.id_pedido
 					WHERE p.id_pedido = {$sale_id}";
 			//die( $sql );
+			$difference = round( $row['sale_total'], 2 ) - round( $row['payments_total'], 2 );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los totales para validar : {$sql} : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			if( $row['was_payed'] == 1 && round( $row['sale_total'], 2 ) > round( $row['payments_total'], 2 ) ){
+			if( $row['was_payed'] == 1 && ( $difference == 1 || $difference == -1) ){
 				die( "<div class=\"row\">
 					<h3 class=\"text-center text-danger fs-2\">La venta no esta liquidada, registra todos los pagos y vuelve a intentar</h3>
 					<div class=\"\">
@@ -676,18 +677,18 @@
 						$color = "class=\"text-danger\"";
 					}
 					if( $row['terminal_id'] > 0 ){
-						$sql_tmp = "SELECT id_transaccion_netpay FROM vf_transacciones_netpay WHERE orderId = '{$row['observaciones']}'";
+						$sql_tmp = "SELECT folio_unico FROM vf_transacciones_netpay WHERE orderId = '{$row['observaciones']}'";
 						$stm_aux = $this->link->query( $sql_tmp ) or die( "Error al conultar id de transaccion : {$this->link->error}" );
 						$aux_row = $stm_aux->fetch_assoc();
 						$button = "<button
 								type=\"button\"
 								class=\"btn btn-warning\"
 								style=\"padding : 0px !important;\"
-								onclick=\"rePrintByOrderId( '{$aux_row['id_transaccion_netpay']}' );\"
+								onclick=\"rePrintByOrderId( '{$aux_row['folio_unico']}' );\"
 							>
 								<i class=\"icon-print-3\"></i>
 							</button>";
-					/*
+					/*deshabilitado por Oscar 2024-03-22
 						<button
 							type=\"button\"
 							class=\"btn btn-danger\"
@@ -865,6 +866,9 @@
 				WHERE id_pedido_relacionado = {$row['id_pedido_relacionado']}";
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar ec_pedidos_relacion_devolucion de pagos : {$sql} {$this->link->error}" );
 //echo $sql . "<br><br>";
+/*Implementacion Oscar 2024-04-11 para imprimir el ticket de la nota dependiente*/
+				
+/*fin de cambio Oscar 2024-04-11*/
 			//modifica el monto para hacer cuadrar el pago por devolucion
 				return $row['id_pedido_original'];
 				//return $amount;
@@ -1282,7 +1286,7 @@
 							terminalId,
 							store_id_netpay
 						FROM vf_transacciones_netpay
-						WHERE id_transaccion_netpay = {$transaction_id}";
+						WHERE folio_unico = '{$transaction_id}'";
 			}else{
 				$sql = "SELECT 
 							orderId,

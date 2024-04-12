@@ -123,20 +123,26 @@
 			}
 		//consulta pagos
 			$sql = "SELECT
-						SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS total_pedido_pagos,
+						ax.total_pedido_pagos,
 						SUM( IF( dp.id_devolucion_pago IS NULL, 0, dp.monto ) ) AS total_devolucion_pagos
-					FROM ec_pedidos p
-					LEFT JOIN ec_pedido_pagos pp
-					ON pp.id_pedido = p.id_pedido
+					FROM(
+						SELECT
+							p.id_pedido,
+							SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS total_pedido_pagos
+						FROM ec_pedidos p
+						LEFT JOIN ec_pedido_pagos pp
+						ON pp.id_pedido = p.id_pedido
+						WHERE p.id_pedido = {$id_pedido_devolucion}
+						GROUP BY p.id_pedido
+					)ax
 					LEFT JOIN ec_devolucion d
-					ON d.id_pedido = p.id_pedido
+					ON d.id_pedido = ax.id_pedido
 					LEFT JOIN ec_devolucion_pagos dp
 					ON dp.id_devolucion = d.id_devolucion
-					WHERE p.id_pedido = {$id_pedido_devolucion}
-					GROUP BY p.id_pedido";
+					GROUP BY ax.id_pedido";
 			$payment_stm = mysql_query( $sql ) or die( "Error al consultar monto pagado : " . mysql_error() );
 			$payment_row = mysql_fetch_assoc( $payment_stm );
-			$devolucion['pagos_realizados'] =$payment_row['total_pedido_pagos'] - $payment_row['total_devolucion_pagos'];
+			$devolucion['pagos_realizados'] = $payment_row['total_pedido_pagos'] - $payment_row['total_devolucion_pagos'];
 		}
 		//die( "here : {$ruta_or}" );
 	//}
