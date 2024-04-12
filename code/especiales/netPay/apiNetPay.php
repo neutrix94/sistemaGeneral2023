@@ -138,13 +138,62 @@
 			return $response;
 			//return $response;
 		}
-		public function insertNetPetitionRow(){
-			$sql = "INSERT INTO vf_transacciones_netpay ( id_transaccion_netpay ) VALUES ( NULL )";
+
+		public function insertNetPetitionRow( $user_id, $store_id ){
+		//consulta token
+			$sql = "SELECT token FROM api_token WHERE id_user=0 and expired_in > now() limit 1";
+			$stm = $this->link->query($sql) or die( "Error al consultar el token : {$this->link->error}" );
+			$respuesta = $stm->fetch_assoc();
+			$token = $respuesta['token'];
+		//consuta path de API linea
+			$sql = "SELECT 
+						prefijo,
+						(SELECT value FROM api_config WHERE `name` = 'path' ) AS api_path
+					FROM sys_sucursales 
+					WHERE acceso = 1";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar prefijo de sucural para generar el folio unico : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			$prefix = $row['prefijo'];
+			$path_api = $row['api_path'];
+
+			/*$sql = "INSERT INTO vf_transacciones_netpay ( id_transaccion_netpay ) VALUES ( NULL )";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el id de transaccion netPay : {$this->link->error}" );
 			$sql = "SELECT LAST_INSERT_ID()";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el ultimo id insertado : {$this->link->error}" );
 			$row = $stm->fetch_row();
-			return $row[0];
+		//actualiza el folio unico
+			$sql = "UPDATE vf_transacciones_netpay SET folio_unico = CONCAT( '{$prefix}_TNP_', {$row[0]} ) WHERE id_transaccion_netpay = {$row[0]}";
+			$stm = $this->link->query( $sql ) or die( "Error al actualizar el folio unico de la transaccion : {$this->link->error}" );*/
+		//consume el webservice para insertar la peticion en en servidor en linea			
+			$post_data = json_encode( array( "id_usuario"=>"{$user_id}", "id_sucursal"=>"{$store_id}" ) );
+			$curl = curl_init();
+			curl_setopt_array($curl, array(
+				CURLOPT_URL => "{$path_api}/rest/netPay/insertar_peticion_transaccion",
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_ENCODING => "",
+				CURLOPT_MAXREDIRS => 10,
+				CURLOPT_TIMEOUT => 0,
+				CURLOPT_FOLLOWLOCATION => true,
+				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+				CURLOPT_CUSTOMREQUEST => "POST",
+				CURLOPT_POSTFIELDS => $post_data,
+				CURLOPT_HTTPHEADER => array(
+				"Content-Type: application/json",
+				"token: {$token}"
+				)
+			));
+
+			$response = curl_exec($curl);
+			curl_close($curl);
+			$result = json_decode( $response );//json_encode(),
+			//var_dump($result);
+			if( $result->status != '200' && $result->status != 200 ){
+				die( "Error al consumir API para insertar peticion de netPay en servidor linea : " . $result->message );
+			}
+			$folio_transaccion = $result->folio_unico_transaccion;
+			$sql = "INSERT INTO vf_transacciones_netpay ( folio_unico ) VALUES ( '{$folio_transaccion}' )";
+			$stm = $this->link->query( $sql ) or die( "Error al insertar el id de transaccion netPay en servidor origen : {$this->link->error}" );
+			return $folio_transaccion;
 		}
 		public function getTerminal( $terminal_id, $store_id ){
 			$sql = "SELECT 
@@ -174,7 +223,7 @@
 			if( sizeof($token) == 0 || $token == null ){
 				$token = $this->requireToken( $terminal['terminal_serie'], 'password', 'smartPos', 'netpay' );
 			}
-			$petition_id = $this->insertNetPetitionRow();
+			$folio_unico_transaccion = $this->insertNetPetitionRow( $user_id, $store_id );
 		//arreglo de prueba
 			$data = array( 
 						"traceability"=>array(  
@@ -184,11 +233,12 @@
 							"id_sesion_cajero"=>"{$session_id}",
 							"smart_accounts"=>true,
 							"store_id_netpay"=>"{$terminal['store_id']}",
-							"id_devolucion_relacionada"=>$id_devolucion_relacionada
+							"id_devolucion_relacionada"=>$id_devolucion_relacionada,
+							"folio_unico_transaccion"=>"{$folio_unico_transaccion}"
 						),
 			            "serialNumber"=>"{$terminal['terminal_serie']}",
 			            "amount"=> $amount,
-			            "folioNumber"=> "{$petition_id}",
+			            "folioNumber"=> "{$folio_unico_transaccion}",
 			            /*"storeId"=>"9194",*/
 			            /*"storeId"=>"{$this->NetPayStoreId}",*/
 			            "storeId"=>"{$terminal['store_id']}",
@@ -224,7 +274,7 @@ fclose($file);
 			curl_close($curl);
 
 			$result = json_decode( $response );//json_encode(),
-			$result->petition_id = $petition_id; 
+			$result->folio_unico_transaccion = $folio_unico_transaccion; 
 			//var_dump($response);die('');
 			if( isset( $result->error ) ){
 				if( $result->error == 'invalid_token' ){//token expirado
@@ -250,16 +300,16 @@ fclose($file);
 			}
 
 			$terminal_data = $this->getTerminal( $terminal, $store_id );
-			$petition_id = $this->insertNetPetitionRow();
+			$folio_unico_transaccion = $this->insertNetPetitionRow( $user_id, $store_id );
 		//arreglo de prueba
 			$data = array( "traceability"=>array(   
 							"id_sucursal"=>"{$store_id}", 
 							"id_cajero"=>"{$user_id}", 
 							"folio_venta"=>"{$sale_folio}", 
 							"id_sesion_cajero"=>"{$session_id}",
-							"petition_id"=>"{$petition_id}",
 							"smart_accounts"=>true,
-							"store_id_netpay"=>$store_id_netpay
+							"store_id_netpay"=>$store_id_netpay,
+							"folio_unico_transaccion"=>"{$folio_unico_transaccion}"
 						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
@@ -297,7 +347,7 @@ fclose($file);
 			$response = curl_exec($curl);
 			curl_close($curl);
 			$result = json_decode( $response );//json_encode(),
-			$result->petition_id = $petition_id; 
+			$result->folio_unico_transaccion = $folio_unico_transaccion; 
 			//var_dump($response);
 			//die( '' );
 			$result = json_encode( $result, true );
@@ -312,16 +362,16 @@ fclose($file);
 				$token = $this->requireToken( $terminal, 'password', 'smartPos', 'netpay' );
 			}
 			$terminal_data = $this->getTerminal( $terminal, $store_id );
-			$petition_id = $this->insertNetPetitionRow();
+			$folio_unico_transaccion = $this->insertNetPetitionRow( $user_id, $store_id );
 		//arreglo de prueba
 			$data = array( "traceability"=>array(   
 							"id_sucursal"=>"{$store_id}", 
 							"id_cajero"=>"{$user_id}", 
 							"folio_venta"=>"{$sale_folio}", 
 							"id_sesion_cajero"=>"{$session_id}",
-							"petition_id"=>"{$petition_id}",
 							"smart_accounts"=>true,
-							"store_id_netpay"=>$store_id_netpay
+							"store_id_netpay"=>$store_id_netpay,
+							"folio_unico_transaccion"=>"{$folio_unico_transaccion}"
 						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
@@ -357,7 +407,7 @@ fclose($file);
 			$response = curl_exec($curl);
 			curl_close($curl);
 			$result = json_decode( $response );//json_encode(),
-			$result->petition_id = $petition_id; 
+			$result->folio_unico_transaccion = $folio_unico_transaccion; 
 			//var_dump($response);
 			//die( '' );
 			$result = json_encode( $result, true );
@@ -371,16 +421,16 @@ fclose($file);
 				$token = $this->requireToken( $terminal, 'password', 'smartPos', 'netpay' );
 			}
 			$terminal_data = $this->getTerminal( $terminal, $store_id );
-			$petition_id = $this->insertNetPetitionRow();
+			$folio_unico_transaccion = $this->insertNetPetitionRow( $user_id, $store_id);
 		//arreglo de prueba
 			$data = array( "traceability"=>array(   
 							"id_sucursal"=>"{$store_id}", 
 							"id_cajero"=>"{$user_id}", 
 							"folio_venta"=>"{$sale_folio}", 
 							"id_sesion_cajero"=>"{$session_id}",
-							"petition_id"=>"{$petition_id}",
 							"smart_accounts"=>true,
-							"store_id_netpay"=>$store_id_netpay
+							"store_id_netpay"=>$store_id_netpay,
+							"folio_unico_transaccion"=>"{$folio_unico_transaccion}"
 						),
 			            "serialNumber"=>"{$terminal}",
 			            "orderId"=> $orderId,
@@ -414,7 +464,7 @@ fclose($file);
 			$response = curl_exec($curl);
 			curl_close($curl);
 			$result = json_decode( $response );//json_encode(),
-			$result->petition_id = $petition_id; 
+			$result->folio_unico_transaccion = $folio_unico_transaccion; 
 			//var_dump($response);
 			//die( '' );
 			$result = json_encode( $result, true );

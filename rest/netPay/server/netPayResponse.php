@@ -84,9 +84,9 @@ $app->post('/', function (Request $request, Response $response){
   $transactionId = $request->getParam( "transactionId" );//40
   $traceability = $request->getParam( "traceability" );//41
   
-  $transactionId_internal = $folioNumber;
-  if( $traceability['petition_id'] != null && $traceability['petition_id'] != '' ){
-    $transactionId_internal = $traceability['petition_id'];
+  $transaction_unique_folio = $folioNumber;
+  if( $traceability['folio_unico_transaccion'] != null && $traceability['folio_unico_transaccion'] != '' ){
+    $transaction_unique_folio = $traceability['folio_unico_transaccion'];
   }
   //traceability
  // $traceability['']
@@ -140,7 +140,7 @@ $app->post('/', function (Request $request, Response $response){
             /*44*/folio_venta = '{$traceability['folio_venta']}',
             /*44*/id_sesion_cajero = '{$traceability['id_sesion_cajero']}',
             /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
-          WHERE id_transaccion_netpay = '{$transactionId_internal}'";//$folioNumber
+          WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
   if( trim($message_) == 'Transaccion exitosa' && $transType == 'A' ){
   //consulta los datos en relacion al numero de serie de la terminal

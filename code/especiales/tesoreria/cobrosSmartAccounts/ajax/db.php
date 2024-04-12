@@ -677,14 +677,14 @@
 						$color = "class=\"text-danger\"";
 					}
 					if( $row['terminal_id'] > 0 ){
-						$sql_tmp = "SELECT id_transaccion_netpay FROM vf_transacciones_netpay WHERE orderId = '{$row['observaciones']}'";
+						$sql_tmp = "SELECT folio_unico FROM vf_transacciones_netpay WHERE orderId = '{$row['observaciones']}'";
 						$stm_aux = $this->link->query( $sql_tmp ) or die( "Error al conultar id de transaccion : {$this->link->error}" );
 						$aux_row = $stm_aux->fetch_assoc();
 						$button = "<button
 								type=\"button\"
 								class=\"btn btn-warning\"
 								style=\"padding : 0px !important;\"
-								onclick=\"rePrintByOrderId( '{$aux_row['id_transaccion_netpay']}' );\"
+								onclick=\"rePrintByOrderId( '{$aux_row['folio_unico']}' );\"
 							>
 								<i class=\"icon-print-3\"></i>
 							</button>";
@@ -1286,7 +1286,7 @@
 							terminalId,
 							store_id_netpay
 						FROM vf_transacciones_netpay
-						WHERE id_transaccion_netpay = {$transaction_id}";
+						WHERE folio_unico = '{$transaction_id}'";
 			}else{
 				$sql = "SELECT 
 							orderId,
