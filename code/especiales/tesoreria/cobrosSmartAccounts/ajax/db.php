@@ -491,9 +491,10 @@
 					ON pp.id_pedido = p.id_pedido
 					WHERE p.id_pedido = {$sale_id}";
 			//die( $sql );
+			$difference = round( $row['sale_total'], 2 ) - round( $row['payments_total'], 2 );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los totales para validar : {$sql} : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			if( $row['was_payed'] == 1 && round( $row['sale_total'], 2 ) > round( $row['payments_total'], 2 ) ){
+			if( $row['was_payed'] == 1 && ( $difference == 1 || $difference == -1) ){
 				die( "<div class=\"row\">
 					<h3 class=\"text-center text-danger fs-2\">La venta no esta liquidada, registra todos los pagos y vuelve a intentar</h3>
 					<div class=\"\">
