@@ -377,7 +377,7 @@ function enlista_paquete(arreglo){
             $('#emergente_1').html( '<img src="../img/img_casadelasluces/load.gif">' );
             var imp_dev = ajaxR( url );
             //alert( imp_dev );return false;
-            if( imp_dev != 'ok ' ){
+            if( imp_dev.trim() != 'ok' ){
                 $('#emergente_1').html( imp_dev );
                 $('#emergente_1').css('display','block');
                 return false;
