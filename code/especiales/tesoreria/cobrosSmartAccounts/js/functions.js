@@ -382,8 +382,14 @@ hljs.highlightAll();
 		}else{
 			alert( "Error : " + resp );
 		}
+		if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
+			url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+			resp = ajaxR( url );
+			console.log( resp );
+			alert( resp );
+		}
 		return false;
-		//lert( url ); return false;
+/*alert( url ); return false;
 	//obtenemos el valor de la caja
 		var id_caja=$("#caja_o_cuenta").val();
 		if(id_caja==0){
@@ -413,7 +419,7 @@ hljs.highlightAll();
 			</p>`;
 		$(".emergent_content").html(observacion);
 		$(".emergent").css("display","block");
-		return true;
+		return true;*/
 	}
 var cont_cheques_transferencia=0;
 	function agregar_fila(caja,monto,texto){
@@ -499,6 +505,15 @@ console.log( resp );
 			url += "&id_sesion_caja=" + $( '#session_id' ).val();
 			//alert( url );
 			var resp = ajaxR( url );
+
+
+			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
+				url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+				resp = ajaxR( url );
+				console.log( resp );
+				alert( resp );
+			}
+			
 //alert( resp );
 			var id_corte = $( "#id_venta" ).val();
 			$.ajax({
@@ -517,7 +532,7 @@ console.log( resp );
 			});
 			//location.reload();
 			return false;
-			var id=$("#id_venta").val();
+/*			var id=$("#id_venta").val();
 			//alert(id);
 			if(id==0){
 				alert("Es necesario que seleccione un folio de pedido antes de continuar!!!");
@@ -562,7 +577,7 @@ console.log( resp );
 					alert(dat);return false;
 					location.reload();
 				}
-			});
+			});*/
 		}
 /*funcion para agregar pagos con tarjeta*/
 	function addPaymetCard( user_id ){
@@ -717,6 +732,14 @@ console.log( resp );
 				$( '.emergent' ).css( 'display', 'block' );
 				return false;
 			}else{
+
+				if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
+					url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+					resp = ajaxR( url );
+					console.log( resp );
+					alert( resp );
+				}
+
 			//recarga vista de cobros
 				$( '#efectivo' ).val( '' );
 				carga_pedido( $( '#id_venta' ).val() );
@@ -772,6 +795,12 @@ console.log( resp );
 		if( resp[0] != 'ok' ){
 			alert( "Error : \n" + resp );
 		}else{
+			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
+				url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+				resp = ajaxR( url );
+				console.log( resp );
+				alert( resp );
+			}
 			carga_pedido( $( '#id_venta' ).val() );
 			alert( resp[1] );
 			close_emergent();

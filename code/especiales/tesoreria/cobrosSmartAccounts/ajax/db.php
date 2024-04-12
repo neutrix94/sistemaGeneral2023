@@ -865,6 +865,9 @@
 				WHERE id_pedido_relacionado = {$row['id_pedido_relacionado']}";
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar ec_pedidos_relacion_devolucion de pagos : {$sql} {$this->link->error}" );
 //echo $sql . "<br><br>";
+/*Implementacion Oscar 2024-04-11 para imprimir el ticket de la nota dependiente*/
+				
+/*fin de cambio Oscar 2024-04-11*/
 			//modifica el monto para hacer cuadrar el pago por devolucion
 				return $row['id_pedido_original'];
 				//return $amount;
