@@ -86,8 +86,13 @@
 	$lineas_pagos = 0;
 	$total_pagos = "0";
 	$tipofolio = "PEDIDO";
-	
-	$cs = "SELECT CONCAT(nombre, ' ', apellido_paterno) AS vendedor FROM sys_users WHERE id_usuario = '{$user_id}' ";
+//consulta datos del vendedor
+	$cs = "SELECT 
+				CONCAT(u.nombre, ' ', u.apellido_paterno) AS vendedor
+			FROM ec_pedidos p
+			LEFT JOIN sys_users u 
+			ON p.id_usuario = u.id_usuario
+			WHERE p.id_pedido = '{$id_pedido}'";
 	if ($rs = mysql_query($cs)) {
 		if ($dr = mysql_fetch_assoc($rs)) {
 			$vendedor = $dr["vendedor"];
