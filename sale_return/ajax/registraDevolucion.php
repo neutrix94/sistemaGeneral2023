@@ -472,8 +472,10 @@ else{
     }
 /**/
     $extra=str_replace("*", "&", $extra);
-    $url_recarga='../touch_desarrollo/index.php?scr=nueva-venta&s_f_c='.$totalDev.$extra."&abonado=".$total_abonado;
-    $sql="UPDATE ec_devolucion SET observaciones='$url_recarga' WHERE id_pedido=$idp";
+/*Modificacion Oscar 2024-04-15 para incluir id devolucion en la url guardada*/
+    $url_recarga = "../touch_desarrollo/index.php?scr=nueva-venta&s_f_c={$totalDev}{$extra}&abonado={$total_abonado}&id_dev={$id_dev_interna}~{$id_dev_externa}";
+/*Fin de cambio Oscar 2024-04-15*/
+    $sql="UPDATE ec_devolucion SET observaciones = '$url_recarga' WHERE id_pedido = {$idp}";
     $eje=mysql_query($sql)or die("Error al actualizar observaciones en las devoluciones!!\n\n".mysql_error()."\n\n".$sql);
 /**/
 //actualizamos monto del pedido y marcamos que este fue modificado
