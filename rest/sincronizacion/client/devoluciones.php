@@ -44,7 +44,7 @@ $app->get('/obtener_devoluciones', function (Request $request, Response $respons
   }
 
   $req["returns"] = $returnsSynchronization->getSynchronizationReturns( -1, $movements_limit );//consulta registros pendientes de sincronizar
-  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'DEVOLUCIONES' );//forma peticion
+  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'DEVOLUCIONES', 'sys_sincronizacion_devoluciones' );//forma peticion
   $post_data = json_encode($req, JSON_PRETTY_PRINT);
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_devoluciones", $post_data );//envia petición
 

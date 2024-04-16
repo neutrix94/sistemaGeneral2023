@@ -38,7 +38,8 @@ $app->get('/obtener_registros_sincronizacion_mov_p_p', function (Request $reques
   }
 
   $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros_movimientos_proveedor_producto' );//consulta registros pendientes de sincronizar
-  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );//inserta request
+  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 
+    'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros_movimientos_proveedor_producto' );//inserta request
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_registros_sincronizacion_movs_p_p", $post_data );//envia petición
   $result = json_decode( $result_1 );//decodifica respuesta

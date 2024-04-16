@@ -49,7 +49,7 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
 
   $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros' );//consulta registros pendientes de sincronizar
 
-    $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );//inserta request
+    $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros' );//inserta request
   
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
   //return $post_data;

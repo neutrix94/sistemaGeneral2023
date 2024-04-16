@@ -81,7 +81,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
 //Valida path
 //if ( sizeof( $req["movements"] ) > 0 ) {
   //inserta request
-    $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN' );
+    $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN', 'sys_sincronizacion_movimientos_almacen' );
   //forma peticion
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//
 //return $post_data;
@@ -164,7 +164,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
 //consulta registros pendientes de sincronizar
     $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 2 );
 //consume API para actualizar los inventarios de productos
-    $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time_2, 'ACTUALIZACION DE INVENTARIOS PRODUCTOS' );
+    $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time_2, 'ACTUALIZACION DE INVENTARIOS PRODUCTOS', 'sys_sincronizacion_movimientos_almacen' );
     
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//
     $result_2 = $SynchronizationManagmentLog->sendPetition( $path.'/rest/v1/actualiza_inventarios_productos', $post_data );

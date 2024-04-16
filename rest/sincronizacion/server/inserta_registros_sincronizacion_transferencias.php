@@ -88,7 +88,7 @@ $app->post('/inserta_registros_sincronizacion_transferencias', function (Request
   $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
   $rows_limit, 'sys_sincronizacion_registros_transferencias' );//obtiene registros para descargar
   if( sizeof( $resp["rows_download"] ) > 0 ){
-    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );
+    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros_transferencias' );
   }
   $SynchronizationManagmentLog->updateModuleResume( 'sys_sincronizacion_registros', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   

@@ -44,7 +44,7 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
   }
 
   $req["sales"] = $salesSynchronization->getSynchronizationSales( -1, $movements_limit );//consulta registros pendientes de sincronizar
-  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'VENTAS' );//inserta request
+  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'VENTAS', 'sys_sincronizacion_ventas' );//inserta request
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_ventas", $post_data );//envia petición
 
