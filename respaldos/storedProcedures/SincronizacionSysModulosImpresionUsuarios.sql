@@ -15,7 +15,7 @@ BEGIN
 				'"action_type" : "', TIPO_EVENTO,'",\n',
 				'"table_name" : "sys_modulos_impresion_usuarios",\n',
 				'"primary_key" : "id_modulo_impresion_usuario",\n',
-				'"primary_key_value" : "', miu.id_modulo_impresion_usuario, ',\n"',
+				'"primary_key_value" : "', miu.id_modulo_impresion_usuario, '",\n',
                 IF( TIPO_EVENTO = 'insert' OR TIPO_EVENTO = 'INSERT',
 					CONCAT( '"id_modulo_impresion_usuario" : "', miu.id_modulo_impresion_usuario, '",\n' ),
                     ''

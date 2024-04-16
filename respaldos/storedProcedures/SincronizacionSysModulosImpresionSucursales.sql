@@ -16,7 +16,7 @@ BEGIN
 				'"table_name" : "sys_modulos_impresion_sucursales",\n',
 				'"id_sucursal" : "', mis.id_sucursal, '",\n',
 				'"primary_key" : "id_modulo_impresion_sucursal",\n',
-				'"primary_key_value" : "', mis.id_modulo_impresion_sucursal, '\n"',
+				'"primary_key_value" : "', mis.id_modulo_impresion_sucursal, '",\n',
                 IF( TIPO_EVENTO = 'insert' OR TIPO_EVENTO = 'INSERT',
                     CONCAT( '"id_modulo_impresion_sucursal" : "', mis.id_modulo_impresion_sucursal, '",\n' ),
                     ''
