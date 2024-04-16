@@ -112,7 +112,7 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
 //return json_encode( $req["sales"] );
 //Valida path
   if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
-    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'VENTAS DESDE LINEA' );
+    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'VENTAS DESDE LINEA', 'sys_sincronizacion_ventas' );
   }
   $SynchronizationManagmentLog->updateModuleResume( 'ec_pedidos', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   

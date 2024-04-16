@@ -113,11 +113,11 @@
 			return $resp;
 		}
 //inserta generacion de peticion ( origen )
-		public function insertPetitionLog( $system_store, $destinity_store, $store_prefix, $initial_time, $log_type ){
+		public function insertPetitionLog( $system_store, $destinity_store, $store_prefix, $initial_time, $log_type, $table_name ){
 			$resp = array();
 			$this->link->autocommit( false );
-			$sql = "INSERT INTO sys_sincronizacion_peticion ( id_peticion, id_sucursal_origen, id_sucursal_destino, tipo, hora_comienzo, 
-			hora_envio ) VALUES( NULL, '{$system_store}', '{$destinity_store}', '{$log_type}', '{$initial_time}', NOW() )";
+			$sql = "INSERT INTO sys_sincronizacion_peticion ( id_peticion, id_sucursal_origen, id_sucursal_destino, tabla, tipo, hora_comienzo, 
+			hora_envio ) VALUES( NULL, '{$system_store}', '{$destinity_store}', '{$table_name}', '{$log_type}', '{$initial_time}', NOW() )";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar registro de peticion : {$this->link->error}" );
 			$sql = "SELECT LAST_INSERT_ID() AS id";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar El útimo id insertado : {$this->link->error}" );
@@ -145,9 +145,9 @@
 			$tmp_ok = str_replace("'", "\'", $tmp_ok );
 			$tmp_no = str_replace("'", "\'", $tmp_no );
 			$this->link->autocommit( false );
-			$sql = "INSERT INTO sys_sincronizacion_peticion ( id_peticion, id_sucursal_origen, id_sucursal_destino, tipo, hora_comienzo, 
+			$sql = "INSERT INTO sys_sincronizacion_peticion ( id_peticion, id_sucursal_origen, id_sucursal_destino, tabla, tipo, hora_comienzo, 
 			hora_envio, folio_unico, hora_llegada_destino, hora_respuesta ) VALUES( NULL, '{$log['origin_store']}', 
-			'{$log['destinity_store']}', '{$log['type']}', '{$log['intial_time']}', 
+			'{$log['destinity_store']}', '{$log['table_name']}', '{$log['type']}', '{$log['intial_time']}', 
 			'{$log['shipping_time']}', '{$log['unique_folio']}', '{$request_initial_time}', NOW() )";//, contenido_respuesta, '{$tmp_ok} | {$tmp_no}'
 			$stm = $this->link->query( $sql ) or die( "Error al insertar registro de peticion : {$sql} {$this->link->error} {$sql}" );
 			$this->link->autocommit( true );
@@ -175,7 +175,8 @@
 				        hora_envio AS shipping_time, 
 				        hora_llegada_destino AS destinity_time,
 				        hora_respuesta AS response_time,
-				        contenido_respuesta AS response_string
+				        contenido_respuesta AS response_string,
+						tabla AS table_name
 			      FROM sys_sincronizacion_peticion";//OR id_peticion = '{$unique_folio}'
 			$sql = $sql_base . " WHERE folio_unico = '{$unique_folio}'";
 			$stm = $this->link->query( $sql ) or die( "Error al recuperar datos de Peticion por folio {$this->link->error}" );

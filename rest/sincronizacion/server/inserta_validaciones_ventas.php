@@ -82,7 +82,7 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
 
   $resp["rows_download"] = $salesValidationSynchronization->getSynchronizationsalesValidation( $log['origin_store'], $rows_limit );//consulta registros pendientes de sincronizar
   if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
-    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'VALIDACION VENTAS DESDE LINEA' );
+    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'VALIDACION VENTAS DESDE LINEA', 'sys_sincronizacion_validaciones_ventas' );
   }
   
 //desbloquea indicador de sincronizacion en tabla

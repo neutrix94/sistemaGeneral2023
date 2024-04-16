@@ -40,7 +40,7 @@ $app->post('/procesa_registros_pendientes', function (Request $request, Response
     }
 //envia peticion al servidor en linea para comprobar 
     return json_encode($data);
-    return 'ok';
+    //return 'ok';
     //return json_encode( $pendientes );
 //envia respuesta al servidor en linea para comprobar 
     //return json_encode($data);
