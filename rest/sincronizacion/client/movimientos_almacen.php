@@ -86,7 +86,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//
 //return $post_data;
   //envia petición
-    $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_movimientos_almacen", $post_data );
+    $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/inserta_movimientos_almacen", $post_data );
 //return $result_1;
   //decodifica respuesta
    $result = json_decode( $result_1 );
@@ -137,7 +137,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
       //return json_encode( $resp );//envia peticion para actualiza log de registros descargados
       $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion//
      // return $post_data;
-      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data );//envia petición
+      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_peticion", $post_data );//envia petición
       //return $result_1;
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
@@ -150,7 +150,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     //envia peticion para actualiza log de registros descargados
       $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion//
      // return $post_data;
-      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data );//envia petición
+      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_peticion", $post_data );//envia petición
       //return $result_1;
 
     }
@@ -167,7 +167,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time_2, 'ACTUALIZACION DE INVENTARIOS PRODUCTOS', 'sys_sincronizacion_movimientos_almacen' );
     
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//
-    $result_2 = $SynchronizationManagmentLog->sendPetition( $path.'/rest/v1/actualiza_inventarios_productos', $post_data );
+    $result_2 = $SynchronizationManagmentLog->sendPetition( $path.'/rest/sincronizacion/actualiza_inventarios_productos', $post_data );
 //return $result_2;
     $result = json_decode( $result_2 );
     if( $result->error ){

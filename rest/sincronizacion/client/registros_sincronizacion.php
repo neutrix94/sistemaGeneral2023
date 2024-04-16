@@ -53,7 +53,7 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
   //return $post_data;
-    $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_registros_sincronizacion", $post_data, 'sys_sincronizacion_registros' );//envia petición
+    $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/inserta_registros_sincronizacion", $post_data, 'sys_sincronizacion_registros' );//envia petición
 //return $result_1;
     $result = json_decode( $result_1 );//decodifica respuesta
     if( $result == '' || $result == null ){  
@@ -88,7 +88,7 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"] );
       //return json_encode( $resp );
       $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"], "table"=>"sys_sincronizacion_registros", "status"=>"error" ), JSON_PRETTY_PRINT);//forma peticion
-      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data );//envia petición
+      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_peticion", $post_data );//envia petición
       //return $result_1;
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
@@ -99,7 +99,7 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
       $resp["log"]["type_update"] = "rowsSynchronization";
       $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"], "table"=>"sys_sincronizacion_registros", "status"=>"ok"  ), JSON_PRETTY_PRINT);//forma peticion//
      // return $post_data;
-      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data );//envia petición
+      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_peticion", $post_data );//envia petición
       //return $result_1;
     }
   }
