@@ -102,7 +102,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
 //consulta registros pendientes de sincronizar
   $resp["rows_download"] = $returnsSynchronization->getSynchronizationReturns( $log['origin_store'], $rows_limit );
   if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
-    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'DEVOLUCIONES DESDE LINEA' );
+    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'DEVOLUCIONES DESDE LINEA', 'sys_sincronizacion_devoluciones' );
   }
   $SynchronizationManagmentLog->updateModuleResume( 'ec_devolucion', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   

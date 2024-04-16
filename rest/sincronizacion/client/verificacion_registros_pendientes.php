@@ -24,7 +24,7 @@ $app->get('/verificacion_registros', function (Request $request, Response $respo
     $store_prefix = $config['store_prefix'];
     $initial_time = $config['process_initial_date_time'];
     $movements_limit = $config['rows_limit'];
-    var_dump( $config );return '';
+    //var_dump( $config );return '';
 //consula la sucursal de acceso
     $sql = "SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1";
     $stm = $link->query( $sql ) or die( "Error al consultar sucursal de acceso : {$link->error}" );
@@ -44,9 +44,10 @@ $app->get('/verificacion_registros', function (Request $request, Response $respo
     }
 //envia peticion al servidor en linea para comprobar 
     $post_data = json_encode($data, JSON_PRETTY_PRINT);
+    return $post_data;
     $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/procesa_registros_pendientes", $post_data );//envia petición
     $result = json_decode( $result_1 );//decodifica respuesta
-    return json_encode($data);
+    return json_encode($result);
     var_dump( $data );
 });
 

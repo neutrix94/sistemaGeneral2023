@@ -44,9 +44,10 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   }
   $req["product_provider_movements"] = $productProviderMovementsSynchronization->getSynchronizationProductProviderMovements( -1, 
   $product_provider_movements_limit );//consulta registros pendientes de sincronizar
-  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'MOVIMIENTOS PROVEEDOR PRODUCTO' );//inserta request
+  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 
+    'MOVIMIENTOS PROVEEDOR PRODUCTO', 'sys_sincronizacion_movimientos_proveedor_producto' );//inserta request
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
-  $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_movimientos_proveedor_producto", $post_data );//envia petición
+  $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/inserta_movimientos_proveedor_producto", $post_data );//envia petición
 
   $result = json_decode( $result_1 );//decodifica respuesta
   if( $result == '' || $result == null ){  
@@ -82,7 +83,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"] );
       $post_data_1 = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
-      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data_1 );//envia peticion para actualiza log de registros descargados
+      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_peticion", $post_data_1 );//envia peticion para actualiza log de registros descargados
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
@@ -92,16 +93,16 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
       $resp["log"]["type_update"] = "productProviderMovementsSynchronization";
     //envia peticion para actualiza log de registros descargados
       $post_data_1 = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
-      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data_1 );//envia petición
+      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_peticion", $post_data_1 );//envia petición
     }
   }
 
   $initial_time_2 = $SynchronizationManagmentLog->getCurrentTime();
-  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, 
-    $initial_time_2, 'ACTUALIZACION DE INVENTARIOS PROVEEDOR PRODUCTO' );//consume API para actualizar los inventarios de productos
+  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time_2, 
+    'ACTUALIZACION DE INVENTARIOS PROVEEDOR PRODUCTO', 'sys_sincronizacion_movimientos_proveedor_producto' );//consume API para actualizar los inventarios de productos
   
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//
-  $result_2 = $SynchronizationManagmentLog->sendPetition( $path.'/rest/v1/actualiza_inventarios_proveedor_producto', $post_data );
+  $result_2 = $SynchronizationManagmentLog->sendPetition( $path.'/rest/sincronizacion/actualiza_inventarios_proveedor_producto', $post_data );
   $result = json_decode( $result_2 );
   if( $result->error ){
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto' );//liberar el modulo de sincronizacion

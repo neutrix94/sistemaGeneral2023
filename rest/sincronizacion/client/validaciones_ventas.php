@@ -47,9 +47,9 @@ $app->get('/obtener_validaciones_ventas', function (Request $request, Response $
   }
 
   $req["validations"] = $salesValidationSynchronization->getSynchronizationSalesValidation( -1, $validation_limits );//consulta registros pendientes de sincronizar
-  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'VALIDACION VENTAS' );//inserta request
+  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'VALIDACION VENTAS', 'sys_sincronizacion_validaciones_ventas' );//inserta request
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
-  $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_validaciones_ventas", $post_data );//envia petición
+  $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/inserta_validaciones_ventas", $post_data );//envia petición
   $result = json_decode( $result_1 );//decodifica respuesta
   if( $result == '' || $result == null ){  
     if( $result_1 == '' || $result_1 == null ){
@@ -84,14 +84,14 @@ $app->get('/obtener_validaciones_ventas', function (Request $request, Response $
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"] );
       //return json_encode( $resp );//envia peticion para actualiza log de registros descargados
       $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
-      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data );//envia petición
+      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_peticion", $post_data );//envia petición
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"] );//inserta respuesta exitosa
       $resp["log"]["type_update"] = "salesValidationSynchronization";
       $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
-      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data );//envia peticion para actualiza log de registros descargados
+      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_peticion", $post_data );//envia peticion para actualiza log de registros descargados
     }
   }
   $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos_validacion_usuarios' );//liberar el modulo de sincronizacion

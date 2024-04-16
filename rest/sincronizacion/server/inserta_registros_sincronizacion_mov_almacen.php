@@ -87,7 +87,7 @@ $app->post('/inserta_registros_sincronizacion_movimientos_almacen', function (Re
   $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
     $rows_limit, 'sys_sincronizacion_registros_movimientos_almacen' );//obtiene registros para descargar
   if( sizeof( $resp["rows_download"] ) > 0 ){
-    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );
+    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros_movimientos_almacen' );
   }
   $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_almacen', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   
