@@ -86,7 +86,7 @@
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el endpoint por usuario : {$sql}" );
 			$conteo = $stm->num_rows;
 			$row = $stm->fetch_assoc();
-			if( $conteo <= 0 || $row['endpoint_api_destino_local'] = '' ){
+			if( $conteo <= 0 || $row['endpoint_api_destino_local'] == '' ){
 		//consulta si tiene endpoint especifico local por sucursal
 				$sql = "SELECT
 					mis.endpoint_api_destino_local
