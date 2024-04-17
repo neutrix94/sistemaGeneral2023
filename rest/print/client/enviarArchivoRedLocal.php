@@ -38,11 +38,11 @@ $app->post('/enviar_archivo_red_local', function (Request $request, Response $re
                 miu.endpoint_api_destino_local
             FROM sys_modulos_impresion_usuarios miu
             WHERE miu.id_modulo_impresion = {$id_modulo_impresion}
-            AND miu.id_usuario = {$id_usuario}";
+            AND miu.id_usuario = {$id_usuario}";//die($sql);
 	$stm = $link->query( $sql ) or die( "Error al consultar el endpoint por usuario : {$sql}" );
     $conteo = $stm->num_rows;
     $row = $stm->fetch_assoc();
-    if( $conteo <= 0 || $row['endpoint_api_destino_local'] = '' ){
+    if( $conteo <= 0 || $row['endpoint_api_destino_local'] == '' ){
 //consulta si tiene endpoint especifico local por sucursal
         $sql = "SELECT
             mis.endpoint_api_destino_local
@@ -52,15 +52,15 @@ $app->post('/enviar_archivo_red_local', function (Request $request, Response $re
     	$stm = $link->query( $sql ) or die( "Error al consultar el endpoint por sucursal : {$sql}" );
         $row = $stm->fetch_assoc();
         $url_base = $row['endpoint_api_destino_local'];
-    }else{
+    }//else{
         $url_base = $row['endpoint_api_destino_local'];
-    }
+    //}
     if( $url_base == "" || $url_base == null ){
-        die( "No hay APIS destino para este modulo. {$sql}" );
+        die( "No hay APIS destino para este modulo : {$url_base}. {$sql}" );
     }
 //consume api en el servidor destino//$row = $stm->fetch_assoc();
 	$url = "{$url_base}";//url
-	
+	//die("{$url}");
 	$resp = "";
 	$crl = curl_init( $url );
 	curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
