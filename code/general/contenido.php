@@ -664,8 +664,8 @@ include( '../especiales/plugins/inventory.php' );//implementación Oscar 2022
 								$sql_sync_2024 = "INSERT INTO sys_sincronizacion_registros ( sucursal_de_cambio, id_sucursal_destino, datos_json, 
 									fecha, tipo, status_sincronizacion )
 									SELECT
-										IF( s.id_sucursal = -1, '{$user_sucursal}', '-1' ),
 										s.id_sucursal,
+										IF( s.id_sucursal = -1, '{$user_sucursal}', '-1' ),
 										CONCAT('{',
 											'\"action_type\" : \"sql_instruction\",',
 											'\"sql\" : \"{$sqGrid_delete}\"',
