@@ -659,6 +659,25 @@ include( '../especiales/plugins/inventory.php' );//implementación Oscar 2022
 									mysql_query( $sql_procedure ) or die( "Error al insertar registro de sincronizacion por actualizacion : " . mysql_error() );
 								}
 
+							}else if( ( $gridArray[$i][0] == 91 || $gridArray[$i][0] == 92 ) && $j == 0 ){
+								$sqGrid_delete = str_replace( "'", "\'", $sqGrids[$j] );
+								$sql_sync_2024 = "INSERT INTO sys_sincronizacion_registros ( sucursal_de_cambio, id_sucursal_destino, datos_json, 
+									fecha, tipo, status_sincronizacion )
+									SELECT
+										IF( s.id_sucursal = -1, '{$user_sucursal}', '-1' ),
+										s.id_sucursal,
+										CONCAT('{',
+											'\"action_type\" : \"sql_instruction\",',
+											'\"sql\" : \"{$sqGrid_delete}\"',
+											'}'
+										),
+										NOW(),
+										'contenido.php',
+										1
+									FROM sys_sucursales s
+									WHERE s.acceso = '1'";
+								$stm_sync_2024 = mysql_query( $sql_sync_2024 ) or die( "Error al insertar instruccion de eliminacion : " );
+								//die( $sqGrids[$j] );
 							}
 							
 							/*else if( $subArray_madpp[1] != '' && $subArray_madpp[1] != null ){
