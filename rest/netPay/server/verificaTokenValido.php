@@ -23,8 +23,10 @@ $app->post('/valida_token', function (Request $request, Response $response){
     }else{
       //Consulta vigencia
         try{
-            $resultadoToken = $vt->validaToken($token);
+            $resultadoToken = $vt->verificaExistenciaToken($token);
         if ($resultadoToken->rowCount()==0) {
+        //verifica si el token existe
+           // $verificacion_token 
             return $rs->errorMessage($request->getParsedBody(),$response, 'Token_Invalido', 'El token proporcionado no es válido', 400);
         }
         }catch (PDOException $e) {
