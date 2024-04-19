@@ -39,8 +39,8 @@ $app->post('/facturaReceptor', function (Request $request, Response $response){
       }
       
       //Recuperar parámetros de entrada
-      $rfc = $request->getParam('rfc');
-      $nombre = $request->getParam('nombre');
+      $rfc = htmlspecialchars($request->getParam('rfc'));
+      $nombre = htmlspecialchars($request->getParam('nombre'));
       $usoCFDI = $request->getParam('usoCFDI');
       $domicilioFiscal = $request->getParam('domicilioFiscal');
       $regimenFiscal = $request->getParam('regimenFiscal');
