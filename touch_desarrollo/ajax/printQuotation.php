@@ -686,10 +686,13 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 			}
 	    	$ticket->Output( "../../{$ruta_salida}/{$nombre_ticket}", "F" );
 		/*Sincronización remota de tickets*/
-			if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
-				$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
-			}else{//impresion por red local
-				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 3, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path );
+			if( ! isset($_GET['show_pdf']) ){
+				if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
+					$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+				}else{//impresion por red local
+					$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 3, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, 
+					$carpeta_path, '../', 'alert("Impresion de cotizacion exitosa!");close_emergent();' );
+				}
 			}
     /*fin de cambio Oscar 25.01.2019*/
     	}//fin de for $cont
@@ -702,9 +705,9 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 	}
 /*Fin de cambio Oscar 07.03.2019*/
 		if( isset($_GET['show_pdf']) ){
-			die( "../../cache/ticket/{$nombre_ticket}" );
+			die( "ok|../../{$ruta_salida}/{$nombre_ticket}" );
 		}
-       	die( "Cotizacion Impresa exitosamente!" );
+       	die( "ok|Cotizacion Impresa exitosamente!" );
        	//header ("location: index.php?scr=evaluation"); 
     }
 		

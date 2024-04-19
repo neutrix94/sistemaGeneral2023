@@ -58,66 +58,46 @@ BEGIN
                     CONCAT( ',"id_sesion_caja" : "( SELECT id_sesion_caja FROM ec_sesion_caja WHERE folio_unico = \'', teller_session_unique_folio, '\' LIMIT 1 )"\n' ),
                     ',"id_sesion_caja" : "0"'
                 ),
-			( SELECT 
-				IF( ped_det.id_pedido_detalle IS NOT NULL,
-					CONCAT( ', "sale_detail" : [\n',
-						GROUP_CONCAT(
-						DISTINCT( CONCAT( 
-								'{',
-									'"id_producto" : "', ped_det.id_producto, '",\n',
-									'"cantidad" : "', ped_det.cantidad, '",\n',
-									'"precio" : "', ped_det.precio, '",\n',
-									'"monto" : "', ped_det.monto, '",\n',
-									'"cantidad_surtida" : "', ped_det.cantidad_surtida, '",\n',
-									'"descuento" : "', ped_det.descuento, '",\n',
-									'"es_externo" : "', ped_det.es_externo, '",\n',
-									'"id_precio" : "', ped_det.id_precio, '",\n',
-									'"folio_unico" : "', ped_det.folio_unico, '"\n',
-								'}\n'
-							) )
-							SEPARATOR ','
+				( SELECT 
+					IF( ped_det.id_pedido_detalle IS NOT NULL,
+						CONCAT( ', "sale_detail" : [\n',
+							GROUP_CONCAT(
+							DISTINCT( CONCAT( 
+									'{',
+										'"id_producto" : "', ped_det.id_producto, '",\n',
+										'"cantidad" : "', ped_det.cantidad, '",\n',
+										'"precio" : "', ped_det.precio, '",\n',
+										'"monto" : "', ped_det.monto, '",\n',
+										'"cantidad_surtida" : "', ped_det.cantidad_surtida, '",\n',
+										'"descuento" : "', ped_det.descuento, '",\n',
+										'"es_externo" : "', ped_det.es_externo, '",\n',
+										'"id_precio" : "', ped_det.id_precio, '",\n',
+										'"folio_unico" : "', ped_det.folio_unico, '"\n',
+									'}\n'
+								) )
+								SEPARATOR ','
+							),
+							']\n'
 						),
-						']\n'
-					),
-					''
-				)
-			FROM ec_pedidos_detalle ped_det
-			WHERE ped_det.id_pedido = ped.id_pedido
+						''
+					)
+				FROM ec_pedidos_detalle ped_det
+				WHERE ped_det.id_pedido = ped.id_pedido
 			),
-			/*(SELECT
-				IF( ped_pag.id_pedido_pago IS NOT NULL,
-					CONCAT( ', "sale_payments" : [\n',
-						GROUP_CONCAT(
-						DISTINCT( CONCAT(
-								'{',
-									'"id_tipo_pago" : "1",\n',
-									'"fecha" : "', ped_pag.fecha, '",\n',
-									'"hora" : "', ped_pag.hora, '",\n',
-									'"monto" : "', ped_pag.monto, '",\n',
-									'"referencia" : "', ped_pag.referencia, '",\n',
-									'"id_moneda" : "', ped_pag.id_moneda, '",\n',
-									'"tipo_cambio" : "', ped_pag.tipo_cambio, '",\n',
-									'"id_nota_credito" : "', ped_pag.id_nota_credito, '",\n',
-									'"id_cxc" : "', ped_pag.id_cxc, '",\n',
-									'"exportado" : "', ped_pag.exportado, '",\n',
-									'"es_externo" : "', ped_pag.es_externo, '",\n',
-									'"id_cajero" : "', ped_pag.id_cajero, '",\n',
-					                IF( ped_pag.id_sesion_caja != 0, 
-					                    CONCAT( '"id_sesion_caja" : "( SELECT id_sesion_caja FROM ec_sesion_caja WHERE folio_unico = \'', teller_session_unique_folio, '\' LIMIT 1 )",\n' ),
-					                    '"id_sesion_caja" : "0",'
-					                ),
-									'"folio_unico" : "', ped_pag.folio_unico, '"\n',
-								'}\n'
-							) )
-							SEPARATOR ','
-						),
-						']\n'
-					),
-					''
+			(SELECT
+				CONCAT(
+				',"return_reference" : [{',
+					'"id_pedido" : " ( SELECT id_pedido FROM ec_pedidos WHERE folio_unico = \'', (SELECT folio_unico FROM ec_pedidos WHERE id_pedido = sale_header_id LIMIT 1),'\' )",',
+					'"total_venta" : "', prd.total_venta,'",',
+					'"monto_venta_mas_ultima_devolucion" : "', prd.monto_venta_mas_ultima_devolucion, '",',
+					'"saldo_a_favor" : "', prd.saldo_a_favor, '",',
+					'"folio_unico" : "', prd.folio_unico, '",',
+					'"sincronizar" : "0"',
+				'}]'
 				)
-			FROM ec_pedido_pagos ped_pag
-			WHERE ped_pag.id_pedido = ped.id_pedido
-			),*/
+			FROM ec_pedidos_referencia_devolucion prd
+			WHERE prd.id_pedido = sale_header_id
+			),
 			'}'
 		),
 		'ec_pedidos',

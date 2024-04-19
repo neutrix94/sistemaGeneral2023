@@ -2,7 +2,7 @@
 class manageResponse{
   function errorMessage($request=null, $response, $error, $description, $code, $inserts = null){
       $resultadoError = [];
-      $resultadoError['erorr']=$error;
+      $resultadoError['error']=$error;
       $resultadoError['description']=$description;
       $this->insertLog($request,$resultadoError);
       return $response->withStatus($code)

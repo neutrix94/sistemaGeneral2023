@@ -481,9 +481,10 @@
       $ticket->Output( "../../../{$ruta_salida}/{$nombre_ticket}", "F" );
       /*Sincronización remota de tickets*/
         if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
-          $registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
+          $registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $this->store_id, $this->user );
         }else{//impresion por red local
-          $enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 4, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path );
+          $enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 4, 'pdf', $nombre_ticket, '', $ruta_salida, $this->store_id, $this->user, 
+          $carpeta_path );
         }
 /*implementacion Oscar 03.03.2019 para actualizar el status de la devolución como terminada*/
       if(isset($id_pedido_original) && $flag_tkt=='devuelve_efectivo'){

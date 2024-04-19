@@ -1,0 +1,1 @@
+{"traceability":{"id_sucursal":"1","id_cajero":"784","folio_venta":"23MAT217","id_sesion_cajero":"3038","smart_accounts":true,"store_id_netpay":"455311","folio_unico_transaccion":"22LINEA_TNP_30"},"serialNumber":"1494113052","orderId":"240412140059-1494113052","storeId":"455311","isSmartAccounts":"true","disablePrintAnimation":false}

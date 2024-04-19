@@ -84,31 +84,16 @@ $app->post('/', function (Request $request, Response $response){
   $transactionId = $request->getParam( "transactionId" );//40
   $traceability = $request->getParam( "traceability" );//41
   
-  $transactionId_internal = $folioNumber;
-  if( $traceability['petition_id'] != null && $traceability['petition_id'] != '' ){
-    $transactionId_internal = $traceability['petition_id'];
+  $transaction_unique_folio = $folioNumber;
+  if( $traceability['folio_unico_transaccion'] != null && $traceability['folio_unico_transaccion'] != '' ){
+    $transaction_unique_folio = $traceability['folio_unico_transaccion'];
   }
   //traceability
  // $traceability['']
 
 //$file = fopen("archivo.txt", "w");
   $link->autocommit( false );
-//inserta la respuesta de la transaccion
-  $sql = "INSERT INTO vf_transacciones_netpay ( /*1*/id_transaccion_netpay, /*2*/affiliation,/*3*/applicationLabel,/*4*/arqc,/*5*/aid,/*6*/amount,
-    /*7*/authCode,/*8*/bin,/*9*/bankName,/*10*/cardExpDate,/*11*/cardType,/*12*/cardTypeName,/*13*/cityName,/*14*/responseCode,/*15*/folioNumber,
-    /*16*/hasPin,/*17*/hexSign,/*18*/isQps,/*19*/message,/*20*/isRePrint,/*21*/moduleCharge,/*22*/moduleLote,/*23*/customerName,/*24*/terminalId,
-    /*25*/orderId,/*26*/preAuth,/*27*/preStatus,/*28*/promotion,/*29*/rePrintDate,/*30*/rePrintMark,/*31*/reprintModule,/*32*/cardNumber,
-    /*33*/storeName,/*34*/streetName,/*35*/ticketDate,/*36*/tipAmount,/*37*/tipLessAmount,/*38*/transDate,/*39*/transType,/*40*/transactionCertificate,
-    /*41*/transactionId, /*42*/id_sucursal, /*43*/id_cajero, /*44*/folio_venta )
-      VALUES( /*1*/NULL, /*2*/'{$affiliation}',/*3*/'{$applicationLabel}',/*4*/'{$arqc}',/*5*/'{$aid}',/*6*/'{$amount}',
-    /*7*/'{$authCode}',/*8*/'{$bin}',/*9*/'{$bankName}',/*10*/'{$cardExpDate}',/*11*/'{$cardType}',/*12*/'{$cardTypeName}',/*13*/'{$cityName}',
-    /*14*/'{$responseCode}',/*15*/'{$folioNumber}',/*16*/'{$hasPin}',/*17*/'{$hexSign}',/*18*/'{$isQps}',/*19*/'{$message_}',/*20*/'{$isRePrint}',
-    /*21*/'{$moduleCharge}',/*22*/'{$moduleLote}',/*23*/'{$customerName}',/*24*/'{$terminalId}',/*25*/'{$orderId}',/*26*/'{$preAuth}',
-    /*27*/'{$preStatus}',/*28*/'{$promotion}',/*29*/'{$rePrintDate}',/*30*/'{$rePrintMark}',/*31*/'{$reprintModule}',/*32*/'{$cardNumber}',
-    /*33*/'{$storeName}',/*34*/'{$streetName}',/*35*/'{$ticketDate}',/*36*/'{$tipAmount}',/*37*/'{$tipLessAmount}',/*38*/'{$transDate}',
-    /*39*/'{$transType}',/*40*/'{$transactionCertificate}',/*41*/'{$transactionId}',/*42*/'{$traceability['id_sucursal']}', 
-    /*43*/'{$traceability['id_cajero']}', /*44*/'{$traceability['folio_venta']}' )";
-  
+//actualiza la respuesta de la transaccion
   $sql = "UPDATE vf_transacciones_netpay SET 
             /*2*/affiliation = '{$affiliation}',
             /*3*/applicationLabel = '{$applicationLabel}',
@@ -155,9 +140,9 @@ $app->post('/', function (Request $request, Response $response){
             /*44*/folio_venta = '{$traceability['folio_venta']}',
             /*44*/id_sesion_cajero = '{$traceability['id_sesion_cajero']}',
             /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
-          WHERE id_transaccion_netpay = '{$transactionId_internal}'";//$folioNumber
+          WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
-  if( trim($message_) == 'Transaccion exitosa' ){
+  if( trim($message_) == 'Transaccion exitosa' && $transType == 'A' ){
   //consulta los datos en relacion al numero de serie de la terminal
     $sql = "";
     if( isset( $traceability['smart_accounts'] ) && $traceability['smart_accounts'] == true ){

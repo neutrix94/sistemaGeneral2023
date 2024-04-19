@@ -164,6 +164,7 @@
 				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_cancelacion' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/cancel";//"http://nubeqa.netpay.com.mx:3334/integration-service/transactions/cancel";
 				$cancel = $apiNetPay->saleCancelation( $apiUrl, $data['orderId'], $data['terminalId'],
 										$user_id, $sucursal_id, $sale_folio, $session_id, $store_id_netpay );
+			//	die("pasa : {$cancel}");
 				$resp = json_decode( $cancel );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
 					$counter = 'null';
@@ -490,9 +491,10 @@
 					ON pp.id_pedido = p.id_pedido
 					WHERE p.id_pedido = {$sale_id}";
 			//die( $sql );
+			$difference = round( $row['sale_total'], 2 ) - round( $row['payments_total'], 2 );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los totales para validar : {$sql} : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			if( $row['was_payed'] == 1 && round( $row['sale_total'], 2 ) > round( $row['payments_total'], 2 ) ){
+			if( $row['was_payed'] == 1 && ( $difference == 1 || $difference == -1) ){
 				die( "<div class=\"row\">
 					<h3 class=\"text-center text-danger fs-2\">La venta no esta liquidada, registra todos los pagos y vuelve a intentar</h3>
 					<div class=\"\">
@@ -675,17 +677,27 @@
 						$color = "class=\"text-danger\"";
 					}
 					if( $row['terminal_id'] > 0 ){
-						$sql_tmp = "SELECT id_transaccion_netpay FROM vf_transacciones_netpay WHERE orderId = '{$row['observaciones']}'";
+						$sql_tmp = "SELECT folio_unico FROM vf_transacciones_netpay WHERE orderId = '{$row['observaciones']}'";
 						$stm_aux = $this->link->query( $sql_tmp ) or die( "Error al conultar id de transaccion : {$this->link->error}" );
 						$aux_row = $stm_aux->fetch_assoc();
 						$button = "<button
 								type=\"button\"
 								class=\"btn btn-warning\"
 								style=\"padding : 0px !important;\"
-								onclick=\"rePrintByOrderId( '{$aux_row['id_transaccion_netpay']}' );\"
+								onclick=\"rePrintByOrderId( '{$aux_row['folio_unico']}' );\"
 							>
 								<i class=\"icon-print-3\"></i>
 							</button>";
+					/*deshabilitado por Oscar 2024-03-22
+						<button
+							type=\"button\"
+							class=\"btn btn-danger\"
+							style=\"padding : 0px !important;\"
+							onclick=\"cancelByOrderId( '{$aux_row['id_transaccion_netpay']}' );\"
+						>
+							<i class=\"icon-cancel-circled\"></i>
+						</button>
+					*/
 					}
 					$resp .= "<tr {$color}>
 						<td class=\"text-center\">{$row['payment_type']}</td>
@@ -854,6 +866,9 @@
 				WHERE id_pedido_relacionado = {$row['id_pedido_relacionado']}";
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar ec_pedidos_relacion_devolucion de pagos : {$sql} {$this->link->error}" );
 //echo $sql . "<br><br>";
+/*Implementacion Oscar 2024-04-11 para imprimir el ticket de la nota dependiente*/
+				
+/*fin de cambio Oscar 2024-04-11*/
 			//modifica el monto para hacer cuadrar el pago por devolucion
 				return $row['id_pedido_original'];
 				//return $amount;
@@ -946,11 +961,12 @@
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los pagos anteriores : {$this->link->error}" );
 			$this->link->autocommit(false);
 			//die( "here" );
+			$row = array();
 			while( $row = $stm->fetch_assoc() ){
-			//inserta pagos en negativo
+			//inserta pagos en negativo{$row['id_cajero_cobro']}
 				$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
 					id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
-					VALUES ( '{$row['id_pedido']}', '{$row['id_cajero_cobro']}', '{$row['id_tipo_pago']}', now(), now(), ( {$row['monto']}*-1 ), 'Pago Anulado por devolucion {$folio_devolucion}', '{$row['id_moneda']}', '{$row['tipo_cambio']}', 
+					VALUES ( '{$row['id_pedido']}', '1', '{$row['id_tipo_pago']}', now(), now(), ( {$row['monto']}*-1 ), 'Pago Anulado por devolucion {$folio_devolucion}', '{$row['id_moneda']}', '{$row['tipo_cambio']}', 
 					'{$row['id_nota_credito']}', '{$row['id_cxc']}', '0', '{$row['es_externo']}', '{$id_cajero}', NULL, '1', '{$id_sesion_caja}')";
 				$insert = $this->link->query( $sql ) or die( "Error al insertar los cobros del cajero : {$this->link->error}" );
 				$sql = "UPDATE ec_pedido_pagos SET referencia = 'Pago para anular por devolucion {$folio_devolucion}' WHERE id_pedido_pago = {$row['id_pedido_pago']}";
@@ -970,11 +986,11 @@
 			if( $stm_aux->num_rows > 0 ){*/
 			if( $monto_dev_interna > 0 ){
 				//$row_aux = $stm_aux->fetch_assoc();
-			//inserta los pagos de acuerdo a la devolucion interna
+			//inserta los pagos de acuerdo a la devolucion interna{$row['id_cajero_cobro']}
 				$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, id_moneda, tipo_cambio, 
 				id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja, referencia )
-				VALUES ( '{$id_venta}', '{$row['id_cajero_cobro']}', '1', now(), now(), ROUND( {$monto_dev_interna}, 4 ), '1', '-1', 
-				'-1', '-1', '0', '0', '{$id_cajero}', '{$row['folio_unico']}', '{$row['sincronizar']}', '{$id_sesion_caja}', 
+				VALUES ( '{$id_venta}', '1', '1', now(), now(), ROUND( {$monto_dev_interna}, 4 ), '1', '-1', 
+				'-1', '-1', '0', '0', '{$id_cajero}', NULL, '{$row['sincronizar']}', '{$id_sesion_caja}', 
 				'Devolucion interna {$folio_devolucion}')";
 				$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero en relacion a la devolucion : {$this->link->error}" );
 			}
@@ -994,7 +1010,7 @@
 			//inserta los pagos de acuerdo a la devolucion externa
 				$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, id_moneda, tipo_cambio, 
 				id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja, referencia )
-				VALUES ( '{$id_venta}', '{$row['id_cajero_cobro']}', '1', now(), now(),  ROUND( {$monto_dev_externa}, 4 ), '1', '-1', 
+				VALUES ( '{$id_venta}', '1', '1', now(), now(),  ROUND( {$monto_dev_externa}, 4 ), '1', '-1', 
 				'-1', '-1', '0', '1', '{$id_cajero}', NULL, '1', '{$id_sesion_caja}', 
 				'Devolucion externa {$folio_devolucion}')";
 				$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro externo del cajero en relacion a la devolucion : {$this->link->error}" );
@@ -1005,7 +1021,8 @@
 			$sql = "SELECT
 					ROUND( ax.internal/ax.total, 6 ) AS internal_porcent,
 					ROUND( ax.external/ax.total, 6 ) AS external_porcent,
-					ROUND( ax.total * porcentaje, 2 ) AS total
+					ROUND( ax.total * porcentaje, 2 ) AS total,
+					'{$row['id_cajero_cobro']}' AS id_cajero_cobro
 				FROM(
 					SELECT
 						SUM( pd.monto ) AS total,
@@ -1035,7 +1052,7 @@
 				//inserta pagos internos
 					$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
 						id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
-						VALUES ( '{$id_venta}', '{$row_cc['id_cajero_cobro']}', '1', now(), now(), ROUND( {$row['total']}*{$row['internal_porcent']}, 4 ), '', '1', '-1', 
+						VALUES ( '{$id_venta}', '1', '1', now(), now(), ROUND( {$row['total']}*{$row['internal_porcent']}, 4 ), '', '1', '-1', 
 						'-1', '-1', '0', '0', '{$id_cajero}', NULL, '1', '{$id_sesion_caja}')";
 					$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero : {$this->link->error}" );
 				}
@@ -1046,7 +1063,7 @@
 				//inserta pagos externos
 					$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
 						id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
-						VALUES ( '{$id_venta}', '{$row_cc['id_cajero_cobro']}', '1', now(), now(), ROUND( {$row['total']}*{$row['external_porcent']}, 4 ), '', '1', '-1', 
+						VALUES ( '{$id_venta}', '1', '1', now(), now(), ROUND( {$row['total']}*{$row['external_porcent']}, 4 ), '', '1', '-1', 
 						'-1', '-1', '0', '1', '{$id_cajero}', NULL, '1', '{$id_sesion_caja}')";
 					$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero : {$this->link->error}" );
 				}
@@ -1061,12 +1078,13 @@
 			$this->link->autocommit(false);
 			$total_pagado = 0;
 			//die( "here" );
+			$row = array();
 			while( $row = $stm->fetch_assoc() ){
 			//inserta pagos en negativo
 				$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
 					id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
 					VALUES ( '{$row['id_pedido']}', '{$row['id_cajero_cobro']}', '{$row['id_tipo_pago']}', now(), now(), ( {$row['monto']}*-1 ), 'Pago Anulado por devolucion {$folio_devolucion}', '{$row['id_moneda']}', '{$row['tipo_cambio']}', 
-					'{$row['id_nota_credito']}', '{$row['id_cxc']}', '{$row['exportado']}', '{$row['es_externo']}', '{$id_cajero}', '{$row['folio_unico']}', '{$row['sincronizar']}', '{$id_sesion_caja}')";
+					'{$row['id_nota_credito']}', '{$row['id_cxc']}', '{$row['exportado']}', '{$row['es_externo']}', '{$id_cajero}', NULL, '{$row['sincronizar']}', '{$id_sesion_caja}')";
 				$insert = $this->link->query( $sql ) or die( "Error al insertar los cobros del cajero : {$this->link->error}" );
 				$sql = "UPDATE ec_pedido_pagos SET referencia = 'Pago para anular por devolucion {$folio_devolucion}' WHERE id_pedido_pago = {$row['id_pedido_pago']}";
 				$insert = $this->link->query( $sql ) or die( "Error al insertar los cobros del cajero : {$this->link->error}" );
@@ -1077,7 +1095,8 @@
 			$sql = "SELECT
 					ROUND( ax.internal/ax.total_nota, 6 ) AS internal_porcent,
 					ROUND( ax.external/ax.total_nota, 6 ) AS external_porcent,
-					ROUND( ax.total * porcentaje, 2 ) AS total
+					ROUND( ax.total * porcentaje, 2 ) AS total,
+					'{$row['id_cajero_cobro']}' AS id_cajero_cobro
 				FROM(
 					SELECT
 						{$total_pagado} AS total,
@@ -1104,22 +1123,22 @@
 					if( $row['internal_porcent'] >= 0.99 ){
 						$row['internal_porcent'] = 1;
 					}
-				//inserta pagos internos
+				//inserta pagos internos{$row['id_cajero_cobro']}
 					$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
 						id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
-						VALUES ( '{$id_venta}', '{$row_cc['id_cajero_cobro']}', '1', now(), now(), ROUND( {$total_pagado}*{$row['internal_porcent']}, 4 ), '', '1', '-1', 
-						'-1', '-1', '0', '0', '{$id_cajero}', '{$row['folio_unico']}', '1', '{$id_sesion_caja}')";
+						VALUES ( '{$id_venta}', '1', '1', now(), now(), ROUND( {$total_pagado}*{$row['internal_porcent']}, 4 ), '', '1', '-1', 
+						'-1', '-1', '0', '0', '{$id_cajero}', NULL, '1', '{$id_sesion_caja}')";
 					$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero : {$this->link->error}" );
 				}
 				if( $row['external_porcent'] > 0 ){
 					if( $row['external_porcent'] >= 0.99 ){
 						$row['external_porcent'] = 1;
 					}
-				//inserta pagos externos
+				//inserta pagos externos{$row['id_cajero_cobro']}
 					$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
 						id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
-						VALUES ( '{$id_venta}', '{$row_cc['id_cajero_cobro']}', '1', now(), now(), ROUND( {$total_pagado}*{$row['external_porcent']}, 4 ), '', '1', '-1', 
-						'-1', '-1', '0', '1', '{$id_cajero}', '{$row['folio_unico']}', '1', '{$id_sesion_caja}')";
+						VALUES ( '{$id_venta}', '1', '1', now(), now(), ROUND( {$total_pagado}*{$row['external_porcent']}, 4 ), '', '1', '-1', 
+						'-1', '-1', '0', '1', '{$id_cajero}', NULL, '1', '{$id_sesion_caja}')";
 					$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero : {$this->link->error}" );
 				}
 			//}
@@ -1267,7 +1286,7 @@
 							terminalId,
 							store_id_netpay
 						FROM vf_transacciones_netpay
-						WHERE id_transaccion_netpay = {$transaction_id}";
+						WHERE folio_unico = '{$transaction_id}'";
 			}else{
 				$sql = "SELECT 
 							orderId,
