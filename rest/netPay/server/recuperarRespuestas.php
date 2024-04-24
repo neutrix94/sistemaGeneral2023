@@ -21,7 +21,7 @@ $app->post('/recuperar_respuestas_transacciones', function (Request $request, Re
     }else{
       //Consulta vigencia
         try{
-            $resultadoToken = $vt->validaToken($token);
+            $resultadoToken = $vt->verificaExistenciaToken($token);
         if ($resultadoToken->rowCount()==0) {
             return $rs->errorMessage($request->getParsedBody(),$response, 'Token_Invalido', 'El token proporcionado no es válido', 400);
         }
