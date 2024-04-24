@@ -46,6 +46,7 @@
     require 'server/actualizarDatosTransacciones.php';//actualizar informacion de peticiones netPay
     require 'server/recuperarRespuestas.php';//recuperar respuestas que no han sido entregadas al usuario
     require 'server/actualizarStatusRespuesta.php';//obtener respuesta de servidor linea a local
+    require 'server/recuperarRespuestaPorFolioUnico.php';//obtener respuesta por folio unico
     //require 'server/test.php';
 
     $app->run();

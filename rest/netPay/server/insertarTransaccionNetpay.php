@@ -19,7 +19,7 @@
 		}else{
 		  //Consulta vigencia
 			try{
-				$resultadoToken = $vt->validaToken($token);
+				$resultadoToken = $vt->verificaExistenciaToken($token);
 			if ($resultadoToken->rowCount()==0) {
 				return $rs->errorMessage($request->getParsedBody(),$response, 'Token_Invalido', 'El token proporcionado no es válido', 400);
 			}
@@ -33,12 +33,21 @@
 		}
 		$id_cajero = $request->getParam( 'id_usuario' );
 		if( $id_cajero == '' || $id_cajero == null ){
-			return json_encode( array( "status"=>400, "message"=>"El id de usuario es requerido" ) );
+			return json_encode( array( "status"=>400, "message"=>"El atributo 'id_usuario' es requerido" ) );
 		}
 		$id_sucursal = $request->getParam( 'id_sucursal' );
 		if( $id_sucursal == '' || $id_sucursal == null ){
-			return json_encode( array( "status"=>400, "message"=>"El id de sucursal es requerido" ) );
+			return json_encode( array( "status"=>400, "message"=>"El atributo 'id_sucursal' es requerido" ) );
 		}
+		$terminalId = $request->getParam( 'terminal_id' );
+		if( $terminalId == '' || $terminalId == null ){
+			return json_encode( array( "status"=>400, "message"=>"El atributo 'id_terminal' de la terminal es requerido" ) );
+		}
+		$store_id_netpay = $request->getParam( 'store_id_netpay' );
+		if( $store_id_netpay == '' || $store_id_netpay == null ){
+			return json_encode( array( "status"=>400, "message"=>"El atributo 'store_id_netpay' es requerido" ) );
+		}
+
 	//consulta folio unico de la sucursal
 		$sql = "SELECT 
 				prefijo,
@@ -55,7 +64,8 @@
 	
 		$link->autocommit(false);
 	//inserta la peticion de la transaccion
-		$sql = "INSERT INTO vf_transacciones_netpay ( id_cajero, id_sucursal ) VALUES ( {$id_cajero}, {$id_sucursal} )";
+		$sql = "INSERT INTO vf_transacciones_netpay ( id_cajero, id_sucursal, terminalId, store_id_netpay ) 
+				VALUES ( {$id_cajero}, {$id_sucursal}, '{$terminalId}', '{$store_id_netpay}' )";
 		$stm = $link->query( $sql );
 		if( $link->error ){
 			return json_encode( array( "status"=>400, "message"=>"Error al insertar transaccion netPay : {$link->error}" ) );
