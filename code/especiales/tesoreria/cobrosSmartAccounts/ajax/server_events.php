@@ -6,9 +6,9 @@
 	
 	function getTransactionStatus( $transaction_id, $link ){
 		$sql = "SELECT
-					message
+					`message`
 				FROM vf_transacciones_netpay
-				WHERE id_transaccion_netpay = {$transaction_id}";
+				WHERE folio_unico = '{$transaction_id}'";
 		$stm = $link->query( $sql );
 		if( ! $stm ){
 			    echo "data: Error al consultar status de la transaccion : {$sql} {$link->error}\n\n";
@@ -49,7 +49,7 @@
 		if( $c == 90 ){
 			$sql = "UPDATE vf_transacciones_netpay 
 						SET message = 'DESCARTADO POR LIMITE DE TIEMPO CDLL'
-					WHERE id_transaccion_netpay = {$_GET['transaction_id']}";
+					WHERE folio_unico = '{$_GET['transaction_id']}'";
 			$stm = $link->query( $sql ) or die( "Error al actualizar transaccion a 'DESCARTADO POR LIMITE DE TIEMPO CDLL' : {$link->error}" );
 		}
 

@@ -1,0 +1,1 @@
+{"traceability":{"id_sucursal":"1","id_cajero":"784","folio_venta":"","id_sesion_cajero":"","petition_id":"12","smart_accounts":true,"store_id_netpay":"455311"},"serialNumber":"1494113052","orderId":"240315115115-1494113052","storeId":"455311","isSmartAccounts":"true","disablePrintAnimation":false}

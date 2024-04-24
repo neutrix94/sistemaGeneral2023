@@ -81,7 +81,7 @@
 	//envia detos por ajax
 		$.ajax({
 			type : 'post',
-			url : '../../Reportes/ajax/pending_validation_tkt.php',
+			url : '../../Arqueo/ajax/pending_validation_tkt.php',
 			cache : false,
 			data : { flag : 'seek_pending_to_validate' },
 			success : function( dat ){
@@ -102,13 +102,15 @@
 		cierra_emergente();
 		$.ajax({
 			type : 'post',
-			url : '../../Reportes/ajax/pending_validation_tkt.php',
+			url : '../../Arqueo/ajax/pending_validation_tkt.php',
 			cache : false,
-			data : { flag : 'print_pending_to_validate' },
+			data : { flag : 'print_pending_to_validate', absolute_path : '../../../../' },
 			success : function( dat ){
 				var aux = dat.split("|");
 				if( aux[0] != 'ok' ){
-					alert(dat);return false;
+					$( "#contenido_emergente" ).html( aux[0] );
+					$( "#emergente" ).css( "display", "block" );
+					//alert(dat);return false;
 				}else{
 					$( "#contenido_emergente" ).html( '' );
 					$( "#emergente" ).css( "display", "none" );
@@ -218,4 +220,9 @@
 	function remove_afiliation( obj ){
 		var element = $( obj ).parent( 'td' ).parent( 'tr' );
 		element.remove();
+	}
+
+	function close_emergent(){
+		$( '#contenido_emergente' ).html( '' );
+		$( '#emergente' ).css( 'display', 'none' );
 	}

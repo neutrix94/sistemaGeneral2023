@@ -1098,8 +1098,10 @@ alert(res);
                 }
                 var reimp = ajaxR(url);
             }else{
-                var url="ajax/ticket-php-head-reimpresion.php?id_ped="+id_pedido+"&id_dev="+aux[2];
-                var reimp = ajaxR(url);
+            /*Deshabilitado por Oscar 2024-03-15*/
+               // var url="ajax/ticket-php-head-reimpresion.php?id_ped="+id_pedido+"&id_dev="+aux[2];
+                //var reimp = ajaxR(url);
+            /**/
             }  
 
             location.href=aux[3];            

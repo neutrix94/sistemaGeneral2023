@@ -366,11 +366,15 @@
 			type : 'post',
 			url : 'ajax/pending_validation_tkt.php',
 			cache : false,
-			data : { flag : 'print_pending_to_validate' },
+			
+			data : { flag : 'print_pending_to_validate', absolute_path : '../../../' },
 			success : function( dat ){
 				var aux = dat.split("|");
 				if( aux[0] != 'ok' ){
-					alert(dat);return false;
+					$( "#contenido_emergente" ).html( aux );
+					$( "#emergente" ).css( "display", "block" );
+					//alert(dat);
+					return false;
 				}else{
 					$( "#contenido_emergente" ).html( '' );
 					$( "#emergente" ).css( "display", "none" );
@@ -378,4 +382,9 @@
 				}
 			}		
 		});
+	}
+	
+	function close_emergent(){
+		$( '#contenido_emergente' ).html( '' );
+		$( '#emergente' ).css( 'display', 'none' );
 	}

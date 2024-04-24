@@ -139,6 +139,9 @@ else if($multicajero==1){
 			$sql = "INSERT INTO ec_sesion_caja_afiliaciones ( id_sesion_caja, id_cajero, id_afiliacion, habilitado, insertada_por_error_en_cobro )
 			VALUES ( '{$new_id}', '{$user_id}', '{$afiliacion}', 1, 0 )";
 			$stm = mysql_query( $sql ) or die( "Error al insertar afiliacion en sesion de caja : " . mysql_error() );
+			$id_sesion_caja_afiliacion = mysql_insert_id();
+			$sql = "CALL SincronizacionSesionCajaAfiliaciones(  'insert', {$id_sesion_caja_afiliacion} );";
+			$stm = mysql_query( $sql ) or die( "Error al ejecutar procedure para sincronizar afiliacion en sesion de caja : " . mysql_error() );
 		}
 //inserta terminales
 		$terminales = explode( ",", $_POST['terminales'] );
@@ -146,6 +149,9 @@ else if($multicajero==1){
 			$sql = "INSERT INTO ec_sesion_caja_terminales ( id_sesion_caja, id_cajero, id_terminal, habilitado, insertada_por_error_en_cobro )
 			VALUES ( '{$new_id}', '{$user_id}', '{$terminal}', 1, 0 )";
 			$stm = mysql_query( $sql ) or die( "Error al insertar terminal en sesion de caja : " . mysql_error() );
+			$id_sesion_caja_terminal = mysql_insert_id();
+			$sql = "CALL SincronizacionSesionCajaTerminales(  'insert', {$id_sesion_caja_terminal} );";
+			$stm = mysql_query( $sql ) or die( "Error al ejecutar procedure para sincronizar terminal en sesion de caja : " . mysql_error() );
 		}
 		$sql = "SELECT 
 				sc.caja_final,

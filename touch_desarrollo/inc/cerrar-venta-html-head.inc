@@ -19,11 +19,23 @@
 ?>
 //fin de cambio
 
-	function reenviar_archivo_ws( file_id ){
+	/*function reenviar_archivo_ws( file_id ){
 		var url = "../code/especiales/controladores/SysArchivosDescarga.php?fl_archivo_descarga=sendSpecificFile&file_id=" + file_id + "&module_id=2";
 		//var resp = ajaxR( url );
 		//alert( resp );
-
+		$.ajax({
+			type:'post',
+			url: url,
+			cache:false,
+			success:function(dat){
+				alert( dat );
+			}
+		});
+	}
+	function enviar_archivo_carpeta_modulo( file_id ){
+		var url = "../code/especiales/controladores/SysArchivosDescarga.php?fl_archivo_descarga=sendSpecificFile&file_id=" + file_id + "&module_id=2";
+		//var resp = ajaxR( url );
+		//alert( resp );
 		$.ajax({
 			type:'post',
 			url: url,
@@ -58,7 +70,7 @@
 		</div>`;
 		$("#cont_emergente").html(content);//cargamos respuesta 
 		$("#emergente_cerrar").css("display","block");//hacemos visible la emergente
-	}
+	}*/
 
 
 /*Implementación Oscar 12.11.2018 para redireccionar a index de ventas cuando sale el error de apartado pagado*/
@@ -656,7 +668,19 @@ function bloquea_pantalla(){
 					servicio_ok = data.trim();
 //console.log( data );
 alert('here:'+data);
-					return true;
+					setTimeout( function(){ 
+						if( data != 'ok' ){
+							alert(1);
+							$("#cont_emergente").html(data);//cargamos respuesta 
+							$("#emergente_cerrar").css("display","block");
+							return false;
+						}else{
+							alert(2);
+							location.href = "index.php?";
+							return false;
+						}
+						return true;
+					}, 300);
 				});
 
             /*                   
@@ -677,8 +701,10 @@ alert('here:'+data);
 						location.href = "index.php?";//scr=evaluation  deshabilitado por Oscar 2022 ( Habilitar evaluacion de vendedores en ventas )
 					}else{
 						var TMP_WS = servicio_ok.split( '|' ); 
-						build_ws_again( TMP_WS[1] );
+						//build_ws_again( TMP_WS[1] );
 						//alert("here_here : " + TMP_WS[1] );
+						$("#cont_emergente").html(servicio_ok);//cargamos respuesta 
+						$("#emergente_cerrar").css("display","block");//hacemos visible la emergente
 						return false;
 					}
 				}      

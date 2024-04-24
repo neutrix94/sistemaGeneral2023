@@ -636,19 +636,48 @@ include( '../especiales/plugins/inventory.php' );//implementación Oscar 2022
 								mysql_query("ROLLBACK");
 								Muestraerror($smarty, "", "3", mysql_error(), $sqGrids[$j], "contenido.php");
 							}else if( $gridArray[$i][0] == 91 && $j > 0 ){
-								//die('here' . $sqGrids[$j] . " id : " . $id_modulo_usuario);
 								if(strpos( $sqGrids[$j], "INSERT" ) === 0 || strpos( $sqGrids[$j], "insert" ) === 0){//insercion
-									//echo 'entra';
 									$id_modulo_usuario = mysql_insert_id();
-									$sql_procedure = "CALL SincronizacionSysModulosImpresionUsuarios( 'insert', $id_modulo_usuario, $user_sucursal)";
+									$sql_procedure = "CALL SincronizacionSysModulosImpresionUsuarios( 'insert', $id_modulo_usuario, -1)";
 									mysql_query( $sql_procedure ) or die( "Error al insertar registro de sincronizacion por insercion : " . mysql_error() );
-								}else if(strpos( $sqGrids[$j], "UPDATE" ) === 0 || strpos( $sqGrids[$j], "update" ) === 0){//insercion
-									//echo 'here';
+								}else if(strpos( $sqGrids[$j], "UPDATE" ) === 0 || strpos( $sqGrids[$j], "update" ) === 0){//actualizacion
 									$tmp_upd_proc = explode( 'WHERE id_modulo_impresion_usuario=', $sqGrids[$j] );
 									$id_modulo_usuario = $tmp_upd_proc[1];
-									$sql_procedure = "CALL SincronizacionSysModulosImpresionUsuarios( 'update', $id_modulo_usuario, $user_sucursal)";
+									$sql_procedure = "CALL SincronizacionSysModulosImpresionUsuarios( 'update', $id_modulo_usuario, -1)";
 									mysql_query( $sql_procedure ) or die( "Error al insertar registro de sincronizacion por actualizacion : " . mysql_error() );
-								}//die('here');
+								}
+							}else if( $gridArray[$i][0] == 92 && $j > 0 ){
+								if(strpos( $sqGrids[$j], "INSERT" ) === 0 || strpos( $sqGrids[$j], "insert" ) === 0){//insercion
+									$id_modulo_sucursal = mysql_insert_id();
+									$sql_procedure = "CALL SincronizacionSysModulosImpresionSucursales( 'insert', $id_modulo_sucursal, -1)";
+									mysql_query( $sql_procedure ) or die( "Error al insertar registro de sincronizacion por insercion : " . mysql_error() );
+								}else if(strpos( $sqGrids[$j], "UPDATE" ) === 0 || strpos( $sqGrids[$j], "update" ) === 0){//actualizacion
+								//	die("here");
+									$tmp_upd_proc = explode( 'WHERE id_modulo_impresion_sucursal=', $sqGrids[$j] );
+									$id_modulo_sucursal = $tmp_upd_proc[1];
+									$sql_procedure = "CALL SincronizacionSysModulosImpresionSucursales( 'update', $id_modulo_sucursal, -1)";
+									mysql_query( $sql_procedure ) or die( "Error al insertar registro de sincronizacion por actualizacion : " . mysql_error() );
+								}
+
+							}else if( ( $gridArray[$i][0] == 91 || $gridArray[$i][0] == 92 ) && $j == 0 ){
+								$sqGrid_delete = str_replace( "'", "\'", $sqGrids[$j] );
+								$sql_sync_2024 = "INSERT INTO sys_sincronizacion_registros ( sucursal_de_cambio, id_sucursal_destino, datos_json, 
+									fecha, tipo, status_sincronizacion )
+									SELECT
+										s.id_sucursal,
+										IF( s.id_sucursal = -1, '{$user_sucursal}', '-1' ),
+										CONCAT('{',
+											'\"action_type\" : \"sql_instruction\",',
+											'\"sql\" : \"{$sqGrid_delete}\"',
+											'}'
+										),
+										NOW(),
+										'contenido.php',
+										1
+									FROM sys_sucursales s
+									WHERE s.acceso = '1'";
+								$stm_sync_2024 = mysql_query( $sql_sync_2024 ) or die( "Error al insertar instruccion de eliminacion : " );
+								//die( $sqGrids[$j] );
 							}
 							
 							/*else if( $subArray_madpp[1] != '' && $subArray_madpp[1] != null ){
