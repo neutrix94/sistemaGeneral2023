@@ -183,7 +183,8 @@
 				die( "Error al consumir API para insertar peticion de netPay en servidor linea : " . $result->message );
 			}
 			$folio_transaccion = $result->folio_unico_transaccion;
-			$sql = "INSERT INTO vf_transacciones_netpay ( folio_unico ) VALUES ( '{$folio_transaccion}' )";
+			$sql = "INSERT INTO vf_transacciones_netpay ( folio_unico, id_cajero, id_sucursal, terminalId, store_id_netpay ) 
+					VALUES ( '{$folio_transaccion}', '{$user_id}', '{$store_id}', '{$terminal_id}', '{$store_id_netpay}' )";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el id de transaccion netPay en servidor origen : {$this->link->error}" );
 			return $folio_transaccion;
 		}
@@ -353,7 +354,7 @@ fclose($file);
 			if( sizeof($token) == 0 || $token == null ){
 				$token = $this->requireToken( $terminal, 'password', 'smartPos', 'netpay' );
 			}
-			$terminal_data = $this->getTerminal( $terminal, $store_id );
+			$terminal_data = $this->getTerminal( $terminal, $store_id );//var_dump( $terminal_data['store_id'] );die('');
 			$folio_unico_transaccion = $this->insertNetPetitionRow( $user_id, $store_id, $terminal_data['terminal_serie'], $terminal_data['store_id'] );
 		//arreglo de prueba
 			$data = array( "traceability"=>array(   
