@@ -21,7 +21,7 @@ BEGIN
                     CONCAT( '"id_modulo_impresion_sucursal" : "', mis.id_modulo_impresion_sucursal, '",\n' ),
                     ''
                 ),
-                '"id_modulo_impresion" : "', mis.id_modulo_impresion, '",\n',
+                /*'"id_modulo_impresion" : "', mis.id_modulo_impresion, '",\n',*/
                 '"id_carpeta" : "', mis.id_carpeta, '",\n',
 				'"id_impresora_sucursal" : "', mis.id_impresora_sucursal, '",\n',
 				'"extension_archivo" : "', mis.extension_archivo, '",\n',
