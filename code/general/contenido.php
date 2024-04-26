@@ -635,7 +635,18 @@ include( '../especiales/plugins/inventory.php' );//implementación Oscar 2022
 							{
 								mysql_query("ROLLBACK");
 								Muestraerror($smarty, "", "3", mysql_error(), $sqGrids[$j], "contenido.php");
-							}else if( $gridArray[$i][0] == 91 && $j > 0 ){
+							}else if( $gridArray[$i][0] == 80 && $j > 0 ){//plantillas de etiquetas por sucursal
+								if(strpos( $sqGrids[$j], "INSERT" ) === 0 || strpos( $sqGrids[$j], "insert" ) === 0){//insercion
+									$id_modulo_usuario = mysql_insert_id();
+									$sql_procedure = "CALL SincronizacionSysSucursalesPlantillasEtiquetas( 'insert', $id_modulo_usuario, -1)";
+									mysql_query( $sql_procedure ) or die( "Error al insertar registro de sincronizacion por insercion : " . mysql_error() );
+								}else if(strpos( $sqGrids[$j], "UPDATE" ) === 0 || strpos( $sqGrids[$j], "update" ) === 0){//actualizacion
+									$tmp_upd_proc = explode( 'WHERE id_sucursal_plantilla_etiqueta=', $sqGrids[$j] );
+									$id_modulo_usuario = $tmp_upd_proc[1];
+									$sql_procedure = "CALL SincronizacionSysSucursalesPlantillasEtiquetas( 'update', $id_modulo_usuario, -1)";
+									mysql_query( $sql_procedure ) or die( "Error al insertar registro de sincronizacion por actualizacion : " . mysql_error() );
+								}
+							}else if( $gridArray[$i][0] == 91 && $j > 0 ){//modulos de impresion por usuario
 								if(strpos( $sqGrids[$j], "INSERT" ) === 0 || strpos( $sqGrids[$j], "insert" ) === 0){//insercion
 									$id_modulo_usuario = mysql_insert_id();
 									$sql_procedure = "CALL SincronizacionSysModulosImpresionUsuarios( 'insert', $id_modulo_usuario, -1)";
@@ -646,7 +657,7 @@ include( '../especiales/plugins/inventory.php' );//implementación Oscar 2022
 									$sql_procedure = "CALL SincronizacionSysModulosImpresionUsuarios( 'update', $id_modulo_usuario, -1)";
 									mysql_query( $sql_procedure ) or die( "Error al insertar registro de sincronizacion por actualizacion : " . mysql_error() );
 								}
-							}else if( $gridArray[$i][0] == 92 && $j > 0 ){
+							}else if( $gridArray[$i][0] == 92 && $j > 0 ){//modulos de impresion por sucursal
 								if(strpos( $sqGrids[$j], "INSERT" ) === 0 || strpos( $sqGrids[$j], "insert" ) === 0){//insercion
 									$id_modulo_sucursal = mysql_insert_id();
 									$sql_procedure = "CALL SincronizacionSysModulosImpresionSucursales( 'insert', $id_modulo_sucursal, -1)";
@@ -659,7 +670,7 @@ include( '../especiales/plugins/inventory.php' );//implementación Oscar 2022
 									mysql_query( $sql_procedure ) or die( "Error al insertar registro de sincronizacion por actualizacion : " . mysql_error() );
 								}
 
-							}else if( ( $gridArray[$i][0] == 91 || $gridArray[$i][0] == 92 ) && $j == 0 ){
+							}else if( ( $gridArray[$i][0] == 91 || $gridArray[$i][0] == 92 || $gridArray[$i][0] == 80 ) && $j == 0 ){
 								$sqGrid_delete = str_replace( "'", "\'", $sqGrids[$j] );
 								$sql_sync_2024 = "INSERT INTO sys_sincronizacion_registros ( sucursal_de_cambio, id_sucursal_destino, datos_json, 
 									fecha, tipo, status_sincronizacion )

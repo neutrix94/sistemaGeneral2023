@@ -23,10 +23,10 @@
 				$print_pieces = ( isset( $_GET['print_pieces'] ) ? $_GET['print_pieces'] : 0 );
 				echo $db->make_barcode( $product_provider_id, $user_id, $sucursal_id, $boxes, $packs, $pieces, $decimal, $print_pieces );
 			//oscar 2023 para consumir servicio de impresion remota
-				$tags_sinchronization = $db->sendPrint();
+				/*//$tags_sinchronization = $db->sendPrint();
 				if( $tags_sinchronization != 'ok' ){
 					die( "<h2 class=\"text-center\">{$tags_sinchronization}</h2>" );
-				}
+				}*/
 			break;
 
 			case 'getImages' :
@@ -40,10 +40,10 @@
 			case 'makeBarcodesPieces' :
 				echo $db->make_barcode( $_GET['product_provider_id'], $user_id, $sucursal_id, 0, 0, 0, 0, $_GET['pieces_number'] );
 			//oscar 2023 para consumir servicio de impresion remota
-				$tags_sinchronization = $db->sendPrint();
+				/*//$tags_sinchronization = $db->sendPrint();
 				if( $tags_sinchronization != 'ok' ){
 					die( "<h2 class=\"text-center\">{$tags_sinchronization}</h2>" );
-				}
+				}*/
 			break;
 
 			default :
@@ -64,7 +64,7 @@
 			//$this->getDistinctRoutes( $store_id );//consulta rutas
 		}
 
-		public function sendPrint(){
+		/*public function sendPrint(){
 			$archivo_path = "../../../../../conexion_inicial.txt";
 			if(file_exists($archivo_path)){
 				$file = fopen($archivo_path,"r");
@@ -98,19 +98,30 @@
 			$result = json_decode(json_encode($resp), true);
 			$result = json_decode( $result );
 			return $result;
-		}
+		}*/
 
-		public function getDistinctRoutes( $store_id ){
-			$sql = "SELECT
-						DISTINCT( ruta_destino ) AS template_route
-					FROM sys_sucursales_plantillas_etiquetas
-					WHERE id_sucursal = {$store_id}";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar las diferentes rutas : {$this->link->error}" );
-			while ( $row = $stm->fetch_assoc() ) {
-				//$this->routes["{$row['template_route']}"] = array();
-				$this->routes["{$row['template_route']}"] = "";
-				
+		public function getDistinctRoutes( $store_id, $user_id ){
+			if( ! include( '../../../controladores/SysModulosImpresionUsuarios.php' ) ){
+				die( "No se pudo incluir la libreria de descargar de archivos : 'SysModulosImpresionUsuarios'" );
 			}
+			$SysModulosImpresionUsuarios = new SysModulosImpresionUsuarios( $this->link );
+			if( ! include( '../../../controladores/SysModulosImpresion.php' ) ){
+				die( "No se pudo incluir la libreria de descargar de archivos : 'SysModulosImpresion'" );
+			}
+			$SysModulosImpresion = new SysModulosImpresion( $this->link );
+			$ruta_salida = '';
+			$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 14 );//etiqueta empaquetado pieza
+			//die( "ruta_salida : : {$ruta_salida}" );
+			if( $ruta_salida == 'no' ){
+				$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $store_id, 14 );//etiqueta empaquetado pieza
+			}
+			$this->routes["{$ruta_salida}"] = "";
+			$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 13 );//etiqueta empaquetado paquete
+			if( $ruta_salida == 'no' ){
+				$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $store_id, 13 );//etiqueta empaquetado paquete
+			}
+			$this->routes["{$ruta_salida}"] = "";
+//var_dump( $this->routes );die('');
 			return true;
 		}
 
@@ -360,25 +371,9 @@
 		}
 
 		public function make_barcode( $product_provider_id, $user_id, $store_id, $boxes = 0, $packs = 0, $pieces = 0, $decimal = 0, $print_pieces = 0  ){
-			$this->getDistinctRoutes( $this->store_id );//consulta rutas
-			//$file_name = "2022_12_19_13_22_47_63a0ba07120a5.txt";
-			//die( $file_name );
-			//include( '../../../../../conectMin.php' );
+			$this->getDistinctRoutes( $this->store_id, $user_id );//consulta rutas
 			$resp = "\n";
-			
-			/*$archivo_path = "../../../../../conexion_inicial.txt";
-			if(file_exists($archivo_path)){
-				$file = fopen($archivo_path,"r");
-				$line=fgets($file);
-				fclose($file);
-			    $config=explode("<>",$line);
-			    $tmp=explode("~",$config[0]);
-			    $ruta_or = base64_decode( $tmp[1] ).base64_decode( $tmp[0] );
-			    $ruta_or = . "/" . base64_decode( $tmp[1] ).base64_decode( $tmp[1] );
-			}else{
-				die("No hay archivo de configuración!!!");
-			}*/
-//implementacion Oscar 2023 para obtener el dominio del equipo		
+/*implementacion Oscar 2023 para obtener el dominio del equipo		
 		$sql = "SELECT 
 					dominio_sucursal AS store_dns
 				FROM ec_configuracion_sucursal
@@ -386,21 +381,7 @@
 		$stm = $this->link->query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
 		$row = $stm->fetch_assoc();
 		$ruta_or = $row['store_dns'];
-		
-//fin de cambio Oscar 2023
-
-			/*$archivo_path = "../../../../../conexion_inicial.txt";
-			if(file_exists($archivo_path)){
-				$file = fopen($archivo_path,"r");
-				$line=fgets($file);
-				fclose($file);
-			    $config=explode("<>",$line);
-			    $tmp=explode("~",$config[2]);
-			    $ruta_or=$tmp[0];
-			    //$ruta_des=$tmp[1];
-			}else{
-				die("No hay archivo de configuración!!!");
-			}*/
+//fin de cambio Oscar 2023*/
 		//busca datos del usuario
 			$sql = "SELECT 
 						CONCAT( nombre, ' ', apellido_paterno ) AS name
@@ -417,6 +398,7 @@
 			$row = $stm->fetch_assoc();
 			$store = $row['store_name'];
 			$store_prefix = $row['store_prefix'];
+		//busca datos del proveedor producto
 			$sql = "SELECT
 						ax.product_provider_id,
 						( ax.boxes_counter + 1 ) AS boxes_counter,
@@ -471,7 +453,7 @@
 			//die( 'decimal : ' . $decimal );
 			$incomplete_pieces_original = 0;
 			if( $decimal != 0 ){
-			//consulta inormacion del producto origen
+			//consulta informacion del producto origen
 				$sql = "SELECT 
 							UPPER( CONCAT( pp.unidad_medida_pieza, 'S') ) AS piece_unit,
 							pd.cantidad AS quantity
@@ -609,12 +591,23 @@
 				$resp .= "\n" . $this->make_barcode_file( $piece_barcode, $store_id, $user_id, $system_type[0], 4 );
 				//die( 'here' . $this->make_barcode_file( $piece_barcode, $store_id, $user_id, $system_type[0], 4 ) );
 			}
-
+//implementacion Oscar 2024-04-24 para enviar etiquetas a traves del webService
+			if( ! include( '../../../controladores/SysArchivosDescarga.php' ) ){
+				die( "No se pudo incluir la libreria de descargar de archivos : 'SysArchivosDescarga'" );
+			}
+			//var_dump( $this->routes );die('ok');
+			$SysArchivosDescarga = new SysArchivosDescarga( $this->link );
+			$modulo = 0;
 			foreach ($this->routes as $key => $route) {
+				if( strpos($key, 'pieza') != false ){//piezas
+					$modulo = 14;
+				}else if( strpos($key, 'paquete') != false ){//paquetes
+					$modulo = 13;
+				}
 				if( $this->routes["{$key}"] != "" ){
 					$file_name = date('Y_m_d_H_i_s_') . uniqid() . '.txt';
 				//genera archivo
-					$fh = fopen("../../../../../{$key}/{$file_name}", 'w') or die("Se produjo un error al crear el archivo");
+					$fh = fopen("../../../../../{$key}/{$file_name}", 'w') or die("Se produjo un error al crear el archivo en '../../../../../{$key}/{$file_name}'");
 					//fwrite($fh, $resp) or die("No se pudo escribir en el archivo");
 					fwrite( $fh, $this->routes["{$key}"] ) or die("No se pudo escribir en el archivo");
 					fclose($fh);
@@ -625,7 +618,7 @@
 							WHERE acceso = 1";
 					$stm = $this->link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$this->link->error}" );
 					$system_type = $stm->fetch_row();
-				//genera registro de descarga
+				/*genera registro de descarga
 					if( $system_type[0] == -1 ){
 				//die( 'Here' );
 						$sql_arch="INSERT INTO sys_archivos_descarga SET 
@@ -638,6 +631,16 @@
 								id_usuario='$user_id',
 								observaciones=''";
 						$inserta_reg_arch=$this->link->query( $sql_arch )or die( "Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n". $this->link->error . "\n\n" . $sql_arch );
+					}*/
+				/*Sincronización remota de tickets*/
+					$config = $this->getConfigurationByTxt();
+					if( $system_type[0] == -1 ){/*registro sincronizacion impresion remota*/
+						$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'txt', $file_name, $config['ruta_or'], $key, $store_id, $user_id );
+					}else{//impresion por red local
+						//die("HERE : {$absolute_path}");
+						$absolute_path = '../../../../';
+						$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( $modulo, 'txt', $file_name, '', $key, $store_id,  $user_id, 
+						$config['carpeta_path'], $absolute_path, 'alert("Impresion de ticket de ventas pendientes exitosa!");location.reload();' );
 					}
 				}
 			}
@@ -647,7 +650,7 @@
 		public function make_barcode_file( $data, $store_id, $user_id, $system_type, $type_id ){
 //echo " type : {$type_id}";
 
-			$tag = $this->getTagTemplate( $data, $store_id, $type_id );
+			$tag = $this->getTagTemplate( $data, $store_id, $user_id, $type_id );
 			$resp = $tag;
 			return $resp;
 
@@ -750,19 +753,46 @@
 			return $resp;
 		}
 
-		public function getTagTemplate( $data, $store_id, $type_id ){
+		public function getTagTemplate( $data, $store_id, $user_id, $type_id ){
 			$sql = "SELECT
 						IF( spe.tipo_codigo_plantilla = 'EPL',  pe.codigo_epl, pe.codigo_zpl ) AS template,
-						ruta_destino AS route_destinity
+						IF( (SELECT 
+								endpoint_api_destino_local
+							FROM sys_modulos_impresion_usuarios
+							WHERE id_usuario = {$user_id} AND id_modulo_impresion = mis.id_modulo_impresion ) != '',
+							(SELECT
+								CONCAT( c1.path, '/', c1.nombre_carpeta )
+							FROM sys_modulos_impresion_usuarios mis1
+							LEFT JOIN sys_carpetas c1
+							ON mis1.id_carpeta = c1.id_carpeta
+							WHERE id_usuario = {$user_id} AND id_modulo_impresion = mis.id_modulo_impresion),
+							CONCAT( c.path, '/', c.nombre_carpeta ) 
+						)AS route_destinity
 					FROM sys_sucursales_plantillas_etiquetas spe
 					LEFT JOIN sys_plantillas_etiquetas pe
 					ON pe.id_plantilla_etiquetas = spe.id_plantilla
 					LEFT JOIN sys_tipos_plantillas_etiquetas tpe
 					ON tpe.id_tipo_plantilla_etiqueta = pe.id_tipo_plantilla_etiqueta
+					LEFT JOIN sys_modulos_impresion_sucursales mis
+					ON mis.id_modulo_impresion_sucursal = spe.ruta_destino
+					LEFT JOIN sys_modulos_impresion mi
+					ON mis.id_modulo_impresion = mi.id_modulo_impresion
+							
+					LEFT JOIN sys_carpetas c 
+					ON c.id_carpeta = mis.id_carpeta
 					WHERE spe.id_sucursal = {$store_id}
-					AND  tpe.id_tipo_plantilla_etiqueta = {$type_id}
+					AND tpe.id_tipo_plantilla_etiqueta = {$type_id}
 					AND spe.habilitado = 1
-					LIMIT 1";
+					LIMIT 1";//die($sql);
+			/*$sql = "SELECT 
+				mis.id_modulo_impresion_sucursal,
+				CONCAT( c.path, '/', c.nombre_carpeta ) AS nombre_carpeta
+			FROM sys_modulos_impresion_sucursales mis
+			LEFT JOIN sys_modulos_impresion mi
+			ON mis.id_modulo_impresion = mi.id_modulo_impresion
+			LEFT JOIN sys_carpetas c 
+			ON c.id_carpeta = mis.id_carpeta
+			WHERE mis.id_sucursal = '$LLAVE'";*/
 		//die( $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar base de etiqueta : {$this->link->error} {$sql}" );
 			if( $stm->num_rows <= 0 ){
@@ -802,6 +832,27 @@
 				$this->routes["{$row['route_destinity']}"] .= "\n{$row['template']}\n";
 				//return $row['template'] . "\n";
 			}
+		}
+
+		public function getConfigurationByTxt(){
+			$archivo_path = "../../../../../conexion_inicial.txt";
+			$ruta_or = "";
+			$ruta_des = "";
+			$carpeta_path = "";
+			if(file_exists($archivo_path)){
+				$file = fopen($archivo_path,"r");
+				$line=fgets($file);
+				fclose($file);
+				$config=explode("<>",$line);
+				$tmp=explode("~",$config[2]);
+				$ruta_or=$tmp[0];
+				$ruta_des=$tmp[1];
+				$tmp_=explode("~",$config[0]);
+				$carpeta_path = base64_decode( $tmp_[1] );
+			}else{
+				die("No hay archivo de configuración!!!");
+			}
+			return array( "ruta_or"=>$ruta_or, "ruta_des"=>$ruta_des, "carpeta_path"=>$carpeta_path );
 		}
 
 	}
