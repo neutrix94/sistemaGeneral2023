@@ -34,5 +34,5 @@ BEGIN
 	FROM sys_sucursales_plantillas_etiquetas spe
     LEFT JOIN sys_sucursales s 
     ON s.id_sucursal = spe.id_sucursal
-    WHERE spe.id_modulo_impresion_sucursal = ID_REGISTRO;
+    WHERE spe.id_sucursal_plantilla_etiqueta = ID_REGISTRO;
 END $$
