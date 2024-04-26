@@ -239,7 +239,10 @@ var current_product = null;
 	//alert( url );
 		var response = ajaxR( url ).split( '|' );
 		if( response[0] != 'ok' ){
-			alert( response );
+		//
+			$( '.emergent_content' ).html( response );
+			$( '.emergent' ).css( 'display', 'block' );
+			//alert( response );
 		}else{
 			alert( response[1] );
 			clean_current_product();
