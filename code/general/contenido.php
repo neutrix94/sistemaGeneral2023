@@ -635,7 +635,7 @@ include( '../especiales/plugins/inventory.php' );//implementación Oscar 2022
 							{
 								mysql_query("ROLLBACK");
 								Muestraerror($smarty, "", "3", mysql_error(), $sqGrids[$j], "contenido.php");
-							}else if( $gridArray[$i][0] == 91 && $j > 0 ){//plantillas de etiquetas por sucursal
+							}else if( $gridArray[$i][0] == 80 && $j > 0 ){//plantillas de etiquetas por sucursal
 								if(strpos( $sqGrids[$j], "INSERT" ) === 0 || strpos( $sqGrids[$j], "insert" ) === 0){//insercion
 									$id_modulo_usuario = mysql_insert_id();
 									$sql_procedure = "CALL SincronizacionSysSucursalesPlantillasEtiquetas( 'insert', $id_modulo_usuario, -1)";
