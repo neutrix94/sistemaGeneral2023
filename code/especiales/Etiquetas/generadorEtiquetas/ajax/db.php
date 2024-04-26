@@ -7,9 +7,6 @@
 		$db = new Db( $link, $sucursal_id );
 
 		switch ( $action ) {
-//datos que llegan para la generscion de etiquetas de piezas
-//makeBarcodesPieces
-//product_provider_id
 			case 'seekProduct' :
 				echo $db->seekProduct( $_GET['key'] );
 			break;
@@ -22,11 +19,6 @@
 				$decimal = ( isset( $_GET['decimal'] ) ? $_GET['decimal'] : 0 );
 				$print_pieces = ( isset( $_GET['print_pieces'] ) ? $_GET['print_pieces'] : 0 );
 				echo $db->make_barcode( $product_provider_id, $user_id, $sucursal_id, $boxes, $packs, $pieces, $decimal, $print_pieces );
-			//oscar 2023 para consumir servicio de impresion remota
-				/*//$tags_sinchronization = $db->sendPrint();
-				if( $tags_sinchronization != 'ok' ){
-					die( "<h2 class=\"text-center\">{$tags_sinchronization}</h2>" );
-				}*/
 			break;
 
 			case 'getImages' :
@@ -39,11 +31,6 @@
 			
 			case 'makeBarcodesPieces' :
 				echo $db->make_barcode( $_GET['product_provider_id'], $user_id, $sucursal_id, 0, 0, 0, 0, $_GET['pieces_number'] );
-			//oscar 2023 para consumir servicio de impresion remota
-				/*//$tags_sinchronization = $db->sendPrint();
-				if( $tags_sinchronization != 'ok' ){
-					die( "<h2 class=\"text-center\">{$tags_sinchronization}</h2>" );
-				}*/
 			break;
 
 			default :
@@ -61,45 +48,8 @@
 		function __construct( $connection, $store_id ){
 			$this->link = $connection;
 			$this->store_id = $store_id;
-			//$this->getDistinctRoutes( $store_id );//consulta rutas
 		}
-
-		/*public function sendPrint(){
-			$archivo_path = "../../../../../conexion_inicial.txt";
-			if(file_exists($archivo_path)){
-				$file = fopen($archivo_path,"r");
-				$line=fgets($file);
-				fclose($file);
-			    $config=explode("<>",$line);
-			    $tmp=explode("~",$config[0]);
-			    $ruta_des=base64_decode( $tmp[1] );
-			}else{
-				die("No hay archivo de configuración!!!");
-			}
-			$url = "localhost/{$ruta_des}/rest/print/send_file";
-			//die( $url );
-			$post_data = json_encode( array( "destinity_store_id"=>$this->store_id ) );
-			$crl = curl_init( $url );
-			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($crl, CURLINFO_HEADER_OUT, true);
-			curl_setopt($crl, CURLOPT_POST, true);
-			curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
-			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
-			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
-			  'Content-Type: application/json',
-			  'token: ' . $token)
-			);
-			$resp = curl_exec($crl);//envia peticion
-			//var_dump( $resp );
-			curl_close($crl);
-			//var_dump($resp);
-		//decodifica el json de respuesta
-			$result = json_decode(json_encode($resp), true);
-			$result = json_decode( $result );
-			return $result;
-		}*/
-
+	//obtener rutas de impresion
 		public function getDistinctRoutes( $store_id, $user_id ){
 			if( ! include( '../../../controladores/SysModulosImpresionUsuarios.php' ) ){
 				die( "No se pudo incluir la libreria de descargar de archivos : 'SysModulosImpresionUsuarios'" );
@@ -111,7 +61,6 @@
 			$SysModulosImpresion = new SysModulosImpresion( $this->link );
 			$ruta_salida = '';
 			$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 14 );//etiqueta empaquetado pieza
-			//die( "ruta_salida : : {$ruta_salida}" );
 			if( $ruta_salida == 'no' ){
 				$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $store_id, 14 );//etiqueta empaquetado pieza
 			}
@@ -121,10 +70,9 @@
 				$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $store_id, 13 );//etiqueta empaquetado paquete
 			}
 			$this->routes["{$ruta_salida}"] = "";
-//var_dump( $this->routes );die('');
 			return true;
 		}
-
+	//busqueda de permisos
 		public function getPermissions( $user_id ){
 			$sql = "SELECT 
 						p.ver AS view,
@@ -144,7 +92,7 @@
 			$row = $stm->fetch_assoc();
 			return $row;
 		}
-
+	//busqueda de productos
 		public function seekProduct( $txt ){
 		//busca por codigo de barras
 			$sql = "SELECT 
@@ -198,7 +146,6 @@
 					OR pp.codigo_barras_caja_2 = '{$txt}' 
 					OR pp.id_proveedor_producto = '{$txt}')
 					AND p.es_maquilado = 0";
-				//die( $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el producto por codigo de barras : " . $this->link->error );
 			if( $stm->num_rows <= 0 ){
 				return $this->seekByName( $txt );
@@ -209,7 +156,7 @@
 				return $this->getProductProviderCatalogue( $stm );
 			}
 		}
-
+	//obtener catalogo de proveedor producto
 		public function getProductProviderCatalogue( $stm ){
 			//echo '|here';
 			$resp = "multiProductProvider|<table class=\"table table-striped\">
@@ -248,9 +195,8 @@
 
 			return $resp;
 		}
-
+	//busqueda de productos por nombre
 		public function seekByName( $barcode ){
-			//die('|here');
 			$barcode_array = explode(' ', $barcode );
 			$condition = " OR (";
 			foreach ($barcode_array as $key => $barcode_txt ) {
@@ -283,12 +229,10 @@
 					$resp .= "<p>{$row_name['name']}</p>";
 				$resp .= "</div>";
 			}
-			//echo $resp;
 			return $resp;
 		} 
-
+	//obtener imagenes de paquetes
 		public function getImages( $product_provider_id, $preview = '' ){
-			//echo 'here';
 			$resp = "";
 
 			$sql = "SELECT 
@@ -309,8 +253,7 @@
 					ON p.id_productos = bp.id_producto_relacionado
 					WHERE ppm.id_proveedor_producto = {$product_provider_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar la medidas del proveedor producto : {$this->link->error}" );
-	//	die ($sql);
-				$sql = "";
+			$sql = "";
 			if( $preview == '' ){
 				$bag = "";
 				$box = "";
@@ -369,19 +312,10 @@
 			}
 			return $resp;
 		}
-
+	//generacion de codigos de barras
 		public function make_barcode( $product_provider_id, $user_id, $store_id, $boxes = 0, $packs = 0, $pieces = 0, $decimal = 0, $print_pieces = 0  ){
 			$this->getDistinctRoutes( $this->store_id, $user_id );//consulta rutas
 			$resp = "\n";
-/*implementacion Oscar 2023 para obtener el dominio del equipo		
-		$sql = "SELECT 
-					dominio_sucursal AS store_dns
-				FROM ec_configuracion_sucursal
-				WHERE id_sucursal = ( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 )";
-		$stm = $this->link->query( $sql ) or die( "Error al consultar el dominio de la sucursal destino" );
-		$row = $stm->fetch_assoc();
-		$ruta_or = $row['store_dns'];
-//fin de cambio Oscar 2023*/
 		//busca datos del usuario
 			$sql = "SELECT 
 						CONCAT( nombre, ' ', apellido_paterno ) AS name
@@ -450,7 +384,6 @@
 			$row = $stm->fetch_assoc();
 			$product_name = $this->part_word( $row['product_name'] );
 		//maquilados incompletos
-			//die( 'decimal : ' . $decimal );
 			$incomplete_pieces_original = 0;
 			if( $decimal != 0 ){
 			//consulta informacion del producto origen
@@ -470,11 +403,10 @@
 						LEFT JOIN ec_proveedor_producto pp
 						ON pp.id_producto = pd.id_producto_ordigen
 						WHERE pd.id_producto_ordigen = {$row['product_id']}";
-//die( $sql );
 				$stm_maquiled_2 = $this->link->query( $sql ) or die( "Error al consultar los detalles del producto maquilado : {$this->link->error}" );
 				$maquiled_row_2 = $stm_maquiled_2->fetch_assoc();
 				$aux = explode('.', $decimal );
-				//die(  );
+				
 				$aux[1] = "0.{$aux[1]}";
 				$incomplete_pieces_original = (float)$aux[1];
 			//	die( $incomplete_pieces_original );
@@ -486,14 +418,7 @@
 					'product_name_2'=>$product_name[1],  'store_prefix' =>$store_prefix, 'maquile_unit'=>$maquiled_row_2['maquile_unit'] );	
 				$resp .= $this->make_barcode_file( $box_barcode, $store_id, $user_id, $system_type[0], 6 );	
 				$print_pieces = ( $complete_pieces >= 1 ? ( $complete_pieces + $row['pieces_pack_and_boxes'] ): 0 );
-//die( 'piezas : ' . $print_pieces );
 			}
-		//cajas
-			//busca si tiene configurada la impresion de cajas
-			/*$sql = "SELECT habilitado AS enabled, codigo_barras AS code FROM ec_codigos_validacion_cajas WHERE habilitado = 1 LIMIT 1";
-			$seil_stm = $this->link->query( $sql ) or die( "Error al consultar el sello de impresion" );
-			$print_box_ceil = ( $seil_stm->num_rows == 1 ? 1 : 0 );
-			$box_seil = $seil_stm->fetch_assoc();*/
 		//Implementacion Oscar 2023 para obtener configuracion de impresion de sello de caja
 			$sql = "SELECT
 						imprime_etiqueta_sello_roto AS print_box_broke_seil
@@ -524,7 +449,6 @@
 					'product_location'=>$row['product_location'], 'tag_type'=>"CAJA", 'store'=>$store, 
 					'user_name'=>$user, 'product_name_1'=>$product_name[0], 'product_name_2'=>$product_name[1] );
 				$resp .= $this->make_barcode_file( $box_barcode, $store_id, $user_id, $system_type[0], 1 );
-
 		//Implementacion Oscar 2023 para obtener configuracion de impresion de sello de caja
 				if( $box_seil_1['print_box_broke_seil'] == 1  ){
 					
@@ -556,14 +480,11 @@
 					'product_location'=>$row['product_location'], 'tag_type'=>"PAQUETE", 'store'=>$store, 
 					'user_name'=>$user, 'product_name_1'=>$product_name[0], 'product_name_2'=>$product_name[1] );
 				$resp .= $this->make_barcode_file( $pack_barcode, $store_id, $user_id, $system_type[0], 2 );
-			//echo 'here';
 		//actualiza el contador de paquetes
 				$sql = "UPDATE ec_proveedor_producto SET contador_paquetes = {$i} WHERE id_proveedor_producto =  {$product_provider_id}";
 				$upd = $this->link->query( $sql ) or die( "Error al actualizar el contador de paquetes : {$this->link->error}" );
 			}
 		//piezas
-			//for( $i = 0; $i < $pieces; $i++ ){
-			//die( 'piezas : ' . $pieces );
 			if( $pieces > 0  ){//&& ( $decimal == 0 || $decimal == 0.0 || $decimal == 0.00 )&& ( $row['pieces_per_pack'] > 1 || $row['pieces_per_box'] > 1 )
 			//verfica si esta habilitado el check de imprimir piezas incompletas	
 				$sql = "SELECT imprimir_piezas_sueltas AS print FROM ec_productos_etiquetado_maquila WHERE id_producto = {$row['product_id']}";
@@ -572,7 +493,6 @@
 				if( $row_ver['print'] == 1 ){
 					$pieces = str_replace('.00', '', $pieces );
 					$pieces = $pieces + (float)$incomplete_pieces_original;
-//die( $pieces );
 					$piece_barcode = array( 'barcode'=>$row['piece_barcode'], 'order_list'=>$row['order_list'], 'tag_date'=>$row['tag_date'], 
 						'product_location'=>$row['product_location'], 'tag_type'=>"{$pieces}+  +   +   +   +   +", 'store'=>$store, 'store_prefix' =>$store_prefix, 
 						'user_name'=>$user, 'product_name_1'=>$product_name[0], 'product_name_2'=>$product_name[1], 'piece_unit'=>$row['piece_unit'],
@@ -583,19 +503,16 @@
 
 			if( $print_pieces > 0 ){//
 				$print_pieces = str_replace('.00', '', $print_pieces );
-//die( 'here' . $print_pieces );
 				$piece_barcode = array( 'barcode'=>$row['piece_barcode'], 'order_list'=>$row['order_list'], 'tag_date'=>$row['tag_date'], 
 					'product_location'=>$row['product_location'], 'tag_type'=>" ", 'store'=>$store, 'store_prefix' =>$store_prefix, 
 					'user_name'=>$user, 'product_name_1'=>$product_name[0], 'product_name_2'=>$product_name[1], 'piece_unit'=>$row['piece_unit'],
 					'presentation'=>$row['presentation'], 'prints_number'=>$print_pieces );
 				$resp .= "\n" . $this->make_barcode_file( $piece_barcode, $store_id, $user_id, $system_type[0], 4 );
-				//die( 'here' . $this->make_barcode_file( $piece_barcode, $store_id, $user_id, $system_type[0], 4 ) );
 			}
 //implementacion Oscar 2024-04-24 para enviar etiquetas a traves del webService
 			if( ! include( '../../../controladores/SysArchivosDescarga.php' ) ){
 				die( "No se pudo incluir la libreria de descargar de archivos : 'SysArchivosDescarga'" );
 			}
-			//var_dump( $this->routes );die('ok');
 			$SysArchivosDescarga = new SysArchivosDescarga( $this->link );
 			$modulo = 0;
 			foreach ($this->routes as $key => $route) {
@@ -608,7 +525,6 @@
 					$file_name = date('Y_m_d_H_i_s_') . uniqid() . '.txt';
 				//genera archivo
 					$fh = fopen("../../../../../{$key}/{$file_name}", 'w') or die("Se produjo un error al crear el archivo en '../../../../../{$key}/{$file_name}'");
-					//fwrite($fh, $resp) or die("No se pudo escribir en el archivo");
 					fwrite( $fh, $this->routes["{$key}"] ) or die("No se pudo escribir en el archivo");
 					fclose($fh);
 
@@ -618,44 +534,27 @@
 							WHERE acceso = 1";
 					$stm = $this->link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$this->link->error}" );
 					$system_type = $stm->fetch_row();
-				/*genera registro de descarga
-					if( $system_type[0] == -1 ){
-				//die( 'Here' );
-						$sql_arch="INSERT INTO sys_archivos_descarga SET 
-								id_archivo=null,
-								tipo_archivo='txt',
-								nombre_archivo='{$file_name}',
-								ruta_origen='{$ruta_or}/{$key}',
-								ruta_destino='$key',
-								id_sucursal={$this->store_id},
-								id_usuario='$user_id',
-								observaciones=''";
-						$inserta_reg_arch=$this->link->query( $sql_arch )or die( "Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n". $this->link->error . "\n\n" . $sql_arch );
-					}*/
 				/*Sincronización remota de tickets*/
 					$config = $this->getConfigurationByTxt();
 					if( $system_type[0] == -1 ){/*registro sincronizacion impresion remota*/
 						$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'txt', $file_name, $config['ruta_or'], $key, $store_id, $user_id );
 					}else{//impresion por red local
-						//die("HERE : {$absolute_path}");
 						$absolute_path = '../../../../';
 						$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( $modulo, 'txt', $file_name, '', $key, $store_id,  $user_id, 
-						$config['carpeta_path'], $absolute_path, 'alert("Impresion de ticket de ventas pendientes exitosa!");location.reload();' );
+						$config['carpeta_path'], $absolute_path, 'alert("Impresion de etiqueta(s) exitosa!");location.reload();' );
 					}
 				}
 			}
 			return 'ok|Impresion Generada exitosamente!';
 		}
-
+	//crear archivo
 		public function make_barcode_file( $data, $store_id, $user_id, $system_type, $type_id ){
-//echo " type : {$type_id}";
-
 			$tag = $this->getTagTemplate( $data, $store_id, $user_id, $type_id );
 			$resp = $tag;
 			return $resp;
 
 		}
-
+	//partir palabras
 		public function part_word( $txt ){
 			$size = strlen( $txt );
 			$half = round( $size / 2 );
@@ -694,8 +593,7 @@
 			}
 			return $resp;
 		}
-
-
+	//obtener proveedores producto por id de producto
 		public function getOptionsByProductId( $product_id ){
 			$sql = "SELECT
 						pp.id_proveedor_producto AS product_provider_id,
@@ -712,7 +610,6 @@
 					AND ipp.id_almacen = 1";
 			$stm_name = $this->link->query( $sql ) or die( "error|Error al consutar el detalle del producto : {$link->error}" ); 
 			$resp = "<div class=\"row\">";
-				//$resp .= "<div class=\"col-2\"></div>";
 				$resp .= "<div class=\"col-12\">";
 					$resp .= "<h5>Selecciona el modelo del producto : </h5>";
 					$resp .= "<table class=\"table table-bordered table-striped table_70\">";
@@ -752,7 +649,7 @@
 			$resp .= "</div>";
 			return $resp;
 		}
-
+//obtener plantilla de etiqueta
 		public function getTagTemplate( $data, $store_id, $user_id, $type_id ){
 			$sql = "SELECT
 						IF( spe.tipo_codigo_plantilla = 'EPL',  pe.codigo_epl, pe.codigo_zpl ) AS template,
@@ -783,17 +680,7 @@
 					WHERE spe.id_sucursal = {$store_id}
 					AND tpe.id_tipo_plantilla_etiqueta = {$type_id}
 					AND spe.habilitado = 1
-					LIMIT 1";//die($sql);
-			/*$sql = "SELECT 
-				mis.id_modulo_impresion_sucursal,
-				CONCAT( c.path, '/', c.nombre_carpeta ) AS nombre_carpeta
-			FROM sys_modulos_impresion_sucursales mis
-			LEFT JOIN sys_modulos_impresion mi
-			ON mis.id_modulo_impresion = mi.id_modulo_impresion
-			LEFT JOIN sys_carpetas c 
-			ON c.id_carpeta = mis.id_carpeta
-			WHERE mis.id_sucursal = '$LLAVE'";*/
-		//die( $sql );
+					LIMIT 1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar base de etiqueta : {$this->link->error} {$sql}" );
 			if( $stm->num_rows <= 0 ){
 				die( "No existe plantilla para la etiqueta {$type_id} !" );
@@ -833,7 +720,7 @@
 				//return $row['template'] . "\n";
 			}
 		}
-
+	//obtener la configuracion del archivo txt de configuracion inicial
 		public function getConfigurationByTxt(){
 			$archivo_path = "../../../../../conexion_inicial.txt";
 			$ruta_or = "";
@@ -854,7 +741,6 @@
 			}
 			return array( "ruta_or"=>$ruta_or, "ruta_des"=>$ruta_des, "carpeta_path"=>$carpeta_path );
 		}
-
 	}
 	
 ?>
