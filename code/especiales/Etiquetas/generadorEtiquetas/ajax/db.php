@@ -599,9 +599,9 @@
 			$SysArchivosDescarga = new SysArchivosDescarga( $this->link );
 			$modulo = 0;
 			foreach ($this->routes as $key => $route) {
-				if( $key == '' ){//piezas
+				if( strpos($key, 'pieza') != false ){//piezas
 					$modulo = 14;
-				}else if( $key == '' ){//paquetes
+				}else if( strpos($key, 'paquete') != false ){//paquetes
 					$modulo = 13;
 				}
 				if( $this->routes["{$key}"] != "" ){
@@ -638,9 +638,9 @@
 						$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'txt', $file_name, $config['ruta_or'], $key, $store_id, $user_id );
 					}else{//impresion por red local
 						//die("HERE : {$absolute_path}");
-						$absolute_path = '../../../../../';
-						$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 13, 'txt', $file_name, '', $key, $store_id,  $user_id, 
-						$config['carpeta_path'], $absolute_path, 'alert("Impresion de ticket de ventas pendientes exitosa!");close_emergent();' );
+						$absolute_path = '../../../../';
+						$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( $modulo, 'txt', $file_name, '', $key, $store_id,  $user_id, 
+						$config['carpeta_path'], $absolute_path, 'alert("Impresion de ticket de ventas pendientes exitosa!");location.reload();' );
 					}
 				}
 			}
