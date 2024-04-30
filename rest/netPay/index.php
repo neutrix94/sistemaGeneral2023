@@ -9,6 +9,7 @@
     */
     require '../vendor/autoload.php';
     require '../src/config/db.php';         // DB Connect CL
+    require 'utils/encriptacion_token.php';
     //require '../src/config/dbFact.php';     // DB Connect Fact
     /*
     * Instancia utilities
@@ -47,6 +48,7 @@
     require 'server/recuperarRespuestas.php';//recuperar respuestas que no han sido entregadas al usuario
     require 'server/actualizarStatusRespuesta.php';//obtener respuesta de servidor linea a local
     require 'server/recuperarRespuestaPorFolioUnico.php';//obtener respuesta por folio unico
+    require 'server/tokenEncriptado.php';//obtener respuesta por folio unico
     //require 'server/test.php';
 
     $app->run();
