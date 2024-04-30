@@ -14,9 +14,12 @@ $app->post('/valida_token', function (Request $request, Response $response){
     $db = $db->conectDB();
     $rs = new manageResponse();
     $vt = new tokenValidation();
+    //$Encrypt = new Encrypt();
+
     //die("here");
 //Valida token
     $token =  (empty($request->getHeader('Token'))) ? '' : implode(" ",$request->getHeader('Token'));
+    //$token = $Encrypt->decryptText($token, 'CDLL2024');//desencripta token
     if (empty($token) || strlen($token)<36 ) {
       //Define estructura de salida: Token requerido
       return $rs->errorMessage($request->getParsedBody(),$response, 'Token_Requerido', 'Se requiere el uso de un token', 400);
