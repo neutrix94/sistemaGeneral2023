@@ -15,6 +15,7 @@ $app->post('/actualizar_status_transacciones', function (Request $request, Respo
     $vt = new tokenValidation();
     
     $token =  (empty($request->getHeader('Token'))) ? '' : implode(" ",$request->getHeader('Token'));
+    $token = $Encrypt->decryptText($token, 'CDLL2024');//desencripta token
     if (empty($token) || strlen($token)<36 ) {
     //Define estructura de salida: Token requerido
         return $rs->errorMessage($request->getParsedBody(),$response, 'Token_Requerido', 'Se requiere el uso de un token', 400);

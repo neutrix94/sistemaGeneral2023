@@ -13,8 +13,10 @@ $app->post('/recuperar_respuesta_por_folio_unico', function (Request $request, R
     $db = $db->conectDB();
     $rs = new manageResponse();
     $vt = new tokenValidation();
+    $Encrypt = new Encrypt();
 //validacion de token
     $token =  (empty($request->getHeader('Token'))) ? '' : implode(" ",$request->getHeader('Token'));
+    $token = $Encrypt->decryptText($token, 'CDLL2024');//desencripta token
     if (empty($token) || strlen($token)<36 ) {
         return $rs->errorMessage($request->getParsedBody(),$response, 'Token_Requerido', 'Se requiere el uso de un token', 400);
     }else{//Consulta vigencia
