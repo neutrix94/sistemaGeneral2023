@@ -272,6 +272,14 @@
 
 		<div class="row">
 			<div class="col-3">
+				<br>
+				<button
+					type="button"
+					class="btn btn-info"
+					onclick="export_csv();"
+				>
+					<i class="icon-download">Exportar</i>
+				</button>
 			</div>
 			<div class="col-6">
 				<br>
@@ -351,6 +359,65 @@
 	function close_emergent(){
 		$( '.emergent_content' ).html( '' );
 		$( '.emergent' ).css( 'display', 'none' );
+	}
+
+	function export_csv(){
+		var product_name = "";
+		var content = `Ubic Alm,Orden Lista,Id_proveedor_producto,Descripcion,Temporal,Inv Sistema,Inv Conteo,Diferencia`;
+	//recore la tabla
+		$( '#adjustment_content tr' ).each( function(index){
+			if( document.getElementById( 'ubicacion_' + index + ';' ) ){
+				$(this).children( 'td' ).each(function(index2){
+					if( index2 == 0 ){//ubicacion de almacen
+						content += "\n" + $( this ).html().trim() + ",";
+					}
+					if( index2 == 1 ){//orden de lista
+						content += $( this ).html().trim() + ",";
+
+					}
+					if( index2 == 4 ){//descripcion/id proveedor producto
+						product_name = $( this ).html().trim();
+						product_name = product_name.replace( '</div>', '' );
+						product_name = product_name.replace( '<div class="product_resumen">', '' );
+						product_name = product_name.replace( '<b>', '' );
+						product_name = product_name.replace( '</b>', '' );
+						product_name = product_name.split('id_p_p : ');
+						if( ! product_name[1] ){
+							product_name[1] = 'n/a';
+						}
+						content += product_name[1] + ',';
+						content += product_name[0] + ',';
+					}
+					if( index2 == 5 ){//temporal
+						content += $( this ).html().trim() + ",";
+
+					}
+					if( index2 == 7 ){//inventario del sistema
+						content += $( this ).html().trim() + ",";
+
+					}
+					if( index2 == 8 ){//inventario del conteo
+						content += $( this ).html().trim() + ",";
+
+					}
+					if( index2 == 9 ){//diferencia
+						content += $( this ).html().trim();
+
+					}
+				});
+			}
+		});
+		//function descargarCSV(datosCSV, nombreArchivo) {
+		const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.setAttribute('download', "pantalla_ajuste.csv");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+//}
+		//console.log( content );
 	}
 
 	var reset_product_help = `
