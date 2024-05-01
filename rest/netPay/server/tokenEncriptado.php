@@ -13,7 +13,7 @@ $app->post('/token', function (Request $request, Response $response){
     $db = new db();
     $db = $db->conectDB();
     $rs = new manageResponse();
-    $Encrypt = new Encrypt();
+   // $Encrypt = new Encrypt();
 
     //Validar parámetros de entrada
     if (empty($request->getParam('user')) || empty($request->getParam('password'))) {
@@ -56,7 +56,7 @@ $app->post('/token', function (Request $request, Response $response){
           //Regresa token
           $resultado = [];
           $resultado['access_token']= $tk;//$Encrypt->encryptText($tk, 'CDLL2024');
-          $resultado['access_token_crypt'] = $Encrypt->encryptText($tk, 'CDLL2024');
+          //$resultado['access_token_crypt'] = $Encrypt->encryptText($tk, 'CDLL2024');
           $resultado['expires_in']=$time_value['value'];
           $resultado['token_type']='bearer';
           return $rs->successMessage($request->getParsedBody(),$response, $resultado);
