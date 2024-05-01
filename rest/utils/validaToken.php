@@ -16,7 +16,7 @@
         $sqlToken = "SELECT token FROM api_token WHERE token='{$token}'";
         $resultadoToken = $db->query($sqlToken);
         if( $resultadoToken->rowCount() == 0 ){
-          return 'El token no existe';
+          return $resultadoToken;
         }else{
           $valida_caducidad = $this->validaToken($token);
           if( $valida_caducidad->rowCount() == 0 ){
