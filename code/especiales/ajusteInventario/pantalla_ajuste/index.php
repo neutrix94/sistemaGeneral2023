@@ -392,15 +392,15 @@
 						content += $( this ).html().trim() + ",";
 
 					}
-					if( index2 == 7 ){//inventario del sistema
+					if( index2 == 6 ){//inventario del sistema
 						content += $( this ).html().trim() + ",";
 
 					}
-					if( index2 == 8 ){//inventario del conteo
+					if( index2 == 7 ){//inventario del conteo
 						content += $( this ).html().trim() + ",";
 
 					}
-					if( index2 == 9 ){//diferencia
+					if( index2 == 8 ){//diferencia
 						content += $( this ).html().trim();
 
 					}
