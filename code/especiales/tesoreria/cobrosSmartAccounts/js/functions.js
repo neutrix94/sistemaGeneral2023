@@ -458,6 +458,25 @@ var cont_cheques_transferencia=0;
 				buildPaymentJustCash();
 				return false;
 			}
+		//verifica que no haya cobros pendientes en tarjetas netPay
+			var montos_smart_accounts = 0;
+			$( '#payments_list tr' ).each( function( index ){
+				montos_smart_accounts += parseFloat( $( '#t' + index ).val() );
+			});
+
+			if( montos_smart_accounts != 0 && montos_smart_accounts != 0.00 ){
+				$( '.emergent_content' ).html( `<h2 class="text-center">No se puede finalizar el cobro porque hay pagos de netPay pendientes!</h2>
+				<div class="text-center"><br>
+					<button
+						type="button"
+						class="btn btn-warning"
+						onclick="close_emergent();"
+					>Cancelar y volver a intentar
+					</button><br>
+				</div>` );
+				$( '.emergent' ).css( 'display', 'block' );
+				return false;
+			}
 		//verifica si hay cobro en efectivo a favor
 			//if( parseInt( $( '#efectivo' ).val() ) != 0 && $( '#efectivo' ).val().trim() != '' 
 			//	&& parseInt( $( '#efectivo' ).val() ) < 0 ){

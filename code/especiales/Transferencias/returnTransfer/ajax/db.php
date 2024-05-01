@@ -418,10 +418,29 @@
 					'user_name'=>$user, 'product_name_1'=>$product_name[0], 'product_name_2'=>$product_name[1], 'piece_unit'=>$row['piece_unit'], 'presentation'=>$row['presentation'] );
 				$resp .= $this->make_barcode_file( $piece_barcode, $store_id, $user_id, $system_type[0], 3 );
 			}
+		
+		//implementacion Oscar 2024-04-24 para enviar etiquetas a traves del webService
+			if( ! include( '../../../controladores/SysArchivosDescarga.php' ) ){
+				die( "No se pudo incluir la libreria de descargar de archivos : 'SysArchivosDescarga'" );
+			}
+			$SysArchivosDescarga = new SysArchivosDescarga( $this->link );
+			if( ! include( '../../../controladores/SysModulosImpresionUsuarios.php' ) ){
+				die( "No se pudo incluir la libreria de descargar de archivos : 'SysModulosImpresionUsuarios'" );
+			}
+			$SysModulosImpresionUsuarios = new SysModulosImpresionUsuarios( $this->link );
+			if( ! include( '../../../controladores/SysModulosImpresion.php' ) ){
+				die( "No se pudo incluir la libreria de descargar de archivos : 'SysModulosImpresion'" );
+			}
+			$SysModulosImpresion = new SysModulosImpresion( $this->link );
+			$ruta_salida = '';
+			$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 13 );//etiqueta empaquetado paquete
+			if( $ruta_salida == 'no' ){
+				$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $store_id, 13 );//etiqueta empaquetado paquete
+			}
 
 			$file_name = date('Y_m_d_H_i_s_') . uniqid() . '.txt';
 		//genera archivo
-			$fh = fopen("../../../../../cache/ticket/{$file_name}", 'w') or die("Se produjo un error al crear el archivo");
+			$fh = fopen("../../../../../{$ruta_salida}/{$file_name}", 'w') or die("Se produjo un error al crear el archivo");
 			fwrite($fh, $resp) or die("No se pudo escribir en el archivo");
 			fclose($fh);
 
@@ -431,24 +450,41 @@
 					WHERE acceso = 1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$this->link->error}" );
 			$system_type = $stm->fetch_row();
+		/*Sincronización remota de tickets*/
+			$config = $this->getConfigurationByTxt();
+			if( $system_type[0] == -1 ){/*registro sincronizacion impresion remota*/
+				$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'txt', $file_name, $config['ruta_or'], $ruta_salida, $store_id, $user_id );
+			}else{//impresion por red local
+				$absolute_path = '../../../../';
+				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 13, 'txt', $file_name, '', $ruta_salida, $store_id,  $user_id, 
+				$config['carpeta_path'], $absolute_path, 'alert("Impresion de etiqueta(s) exitosa!");location.reload();' );
+			}
+			
+
+			/*$sql = "SELECT 
+						id_sucursal
+					FROM sys_sucursales
+					WHERE acceso = 1";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$this->link->error}" );
+			$system_type = $stm->fetch_row();
 		//genera registro de descarga
 			if( $system_type[0] == -1 ){
 		//die( 'Here' );
-			/*cambio Oscar 2024-02-01*/
+			/*cambio Oscar 2024-02-01*
 				$ruta_or .= 'cache/ticket/';
 				//$ruta_or = str_replace( '//', '/', $ruta_or );
-			/*fin de cambio Oscar 2024-02-01*/
+			/*fin de cambio Oscar 2024-02-01*
 				$sql_arch="INSERT INTO sys_archivos_descarga SET 
 						id_archivo=null,
 						tipo_archivo='txt',
 						nombre_archivo='{$file_name}',
 						ruta_origen='{$ruta_or}',
-						ruta_destino='cache/ticket/',/*cambio Oscar 2024-02-01*/
+						ruta_destino='cache/ticket/',/*cambio Oscar 2024-02-01*
 						id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE id_sucursal='$store_id'),
 						id_usuario='$user_id',
 						observaciones=''";
 				$inserta_reg_arch=$this->link->query( $sql_arch )or die( "Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n". $this->link->error . "\n\n" . $sql_arch );
-			}
+			}*/
 			return 'ok|Impresion Generada exitosamente!';
 		}
 
@@ -616,6 +652,28 @@
 				}
 				return $row['template'] . "\n";
 			}
+		}
+
+	//obtener la configuracion del archivo txt de configuracion inicial
+		public function getConfigurationByTxt(){
+			$archivo_path = "../../../../../conexion_inicial.txt";
+			$ruta_or = "";
+			$ruta_des = "";
+			$carpeta_path = "";
+			if(file_exists($archivo_path)){
+				$file = fopen($archivo_path,"r");
+				$line=fgets($file);
+				fclose($file);
+				$config=explode("<>",$line);
+				$tmp=explode("~",$config[2]);
+				$ruta_or=$tmp[0];
+				$ruta_des=$tmp[1];
+				$tmp_=explode("~",$config[0]);
+				$carpeta_path = base64_decode( $tmp_[1] );
+			}else{
+				die("No hay archivo de configuración!!!");
+			}
+			return array( "ruta_or"=>$ruta_or, "ruta_des"=>$ruta_des, "carpeta_path"=>$carpeta_path );
 		}
 
 	}
