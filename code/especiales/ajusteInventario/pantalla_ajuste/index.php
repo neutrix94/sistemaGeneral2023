@@ -366,7 +366,7 @@
 		var content = `Ubic Alm,Orden Lista,Id_proveedor_producto,Descripcion,Temporal,Inv Sistema,Inv Conteo,Diferencia`;
 	//recore la tabla
 		$( '#adjustment_content tr' ).each( function(index){
-			if( document.getElementById( 'ubicacion_' + index + ';' ) ){
+			//if( document.getElementById( 'ubicacion_' + index + ';' ) ){
 				$(this).children( 'td' ).each(function(index2){
 					if( index2 == 0 ){//ubicacion de almacen
 						content += "\n" + $( this ).html().trim() + ",";
@@ -405,7 +405,7 @@
 
 					}
 				});
-			}
+			//}
 		});
 		//function descargarCSV(datosCSV, nombreArchivo) {
 		const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });

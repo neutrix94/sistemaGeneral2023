@@ -32,7 +32,7 @@
 			case 'move_file_to_generic_folder' : 
 				$file_id = ( isset( $_GET['file_id'] ) ? $_GET['file_id'] : $_POST['file_id'] );
 				$path = ( isset( $_GET['path'] ) ? $_GET['path'] : $_POST['path'] );
-				$id_modulo = ( isset( $_GET['id_modulo'] ) ? $_GET['id_modulo'] : $_POST['id_modulo'] );
+				$id_modulo = ( isset( $_GET['module_id'] ) ? $_GET['module_id'] : $_POST['module_id'] );
 				echo $SysArchivosDescarga->move_file_to_generic_folder( $file_id, $path, $id_modulo, $user_sucursal );
 			break;
 			
@@ -199,9 +199,17 @@
 			$file_row = $stm->fetch_assoc();
 			$origin_file_path = "../../..{$file_row['ruta_origen']}{$file_row['nombre_archivo']}";//ruta origen
 		//consulta la ruta origen en relacion al modulo y sucursal
-			
+			$sql = "SELECT 
+						CONCAT( c.path, '/', c.nombre_carpeta, '/' ) AS carpeta_generica
+					FROM sys_modulos_impresion_sucursales mis
+					LEFT JOIN sys_carpetas c
+					ON mis.id_carpeta = c.id_carpeta
+					WHERE mis.id_modulo_impresion = {$id_modulo}
+					AND mis.id_sucursal = {$store_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar la carpeta generica del módulo : {$sql} {$this->link->error}" );
+			$destinity_row = $stm->fetch_assoc();
 
-			$destinity_file_path = "../../..{$file_row['ruta_origen']}{$file_row['nombre_archivo']}";
+			$destinity_file_path = "../../../{$destinity_row['carpeta_generica']}{$file_row['nombre_archivo']}";
 			
 			$moved = false;
 			if(is_file($origin_file_path)){
