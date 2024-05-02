@@ -34,6 +34,15 @@ $app->post('/valida_token', function (Request $request, Response $response){
             return $rs->errorMessage($request->getParsedBody(),$response, 'CL_Error', $e->getMessage(), 500);
         }
     }
-    return json_encode( array( "status"=>200, "message"=>"Token válido" ) );
+//consulta el usuario al que corresponde el token
+   // $db = $db->conectDB();
+    include( '../../conexionMysqli.php' );
+    $sqlToken = "SELECT id_user AS id_usuario FROM api_token WHERE token='{$token}'";
+    $resultadoToken = $link->query($sqlToken) or die( "error : {$link->error}" );
+    if( $link->error ){
+        die( "Error al consultar usuario del token : {$link->error}" );
+    }
+    $row = $resultadoToken->fetch_assoc();
+    return json_encode( array( "status"=>200, "message"=>"Token válido", "id_usuario"=>$row['id_usuario'] ) );
 });
 ?>
