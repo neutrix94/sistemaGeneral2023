@@ -461,7 +461,9 @@ var cont_cheques_transferencia=0;
 		//verifica que no haya cobros pendientes en tarjetas netPay
 			var montos_smart_accounts = 0;
 			$( '#payments_list tr' ).each( function( index ){
-				montos_smart_accounts += parseFloat( $( '#t' + index ).val() );
+				if( ! isNaN( parseFloat( $( '#t' + index ).val() ) ) ){
+					montos_smart_accounts += parseFloat( $( '#t' + index ).val() );
+				}
 			});
 
 			if( montos_smart_accounts != 0 && montos_smart_accounts != 0.00 ){
@@ -856,6 +858,8 @@ console.log( resp );
 		var url = "ajax/db.php?fl=agregarAfiliacionSesion&session_id=" + session_id;
 		url += "&mannager_password=" + password;
 		url += "&id_afiliacion=" + afiliation_id;
+		url += "&error=" + $( '#afiliacion_por_error' ).attr( "error" );
+		alert( url );
 		var resp = ajaxR( url );
 		if( resp != 'ok' ){
 			alert( resp );
