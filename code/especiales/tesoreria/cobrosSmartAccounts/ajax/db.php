@@ -51,6 +51,7 @@
 				$resp = json_decode( $req );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
 					$transaction_id = $resp->petition_id;
+					$is_payment_petition = true;
 					include( '../vistas/formularioNetPay.php' );
 				}else{
 					die( "<div class=\"row text-center\">
@@ -295,7 +296,7 @@
 				$id_afiliacion = ( isset( $_GET['id_afiliacion'] ) ? $_GET['id_afiliacion'] : $_POST['id_afiliacion'] );
 				$check_password = $Payments->check_mannager_password( $sucursal_id, $mannager_password );
 				$error = ( isset( $_GET['error'] ) ? $_GET['error'] : $_POST['error'] );
-				echo $Payments->agregarAfiliacionSesion( $session_id, $user_id, $id_afiliacion );
+				echo $Payments->agregarAfiliacionSesion( $session_id, $user_id, $id_afiliacion, $error );
 			break;
 //afiliaciones
 			case 'obtenerListaAfiliaciones' :
@@ -320,7 +321,7 @@
 				$id_afiliacion = ( isset( $_GET['id_afiliacion'] ) ? $_GET['id_afiliacion'] : $_POST['id_afiliacion'] );
 				$check_password = $Payments->check_mannager_password( $sucursal_id, $mannager_password );
 				$error = ( isset( $_GET['error'] ) ? $_GET['error'] : $_POST['error'] );
-				echo $Payments->agregarAfiliacionSesion( $session_id, $user_id, $id_afiliacion );
+				echo $Payments->agregarAfiliacionSesion( $session_id, $user_id, $id_afiliacion, $error );
 			break;
 	//terminales
 			case 'obtenerListaTerminales' :
