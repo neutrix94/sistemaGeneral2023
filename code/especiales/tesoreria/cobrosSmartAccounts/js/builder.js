@@ -245,9 +245,9 @@
 					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
 					<div class="input-group">
 						${resp}
-						<input type="checkbox" id="afiliacion_por_error" style="display:none">
+						<input type="checkbox" style="display:none">
 						Error : 
-						<label for="error" class="icon-toggle-off text-success fs-3"></label>
+						<label id="afiliacion_por_error" error="0" class="icon-toggle-off text-success fs-3" onclick="cambiar_check_error(this);"></label>
 					</div>
 					<br>
 					<h2>Pide al encargado que ingrese su contraseña para continuar : </h2>
@@ -263,6 +263,24 @@
 		</div>`;
 		$( '.emergent_content' ).html( content );
 		$( '.emergent' ).css( 'display', 'block' );
+	}
+
+	function cambiar_check_error(obj){
+		var status = $( obj ).attr( 'error' );
+		if( status == 0 ){
+			$( obj ).attr( 'error', 1 );
+			$( obj ).removeClass( 'icon-toggle-off' );
+			$( obj ).removeClass( 'text-success' );
+			$( obj ).addClass( 'icon-toggle-on' );
+			$( obj ).addClass( 'text-danger' );
+		}else if( status == 1 ){
+			$( obj ).attr( 'error', 0 );
+			$( obj ).removeClass( 'icon-toggle-on' );
+			$( obj ).removeClass( 'text-danger' );
+			$( obj ).addClass( 'icon-toggle-off' );
+			$( obj ).addClass( 'text-success' );
+		}
+
 	}
 
 //obtener lista de terminales con integracion
