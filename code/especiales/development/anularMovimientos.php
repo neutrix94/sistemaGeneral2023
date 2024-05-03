@@ -25,12 +25,12 @@ $link->autocommit( false );
             id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar ) VALUES ( {$ma['nuevo_id']}, {$md['id_producto']}, {$md['cantidad']}, 
             {$md['cantidad_surtida']}, {$md['id_pedido_detalle']}, {$md['id_oc_detalle']}, {$md['id_proveedor_producto']}, {$md['id_equivalente']}, 1 )";
             $stm_3 = $link->query( $sql ) or die( "Error al insertar la cabecera de movimiento de almacen : {$link->error} : {$sql}" );
-            $sql = "SELECT MAX( id_movimiento_almacen_detalle ) AS id FROM ec_movimiento_detalle";
+            /*$sql = "SELECT MAX( id_movimiento_almacen_detalle ) AS id FROM ec_movimiento_detalle";
             $max_id_stm = $link->query( $sql ) or die( "Err 1 : {$link->error}" );
             $row_id = $max_id_stm->fetch_assoc();
-            $md['nuevo_id'] = $row_id['id'];
+            $md['nuevo_id'] = $row_id['id'];*/
 
-        //consulta detalle de movimiento detalle proveedor producto
+        /*consulta detalle de movimiento detalle proveedor producto
             $sql = "SELECT * FROM ec_movimiento_detalle_proveedor_producto WHERE id_movimiento_almacen_detalle = {$md['id_movimiento_almacen_detalle']}";
             $stm_4 = $link->query( $sql ) or die( "Error al consultar detalle proveedor producto de movimiento de almacen : {$link->error}" );
             while ( $mdpp = $stm_4->fetch_assoc() ){
@@ -39,7 +39,7 @@ $link->autocommit( false );
                id_sucursal, status_agrupacion, id_tipo_movimiento, id_almacen, id_pedido_validacion, sincronizar ) VALUES ( {$md['nuevo_id']}, {$mdpp['id_proveedor_producto']}, 
                {$mdpp['cantidad']}, '{$mdpp['fecha_registro']}', {$mdpp['id_sucursal']}, {$mdpp['status_agrupacion']}, 13, {$mdpp['id_almacen']}, {$mdpp['id_pedido_validacion']}, 1 )";
                 $stm_5 = $link->query( $sql ) or die( "Error al insertar detalle proveedor producto de movimiento de almacen : {$link->error} : {$sql}" ); 
-            }
+            }*/
         }
     }
 //, 
@@ -66,12 +66,12 @@ $link->autocommit( false );
             id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar ) VALUES ( {$ma['nuevo_id']}, {$md['id_producto']}, {$md['cantidad']}, 
             {$md['cantidad_surtida']}, {$md['id_pedido_detalle']}, {$md['id_oc_detalle']}, {$md['id_proveedor_producto']}, {$md['id_equivalente']}, 1 )";
             $stm_3 = $link->query( $sql ) or die( "Error al insertar la cabecera de movimiento de almacen : {$link->error} : {$sql}" );
-            $sql = "SELECT MAX( id_movimiento_almacen_detalle ) AS id FROM ec_movimiento_detalle";
+            /*$sql = "SELECT MAX( id_movimiento_almacen_detalle ) AS id FROM ec_movimiento_detalle";
             $max_id_stm = $link->query( $sql ) or die( "Err 1 : {$link->error}" );
             $row_id = $max_id_stm->fetch_assoc();
-            $md['nuevo_id'] = $row_id['id'];
+            $md['nuevo_id'] = $row_id['id'];*/
 
-        //consulta detalle de movimiento detalle proveedor producto
+        /*consulta detalle de movimiento detalle proveedor producto
             $sql = "SELECT * FROM ec_movimiento_detalle_proveedor_producto WHERE id_movimiento_almacen_detalle = {$md['id_movimiento_almacen_detalle']}";
             $stm_4 = $link->query( $sql ) or die( "Error al consultar detalle proveedor producto de movimiento de almacen : {$link->error}" );
             while ( $mdpp = $stm_4->fetch_assoc() ){
@@ -80,7 +80,7 @@ $link->autocommit( false );
                id_sucursal, status_agrupacion, id_tipo_movimiento, id_almacen, id_pedido_validacion, sincronizar ) VALUES ( {$md['nuevo_id']}, {$mdpp['id_proveedor_producto']}, 
                {$mdpp['cantidad']}, '{$mdpp['fecha_registro']}', {$mdpp['id_sucursal']}, {$mdpp['status_agrupacion']}, 14, {$mdpp['id_almacen']}, {$mdpp['id_pedido_validacion']}, 1 )";
                 $stm_5 = $link->query( $sql ) or die( "Error al insertar detalle proveedor producto de movimiento de almacen : {$link->error} : {$sql}" ); 
-            }
+            }*/
         }
     }
 
