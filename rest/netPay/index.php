@@ -50,7 +50,7 @@
     require 'server/recuperarRespuestaPorFolioUnico.php';//obtener respuesta por folio unico
     require 'server/tokenEncriptado.php';//obtener respuesta por folio unico
 
-    require 'server/test_eugenio.php';//obtener respuesta por folio unico
+    //require 'server/test_eugenio.php';//obtener respuesta por folio unico
     //require 'server/test.php';
 
     $app->run();

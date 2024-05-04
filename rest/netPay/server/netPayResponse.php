@@ -291,7 +291,9 @@ fclose($fp);*/
 /*inicio websocket*/
 //require './utils/encriptacion_token.php';
 
-require_once("../../vendor/autoload.php");    
+if( ! require_once("../../vendor/autoload.php") ){
+  die( "Sin libreria websockets" );
+}
 $loop = \React\EventLoop\Factory::create();
 
 $logger = new \Zend\Log\Logger();
@@ -305,11 +307,11 @@ $client = new \Devristo\Phpws\Client\WebSocket("wss://m9dksnfd-3003.usw3.devtunn
 
 $client->on("connect", function($headers) use ($logger, $client){
     $logger->notice("Connected to WebSocket");
-    $json = $body;
+  /*  $json = $body;
     $request = array( "type"=>"actual_transaction",
     "transaction"=>$json );
-    $request = json_encode( $request );
-    $client->send($request);
+    $request = json_encode( $request );*/
+    $client->send("este es un ejemplo");//$request
 });
 
 $client->on("message", function($message) use ($client, $logger){
