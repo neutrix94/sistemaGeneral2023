@@ -288,6 +288,41 @@ fwrite($fp, $sql );
 fclose($fp);*/
   }
   $link->autocommit( true );
+/*inicio websocket*/
+//require './utils/encriptacion_token.php';
+
+require_once("../../vendor/autoload.php");    
+$loop = \React\EventLoop\Factory::create();
+
+$logger = new \Zend\Log\Logger();
+$writer = new Zend\Log\Writer\Stream("php://output");
+$logger->addWriter($writer);
+$Encrypt = new Encrypt();
+$token = '7dff3c34-faee-11ea-a7be-3d014d7f956c';
+$token = $Encrypt->encryptText( $token, '' );
+
+$client = new \Devristo\Phpws\Client\WebSocket("wss://m9dksnfd-3003.usw3.devtunnels.ms/{$token}", $loop, $logger);
+
+$client->on("connect", function($headers) use ($logger, $client){
+    $logger->notice("Connected to WebSocket");
+    $json = $body;
+    $request = array( "type"=>"actual_transaction",
+    "transaction"=>$json );
+    $request = json_encode( $request );
+    $client->send($request);
+});
+
+$client->on("message", function($message) use ($client, $logger){
+    $logger->notice("Got message: ".$message->getData());
+    $client->close();
+});
+
+$client->open();
+$loop->run();
+
+/*fin Websocket*/
+
+
   $resp = array(
     "code"=>"00",
     "message"=>$message_
