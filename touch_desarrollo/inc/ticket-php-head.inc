@@ -792,7 +792,7 @@ $ticket->SetXY(5, $ticket->GetY()+4);
         $ticket->Image( $barcodePath, 6, $ticket->GetY()+10, 70);
    // die( $folio );
     }else if ( $pagado == 1 ){//implementacion Oscar 2024-04-26 para no imprimir 
-		return 'La nota no ah sido liquidada y no saldra el ticket de productos.';
+		//deshabilitado por Oscar 2024-05-01 die('La nota no ah sido liquidada y no saldra el ticket de productos.');
 	}
 /*fin de cambio Oscar 2023/10/12*/
     if($printPan == 1) {
