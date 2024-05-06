@@ -152,4 +152,12 @@
             
         return cad;
     } 
+    
+    //marcar notificacion como vista
+	function marcar_notificacion_vista( folio_unico ){
+		//console.log( ws );
+        ws.viewedFolios = [folio_unico, ...ws.viewedFolios];
+        ws.sendViewedTransactions();
+		close_emergent();
+	}
      

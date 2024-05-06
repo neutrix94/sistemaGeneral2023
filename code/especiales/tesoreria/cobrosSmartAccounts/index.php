@@ -40,6 +40,24 @@
 	$Payments->checkAccess( $user_id );//verifica permisos
 	$tarjetas_cajero = $Payments->getTerminals( $user_id, 0, $user_sucursal, $session_id );//afiliaciones por cajero
 	$cajas = $Payments->getBoxesMoney( $sucursal_id );//cheque o transferencia 
+//configuracion del Websocket
+	$url_websocket = "ws://m9dksnfd-3000.usw3.devtunnels.ms/";//"ws://localhost:3000";
+//aqui encriptar en token 
+	if( !include( '../../../../rest/netPay/utils/encriptacion_token.php' ) ){
+		die( "no se incluyo libreria Encrypt" );
+	}
+	$Encrypt = new Encrypt();
+	$token_websocket = $Encrypt->encryptText( "d4186cb3-7400-4e0f-bbea-55ebc8739b23", "" );//hay que recuperar de DB7dff3c34-faee-11ea-a7be-3d014d7f956c
+//die( "Token : {$token_websocket}" );
+	$usuario_websocket = $user_id;
+	$sucursal_websocket = $sucursal_id;
+	echo "<script type=\"text/JavaScript\">
+		var \$url_websocket = '{$url_websocket}';
+		var \$token_websocket = '{$token_websocket}';
+		var \$usuario_websocket = '{$usuario_websocket}';
+		var \$sucursal_websocket = '{$sucursal_websocket}';
+		var ws;
+	</script>";
 ?>
 <!DOCTYPE html>
 <html>
@@ -49,12 +67,15 @@
 	<title>Cobrar | SmartAccounts</title>
 	<script type="text/javascript" src="../../../../js/jquery-1.10.2.min.js"></script>
 	<script type="text/javascript" src="js/functions.js"></script>
-	<script type="text/javascript" src="js/apis.js"></script>
 	<script type="text/javascript" src="js/builder.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../../../css/bootstrap/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="../../../../css/icons/css/fontello.css">
 	<link rel="stylesheet" type="text/css" href="css/styles.css">    
 	<script src="../../../../js/highlight/highlight.min.js"></script>
+<!--Websockets (Eugenio) -->
+	<script src="./websocket_client/websocket_client.js" type="module"></script>
+	<script type="text/javascript" src="js/apis.js"></script>
+<!-- -->
 	<link rel="stylesheet" href="../../../../js/highlight/styles/default.min.css">
     <script>hljs.highlightAll();</script>
 
