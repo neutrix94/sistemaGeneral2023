@@ -289,20 +289,24 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 		
 		//redirecciona si es el caso
 			if( json_data['url'].trim() != '' && json_data['url'] != null ){
-				print_sale_edition( json_data['url'] );
+				//print_sale_edition( json_data['url'] );
+				setTimeout( function (){
+				//libera el id de ticket
+					localStorage.setItem( 'current_ticket', null );
+					location.href = json_data['url'];
+					}, 1500);
 				return false;
 			}else{
-				alert_scann( 'validation_ok' );//oscar 2023
-				
 				setTimeout( function (){
 			//libera el id de ticket
+				alert_scann( 'validation_ok' );//oscar 2023
 				localStorage.setItem( 'current_ticket', null );
 					location.reload();
-				}, 2000);
+				}, 1500);
 			}
 		}	
 	}
-var url_por_devolucion = '';
+/*var url_por_devolucion = '';
 	function print_sale_edition(url_redirect){
 		//alert( "url : " + url_redirect + ": url" );
 		url_por_devolucion = url_redirect;
@@ -326,7 +330,7 @@ var url_por_devolucion = '';
 			//localStorage.setItem( 'current_ticket', null );
 			//location.href = url_redirect;//json_data['url'];
 		}, 2000 );
-	}
+	}*/
 
 	function setProductSeekerType( obj ){
 		if( $( obj ).prop( 'checked' ) ){
