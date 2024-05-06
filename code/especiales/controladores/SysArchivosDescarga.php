@@ -131,6 +131,7 @@
 				<div class=\"col-6 text-end\"><br>
 					<button 
 						type=\"button\"
+						id=\"reenviar_archivo_ws_btn\"
 						class=\"btn btn-success\"
 						onclick=\"reenviar_archivo_ws( path = '../', {$file_id}, {$id_modulo} );\"
 					>
@@ -140,6 +141,7 @@
 				<div class=\"col-6 text-start\"><br>
 					<button 
 						type=\"button\"
+						id=\"enviar_archivo_carpeta_modulo_btn\"
 						class=\"btn btn-warning\"
 						onclick=\"enviar_archivo_carpeta_modulo( path = '../', {$file_id}, {$id_modulo} );\"
 					>
@@ -235,7 +237,7 @@
 			curl_setopt($crl, CURLOPT_POST, true);
 			curl_setopt($crl, CURLOPT_POSTFIELDS, $json);
 			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-		    curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+		    curl_setopt($crl, CURLOPT_TIMEOUT, 10);
 			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
 			  'Content-Type: application/json',
 			  'token: ' . $token)

@@ -162,14 +162,14 @@
         if($i==0&&$num_internos>0||$i==1&&$num_externos>0){
             $insMov="INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal,
             fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, 
-            status_agrupacion, id_equivalente, ultima_sincronizacion, ultima_actualizacion ) 
+            status_agrupacion, ultima_sincronizacion, ultima_actualizacion, id_pantalla ) 
             VALUES(null,'12','$user_id','$user_sucursal',now(),now(),'DEVOLUCION $fol_dev',-1,-1,'',-1,-1,";
             if($i==0){
                 $insMov.=$id_almacen_principal;
             }else if($i==1){
                 $insMov.=$id_almacen_externo;
             }
-            $insMov.=",-1,0,null,now())";
+            $insMov.=",-1,null,now(),15)";
             $eje=mysql_query($insMov)or die("Error al insertar el encabezado de movimiento de almacén con entrada por devolución2....".$insMov.mysql_error());
             if($i==0){
                 $id_nvo_mov_int=mysql_insert_id();//capturamos el id asignado al movimiento de devolución
@@ -495,11 +495,11 @@ else{
 
     if(mysql_query("COMMIT")){//autorizamos transacción
        // if($es_completa==1){
-        //imprimimos el ticket de la devolución
+        /*imprimimos el ticket de la devolución
             if(!include('imprimeDev.php')){
     		  die("Error al generar ticket de devolución");
     	   }
-        //}
+        //}*/
     }else{
     	mysql_query("ROLLBACK");//cancelamos transacción
     	die("Se generó un Error al completar la transaccion!!!\n\nActualice la pantalla y vuelva a intentar");

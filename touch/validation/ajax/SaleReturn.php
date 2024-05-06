@@ -244,7 +244,7 @@
 	//&& $this->was_payed == 1
 		            $insMov="INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, 
 		            	id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, 
-		            	id_almacen, status_agrupacion, id_equivalente, ultima_sincronizacion, ultima_actualizacion )
+		            	id_almacen, status_agrupacion, ultima_sincronizacion, ultima_actualizacion, id_pantalla )
 		            VALUES(null,'12','{$this->user}','{$this->store_id}',now(),now(),'DEVOLUCION',-1,-1,'',-1,-1,";
 
 		            if($i==0){
@@ -252,7 +252,7 @@
 		            }else if($i==1){
 		                $insMov .= $this->external_warehouse;
 		            }
-		            $insMov.=",-1,0,null,now())";
+		            $insMov.=",-1,null,now(), 14)";
 //echo "inserta movimiento : " . $insMov;
 		            $eje = $this->link->query( $insMov )or die( "error|Error al insertar el encabezado de movimiento de almacén con entrada por devolución : {$this->link->error}");
 		            if($i==0){
@@ -632,9 +632,12 @@
 		    //if(mysql_query("COMMIT")){//autorizamos transacción
 		       // if($es_completa==1){
 		        //imprimimos el ticket de la devolución
-	            if( !include('imprimeDev.php') ){
-	    		  die("Error al generar ticket de devolución");
-	    	   	}
+
+/*deshabilitado por Oscar 2024-04-30
+if( !include('imprimeDev.php') ){
+die("Error al generar ticket de devolución");
+}
+ */
 		//regresa el id de la devolución 
 		    //return 'ok|'.$id_dev."|".$total_abonado."|".$url_recarga."&id_dev=".$id_dev_interna."~".$id_dev_externa;
 			return $url_recarga;
