@@ -1,11 +1,12 @@
 <?php
 	#header("Content-Type: text/plain;charset=utf-8");
 	//die('here');
-	define('FPDF_FONTPATH','../include/fpdf153/font/');
+	define('FPDF_FONTPATH','../../include/fpdf153/font/');
 	
-	include("../include/fpdf153/fpdf.php");
+	include("../../include/fpdf153/fpdf.php");
+	include("../../conect.php");
 /*implementación Oscar 25.01.2019 para sacar rutas de tickets*/
-	$archivo_path = "../conexion_inicial.txt";
+	$archivo_path = "../../conexion_inicial.txt";
 	$carpeta_path = "";
 	if(file_exists($archivo_path)){
 		$file = fopen($archivo_path,"r");
@@ -392,7 +393,7 @@ Fin de cambio Oscar 25.06.2019*/
     $comprobacion_cobro = round( $total - $payments_total );
     if( ( $comprobacion_cobro == 1 || $comprobacion_cobro == 0 || $comprobacion_cobro == -1 ) || $pagado == 0 ){
 	//if( $payments_total == $total ){
-        $ticket->Image("../img/especiales/pagado.jpeg", 5, 2, 70);
+        $ticket->Image("../../img/especiales/pagado.jpeg", 5, 2, 70);
 		$ticket->SetXY(5, $ticket->GetY()+20);
 	}
 /*Fin de cambio Oscar 2023/10/12*/
@@ -727,7 +728,7 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 	
 	}
 
-	$ar = fopen("../leyenda_ticket/leyenda.txt","r") or die ('No se pudo abrir el archivo');
+	$ar = fopen("../../leyenda_ticket/leyenda.txt","r") or die ('No se pudo abrir el archivo');
 
 	 
     while(!feof($ar))
@@ -784,9 +785,9 @@ $ticket->SetXY(5, $ticket->GetY()+4);
     	//die( 'ere' );
        // $ticket->Image("../../../../img/especiales/pagado.jpeg", 5, 2, 70);
     //generacion de codigo de barras
-        include('../include/barcode/barcode.php');
+        include('../../include/barcode/barcode.php');
         $barcode_name = str_replace(' ', '', $folio );
-        $barcodePath = "../img/codigos_barra/{$barcode_name}.png";
+        $barcodePath = "../../img/codigos_barra/{$barcode_name}.png";
         barcode( $barcodePath, base64_encode( $folio ), '60', 'horizontal', 'code128', false, 1);
     //se incrustra el codigo de barras en el ticket
         $ticket->Image( $barcodePath, 6, $ticket->GetY()+10, 70);
@@ -801,12 +802,12 @@ $ticket->SetXY(5, $ticket->GetY()+4);
     }else{
 /*implementacion Oscar 2024-02-01 para ruta especifica de ticket*/
 	/*instancia clases*/
-		include( '../conexionMysqli.php' );
-		include( '../code/especiales/controladores/SysArchivosDescarga.php' );
+		include( '../../conexionMysqli.php' );
+		include( '../../code/especiales/controladores/SysArchivosDescarga.php' );
 		$SysArchivosDescarga = new SysArchivosDescarga( $link );
-		include( '../code/especiales/controladores/SysModulosImpresionUsuarios.php' );
+		include( '../../code/especiales/controladores/SysModulosImpresionUsuarios.php' );
 		$SysModulosImpresionUsuarios = new SysModulosImpresionUsuarios( $link );
-		include( '../code/especiales/controladores/SysModulosImpresion.php' );
+		include( '../../code/especiales/controladores/SysModulosImpresion.php' );
 		$SysModulosImpresion = new SysModulosImpresion( $link );
 
 /*implementación Oscar 17.09.2018 para impresión de tickets de acuerdo a la configuración de la sucursal*/
@@ -821,12 +822,13 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 			if( $ruta_salida == 'no' ){
 				$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 5 );//ticket de impresion
 			}
-	    	$ticket->Output( "../{$ruta_salida}/{$nombre_ticket}", "F" );
+	    	$ticket->Output( "../../{$ruta_salida}/{$nombre_ticket}", "F" );
         /*Sincronización remota de tickets*/
     		if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 				$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo('pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
     		}else{//impresion por red local
-				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 5, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path );
+                $after_function = '';
+				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 5, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path, $after_function );
 			}
 	    	if( $special_products > 0 ){
 		    	$ticket = null;

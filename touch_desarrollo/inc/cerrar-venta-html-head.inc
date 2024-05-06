@@ -412,7 +412,7 @@ var emrge_aviso='';
 		/*Implementación Oscar 30.11.2018 para no dejar hacer más de una venta por dar click doble*/
 				hay_proceso=1;//ocupamos el proceso
 		/*Fin de cambio Oscar 30.11.2018*/
-	//alert(data);
+	alert(data);
 				retval = ax[0].match (/^ok$/i);
 				pedidor=ax[1];
 		/**/
