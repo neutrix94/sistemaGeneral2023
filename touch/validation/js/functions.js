@@ -288,21 +288,23 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 			$( '.emergent' ).css( 'display', 'block' );
 		
 		//redirecciona si es el caso
-			if( json_data['url'] != '' ){
+			if( json_data['url'].trim() != '' && json_data['url'] != null ){
 				print_sale_edition( json_data['url'] );
+				return false;
 			}else{
 				alert_scann( 'validation_ok' );//oscar 2023
 				
 				setTimeout( function (){
+			//libera el id de ticket
+				localStorage.setItem( 'current_ticket', null );
 					location.reload();
 				}, 2000);
 			}
-		//libera el id de ticket
-			localStorage.setItem( 'current_ticket', null );
 		}	
 	}
 var url_por_devolucion = '';
 	function print_sale_edition(url_redirect){
+		//alert( "url : " + url_redirect + ": url" );
 		url_por_devolucion = url_redirect;
 		alert_scann( 'validation_ok' );//oscar 2023
 		//$( '#btn_reload_final' ).css( 'display', 'none' );
@@ -310,9 +312,14 @@ var url_por_devolucion = '';
 		var url = "../../touch_desarrollo/ajax/impresionTalonPago.php?idp="+localStorage.getItem( 'current_ticket' ) + "&redirect=edicion_nota";//+"&id_dev=0"
 		//alert( url );
 		var reimp = ajaxR(url);
-		alert( reimp );
-		$( '.emergent_content' ).html( reimp );
-		$( '.emergent' ).css( 'display', 'block' );
+		//alert( reimp );
+		if( reimp == 'ok' ){
+			localStorage.setItem( 'current_ticket', null );
+			location.href = url_redirect;
+		}else{
+			$( '.emergent_content' ).html( reimp );
+			$( '.emergent' ).css( 'display', 'block' );
+		}
 		return false;
 		setTimeout( function (){
 		//libera el id de ticket
