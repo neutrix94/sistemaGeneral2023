@@ -519,8 +519,8 @@ console.log( resp );
 			//var resp = ajaxR( url );
 
 			//getHistoricPayment( $( '#id_venta' ).val() );
-			carga_pedido( $( '#id_venta' ).val() );
-			imprimir_tickets();//impresion de tickets
+			/*carga_pedido( $( '#id_venta' ).val() );
+			imprimir_tickets();//impresion de tickets*/
 			
 //alert( resp );
 			var id_corte = $( "#id_venta" ).val();
