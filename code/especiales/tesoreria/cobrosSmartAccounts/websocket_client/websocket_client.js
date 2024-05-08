@@ -25,6 +25,7 @@ const connectWebSocket = (ws_ref) => {
   ws.isProcessing = false;
   ws.eventQueue = ws_ref ? ws_ref.eventQueue : new Queue();
   ws.actualTransaction = ws_ref ? ws_ref.actualTransaction : null;
+  ws.currentTransaction = ws_ref ? ws_ref.currentTransaction : null;
   ws.viewedFolios = ws_ref ? ws_ref.actualTransaction : [];
 
   const isBinary = (obj) => {
@@ -155,7 +156,7 @@ const connectWebSocket = (ws_ref) => {
     ws.send(
       JSON.stringify({
         type: events.GET_TRANSACTION_STATUS,
-        transaction: current_transaction,
+        payload: ws.currentTransaction,
       }),
     );
     ws.isProcessing = false;
@@ -174,7 +175,7 @@ const connectWebSocket = (ws_ref) => {
 					<button
 						type="button"
 						class="btn btn-success"
-						onclick="marcar_notificacion_vista( '${transaction.folio_unico}' );"
+						onclick="marcar_notificacion_vista( '${transaction.traceability.folio_unico_transaccion}' );"
 					><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
 					</button>
           </div>` );
@@ -195,14 +196,26 @@ const connectWebSocket = (ws_ref) => {
 					<button
 						type="button"
 						class="btn btn-success"
-						onclick="marcar_notificacion_vista( '${ws.actualTransaction.folio_unico}' );"
+						onclick="marcar_notificacion_vista( '${ws.actualTransaction.traceability.folio_unico_transaccion}' );"
 					><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
 					</button>
           </div>` );
         $( ".emergent" ).css( "display", "block" );
     } else if (jsonMsg.type == events.SEND_TRANSACTION_STATUS) {
       ws.sendAcknowledgment(jsonMsg.type);
-      console.log(jsonMsg);
+      console.log( jsonMsg.transaction );
+     //aqui brinca la emergente
+      $( ".emergent_content" ).html( `<h2 class="text-success text-center">${jsonMsg.transaction.message}</h2>
+      <div class="text-center">
+        <button
+          type="button"
+          class="btn btn-success"
+          onclick="marcar_notificacion_vista( '${jsonMsg.transaction.folio_unico}' );"
+        ><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
+        </button>
+        </div>` );
+      $( ".emergent" ).css( "display", "block" );
+      //console.log(jsonMsg);
     }
   };
 };
