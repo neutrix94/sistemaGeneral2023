@@ -155,9 +155,17 @@
     
     //marcar notificacion como vista
 	function marcar_notificacion_vista( folio_unico ){
-		//console.log( ws );
         ws.viewedFolios = [folio_unico, ...ws.viewedFolios];
         ws.sendViewedTransactions();
 		close_emergent();
+	}    //marcar notificacion como vista
+	
+    function buscar_repuesta_peticion_por_folio( folio_unico ){
+        ws.currentTransaction = {
+            folio_unico: folio_unico,
+            id_sucursal: $sucursal_websocket,
+        };
+        ws.refreshTransaction();
+		//close_emergent();
 	}
      
