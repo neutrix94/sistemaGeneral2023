@@ -391,16 +391,18 @@ hljs.highlightAll();
 		}
 
 	}
+var url_impresion_venta_origen = '';
+var url_impresion_venta_actual = '';
 	function imprimir_tickets(){
 		//alert( "imprimir_tickets" );
 		//setTimeout( function(){
 			if( parseInt( $( '#monto_total' ).val().trim() ) == 0 ){
 				//alert("tkt 1");
-				url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( '#id_venta' ).val();
-				url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
-				url += "&id_sesion_caja=" + $( '#session_id' ).val();
+				url_impresion_venta_origen = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( '#id_venta' ).val();
+				url_impresion_venta_origen += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
+				url_impresion_venta_origen += "&id_sesion_caja=" + $( '#session_id' ).val();
 				//alert( url );
-				var resp = ajaxR( url );
+				var resp = ajaxR( url_impresion_venta_origen );
 			}
 			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null
 			&& parseInt( $( '#monto_total' ).val().trim() ) == 0 ){//alert('here');
@@ -625,7 +627,7 @@ console.log( resp );
 			<div>
 			<br>
 			Tarjeta : 
-			<select class="form-select" id="afiliation_select_tmp">
+			<select class="form-select" id="afiliation_select_tmp" is_error="${terminal.is_per_error}">
 				<option value="${terminal.afiliation_id}">${terminal.afiliation_number}</option>
 			</select>
 			<div>
@@ -748,6 +750,7 @@ console.log( resp );
 		var url = "ajax/db.php?fl=setPaymentWhithouthIntegration&afiliation_id=" + afiliation_id;
 		url += "&ammount=" + ammount + "&authorization_number=" + authorization_number;
 		url += "&sale_id=" + $( '#id_venta' ).val() + "&session_id=" + $( '#session_id' ).val();
+		url += "&is_per_error=" + $( '#afiliation_select_tmp' ).attr( "is_error" );
 		if( respuesta.monto_saldo_a_favor > parseFloat( respuesta.total_real ) ){//tomar saldo a
 			url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
 		}
@@ -791,27 +794,74 @@ console.log( resp );
 
 //agregar afiliacion 
 	function agregarAfiliacionSesion(){
-		var session_id = $( '#session_id' ).val();
-		var password = $( '#mannager_password' ).val();
+	//saca lista de afiliaciones actuales
+		var curent_afiliations_tmp = new Array();
+		$( '#afiliations_table_body tr' ).each( function ( index ) {
+			$( this ).children( 'td' ).each( function( index2 ){
+				if( index2 == 1 ){
+					curent_afiliations_tmp.push( $( this ).attr( 'afiliation_id' ) );
+				}
+			});
+		});
+		//console.log( curent_afiliations_tmp );
 		var afiliation_id = $( '#afiliacion_combo_tmp' ).val();
 		if( afiliation_id == '' || afiliation_id == null || afiliation_id == 0 || afiliation_id == '0' ){
 			alert( "Pimero elije una afiliación válida!" );
 			return false;
-		}	
+		}
+		if( curent_afiliations_tmp.indexOf( afiliation_id ) != -1 ){
+			alert( "Esta terminal ya existe y no puede ser agregada nuevamente!" );
+			return false;
+		}
+		var afiliation_description = $( '#afiliacion_combo_tmp option:selected' ).text();
+		var new_row = build_afiliation_row( afiliation_id, afiliation_description );
+
+		$( '#afiliations_table_body' ).append( new_row );
+		$( '#afiliations_changes_container' ).removeClass( 'no_visible' );
+	}
+
+	function saveAfiliationsChanges(){
+	//recolecta los valores
+		var afiliations = '';
+		$( '#afiliations_table_body tr' ).each( function ( index ) {
+			if( index > 0 ){
+				afiliations += '|~|';
+			}
+			$( this ).children( 'td' ).each( function( index2 ){
+				if( index2 == 0 ){
+					afiliations += $( this ).html().trim() + '|';//id_afiliacion
+				}else if( index2 == 1 ){
+					afiliations += $( this ).attr( 'afiliation_id' ) + '|';//id 
+				}else if ( index2 == 2 || index2 == 3 ){
+					var tmp ='0';
+					$( this ).children( 'input' ).each( function( index3 ){
+						if( index3 == 0 ){
+							if( $( this ).prop( "checked" ) == true ){
+								tmp = '1';
+							}
+							afiliations += tmp + '|';
+						}
+					});
+				}
+			});
+		});
+		//alert( afiliations );return false;
+		var password = $( '#mannager_password' ).val();
+		var afiliation_id = $( '#afiliacion_combo_tmp' ).val();
 		if( password.length <= 0 ){
 			alert( "La contraseña del encargado no puede ir vacía!" );
 			return false;
 		}
-		var url = "ajax/db.php?fl=agregarAfiliacionSesion&session_id=" + session_id;
+		var session_id = $( '#session_id' ).val();
+		var url = "ajax/db.php?fl=guardaAfiliacionSesion&session_id=" + session_id;
 		url += "&mannager_password=" + password;
-		url += "&id_afiliacion=" + afiliation_id;
-		url += "&error=" + $( '#afiliacion_por_error' ).attr( "error" );
-		alert( url );
+		url += "&afiliations=" + afiliations;
+		//alert( url );return false;
 		var resp = ajaxR( url );
 		if( resp != 'ok' ){
 			alert( resp );
 		}else{
-			alert( "Afiliacion agregada exitosamente." );
+			alert( "Cambios guardados exitosamente." );
 			getAfiliacionesForm();//recarga emergente de afiliaciones
 		}
 	}
@@ -853,14 +903,15 @@ console.log( resp );
 	}
 
 	function checkTerminalSesion( obj, session_terminal_id ){
-		var enabled = 1;
+		/*var enabled = 1;
 		//var session_id = $( '#session_id' ).val();
 		if( ! $(obj).prop('checked') ){
 			enabled = 0;
 		}	
 		var url = 'ajax/db.php?fl=checkTerminalSesion&enabled=' + enabled + '&session_terminal_id=' + session_terminal_id;
 		//alert( url );
-		alert( ajaxR( url ) );
+		alert( ajaxR( url ) );*/
+		$( '#afiliations_changes_container' ).removeClass( "no_visible" );
 		return false;
 	}
 
