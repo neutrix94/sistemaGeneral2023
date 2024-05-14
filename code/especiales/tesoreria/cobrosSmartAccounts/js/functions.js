@@ -392,27 +392,69 @@ hljs.highlightAll();
 
 	}
 var url_impresion_venta_origen = '';
+var venta_origen_impresa = false;
 var url_impresion_venta_actual = '';
+var venta_actual_impresa = false;
 	function imprimir_tickets(){
-		//alert( "imprimir_tickets" );
+//alert( "imprimir_tickets" );
 		//setTimeout( function(){
 			if( parseInt( $( '#monto_total' ).val().trim() ) == 0 ){
-				//alert("tkt 1");
-				url_impresion_venta_origen = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( '#id_venta' ).val();
-				url_impresion_venta_origen += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
-				url_impresion_venta_origen += "&id_sesion_caja=" + $( '#session_id' ).val();
-				//alert( url );
-				var resp = ajaxR( url_impresion_venta_origen );
+				//alert( "condicion 1" );
+//alert("tkt 1");
+				url_impresion_venta_actual = "../../../../touch_desarrollo/ajax/impresionTicket.php?idp=" + $( '#id_venta' ).val();//index.php?scr=ticket&
+				url_impresion_venta_actual += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
+				url_impresion_venta_actual += "&id_sesion_caja=" + $( '#session_id' ).val();
+				url_impresion_venta_actual += "&path=../../../../";
+//alert("origen : " + $( "#id_venta_origen" ).val());
+				if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null
+					){//&& parseInt( $( '#monto_total' ).val().trim() ) == 0 
+					//url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+					url_impresion_venta_origen = "../../../../touch_desarrollo/ajax/impresionTicket.php?idp=" + $( "#id_venta_origen" ).val();
+					url_impresion_venta_origen += "&reload_page=true";
+					url_impresion_venta_origen += "&path=../../../../";//agregamos indicador para imprimir segundo ticket por si falla api				
+					url_impresion_venta_origen += "&aditional_object_text=Ticket Origen ( Devolución )";
+
+					//alert( url_impresion_venta_origen);
+					url_impresion_venta_actual += "&reprint_initial_sale=true";
+				}else{
+					url_impresion_venta_actual += "&reload_page=true";
+				}
+				url_impresion_venta_actual += "&aditional_object_text=Ticket Actual";
+//alert( url );
+				var resp = ajaxR( url_impresion_venta_actual );
+//alert(resp);
+				if( resp.trim() != 'ok' ){
+					$( '.emergent_content' ).html( resp );
+					$( '.emergent' ).css( 'display', 'block' );
+					return false;
+				}
 			}
 			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null
 			&& parseInt( $( '#monto_total' ).val().trim() ) == 0 ){//alert('here');
-				//alert("tkt 2");
-				url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
-				resp = ajaxR( url );
-				console.log( resp );
-				alert( resp );
+				
+				alert("tkt 2");
+				
+				//url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+				//resp = ajaxR( url );
+				//console.log( resp );
+				//alert( resp );
+				imprimir_ticket_dependiente( true );
 			}
 		//}, 500 );
+	}
+	function imprimir_ticket_dependiente( reload = false ){
+
+		resp = ajaxR( url_impresion_venta_origen );
+		if( resp != 'ok' ){
+			$( '.emergent_content' ).html( resp );
+			$( '.emergent' ).css( 'display', 'block' );
+			return false;
+		}
+		if(reload){
+			location.reload();
+		}else{
+			return true;
+		}
 	}
 var cont_cheques_transferencia=0;
 	function agregar_fila(caja,monto,texto){
@@ -538,8 +580,9 @@ console.log( resp );
 					var aux=dat.split("|");
 					//alert(dat);return false;
 					carga_pedido( $( '#id_venta' ).val() );
-					imprimir_tickets();//impresion de tickets
-					location.reload();
+					if( imprimir_tickets() ){//impresion de tickets
+						location.reload();
+					}
 				}
 			});
 			//location.reload();
@@ -765,6 +808,8 @@ console.log( resp );
 		if( resp[0] != 'ok' ){
 			alert( "Error : \n" + resp );
 		}else{
+			
+			alert( resp[1] );
 			carga_pedido( $( '#id_venta' ).val() );
 			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
 				/*url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
@@ -773,7 +818,6 @@ console.log( resp );
 				alert( resp );*/
 				imprimir_tickets();
 			}
-			alert( resp[1] );
 			close_emergent();
 		}
 	}
