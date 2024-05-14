@@ -75,7 +75,7 @@
 		}
 
 		function crea_registros_sincronizacion_archivo_por_red_local( $id_modulo, $tipo, $nombre_ticket, $ruta_origen, $ruta_salida, $store_id, $user_id, $carpeta_path, 
-			$path = '../', $action_after = '' ){
+			$path = '../', $action_after = '', $aditional_object_text = '' ){
 		//consulta si tiene endpoint especifico local por usuario
 			$url_base = "";
 			$sql = "SELECT
@@ -113,7 +113,7 @@
 				$url = "http://localhost/{$carpeta_path}/rest/print/enviar_archivo_red_local";
 				$enviar_archivo = $this->sendPetition( $url, $post_data );
 				if( $enviar_archivo != "ok" ){
-					die( $this->build_error_view( $id, $store_id, $id_modulo, $path, $action_after, $carpeta_path ) );
+					die( $this->build_error_view( $id, $store_id, $id_modulo, $path, $action_after, $carpeta_path, $aditional_object_text ) );
 					//die( "Error al consumir el WebService en Red Local : {$enviar_archivo}|{$id}" );
 				}//die( "here_2" );
 				//die( "No hay APIS destino para este modulo. {$sql}" );
@@ -123,14 +123,18 @@
 			
 		}
 		
-		function build_error_view( $file_id, $store_id, $id_modulo, $path, $action_after, $carpeta_path ){
+		function build_error_view( $file_id, $store_id, $id_modulo, $path, $action_after, $carpeta_path, $aditional_object_text ){
 			$resp = "<div class=\"row\">
-				<div class=\"col-12 text-center\" style=\"font-size : 200% !important;\"><br>
-					<h2 class=\"text-danger\">Hubo un error al enviar el archivo por WebService, deseas volver a intentar?</h2>
+				<div class=\"col-12 text-center\" style=\"font-size : 200% !important;\"><br>";
+			if( $aditional_object_text != '' && $aditional_object_text != null ){
+				$resp .= "<h1 class=\"text-primary\">{$aditional_object_text}</h1>";
+			}	
+			$resp .= "<h2 class=\"text-danger\">Hubo un error al enviar el archivo por WebService, deseas volver a intentar?</h2>
 				</div>
 				<div class=\"col-6 text-end\"><br>
 					<button 
 						type=\"button\"
+						id=\"reenviar_archivo_ws_btn\"
 						class=\"btn btn-success\"
 						onclick=\"reenviar_archivo_ws( path = '../', {$file_id}, {$id_modulo} );\"
 					>
@@ -140,6 +144,7 @@
 				<div class=\"col-6 text-start\"><br>
 					<button 
 						type=\"button\"
+						id=\"enviar_archivo_carpeta_modulo_btn\"
 						class=\"btn btn-warning\"
 						onclick=\"enviar_archivo_carpeta_modulo( path = '../', {$file_id}, {$id_modulo} );\"
 					>
@@ -235,7 +240,7 @@
 			curl_setopt($crl, CURLOPT_POST, true);
 			curl_setopt($crl, CURLOPT_POSTFIELDS, $json);
 			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-		    curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+		    curl_setopt($crl, CURLOPT_TIMEOUT, 10);
 			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
 			  'Content-Type: application/json',
 			  'token: ' . $token)

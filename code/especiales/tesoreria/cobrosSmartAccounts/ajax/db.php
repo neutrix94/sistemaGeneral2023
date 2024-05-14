@@ -241,6 +241,9 @@
 				$authorization_number = ( isset( $_GET['authorization_number'] ) ? $_GET['authorization_number'] : $_POST['authorization_number'] );
 				$sale_id = ( isset( $_GET['sale_id'] ) ? $_GET['sale_id'] : $_POST['sale_id'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+
+				$is_per_error = ( isset( $_GET['is_per_error'] ) ? $_GET['is_per_error'] : $_POST['is_per_error'] );
+				
 				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
 				$id_devolucion_relacionada = 0;
 				if( isset( $_GET['id_devolucion_relacionada'] ) || isset( $_POST['id_devolucion_relacionada'] ) ){
@@ -256,7 +259,7 @@
 					$id_venta_origen = ( isset( $_GET['id_venta_origen'] ) ? $_GET['id_venta_origen'] : $_POST['id_venta_origen'] );
 				}
 
-				echo $Payments->setPaymentWhithouthIntegration( $afiliation_id, $ammount, $authorization_number, $sale_id, $session_id, $user_id, $pago_por_saldo_a_favor, $id_venta_origen, $id_devolucion_relacionada );
+				echo $Payments->setPaymentWhithouthIntegration( $afiliation_id, $ammount, $authorization_number, $is_per_error, $sale_id, $session_id, $user_id, $pago_por_saldo_a_favor, $id_venta_origen, $id_devolucion_relacionada );
 			break;
 
 			case 'getTicketsToReprint' :
@@ -290,14 +293,14 @@
 				echo $Payments->checkAfiliationSesion( $enabled, $session_terminal_id );
 			break;
 
-			case 'agregarAfiliacionSesion' :
+			/*case 'agregarAfiliacionSesion' :
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				$mannager_password = ( isset( $_GET['mannager_password'] ) ? $_GET['mannager_password'] : $_POST['mannager_password'] );
 				$id_afiliacion = ( isset( $_GET['id_afiliacion'] ) ? $_GET['id_afiliacion'] : $_POST['id_afiliacion'] );
 				$check_password = $Payments->check_mannager_password( $sucursal_id, $mannager_password );
 				$error = ( isset( $_GET['error'] ) ? $_GET['error'] : $_POST['error'] );
 				echo $Payments->agregarAfiliacionSesion( $session_id, $user_id, $id_afiliacion, $error );
-			break;
+			break;*/
 //afiliaciones
 			case 'obtenerListaAfiliaciones' :
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
@@ -315,13 +318,13 @@
 				echo $Payments->checkAfiliationSesion( $enabled, $session_terminal_id );
 			break;
 
-			case 'agregarAfiliacionSesion' :
+			case 'guardaAfiliacionSesion' :
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				$mannager_password = ( isset( $_GET['mannager_password'] ) ? $_GET['mannager_password'] : $_POST['mannager_password'] );
-				$id_afiliacion = ( isset( $_GET['id_afiliacion'] ) ? $_GET['id_afiliacion'] : $_POST['id_afiliacion'] );
+				$afiliaciones = ( isset( $_GET['afiliations'] ) ? $_GET['afiliations'] : $_POST['afiliations'] );
 				$check_password = $Payments->check_mannager_password( $sucursal_id, $mannager_password );
-				$error = ( isset( $_GET['error'] ) ? $_GET['error'] : $_POST['error'] );
-				echo $Payments->agregarAfiliacionSesion( $session_id, $user_id, $id_afiliacion, $error );
+				//$error = ( isset( $_GET['error'] ) ? $_GET['error'] : $_POST['error'] );
+				echo $Payments->guardaAfiliacionSesion( $session_id, $user_id, $afiliaciones );
 			break;
 	//terminales
 			case 'obtenerListaTerminales' :
@@ -515,7 +518,7 @@
 			die( 'ok|' );
 		}
 
-		public function setPaymentWhithouthIntegration( $afiliation_id, $ammount, $authorization_number, $sale_id, $session_id, $user_id, $pago_por_saldo_a_favor = 0, $id_venta_origen = 0, $id_devolucion_relacionada = 0 ){	
+		public function setPaymentWhithouthIntegration( $afiliation_id, $ammount, $authorization_number, $is_per_error, $sale_id, $session_id, $user_id, $pago_por_saldo_a_favor = 0, $id_venta_origen = 0, $id_devolucion_relacionada = 0 ){	
 			$this->link->autocommit( false );
 				if( $id_devolucion_relacionada > 0 ){
 					//die( "Entra en reinsertaPagosPorDevolucionCaso2" );
@@ -594,6 +597,14 @@
 				$sql = "UPDATE ec_pedidos SET pagado = 1 WHERE id_pedido = {$sale_id}";
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar la cabecera del pedido a pagada : {$this->link->error}" );
 			}
+			if( $is_per_error == 1 ){
+			//consulta el id de registro de afiliacion de la sesion de caja
+				$sql = "UPDATE ec_sesion_caja_afiliaciones 
+							SET habilitado = 0 
+						WHERE id_sesion_caja = {$session_id}
+						AND id_afiliacion = {$afiliation_id}";
+				$stm = $this->link->query( $sql ) or die( "Error al desahabilitar la afiliacion de sesion de caja por cobro unico {$this->link->error}" );		
+			}
 			$this->link->autocommit( true );
 			return "ok|Pago registrado exitosamente!";
 		}
@@ -601,14 +612,16 @@
 		public function seekTerminalByQr( $qr_txt, $sucursal_id, $session_id ){
 			$sql = "SELECT
 						a.id_afiliacion AS afiliation_id,
-						a.no_afiliacion AS afiliation_number
+						a.no_afiliacion AS afiliation_number,
+						sca.insertada_por_error_en_cobro AS is_per_error
 					FROM ec_afiliaciones a
 					LEFT JOIN ec_afiliacion_sucursal afs
 					ON a.id_afiliacion = afs.id_afiliacion
 					LEFT JOIN ec_sesion_caja_afiliaciones sca
 					ON sca.id_afiliacion = a.id_afiliacion
 					WHERE a.no_afiliacion = '{$qr_txt}'
-					AND sca.id_sesion_caja = {$session_id}";
+					AND sca.id_sesion_caja = {$session_id}
+					AND sca.habilitado=1";//AND( IF( sca.insertada_por_error_en_cobro = 1, sca.utilizada_en_error = 0, 1=1 ) )
 			$stm = $this->link->query( $sql ) or die( "Error al consultar la afiliacion en la sesion : {$this->link->error}" );
 			if( $stm->num_rows <= 0 ){
 				die( "La terminal '{$qr_txt}' no fue encontrada en la sesion de cajero actual, verifica y vuelve a intentar!" );
@@ -1583,24 +1596,41 @@
 					<tr>
 						<th class=\"text-center\">Terminal</th>
 						<th class=\"text-center\">Habilitada</th>
+						<th class=\"text-center\">Cobro<br>único</th>
 					</tr>
 				<thead>
-				<tbody>";
+				<tbody id=\"afiliations_table_body\">";
 			$sql = "SELECT
+						sca.id_sesion_caja_afiliaciones AS sesion_afiliation_id,
 						a.id_afiliacion AS afiliation_id,
 						a.no_afiliacion AS afiliation_number,
-						sca.habilitado AS enabled
+						sca.habilitado AS enabled,
+						sca.insertada_por_error_en_cobro AS is_per_error
 					FROM ec_sesion_caja_afiliaciones sca
 					LEFT JOIN ec_afiliaciones a
 					ON a.id_afiliacion = sca.id_afiliacion
 					WHERE sca.id_sesion_caja = {$session_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar afiliaciones de la sesion acual : {$this->link->error} {$sql}" );
+			$counter = 0;
 			while( $row = $stm->fetch_assoc() ){
 				$enabled = ( $row['enabled'] == 1 ? 'checked' : '');
+				$is_per_error = ( $row['is_per_error'] == 1 ? 'checked' : '');
+				$disabled = ( $row['is_per_error'] == 1 ? 'disabled' : '');
 				$resp .= "<tr>
-					<td class=\"text-center\">{$row['afiliation_number']}</td>
-					<td class=\"text-center\"><input type=\"checkbox\" {$enabled} onclick=\"checkTerminalSesion( this, {$row['afiliation_id']} );\"></td>
+					<td id=\"afiliation_0_{$counter}\"  class=\"text-center no_visible\">
+						{$row['sesion_afiliation_id']}
+					</td>
+					<td id=\"afiliation_1_{$counter}\" afiliation_id=\"{$row['afiliation_id']}\" class=\"text-center\">
+						{$row['afiliation_number']}
+					</td>
+					<td class=\"text-center\">
+						<input id=\"afiliation_2_{$counter}\" type=\"checkbox\" {$enabled} onclick=\"checkTerminalSesion( this, {$row['afiliation_id']} );\" {$disabled}>
+					</td>
+					<td class=\"text-center\">
+						<input id=\"afiliation_3_{$counter}\" type=\"checkbox\" {$is_per_error} onclick=\"checkTerminalError( this, {$row['afiliation_id']} );\">
+					</td>
 				</tr>";
+				$counter ++;
 			}
 			$resp .= "</tbody>
 			</table>";
@@ -1608,10 +1638,20 @@
 			return $resp;
 		}
 
-		public function agregarAfiliacionSesion( $session_id, $user_id, $afiliation_id, $es_error = 0 ){
-			$sql = "INSERT INTO ec_sesion_caja_afiliaciones ( id_sesion_caja, id_cajero, id_afiliacion, habilitado, insertada_por_error_en_cobro )
-			VALUES ( '{$session_id}', '{$user_id}', '{$afiliation_id}', 1, '{$es_error}' )";
-			$stm = $this->link->query( $sql ) or die( "Error al agregar afiliacion a la sesion de caja actual : {$this->link->error}" );
+		public function guardaAfiliacionSesion( $session_id, $user_id, $afiliations ){
+			$afiliations = explode( "|~|", $afiliations );
+			foreach ( $afiliations as $key => $afiliation ) {
+				$afiliation = explode( "|", $afiliation );
+				if( $afiliation[0] == '' || $afiliation[0] == null ){//si no tiene id de detalle
+					$sql = "INSERT INTO ec_sesion_caja_afiliaciones ( id_sesion_caja, id_cajero, id_afiliacion, habilitado, insertada_por_error_en_cobro )
+					VALUES ( '{$session_id}', '{$user_id}', '{$afiliation[1]}', '{$afiliation[2]}', '{$afiliation[3]}' )";//die( $sql );
+				}else{//si ya tiene id de detalle y es actulizacion
+					$sql = "UPDATE ec_sesion_caja_afiliaciones SET habilitado = {$afiliation[2]}, insertada_por_error_en_cobro = {$afiliation[3]} 
+					WHERE id_sesion_caja_afiliaciones = {$afiliation[0]}";
+				}
+				$stm = $this->link->query( $sql ) or die( "Error al agregar/ actualizar afiliacion a la sesion de caja actual : {$sql} : {$this->link->error}" );
+
+			}
 			return 'ok';
 		}
 

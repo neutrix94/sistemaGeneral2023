@@ -983,7 +983,7 @@
           if ($("#es_regalo").prop('checked'))
                 $("#divEspera").css ("display", "block");
       }
-
+var url_por_devolucion;
 	function guardarVenta (){
 //alert('entra enn venta');
         var es_apartado=$("#es_apartado").val();
@@ -1049,6 +1049,7 @@
 return false;*/
 		aux=res.split('|');
 		if(aux[0] == 'ok'){
+                //alert( 'here 1' );
 			var ax=aux[1].split(':');
 			$("#id_pedido").val(ax[1]);
 			retval = true;
@@ -1057,15 +1058,24 @@ return false;*/
 /**/
     //validamos que no sea devolución completa, si lo es ya no se reimprime el ticket
             if(es_dev_completa==0 && es_apartado==0){
-                url="../touch_desarrollo/ajax/ticket-php-head-reimpresion.php?id_ped="+id_pedido+"&id_dev="+aux[2];
-                var reimp=ajaxR(url);
-            }  
-
-            location.href=aux[3];            
+                url_por_devolucion = aux[3];
+//    alert( 'here 1.1' );
+                /*setTimeout( function(){
+                    url = `../touch_desarrollo/ajax/impresionTalonPago.php?idp=${id_pedido}&id_dev=${aux[2]}&redirect=devolucion_pp`;//;impresionTicket
+                    var reimp=ajaxR(url);
+                    alert( reimp );
+                    $( '#emergente_bloqueo' ).html( reimp );
+                    $( '#emergente_bloqueo' ).css( 'display', 'block' );
+                });
+                return false;*/
+                location.href=url_por_devolucion;   
+            }           
             return false;
-		}
-		else{
-			alert(aux);
+		}else{
+//    alert( 'here 2' );
+//alert(aux);
+            $( '#emergente_bloqueo' ).html( aux );
+            $( '#emergente_bloqueo' ).css( 'display', 'block' );
 			retval = false;
 		}
 			

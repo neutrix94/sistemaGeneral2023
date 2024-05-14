@@ -230,6 +230,11 @@
 		$( '.emergent' ).css( 'display', 'none' );
 	}
 
+	function close_emergent_2(){
+		$( '.emergent_content_2' ).html( '' );
+		$( '.emergent_2' ).css( 'display', 'none' );
+	}
+
 
 //obtener lista de terminales sin integracion
 	function getAfiliacionesForm(){
@@ -243,44 +248,78 @@
 				<div class="col-2"></div>
 				<div class="col-8">
 					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
-					<div class="input-group">
-						${resp}
-						<input type="checkbox" style="display:none">
-						Error : 
-						<label id="afiliacion_por_error" error="0" class="icon-toggle-off text-success fs-3" onclick="cambiar_check_error(this);"></label>
+					<div class="row">
+						<div class="col-9">${resp}</div>
+						<div class="col-3 text-center">	
+							<button type="button" class="btn btn-info" onclick="show_afiliations_info();">?</span>
+							<!--input type="checkbox" style="display:none">
+							Cobro único :
+							<p id="afiliacion_por_error" error="0" class="icon-toggle-off text-success fs-3 text-center" onclick="cambiar_check_error(this);"></p-->
+						</div>
 					</div>
-					<br>
-					<h2>Pide al encargado que ingrese su contraseña para continuar : </h2>
-					<input type="password" id="mannager_password" class="form-control">
 					<br>
 					<button class="btn btn-success form-control" onclick="agregarAfiliacionSesion();">
 						<i class="icon-plus">Agregar</i>
 					</button>
+					<br>
 					<h1>Afiliaciones activas : </h1>
 					${afiliaciones}
+					<div class="text-center">
+					<br>
+					<div id=\"afiliations_changes_container\" class=\"no_visible\">
+						<h2>Pide al encargado que ingrese su contraseña para continuar : </h2>
+						<input type="password" id="mannager_password" class="form-control">
+						<br>
+						<button class="btn btn-success form-control" onclick="saveAfiliationsChanges();">
+							<i class="icon-plus">Guardar Cambios</i>
+						</button>
+					</div>
 				</div>
 			</div>
+			
 		</div>`;
 		$( '.emergent_content' ).html( content );
 		$( '.emergent' ).css( 'display', 'block' );
 	}
 
-	function cambiar_check_error(obj){
-		var status = $( obj ).attr( 'error' );
-		if( status == 0 ){
-			$( obj ).attr( 'error', 1 );
-			$( obj ).removeClass( 'icon-toggle-off' );
-			$( obj ).removeClass( 'text-success' );
-			$( obj ).addClass( 'icon-toggle-on' );
-			$( obj ).addClass( 'text-danger' );
-		}else if( status == 1 ){
-			$( obj ).attr( 'error', 0 );
-			$( obj ).removeClass( 'icon-toggle-on' );
-			$( obj ).removeClass( 'text-danger' );
-			$( obj ).addClass( 'icon-toggle-off' );
-			$( obj ).addClass( 'text-success' );
-		}
+	function show_afiliations_info(){
+		var content = `<div class="row">
+			Se pueden agregar terminales
+			<button
+				type="button"
+				class="btn btn-success"
+				onclick="close_emergent_2();"
+			>
+				<i class="icon-ok-circled">Aceptar y cerrar</i>
+			</button>
+		</div>`;
+		$( '.emergent_content_2' ).html( content );
+		$( '.emergent_2' ).css( "display", "block" );
+	}
 
+	function checkTerminalError(obj){
+		if( $( obj ).prop( 'checked' ) == true ){
+			var tr = $(obj).parent().parent();	
+			$( tr ).children('td').each( function(index){
+				if( index == 2 ){
+					$( this ).children( 'input' ).each( function(index2){
+						$( this ).attr( 'disabled', true );
+						$( this ).attr( 'checked', true );
+					});
+				}
+			});
+		}else if( $( obj ).prop( 'checked' ) == false ){
+			var tr = $(obj).parent().parent();	
+			$( tr ).children('td').each( function(index){
+				if( index == 2 ){
+					$( this ).children( 'input' ).each( function(index2){
+						$( this ).attr( 'disabled', false );
+						$( this ).attr( 'checked', false );
+					});
+				}
+			});
+		}
+		$( '#afiliations_changes_container' ).removeClass( "no_visible" );
 	}
 
 //obtener lista de terminales con integracion
@@ -318,4 +357,22 @@
 		$(".emergent_content").html(`<button onclick="close_emergent();">X</button><br><pre><code class="json">${debug_json}</code></pre>`);
 		$(".emergent").css("display","block");
 		hljs.highlightAll();
+	}
+//creacion de fila en afiliaciones
+	function build_afiliation_row( afiliation_id, afiliation_description ){
+		var content = `<tr>
+			<td  class="text-center no_visible"></td>
+			<td class="text-center" afiliation_id="${afiliation_id}">
+				${afiliation_description}
+			</td>
+			<td class="text-center">
+				<input type="checkbox" checked>
+			</td>
+			<td class="text-center">
+				<input type="checkbox">
+			</td>
+		</tr>`;
+		return content;
+		//onclick="checkTerminalSesion( this, {$row['afiliation_id']} );
+		//onclick=\"checkTerminalError( this, {$row['afiliation_id']} );\"
 	}

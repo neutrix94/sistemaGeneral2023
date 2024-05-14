@@ -1758,19 +1758,26 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 				$aditional_message = "<h6>Esta pantalla te redireccionara a la url : {$url}</h6>"; 
 				$no_visible = "style=\"display : none;\"";
 			}
-			$resp = "ok|<div class=\"row\">
+			$response = array();
+			$response['status'] = 'ok';
+			$response['url'] = $url;
+			$response['ticket_has_changed'] = $ticket_has_changed;
+			$response['mensaje'] = "<div class=\"row\">
 						<p align=\"center\" style=\"color : green;\">Nota de venta validada exitosamente.
 						<br><b style=\"color : orange;\">Entrega los productos al cliente.</b></p>	
 						{$aditional_message}
 						<div class=\"col-2\"></div>
 						<div class=\"col-8 text-center\">
+						<!--
 							<button class=\"btn btn-success\" id=\"btn_reload_final\" {$no_visible} onclick=\"location.reload();\">
+								<i class=\"icon-ok-circle\">Aceptar</i>
+							</button-->
+							<button class=\"btn btn-success\" id=\"btn_reload_final\" onclick=\"print_return_ticket( '{$url}' );\">
 								<i class=\"icon-ok-circle\">Aceptar</i>
 							</button>
 						</div>
-					</div>|{$url}";
-
-			return $resp;
+					</div>";//{$url}
+			return json_encode( $response );
 		}
 
 		public function makeExhibitionMovements( $ticket_id, $store_id, $user_id ){
