@@ -98,7 +98,7 @@
 		<div style="position: relative; top : 120px; left: 90%; z-index:2; display:none;">
 			<button 
 				class="btn btn-danger"
-				onclick="close_emergent();"
+				onclick="close_emergent_2();"
 			>X</button>
 		</div>
 		<div class="emergent_content_2" tabindex="2"></div>
