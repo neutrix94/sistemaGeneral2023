@@ -209,33 +209,38 @@
 		$ids = '';
 	//elimina las medidas de proveedor producto
 		$sql_delete = "DELETE FROM ec_proveedor_producto_medidas WHERE id_proveedor_producto = {$product_provider_id}";
-		
+		//die( $meassures );
 		$meassures_array = explode( '|~|', $meassures );
 		foreach ( $meassures_array as $key => $meassure_array ) {
 			$meassure = explode( '~', $meassure_array );
 			if( $meassure[16] == 1 ){//si es un registro temporal
+			//echo $meassure_array;
 
 				//mueve las imágenes a la carpeta correspondiente
 				$tmp_counter = 1;
 				for( $i = 9; $i <= 11; $i ++ ){
 					$currentLocation = "../../../../../files/packs_img_tmp/{$meassure[$i]}";
-						$sql = "SELECT 
-								CONCAT(
-									REPLACE( codigo_barras_presentacion_cluces_1, ' ', '_' ),
-									'_',
-									DATE_FORMAT(NOW(), '%Y%m%d_%h%i%s_'),
-									'{$tmp_counter}'
-								) AS name
-							FROM ec_proveedor_producto
-							WHERE id_proveedor_producto = {$product_provider_id}";
-					$stm_img_name = $link->query( $sql ) or die( "Error al formar nombre de fotografía : {$link->error}");
-					$row_img_name = $stm_img_name->fetch_assoc();
-					$newLocation = "../../../../../files/packs_img/{$row_img_name['name']}";
-					$moved = rename($currentLocation, $newLocation);
-					if(!$moved){
-						return "No se pudo mover la imágen {$counter} de '{currentLocation}' a '{$newLocation}'";
+					if( file_exists( $currentLocation ) ){
+							$sql = "SELECT 
+									CONCAT(
+										REPLACE( codigo_barras_presentacion_cluces_1, ' ', '_' ),
+										'_',
+										DATE_FORMAT(NOW(), '%Y%m%d_%h%i%s_'),
+										'{$tmp_counter}.png'
+									) AS name
+								FROM ec_proveedor_producto
+								WHERE id_proveedor_producto = {$product_provider_id}";
+						$stm_img_name = $link->query( $sql ) or die( "Error al formar nombre de fotografía : {$link->error}");
+						$row_img_name = $stm_img_name->fetch_assoc();
+						$newLocation = "../../../../../files/packs_img/{$row_img_name['name']}";
+						$moved = rename($currentLocation, $newLocation);
+						if(!$moved){
+							return "No se pudo mover la imágen {$counter} de '{$currentLocation}' a '{$newLocation}'";
+						}
+						$meassure[$i] = $row_img_name['name'];
+					}else{
+						//die( "njo existe : {$currentLocation}" );
 					}
-					$meassure[$i] = $row_img_name['name'];
 					$tmp_counter ++;
 				}
 				$sql = "INSERT INTO ec_proveedor_producto_medidas (
