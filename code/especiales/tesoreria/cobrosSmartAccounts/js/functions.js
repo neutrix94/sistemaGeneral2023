@@ -383,43 +383,81 @@ hljs.highlightAll();
 			alert( "Error : " + resp );
 		}
 		if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
-			url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+			if( imprimir_tickets() == true ){
+				location.reload();
+			}
+			/*url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
 			resp = ajaxR( url );
 			console.log( resp );
-			alert( resp );
+			alert( resp );*/
 		}
-		return false;
-/*alert( url ); return false;
-	//obtenemos el valor de la caja
-		var id_caja=$("#caja_o_cuenta").val();
-		if(id_caja==0){
-			alert("Elija una cuenta valida!!!");
-			$("#caja_o_cuenta").focus();
+
+	}
+var url_impresion_venta_origen = '';
+var venta_origen_impresa = false;
+var url_impresion_venta_actual = '';
+var venta_actual_impresa = false;
+	function imprimir_tickets(){
+//alert( "imprimir_tickets" );
+		//setTimeout( function(){
+			if( parseInt( $( '#monto_total' ).val().trim() ) == 0 ){
+				//alert( "condicion 1" );
+//alert("tkt 1");
+				url_impresion_venta_actual = "../../../../touch_desarrollo/ajax/impresionTicket.php?idp=" + $( '#id_venta' ).val();//index.php?scr=ticket&
+				url_impresion_venta_actual += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
+				url_impresion_venta_actual += "&id_sesion_caja=" + $( '#session_id' ).val();
+				url_impresion_venta_actual += "&path=../../../../";
+//alert("origen : " + $( "#id_venta_origen" ).val());
+				if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null
+					){//&& parseInt( $( '#monto_total' ).val().trim() ) == 0 
+					//url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+					url_impresion_venta_origen = "../../../../touch_desarrollo/ajax/impresionTicket.php?idp=" + $( "#id_venta_origen" ).val();
+					url_impresion_venta_origen += "&reload_page=true";
+					url_impresion_venta_origen += "&path=../../../../";//agregamos indicador para imprimir segundo ticket por si falla api				
+					url_impresion_venta_origen += "&aditional_object_text=Ticket Origen ( Devolución )";
+
+					//alert( url_impresion_venta_origen);
+					url_impresion_venta_actual += "&reprint_initial_sale=true";
+				}else{
+					url_impresion_venta_actual += "&reload_page=true";
+				}
+				url_impresion_venta_actual += "&aditional_object_text=Ticket Actual";
+//alert( url );
+				var resp = ajaxR( url_impresion_venta_actual );
+//alert(resp);
+				if( resp.trim() != 'ok' ){
+					$( '.emergent_content' ).html( resp );
+					$( '.emergent' ).css( 'display', 'block' );
+					return false;
+				}
+			}
+			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null
+			&& parseInt( $( '#monto_total' ).val().trim() ) == 0 ){//alert('here');
+				
+				//alert("tkt 2");
+				
+				//url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+				//resp = ajaxR( url );
+				//console.log( resp );
+				//alert( resp );
+				return imprimir_ticket_dependiente( true );
+			}
+			return true;
+		//}, 500 );
+	}
+	function imprimir_ticket_dependiente( reload = false ){
+
+		resp = ajaxR( url_impresion_venta_origen );
+		if( resp != 'ok' ){
+			$( '.emergent_content' ).html( resp );
+			$( '.emergent' ).css( 'display', 'block' );
 			return false;
 		}
-		var txt_select=$('#caja_o_cuenta option:selected').text();
-		//alert(txt_select);
-	//obtenemos el monto
-		var monto=$("#monto_cheque_transferencia").val();
-		if(monto<=0){
-			alert("El monto no puede ir vacío!!!");
-			$("#monto_cheque_transferencia").focus();
-			return false;
+		if(reload){
+			location.reload();
+		}else{
+			return true;
 		}
-	//obtenemos la referencia
-		var observacion = `<p class="text-success" align="center">
-			Ingresa la referencia del Cheque/Transferencia</p>
-			<p align="center">
-				<textarea id="referencia_cheque_transferencia"></textarea>
-				<br><br>
-				<button 
-					class="btn btn-success" 
-					onclick="agregar_fila( ${id_caja}, ${monto}, '${txt_select}')">
-				Aceptar</button>
-			</p>`;
-		$(".emergent_content").html(observacion);
-		$(".emergent").css("display","block");
-		return true;*/
 	}
 var cont_cheques_transferencia=0;
 	function agregar_fila(caja,monto,texto){
@@ -449,6 +487,7 @@ var cont_cheques_transferencia=0;
 	}
 
 		function cobrar( amount_type, permission = false ){
+		//alert(`here : cobrar , ${amount_type}, ${permission}`);
 			var sale_id = $( '#id_venta' ).val();
 			var pago_efectivo =  parseFloat( $( '#efectivo' ).val() );
 			if( pago_efectivo == '' || pago_efectivo == null || pago_efectivo == 'undefined' ||  pago_efectivo == undefined ){
@@ -504,6 +543,10 @@ console.log( resp );
 				if( resp[0] != 'ok' ){
 					$( '.emergent_content' ).html( resp );
 					$( '.emergent' ).css( 'display', 'block' );
+					carga_pedido( $( '#id_venta' ).val() );
+					if( imprimir_tickets() == true ){
+						location.reload();
+					}
 					return false;
 				}
 			//}
@@ -514,6 +557,10 @@ console.log( resp );
 			if( resp[0] != 'ok' ){
 				$( '.emergent_content' ).html( resp );
 				$( '.emergent' ).css( 'display', 'block' );
+				carga_pedido( $( '#id_venta' ).val() );
+				if( imprimir_tickets() == true ){
+					location.reload();
+				}
 				return false;
 			}
 			//alert( resp );
@@ -521,19 +568,10 @@ console.log( resp );
 		//manda impresion del ticket
 			//var url = "ticket_pagos.php?id_pedido=" + $( '#id_venta' ).val();
 			//var resp = ajaxR( url );
-			url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( '#id_venta' ).val();
-			url += "&id_venta_origen=" + $( "#id_venta_origen" ).val();
-			url += "&id_sesion_caja=" + $( '#session_id' ).val();
-			//alert( url );
-			var resp = ajaxR( url );
 
-
-			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
-				url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
-				resp = ajaxR( url );
-				console.log( resp );
-				alert( resp );
-			}
+			//getHistoricPayment( $( '#id_venta' ).val() );
+			/*carga_pedido( $( '#id_venta' ).val() );
+			imprimir_tickets();//impresion de tickets*/
 			
 //alert( resp );
 			var id_corte = $( "#id_venta" ).val();
@@ -548,57 +586,14 @@ console.log( resp );
 				success:function(dat){
 					var aux=dat.split("|");
 					//alert(dat);return false;
-					location.reload();
+					carga_pedido( $( '#id_venta' ).val() );
+					if( imprimir_tickets() == true ){//impresion de tickets
+						location.reload();
+					}
 				}
 			});
 			//location.reload();
 			return false;
-/*			var id=$("#id_venta").val();
-			//alert(id);
-			if(id==0){
-				alert("Es necesario que seleccione un folio de pedido antes de continuar!!!");
-				$("#buscador").focus();
-			}
-			if(total_cobros!=monto_real){
-				alert("La suma de los pagos es diferente al monto total;\nverifique sus atos y vuelva a intentar!!!"+monto_real+"\n"+total_cobros);return false;
-			}
-			var cantidad_tarjetas=$("#cantidad_tarjetas").val();
-			var cantidad_cheque=$("#no_cheque_transferencia").val();
-			var id_corte=$("#id_venta").val();
-			var tarjetas='',cheques='',efectivo=0,cambio=0,recibido=0;
-		//extraemos los valores de las tarjetas
-			for(var i=1;i<=cantidad_tarjetas;i++){
-				if($("#t"+i).val()!=0){
-					tarjetas+=$("#tarjeta_"+i).val()+'~';//id de afiliacion
-					tarjetas+=$("#t"+i).val()+'°';//monto
-				}
-			}
-		//extraemos los valores de las tarjetas
-			for(var i=1;i<=cantidad_cheque;i++){
-				cheques+=$("#caja_"+i).html()+'~';//id de banco
-				cheques+=$("#monto_"+i).html()+'~';//monto
-				cheques+=$("#referencia_"+i).html()+'°';//monto
-			}
-//			alert(tarjetas+"\n"+cheques);
-		//efectivo
-			efectivo=$("#efectivo").val();
-
-			cambio=$("#efectivo_devolver").val();
-			recibido=$("#efectivo_recibido").val();
-		//	alert(cambio);
-		//enviamos datos por ajax
-			$.ajax({
-				type:'post',
-				url:'cobrosBd.php',
-				cache:false,
-				data:{flag:'cobrar',efe:efectivo,camb:cambio,recib:recibido,tar:tarjetas,chq:cheques,
-				id_venta:id_corte, session_id : $( '#session_id' ).val() },
-				success:function(dat){
-					var aux=dat.split("|");
-					alert(dat);return false;
-					location.reload();
-				}
-			});*/
 		}
 /*funcion para agregar pagos con tarjeta*/
 	function addPaymetCard( user_id ){
@@ -682,7 +677,7 @@ console.log( resp );
 			<div>
 			<br>
 			Tarjeta : 
-			<select class="form-select" id="afiliation_select_tmp">
+			<select class="form-select" id="afiliation_select_tmp" is_error="${terminal.is_per_error}">
 				<option value="${terminal.afiliation_id}">${terminal.afiliation_number}</option>
 			</select>
 			<div>
@@ -753,18 +748,23 @@ console.log( resp );
 				$( '.emergent' ).css( 'display', 'block' );
 				return false;
 			}else{
-
-				if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
-					url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
-					resp = ajaxR( url );
-					console.log( resp );
-					alert( resp );
+				carga_pedido( $( '#id_venta' ).val() );
+				//getHistoricPayment( $( '#id_venta' ).val() );
+				if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null 
+				&& parseInt( $( '#monto_total' ).val().trim() ) == 0 ){
+					setTimeout( function(){
+						if( imprimir_tickets() == true ){
+							location.reload();
+						}
+						/*url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+						resp = ajaxR( url );
+						console.log( resp );*/
+						alert( resp );
+					}, 1000);
 				}
 
 			//recarga vista de cobros
 				$( '#efectivo' ).val( '' );
-				carga_pedido( $( '#id_venta' ).val() );
-				getHistoricPayment( $( '#id_venta' ).val() );
 				var content = `<div class="text-center">
 					<h2 class="text-success">Pago registrado exitosamente</h2>
 					<button
@@ -802,6 +802,7 @@ console.log( resp );
 		var url = "ajax/db.php?fl=setPaymentWhithouthIntegration&afiliation_id=" + afiliation_id;
 		url += "&ammount=" + ammount + "&authorization_number=" + authorization_number;
 		url += "&sale_id=" + $( '#id_venta' ).val() + "&session_id=" + $( '#session_id' ).val();
+		url += "&is_per_error=" + $( '#afiliation_select_tmp' ).attr( "is_error" );
 		if( respuesta.monto_saldo_a_favor > parseFloat( respuesta.total_real ) ){//tomar saldo a
 			url += "&pago_por_saldo_a_favor=" + parseFloat( respuesta.total_real );
 		}
@@ -816,14 +817,18 @@ console.log( resp );
 		if( resp[0] != 'ok' ){
 			alert( "Error : \n" + resp );
 		}else{
+			
+			alert( resp[1] );
+			carga_pedido( $( '#id_venta' ).val() );
 			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
-				url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+				/*url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
 				resp = ajaxR( url );
 				console.log( resp );
-				alert( resp );
+				alert( resp );*/
+				if( imprimir_tickets() == true ){
+					location.reload();
+				}
 			}
-			carga_pedido( $( '#id_venta' ).val() );
-			alert( resp[1] );
 			close_emergent();
 		}
 	}
@@ -844,27 +849,74 @@ console.log( resp );
 
 //agregar afiliacion 
 	function agregarAfiliacionSesion(){
-		var session_id = $( '#session_id' ).val();
-		var password = $( '#mannager_password' ).val();
+	//saca lista de afiliaciones actuales
+		var curent_afiliations_tmp = new Array();
+		$( '#afiliations_table_body tr' ).each( function ( index ) {
+			$( this ).children( 'td' ).each( function( index2 ){
+				if( index2 == 1 ){
+					curent_afiliations_tmp.push( $( this ).attr( 'afiliation_id' ) );
+				}
+			});
+		});
+		//console.log( curent_afiliations_tmp );
 		var afiliation_id = $( '#afiliacion_combo_tmp' ).val();
 		if( afiliation_id == '' || afiliation_id == null || afiliation_id == 0 || afiliation_id == '0' ){
 			alert( "Pimero elije una afiliación válida!" );
 			return false;
-		}	
+		}
+		if( curent_afiliations_tmp.indexOf( afiliation_id ) != -1 ){
+			alert( "Esta terminal ya existe y no puede ser agregada nuevamente!" );
+			return false;
+		}
+		var afiliation_description = $( '#afiliacion_combo_tmp option:selected' ).text();
+		var new_row = build_afiliation_row( afiliation_id, afiliation_description );
+
+		$( '#afiliations_table_body' ).append( new_row );
+		$( '#afiliations_changes_container' ).removeClass( 'no_visible' );
+	}
+
+	function saveAfiliationsChanges(){
+	//recolecta los valores
+		var afiliations = '';
+		$( '#afiliations_table_body tr' ).each( function ( index ) {
+			if( index > 0 ){
+				afiliations += '|~|';
+			}
+			$( this ).children( 'td' ).each( function( index2 ){
+				if( index2 == 0 ){
+					afiliations += $( this ).html().trim() + '|';//id_afiliacion
+				}else if( index2 == 1 ){
+					afiliations += $( this ).attr( 'afiliation_id' ) + '|';//id 
+				}else if ( index2 == 2 || index2 == 3 ){
+					var tmp ='0';
+					$( this ).children( 'input' ).each( function( index3 ){
+						if( index3 == 0 ){
+							if( $( this ).prop( "checked" ) == true ){
+								tmp = '1';
+							}
+							afiliations += tmp + '|';
+						}
+					});
+				}
+			});
+		});
+		//alert( afiliations );return false;
+		var password = $( '#mannager_password' ).val();
+		var afiliation_id = $( '#afiliacion_combo_tmp' ).val();
 		if( password.length <= 0 ){
 			alert( "La contraseña del encargado no puede ir vacía!" );
 			return false;
 		}
-		var url = "ajax/db.php?fl=agregarAfiliacionSesion&session_id=" + session_id;
+		var session_id = $( '#session_id' ).val();
+		var url = "ajax/db.php?fl=guardaAfiliacionSesion&session_id=" + session_id;
 		url += "&mannager_password=" + password;
-		url += "&id_afiliacion=" + afiliation_id;
-		url += "&error=" + $( '#afiliacion_por_error' ).attr( "error" );
-		alert( url );
+		url += "&afiliations=" + afiliations;
+		//alert( url );return false;
 		var resp = ajaxR( url );
 		if( resp != 'ok' ){
 			alert( resp );
 		}else{
-			alert( "Afiliacion agregada exitosamente." );
+			alert( "Cambios guardados exitosamente." );
 			getAfiliacionesForm();//recarga emergente de afiliaciones
 		}
 	}
@@ -906,14 +958,15 @@ console.log( resp );
 	}
 
 	function checkTerminalSesion( obj, session_terminal_id ){
-		var enabled = 1;
+		/*var enabled = 1;
 		//var session_id = $( '#session_id' ).val();
 		if( ! $(obj).prop('checked') ){
 			enabled = 0;
 		}	
 		var url = 'ajax/db.php?fl=checkTerminalSesion&enabled=' + enabled + '&session_terminal_id=' + session_terminal_id;
 		//alert( url );
-		alert( ajaxR( url ) );
+		alert( ajaxR( url ) );*/
+		$( '#afiliations_changes_container' ).removeClass( "no_visible" );
 		return false;
 	}
 

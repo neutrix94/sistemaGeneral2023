@@ -92,11 +92,12 @@
 
     <button 
       class="btn btn-primary"
-      style="position:absolute;top:190px !important;right:2%; padding : 10px;"
+      style="position:absolute;top:190px !important;right:2%; padding : 10px; width : 42%;"
       onclick="window.open('../../pagina/productos.php');"
     >
       <i class="icon-book-open">Catálogo</i>
     </button>
+
 <?php
 /*if($perfil_usuario==7){*/
   $sql="SELECT IF(p.ver=1 OR p.modificar=1,1,0) 
@@ -117,13 +118,20 @@
    // die('here');
     if($r_c[0]==1){*/
 ?>
-    <p align="center" class="pqt" style="top:70%;" onclick="location.href='../code/especiales/tesoreria/cobros/index.php?';">
-      <img src="img/cobros.png" height="70%" width="70%" title="ingresae para cobrar ventas">
+    <button
+      class="btn btn-success"
+      onclick="location.href='../code/especiales/tesoreria/cobros/index.php?';" 
+      style="position:absolute;top:260px !important;right:2%; padding : 10px; width:42%;"
+      title="ingresa para cobrar ventas"
+    >
+      <i class="icon-money">Cobrar</i>
+    <!--img src="img/cobros.png" height="70%" width="70%"-->
+    </button>
+    <!--p align="center" class="pqt" style="top:70%;" >
       <br>Cobrar
-    </p>
+    </p-->
 <?php
-//  }
-}
+  }
 ?>
 </div>
 <style type="text/css">

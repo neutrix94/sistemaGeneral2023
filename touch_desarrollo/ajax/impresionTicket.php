@@ -828,7 +828,25 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 				$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo('pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
     		}else{//impresion por red local
                 $after_function = '';
-				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 5, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path, $after_function );
+				$relative_path = '../';
+				$aditional_object_text = '';
+				if( isset( $_GET['reprint_initial_sale'] ) ){
+					$after_function = "imprimir_ticket_dependiente( true );";
+				}
+				if( isset($_GET['reload_page']) ){
+					$after_function = "location.reload();";
+				}
+				if( isset( $_GET['path'] ) ){
+					$relative_path = $_GET['path'];
+				}
+				if( isset( $_GET['aditional_object_text'] ) ){
+					$aditional_object_text = $_GET['aditional_object_text'];
+				}
+				//die( "carpeta path : {$carpeta_path}" );
+//$id_modulo, $tipo, $nombre_ticket, $ruta_origen, $ruta_salida, $store_id, $user_id, $carpeta_path, 
+//$path = '../', $action_after = '' 
+				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 5, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path,
+				$relative_path, $after_function, $aditional_object_text );
 			}
 	    	if( $special_products > 0 ){
 		    	$ticket = null;
@@ -885,7 +903,8 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 /*Fin de cambio Oscar 07.03.2019*/
        	
       //deshabilitado por Oscare 2023/10/12 para no redireccionar	header ("location: index.php?scr=evaluation"); 
-    }
+    	die( 'ok' );
+	}
 		
 	exit (0);
 
