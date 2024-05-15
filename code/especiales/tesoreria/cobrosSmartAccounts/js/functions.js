@@ -538,9 +538,10 @@ var cont_cheques_transferencia=0;
 				}
 //alert( url ); return false;
 				var resp = ajaxR( url ).split( '|' );
-console.log( resp );
+//console.log( resp );return false;
 //alert( resp );
 				if( resp[0] != 'ok' ){
+//alert("entra 1");
 					$( '.emergent_content' ).html( resp );
 					$( '.emergent' ).css( 'display', 'block' );
 					carga_pedido( $( '#id_venta' ).val() );
@@ -555,6 +556,7 @@ console.log( resp );
 			//alert( url );
 			var resp = ajaxR( url ).split( '|' );
 			if( resp[0] != 'ok' ){
+//alert("entra 2");
 				$( '.emergent_content' ).html( resp );
 				$( '.emergent' ).css( 'display', 'block' );
 				carga_pedido( $( '#id_venta' ).val() );
@@ -584,12 +586,15 @@ console.log( resp );
 					id_venta:id_corte, 
 					session_id : $( '#session_id' ).val() },
 				success:function(dat){
+//alert("entra 3");
 					var aux=dat.split("|");
 					//alert(dat);return false;
 					carga_pedido( $( '#id_venta' ).val() );
-					if( imprimir_tickets() == true ){//impresion de tickets
-						location.reload();
-					}
+					setTimeout( function(){
+						if( imprimir_tickets() == true ){//impresion de tickets
+							location.reload();
+						}
+					}, 100);
 				}
 			});
 			//location.reload();
