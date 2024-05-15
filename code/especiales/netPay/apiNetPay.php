@@ -141,7 +141,7 @@
 
 		public function insertNetPetitionRow( $user_id, $store_id, $terminal_id, $store_id_netpay ){
 		//consulta token
-			$sql = "SELECT token FROM api_token WHERE id_user=0 and expired_in > now() limit 1";
+			$sql = "SELECT token FROM api_token WHERE id_user=-1 and expired_in > now() limit 1";
 			$stm = $this->link->query($sql) or die( "Error al consultar el token : {$this->link->error}" );
 			$respuesta = $stm->fetch_assoc();
 			$token = $respuesta['token'];
@@ -180,7 +180,8 @@
 			$result = json_decode( $response );//json_encode(),
 			//var_dump($result);
 			if( $result->status != '200' && $result->status != 200 ){
-				die( "Error al consumir API para insertar peticion de netPay en servidor linea : " . $result->message );
+				var_dump( $result );
+				die( "Error al consumir API para insertar peticion de netPay en servidor linea : {$path_api}" . $result->message );
 			}
 			$folio_transaccion = $result->folio_unico_transaccion;
 			$sql = "INSERT INTO vf_transacciones_netpay ( folio_unico, id_cajero, id_sucursal, terminalId, store_id_netpay ) 
