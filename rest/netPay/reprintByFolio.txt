@@ -1,1 +1,1 @@
-{"serialNumber":"","orderId":"","folioId":"24LNA34","storeId":"","isSmartAccounts":true,"disablePrintAnimation":true}
+{"serialNumber":"1494113054","orderId":"","folioId":"24LNA_TNP_77","storeId":"0","isSmartAccounts":true,"disablePrintAnimation":true}
