@@ -58,6 +58,7 @@
 	var global_meassures_path_camera_plugin = '../../../';
 	var global_save_meassure_img_path = '../../recepcionBodega/';
 	var global_save_meassure_type = 1;
+	var global_save_meassure_path = '.';
 </script>
 
 </head>

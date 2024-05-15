@@ -166,10 +166,9 @@ function quitar_fila( num, type = null ){
 		document.getElementById("10_"+num).checked=true;
 	//lanza emergente de opciones de fila
 	}else if( type == 'measure' ){
-		url = "ajax/getProductProvider.php";
+		url = `${global_save_meassure_path}/ajax/getProductProvider.php`;
 		flag = 'deleteMeasure';
 		delete_id = $( '#measures_1_' + num ).html().trim();
-		alert( delete_id );
 		remove_prefix = "#measure_row_";
 		if( $( '#measures_18_' + num ).html().trim() == 1 ){
 			is_tmp = 1;
