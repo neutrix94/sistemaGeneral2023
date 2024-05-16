@@ -937,14 +937,7 @@ alert("entra 3");
 	}
 
 	function checkAfiliationSesion( obj, session_terminal_id ){
-		var enabled = 1;
-		//var session_id = $( '#session_id' ).val();
-		if( ! $(obj).prop('checked') ){
-			enabled = 0;
-		}	
-		var url = 'ajax/db.php?fl=checkAfiliationSesion&enabled=' + enabled + '&session_terminal_id=' + session_terminal_id;
-		alert( url );
-		alert( ajaxR( url ) );
+		$( '#afiliations_changes_container' ).removeClass( "no_visible" );
 		return false;
 	}
 //agregar afiliacion 
@@ -973,15 +966,14 @@ alert("entra 3");
 	}
 
 	function checkTerminalSesion( obj, session_terminal_id ){
-		/*var enabled = 1;
+		var enabled = 1;
 		//var session_id = $( '#session_id' ).val();
 		if( ! $(obj).prop('checked') ){
 			enabled = 0;
 		}	
 		var url = 'ajax/db.php?fl=checkTerminalSesion&enabled=' + enabled + '&session_terminal_id=' + session_terminal_id;
 		//alert( url );
-		alert( ajaxR( url ) );*/
-		$( '#afiliations_changes_container' ).removeClass( "no_visible" );
+		alert( ajaxR( url ) );
 		return false;
 	}
 

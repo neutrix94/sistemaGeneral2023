@@ -1360,6 +1360,9 @@
 			$resp .= "<tr id=\"card_payment_row_{$c}\">
 				<td class=\"col-5\">
 					<select id=\"tarjeta_{$c}\" class=\"form-select\">";
+			if( $stm->num_rows > 1 ){
+				$resp .= "<option vlaue=\"0\">--Seleccionar--</option>";
+			}
 			while($r = $stm->fetch_assoc() ){
 					$resp .= "<option value=\"{$r['afiliation_id']}\">{$r['afiliation_number']}</option>";
 			}
@@ -1624,7 +1627,7 @@
 						{$row['afiliation_number']}
 					</td>
 					<td class=\"text-center\">
-						<input id=\"afiliation_2_{$counter}\" type=\"checkbox\" {$enabled} onclick=\"checkTerminalSesion( this, {$row['afiliation_id']} );\" {$disabled}>
+						<input id=\"afiliation_2_{$counter}\" type=\"checkbox\" {$enabled} onclick=\"checkAfiliationSesion( this, {$row['afiliation_id']} );\" {$disabled}>
 					</td>
 					<td class=\"text-center\">
 						<input id=\"afiliation_3_{$counter}\" type=\"checkbox\" {$is_per_error} onclick=\"checkTerminalError( this, {$row['afiliation_id']} );\">
