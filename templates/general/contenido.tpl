@@ -2264,10 +2264,9 @@
 <!-- Implementacion Oscar 2024-26-01 -->
 							if (nomGrid == 'UsersPrintsModules'){
 								var validation = UsersPrintsModulesValidation();
-								if( UsersPrintsModulesValidation != true ){
-									alert( validation );
+								if( ! validation ){
 									$( '#emerge' ).css( 'display', 'none' );
-									//return false;
+									return false;
 								}
 								//alert( 'here' );
 							}
