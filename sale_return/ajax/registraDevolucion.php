@@ -162,7 +162,7 @@
         if($i==0&&$num_internos>0||$i==1&&$num_externos>0){
             $insMov="INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal,
             fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, 
-            status_agrupacion, ultima_sincronizacion, ultima_actualizacion, id_pantalla ) 
+            status_agrupacion, ultima_sincronizacion, ultima_actualizacion ) 
             VALUES(null,'12','$user_id','$user_sucursal',now(),now(),'DEVOLUCION $fol_dev',-1,-1,'',-1,-1,";
             if($i==0){
                 $insMov.=$id_almacen_principal;
