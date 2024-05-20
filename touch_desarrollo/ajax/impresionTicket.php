@@ -8,6 +8,7 @@
 /*implementación Oscar 25.01.2019 para sacar rutas de tickets*/
 	$archivo_path = "../../conexion_inicial.txt";
 	$carpeta_path = "";
+	$espacio_ticket_dia_siguiente = 0;
 	if(file_exists($archivo_path)){
 		$file = fopen($archivo_path,"r");
 		$line=fgets($file);
@@ -279,6 +280,9 @@ Fin de cambio Oscar 25.06.2019*/
 		/*fin de cambio 10.10.2018*/	
 		}
 		mysql_free_result($rs);
+		if( $special_products > 0 ){
+			$espacio_ticket_dia_siguiente = 80 + ( $special_products * 20 );
+		}
 	}
 	
 	$cs = "SELECT CONCAT(PP.fecha,' ',TP.nombre,'(pagos)') as nombre, sum(monto) as monto FROM ec_pedido_pagos PP
@@ -358,7 +362,7 @@ Fin de cambio Oscar 25.06.2019*/
 	}
 	
 	//+40+130
-	$ticket = new TicketPDF("P", "mm", array(80,50+$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
+	$ticket = new TicketPDF("P", "mm", array(80,$espacio_ticket_dia_siguiente+50+$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
 	
@@ -795,6 +799,11 @@ $ticket->SetXY(5, $ticket->GetY()+4);
     }else if ( $pagado == 1 ){//implementacion Oscar 2024-04-26 para no imprimir 
 		//deshabilitado por Oscar 2024-05-01 die('La nota no ah sido liquidada y no saldra el ticket de productos.');
 	}
+
+	if( $special_products > 0 ){
+		//$ticket = null;
+		include( 'ticket_dia_siguiente.php' );
+	}
 /*fin de cambio Oscar 2023/10/12*/
     if($printPan == 1) {
     	ob_end_clean();
@@ -823,6 +832,7 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 				$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $user_sucursal, 5 );//ticket de impresion
 			}
 	    	$ticket->Output( "../../{$ruta_salida}/{$nombre_ticket}", "F" );
+
         /*Sincronización remota de tickets*/
     		if( $user_tipo_sistema == 'linea' ){/*registro sincronizacion impresion remota*/
 				$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo('pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
@@ -848,10 +858,6 @@ $ticket->SetXY(5, $ticket->GetY()+4);
 				$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 5, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path,
 				$relative_path, $after_function, $aditional_object_text );
 			}
-	    	if( $special_products > 0 ){
-		    	$ticket = null;
-	    		include( 'ajax/ticket_dia_siguiente.php' );
-	    	}
     /*fin de cambio Oscar 25.01.2019*/
     	}//fin de for $cont
     	//die( "here" );
