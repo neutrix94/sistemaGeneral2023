@@ -169,7 +169,7 @@
             }else if($i==1){
                 $insMov.=$id_almacen_externo;
             }
-            $insMov.=",-1,null,now(),15)";
+            $insMov.=",-1,null,now() )";
             $eje=mysql_query($insMov)or die("Error al insertar el encabezado de movimiento de almacén con entrada por devolución2....".$insMov.mysql_error());
             if($i==0){
                 $id_nvo_mov_int=mysql_insert_id();//capturamos el id asignado al movimiento de devolución
