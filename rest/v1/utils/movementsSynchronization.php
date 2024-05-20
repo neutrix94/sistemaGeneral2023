@@ -113,11 +113,11 @@ fwrite($file, "{$sql}\n" );
 
 if( $is_valid == true ){
 				$sql = "INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, 
-				id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, status_agrupacion, folio_unico, insertado_por_sincronizacion, sincronizar, id_pantalla )
+				id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, status_agrupacion, folio_unico, insertado_por_sincronizacion, sincronizar )
 				VALUES ( NULL, {$movement['id_tipo_movimiento']}, {$movement['id_usuario']}, {$movement['id_sucursal']}, '{$movement['fecha']}', '{$movement['hora']}', 
 				'{$movement['observaciones']} \nInsertado desde API por sincronización', -1, 
 				'-1', '{$movement['lote']}', '{$movement['id_maquila']}', '{$movement['id_transferencia']}', 
-				'{$movement['id_almacen']}', '{$movement['status_agrupacion']}', '{$movement['folio_unico']}', '1', '1', -1)";
+				'{$movement['id_almacen']}', '{$movement['status_agrupacion']}', '{$movement['folio_unico']}', '1', '1' )";
 fwrite($file, "{$sql}\n");
 			//reemplazamiento de comillas en consultas
 				$sql = str_replace( "'(", "(", $sql );
