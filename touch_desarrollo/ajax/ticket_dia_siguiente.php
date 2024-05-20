@@ -153,20 +153,54 @@
 /*fin de cambio 06.09.2018*/
 	
 	//+40+130
-	$ticket = new TicketPDF("P", "mm", array(80,$lineas_dev+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
-	$ticket->AliasNbPages();
-	$ticket->AddPage();
+	//$ticket = new TicketPDF("P", "mm", array(80,$lineas_dev+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
+	//$ticket->AliasNbPages();
+	//$ticket->AddPage();
 	
 	$bF=10;
 
 	$ticket->SetXY(5, $ticket->GetY()+50);
-	$ticket->Cell(66, 3, "", "TB" ,0, "C");
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(10, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(15, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(20, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(25, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(30, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(35, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(40, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(45, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(50, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(55, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(60, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(65, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(70, $ticket->GetY());
+	$ticket->Cell(3, .2, "", "TB" ,0, "L");
+	$ticket->SetXY(75, $ticket->GetY());
+	$ticket->Cell(1.5, .2, "", "TB" ,0, "L");
+
+	$ticket->SetFont('Arial','',$bF-2);
+	$ticket->SetXY(5, $ticket->GetY()+2);
+	$ticket->MultiCell(66, 4, utf8_decode("Recortar"), "", "C", false);
 	
 
 $ticket->SetFont('Arial','',$bF-2);
-$ticket->SetXY(5, $ticket->GetY()+4);
-//$ticket->MultiCell(66, 6, utf8_decode('datos:'.$datos_fiscales), "" ,0, "C");
-$ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
+/*Deshabiltado por Oscar 2024-05-20*/
+	//$ticket->SetXY(5, $ticket->GetY()+4);
+	//$ticket->MultiCell(66, 6, utf8_decode('datos:'.$datos_fiscales), "" ,0, "C");
+	//$ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
+/*Oscar 2024-05-20*/
 	
 	$ticket->SetFont('Arial','',$bF+2);
 	
@@ -277,7 +311,7 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
     	$ticket->Image("../img/codigos_barra/".$folio.".png", 15, $ticket->GetY()+5,46);
     }
     */
-    $nombre_ticket="ticket_".$user_sucursal."_" . date("YmdHis") . "_" . strtolower($tipofolio) . "_" . $folio . "_nex_day_.pdf";
-   	$ticket->Output("../cache/ticket/".$nombre_ticket, "F");
+  //  $nombre_ticket="ticket_".$user_sucursal."_" . date("YmdHis") . "_" . strtolower($tipofolio) . "_" . $folio . "_nex_day_.pdf";
+  // 	$ticket->Output("../cache/ticket/".$nombre_ticket, "F");
 		
 ?>

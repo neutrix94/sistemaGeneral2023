@@ -545,7 +545,7 @@ var cont_cheques_transferencia=0;
 //console.log( resp );return false;
 //alert( resp );
 				if( resp[0] != 'ok' ){
-alert("entra 1");
+//alert("entra 1");
 					$( '.emergent_content' ).html( resp );
 					$( '.emergent' ).css( 'display', 'block' );
 					carga_pedido( $( '#id_venta' ).val() );
@@ -562,7 +562,7 @@ alert("entra 1");
 			//alert( url );
 			var resp = ajaxR( url ).split( '|' );
 			if( resp[0] != 'ok' ){
-alert("entra 2");
+//alert("entra 2");
 				$( '.emergent_content' ).html( resp );
 				$( '.emergent' ).css( 'display', 'block' );
 				carga_pedido( $( '#id_venta' ).val() );			
@@ -594,7 +594,7 @@ alert("entra 2");
 					id_venta:id_corte, 
 					session_id : $( '#session_id' ).val() },
 				success:function(dat){
-alert("entra 3");
+//alert("entra 3");
 					var aux=dat.split("|");
 					//alert(dat);return false;
 					carga_pedido( $( '#id_venta' ).val() );
