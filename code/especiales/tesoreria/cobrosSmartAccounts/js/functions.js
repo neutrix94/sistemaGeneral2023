@@ -382,15 +382,19 @@ hljs.highlightAll();
 		}else{
 			alert( "Error : " + resp );
 		}
-		if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
-			if( imprimir_tickets() == true ){
-				location.reload();
+			
+		setTimeout( function(){
+			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
+				if( imprimir_tickets() == true ){
+					location.reload();
+				}
 			}
+		}, 100);
 			/*url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
 			resp = ajaxR( url );
 			console.log( resp );
 			alert( resp );*/
-		}
+		
 
 	}
 var url_impresion_venta_origen = '';
@@ -538,15 +542,18 @@ var cont_cheques_transferencia=0;
 				}
 //alert( url ); return false;
 				var resp = ajaxR( url ).split( '|' );
-console.log( resp );
+//console.log( resp );return false;
 //alert( resp );
 				if( resp[0] != 'ok' ){
+alert("entra 1");
 					$( '.emergent_content' ).html( resp );
 					$( '.emergent' ).css( 'display', 'block' );
 					carga_pedido( $( '#id_venta' ).val() );
-					if( imprimir_tickets() == true ){
-						location.reload();
-					}
+					setTimeout( function(){
+						if( imprimir_tickets() == true ){
+							location.reload();
+						}
+					}, 100 );
 					return false;
 				}
 			//}
@@ -555,12 +562,15 @@ console.log( resp );
 			//alert( url );
 			var resp = ajaxR( url ).split( '|' );
 			if( resp[0] != 'ok' ){
+alert("entra 2");
 				$( '.emergent_content' ).html( resp );
 				$( '.emergent' ).css( 'display', 'block' );
-				carga_pedido( $( '#id_venta' ).val() );
-				if( imprimir_tickets() == true ){
-					location.reload();
-				}
+				carga_pedido( $( '#id_venta' ).val() );			
+				setTimeout( function(){
+					if( imprimir_tickets() == true ){
+						location.reload();
+					}
+				}, 100 );
 				return false;
 			}
 			//alert( resp );
@@ -584,12 +594,15 @@ console.log( resp );
 					id_venta:id_corte, 
 					session_id : $( '#session_id' ).val() },
 				success:function(dat){
+alert("entra 3");
 					var aux=dat.split("|");
 					//alert(dat);return false;
 					carga_pedido( $( '#id_venta' ).val() );
-					if( imprimir_tickets() == true ){//impresion de tickets
-						location.reload();
-					}
+					setTimeout( function(){
+						if( imprimir_tickets() == true ){//impresion de tickets
+							location.reload();
+						}
+					}, 100);
 				}
 			});
 			//location.reload();
@@ -749,6 +762,7 @@ console.log( resp );
 				return false;
 			}else{
 				carga_pedido( $( '#id_venta' ).val() );
+				alert( resp );
 				//getHistoricPayment( $( '#id_venta' ).val() );
 				if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null 
 				&& parseInt( $( '#monto_total' ).val().trim() ) == 0 ){
@@ -759,7 +773,6 @@ console.log( resp );
 						/*url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
 						resp = ajaxR( url );
 						console.log( resp );*/
-						alert( resp );
 					}, 1000);
 				}
 
@@ -820,15 +833,17 @@ console.log( resp );
 			
 			alert( resp[1] );
 			carga_pedido( $( '#id_venta' ).val() );
-			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
-				/*url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
-				resp = ajaxR( url );
-				console.log( resp );
-				alert( resp );*/
-				if( imprimir_tickets() == true ){
-					location.reload();
+			setTimeout( function(){
+				if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null ){
+					/*url = "../../../../touch_desarrollo/index.php?scr=ticket&idp=" + $( "#id_venta_origen" ).val();
+					resp = ajaxR( url );
+					console.log( resp );
+					alert( resp );*/
+					if( imprimir_tickets() == true ){
+						location.reload();
+					}
 				}
-			}
+			}, 100);
 			close_emergent();
 		}
 	}
@@ -922,14 +937,7 @@ console.log( resp );
 	}
 
 	function checkAfiliationSesion( obj, session_terminal_id ){
-		var enabled = 1;
-		//var session_id = $( '#session_id' ).val();
-		if( ! $(obj).prop('checked') ){
-			enabled = 0;
-		}	
-		var url = 'ajax/db.php?fl=checkAfiliationSesion&enabled=' + enabled + '&session_terminal_id=' + session_terminal_id;
-		alert( url );
-		alert( ajaxR( url ) );
+		$( '#afiliations_changes_container' ).removeClass( "no_visible" );
 		return false;
 	}
 //agregar afiliacion 
@@ -958,15 +966,14 @@ console.log( resp );
 	}
 
 	function checkTerminalSesion( obj, session_terminal_id ){
-		/*var enabled = 1;
+		var enabled = 1;
 		//var session_id = $( '#session_id' ).val();
 		if( ! $(obj).prop('checked') ){
 			enabled = 0;
 		}	
 		var url = 'ajax/db.php?fl=checkTerminalSesion&enabled=' + enabled + '&session_terminal_id=' + session_terminal_id;
 		//alert( url );
-		alert( ajaxR( url ) );*/
-		$( '#afiliations_changes_container' ).removeClass( "no_visible" );
+		alert( ajaxR( url ) );
 		return false;
 	}
 

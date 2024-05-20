@@ -412,14 +412,14 @@ var emrge_aviso='';
 		/*Implementación Oscar 30.11.2018 para no dejar hacer más de una venta por dar click doble*/
 				hay_proceso=1;//ocupamos el proceso
 		/*Fin de cambio Oscar 30.11.2018*/
-	alert(data);
+	//alert(data);
 				retval = ax[0].match (/^ok$/i);
 				pedidor=ax[1];
 		/**/
 				emrge_aviso=ax[2];
 		/**/
 			}).fail (function () {
-				alert(data);
+				//alert(data);
 				retval = false;
 			});
 
@@ -667,10 +667,10 @@ function bloquea_pantalla(){
 				}).done (function (data){
 					servicio_ok = data.trim();
 //console.log( data );
-alert('here:'+data);
+//alert('here:'+data);
 					setTimeout( function(){ 
 						if( data != 'ok' ){
-							alert(1);
+//alert(1);
 							$("#cont_emergente").html(data);//cargamos respuesta 
 							$("#emergente_cerrar").css("display","block");
 							return false;

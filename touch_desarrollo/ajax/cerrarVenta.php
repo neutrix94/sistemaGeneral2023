@@ -297,8 +297,8 @@
 				//if($ro[2]>-10000){
 				//echo'here';
 					//Insertamos cabecera
-					$sql="	INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, id_pantalla)
-							SELECT 2,$user_id,id_sucursal, now(),now(),'',{$id_pedido_r}, -1, '', -1, -1, IF($es_externo=1,almacen_externo,$ro[0]), 11
+					$sql="	INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen)
+							SELECT 2,$user_id,id_sucursal, now(),now(),'',{$id_pedido_r}, -1, '', -1, -1, IF($es_externo=1,almacen_externo,$ro[0])
 							FROM sys_sucursales WHERE id_sucursal=$user_sucursal";/*Modificado por oscar 07.08.2018*/
 					//VALUES(2, $user_id, $user_sucursal, NOW(), NOW(), '', {$id_pedido_r}, -1, '', -1, -1, $ro[0])
                     //echo $sql;

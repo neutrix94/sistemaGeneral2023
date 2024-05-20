@@ -4,6 +4,21 @@
 	var global_is_repeat = 0;
 /*implementacion Oscar 2024-01-26*/
 	function UsersPrintsModulesValidation(){
+		var current_user_modules = new Array();
+		var module_repeated = false;
+	//recorre la tabla 
+		$( '#Body_UsersPrintsModules tr' ).each( function( index ){
+			var module_tmp = $( '#UsersPrintsModules_1_' + index ).attr( 'valor' );
+			if( current_user_modules.indexOf( module_tmp ) != -1 ){
+				module_repeated = true;
+				return false;
+			}	
+			current_user_modules.push( module_tmp );
+		});
+		if( module_repeated == true ){
+			alert( "Hay modulos de impresión repetidos, verifica y vuelve a intentar!" );
+			return false;
+		}
 		return true;
 	}
 /*implementacion Oscar 2024-01-26*/
