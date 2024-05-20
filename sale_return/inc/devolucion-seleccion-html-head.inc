@@ -1057,7 +1057,8 @@ return false;*/
         
 /**/
     //validamos que no sea devolución completa, si lo es ya no se reimprime el ticket
-            if(es_dev_completa==0 && es_apartado==0){
+            //if(es_dev_completa==0 && es_apartado==0){
+               // alert( "here" );
                 url_por_devolucion = aux[3];
 //    alert( 'here 1.1' );
                 /*setTimeout( function(){
@@ -1069,7 +1070,7 @@ return false;*/
                 });
                 return false;*/
                 location.href=url_por_devolucion;   
-            }           
+           // }           
             return false;
 		}else{
 //    alert( 'here 2' );
