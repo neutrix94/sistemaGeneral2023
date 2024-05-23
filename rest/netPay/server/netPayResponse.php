@@ -148,12 +148,12 @@ $app->post('/', function (Request $request, Response $response){
           WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
   if( $system_type != -1 ){
-    require_once( './utils/inserta_pago_con_tarjeta.php' );
+    require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago
     $link->autocommit( true );
   }else{
     $link->autocommit( true );
   /*inicio websocket */
-    require_once( './utils/conexion_con_websocket.php' );
+    require_once( './utils/conexion_con_websocket.php' );//consume websocket
   /*fin Websocket*/
   }
 
