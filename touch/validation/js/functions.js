@@ -271,9 +271,9 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 		}else{
 			var url = "ajax/db.php?fl=finishValidation&p_k=" + localStorage.getItem( 'current_ticket' );
 			url += "&ticket_has_changed=" + global_ticket_has_return;
-			
 			//alert( url ); return  false;
 			var response = ajaxR( url ).trim().split( '|' );
+			console.log( response );
 		//recibe la respuesta en JSON
 			var json_data = JSON.parse( response );
 			//if( response[0] != 'ok' ){

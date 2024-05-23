@@ -160,7 +160,7 @@
 //insertamos cabecera del movimiento de almacen de la devolución
     for($i=0;$i<=1;$i++){
         if($i==0&&$num_internos>0||$i==1&&$num_externos>0){
-            $insMov="INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal,
+            /*$insMov="INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal,
             fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, 
             status_agrupacion, ultima_sincronizacion, ultima_actualizacion ) 
             VALUES(null,'12','$user_id','$user_sucursal',now(),now(),'DEVOLUCION $fol_dev',-1,-1,'',-1,-1,";
@@ -169,12 +169,13 @@
             }else if($i==1){
                 $insMov.=$id_almacen_externo;
             }
-            $insMov.=",-1,null,now() )";
-            $eje=mysql_query($insMov)or die("Error al insertar el encabezado de movimiento de almacén con entrada por devolución2....".$insMov.mysql_error());
+            $insMov.=",-1,null,now() )";*/
+            $warehouse_id = ($i==0 ? $id_almacen_principal : $id_almacen_externo );
+            $insMov = "CALL spMovimientoAlmacen_inserta ( {$user_id}, 'DEVOLUCION', {$user_sucursal}, {$warehouse_id}, 12, -1, -1, -1, -1, 15 )";
+            $eje=mysql_query($insMov) or die("Error al insertar el encabezado de movimiento de almacén con entrada por devolución2....".$insMov.mysql_error());
             if($i==0){
                 $id_nvo_mov_int=mysql_insert_id();//capturamos el id asignado al movimiento de devolución
-            }
-            if($i==1){
+            }else if($i==1){
                 $id_nvo_mov_ext=mysql_insert_id();//capturamos el id asignado al movimiento de devolución
             }
         }

@@ -242,31 +242,38 @@
 			for($i=0;$i<=1;$i++){
 		        if( ( $i == 0 && $this->internal_counter > 0 ) || ( $i == 1 && $this->external_counter > 0 ) ){
 	//&& $this->was_payed == 1
-		            $insMov="INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, 
+		            /*$insMov="INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, 
 		            	id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, 
 		            	id_almacen, status_agrupacion, ultima_sincronizacion, ultima_actualizacion )
 		            VALUES(null,'12','{$this->user}','{$this->store_id}',now(),now(),'DEVOLUCION',-1,-1,'',-1,-1,";
-
-		            if($i==0){
-		                $insMov .= $this->principal_warehouse;
-		            }else if($i==1){
-		                $insMov .= $this->external_warehouse;
-		            }
-		            $insMov.=",-1,null,now())";
+		            $insMov.=",-1,null,now())";*/
 //echo "inserta movimiento : " . $insMov;
-		            $eje = $this->link->query( $insMov )or die( "error|Error al insertar el encabezado de movimiento de almacén con entrada por devolución : {$this->link->error}");
+					$almacen_id = 0;
 		            if($i==0){
-		                $sql = "SELECT LAST_INSERT_ID() AS last_id";
+		                $almacen_id = $this->principal_warehouse;
+		            }else if($i==1){
+		                $almacen_id = $this->external_warehouse;
+		            }
+           			$insMov = "CALL spMovimientoAlmacen_inserta ( {$this->user}, 'DEVOLUCION', {$this->store_id}, {$almacen_id}, 12, -1, -1, -1, -1, 14 )";
+		            $eje = $this->link->query( $insMov )or die( "error|Error al insertar el encabezado de movimiento de almacén con entrada por devolución : {$this->link->error} {$insMov}");
+		            if($i==0){
+		                /*$sql = "SELECT LAST_INSERT_ID() AS last_id";
 		                $eje_id = $this->link->query( $sql )or die( "error|Error al recuperar id mov alm int: {$this->link->error}");
-        				$row_id = $eje_id->fetch_assoc();
-		                $this->internal_return_movement_id = $row_id['last_id'];//id asignado al movimiento de devolución
+        				$row_id = $eje_id->fetch_assoc();*/
+						$ma_stm = $this->link->query( "SELECT max( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen" ) or die( "Error al recuperar id ma insertado : " . mysql_error() );
+						$id_mov = $ma_stm->fetch_assoc();//mysql_fetch_assoc( $ma_stm );
+						//$id_mov = $id_mov['id_movimiento_almacen'];
+		                $this->internal_return_movement_id = $id_mov['id_movimiento_almacen'];//id asignado al movimiento de devolución
 //echo "here 1 : {$this->internal_return_movement_id}";	           
 		            }
 		            if($i==1){
-		                $sql = "SELECT LAST_INSERT_ID() AS last_id";
+		                /*$sql = "SELECT LAST_INSERT_ID() AS last_id";
 		                $eje_id = $this->link->query( $sql )or die( "error|Error al recuperar id mov alm ext: {$this->link->error}");
-        				$row_id = $eje_id->fetch_assoc();
-		                $this->external_return_movement_id = $row_id['last_id'];//id asignado al movimiento de devolución
+        				$row_id = $eje_id->fetch_assoc();*/
+						$ma_stm = $this->link->query( "SELECT max( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen" ) or die( "Error al recuperar id ma insertado : " . mysql_error() );
+						$id_mov = $ma_stm->fetch_assoc();//mysql_fetch_assoc( $ma_stm );
+						//$id_mov = $id_mov['id_movimiento_almacen'];
+		                $this->external_return_movement_id = $id_mov['id_movimiento_almacen'];//$row_id['last_id']id asignado al movimiento de devolución
 //echo "here 2 : {$this->external_return_movement_id}";	           
 		            }
 		        }
@@ -289,28 +296,26 @@
 				if( $row[0] == 1 ){
 					die( "La nota esta pagada y no debe de entrar en esta condicion." );
 				} 
-            	$sql ="INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, 
+				/*INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, 
             			cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle, id_proveedor_producto, 
-            			id_equivalente, sincronizar ) 
-                        SELECT 
-                            NULL,
+            			id_equivalente, sincronizar )*/
+            	$sql ="SELECT 
                             IF( pd.es_externo = 1,
                             	{$this->external_return_movement_id},
                             	{$this->internal_return_movement_id}
-                           	),
-                            IF(p.id_producto_ordigen IS NULL,pd.id_producto,p.id_producto_ordigen),
-                            IF(p.id_producto_ordigen IS NULL,pd.cantidad,(pd.cantidad*p.cantidad)),
-                            IF(p.id_producto_ordigen IS NULL,pd.cantidad,(pd.cantidad*p.cantidad)),
-                            -1,
-                            -1,
-                            NULL,
-                            '0',
-                            '0'
+                           	) AS movement_header_id,
+                            IF(p.id_producto_ordigen IS NULL,pd.id_producto,p.id_producto_ordigen) AS product_id,
+                            IF(p.id_producto_ordigen IS NULL,pd.cantidad,(pd.cantidad*p.cantidad)) AS quantity
                         FROM ec_pedidos_detalle pd
                         LEFT JOIN ec_productos_detalle p 
                         ON p.id_producto=pd.id_producto
                         WHERE pd.id_pedido = {$this->sale_id}";
-            	$stm = $this->link->query( $sql ) or die( "Error al insertar todo el detalle de movimiento devolución : {$this->link->error}" );
+            	$stm = $this->link->query( $sql ) or die( "Error al consultar todo el detalle de movimiento devolución : {$this->link->error}" );
+				while( $dev_row = $stm->fetch_assoc() ){
+					$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$dev_row['movement_header_id']}, {$dev_row['product_id']}, {$dev_row['quantity']}, 
+						{$dev_row['quantity']}, -1, -1, NULL, 14 )";
+					$exc_procedure = $this->link->query( $sql ) or die( "Error al mandar llamar procedure spMovimientoAlmacenDetalle_inserta : {$this->link->error} {$sql}" );
+				}
 		//echo $sql;	
 			}else{
 			//die( "Esta pagado" );
@@ -373,7 +378,7 @@
 
 		    //si la nota esta pagada insertamos el detalle del movimiento por devolución de los productos devueltos
 				if( $this->was_payed == 1 ){
-		            $ins_mov_det="INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, 
+		            /*$ins_mov_det="INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, 
             			cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle, id_proveedor_producto, 
             			id_equivalente, sincronizar ) 
 		            SELECT 
@@ -386,7 +391,10 @@
 			            -1,
 			            NULL,
 			            0,
-			            0";
+			            0";*/
+					$movement_header_id = ( $product['is_external'] == 0 ? $this->internal_return_movement_id : $this->external_return_movement_id );
+					$ins_mov_det = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_header_id}, {$product['product_id']}, {$product['return_quantity']}, 
+					{$product['return_quantity']}, -1, -1, NULL, 14 )";
 		            $eje = $this->link->query( $ins_mov_det ) or die( "Error al insertar el detalle de movimiento por devolución 1 : {$ins_mov_det} {$this->link->error} " );
 				}//fin de si esta pagado
 
@@ -440,7 +448,7 @@
 		    	
 		    //si la nota esta pagada insertamos el detalle del movimiento por devolución de los productos devueltos
 				if( $this->was_payed == 1 ){
-		            $ins_mov_det="INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, 
+		            /*$ins_mov_det="INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, 
             			cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle, id_proveedor_producto, 
             			id_equivalente, sincronizar ) 
 		            SELECT
@@ -453,7 +461,10 @@
 			            -1,
 			            NULL,
 			            0,
-			            0";
+			            0";*/
+					$movement_header_id = ( $product['is_external'] == 0 ? $this->internal_return_movement_id : $this->external_return_movement_id );
+					$ins_mov_det = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_header_id}, {$product['product_id']}, {$product['return_quantity']}, 
+					{$product['return_quantity']}, -1, -1, NULL, 14 )";
 		            $eje = $this->link->query( $ins_mov_det ) or die( "Error al insertar el detalle de movimiento por devolución 2 : {$this->link->error} " );
 				}//fin de si esta pagado
 
