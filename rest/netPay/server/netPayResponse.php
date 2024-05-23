@@ -143,7 +143,7 @@ $app->post('/', function (Request $request, Response $response){
             /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
           WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
-  if( trim($message_) == 'Transaccion exitosa' && $transType == 'A' ){
+/*  if( trim($message_) == 'Transaccion exitosa' && $transType == 'A' ){
   //consulta los datos en relacion al numero de serie de la terminal
     $sql = "";
     if( isset( $traceability['smart_accounts'] ) && $traceability['smart_accounts'] == true ){
@@ -240,14 +240,7 @@ $app->post('/', function (Request $request, Response $response){
       $sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
       id_nota_credito, id_cxc, es_externo )
       VALUES( {$row['sale_id']}, 7, NOW(), NOW(), {$amount}, '', 1, 1, -1, -1, 0 )";
-      $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$link->error}" );*/
-
-//inserta el cobro del cajero si el cobro fue exitoso
-    $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, id_sucursal, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_terminal, 
-    /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar, /*11*/id_sesion_caja, /*12*/id_tipo_pago ) 
-    VALUES ( /*1*/NULL, '{$traceability['id_sucursal']}', /*2*/'{$row['sale_id']}', /*3*/'{$traceability['id_cajero']}', /*4*/'{$row['affiliation_id']}', 
-    /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1, 
-    /*11*/{$traceability['id_sesion_cajero']}, /*12*/7 )";
+      $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$link->error}" );
 //    error_log( $sql );
     $stm = $link->query( $sql ) or die( "Error al insertar el cobro del cajero : {$link->error}" );
     $paymet_id = $link->insert_id;
@@ -261,21 +254,21 @@ $app->post('/', function (Request $request, Response $response){
               WHERE id_transaccion_netpay = '{$folioNumber}'";
       $stm = $link->query( $sql ) or die( "Error al actualizar el cobro del cajero en la peticion : {$sql} {$link->error}" );
           
-  //actualiza en la venta el id de cajero que cobro el pago*/
+  //actualiza en la venta el id de cajero que cobro el pago*
     if( $row['sale_id'] != null && $row['sale_id'] != '' ){
       $sql="UPDATE ec_pedidos 
               SET id_cajero = '{$traceability['id_cajero']}' 
               WHERE id_pedido = {$row['sale_id']}";
       $stm = $link->query( $sql ) or die( "Error al actualizar el pedido para este cajero : {$sql} {$link->error}" );
 
-  //actualiza en el pago el id de cajero que cobro el pago Oscar 2023-01-10*/
+  //actualiza en el pago el id de cajero que cobro el pago Oscar 2023-01-10*
     //if( $row['sale_id'] != null && $row['sale_id'] != '' ){
       $sql="UPDATE ec_pedido_pagos 
               SET id_cajero_cobro = '{$paymet_id}' 
               WHERE id_pedido_pago IN( {$internal_payment_id}, {$external_payment_id} )";
       $stm = $link->query( $sql ) or die( "Error al actualizar el pedido para este cajero : {$sql} {$link->error}" );
 
-    //actualiza el id de cajero que cobro el pago*/
+    //actualiza el id de cajero que cobro el pago*
       $sql="UPDATE ec_pedido_pagos 
               SET id_cajero = '{$traceability['id_cajero']}',
               fecha = now(),
@@ -284,10 +277,7 @@ $app->post('/', function (Request $request, Response $response){
               AND id_cajero=0";
       $stm = $link->query( $sql ) or die( "Error al actualizar el pago para este cajero : {$sql} {$link->error}" );
     }
-/*$fp = fopen('data.txt', 'w');
-fwrite($fp, $sql );
-fclose($fp);*/
-  }
+  }*/
   $link->autocommit( true );
 /*inicio websocket */
 //require './utils/encriptacion_token.php';
@@ -304,7 +294,8 @@ $Encrypt = new Encrypt();
 $token = '7dff3c34-faee-11ea-a7be-3d014d7f956c';
 $token = $Encrypt->encryptText( $token, '' );
 
-$client = new \Devristo\Phpws\Client\WebSocket("wss://m9dksnfd-3003.usw3.devtunnels.ms/{$token}", $loop, $logger);
+//$client = new \Devristo\Phpws\Client\WebSocket("wss://m9dksnfd-3003.usw3.devtunnels.ms/{$token}", $loop, $logger);
+$client = new \Devristo\Phpws\Client\WebSocket("ws://sistemaalfa2024.com:3000/{$token}", $loop, $logger);
 
 $client->on("connect", function($headers) use ($logger, $client, $body){
   //$logger->notice("Connected to WebSocket");
@@ -323,7 +314,7 @@ $client->on("message", function($message) use ($client){//, $logger
 });
 
 $client->open();
-$loop->addTimer(15, function () use ($loop) {//para limitar el tiempo de ejecucion del websocket ( segundos )
+$loop->addTimer(10, function () use ($loop) {//para limitar el tiempo de ejecucion del websocket ( segundos )
   $loop->stop();
 });
 $loop->run();

@@ -1606,24 +1606,21 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 
 		public function insertMovementProviderProduct( $ticket_id, $sucursal, $validation_id, $movement_type = 1, 
 			$sale_detail_id, $quantity = 0 ){
-			$sql = "INSERT INTO ec_movimiento_detalle_proveedor_producto ( /*1*/id_movimiento_detalle_proveedor_producto, 
-				/*2*/id_movimiento_almacen_detalle, /*3*/id_proveedor_producto, /*4*/cantidad, /*5*/fecha_registro, 
-				/*6*/id_sucursal, /*7*/status_agrupacion, /*8*/id_tipo_movimiento, /*9*/id_almacen,
-				/*10*/id_pedido_validacion/*7,id_equivalente */)
-				SELECT
-				/*1*/NULL,
-				/*2*/ax.id_movimiento_almacen_detalle,
-			    /*3*/pvu.id_proveedor_producto,
-			    /*4*/IF( {$quantity} = 0,
+		//consulta los movimientos almacen		
+			$sql = "SELECT
+					NULL,
+					ax.id_movimiento_almacen_detalle AS movement_detail_id,
+					pvu.id_proveedor_producto AS product_provider_id,
+					IF( {$quantity} = 0,
 			    		IF( pvu.id_pedido_validacion IS NULL, 0, SUM( pvu.piezas_validadas - pvu.piezas_devueltas ) ),
 			    		{$quantity}
-			    	),
-			    /*5*/NOW(),
-			    /*6*/'{$sucursal}',
-			    /*7*/-1,
-			    /*8*/IF( {$movement_type} = 1, ax.id_tipo_movimiento, 12 ),
-			    /*9*/ax.id_almacen,
-			    /*10*/'{$validation_id}'
+			    	) AS quantity,
+					NOW() AS date_time,
+					'{$sucursal}' AS store_id,
+					-1 AS group_status,
+					IF( {$movement_type} = 1, ax.id_tipo_movimiento, 12 ) AS movement_type,
+					ax.id_almacen AS warehouse_id,
+					'{$validation_id}' AS validation_id
 				FROM
 				(
 				    SELECT 
@@ -1647,6 +1644,11 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 //		die( $sql );
 //echo ( "<br>" . $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al insertar los detalles de movimiento almacen proveedor producto : {$this->link->error}" );
+			while( $row = $stm->fetch_assoc() ){
+				$sql = "CALL spMovimientoDetalleProveedorProducto_inserta( {$row['movement_detail_id']}, {$row['product_provider_id']}, {$row['quantity']}, 
+				{$row['store_id']}, {$row['movement_type']}, {$row['warehouse_id']}, {$row['validation_id']}, 12 )";
+				$procedure_stm = $this->link->query( $sql ) or die( "Error al ejecutar procedure spMovimientoDetalleProveedorProducto_inserta : {$this->link->error} {$sql}" );
+			}
 			return 'ok';
 		}
 
@@ -1863,19 +1865,25 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 							}
 						}
 					//insertamos cabecera
-						$sql="INSERT INTO ec_movimiento_almacen ( /*1*/id_tipo_movimiento, /*2*/id_usuario, 
-							/*3*/id_sucursal, /*4*/fecha, /*5*/hora, /*6*/observaciones, /*7*/id_almacen, /*8*/id_pedido ) 
-						VALUES ( /*1*/{$movement_type},/*2*/{$user_id},/*3*/{$store_id},/*4*/now(),/*5*/now(), 
-							/*6*/'{$obs}', /*7*/{$warehouse_id}, /*8*/-1 )";
+						//$sql="INSERT INTO ec_movimiento_almacen ( /*1*/id_tipo_movimiento, /*2*/id_usuario, 
+						//	/*3*/id_sucursal, /*4*/fecha, /*5*/hora, /*6*/observaciones, /*7*/id_almacen, /*8*/id_pedido ) 
+						//VALUES ( /*1*/{$movement_type},/*2*/{$user_id},/*3*/{$store_id},/*4*/now(),/*5*/now(), 
+						//	/*6*/'{$obs}', /*7*/{$warehouse_id}, /*8*/-1 )";
+						
+						$sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, '{$obs}', {$store_id}, {$warehouse_id}, {$movement_type}, -1, -1, -1, -1, 12 )";
 						$stm = $this->link->query( $sql ) or die( "Error al insertar la cabecera del movimiento almacen : {$this->link->error} {$sql}" );			
-						$sql = "SELECT LAST_INSERT_ID()";
+						/*$sql = "SELECT LAST_INSERT_ID()";
 						$stm_2 = $this->link->query( $sql ) or die( "Error al consultar id de cabecera de movimiento almacen : {$this->link->error} {$sql}" );
-						$header_id = $stm_2->fetch_row();
-						$header_id = $header_id[0];
+						$header_id = $stm_2->fetch_row();*/
+						$ma_stm = $this->link->query( "SELECT max( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen" ) or die( "Error al recuperar id ma insertado : " . mysql_error() );
+						$id_mov = $ma_stm->fetch_assoc();
+						$header_id = $id_mov['id_movimiento_almacen'];
 					//inserta detalles	
-						$sql = "INSERT INTO ec_movimiento_detalle( id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						/*$sql = "INSERT INTO ec_movimiento_detalle( id_movimiento, id_producto, cantidad, cantidad_surtida, 
 						id_proveedor_producto, id_pedido_detalle ) VALUES ( {$header_id}, {$prods_row['product_id']}, {$prods_row['quantity']},
-						{$prods_row['quantity']}, {$prods_row['product_provider_id']}, /*8*/-1 )";
+						{$prods_row['quantity']}, {$prods_row['product_provider_id']}, -1 )";/*8*/
+						$sql = "CALL spMovimientoAlmacenDetalle_inserta( {$header_id}, {$prods_row['product_id']}, {$prods_row['quantity']}, {$prods_row['quantity']}, 
+						-1, -1, {$prods_row['product_provider_id']}, 12 );";
 						$stm_2 = $this->link->query( $sql ) or die( "Error al insertar detalles de movimiento almacen por exhibicion : {$this->link->error} {$sql}" );
 					}
 				}
