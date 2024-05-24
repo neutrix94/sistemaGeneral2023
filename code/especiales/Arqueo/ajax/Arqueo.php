@@ -63,13 +63,13 @@
 					sca.insertada_por_error_en_cobro,
 					CONCAT( a.observaciones )/*a.no_afiliacion, ' ', */
 				FROM ec_afiliaciones a
-				LEFT JOIN ec_afiliaciones_cajero ac 
-				ON ac.id_afiliacion = a.id_afiliacion
+				/*LEFT JOIN ec_afiliaciones_cajero ac 
+				ON ac.id_afiliacion = a.id_afiliacion*/
 				LEFT JOIN ec_sesion_caja_afiliaciones sca
 				ON sca.id_afiliacion = a.id_afiliacion 
-				WHERE ac.id_cajero='{$user_id}' 
-				AND ac.activo=1 
-				AND a.id_afiliacion>0
+				WHERE /*ac.id_cajero='{$user_id}' 
+				AND ac.activo=1
+				AND */a.id_afiliacion>0
 				AND sca.id_sesion_caja = '{$id_sesion_caja}'";
 			$eje = $this->link->query( $sql )or die("Error al consultar las afiliaciones para este cajero!!!<br>{$this->link->error}");
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
@@ -96,8 +96,12 @@
 					$total=0;
 				}
 				$this->cards_counter++;
-				$tarjetas_cajero.='<tr class="informative_row">';
-					$tarjetas_cajero.='<td colspan="2" class="bg-warning"><p style="font-size:20px;margin:0;" align="center" id="card_description_' . $this->cards_counter . '">' . $this->cards_counter . '.- ' . $r[3] . ':</p></td>';//
+				$error = "";
+				if( $r[2] == 1 ){
+					$error = "color : red !important;";
+				}
+				$tarjetas_cajero.="<tr class=\"informative_row\" style=\"{$error}\">";
+					$tarjetas_cajero.="<td colspan=\"2\" class=\"bg-warning\"><p style=\"font-size:20px;margin:0;{$error}\"  align=\"center\" id=\"card_description_{$this->cards_counter}\">{$this->cards_counter}.- {$r[3]} :</p></td>";//
 				$tarjetas_cajero.='</tr>';
 				$tarjetas_cajero.='<tr class="is_card_row">';
 					$tarjetas_cajero.='<td align="center">';

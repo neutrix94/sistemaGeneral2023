@@ -14,6 +14,12 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
     $rs = new manageResponse();
     $vt = new tokenValidation();
     //$Encrypt = new $Encrypt();
+
+    $body = $request->getBody();
+    //var_dump( $body );
+    $file = fopen("archivo_local.txt", "w");
+    fwrite($file,"{$body}");
+    fclose($file);
     
     $token =  (empty($request->getHeader('Token'))) ? '' : implode(" ",$request->getHeader('Token'));
     //$token = $Encrypt->decryptText($token, 'CDLL2024');//desencripta token
@@ -141,10 +147,12 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
               /*44*/id_sesion_cajero = '{$traceability['id_sesion_cajero']}',
               /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
             WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
-    $stm = $link->query( $sql );
+    $stm = $link->query( $sql );//die( $sql );
     if( $link->error ){
         return json_encode( array( "status"=>400, "message"=>"Error al actualizar datos de la transaccion : {$link->error}" ) );
     }
+//inserta pago
+    require_once( './utils/inserta_pago_con_tarjeta.php' );
     $link->autocommit( true );
 	return json_encode( array( "status"=>200, "message"=>"Registro actualizado exitosamente." ) );
 });
