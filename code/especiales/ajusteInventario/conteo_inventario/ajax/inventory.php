@@ -4,6 +4,9 @@
 		$action = $_GET['inventory_fl'];
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
+		if( $user_sucursal != 1 ){//si la sucursal es diferente a Matriz
+			die( 'invalid_store' );
+		}
 		$inventory = new Inventory( $link, $sucursal_id );
 
 		switch ( $action ) {
