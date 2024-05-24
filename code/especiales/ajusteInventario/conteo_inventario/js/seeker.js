@@ -37,6 +37,10 @@ var scanned_historic = new Array();
 
 		var response = ajaxR( 'ajax/inventory.php?inventory_fl=seekProduct&key=' + txt + "&warehouse_id=" + current_warehouse );
 		var aux = response.split( '|' );
+		if( response[0].trim() == 'invalid_store' ){
+			exit_by_session_error();
+			return false;
+		}
 		//alert( response );
 		$( "#principal_seeker" ).val( '' );
 		switch( aux[0] ){
@@ -118,6 +122,10 @@ var scanned_historic = new Array();
 		$( '#seeker_response' ).css( 'display' , 'none' );//oculta resultado de búsqueda
 		var url = "ajax/inventory.php?inventory_fl=getOptionsByProductId&product_id=" + product_id;
 		var response = ajaxR( url );
+		if( response.trim() == 'invalid_store' ){
+			exit_by_session_error();
+			return false;
+		}
 		$( '.emergent_content' ).html( response );
 		$( '.emergent' ).css( 'display', 'block' );
 	}
@@ -180,6 +188,10 @@ var scanned_historic = new Array();
 		var response = ajaxR( url ).split( '|~~|' );
 		//alert( response );
 		if( response[0] != 'ok' ){
+			if( response[0].trim() == 'invalid_store' ){
+				exit_by_session_error();
+				return false;
+			}
 			alert( "Error : " + response[0] );
 		}else{
 			var tmp1 = response[1].split( '|~|' );
@@ -332,6 +344,10 @@ var scanned_historic = new Array();
 		//alert( url );
 		var response = ajaxR( url ).split( '|' );
 		if( response[0] != 'ok' ){
+			if( response[0].trim() == 'invalid_store' ){
+				exit_by_session_error();
+				return false;
+			}
 			alert( "Error: " + response[0] );
 		}else{
 			return 'ok|' + response[1];
@@ -349,6 +365,10 @@ var scanned_historic = new Array();
 		url += "&product_provider_id=" + current_product.product_provider_id + "&warehouse_id=" + current_warehouse;
 		var response = ajaxR( url ).split( '|' );
 		if( response[0] != 'ok' ){
+			if( response[0].trim() == 'invalid_store' ){
+				exit_by_session_error();
+				return false;
+			}
 			alert( "Error : " + response[0] );
 		}else{
 			show_emergent( response[1], true, false );
@@ -415,6 +435,10 @@ var scanned_historic = new Array();
 		url += "&warehouse_id=" + current_warehouse;
 		response = ajaxR( url );
 		if( response.trim() != 'ok' ){
+			if( response.trim() == 'invalid_store' ){
+				exit_by_session_error();
+				return false;
+			}
 			alert( "Error : " + response );
 			return false;
 		}
@@ -568,6 +592,10 @@ var scanned_historic = new Array();
 			url += "&warehouse_id=" + current_warehouse;
 		var response = ajaxR( url );
 		if( response.trim() != 'ok' ){
+			if( response.trim() == 'invalid_store' ){
+				exit_by_session_error();
+				return false;
+			}
 			show_emergent( response, true, true );
 			return false;
 		}
@@ -651,6 +679,10 @@ var scanned_historic = new Array();
 		var response  = ajaxR( url ).split( '|' );
 		//alert( response );
 		if( response[0] != 'ok' ){
+			if( response[0].trim() == 'invalid_store' ){
+				exit_by_session_error();
+				return false;
+			}
 			alert( "Error" + response );
 		}else{
 			if( response[1] == 'withouth_rows' ){

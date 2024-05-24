@@ -18,6 +18,10 @@ var location_range_since, location_range_to, count_type;
 		url += '&range_to=' + location_range_to;*/
 		url += '&warehouse_id=' + current_warehouse;
 		var response = ajaxR( url );//
+		if( response.trim() == 'invalid_store' ){
+			exit_by_session_error();
+			return false;
+		}
 		//alert( response );
 
 		if( ! $( '#is_per_product' ).prop( 'checked' ) ){
@@ -69,6 +73,10 @@ var location_range_since, location_range_to, count_type;
 		if( response == 'ok' ){
 			return true;
 		}else{
+			if( response.trim() == 'invalid_store' ){
+				exit_by_session_error();
+				return false;
+			}
 			alert( response );//"La contraseña es incorrecta, verifica y vuelve a intentar : " + 
 			return false;
 		}
@@ -138,6 +146,10 @@ var location_range_since, location_range_to, count_type;
 	function getStoreWharehouses(){
 		var url = "ajax/inventory.php?inventory_fl=getStoreWhareouses";
 		var response =  ajaxR( url );
+		if( response.trim() == 'invalid_store' ){
+			exit_by_session_error();
+			return false;
+		}
 		return response;
 	}
 
@@ -155,6 +167,10 @@ var location_range_since, location_range_to, count_type;
 		url += "&warehouse_id=" + current_warehouse;
 		var response = ajaxR( url ).split('|');
 		if( response[0] != 'ok' ){
+			if( response[0].trim() == 'invalid_store' ){
+				exit_by_session_error();
+				return false;
+			}
 			alert( "Error : " + response );
 		}else{
 			clean_current_product();
@@ -169,6 +185,10 @@ var location_range_since, location_range_to, count_type;
 		var url = "ajax/inventory.php?inventory_fl=getOmitedProducts&warehouse_id=" + current_warehouse;
 		var response = ajaxR( url ).split( '|' );
 		if( response[0] != 'ok' ){
+			if( response[0].trim() == 'invalid_store' ){
+				exit_by_session_error();
+				return false;
+			}
 			alert( "Error : " + response );
 		}else{
 			$( '#omited_products_list' ).empty();
@@ -199,6 +219,10 @@ var location_range_since, location_range_to, count_type;
 			case 1:
 				url = "ajax/inventory.php?inventory_fl=getSubcategories&category_id=" + $( '#category_combo' ).val();
 				var response = ajaxR( url );
+				if( response.trim() == 'invalid_store' ){
+					exit_by_session_error();
+					return false;
+				}
 				//alert( response );
 				$( '#subcategory_combo' ).empty();
 				$( '#subcategory_combo' ).append( response );
@@ -207,6 +231,10 @@ var location_range_since, location_range_to, count_type;
 			case 2 :
 				url = "ajax/inventory.php?inventory_fl=getSubtypes&subcategory_id=" + $( '#subcategory_combo' ).val();
 				var response = ajaxR( url );
+				if( response.trim() == 'invalid_store' ){
+					exit_by_session_error();
+					return false;
+				}
 				//alert( response );
 				$( '#subtype_combo' ).empty();
 				$( '#subtype_combo' ).append( response );
@@ -292,6 +320,12 @@ var location_range_since, location_range_to, count_type;
 					</button>
 				</div>
 			</div>`;
+
+	function exit_by_session_error(){
+		alert( "Esta pantalla solo se puede abrir logueado en sucursal matriz, logueate en Matriz para continuar!" );
+		location.href = "../../../../index.php";
+		return false;
+	}
 
 //llamadas asincronas
 	function ajaxR(url){
