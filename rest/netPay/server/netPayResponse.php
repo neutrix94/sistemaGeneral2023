@@ -93,7 +93,7 @@ $app->post('/', function (Request $request, Response $response){
  // $traceability['']
 //consulta el tipo de sistema en relacion al campo de acceso
   $sql_store = "SELECT id_sucursal AS sotre_id FROM sys_sucursales WHERE acceso = 1";
-  $stm_store = $link->query( $sql ) or die( "Error al consultar el tipo de sistema  : {$link->qerror} : {$sql}" );
+  $stm_store = $link->query( $sql_store ) or die( "Error al consultar el tipo de sistema  : {$link->error} : {$sql}" );
   $store_row = $stm_store->fetch_assoc();
   $system_type = $store_row['store_id'];
 //$file = fopen("archivo.txt", "w");
