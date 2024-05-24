@@ -13,7 +13,7 @@
     $token = $Encrypt->encryptText( $token, '' );
 
     //$client = new \Devristo\Phpws\Client\WebSocket("wss://m9dksnfd-3003.usw3.devtunnels.ms/{$token}", $loop, $logger);
-    $client = new \Devristo\Phpws\Client\WebSocket("ws://sistemaalfa2024.com:3000/{$token}", $loop, $logger);
+    $client = new \Devristo\Phpws\Client\WebSocket("wss://sistemaalfa2024.com:3000/{$token}", $loop, $logger);
 
     $client->on("connect", function($headers) use ($logger, $client, $body){
     //$logger->notice("Connected to WebSocket");
