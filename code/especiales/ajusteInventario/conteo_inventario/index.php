@@ -3,6 +3,12 @@
 	include( '../../../../conect.php' );
 	include( '../../../../conexionMysqli.php' );
 	include( 'ajax/inventory.php' );
+	if( $user_sucursal != 1 ){
+		die( "<script>
+			alert( \"Esta pantalla solo se puede abrir logueado en sucursal matriz, logueate en Matriz para continuar!\" );
+			location.href=\"../../../../index.php\";
+		</script>" );
+	}
 	$inventory = new Inventory( $link );
 
 ?>
