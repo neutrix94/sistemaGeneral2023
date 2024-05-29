@@ -168,4 +168,14 @@
         ws.refreshTransaction();
 		//close_emergent();
 	}
+
+    function informar_folio( folio_unico ){
+        ws.currentFolio = folio_unico;
+        /*{
+            folio_unico: folio_unico,
+            id_sucursal: $sucursal_websocket,
+        };*/
+        ws.informFolio();
+		//close_emergent();
+	}
      
