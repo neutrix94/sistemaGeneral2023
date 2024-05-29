@@ -10,6 +10,11 @@ const connectWebSocket = (ws_ref) => {
   const MAX_TRIES = 3;
   var reconnectTries = 0;
 
+  const ACKNOWLEDGEMENT_EVENTS_CLIENTS = [
+    events.INFORM_VIEWED_TRANSACTION,
+    events.INFORM_FOLIO,
+  ];
+
   /*var ws = new WebSocket('ws://localhost:3000', [
     '7dff3c34-faee-11ea-a7be-3d014d7f956c',
     'true',
@@ -25,6 +30,7 @@ const connectWebSocket = (ws_ref) => {
   ws.isProcessing = false;
   ws.eventQueue = ws_ref ? ws_ref.eventQueue : new Queue();
   ws.actualTransaction = ws_ref ? ws_ref.actualTransaction : null;
+  ws.currentFolio = ws_ref ? ws_ref.currentFolio : null;
   ws.currentTransaction = ws_ref ? ws_ref.currentTransaction : null;
   ws.viewedFolios = ws_ref ? ws_ref.actualTransaction : [];
 
@@ -136,6 +142,8 @@ const connectWebSocket = (ws_ref) => {
       ws.sendViewedTransactions();
     } else if (event === event.GET_TRANSACTION_STATUS) {
       ws.refreshTransaction();
+    }else if (event === event.INFORM_FOLIO) {
+      ws.informFolio();
     }
   };
 
@@ -162,9 +170,24 @@ const connectWebSocket = (ws_ref) => {
     ws.isProcessing = false;
     ws.eventQueue.add(events.GET_TRANSACTION_STATUS);
   };
+  
+  ws.informFolio = () => {
+    ws.isProcessing = true;
+    ws.send(
+      JSON.stringify({
+        type: events.INFORM_FOLIO,
+        payload: ws.currentFolio,
+      }),
+    );
+    ws.isProcessing = false;
+    ws.eventQueue.add(events.INFORM_FOLIO);
+  };
+
 //aqui llega respuesta
   ws.msgFunction = (jsonMsg) => {
-    if (jsonMsg.type == events.INFORM_VIEWED_TRANSACTION) {
+    
+    //ACKNOWLEDGEMENT_EVENTS_CLIENTSif (jsonMsg.type == events.INFORM_VIEWED_TRANSACTION) {
+    if (ACKNOWLEDGEMENT_EVENTS_CLIENTS.includes(jsonMsg.type)) {
       ws.eventQueue.remove(jsonMsg.type);
     } else if (jsonMsg.type == events.INFORM_TRANSACTIONS) {//aqui llegan las transacciones
       let folios = [];
