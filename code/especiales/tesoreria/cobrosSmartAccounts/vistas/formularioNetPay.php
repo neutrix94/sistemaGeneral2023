@@ -35,6 +35,10 @@
 	</button>
 <?php
 	}
+
+	echo "<script>
+		informar_folio( '{$resp->folio_unico_transaccion}' );
+	</script>";
 ?>
 </div>	
 
