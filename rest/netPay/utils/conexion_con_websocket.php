@@ -12,8 +12,7 @@
     $token = '7dff3c34-faee-11ea-a7be-3d014d7f956c';
     $token = $Encrypt->encryptText( $token, '' );
 
-    //$client = new \Devristo\Phpws\Client\WebSocket("wss://m9dksnfd-3003.usw3.devtunnels.ms/{$token}", $loop, $logger);
-    $client = new \Devristo\Phpws\Client\WebSocket("wss://sistemaalfa2024.com:3000/{$token}", $loop, $logger);
+    $client = new \Devristo\Phpws\Client\WebSocket("{$urlWebsocket}{$token}", $loop, $logger);
 
     $client->on("connect", function($headers) use ($logger, $client, $body){
     //$logger->notice("Connected to WebSocket");
@@ -33,7 +32,7 @@
 
     $client->open();
     $loop->addTimer(10, function () use ($loop) {//para limitar el tiempo de ejecucion del websocket ( segundos )
-    $loop->stop();
+        $loop->stop();
     });
     $loop->run();
 ?>

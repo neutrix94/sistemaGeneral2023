@@ -151,10 +151,12 @@ $app->post('/', function (Request $request, Response $response){
   if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
     require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago
     $link->autocommit( true );
+    $urlWebsocket = 'wss://websocketserverlocal-sqk76fij5a-uc.a.run.app/';
   }else{//peticion desde local
     $link->autocommit( true );
-    require_once( './utils/conexion_con_websocket.php' );//consume websocket
+    $urlWebsocket = 'wss://websocketserver-sqk76fij5a-uc.a.run.app/';
   }
+  require_once( './utils/conexion_con_websocket.php' );//consume websocket
 
 
 ob_start();
