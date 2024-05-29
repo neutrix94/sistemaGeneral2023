@@ -78,7 +78,7 @@
 				VALUES ( {$p_p_movement['id_movimiento_almacen_detalle']}, {$p_p_movement['id_proveedor_producto']}, 
 					'{$p_p_movement['cantidad']}', '{$p_p_movement['fecha_registro']}', '{$p_p_movement['id_sucursal']}', 
 					'{$p_p_movement['status_agrupacion']}', '{$p_p_movement['id_tipo_movimiento']}', 
-					'{$p_p_movement['id_almacen']}', '{$p_p_movement['id_pedido_validacion']}', '{$p_p_movement['folio_unico']}', '1', '{$p_p_movement['id_pantalla']}', '1' )";
+					'{$p_p_movement['id_almacen']}', '{$p_p_movement['id_pedido_validacion']}', '{$p_p_movement['folio_unico']}', '1', '-1', '1' )";//{$p_p_movement['id_pantalla']}
 				$sql = str_replace("' (", "(", $sql);
 				$sql = str_replace("'(", "(", $sql);
 				$sql = str_replace(")'", ")", $sql);

@@ -117,7 +117,7 @@ if( $is_valid == true ){
 				VALUES ( NULL, {$movement['id_tipo_movimiento']}, {$movement['id_usuario']}, {$movement['id_sucursal']}, '{$movement['fecha']}', '{$movement['hora']}', 
 				'{$movement['observaciones']} \nInsertado desde API por sincronización', -1, 
 				'-1', '{$movement['lote']}', '{$movement['id_maquila']}', '{$movement['id_transferencia']}', 
-				'{$movement['id_almacen']}', '{$movement['status_agrupacion']}', '{$movement['folio_unico']}', '1', '{$movement['id_pantalla']}', '1' )";
+				'{$movement['id_almacen']}', '{$movement['status_agrupacion']}', '{$movement['folio_unico']}', '1', '-1', '1' )";//{$movement['id_pantalla']}
 fwrite($file, "{$sql}\n");
 			//reemplazamiento de comillas en consultas
 				$sql = str_replace( "'(", "(", $sql );
