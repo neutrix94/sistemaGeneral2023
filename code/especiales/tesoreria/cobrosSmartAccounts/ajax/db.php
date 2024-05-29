@@ -2,7 +2,7 @@
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
-	//verifica si esta habilitada la funcion de SmartAccounts
+	/*verifica si esta habilitada la funcion de SmartAccounts
 		$sql = "SELECT 
 					habilitar_smartaccounts_netpay AS is_smart_accounts
 				FROM sys_sucursales s
@@ -13,10 +13,15 @@
 		//if( $row['is_smart_accounts'] == 0 ){
 		//	include( '../../../netPay/apiNetPaySinSmartAccount.php' );//sin smartaccounts
 		//}else{
-			include( '../../../netPay/apiNetPay.php' );
 		//}
-	//
-		$apiNetPay = new apiNetPay( $link, $sucursal_id );
+	*/
+		$sql = "SELECT id_sucursal FROM sys_sucursales AS system_type WHERE acceso = 1";
+		$stm = $link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$link->error}" );
+		$row = $stm->fetch_assoc();
+		$system_type = $row['system_type'];
+
+		include( '../../../netPay/apiNetPay.php' );
+		$apiNetPay = new apiNetPay( $link, $sucursal_id, $system_type );
 		$Payments = new Payments( $link, $user_sucursal );
 		$action = ( isset( $_GET['fl'] ) ? $_GET['fl'] : $_POST['fl'] );
 		switch ( $action ) {
