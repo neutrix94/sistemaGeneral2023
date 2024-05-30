@@ -92,10 +92,10 @@ $app->post('/', function (Request $request, Response $response){
   //traceability
  // $traceability['']
 //consulta el tipo de sistema en relacion al campo de acceso
-  $sql_store = "SELECT id_sucursal AS sotre_id FROM sys_sucursales WHERE acceso = 1";
+  /*$sql_store = "SELECT id_sucursal AS store_id FROM sys_sucursales WHERE acceso = 1";
   $stm_store = $link->query( $sql_store ) or die( "Error al consultar el tipo de sistema  : {$link->error} : {$sql}" );
   $store_row = $stm_store->fetch_assoc();
-  $system_type = $store_row['store_id'];
+  $system_type = $store_row['store_id'];*/
 //$file = fopen("archivo.txt", "w");
   $link->autocommit( false );
 //actualiza la respuesta de la transaccion
@@ -147,14 +147,14 @@ $app->post('/', function (Request $request, Response $response){
             /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
           WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
-  if( $system_type != -1 ){
+
+  
+  if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
     require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago
     $link->autocommit( true );
-  }else{
+  }else{//peticion desde local
     $link->autocommit( true );
-  /*inicio websocket */
     require_once( './utils/conexion_con_websocket.php' );//consume websocket
-  /*fin Websocket*/
   }
 
 
