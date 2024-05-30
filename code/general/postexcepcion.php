@@ -22,6 +22,7 @@
 	}
 
 //2. Implementacion Oscar 11-08-2020 para insertar productos en nuevo almacen
+/*Deshabilitado por Oscar 2024-05-29 para que no se dupliquen los almacenes por producto
 	if($tabla=='ec_almacen' && $no_tabla==0 && $accion=='insertar' ){
 		$sql = "INSERT INTO ec_almacen_producto (id_almacen, id_producto)
 					SELECT
@@ -34,7 +35,7 @@
             mysql_query("ROLLBACK");
             Muestraerror($smarty, "", "3", mysql_error(), $sql, "contenido.php");
         }
-	}
+	}*/
 
 //3. Implementacion Oscar 11-08-2020 para insertar productos en almacen cuando se inserta un nuevo producto
 	if( $tabla == 'ec_productos' && $no_tabla == 0 && ($accion=='insertar' || $accion == 'actualizar') ){
