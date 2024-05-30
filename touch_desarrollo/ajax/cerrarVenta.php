@@ -260,7 +260,7 @@
 			$row = mysql_fetch_assoc($res);
 			extract($row);
 	//Buscamos el almacen correspondiente
-			$sql="SELECT
+			/*$sql="SELECT
 					a.id_almacen,
 					a.prioridad,
 					(
@@ -275,7 +275,17 @@
 					FROM ec_almacen a
 					WHERE a.id_sucursal=$user_sucursal
 					AND a.id_almacen <> -1 
-					ORDER BY es_almacen DESC, prioridad";
+					ORDER BY es_almacen DESC, prioridad";*/
+			$sql = "SELECT
+						IF( sp.es_externo = 1, s.almacen_externo, a.id_almacen )
+					FROM sys_sucursales s
+					LEFT JOIN sys_sucursales_producto sp
+					ON s.id_sucursal = sp.id_sucursal
+					LEFT JOIN ec_almacen a
+					ON a.id_sucursal = s.id_sucursal
+					AND a.es_almacen = 1
+					WHERE sp.id_producto = {$id_prod}
+					AND s.id_sucursal = {$user_sucursal}";
       //           die($sql);
 			$re=mysql_query($sql);
 	        if(!$re){
@@ -288,9 +298,9 @@
 	//		echo 'num:'.$nu;
 			for($j=0;$j<1;$j++){
 				$ro=mysql_fetch_row($re);
-				if($j == 0){
+				/*if($j == 0){
 					$almacenPri=$ro[0];
-				}
+				}*/
 				//echo 'jkebfkñwebf';
 			//Si existe inventario en el almacen (aqui modifique deberia de ser mayor a cero)    
 				//echo 'ro2: '.$ro[2];
