@@ -57,6 +57,12 @@
 					$transaction_id = $resp->petition_id;
 					$is_payment_petition = true;
 					include( '../vistas/formularioNetPay.php' );
+					echo "<script type=\"text/JavaScript\">
+						console.log( \"Si entra bien\" );
+							setTimeout( function (){ 
+								informar_folio( '{$resp->folio_unico_transaccion}' );
+							}, 1000 );
+						</script>";
 				}else{
 					die( "<div class=\"row text-center\">
 							<h2 class=\"text-center\">Ocurrio un error :</h2>
