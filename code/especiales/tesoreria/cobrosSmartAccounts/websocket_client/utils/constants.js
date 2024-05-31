@@ -5,6 +5,7 @@ const ACTUAL_TRANSACTION = 'actual_transaction';
 const GET_TRANSACTION_STATUS = 'get_transaction_status';
 const SEND_TRANSACTION_STATUS = 'send_transaction_status';
 const INFORM_USERS = 'inform_users';
+const INFORM_FOLIO = 'inform_folio';
 
 export default {
   INFORM_TRANSACTIONS,
@@ -14,4 +15,5 @@ export default {
   GET_TRANSACTION_STATUS,
   SEND_TRANSACTION_STATUS,
   INFORM_USERS,
+  INFORM_FOLIO
 };

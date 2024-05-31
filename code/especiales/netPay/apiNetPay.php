@@ -5,10 +5,12 @@
 		private $link;
 		private $store_id;
 		private $NetPayStoreId;
-		function __construct( $connection, $store_id )
+		private $system_type;
+		function __construct( $connection, $store_id, $system_type )
 		{
 			$this->link = $connection;
 			$this->store_id = $store_id;
+			$this->system_type = $system_type;
 			//$this->NetPayStoreId = $this->getCurrentStoreId();
 			//die( $this->NetPayStoreId );
 		}
@@ -141,7 +143,7 @@
 
 		public function insertNetPetitionRow( $user_id, $store_id, $terminal_id, $store_id_netpay ){
 		//consulta token
-			$sql = "SELECT token FROM api_token WHERE id_user=-1 and expired_in > now() limit 1";
+			$sql = "SELECT token FROM api_token WHERE id_user = {$user_id} and expired_in > now() limit 1";//-1
 			$stm = $this->link->query($sql) or die( "Error al consultar el token : {$this->link->error}" );
 			$respuesta = $stm->fetch_assoc();
 			$token = $respuesta['token'];
@@ -228,6 +230,7 @@
 							"smart_accounts"=>true,
 							"store_id_netpay"=>"{$terminal['store_id']}",
 							"id_devolucion_relacionada"=>$id_devolucion_relacionada,
+							"tipo_sistema"=>$this->system_type,
 							"folio_unico_transaccion"=>"{$folio_unico_transaccion}"
 						),
 			            "serialNumber"=>"{$terminal['terminal_serie']}",
@@ -303,6 +306,7 @@ fclose($file);
 							"id_sesion_cajero"=>"{$session_id}",
 							"smart_accounts"=>true,
 							"store_id_netpay"=>$store_id_netpay,
+							"tipo_sistema"=>$this->system_type,
 							"folio_unico_transaccion"=>"{$folio_unico_transaccion}"
 						),
 			            "serialNumber"=>"{$terminal}",
@@ -365,6 +369,7 @@ fclose($file);
 							"id_sesion_cajero"=>"{$session_id}",
 							"smart_accounts"=>true,
 							"store_id_netpay"=>$store_id_netpay,
+							"tipo_sistema"=>$this->system_type,
 							"folio_unico_transaccion"=>"{$folio_unico_transaccion}"
 						),
 			            "serialNumber"=>"{$terminal}",
@@ -483,6 +488,7 @@ fclose($file);
 							"id_sesion_cajero"=>"{$session_id}",
 							"smart_accounts"=>true,
 							"store_id_netpay"=>$store_id_netpay,
+							"tipo_sistema"=>$this->system_type,
 							"folio_unico_transaccion"=>"{$folio_unico_transaccion}"
 						),
 			            "serialNumber"=>"{$terminal}",
