@@ -8,7 +8,7 @@ BEGIN
     DECLARE return_payment_store INTEGER;
     DECLARE teller_session_unique_folio VARCHAR( 30 );
     
-    IF( new.sincronizar = 1 )
+    IF( new.sincronizar = 1 AND ( new.folio_unico IS NOT NULL AND old.folio_unico IS NOT NULL ) )
     THEN
         SELECT id_sucursal INTO store_id FROM sys_sucursales WHERE acceso=1;
         SELECT id_sucursal INTO return_payment_store FROM ec_devolucion WHERE id_devolucion = new.id_devolucion;
