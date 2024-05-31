@@ -35,7 +35,7 @@ BEGIN
 	THEN
 		SELECT COUNT( * ) INTO row_counter FROM ec_transferencia_productos WHERE id_transferencia=idTransfer
 		AND omite_movimiento_origen = 0;
-	IF( row_counter > 0 )
+	/*IF( row_counter > 0 )
 	THEN
 	INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, 
 		id_orden_compra, lote, id_maquila, id_transferencia, id_almacen)
@@ -54,14 +54,14 @@ BEGIN
 	FROM ec_transferencia_productos tP
 	WHERE tP.id_transferencia=idTransfer
 	AND tP.omite_movimiento_origen = 0;
-	END IF;
+	END IF;*/
 	END IF;
 
 	IF( new.id_estado=9 AND new.id_estado!=old.id_estado AND (sucActual=-1 OR permiso_transfer=1) )
 	THEN
 		SELECT COUNT( * ) INTO row_counter FROM ec_transferencia_productos WHERE id_transferencia=idTransfer
 		AND omite_movimiento_destino = 0;
-		IF( row_counter > 0 )
+		/*IF( row_counter > 0 )
 		THEN
 			INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora,
 			observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen)
@@ -78,7 +78,7 @@ BEGIN
 			WHERE tP.id_transferencia=idTransfer
 			AND tP.total_piezas_recibidas != 0
 			AND tP.omite_movimiento_destino = 0;
-		END IF;
+		END IF;*/
 	END IF;
 
 	IF( new.sincronizar = 1 )
