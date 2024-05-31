@@ -15,11 +15,10 @@
 		//}else{
 		//}
 	*/
-		$sql = "SELECT id_sucursal FROM sys_sucursales AS system_type WHERE acceso = 1";
+		$sql = "SELECT id_sucursal AS system_type FROM sys_sucursales WHERE acceso = 1";
 		$stm = $link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$link->error}" );
 		$row = $stm->fetch_assoc();
 		$system_type = $row['system_type'];
-
 		include( '../../../netPay/apiNetPay.php' );
 		$apiNetPay = new apiNetPay( $link, $sucursal_id, $system_type );
 		$Payments = new Payments( $link, $user_sucursal );
