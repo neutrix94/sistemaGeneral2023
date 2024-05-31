@@ -170,7 +170,8 @@
 	}
 
     function informar_folio( folio_unico ){
-        ws.currentFolio = folio_unico;
+        ws.actualFolio = folio_unico;
+        console.log( folio_unico );
         /*{
             folio_unico: folio_unico,
             id_sucursal: $sucursal_websocket,
