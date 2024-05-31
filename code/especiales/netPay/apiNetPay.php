@@ -106,7 +106,7 @@
 			$row = $stm->fetch_assoc();
 			return $row;
 		}
-	//renovacion de token
+	//renovacion de token 
 		public function refreshToken( $token, $terminal_id ){
 			$apiUrl = $this->getEndpoint( $terminal_id, 'endpoint_token' );//obtiene url de api token
 			$refresh_token = $token['refresh_token'];
