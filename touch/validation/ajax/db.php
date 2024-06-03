@@ -1406,7 +1406,9 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 								<input 
 									type=\"number\" 
 									id=\"{$prefix}vrs_row_2_{$counter}\"
-									value=\"\" 
+									value=\"\"
+									min=\"0\"
+									onkeyup=\"prevent_negative_number( this, event );\"
 									class=\"form-control text-end\"
 									" . ( $is_editable != true ? ' readonly' : '' ) . 
 									( $is_editable == true ? "onchange=\"recalculateReturnProduct();\"" : "" ) 

@@ -11,11 +11,13 @@
     $Encrypt = new Encrypt();
     $token = '7dff3c34-faee-11ea-a7be-3d014d7f956c';
     $token = $Encrypt->encryptText( $token, '' );
-
+//die( "ok" . $body );
+//return json_encode($body);
     //$client = new \Devristo\Phpws\Client\WebSocket("wss://m9dksnfd-3003.usw3.devtunnels.ms/{$token}", $loop, $logger);
-    $client = new \Devristo\Phpws\Client\WebSocket("wss://sistemaalfa2024.com:3000/{$token}", $loop, $logger);
-
+    //$client = new \Devristo\Phpws\Client\WebSocket("wss://websocketserver-sqk76fij5a-uc.a.run.app/{$token}", $loop, $logger);
+    $client = new \Devristo\Phpws\Client\WebSocket("{$urlWebsocket}{$token}", $loop, $logger);
     $client->on("connect", function($headers) use ($logger, $client, $body){
+//die( $body );
     //$logger->notice("Connected to WebSocket");
         $json = json_decode( $body, true );
         //die( $json );

@@ -27,9 +27,13 @@ $app->post('/', function (Request $request, Response $response){
   //try{
     $body = $request->getBody();
     //var_dump( $body );
-    $file = fopen("archivo.txt", "w");
-    fwrite($file,"{$body}");
-    fclose($file);
+    try{
+      $file = fopen("archivo.txt", "w");
+      fwrite($file,"{$body}");
+      fclose($file);
+    }catch( Exception $e ){
+      die( "Error en escritura de arcchivo.txt : {$e}" );
+    }
   //}catch( Exception e ){
   //  die( "Error al escribir archivo txt : {$e}" );
   //}
@@ -149,14 +153,27 @@ $app->post('/', function (Request $request, Response $response){
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
 
   
-  if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
+  /*if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
     require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago
     $link->autocommit( true );
   }else{//peticion desde local
     $link->autocommit( true );
     require_once( './utils/conexion_con_websocket.php' );//consume websocket
-  }
+  }*/
 
+  if( isset( $traceability['tipo_sistema'] ) ){
+    if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
+      require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago
+      $link->autocommit( true );
+      $urlWebsocket = 'wss://websocketserverlocal-sqk76fij5a-uc.a.run.app/';
+    }else{//peticion desde local
+      $link->autocommit( true );
+      $urlWebsocket = 'wss://websocketserver-sqk76fij5a-uc.a.run.app/';
+    }
+    require_once( './utils/conexion_con_websocket.php' );//consume websocket
+  }else{
+    return json_encode( array( "code"=>"00", "message"=>"falta el parametro tracebility->tipo_sistema" ) );
+  }
 
 ob_start();
   $resp = array(
