@@ -30,7 +30,7 @@ const connectWebSocket = (ws_ref) => {
   ws.isProcessing = false;
   ws.eventQueue = ws_ref ? ws_ref.eventQueue : new Queue();
   ws.actualTransaction = ws_ref ? ws_ref.actualTransaction : null;
-  ws.currentFolio = ws_ref ? ws_ref.currentFolio : null;
+  ws.actualFolio = ws_ref ? ws_ref.actualFolio : null;
   ws.currentTransaction = ws_ref ? ws_ref.currentTransaction : null;
   ws.viewedFolios = ws_ref ? ws_ref.actualTransaction : [];
 
@@ -176,7 +176,7 @@ const connectWebSocket = (ws_ref) => {
     ws.send(
       JSON.stringify({
         type: events.INFORM_FOLIO,
-        payload: ws.currentFolio,
+        folio: ws.actualFolio,
       }),
     );
     ws.isProcessing = false;

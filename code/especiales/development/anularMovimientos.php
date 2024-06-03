@@ -1,7 +1,7 @@
 <?php
     include( '../../../conexionMysqli.php' );
 //consulta datos de movimientos de almacen
-    $sql = "SELECT * FROM ec_movimiento_almacen WHERE id_movimiento_almacen IN( 1390868, 1390867, 1390866, 1390865, 1390864,1390863, 1390862, 1390861)";
+    $sql = "SELECT * FROM ec_movimiento_almacen WHERE id_movimiento_almacen IN( 1390868, 1390867, 1390866, 1390865, 1390864,1390863, 1390862, 1390861, 1390859)";
     $stm = $link->query( $sql )or die( "Error al consultar los datos de movimientos de almacen : {$link->error}" );
 $link->autocommit( false );
     while( $ma = $stm->fetch_assoc() ){
