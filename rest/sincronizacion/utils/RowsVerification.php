@@ -84,7 +84,7 @@
                         hora_finalizacion AS datetime_end
                     FROM sys_sincronizacion_peticion
                     WHERE folio_unico = '{$petition_log['unique_folio']}'";
-            $stm = $this->link->query( $sql ) or die( "Error al consultar si existe la peticion en el destino" );
+            $stm = $this->link->query( $sql ) or die( "Error al consultar si existe la peticion en el destino : {$sql} : {$this->link->error}" );
             if( $stm->num_rows > 0 ){//existe
                 $row = $stm->fetch_assoc();
                 $resp = $row;
@@ -146,7 +146,7 @@
                     $sql = "SELECT id_movimiento_almacen_detalle FROM ec_movimiento_detalle WHERE folio_unico = '{$detail->folio_unico}'";
                     $stm_4 = $this->link->query( $sql ) or die( "Error al consultar si existe el detalle de movimiento de almacen : {$sql} : {$this->link->error}" );
                     if( $stm_4->num_rows <= 0 ){
-                        $sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_header_id}, {$detail->id_producto}, {$detail->cantidad}, {$detail->cantidad_surida},
+                        $sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_header_id}, {$detail->id_producto}, {$detail->cantidad}, {$detail->cantidad_surtida},
                                     {$detail->id_pedido_detalle}, {$detail->id_oc_detalle}, {$detail->id_producto}, {$detail->id_proveedor_producto}, {$movement->id_pantalla} )";
                         $stm_5 = $this->link->query( $sql ) or die( "Error al insertar detalle de movimientos de almacen : {$sql} : {$this->link->error}" );
                     }
@@ -209,5 +209,5 @@
             }
             return true;//existe
         }*/
-        
+
 ?>
