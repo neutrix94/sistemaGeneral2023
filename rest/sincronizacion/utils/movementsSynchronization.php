@@ -21,7 +21,7 @@
 			return 'ok';
 		}
 //hacer / obtener jsons de movimientos de almacen
-		public function getSynchronizationMovements( $system_store, $limit, $type ){
+		public function getSynchronizationMovements( $system_store, $limit, $type, $petition_unique_folio ){
 			$condition = "";
 			if( $type == 1 ){
 				$condition = "AND id_status_sincronizacion IN( 1 )";
@@ -53,6 +53,9 @@
 					
 					array_push( $resp, json_decode($row['data']) );//decodifica el JSON
 					$movements_counter ++;
+				//actualiza al status 2 los registros que va a enviar
+					$sql = "UPDATE sys_sincronizacion_movimientos_almacen SET id_status_sincronizacion = 2, folio_unico_peticion = '{$petition_unique_folio}' WHERE id_sincronizacion_movimiento_almacen = {$row['id_sincronizacion_movimiento_almacen']}";
+					$stm_2 = $this->link->query( $sql ) or die( "Error al poner registro de sincronizacion de movimiento de almacen en status 2 : {$sql} : {$this->link->error}" );
 				}
 			}
 			//var_dump( $resp );
@@ -109,16 +112,10 @@
 					}	
 				}
 				if( $is_valid == true ){
-				/*$sql = "INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, 
-				id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, status_agrupacion, id_equivalente, folio_unico, insertado_por_sincronizacion, sincronizar )
-				VALUES ( NULL,  ,  '{$movement['fecha']}', '{$movement['hora']}', 
-				, -1, 
-				'-1', '{$movement['lote']}', '{$movement['id_maquila']}', '{$movement['id_transferencia']}', 
-				'', '{$movement['status_agrupacion']}', '{$movement['id_equivalente']}', '{$movement['folio_unico']}', '1', '1' )";*/
-	//se inserta cabecera de movimiento de almacen por procedure
+				//se inserta cabecera de movimiento de almacen por procedure
 					$sql =  "CALL spMovimientoAlmacen_inserta( {$movement['id_usuario']}, '{$movement['observaciones']} \nInsertado desde API por sincronización', {$movement['id_sucursal']},
 						{$movement['id_almacen']}, {$movement['id_tipo_movimiento']}, -1, -1, '{$movement['id_maquila']}', {$movement['id_transferencia']}, {$movement['id_pantalla']} )";
-//fwrite($file, "{$sql}\n");
+				//fwrite($file, "{$sql}\n");
 				//reemplazamiento de comillas en consultas
 					$sql = str_replace( "'(", "(", $sql );
 					$sql = str_replace( "' (", "(", $sql );

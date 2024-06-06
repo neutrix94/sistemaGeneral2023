@@ -8,7 +8,6 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Descripción: Recupera y envia los movimientos de almacen que no se han sincronizado
 */
 $app->get('/obtener_movimientos_almacen', function (Request $request, Response $response){
-
   if ( ! include( '../../conexionMysqli.php' ) ){
     die( 'no se incluyó conexion' );
   }
@@ -34,6 +33,28 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   $initial_time = $config['process_initial_date_time'];
   $movements_limit = $config['rows_limit'];
 
+
+/*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
+  if( !include( 'utils/RowsVerification.php' ) ){
+    die( "No se pudo incluir la clase RowsVerification.php" );
+  }
+  $RowsVerification = new RowsVerification( $link );
+  $verification = $RowsVerification->getPendingWarehouseMovement( $system_store, -1 );//$origin_store_id, $destinity_store_id
+//codifica validacion en JSON
+  $post_data = json_encode( $verification );//return $post_data;
+//envia peticion
+  $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/valida_movimientos_almacen", $post_data );
+  var_dump( $result_1 );
+  die( "here" );
+/*para decodificar
+  $decode = json_decode( $post_data );
+  $row =  $decode->rows[0]->json;
+  $row_2 = json_decode( $row );
+  echo( $row_2->id_tipo_movimiento );
+*/
+  //die( 'here' );
+/*Fin de comprobacion de movimientos de almacen*/
+
 //return json_encode( $config );
 
 //valida que el origen no sea linea
@@ -43,38 +64,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
   }
 
-/*comprobacion de movimientos de almacen ( peticiones anteriores )*
-  $pending_responses['pending_responses'] = $SynchronizationManagmentLog->getPendingResponses( $system_store );
- // return json_encode( $pending_responses );
-  if( sizeof( $pending_responses ) > 0 ){//consulta respuestas pendientes
-    $pending_responses = json_encode( $pending_responses );
-    $validate_before_petition = $SynchronizationManagmentLog->sendPetition( $path.'/rest/v1/comprobacion_movimientos_almacen', $pending_responses );
-  //return json_encode( $validate_before_petition );
-    $validate_before_petition_decoded = json_decode( $validate_before_petition );
-    
-    if( $validate_before_petition_decoded == '' || $validate_before_petition_decoded == null ){
-      if( $validate_before_petition == '' || $validate_before_petition == null ){
-        $validate_before_petition = "Posiblemente no hay conexion con el servidor de Linea";
-      }
-      return json_encode( array( "response" => "Respuesta Erronea : {$validate_before_petition}" ) );
-    }  //before_petitions
-//return json_encode($validate_before_petition_decoded );
-    if( $validate_before_petition_decoded->before_petitions != '' && $validate_before_petition_decoded->before_petitions != null ){
-        $SynchronizationManagmentLog->updatePendingPetitions( $validate_before_petition_decoded->before_petitions );
-    }
-  }
-//die( 'ok' );*/
-
-//ejecuta el procedure para generar los movimientos de almacen
-  $setMovements = $movementsSynchronization->setNewSynchronizationMovements( $system_store, $system_store, $store_prefix, $movements_limit );
-  if( $setMovements != 'ok' ){
-  //liberar el modulo de sincronizacion
-    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_almacen' );
-    return json_encode( array( "response" => $setMovements ) );
-  }
-
-//consulta registros pendientes de sincronizar
-  $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 1 );
+  
 //var_dump($req["movements"]);
 //die( 'here' );
 //return json_encode( $req["movements"] );
@@ -82,6 +72,15 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
 //if ( sizeof( $req["movements"] ) > 0 ) {
   //inserta request
     $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN', 'sys_sincronizacion_movimientos_almacen' );
+  //ejecuta el procedure para generar los movimientos de almacen
+    $setMovements = $movementsSynchronization->setNewSynchronizationMovements( $system_store, $system_store, $store_prefix, $movements_limit );
+    if( $setMovements != 'ok' ){
+  //liberar el modulo de sincronizacion
+    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_almacen' );
+    return json_encode( array( "response" => $setMovements ) );
+  }
+  //consulta registros pendientes de sincronizar
+  $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 1, $req['log']['unique_folio'] );
   //forma peticion
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//
 //return $post_data;
@@ -161,11 +160,10 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
 
 
     $initial_time_2 = $SynchronizationManagmentLog->getCurrentTime();
-//consulta registros pendientes de sincronizar
-    $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 2 );
 //consume API para actualizar los inventarios de productos
     $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time_2, 'ACTUALIZACION DE INVENTARIOS PRODUCTOS', 'sys_sincronizacion_movimientos_almacen' );
-    
+//consulta registros pendientes de sincronizar
+    $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 2, $log['unique_folio'] );
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//
     $result_2 = $SynchronizationManagmentLog->sendPetition( $path.'/rest/sincronizacion/actualiza_inventarios_productos', $post_data );
 //return $result_2;

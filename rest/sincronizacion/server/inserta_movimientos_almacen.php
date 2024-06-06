@@ -92,16 +92,14 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   if( $system_store != -1 ){
     return json_encode( array( "response"=>"La sucursal es local y no puede ser servidor." ) );
   }
+  $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', 'sys_sincronizacion_movimientos_almacen' );
 //ejecuta el procedure para generar los movimientos de almacen
   $setMovements = $movementsSynchronization->setNewSynchronizationMovements( $log['origin_store'], $system_store, $store_prefix, $rows_limit );
   if( $setMovements != 'ok' ){
     return json_encode( array( "response" => $setMovements ) );
   }
 //consulta registros pendientes de sincronizar
-  $resp["rows_download"] = $movementsSynchronization->getSynchronizationMovements( $log['origin_store'], $rows_limit, 1 );
-  if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
-    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', 'sys_sincronizacion_movimientos_almacen' );
-  }
+  $resp["rows_download"] = $movementsSynchronization->getSynchronizationMovements( $log['origin_store'], $rows_limit, 1, $resp["log_download"]["unique_folio"] );
   $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_almacen', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   
 //desbloquea indicador de sincronizacion en tabla
