@@ -147,7 +147,7 @@
                     $stm_4 = $this->link->query( $sql ) or die( "Error al consultar si existe el detalle de movimiento de almacen : {$sql} : {$this->link->error}" );
                     if( $stm_4->num_rows <= 0 ){
                         $sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_header_id}, {$detail->id_producto}, {$detail->cantidad}, {$detail->cantidad_surtida},
-                                    {$detail->id_pedido_detalle}, {$detail->id_oc_detalle}, {$detail->id_proveedor_producto}, {$movement->id_pantalla}, {$detail->folio_unico} )";
+                                    {$detail->id_pedido_detalle}, {$detail->id_oc_detalle}, {$detail->id_proveedor_producto}, {$movement->id_pantalla}, '{$detail->folio_unico}' )";
                         $stm_5 = $this->link->query( $sql ) or die( "Error al insertar detalle de movimientos de almacen : {$sql} : {$this->link->error}" );
                     }
                 }
