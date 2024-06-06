@@ -128,7 +128,7 @@
                 if( $stm->num_rows <= 0 ){//no existe
                     //se inserta cabecera de movimiento de almacen por procedure
 				    $sql = "CALL spMovimientoAlmacen_inserta( {$movement->id_usuario}, '{$movement->observaciones} \nInsertado desde API por sincronización', {$movement->id_sucursal},
-                    {$movement->id_almacen}, {$movement->id_tipo_movimiento}, -1, -1, '{$movement->id_maquila}', {$movement->id_transferencia}, {$movement->id_pantalla} )";
+                    {$movement->id_almacen}, {$movement->id_tipo_movimiento}, -1, -1, '{$movement->id_maquila}', {$movement->id_transferencia}, {$movement->id_pantalla}, '{$movement->folio_unico}' )";
                     $stm = $this->link->query( $sql ) or die( "Error al insertar cabecera de movimiento de almacen : {$sql} : {$this->link->error}" );
                 //recupera el id insertado
                     $sql = "SELECT MAX( id_movimiento_almacen ) AS movement_id FROM ec_movimiento_almacen";
@@ -147,7 +147,7 @@
                     $stm_4 = $this->link->query( $sql ) or die( "Error al consultar si existe el detalle de movimiento de almacen : {$sql} : {$this->link->error}" );
                     if( $stm_4->num_rows <= 0 ){
                         $sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_header_id}, {$detail->id_producto}, {$detail->cantidad}, {$detail->cantidad_surtida},
-                                    {$detail->id_pedido_detalle}, {$detail->id_oc_detalle}, {$detail->id_proveedor_producto}, {$movement->id_pantalla} )";
+                                    {$detail->id_pedido_detalle}, {$detail->id_oc_detalle}, {$detail->id_proveedor_producto}, {$movement->id_pantalla}, {$detail->folio_unico} )";
                         $stm_5 = $this->link->query( $sql ) or die( "Error al insertar detalle de movimientos de almacen : {$sql} : {$this->link->error}" );
                     }
                 }
