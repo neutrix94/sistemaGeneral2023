@@ -21,13 +21,14 @@ $app->post('/valida_movimientos_almacen', function (Request $request, Response $
     $RowsVerification = new RowsVerification( $link );//instancia clase de comprobacion
     $petition_log = $request->getParam( 'petition' );//recibe folio unico de la peticion
     $verification = $request->getParam( 'verification' );
+    $origin_store = $request->getParam( 'origin_store' );
     $movements = $request->getParam( 'rows' );
     if( $verification == true ){
     //consulta si la peticion existe en linea
         $resp['log_response'] = $RowsVerification->validateIfExistsPetitionLog( $petition_log );
         $resp ['rows_response'] = $RowsVerification->warehouseMovementsValidation( $movements );//realiza proceso de comprobacion
     }
-    $resp['rows_download'] = $RowsVerification->getPendingWarehouseMovement( -1, $petition_log['origin_store'] );//consulta las comprobaciones pendientes de linea a local
+    $resp['rows_download'] = $RowsVerification->getPendingWarehouseMovement( -1, $origin_store );//consulta las comprobaciones pendientes de linea a local
     $resp['status'] = 200;
     return json_encode( $resp );
 });

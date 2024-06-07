@@ -41,7 +41,8 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   $RowsVerification = new RowsVerification( $link );
   $verification = $RowsVerification->getPendingWarehouseMovement( $system_store, -1 );//$origin_store_id, $destinity_store_id
 //codifica validacion en JSON
-  $post_data = json_encode( $verification );//return $post_data;
+  $verification['origin_store'] = $system_store;
+  $post_data = json_encode( $verification );return $post_data;
 //envia peticion
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/valida_movimientos_almacen", $post_data );
 //procesa respuesta de comprobacion
@@ -54,7 +55,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     }
   }
   $verification_req = array();
-  //var_dump( $resultado );die( "here" );
+  var_dump( $resultado );die( "here" );
 //ejecuta la comprobacion de linea a local
   if( $resultado->rows_download != null && $resultado->rows_download != '' ){
     $download = $resultado->rows_download;
