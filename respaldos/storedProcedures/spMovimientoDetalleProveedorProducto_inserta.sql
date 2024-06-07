@@ -1,4 +1,4 @@
-DROP PROCEDURE IF EXISTS spMovimientoDetalleProveedorProducto_inserta;
+DROP PROCEDURE IF EXISTS spMovimientoDetalleProveedorProducto_inserta|
 DELIMITER $$
 create procedure spMovimientoDetalleProveedorProducto_inserta (
  IN id_movimiento_almacen_detalle INTEGER(11)

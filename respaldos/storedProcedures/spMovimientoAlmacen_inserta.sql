@@ -1,4 +1,4 @@
-DROP PROCEDURE IF EXISTS spMovimientoAlmacen_inserta;
+DROP PROCEDURE IF EXISTS spMovimientoAlmacen_inserta|
 DELIMITER $$
 CREATE procedure spMovimientoAlmacen_inserta (
  IN id_usuario INT
