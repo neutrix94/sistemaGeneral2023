@@ -92,7 +92,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   if( $system_store != -1 ){
     return json_encode( array( "response"=>"La sucursal es local y no puede ser servidor." ) );
   }
-  $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', 'sys_sincronizacion_movimientos_almacen' );
+  $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'],  $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', 'sys_sincronizacion_movimientos_almacen' );
 //ejecuta el procedure para generar los movimientos de almacen
   $setMovements = $movementsSynchronization->setNewSynchronizationMovements( $log['origin_store'], $system_store, $store_prefix, $rows_limit );
   if( $setMovements != 'ok' ){

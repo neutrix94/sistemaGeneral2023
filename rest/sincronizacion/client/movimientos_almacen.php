@@ -61,16 +61,13 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     $download = $resultado->rows_download;
     $petition_log = json_decode(json_encode($download->petition), true);//$array = json_decode(json_encode($object), true);
     $movements = json_decode(json_encode($download->rows), true);//$download->rows;
-    //var_dump( $petition_log );die('');
     if( $download->verification == true ){
-    //consulta si la peticion existe en local
-      $verification_req['log_response'] = $RowsVerification->validateIfExistsPetitionLog( $petition_log );
+      $verification_req['log_response'] = $RowsVerification->validateIfExistsPetitionLog( $petition_log );//consulta si la peticion existe en local
       $verification_req['rows_response'] = $RowsVerification->warehouseMovementsValidation( $movements );//realiza proceso de comprobacion
-     // die('here3');
     //consume servicio para actualizar la comprobacion
-      $post_data = json_encode( $verification_req );//return $post_data;
+      $post_data = json_encode( $verification_req );
       $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_comprobacion_movimientos_almacen", $post_data );
-      var_dump( $result_1 );die( "here" );
+      //var_dump( $result_1 );die( "here" );
     }
   }
 /* 
@@ -84,7 +81,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     }
     $resp['rows_download'] = $RowsVerification->getPendingWarehouseMovement( -1, $petition_log['origin_store'] );//consulta las comprobaciones pendientes de linea a local
 */
-  echo 'Comprobacion ejecutada exitosamente.';
+ // echo 'Comprobacion ejecutada exitosamente.';
   //var_dump( $resultado->log_response );
   
   //die( "here" );
@@ -184,7 +181,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
     //aqui actualiza inventario de lo que viene de linea  
-      $movementsSynchronization->updateInventory( $rows_download );//suma el inventario
+      //$movementsSynchronization->updateInventory( $rows_download );//suma el inventario
     //inserta respuesta exitosa
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"] );
       $resp["log"]["type_update"] = "movementsSynchronization";
@@ -200,7 +197,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
 
 
 
-
+/*
     $initial_time_2 = $SynchronizationManagmentLog->getCurrentTime();
 //consume API para actualizar los inventarios de productos
     $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time_2, 'ACTUALIZACION DE INVENTARIOS PRODUCTOS', 'sys_sincronizacion_movimientos_almacen' );
@@ -238,7 +235,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
 //var_dump($result->log );
       $SynchronizationManagmentLog->updatePetitionLog( $result->log->destinity_time, $result->log->response_time, $result->log->response_string, 
         $result->log->unique_folio );
-    }
+    }*/
 //liberar el modulo de sincronizacion
   $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_almacen' );
 //return $result_2;

@@ -135,7 +135,8 @@
 		              SET hora_llegada_destino = '{$destinity_time}',
 		                hora_respuesta = '{$response_time}',
 		                contenido_respuesta = '{$response_string}',
-		                hora_llegada_respuesta = NOW()
+		                hora_llegada_respuesta = NOW(),
+		                hora_finalizacion = NOW()
 		            WHERE folio_unico = '{$unique_folio}'";
 		    $stm = $this->link->query( $sql ) or die( "Error al actualizar respuesta de sincronización : {$sql} {$this->link->error}" );
 			return $this->getPetitionLog( $unique_folio );
@@ -241,7 +242,8 @@
 				$sql = "UPDATE sys_sincronizacion_peticion
 							SET {$updates}
 							contenido_respuesta = '{$tmp}',
-							hora_llegada_respuesta = NOW()
+							hora_llegada_respuesta = NOW(),
+							hora_finalizacion = NOW()
 						WHERE folio_unico = '{$before_petition->unique_folio}'";
 		//echo ( $sql );
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar datos de respuesta pendiente : {$sql} {$this->link->error}" );

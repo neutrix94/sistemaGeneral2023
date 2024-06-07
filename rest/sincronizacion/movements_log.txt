@@ -1,2 +1,5 @@
-CALL spMovimientoAlmacenDetalle_inserta( 1391065, 1888, 12.0000, 12.0000, -1,
-										-1, IF( 125 IS NULL OR '125' = '', NULL, '125', 3 )
+CALL spMovimientoAlmacenDetalle_inserta( 1391071, 2178, 72.0000, 72.0000, -1,
+										-1, IF( 1 IS NULL OR '1' = '', NULL, '1' ), 
+										3, '24LNA_MD_4293276' )
+
+
