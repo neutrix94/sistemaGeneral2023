@@ -159,6 +159,31 @@
             //die( $resp['ok_rows'] );
             return $resp;
         }
+
+        public function updateLogAndJsonsRows( $log_response, $rows_response ){
+            $this->link->autocommit( false );
+            //die( "here1" );
+            $sql = "UPDATE sys_sincronizacion_peticion SET hora_llegada_destino = IF( hora_llegada_destino IS NULL OR hora_llegada_destino = '', '{$log_response->datetime_destinity}', hora_llegada_destino ),
+                        hora_respuesta = IF( hora_respuesta IS NULL OR hora_respuesta = '', '{$log_response->datetime_send_response}', hora_respuesta ),
+                        contenido_respuesta = IF( contenido_respuesta IS NULL OR contenido_respuesta = '', '{$log_response->response_content}', contenido_respuesta ),
+                        hora_llegada_respuesta = IF( hora_llegada_respuesta IS NULL OR hora_llegada_respuesta = '', NOW(), hora_llegada_respuesta ),
+                        hora_llegada_respuesta = IF( hora_llegada_respuesta IS NULL OR hora_llegada_respuesta = '', NOW(), hora_llegada_respuesta ),
+                        hora_finalizacion = NOW()
+                    WHERE folio_unico = '{$log_response->unique_folio}'";//die( $sql );
+            $stm = $this->link->query( $sql ) or die( "Error al actualizar la peticion (comprobación) local : {$sql} : {$this->link->error}" );
+        //actualiza los registros correctos
+            $ok_rows = $rows_response->ok_rows;
+            $uniques_folios = '';
+            $ok_rows = explode( '|', $ok_rows );//= str_replace( '|', ',', $ok_rows );
+            foreach ($ok_rows as $key => $row) {
+                $uniques_folios .= ( $uniques_folios == '' ? '' : ',' );
+                $uniques_folios .= "'{$row}'";
+            }
+            $sql = "UPDATE sys_sincronizacion_movimientos_almacen SET id_status_sincronizacion = 3 WHERE registro_llave IN( $uniques_folios )";
+            $stm = $this->link->query( $sql ) or die( "Error al actualizar detalles (jsons) local : {$sql} : {$this->link->error}" );
+            $this->link->autocommit( true );
+            return 'ok';
+        }
     }
 
 

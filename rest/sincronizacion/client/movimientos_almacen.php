@@ -35,7 +35,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
 
 
 /*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
-  if( !include( 'utils/RowsVerification.php' ) ){
+  if( !include( 'utils/RowsVerification.php' ) ){ 
     die( "No se pudo incluir la clase RowsVerification.php" );
   }
   $RowsVerification = new RowsVerification( $link );
@@ -44,8 +44,41 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   $post_data = json_encode( $verification );//return $post_data;
 //envia peticion
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/valida_movimientos_almacen", $post_data );
-  var_dump( $result_1 );
-  die( "here" );
+//procesa respuesta de comprobacion
+  $resultado = json_decode( $result_1 );
+ // var_dump( $resultado->rows_response );die('');
+  if( $resultado->log_response != null && $resultado->log_response != '' ){
+    $update_log = $RowsVerification->updateLogAndJsonsRows( $resultado->log_response, $resultado->rows_response );
+    if( $update_log != 'ok' ){
+      die( "Hubo un error : {$update_log}" );
+    }
+  }
+  $verification_req = array();
+  //var_dump( $resultado );die( "here" );
+//ejecuta la comprobacion de linea a local
+  if( $resultado->rows_download != null && $resultado->rows_download != '' ){
+    $download = $resultado->rows_download;
+    if( $download->verification == true ){
+    //consulta si la peticion existe en local
+      $verification_req['log_response'] = $RowsVerification->validateIfExistsPetitionLog( $petition_log );
+      $verification_req['rows_response'] = $RowsVerification->warehouseMovementsValidation( $movements );//realiza proceso de comprobacion
+    }
+  }
+/* 
+  $petition_log = $request->getParam( 'petition' );//recibe folio unico de la peticion
+    $verification = $request->getParam( 'verification' );
+    $movements = $request->getParam( 'rows' );
+    if( $verification == true ){
+    //consulta si la peticion existe en linea
+        $resp['log_response'] = $RowsVerification->validateIfExistsPetitionLog( $petition_log );
+        $resp ['rows_response'] = $RowsVerification->warehouseMovementsValidation( $movements );//realiza proceso de comprobacion
+    }
+    $resp['rows_download'] = $RowsVerification->getPendingWarehouseMovement( -1, $petition_log['origin_store'] );//consulta las comprobaciones pendientes de linea a local
+*/
+  echo 'Comprobacion ejecutada exitosamente.';
+  //var_dump( $resultado->log_response );
+  
+  //die( "here" );
 /*para decodificar
   $decode = json_decode( $post_data );
   $row =  $decode->rows[0]->json;
