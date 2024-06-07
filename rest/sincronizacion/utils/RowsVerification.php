@@ -168,8 +168,7 @@
                         hora_respuesta = IF( hora_respuesta IS NULL OR hora_respuesta = '', '{$log_response->datetime_send_response}', hora_respuesta ),
                         contenido_respuesta = IF( contenido_respuesta IS NULL OR contenido_respuesta = '', '{$log_response->response_content}', contenido_respuesta ),
                         hora_llegada_respuesta = IF( hora_llegada_respuesta IS NULL OR hora_llegada_respuesta = '', NOW(), hora_llegada_respuesta ),
-                        hora_llegada_respuesta = IF( hora_llegada_respuesta IS NULL OR hora_llegada_respuesta = '', NOW(), hora_llegada_respuesta ),
-                        hora_finalizacion = NOW()
+                        hora_finalizacion = IF( hora_finalizacion IS NULL OR hora_finalizacion = '', NOW(), hora_finalizacion )
                     WHERE folio_unico = '{$log_response->unique_folio}'";//die( $sql );
             $stm = $this->link->query( $sql ) or die( "Error al actualizar la peticion (comprobación) local : {$sql} : {$this->link->error}" );
         //actualiza los registros correctos

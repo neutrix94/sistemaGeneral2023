@@ -10,8 +10,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 */
 $app->post('/actualiza_comprobacion_movimientos_almacen', function (Request $request, Response $response){  
     $resp = array();
-    $resp['rows_response'] = array();
-    $resp['rows_download'] = array();
+    //$resp['rows_response'] = array();
+    //$resp['rows_download'] = array();
     if ( ! include( '../../conexionMysqli.php' ) ){
         die( 'no se incluyó conexion' );
     }
@@ -23,8 +23,8 @@ $app->post('/actualiza_comprobacion_movimientos_almacen', function (Request $req
     $rows_response = json_decode( json_encode( $request->getParam( 'rows_response' ) ) );//recibe folio unico de la peticion
     //$verification = $request->getParam( 'verification' );
     //$origin_store = $request->getParam( 'origin_store' );
-    if( $log_response != null && $log_response != '' ){
-        $update_log = $RowsVerification->updateLogAndJsonsRows( $log_response, $rows_response );
+    if( $petition_log != null && $petition_log != '' ){
+        $update_log = $RowsVerification->updateLogAndJsonsRows( $petition_log, $rows_response );
         if( $update_log != 'ok' ){
           die( "Hubo un error : {$update_log}" );
         }
