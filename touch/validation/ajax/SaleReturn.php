@@ -254,7 +254,7 @@
 		            }else if($i==1){
 		                $almacen_id = $this->external_warehouse;
 		            }
-           			$insMov = "CALL spMovimientoAlmacen_inserta ( {$this->user}, 'DEVOLUCION', {$this->store_id}, {$almacen_id}, 12, -1, -1, -1, -1, 14 )";
+           			$insMov = "CALL spMovimientoAlmacen_inserta ( {$this->user}, 'DEVOLUCION', {$this->store_id}, {$almacen_id}, 12, -1, -1, -1, -1, 14, NULL )";
 		            $eje = $this->link->query( $insMov )or die( "error|Error al insertar el encabezado de movimiento de almacén con entrada por devolución : {$this->link->error} {$insMov}");
 		            if($i==0){
 		                /*$sql = "SELECT LAST_INSERT_ID() AS last_id";
@@ -313,7 +313,7 @@
             	$stm = $this->link->query( $sql ) or die( "Error al consultar todo el detalle de movimiento devolución : {$this->link->error}" );
 				while( $dev_row = $stm->fetch_assoc() ){
 					$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$dev_row['movement_header_id']}, {$dev_row['product_id']}, {$dev_row['quantity']}, 
-						{$dev_row['quantity']}, -1, -1, NULL, 14 )";
+						{$dev_row['quantity']}, -1, -1, NULL, 14, NULL )";
 					$exc_procedure = $this->link->query( $sql ) or die( "Error al mandar llamar procedure spMovimientoAlmacenDetalle_inserta : {$this->link->error} {$sql}" );
 				}
 		//echo $sql;	
@@ -394,7 +394,7 @@
 			            0";*/
 					$movement_header_id = ( $product['is_external'] == 0 ? $this->internal_return_movement_id : $this->external_return_movement_id );
 					$ins_mov_det = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_header_id}, {$product['product_id']}, {$product['return_quantity']}, 
-					{$product['return_quantity']}, -1, -1, NULL, 14 )";
+					{$product['return_quantity']}, -1, -1, NULL, 14, NULL )";
 		            $eje = $this->link->query( $ins_mov_det ) or die( "Error al insertar el detalle de movimiento por devolución 1 : {$ins_mov_det} {$this->link->error} " );
 				}//fin de si esta pagado
 
@@ -464,7 +464,7 @@
 			            0";*/
 					$movement_header_id = ( $product['is_external'] == 0 ? $this->internal_return_movement_id : $this->external_return_movement_id );
 					$ins_mov_det = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_header_id}, {$product['product_id']}, {$product['return_quantity']}, 
-					{$product['return_quantity']}, -1, -1, NULL, 14 )";
+					{$product['return_quantity']}, -1, -1, NULL, 14, NULL )";
 		            $eje = $this->link->query( $ins_mov_det ) or die( "Error al insertar el detalle de movimiento por devolución 2 : {$this->link->error} " );
 				}//fin de si esta pagado
 

@@ -439,7 +439,7 @@ include( '../especiales/plugins/inventory.php' );//implementación Oscar 2022
 		$sqlCommand=$sqlHead.")".$sqlVals.")";
 		if( $tabla == 'ec_movimiento_almacen' && $accion == 'insertar'){
 			$sqlCommand = "CALL spMovimientoAlmacen_inserta( {$user_id}, '{$observaciones}', {$id_sucursal}, {$id_almacen}, {$id_tipo_movimiento}, {$id_pedido}, {$id_orden_compra}, 
-				{$id_maquila}, -1, 3 )";
+				{$id_maquila}, -1, 3, NULL )";
 		}
 
 

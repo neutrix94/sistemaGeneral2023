@@ -171,7 +171,7 @@
             }else if($i==1){
                 $almacen_id = $id_almacen_externo;
             }
-            $sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, 'DEVOLUCION $fol_dev', {$user_sucursal}, {$almacen_id}, 12, -1, -1, -1, -1, 13 )";
+            $sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, 'DEVOLUCION $fol_dev', {$user_sucursal}, {$almacen_id}, 12, -1, -1, -1, -1, 13, NULL )";
             // $insMov.=",-1,null,now() )";
             $eje=mysql_query($sql)or die("Error al insertar el encabezado de movimiento de almacén con entrada por devolución2....".$insMov.mysql_error());
             $ma_stm = mysql_query( "SELECT max( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen" ) or die( "Error al recuperar id ma insertado : " . mysql_error() );
@@ -232,7 +232,7 @@
             while( $detail_row = $stm_detail->fetch_assoc() ){
             $ins_mov_det = "CALL spMovimientoAlmacenDetalle_inserta( {$detail_row['id_movimiento']}, 
             {$detail_row['id_producto']}, {$detail_row['cantidad']}, {$detail_row['cantidad_surtida']}, 
-            {$detail_row['id_pedido_detalle']}, -1, {$detail_row['id_proveedor_producto']}, 13 );";		
+            {$detail_row['id_pedido_detalle']}, -1, {$detail_row['id_proveedor_producto']}, 13, NULL );";		
             $eje=mysql_query($ins_mov_det);
             if(!$eje){
                 $error=mysql_error();
@@ -336,7 +336,7 @@
             
             $id_movimiento_almacen = ( $r[2] == 0 ? $id_nvo_mov_int : $id_nvo_mov_ext );
             $ins_mov_det = "CALL spMovimientoAlmacenDetalle_inserta( {$id_movimiento_almacen}, 
-            {$get_product_id}, {$get_quantity}, {$get_quantity}, -1, -1, NULL, 13 );";	
+            {$get_product_id}, {$get_quantity}, {$get_quantity}, -1, -1, NULL, 13, NULL );";	
             $eje=mysql_query($ins_mov_det);
             if(!$eje){
                 $error=mysql_error();
