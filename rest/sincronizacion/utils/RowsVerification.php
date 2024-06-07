@@ -96,7 +96,7 @@
             }else{//no_existe
                 $sql = "INSERT INTO sys_sincronizacion_peticion ( id_sucursal_origen, id_sucursal_destino, tabla, tipo, hora_comienzo, 
                             hora_envio, hora_llegada_destino, hora_respuesta, contenido_respuesta, hora_llegada_respuesta, hora_finalizacion, folio_unico )
-                        VALUES ( {$petition_log['origin_store']}, {$petition_log['destinity_store']}, '{$petition_log['table_name']}', {$petition_log['petition_type']}, {$petition_log['datetime_start']}, 
+                        VALUES ( {$petition_log['origin_store']}, {$petition_log['destinity_store']}, '{$petition_log['table_name']}', '{$petition_log['petition_type']}', {$petition_log['datetime_start']}, 
                         {$petition_log['datetime_send']}, NOW(), NOW(), '', NOW(), NOW(), '{$petition_log['unique_folio']}' )";
                 $stm = $this->link->query( $sql ) or die( "Error al insertar el registro de sincronizacion en el destino : {$sql} : {$this->link->error}" );
                 $resp = $petition_log;
