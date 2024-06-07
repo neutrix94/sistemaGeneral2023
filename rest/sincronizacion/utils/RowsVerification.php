@@ -163,6 +163,7 @@
         public function updateLogAndJsonsRows( $log_response, $rows_response ){
             $this->link->autocommit( false );
             //die( "here1" );
+            $log_response->response_content = str_replace( "'", "\'", $log_response->response_content );
             $sql = "UPDATE sys_sincronizacion_peticion SET hora_llegada_destino = IF( hora_llegada_destino IS NULL OR hora_llegada_destino = '', '{$log_response->datetime_destinity}', hora_llegada_destino ),
                         hora_respuesta = IF( hora_respuesta IS NULL OR hora_respuesta = '', '{$log_response->datetime_send_response}', hora_respuesta ),
                         contenido_respuesta = IF( contenido_respuesta IS NULL OR contenido_respuesta = '', '{$log_response->response_content}', contenido_respuesta ),
