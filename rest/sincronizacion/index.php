@@ -58,9 +58,10 @@
 	//server consultas predisenadas desarrollo ( 2023 )
 	require 'server/restauracion.php';
 
-	
+
 //comprobaciones 2024
 	require 'server/wharehouseMovementVerification.php';
+	require 'server/warehouseMovementVerificationServer.php';
 
 
 //Servicios de Cliente

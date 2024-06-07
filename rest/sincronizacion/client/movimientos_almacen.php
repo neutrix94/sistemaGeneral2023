@@ -42,7 +42,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   $verification = $RowsVerification->getPendingWarehouseMovement( $system_store, -1 );//$origin_store_id, $destinity_store_id
 //codifica validacion en JSON
   $verification['origin_store'] = $system_store;
-  $post_data = json_encode( $verification );return $post_data;
+  $post_data = json_encode( $verification );//return $post_data;
 //envia peticion
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/valida_movimientos_almacen", $post_data );
 //procesa respuesta de comprobacion
@@ -54,15 +54,23 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
       die( "Hubo un error : {$update_log}" );
     }
   }
+  //var_dump( $resultado );die('');
   $verification_req = array();
-  var_dump( $resultado );die( "here" );
 //ejecuta la comprobacion de linea a local
   if( $resultado->rows_download != null && $resultado->rows_download != '' ){
     $download = $resultado->rows_download;
+    $petition_log = json_decode(json_encode($download->petition), true);//$array = json_decode(json_encode($object), true);
+    $movements = json_decode(json_encode($download->rows), true);//$download->rows;
+    //var_dump( $petition_log );die('');
     if( $download->verification == true ){
     //consulta si la peticion existe en local
       $verification_req['log_response'] = $RowsVerification->validateIfExistsPetitionLog( $petition_log );
       $verification_req['rows_response'] = $RowsVerification->warehouseMovementsValidation( $movements );//realiza proceso de comprobacion
+     // die('here3');
+    //consume servicio para actualizar la comprobacion
+      $post_data = json_encode( $verification_req );//return $post_data;
+      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_comprobacion_movimientos_almacen", $post_data );
+      var_dump( $result_1 );die( "here" );
     }
   }
 /* 
