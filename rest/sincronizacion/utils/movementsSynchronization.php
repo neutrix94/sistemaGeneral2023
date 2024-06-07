@@ -114,7 +114,8 @@
 				if( $is_valid == true ){
 				//se inserta cabecera de movimiento de almacen por procedure
 					$sql =  "CALL spMovimientoAlmacen_inserta( {$movement['id_usuario']}, '{$movement['observaciones']} \nInsertado desde API por sincronización', {$movement['id_sucursal']},
-						{$movement['id_almacen']}, {$movement['id_tipo_movimiento']}, -1, -1, '{$movement['id_maquila']}', {$movement['id_transferencia']}, {$movement['id_pantalla']} )";
+						{$movement['id_almacen']}, {$movement['id_tipo_movimiento']}, -1, -1, '{$movement['id_maquila']}', {$movement['id_transferencia']}, {$movement['id_pantalla']}, 
+						'{$movement['folio_unico']}' )";
 				//fwrite($file, "{$sql}\n");
 				//reemplazamiento de comillas en consultas
 					$sql = str_replace( "'(", "(", $sql );
@@ -143,7 +144,8 @@
 							{$detail['id_pedido_detalle']}, -1, IF( {$detail['id_proveedor_producto']} IS NULL OR '{$detail['id_proveedor_producto']}' = '', NULL, '{$detail['id_proveedor_producto']}' ), '0', 
 							'1', '{$detail['folio_unico']}', '1' )";*/
 							$sql = "CALL spMovimientoAlmacenDetalle_inserta( {$movement_id}, {$detail['id_producto']}, {$detail['cantidad']}, {$detail['cantidad']}, {$detail['id_pedido_detalle']},
-										-1, IF( {$detail['id_proveedor_producto']} IS NULL OR '{$detail['id_proveedor_producto']}' = '', NULL ), '{$detail['id_proveedor_producto']}', {$movement['id_pantalla']} )";
+										-1, IF( {$detail['id_proveedor_producto']} IS NULL OR '{$detail['id_proveedor_producto']}' = '', NULL, '{$detail['id_proveedor_producto']}' ), 
+										{$movement['id_pantalla']}, '{$detail['folio_unico']}' )";
 							$stm = $this->link->query( $sql );// or die( "Error al insertar detalle de movimiento de almacen : {$sql} :  {$this->link->error}" );
 							fwrite($file, "{$sql}\n" );
 							if( ! $stm ){
