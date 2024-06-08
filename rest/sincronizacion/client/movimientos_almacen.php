@@ -34,33 +34,36 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   $movements_limit = $config['rows_limit'];
 
 /*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
-  if( !include( 'utils/RowsVerification.php' ) ){ 
-    die( "No se pudo incluir la clase RowsVerification.php" );
+  if( !include( 'utils/warehouseMovementsRowsVerification.php' ) ){ 
+    die( "No se pudo incluir la clase warehouseMovementsRowsVerification.php" );
   }
-  $RowsVerification = new RowsVerification( $link );
-  $verification = $RowsVerification->getPendingWarehouseMovement( $system_store, -1 );//obtiene los registros de comprobacion de movientos de almacen
+  $warehouseMovementsRowsVerification = new warehouseMovementsRowsVerification( $link );
+  $verification = $warehouseMovementsRowsVerification->getPendingWarehouseMovement( $system_store, -1 );//obtiene los registros de comprobacion de movientos de almacen
   $verification['origin_store'] = $system_store;//id sucursal origen de verificacion
   $post_data = json_encode( $verification );//codifica validacion en JSON
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/valida_movimientos_almacen", $post_data );//envia peticion
   $resultado = json_decode( $result_1 );//procesa respuesta de comprobacion
   if( $resultado->log_response != null && $resultado->log_response != '' ){
-    $update_log = $RowsVerification->updateLogAndJsonsRows( $resultado->log_response, $resultado->rows_response );
+    $update_log = $warehouseMovementsRowsVerification->updateLogAndJsonsRows( $resultado->log_response, $resultado->rows_response );
     if( $update_log != 'ok' ){
       die( "Hubo un error : {$update_log}" );
     }
   }
   //ejecuta la comprobacion de linea a local
   $verification_req = array();
-  if( $resultado->rows_download != null && $resultado->rows_download != '' ){
+  if( $resultado->rows_download != null && $resultado->rows_download != '' ){//echo 'here';
     $download = $resultado->rows_download;
     $petition_log = json_decode(json_encode($download->petition), true);//$array = json_decode(json_encode($object), true);
     $movements = json_decode(json_encode($download->rows), true);//$download->rows;
     if( $download->verification == true ){
-      $verification_req['log_response'] = $RowsVerification->validateIfExistsPetitionLog( $petition_log );//consulta si la peticion existe en local
-      $verification_req['rows_response'] = $RowsVerification->warehouseMovementsValidation( $movements );//realiza proceso de comprobacion
-   
-      $post_data = json_encode( $verification_req );
-      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_comprobacion_movimientos_almacen", $post_data );//consume servicio para actualizar la comprobacion en linea
+      if( sizeof($petition_log) > 0 ){
+        //var_dump( $resultado );
+        $verification_req['log_response'] = $warehouseMovementsRowsVerification->validateIfExistsPetitionLog( $petition_log );//consulta si la peticion existe en local
+        $verification_req['rows_response'] = $warehouseMovementsRowsVerification->warehouseMovementsValidation( $movements );//realiza proceso de comprobacion
+    
+        $post_data = json_encode( $verification_req );
+        $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_comprobacion_movimientos_almacen", $post_data );//consume servicio para actualizar la comprobacion en linea
+      }
     }
   }
 /*Fin de comprobacion de movimientos de almacen*/

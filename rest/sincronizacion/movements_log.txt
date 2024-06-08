@@ -1,8 +1,5 @@
-CALL spMovimientoAlmacenDetalle_inserta( 1391072, 1821, 10.0000, 10.0000, -1,
-										-1, IF( 64 IS NULL OR '64' = '', NULL, '64' ), 
-										3, '24LNA_MD_4293277' )
-CALL spMovimientoAlmacenDetalle_inserta( 1391072, 2647, 2.0000, 2.0000, -1,
-										-1, IF( 1671 IS NULL OR '1671' = '', NULL, '1671' ), 
-										3, '24LNA_MD_4293278' )
+CALL spMovimientoAlmacenDetalle_inserta( 1391074, 3097, 4.0000, 4.0000, -1,
+										-1, IF( 1344 IS NULL OR '1344' = '', NULL, '1344' ), 
+										3, '24LNA_MD_4293280' )
 
 

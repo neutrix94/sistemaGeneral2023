@@ -17,7 +17,7 @@
 			return 'ok';
 		}
 //hacer / obtener jsons de movimientos de almacen
-		public function getSynchronizationProductProviderMovements( $system_store, $limit ){
+		public function getSynchronizationProductProviderMovements( $system_store, $limit, $petition_unique_folio ){
 			$resp = array();
 			$sql = "SELECT 
 						id_sincronizacion_movimiento_proveedor_producto,
@@ -45,6 +45,10 @@
 					
 					array_push( $resp, json_decode($row['data']) );//decodifica el JSON
 					$movements_counter ++;
+				//actualiza al status 2 los registros que va a enviar
+					$sql = "UPDATE sys_sincronizacion_movimientos_proveedor_producto SET id_status_sincronizacion = 2, folio_unico_peticion = '{$petition_unique_folio}' 
+					WHERE id_sincronizacion_movimiento_proveedor_producto = {$row['id_sincronizacion_movimiento_proveedor_producto']}";
+					$stm_2 = $this->link->query( $sql ) or die( "Error al poner registro de sincronizacion de detalle movimiento de almacen proveedor producto en status 2 : {$sql} : {$this->link->error}" );
 				}
 			}
 			//var_dump( $resp );

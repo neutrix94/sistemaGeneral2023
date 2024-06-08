@@ -15,20 +15,20 @@ $app->post('/valida_movimientos_almacen', function (Request $request, Response $
     if ( ! include( '../../conexionMysqli.php' ) ){
         die( 'no se incluyó conexion' );
     }
-    if( ! include( 'utils/RowsVerification.php' ) ){
-        die( "Error al incluir clase RowsVerification.php" );
+    if( ! include( 'utils/warehouseMovementsRowsVerification.php' ) ){
+        die( "Error al incluir clase warehouseMovementsRowsVerification.php" );
     }
-    $RowsVerification = new RowsVerification( $link );//instancia clase de comprobacion
+    $warehouseMovementsRowsVerification = new warehouseMovementsRowsVerification( $link );//instancia clase de comprobacion
     $petition_log = $request->getParam( 'petition' );//recibe folio unico de la peticion
     $verification = $request->getParam( 'verification' );
     $origin_store = $request->getParam( 'origin_store' );
     $movements = $request->getParam( 'rows' );
     if( $verification == true ){
     //consulta si la peticion existe en linea
-        $resp['log_response'] = $RowsVerification->validateIfExistsPetitionLog( $petition_log );
-        $resp ['rows_response'] = $RowsVerification->warehouseMovementsValidation( $movements );//realiza proceso de comprobacion
+        $resp['log_response'] = $warehouseMovementsRowsVerification->validateIfExistsPetitionLog( $petition_log );
+        $resp ['rows_response'] = $warehouseMovementsRowsVerification->warehouseMovementsValidation( $movements );//realiza proceso de comprobacion
     }
-    $resp['rows_download'] = $RowsVerification->getPendingWarehouseMovement( -1, $origin_store );//consulta las comprobaciones pendientes de linea a local
+    $resp['rows_download'] = $warehouseMovementsRowsVerification->getPendingWarehouseMovement( -1, $origin_store );//consulta las comprobaciones pendientes de linea a local
     $resp['status'] = 200;
     return json_encode( $resp );
 });

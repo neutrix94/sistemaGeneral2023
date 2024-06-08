@@ -42,10 +42,10 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto' );//liberar el modulo de sincronizacion
     return json_encode( array( "response" => $setProductProviderMovements ) );
   }
-  $req["product_provider_movements"] = $productProviderMovementsSynchronization->getSynchronizationProductProviderMovements( -1, 
-  $product_provider_movements_limit );//consulta registros pendientes de sincronizar
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 
     'MOVIMIENTOS PROVEEDOR PRODUCTO', 'sys_sincronizacion_movimientos_proveedor_producto' );//inserta request
+  $req["product_provider_movements"] = $productProviderMovementsSynchronization->getSynchronizationProductProviderMovements( -1, 
+  $product_provider_movements_limit, $req["log"]['unique_folio'] );//consulta registros pendientes de sincronizar
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/inserta_movimientos_proveedor_producto", $post_data );//envia petición
 

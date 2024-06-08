@@ -1,5 +1,5 @@
 <?php
-    class RowsVerification{
+    class warehouseMovementsRowsVerification{
 		function __construct( $connection ){
 			$this->link = $connection;
 		}
@@ -15,27 +15,31 @@
             $resp = array();
             $pending_rows = array();
             $sql = "SELECT 
-                        id_peticion AS petition_id,
-                        folio_unico AS unique_folio,
-                        id_sucursal_origen AS origin_store,
-                        id_sucursal_destino AS destinity_store,
-                        tabla AS table_name,
-                        tipo AS petition_type,
-                        hora_comienzo AS datetime_start,
-                        hora_envio AS datetime_send,
-                        hora_llegada_destino AS datetime_destinity,
-                        hora_respuesta AS datetime_send_response,
-                        contenido_respuesta AS response_content,
-                        hora_llegada_respuesta AS datetime_response,
-                        hora_finalizacion AS datetime_end
-                    FROM sys_sincronizacion_peticion
-                    WHERE tabla = 'sys_sincronizacion_movimientos_almacen'
-                    AND id_sucursal_origen = {$origin_store_id}
-                    AND id_sucursal_destino = {$destinity_store_id}
-                    AND hora_envio IS NOT NULL
-                    AND( hora_llegada_destino IS NULL
-                    OR hora_llegada_respuesta IS NULL
-                    OR hora_finalizacion IS NULL )";
+                        sp.id_peticion AS petition_id,
+                        sp.folio_unico AS unique_folio,
+                        sp.id_sucursal_origen AS origin_store,
+                        sp.id_sucursal_destino AS destinity_store,
+                        sp.tabla AS table_name,
+                        sp.tipo AS petition_type,
+                        sp.hora_comienzo AS datetime_start,
+                        sp.hora_envio AS datetime_send,
+                        sp.hora_llegada_destino AS datetime_destinity,
+                        sp.hora_respuesta AS datetime_send_response,
+                        sp.contenido_respuesta AS response_content,
+                        sp.hora_llegada_respuesta AS datetime_response,
+                        sp.hora_finalizacion AS datetime_end
+                    FROM sys_sincronizacion_peticion sp
+                    LEFT JOIN sys_sincronizacion_movimientos_almacen sma
+                    ON sma.folio_unico_peticion = sp.folio_unico
+                    WHERE sp.tabla = 'sys_sincronizacion_movimientos_almacen'
+                    AND sp.id_sucursal_origen = {$origin_store_id}
+                    AND sp.id_sucursal_destino = {$destinity_store_id}
+                    AND sp.hora_envio IS NOT NULL
+                    AND( sp.hora_llegada_destino IS NULL
+                    OR sp.hora_llegada_respuesta IS NULL
+                    OR sp.hora_finalizacion IS NULL )
+                    OR sma.id_status_sincronizacion = 2
+                    GROUP BY sp.id_peticion";
             $stm = $this->link->query( $sql ) or die( "Error al consultar las peticiones pendientes de alguna respuesta : {$sql} : {$this->link->error}" );
             $petition = $stm->fetch_assoc();
             $resp['petition'] = $petition;
