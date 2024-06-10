@@ -5,6 +5,7 @@
 		}
 
         public function insertVerificationLog( $table, $unique_folio, $json_detail ){
+            $json_detail = str_replace( "'", "\'", $json_detail );
             $sql = "INSERT INTO sys_sincronizacion_comprobaciones_log ( tabla, folio_unico_peticion, json_comprobacion, fecha_alta ) 
                         VALUES( '{$table}', '{$unique_folio}', '{$json_detail}', NOW() )";
             $stm = $this->link->query( $sql ) or die( "Error al insertar log de comprobacion : {$sql} : {$this->link->error}" );

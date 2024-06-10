@@ -17,9 +17,6 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-  if( ! include( 'utils/warehouseProductProviderMovementsRowsVerification.php' ) ){
-    die( "No se incluyó : warehouseProductProviderMovementsRowsVerification.php" );
-  }
 //variables
   $req = [];
   $req["product_provider_movements"] = array();
@@ -39,18 +36,19 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto' );//liberar el modulo de sincronizacion
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
   }
-
   
 /*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
   if( !include( 'utils/warehouseProductProviderMovementsRowsVerification.php' ) ){ 
     die( "No se pudo incluir la clase warehouseProductProviderMovementsRowsVerification.php" );
   }
   $warehouseProductProviderMovementsRowsVerification = new warehouseProductProviderMovementsRowsVerification( $link );
-  $verification = $warehouseProductProviderMovementsRowsVerification->getPendingProductProviderWarehouseMovement( $system_store, -1 );//obtiene los registros de comprobacion de movientos de almacen
+  $verification = $warehouseProductProviderMovementsRowsVerification->getPendingWarehouseProductProviderMovement( $system_store, -1 );//obtiene los registros de comprobacion de movimientos de almacen
   $verification['origin_store'] = $system_store;//id sucursal origen de verificacion
   $post_data = json_encode( $verification );//codifica validacion en JSON
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/valida_movimientos_almacen_proveedor_producto", $post_data );//envia peticion
   $resultado = json_decode( $result_1 );//procesa respuesta de comprobacion
+  return $resultado;
+  die( "resultado : " );
   if( $resultado->log_response != null && $resultado->log_response != '' ){
     $update_log = $warehouseProductProviderMovementsRowsVerification->updateLogAndJsonsRows( $resultado->log_response, $resultado->rows_response );
     if( $update_log != 'ok' ){
