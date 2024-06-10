@@ -21,7 +21,6 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   $req = [];
   $req["product_provider_movements"] = array();
   $result = "";
-
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $productProviderMovementsSynchronization = new productProviderMovementsSynchronization( $link );//instancia clase de sincronizacion de movimientos
 
@@ -45,10 +44,13 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   $verification = $warehouseProductProviderMovementsRowsVerification->getPendingWarehouseProductProviderMovement( $system_store, -1 );//obtiene los registros de comprobacion de movimientos de almacen
   $verification['origin_store'] = $system_store;//id sucursal origen de verificacion
   $post_data = json_encode( $verification );//codifica validacion en JSON
+  //return $post_data;
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/valida_movimientos_almacen_proveedor_producto", $post_data );//envia peticion
+//var_dump( $result_1 );
   $resultado = json_decode( $result_1 );//procesa respuesta de comprobacion
-  return $resultado;
-  die( "resultado : " );
+ // var_dump( $resultado );
+ // echo $resultado;  die( "here 7" );
+  //die( "resultado : " );//. $resultado 
   if( $resultado->log_response != null && $resultado->log_response != '' ){
     $update_log = $warehouseProductProviderMovementsRowsVerification->updateLogAndJsonsRows( $resultado->log_response, $resultado->rows_response );
     if( $update_log != 'ok' ){
@@ -74,6 +76,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   }
 /*Fin de comprobacion de movimientos de almacen*/
 
+  die( "here 3" );
   $setProductProviderMovements = $productProviderMovementsSynchronization->setNewSynchronizationProductProviderMovements( $system_store, $system_store, $store_prefix, 
   $product_provider_movements_limit );//ejecuta el procedure para generar los movimientos de almacen
   if( $setProductProviderMovements != 'ok' ){
@@ -125,7 +128,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
-      $productProviderMovementsSynchronization->updateProductProviderInventory( $rows_download );//suma el inventario
+        //$productProviderMovementsSynchronization->updateProductProviderInventory( $rows_download );//suma el inventario
     //inserta respuesta exitosa
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"] );
       $resp["log"]["type_update"] = "productProviderMovementsSynchronization";
@@ -135,38 +138,38 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     }
   }
 
-  $initial_time_2 = $SynchronizationManagmentLog->getCurrentTime();
-  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time_2, 
-    'ACTUALIZACION DE INVENTARIOS PROVEEDOR PRODUCTO', 'sys_sincronizacion_movimientos_proveedor_producto' );//consume API para actualizar los inventarios de productos
+  //$initial_time_2 = $SynchronizationManagmentLog->getCurrentTime();
+  //$req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time_2, 
+  //  'ACTUALIZACION DE INVENTARIOS PROVEEDOR PRODUCTO', 'sys_sincronizacion_movimientos_proveedor_producto' );//consume API para actualizar los inventarios de productos
   
-  $post_data = json_encode($req, JSON_PRETTY_PRINT);//
-  $result_2 = $SynchronizationManagmentLog->sendPetition( $path.'/rest/sincronizacion/actualiza_inventarios_proveedor_producto', $post_data );
-  $result = json_decode( $result_2 );
-  if( $result->error ){
-    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto' );//liberar el modulo de sincronizacion
-      return json_encode( array( "response" => $result->error ) );    
-  }
-  if( $result == '' || $result == null ){  
-    if( $result_2 == '' || $result_2 == null ){
-      $result_2 = "Posiblemente no hay conexion con el servidor de Linea";
-    }
-    $time = $SynchronizationManagmentLog->getCurrentTime();
-    $SynchronizationManagmentLog->updatePetitionLog( $time, $time, $result_2, $req["log"]["unique_folio"] );//guarda el error de la respuesta
-    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto' );//liberar el modulo de sincronizacion
-    return json_encode( array( "response" => "Respuesta Erronea : {$result_1}" ) );
-  }
+  //$post_data = json_encode($req, JSON_PRETTY_PRINT);//
+  //$result_2 = $SynchronizationManagmentLog->sendPetition( $path.'/rest/sincronizacion/actualiza_inventarios_proveedor_producto', $post_data );
+  //$result = json_decode( $result_2 );
+  //if( $result->error ){
+  //  $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto' );//liberar el modulo de sincronizacion
+  //    return json_encode( array( "response" => $result->error ) );    
+  //}
+  //if( $result == '' || $result == null ){  
+  //  if( $result_2 == '' || $result_2 == null ){
+  //    $result_2 = "Posiblemente no hay conexion con el servidor de Linea";
+  //  }
+  //  $time = $SynchronizationManagmentLog->getCurrentTime();
+  //  $SynchronizationManagmentLog->updatePetitionLog( $time, $time, $result_2, $req["log"]["unique_folio"] );//guarda el error de la respuesta
+  //  $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto' );//liberar el modulo de sincronizacion
+  //  return json_encode( array( "response" => "Respuesta Erronea : {$result_1}" ) );
+  //}
 //actualiza registros exitosos
-  if( $result->ok_rows != '' && $result->ok_rows != null ){
-    $productProviderMovementsSynchronization->updateProductProviderMovementsSynchronization( $result->ok_rows, $req["log"]["unique_folio"], null, true );
-  }
+  //if( $result->ok_rows != '' && $result->ok_rows != null ){
+  //  $productProviderMovementsSynchronization->updateProductProviderMovementsSynchronization( $result->ok_rows, $req["log"]["unique_folio"], null, true );
+  //}
 //actualiza erores
-  if( $result->error_rows != '' && $result->error_rows != null ){
-    $productProviderMovementsSynchronization->updateProductProviderMovementsSynchronization( $result->error_rows, $req["log"]["unique_folio"], null, true );
-  }
-  if( $result->log != '' && $result->log != null ){
-    $SynchronizationManagmentLog->updatePetitionLog( $result->log->destinity_time, $result->log->response_time, $result->log->response_string, 
-      $result->log->unique_folio );
-  }
+  //if( $result->error_rows != '' && $result->error_rows != null ){
+    //$productProviderMovementsSynchronization->updateProductProviderMovementsSynchronization( $result->error_rows, $req["log"]["unique_folio"], null, true );
+  //}
+  //if( $result->log != '' && $result->log != null ){
+    //$SynchronizationManagmentLog->updatePetitionLog( $result->log->destinity_time, $result->log->response_time, $result->log->response_string, 
+      //$result->log->unique_folio );
+  //}
   $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto' );//liberar el modulo de sincronizacion
   $link->close();//cierra conexion Mysql
   return 'ok';//regresa respuesta
