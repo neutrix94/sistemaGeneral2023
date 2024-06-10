@@ -75,18 +75,26 @@
 			$this->link->autocommit( false );
 			foreach ( $product_providers_movements as $key => $p_p_movement ) {
 				$ok = true;
-			//inserta cabecera
-				$sql = "INSERT INTO ec_movimiento_detalle_proveedor_producto ( id_movimiento_almacen_detalle, 
-				id_proveedor_producto, cantidad, fecha_registro, id_sucursal, status_agrupacion, 
-				id_tipo_movimiento, id_almacen, id_pedido_validacion, folio_unico, sincronizar, insertado_por_sincronizacion )
-				VALUES ( {$p_p_movement['id_movimiento_almacen_detalle']}, {$p_p_movement['id_proveedor_producto']}, 
-					'{$p_p_movement['cantidad']}', '{$p_p_movement['fecha_registro']}', '{$p_p_movement['id_sucursal']}', 
-					'{$p_p_movement['status_agrupacion']}', '{$p_p_movement['id_tipo_movimiento']}', 
-					'{$p_p_movement['id_almacen']}', '{$p_p_movement['id_pedido_validacion']}', '{$p_p_movement['folio_unico']}', '1', '1' )";
-				$sql = str_replace("' (", "(", $sql);
+			//consulta el id del detalle a nivel producto
+				$sql = "{$p_p_movement['id_movimiento_almacen_detalle']}";
+				$stm = $this->link->query( $sql ) or die( "Error al consultar el id de cabecera de movimientos de almacen : {$sql} : {$this->link->error}" );
+				$row = $stm->fetch_row();
+				$p_p_movement['id_movimiento_almacen_detalle'] = $row[0];
+			//consulta el id de la validacion si es el caso
+				if( $p_p_movement['id_pedido_validacion'] != -1 && $p_p_movement['id_pedido_validacion'] != "-1" ){
+					$sql = "{$p_p_movement['id_pedido_validacion']}";
+					$stm = $this->link->query( $sql ) or die( "Error al consultar el id de la validacion relacionada al detalle pp : {$sql} : {$this->link->error}" );
+					$row = $stm->fetch_row();
+					$p_p_movement['id_pedido_validacion'] = $row[0];
+				}
+			//inserta registro a nivel proveedor producto
+				$sql = "CALL spMovimientoDetalleProveedorProducto_inserta( {$p_p_movement['id_movimiento_almacen_detalle']}, {$p_p_movement['id_proveedor_producto']}, {$p_p_movement['cantidad']}, 
+							{$p_p_movement['id_sucursal']}, {$p_p_movement['id_tipo_movimiento']}, {$p_p_movement['id_almacen']}, {$p_p_movement['id_pedido_validacion']}, 
+							{$p_p_movement['id_pantalla']}, '{$p_p_movement['folio_unico']}' )";
+				/*$sql = str_replace("' (", "(", $sql);
 				$sql = str_replace("'(", "(", $sql);
 				$sql = str_replace(")'", ")", $sql);
-				$sql = str_replace(") '", ")", $sql);
+				$sql = str_replace(") '", ")", $sql);*/
 				$sql = str_replace("NULL, ,", "NULL, NULL,", $sql);
 				$stm_head = $this->link->query( $sql )or die( "Error al insertar de movimiento de almacen proveedor producto : {$sql} {$this->link->error}" );
 				if( ! $stm_head ){
