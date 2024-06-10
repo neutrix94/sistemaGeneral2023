@@ -63,6 +63,9 @@
 	require 'server/wharehouseMovementVerification.php';
 	require 'server/warehouseMovementVerificationServer.php';
 
+	require 'server/wharehouseProductProviderMovementVerification.php';
+	require 'server/warehouseProductProviderMovementVerificationServer.php';
+
 
 //Servicios de Cliente
 	require 'client/verificacion_registros_pendientes.php';//comprobacion de los registros pendientes

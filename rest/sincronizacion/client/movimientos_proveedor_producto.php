@@ -17,6 +17,9 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
+  if( ! include( 'utils/warehouseProductProviderMovementsRowsVerification.php' ) ){
+    die( "No se incluyó : warehouseProductProviderMovementsRowsVerification.php" );
+  }
 //variables
   $req = [];
   $req["product_provider_movements"] = array();
@@ -36,6 +39,43 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto' );//liberar el modulo de sincronizacion
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
   }
+
+  
+/*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
+  if( !include( 'utils/warehouseProductProviderMovementsRowsVerification.php' ) ){ 
+    die( "No se pudo incluir la clase warehouseProductProviderMovementsRowsVerification.php" );
+  }
+  $warehouseProductProviderMovementsRowsVerification = new warehouseProductProviderMovementsRowsVerification( $link );
+  $verification = $warehouseProductProviderMovementsRowsVerification->getPendingProductProviderWarehouseMovement( $system_store, -1 );//obtiene los registros de comprobacion de movientos de almacen
+  $verification['origin_store'] = $system_store;//id sucursal origen de verificacion
+  $post_data = json_encode( $verification );//codifica validacion en JSON
+  $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/valida_movimientos_almacen_proveedor_producto", $post_data );//envia peticion
+  $resultado = json_decode( $result_1 );//procesa respuesta de comprobacion
+  if( $resultado->log_response != null && $resultado->log_response != '' ){
+    $update_log = $warehouseProductProviderMovementsRowsVerification->updateLogAndJsonsRows( $resultado->log_response, $resultado->rows_response );
+    if( $update_log != 'ok' ){
+      die( "Hubo un error : {$update_log}" );
+    }
+  }
+  //ejecuta la comprobacion de linea a local
+  $verification_req = array();
+  if( $resultado->rows_download != null && $resultado->rows_download != '' ){//echo 'here';
+    $download = $resultado->rows_download;
+    $petition_log = json_decode(json_encode($download->petition), true);//$array = json_decode(json_encode($object), true);
+    $movements = json_decode(json_encode($download->rows), true);//$download->rows;
+    if( $download->verification == true ){
+      if( sizeof($petition_log) > 0 ){
+        //var_dump( $resultado );
+        $verification_req['log_response'] = $warehouseProductProviderMovementsRowsVerification->validateIfExistsPetitionLog( $petition_log );//consulta si la peticion existe en local
+        $verification_req['rows_response'] = $warehouseProductProviderMovementsRowsVerification->warehouseProductProviderMovementsValidation( $movements );//realiza proceso de comprobacion
+    
+        $post_data = json_encode( $verification_req );
+        $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_comprobacion_movimientos_almacen_proveedor_producto", $post_data );//consume servicio para actualizar la comprobacion en linea
+      }
+    }
+  }
+/*Fin de comprobacion de movimientos de almacen*/
+
   $setProductProviderMovements = $productProviderMovementsSynchronization->setNewSynchronizationProductProviderMovements( $system_store, $system_store, $store_prefix, 
   $product_provider_movements_limit );//ejecuta el procedure para generar los movimientos de almacen
   if( $setProductProviderMovements != 'ok' ){
