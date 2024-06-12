@@ -22,12 +22,12 @@
 		}
 //hacer / obtener jsons de movimientos de almacen
 		public function getSynchronizationMovements( $system_store, $limit, $type, $petition_unique_folio ){
-			$condition = "";
+			/*$condition = "";
 			if( $type == 1 ){
 				$condition = "AND id_status_sincronizacion IN( 1 )";
 			}elseif( $type == 2 ){
 				$condition = "AND id_status_sincronizacion IN( 3 ) AND movimiento_sumado = 0";
-			}
+			}*/
 			$resp = array();
 			$sql = "SELECT 
 						id_sincronizacion_movimiento_almacen,
@@ -35,8 +35,9 @@
 						tabla
 					FROM sys_sincronizacion_movimientos_almacen
 					WHERE tabla = 'ec_movimiento_almacen'
+					AND id_status_sincronizacion IN( 1 )
 					AND id_sucursal_destino = {$system_store}
-					{$condition}
+					AND json != ''
 					LIMIT {$limit}";
 		//die( $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los datos de jsons : {$this->link->error}" );
@@ -125,7 +126,7 @@
 					$sql = str_replace( ") '", ")", $sql );
 
 					$stm_head = $this->link->query( $sql );//or die( "Error al insertar cabecera de movimiento de almacen : {$sql} {$this->link->error}" );
-					if( $this->link->error ){//regresar los registros insertados correctamente
+					if( $this->link->error ){//captura error en log
 					//inserta el log del error en tabla de errores
 						$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
 									VALUES ( 'sys_sincronizacion_movimientos_almacen', '{$movement['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";

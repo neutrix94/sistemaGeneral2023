@@ -51,8 +51,8 @@
                         tabla,
                         registro_llave
                     FROM sys_sincronizacion_movimientos_proveedor_producto
-                    WHERE folio_unico_peticion = '{$petition['unique_folio']}'/*
-                    ANd id_status_sincronizacion = 2*/";
+                    WHERE folio_unico_peticion = '{$petition['unique_folio']}'
+                    ANd id_status_sincronizacion = 2";
             $stm_2 = $this->link->query( $sql ) or die( "Error al consultar detalle de json : {$sql} : {$this->link->error}" );
             $resp['verification'] = ( $stm->num_rows > 0 ? true : false );
             while( $detail = $stm_2->fetch_assoc() ){

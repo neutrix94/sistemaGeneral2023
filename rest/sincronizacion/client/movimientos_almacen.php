@@ -17,12 +17,16 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
+  if( !include( 'utils/warehouseMovementsRowsVerification.php' ) ){
+    die( "No se pudo incluir la clase warehouseMovementsRowsVerification.php" );
+  }
 //variables
   $req = [];
   $req["movements"] = array(); 
   $result = "";
 
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
+  $warehouseMovementsRowsVerification = new warehouseMovementsRowsVerification( $link );//instancia de clase de comprobacion de movimientos de almacen
   $movementsSynchronization = new movementsSynchronization( $link );//instancia clase de sincronizacion de movimientos
 
 //consulta path del sistema central
@@ -34,13 +38,10 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   $movements_limit = $config['rows_limit'];
 
 /*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
-  if( !include( 'utils/warehouseMovementsRowsVerification.php' ) ){ 
-    die( "No se pudo incluir la clase warehouseMovementsRowsVerification.php" );
-  }
-  $warehouseMovementsRowsVerification = new warehouseMovementsRowsVerification( $link );
-  $verification = $warehouseMovementsRowsVerification->getPendingWarehouseMovement( $system_store, -1 );//obtiene los registros de comprobacion de movientos de almacen
-  $verification['origin_store'] = $system_store;//id sucursal origen de verificacion
-  $post_data = json_encode( $verification );//codifica validacion en JSON
+  $req['verification'] = $warehouseMovementsRowsVerification->getPendingWarehouseMovement( $system_store, -1 );//obtiene los registros de comprobacion de movientos de almacen
+  //$verification['origin_store'] = $system_store;//id sucursal origen de verificacion
+  //var_dump( $req );
+  /*$post_data = json_encode( $verification );//codifica validacion en JSON
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/valida_movimientos_almacen", $post_data );//envia peticion
   $resultado = json_decode( $result_1 );//procesa respuesta de comprobacion
   if( $resultado->log_response != null && $resultado->log_response != '' ){
@@ -48,8 +49,8 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     if( $update_log != 'ok' ){
       die( "Hubo un error : {$update_log}" );
     }
-  }
-  //ejecuta la comprobacion de linea a local
+  }*/
+/*ejecuta la comprobacion de linea a local
   $verification_req = array();
   if( $resultado->rows_download != null && $resultado->rows_download != '' ){//echo 'here';
     $download = $resultado->rows_download;
@@ -65,7 +66,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
         $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_comprobacion_movimientos_almacen", $post_data );//consume servicio para actualizar la comprobacion en linea
       }
     }
-  }
+  }*/
 /*Fin de comprobacion de movimientos de almacen*/
 
   if( $system_store == -1 ){//valida que el origen no sea linea
@@ -82,7 +83,10 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   }
   $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 1, $req['log']['unique_folio'] );//consulta registros pendientes de sincronizar
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
+  //return $post_data;
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/inserta_movimientos_almacen", $post_data );//envia petición
+  //return( $result_1 );
+  //return '';
   $result = json_decode( $result_1 );//decodifica respuesta
   if( $result == '' || $result == null ){  
     if( $result_1 == '' || $result_1 == null ){
@@ -93,6 +97,36 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_almacen' );//liberar el modulo de sincronizacion
     return json_encode( array( "response" => "Respuesta Erronea : {$result_1}" ) );
   }
+/*Respuesta de comprobacion*/
+  if( $result->verification_movements->log_response != null && $result->verification_movements->log_response != '' ){
+    //die( "here 1" );
+    $update_log = $warehouseMovementsRowsVerification->updateLogAndJsonsRows( $resultado->verification_movements->log_response, $resultado->verification_movements->rows_response );
+    if( $update_log != 'ok' ){
+      die( "Hubo un error : {$update_log}" );
+    }
+  }
+  $verification_req = array();
+  if( $result->verification_movements->rows_download != null && $result->verification_movements->rows_download != '' ){//echo 'here';
+    
+  //die( "here 3" );
+    $download = $result->verification_movements->rows_download;
+    $petition_log = json_decode(json_encode($download->petition), true);//$array = json_decode(json_encode($object), true);
+    
+    $movements = json_decode(json_encode($download->rows), true);//$download->rows;
+    //var_dump($movements);die('herre2');
+    if( $download->verification == true ){
+      if( sizeof($petition_log) > 0 ){
+        //var_dump( $resultado );
+        $verification_req['log_response'] = $warehouseMovementsRowsVerification->validateIfExistsPetitionLog( $petition_log );//consulta si la peticion existe en local
+        $verification_req['rows_response'] = $warehouseMovementsRowsVerification->warehouseMovementsValidation( $movements );//realiza proceso de comprobacion
+    
+        $post_data = json_encode( $verification_req );
+        $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_comprobacion_movimientos_almacen", $post_data );//consume servicio para actualizar la comprobacion en linea
+      }
+    }
+  }
+  //die( "here 2" );
+/*Fin de Respuesta de Comprobacion*/
   if( $result->ok_rows != '' && $result->ok_rows != null ){
     $movementsSynchronization->updateMovementSynchronization( $result->ok_rows, $req["log"]["unique_folio"], 3, false );//actualiza registros exitosos
   }

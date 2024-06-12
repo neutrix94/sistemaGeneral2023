@@ -18,7 +18,10 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-
+  if( ! include( 'utils/warehouseMovementsRowsVerification.php' ) ){
+    die( "No se incluyó : warehouseMovementsRowsVerification.php" );
+  }
+  $warehouseMovementsRowsVerification = new warehouseMovementsRowsVerification( $link );
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
   $movementsSynchronization = new movementsSynchronization( $link );//instancia clase de sincronizacion de movimientos
 /*valida que las apis no esten bloqueadas
@@ -31,15 +34,43 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   $resp["ok_rows"] = '';
   $resp["error_rows"] = '';
   $resp["status"] = "ok";
+  $resp["verification_movements"] = array();
   
   $tmp_ok = "";
   $tmp_no = "";
-
-//
-  $movements = $request->getParam( "movements" );
+//RECIBE VARIABLES DE ENTRADA
   $log = $request->getParam( "log" );
-
-
+  $VERIFICATION = $request->getParam( 'verification' );
+  $movements = $request->getParam( "movements" );
+//
+/*COMPROBACION 2024*/
+  $petition_log = $VERIFICATION["petition"];//recibe folio unico de la peticion
+  //var_dump( $petition_log );
+  $verification = $VERIFICATION["verification"];
+  //$origin_store = $VERIFICATION->getParam( 'origin_store' );
+  $pending_movements = $VERIFICATION["rows"];
+  if( $verification == true ){
+  //consulta si la peticion existe en linea
+      $resp["verification_movements"]["log_response"] = $warehouseMovementsRowsVerification->validateIfExistsPetitionLog( $petition_log );
+      $resp["verification_movements"]["rows_response"] = $warehouseMovementsRowsVerification->warehouseMovementsValidation( $pending_movements );//realiza proceso de comprobacion
+  }
+  $resp["verification_movements"]["rows_download"] = $warehouseMovementsRowsVerification->getPendingWarehouseMovement( -1, $log['origin_store'] );//consulta las comprobaciones pendientes de linea a local
+  //var_dump( $resp );
+  return json_encode( $resp );
+/*Comprobacion*/
+  /*$petition_log = json_decode( json_encode( $request->getParam( 'log_response' ) ) );//recibe folio unico de la peticion
+  $rows_response = json_decode( json_encode( $request->getParam( 'rows_response' ) ) );//recibe folio unico de la peticion
+  //$verification = $request->getParam( 'verification' );
+  //$origin_store = $request->getParam( 'origin_store' );
+  if( $petition_log != null && $petition_log != '' ){
+      $update_log = $warehouseMovementsRowsVerification->updateLogAndJsonsRows( $petition_log, $rows_response );
+      if( $update_log != 'ok' ){
+        die( "Hubo un error : {$update_log}" );
+      }
+  }*/
+/*fin de la comprobacion*/
+  //$resp['status'] = 200;
+  //$resp['message'] = "Comprobacion de movimientos almacen (producto) actualizada exitosamente en linea.";
 
 /*valida que las apis no esten bloqueadas*/
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );
