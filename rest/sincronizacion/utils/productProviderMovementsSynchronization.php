@@ -72,44 +72,60 @@
 			$resp["tmp_ok"] = "";
 			$resp["tmp_no"] = "";
 			$updates = array();
-			$this->link->autocommit( false );
 			foreach ( $product_providers_movements as $key => $p_p_movement ) {
-				$ok = true;
+				//$ok = true;
 			//consulta el id del detalle a nivel producto
 				$sql = "{$p_p_movement['id_movimiento_almacen_detalle']}";
-				$stm = $this->link->query( $sql ) or die( "Error al consultar el id de cabecera de movimientos de almacen : {$sql} : {$this->link->error}" );
+				$stm = $this->link->query( $sql );
+				if( $this->link->error ){
+					$ok = false;
+					// or die( "Error al consultar el id de cabecera de movimientos de almacen : {$sql} : {$this->link->error}" );
+				}
 				$row = $stm->fetch_row();
 				$p_p_movement['id_movimiento_almacen_detalle'] = $row[0];
 			//consulta el id de la validacion si es el caso
 				if( $p_p_movement['id_pedido_validacion'] != -1 && $p_p_movement['id_pedido_validacion'] != "-1" ){
 					$sql = "{$p_p_movement['id_pedido_validacion']}";
-					$stm = $this->link->query( $sql ) or die( "Error al consultar el id de la validacion relacionada al detalle pp : {$sql} : {$this->link->error}" );
+					$stm = $this->link->query( $sql );
+					if( $this->link->error ){
+						$ok = false;
+						//die( "Error al consultar el id de la validacion relacionada al detalle pp : {$sql} : {$this->link->error}" );
+					}
 					$row = $stm->fetch_row();
 					$p_p_movement['id_pedido_validacion'] = $row[0];
 				}
-			//inserta registro a nivel proveedor producto
-				$sql = "CALL spMovimientoDetalleProveedorProducto_inserta( {$p_p_movement['id_movimiento_almacen_detalle']}, {$p_p_movement['id_proveedor_producto']}, {$p_p_movement['cantidad']}, 
-							{$p_p_movement['id_sucursal']}, {$p_p_movement['id_tipo_movimiento']}, {$p_p_movement['id_almacen']}, {$p_p_movement['id_pedido_validacion']}, 
-							{$p_p_movement['id_pantalla']}, '{$p_p_movement['folio_unico']}' )";
-				/*$sql = str_replace("' (", "(", $sql);
-				$sql = str_replace("'(", "(", $sql);
-				$sql = str_replace(")'", ")", $sql);
-				$sql = str_replace(") '", ")", $sql);*/
-				$sql = str_replace("NULL, ,", "NULL, NULL,", $sql);
-				$stm_head = $this->link->query( $sql )or die( "Error al insertar de movimiento de almacen proveedor producto : {$sql} {$this->link->error}" );
-				if( ! $stm_head ){
-					return array( "error"=>"Error al insertar movimiento detalle proveedor producto : {$this->link->error} {$sql}");
-					$ok = false;
-				}
 				if( $ok == true ){
-					$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
-					$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
-				}else{
-					$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
-					$resp["tmp_no"] .= ( $resp["tmp_no"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
+					$this->link->autocommit( false );//declara inicio de la transaccion
+				//inserta registro a nivel proveedor producto
+					$sql = "CALL spMovimientoDetalleProveedorProducto_inserta( {$p_p_movement['id_movimiento_almacen_detalle']}, {$p_p_movement['id_proveedor_producto']}, {$p_p_movement['cantidad']}, 
+								{$p_p_movement['id_sucursal']}, {$p_p_movement['id_tipo_movimiento']}, {$p_p_movement['id_almacen']}, {$p_p_movement['id_pedido_validacion']}, 
+								{$p_p_movement['id_pantalla']}, '{$p_p_movement['folio_unico']}' )";
+					/*$sql = str_replace("' (", "(", $sql);
+					$sql = str_replace("'(", "(", $sql);
+					$sql = str_replace(")'", ")", $sql);
+					$sql = str_replace(") '", ")", $sql);*/
+					$sql = str_replace("NULL, ,", "NULL, NULL,", $sql);
+					$stm_head = $this->link->query( $sql );//or die( "Error al insertar de movimiento de almacen proveedor producto : {$sql} {$this->link->error}" );
+					if( ! $this->link->error ){
+						$this->link->commit();
+						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
+						$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
+						//$ok = false;
+					}else{
+						$this->link->rollback();
+					//inserta el log del error en tabla de errores
+						$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
+									VALUES ( 'sys_sincronizacion_movimientos_proveedor_producto', '{$p_p_movement['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";
+						$stm = $this->link->query( $sql );// or die( "Error al insertar error en sys_sincronizacion_log_errores_registros : {$this->link->error}" );
+						if( $this->link->error ){
+							echo "Error al insertar el log de error en sincronización : {$this->link->error}";
+						}
+						$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
+						$resp["tmp_no"] .= ( $resp["tmp_no"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
+					}
 				}
 			}
-		    $this->link->autocommit( true );
+			$this->link->close();
 			return $resp;
 		}
 

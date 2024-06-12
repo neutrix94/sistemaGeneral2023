@@ -99,9 +99,10 @@
 					if( $detail['id_pedido_detalle'] != -1 && $detail['id_pedido_detalle'] != '' 
 						&& $detail['id_pedido_detalle'] != null ){
 						$sql = "{$detail['id_pedido_detalle']}";
-				//echo $sql;
-						fwrite($file, "{$sql}\n" );
-						$stm_aux = $this->link->query( $sql ) or die( "Error al consultar si existe el detalle de venta : {$this->link->error}" );
+						$stm_aux = $this->link->query( $sql );
+						if( $this->link->error ){
+							// or die( "Error al consultar si existe el detalle de venta : {$this->link->error}" );
+						}
 						if( $stm_aux->num_rows <= 0 ){
 							$is_valid = false;
 							$ok = false;
@@ -111,7 +112,7 @@
 						}
 					}	
 				}
-				if( $is_valid == true ){
+				if( $is_valid == true && $ok == true ){
 				//se inserta cabecera de movimiento de almacen por procedure
 					$sql =  "CALL spMovimientoAlmacen_inserta( {$movement['id_usuario']}, '{$movement['observaciones']} \nInsertado desde API por sincronización', {$movement['id_sucursal']},
 						{$movement['id_almacen']}, {$movement['id_tipo_movimiento']}, -1, -1, '{$movement['id_maquila']}', {$movement['id_transferencia']}, {$movement['id_pantalla']}, 
@@ -125,47 +126,55 @@
 
 					$stm_head = $this->link->query( $sql );//or die( "Error al insertar cabecera de movimiento de almacen : {$sql} {$this->link->error}" );
 					if( $this->link->error ){//regresar los registros insertados correctamente
-						return array( "error"=>"Error al insertar cabecera de movimiento de almacen : {$this->link->error} {$sql}",
-							"response"=>$resp
-						);
+					//inserta el log del error en tabla de errores
+						$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
+									VALUES ( 'sys_sincronizacion_movimientos_almacen', '{$movement['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";
+						$stm = $this->link->query( $sql );// or die( "Error al insertar error en sys_sincronizacion_log_errores_registros : {$this->link->error}" );
+						if( $this->link->error ){
+							echo "Error al insertar el log de error en sincronización : {$this->link->error}";
+						}
 						$ok = false;
 					}
 					$sql = "SELECT MAX( id_movimiento_almacen ) AS last_id FROM ec_movimiento_almacen";
-					$stm = $this->link->query( $sql ) or die( "Error al recuperar el id insertado : {$sql} :  {$this->link->error}" );
+					$stm = $this->link->query( $sql );
+					if( $this->link->error ){
+						$ok = false;
+						//or die( "Error al recuperar el id insertado : {$sql} :  {$this->link->error}" );
+					}
 					$row = $stm->fetch_assoc();
 					$movement_id = $row['last_id'];
 					$movement_detail = $movement['movimiento_detail'];
-
-					foreach ($movement_detail as $key2 => $detail) {
-						if( $ok == true ){
-							/*$sql = "INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
-							id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
-							VALUES ( NULL, '{$movement_id}', '{$detail['id_producto']}', '{$detail['cantidad']}', '{$detail['cantidad']}', 
-							{$detail['id_pedido_detalle']}, -1, IF( {$detail['id_proveedor_producto']} IS NULL OR '{$detail['id_proveedor_producto']}' = '', NULL, '{$detail['id_proveedor_producto']}' ), '0', 
-							'1', '{$detail['folio_unico']}', '1' )";*/
-							$sql = "CALL spMovimientoAlmacenDetalle_inserta( {$movement_id}, {$detail['id_producto']}, {$detail['cantidad']}, {$detail['cantidad']}, {$detail['id_pedido_detalle']},
-										-1, IF( {$detail['id_proveedor_producto']} IS NULL OR '{$detail['id_proveedor_producto']}' = '', NULL, '{$detail['id_proveedor_producto']}' ), 
-										{$movement['id_pantalla']}, '{$detail['folio_unico']}' )";
-							$stm = $this->link->query( $sql );// or die( "Error al insertar detalle de movimiento de almacen : {$sql} :  {$this->link->error}" );
-							fwrite($file, "{$sql}\n" );
-							if( ! $stm ){
-								return array( "error"=>"Error al insertar detalle de movimiento de almacen : {$sql} : {$this->link->error}");
-								$ok = false;
+					if($ok == true ){
+						foreach ($movement_detail as $key2 => $detail) {
+							if( $ok == true ){
+								$sql = "CALL spMovimientoAlmacenDetalle_inserta( {$movement_id}, {$detail['id_producto']}, {$detail['cantidad']}, {$detail['cantidad']}, {$detail['id_pedido_detalle']},
+											-1, IF( {$detail['id_proveedor_producto']} IS NULL OR '{$detail['id_proveedor_producto']}' = '', NULL, '{$detail['id_proveedor_producto']}' ), 
+											{$movement['id_pantalla']}, '{$detail['folio_unico']}' )";
+								$stm = $this->link->query( $sql );
+								if( $this->link->error ){
+									$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
+												VALUES ( 'sys_sincronizacion_movimientos_almacen', '{$movement['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";
+									$stm = $this->link->query( $sql );
+									if( $this->link->error ){
+										echo "Error al insertar el log de error en sincronización : {$this->link->error}";
+									}
+									$ok = false;
+								}
 							}
 						}
 					}
 					if( $ok == true ){
+						$this->link->commit();
 						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$movement['folio_unico']}'";
 						$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$movement['folio_unico']}'";
 					}else{
+						$this->link->rollback();
 						$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$movement['folio_unico']}'";
 						$resp["tmp_no"] .= ( $resp["tmp_no"] == '' ? '' : ',' ) . "'{$movement['folio_unico']}'";
 					}
-					fwrite($file, "\n\n" );
 				}
-		    	$this->link->autocommit( true );//commit por registro
 			}
-			fclose($file);
+			//fclose($file);
 			return $resp;
 		}
 //actualización de inventario almacen producto

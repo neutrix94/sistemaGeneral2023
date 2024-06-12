@@ -76,7 +76,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   }
 /*Fin de comprobacion de movimientos de almacen*/
 
-  die( "here 3" );
+  //die( "here 3" );
   $setProductProviderMovements = $productProviderMovementsSynchronization->setNewSynchronizationProductProviderMovements( $system_store, $system_store, $store_prefix, 
   $product_provider_movements_limit );//ejecuta el procedure para generar los movimientos de almacen
   if( $setProductProviderMovements != 'ok' ){
