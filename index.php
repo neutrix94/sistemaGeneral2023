@@ -1,5 +1,5 @@
 <?php
-/*prueba github 2024-06-12*/
+/*prueba github 2024-06-12 prueba 2*/
 	extract($_POST);
 	extract($_GET);	
 	require("conect.php");
