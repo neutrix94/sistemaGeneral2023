@@ -691,7 +691,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
     <table id="listaProductos" class="table table-striped table-bordered" cellpadding="0" cellspacing="0">
     <thead class="product_list_header">
       <tr class="cabecera">
-        <th width="100"><p>Prod</p></th>
+        <th width="100"><p>Producto</p></th>
         <th width="350"><p>Descripción</p></th>
         <th width="100"><p>Cant</p></th>
         <th width="100"><p>Precio</p></th>
