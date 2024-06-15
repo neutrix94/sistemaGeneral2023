@@ -42,6 +42,8 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   $log = $request->getParam( "log" );
   $VERIFICATION = $request->getParam( 'verification' );
   $movements = $request->getParam( "movements" );
+ /* var_dump( $movements );
+  return '';*/
 //
 /*COMPROBACION 2024*/
   $petition_log = $VERIFICATION["petition"];//recibe folio unico de la peticion
@@ -56,7 +58,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   }
   $resp["verification_movements"]["rows_download"] = $warehouseMovementsRowsVerification->getPendingWarehouseMovement( -1, $log['origin_store'] );//consulta las comprobaciones pendientes de linea a local
   //var_dump( $resp );
-  return json_encode( $resp );
+  //return json_encode( $resp );
 /*Comprobacion*/
   /*$petition_log = json_decode( json_encode( $request->getParam( 'log_response' ) ) );//recibe folio unico de la peticion
   $rows_response = json_decode( json_encode( $request->getParam( 'rows_response' ) ) );//recibe folio unico de la peticion

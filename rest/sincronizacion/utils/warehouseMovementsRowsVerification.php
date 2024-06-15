@@ -1,18 +1,32 @@
 <?php
     class warehouseMovementsRowsVerification{
-		function __construct( $connection ){
+        private $link;
+		private $LOGGER;
+		function __construct( $connection, $Logger = false ){
 			$this->link = $connection;
+            $this->LOGGER = $Logger;
 		}
 
-        public function insertVerificationLog( $table, $unique_folio, $json_detail ){
+        public function insertVerificationLog( $table, $unique_folio, $json_detail, $logger_id = false ){
+            $log_steep_id = null;
             $json_detail = str_replace( "'", "\'", $json_detail );
             $sql = "INSERT INTO sys_sincronizacion_comprobaciones_log ( tabla, folio_unico_peticion, json_comprobacion, fecha_alta ) 
                         VALUES( '{$table}', '{$unique_folio}', '{$json_detail}', NOW() )";
-            $stm = $this->link->query( $sql ) or die( "Error al insertar log de comprobacion : {$sql} : {$this->link->error}" );
+            $stm = $this->link->query( $sql );
+                if( $logger_id ){
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta log de comprobacion", $sql );
+				}
+				if( $this->link->error ){
+					if( $logger_id ){
+						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar log de comprobacion", 'sys_sincronizacion_comprobaciones_log', $sql, $this->link->error );
+					}
+					die( "Error al insertar log de comprobacion : {$this->link->error} {$sql}" );
+				}
             return 'ok';
         }
 
-        public function getPendingWarehouseMovement( $origin_store_id, $destinity_store_id ){
+        public function getPendingWarehouseMovement( $origin_store_id, $destinity_store_id, $logger_id = false){
+            $log_steep_id = null;
             $resp = array();
             $pending_rows = array();
             $sql = "SELECT 
@@ -41,7 +55,16 @@
                     OR sp.hora_finalizacion IS NULL )
                     OR sma.id_status_sincronizacion = 2
                     GROUP BY sp.id_peticion";
-            $stm = $this->link->query( $sql ) or die( "Error al consultar las peticiones pendientes de alguna respuesta : {$sql} : {$this->link->error}" );
+            $stm = $this->link->query( $sql );
+                if( $logger_id ){
+                    $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta peticiones pendientes de alguna respuesta", $sql );
+                }
+                if( $this->link->error ){
+                    if( $logger_id ){
+                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar las peticiones pendientes de alguna respuesta", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+                    }
+                    die( "Error al consultar las peticiones pendientes de alguna respuesta : {$this->link->error} {$sql}" );
+                }
             $petition = $stm->fetch_assoc();
             $resp['petition'] = $petition;
             //$resp['petition_id'] = $petition['petition_id'];
@@ -53,7 +76,17 @@
                     FROM sys_sincronizacion_movimientos_almacen
                     WHERE folio_unico_peticion = '{$petition['unique_folio']}'
                     AND id_status_sincronizacion = 2";
-            $stm_2 = $this->link->query( $sql ) or die( "Error al consultar detalle de json : {$sql} : {$this->link->error}" );
+            $stm_2 = $this->link->query( $sql );
+                if( $logger_id ){
+                    $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta detalle de json", $sql );
+                }
+                if( $this->link->error ){
+                    if( $logger_id ){
+                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar detalle de json", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+                    }
+                    die( "Error al consultar detalle de json : {$this->link->error} {$sql}" );
+                }
+            // or die( "Error al consultar detalle de json : {$sql} : {$this->link->error}" );
             $resp['verification'] = ( $stm->num_rows > 0 ? true : false );
             while( $detail = $stm_2->fetch_assoc() ){
                 //echo 'here';
@@ -62,14 +95,15 @@
             $resp['rows'] = $pending_rows;
             $pending_rows_string = json_encode( $pending_rows );
         //inserta el log
-            $log = $this->insertVerificationLog( 'sys_sincronizacion_movimientos_almacen', $petition['unique_folio'], $pending_rows_string );
+            $log = $this->insertVerificationLog( 'sys_sincronizacion_movimientos_almacen', $petition['unique_folio'], $pending_rows_string, $logger_id );
             if( $log != 'ok' ){
                 return false;
             }
             return $resp;
         }
         
-        public function validateIfExistsPetitionLog( $petition_log ){
+        public function validateIfExistsPetitionLog( $petition_log, $logger_id = false ){
+            $log_steep_id = null;
            // var_dump( $petition_log );
             $resp = array();
         //verifica si existe el log de peticion
@@ -89,7 +123,16 @@
                         hora_finalizacion AS datetime_end
                     FROM sys_sincronizacion_peticion
                     WHERE folio_unico = '{$petition_log['unique_folio']}'";
-            $stm = $this->link->query( $sql ) or die( "Error al consultar si existe la peticion en el destino : {$sql} : {$this->link->error}" );
+            $stm = $this->link->query( $sql );
+                if( $logger_id ){
+                    $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta si existe la peticion en el destino", $sql );
+                }
+                if( $this->link->error ){
+                    if( $logger_id ){
+                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar si existe la peticion en el destino", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+                    }
+                    die( "Error al consultar si existe la peticion en el destino : {$this->link->error} {$sql}" );
+                }
             if( $stm->num_rows > 0 ){//existe
                 $row = $stm->fetch_assoc();
                 $resp = $row;
@@ -103,7 +146,17 @@
                             hora_envio, hora_llegada_destino, hora_respuesta, contenido_respuesta, hora_llegada_respuesta, hora_finalizacion, folio_unico )
                         VALUES ( {$petition_log['origin_store']}, {$petition_log['destinity_store']}, '{$petition_log['table_name']}', '{$petition_log['petition_type']}', '{$petition_log['datetime_start']}', 
                         '{$petition_log['datetime_send']}', NOW(), NOW(), '', NOW(), NOW(), '{$petition_log['unique_folio']}' )";
-                $stm = $this->link->query( $sql ) or die( "Error al insertar el registro de sincronizacion en el destino : {$sql} : {$this->link->error}" );
+                $stm = $this->link->query( $sql );
+                    if( $logger_id ){
+                        $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta peticion en el destino", $sql );
+                    }
+                    if( $this->link->error ){
+                        if( $logger_id ){
+                            $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar peticion en el destino", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+                        }
+                        die( "Error al insertar peticion en el destino : {$this->link->error} {$sql}" );
+                    }
+                // or die( "Error al insertar el registro de sincronizacion en el destino : {$sql} : {$this->link->error}" );
                 $resp = $petition_log;
             //consulta la hor actual
                 $sql = "SELECT NOW() AS current_date_time";
@@ -118,7 +171,8 @@
             return $resp;
         }
 
-        public function warehouseMovementsValidation( $movements ){
+        public function warehouseMovementsValidation( $movements, $logger_id = false ){
+            $log_steep_id = null;
             $resp = array();
             $resp['ok_rows'] = "";
             $resp['error_rows'] = "";
@@ -128,13 +182,31 @@
                 //var_dump($movement);
             //consulta si la cabecera existe
                 $sql = "SELECT id_movimiento_almacen AS movement_id FROM ec_movimiento_almacen WHERE folio_unico = '{$movement_['registro_llave']}'";
-                $stm = $this->link->query( $sql );// or die( "Error al consultar si ya existe la cabecera de movimiento de almacen en la comprobacion : {$sql} : {$this->link->error}" );
+                $stm = $this->link->query( $sql );
+                    if( $logger_id ){
+                        $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta si ya existe la cabecera de movimiento de almacen en la comprobacion", $sql );
+                    }
+                    if( $this->link->error ){
+                        if( $logger_id ){
+                            $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar si ya existe la cabecera de movimiento de almacen en la comprobacion", 'ec_movimiento_almacen', $sql, $this->link->error );
+                        }
+                        die( "Error al consultar si ya existe la cabecera de movimiento de almacen en la comprobacion : {$this->link->error} {$sql}" );
+                    }
                 $movement_header_id = 0;
                 if( $stm->num_rows <= 0 ){//no existe
                     //se inserta cabecera de movimiento de almacen por procedure
 				    $sql = "CALL spMovimientoAlmacen_inserta( {$movement->id_usuario}, '{$movement->observaciones} \nInsertado desde API por sincronización', {$movement->id_sucursal},
                     {$movement->id_almacen}, {$movement->id_tipo_movimiento}, -1, -1, '{$movement->id_maquila}', {$movement->id_transferencia}, {$movement->id_pantalla}, '{$movement->folio_unico}' )";
-                    $stm = $this->link->query( $sql ) or die( "Error al insertar cabecera de movimiento de almacen : {$sql} : {$this->link->error}" );
+                    $stm = $this->link->query( $sql );
+                        if( $logger_id ){
+                            $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta cabecera de movimiento de almacen", $sql );
+                        }
+                        if( $this->link->error ){
+                            if( $logger_id ){
+                                $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar cabecera de movimiento de almacen", 'ec_movimiento_almacen', $sql, $this->link->error );
+                            }
+                            die( "Error al insertar cabecera de movimiento de almacen : {$this->link->error} {$sql}" );
+                        }
                 //recupera el id insertado
                     $sql = "SELECT MAX( id_movimiento_almacen ) AS movement_id FROM ec_movimiento_almacen";
                     $stm_3 = $this->link->query( $sql ) or die( "Error al recuperar el id de movimiento de almacen insertado por procedure : {$sql} : {$this->link->error}" );
@@ -153,7 +225,16 @@
                     if( $stm_4->num_rows <= 0 ){
                         $sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_header_id}, {$detail->id_producto}, {$detail->cantidad}, {$detail->cantidad_surtida},
                                     {$detail->id_pedido_detalle}, {$detail->id_oc_detalle}, {$detail->id_proveedor_producto}, {$movement->id_pantalla}, '{$detail->folio_unico}' )";
-                        $stm_5 = $this->link->query( $sql ) or die( "Error al insertar detalle de movimientos de almacen : {$sql} : {$this->link->error}" );
+                        $stm_5 = $this->link->query( $sql );
+                            if( $logger_id ){
+                                $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta detalle de movimiento de almacen", $sql );
+                            }
+                            if( $this->link->error ){
+                                if( $logger_id ){
+                                    $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar detalle de movimiento de almacen", 'ec_movimiento_detalle', $sql, $this->link->error );
+                                }
+                                die( "Error al insertar detalle de movimiento de almacen : {$this->link->error} {$sql}" );
+                            }
                     }
                 }
                 $this->link->autocommit( true );
@@ -165,7 +246,8 @@
             return $resp;
         }
 
-        public function updateLogAndJsonsRows( $log_response, $rows_response ){
+        public function updateLogAndJsonsRows( $log_response, $rows_response, $logger_id = false ){
+            $log_steep_id = null;
             $this->link->autocommit( false );
             //die( "here1" );
             $log_response->response_content = str_replace( "'", "\'", $log_response->response_content );
@@ -175,7 +257,16 @@
                         hora_llegada_respuesta = IF( hora_llegada_respuesta IS NULL OR hora_llegada_respuesta = '', NOW(), hora_llegada_respuesta ),
                         hora_finalizacion = IF( hora_finalizacion IS NULL OR hora_finalizacion = '', NOW(), hora_finalizacion )
                     WHERE folio_unico = '{$log_response->unique_folio}'";//die( $sql );
-            $stm = $this->link->query( $sql ) or die( "Error al actualizar la peticion (comprobación) local : {$sql} : {$this->link->error}" );
+            $stm = $this->link->query( $sql );
+                if( $logger_id ){
+                    $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza la peticion (comprobación)", $sql );
+                }
+                if( $this->link->error ){
+                    if( $logger_id ){
+                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al actualizar la peticion (comprobación) ", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+                    }
+                    die( "Error al actualizar la peticion (comprobación) : {$this->link->error} {$sql}" );
+                }
         //actualiza los registros correctos
             $ok_rows = $rows_response->ok_rows;
             $uniques_folios = '';
@@ -185,59 +276,19 @@
                 $uniques_folios .= "'{$row}'";
             }
             $sql = "UPDATE sys_sincronizacion_movimientos_almacen SET id_status_sincronizacion = 3 WHERE registro_llave IN( $uniques_folios )";
-            $stm = $this->link->query( $sql ) or die( "Error al actualizar detalles (jsons) local : {$sql} : {$this->link->error}" );
+            $stm = $this->link->query( $sql );
+            if( $logger_id ){
+                $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Error al actualizar detalles (jsons)", $sql );
+            }
+            if( $this->link->error ){
+                if( $logger_id ){
+                    $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al actualizar detalles (jsons)", 'sys_sincronizacion_movimientos_almacen', $sql, $this->link->error );
+                }
+                die( "Error al actualizar detalles (jsons) local : {$this->link->error} {$sql}" );
+            }
             $this->link->autocommit( true );
             return 'ok';
         }
     }
-
-
-
-
-        /*public function insertVerification( $table, $primary_key, $primary_key_value, $secondary_key = null, $secondary_key_value = null, $third_key = null, $third_key_value = null ){
-            $sql = "SELECT COUNT( * ) AS counter FROM $table WHERE $primary_key = '{$primary_key_value}'";
-            if( $secondary_key != null ){
-                $sql .= " AND {$secondary_key} = {$secondary_key_value}";
-            }
-            if( $third_key != null ){
-                $sql .= " AND {$third_key} = {$third_key_value}";
-            }
-            $stm = $this->link->query( $sql ) or die( "Error al comprobar si el registro existe en insertVerification : {$this->link->error}" );
-            $row = $stm->fetch_assoc();
-            if( $row['counter'] == 0 ){
-                return false;//no existe
-            }
-            return true;//existe
-        }
-
-        public function updateVerification( $row ){
-            
-        }
-
-        public function deleteVerification( $table, $primary_key, $primary_key_value, $secondary_key = null, $secondary_key_value = null, $third_key = null, $third_key_value = null ){
-            $sql = "SELECT COUNT( * ) AS counter FROM $table WHERE $primary_key = '{$primary_key_value}'";
-            if( $secondary_key != null ){
-                $sql .= " AND {$secondary_key} = {$secondary_key_value}";
-            }
-            if( $third_key != null ){
-                $sql .= " AND {$third_key} = {$third_key_value}";
-            }
-            $stm = $this->link->query( $sql ) or die( "Error al comprobar si el registro existe en deleteVerification : {$this->link->error}" );
-            $row = $stm->fetch_assoc();
-            if( $row['counter'] == 0 ){
-                return false;//no existe
-            }
-            return true;//existe
-        }
-
-        public function insertWarehouseMovementVerification( $unique_folio ){
-            $sql = "SELECT COUNT( * ) AS counter FROM ec_movimiento_almacen WHERE folio_unico = '{$unique_folio}'";
-            $stm = $this->link->query( $sql ) or die( "Error al comprobar si el registro de movimiento de almacen existe en insertWarehouseMovementVerification : {$this->link->error}" );
-            $row = $stm->fetch_assoc();
-            if( $row['counter'] == 0 ){
-                return false;//no existe
-            }
-            return true;//existe
-        }*/
 
 ?>

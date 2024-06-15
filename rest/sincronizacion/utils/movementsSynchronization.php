@@ -3,31 +3,41 @@
 	class movementsSynchronization
 	{
 		private $link;
-		function __construct( $connection ){
+		private $LOGGER;
+		function __construct( $connection, $Logger = false ){
 			$this->link = $connection;
+			$this->LOGGER = $Logger;
 		}
 //hacer jsons de movimientos de almacen
-		public function setNewSynchronizationMovements( $store_id, $system_store, $origin_store_prefix, $limit ){
+		public function setNewSynchronizationMovements( $store_id, $system_store, $origin_store_prefix, $limit, $logger_id = false ){
+			$log_steep_id = null;
 			$sql = "CALL buscaMovimientosPendientes( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
 			$stm = $this->link->query( $sql );
-			if( ! $stm ){
-				return "Error al generar registros de movimientos de almacen : {$this->link->error}";
-			}
-			$sql = "CALL buscaDetallesMovimientosPendientes( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
+				if( $logger_id ){
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Genera registros de Movimientos de Almacen pendientes", $sql );
+				}
+				if( $this->link->error ){
+					if( $logger_id ){
+						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al generar registros de movimientos de almacen", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+					}
+					die( "Error al generar registros de movimientos de almacen : {$this->link->error} {$sql}" );
+				}
+			$sql = "CALL buscaDetallesMovimientosPendientes( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )";			
 			$stm = $this->link->query( $sql );
-			if( ! $stm ){
-				return "Error al generar registros de detalles movimientos de almacen : {$this->link->error}";
-			}
+				if( $logger_id ){
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Genera registros de detalles de Movimientos de Almacen pendientes", $sql );
+				}
+				if( $this->link->error ){
+					if( $logger_id ){
+						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al generar registros de detalles de movimientos de almacen", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+					}
+					die( "Error al generar registros de detalles de movimientos de almacen : {$this->link->error} {$sql}" );
+				}
 			return 'ok';
 		}
 //hacer / obtener jsons de movimientos de almacen
-		public function getSynchronizationMovements( $system_store, $limit, $type, $petition_unique_folio ){
-			/*$condition = "";
-			if( $type == 1 ){
-				$condition = "AND id_status_sincronizacion IN( 1 )";
-			}elseif( $type == 2 ){
-				$condition = "AND id_status_sincronizacion IN( 3 ) AND movimiento_sumado = 0";
-			}*/
+		public function getSynchronizationMovements( $system_store, $limit, $type, $petition_unique_folio, $logger_id = false ){
+			$log_steep_id = null;
 			$resp = array();
 			$sql = "SELECT 
 						id_sincronizacion_movimiento_almacen,
@@ -40,7 +50,16 @@
 					AND json != ''
 					LIMIT {$limit}";
 		//die( $sql );
-			$stm = $this->link->query( $sql ) or die( "Error al consultar los datos de jsons : {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+				if( $logger_id ){
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta JSONs de Movimientos de Almacen", $sql );
+				}
+				if( $this->link->error ){
+					if( $logger_id ){
+						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar JSONs de Movimientos de Almacen", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+					}
+					die( "Error al consultar JSONs de Movimientos de Almacen : {$this->link->error} {$sql}" );
+				}
 			$movements_counter = 0;
 			//forma arreglo
 			while ( $row = $stm->fetch_assoc() ) {
@@ -56,33 +75,55 @@
 					$movements_counter ++;
 				//actualiza al status 2 los registros que va a enviar
 					$sql = "UPDATE sys_sincronizacion_movimientos_almacen SET id_status_sincronizacion = 2, folio_unico_peticion = '{$petition_unique_folio}' WHERE id_sincronizacion_movimiento_almacen = {$row['id_sincronizacion_movimiento_almacen']}";
-					$stm_2 = $this->link->query( $sql ) or die( "Error al poner registro de sincronizacion de movimiento de almacen en status 2 : {$sql} : {$this->link->error}" );
+					$stm_2 = $this->link->query( $sql );
+						if( $logger_id ){
+							$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza registro de sincronizacion a status 2", $sql );
+						}
+						if( $this->link->error ){
+							if( $logger_id ){
+								$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al poner registro de sincronizacion de movimiento de almacen en status 2", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+							}
+							die( "Error al poner registro de sincronizacion de movimiento de almacen en status 2 : {$this->link->error} {$sql}" );
+						}
 				}
 			}
 			//var_dump( $resp );
 			return $resp;
 		}
 //actualizacion de registros de sincronizacion
-		public function updateMovementSynchronization( $rows, $petition_unique_folio, $status = null, $sum = false ){
+		public function updateMovementSynchronization( $rows, $petition_unique_folio, $status = null, $sum = false, $logger_id = false ){
+			$log_steep_id = null;
 			$sql = "";
-			if( $status != null ){//actualiza status y folio unico de peticion
-				$sql = "UPDATE sys_sincronizacion_movimientos_almacen 
-	              SET id_status_sincronizacion = '{$status}',
-	              	folio_unico_peticion = '{$petition_unique_folio}' 
-	            WHERE registro_llave IN( {$rows} )";
+			if( $rows != '' && $rows != null  ){
+				if( $status != null ){//actualiza status y folio unico de peticion
+					$sql = "UPDATE sys_sincronizacion_movimientos_almacen 
+					SET id_status_sincronizacion = '{$status}',
+						folio_unico_peticion = '{$petition_unique_folio}' 
+					WHERE registro_llave IN( {$rows} )";
 
-	   		}else if( $sum == true ){//actualiza a sumado y folio unico de peticion
-				$sql = "UPDATE sys_sincronizacion_movimientos_almacen 
-	              SET movimiento_sumado = '1',
-	              	folio_unico_peticion = '{$petition_unique_folio}' 
-	            WHERE registro_llave IN( {$rows} )";
-	   		}
-	   	 	$stm = $this->link->query( $sql ) or die( "Error al actualizar registros de sincronización exitosos : {$this->link->error} {$sql}" );
-		
+				}/*else if( $sum == true ){//actualiza a sumado y folio unico de peticion
+					$sql = "UPDATE sys_sincronizacion_movimientos_almacen 
+					SET movimiento_sumado = '1',
+						folio_unico_peticion = '{$petition_unique_folio}' 
+					WHERE registro_llave IN( {$rows} )";
+				}*/
+				$stm = $this->link->query( $sql );
+					if( $logger_id ){
+						$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza status de registros de sincronizacion", $sql );
+					}
+					if( $this->link->error ){
+						if( $logger_id ){
+							$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al actualizar status de registros de sincronizacion", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+						}
+						die( "Error al actualizar status de registros de sincronizacion : {$this->link->error} {$sql}" );
+					}
+				//or die( "Error al actualizar registros de sincronización exitosos : {$this->link->error} {$sql}" );
+			}
 		}
 //inserción de movimientos
-		public function insertMovements( $movements ){
+		public function insertMovements( $movements, $logger_id = false ){
 //oscar 2023
+			$log_steep_id = null;
 			$file = fopen("movements_log.txt", "w");
   			$resp = array();
 			$resp["ok_rows"] = '';
@@ -126,16 +167,17 @@
 					$sql = str_replace( ") '", ")", $sql );
 
 					$stm_head = $this->link->query( $sql );//or die( "Error al insertar cabecera de movimiento de almacen : {$sql} {$this->link->error}" );
-					if( $this->link->error ){//captura error en log
-					//inserta el log del error en tabla de errores
-						$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
-									VALUES ( 'sys_sincronizacion_movimientos_almacen', '{$movement['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";
-						$stm = $this->link->query( $sql );// or die( "Error al insertar error en sys_sincronizacion_log_errores_registros : {$this->link->error}" );
-						if( $this->link->error ){
-							echo "Error al insertar el log de error en sincronización : {$this->link->error}";
+					
+						if( $logger_id ){
+							$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta cabecera de movimientos de almacen", $sql );
 						}
-						$ok = false;
-					}
+						if( $this->link->error ){
+							$ok = false;
+							if( $logger_id ){
+								$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar cabecera de movimientos de almacen", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+							}
+							die( "Error al insertar cabecera de movimientos de almacen : {$this->link->error} {$sql}" );
+						}
 					$sql = "SELECT MAX( id_movimiento_almacen ) AS last_id FROM ec_movimiento_almacen";
 					$stm = $this->link->query( $sql );
 					if( $this->link->error ){
@@ -152,15 +194,16 @@
 											-1, IF( {$detail['id_proveedor_producto']} IS NULL OR '{$detail['id_proveedor_producto']}' = '', NULL, '{$detail['id_proveedor_producto']}' ), 
 											{$movement['id_pantalla']}, '{$detail['folio_unico']}' )";
 								$stm = $this->link->query( $sql );
-								if( $this->link->error ){
-									$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
-												VALUES ( 'sys_sincronizacion_movimientos_almacen', '{$movement['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";
-									$stm = $this->link->query( $sql );
-									if( $this->link->error ){
-										echo "Error al insertar el log de error en sincronización : {$this->link->error}";
+									if( $logger_id ){
+										$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta detalle de movimientos de almacen", $sql );
 									}
-									$ok = false;
-								}
+									if( $this->link->error ){
+										$ok = false;
+										if( $logger_id ){
+											$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar cabecera de movimientos de almacen", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+										}
+										die( "Error al insertar detalle de movimientos de almacen : {$this->link->error} {$sql}" );
+									}
 							}
 						}
 					}
@@ -179,7 +222,7 @@
 			return $resp;
 		}
 //actualización de inventario almacen producto
-		public function updateInventory( $movements ){
+		public function updateInventory( $movements, $logger_id = false ){
 			$updates = array();
   			$resp = array();
 			$resp["ok_rows"] = '';
