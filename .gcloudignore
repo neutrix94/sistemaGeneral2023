@@ -12,4 +12,4 @@
 # below:
 .git
 .gitignore
-files/
+.git/

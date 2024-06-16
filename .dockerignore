@@ -5,7 +5,7 @@
 # Exclude "build-time" ignore files.
 .dockerignore
 .gcloudignore
-files/
+.git/
 
 # Exclude git history and configuration.
 .gitignore
