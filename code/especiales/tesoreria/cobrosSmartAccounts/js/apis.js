@@ -155,7 +155,8 @@
     
     //marcar notificacion como vista
 	function marcar_notificacion_vista( folio_unico ){
-        ws.viewedFolios = [folio_unico, ...ws.viewedFolios];
+        let folios = ws.viewedFolios ? ws.viewedFolios : [];
+        ws.viewedFolios = [folio_unico, ...folios];
         ws.sendViewedTransactions();
 		close_emergent();
 	}    //marcar notificacion como vista
