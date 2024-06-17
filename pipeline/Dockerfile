@@ -9,10 +9,11 @@ RUN a2enmod rewrite
 # Update apt source list (for debian stretch on old PS images using debian 9)
 RUN if [ $(awk -F. '{print $1}' /etc/debian_version) -eq 9 ]; then \
   printf 'deb http://archive.debian.org/debian/ stretch main contrib non-free deb http://archive.debian.org/debian-security/ stretch/updates main contrib non-free deb http://archive.debian.org/debian/ stretch-backports main contrib non-free' > /etc/apt/sources.list; \
-  fi
-# Precompile PHP code with opcache.
+fi
+
+# Install dependencies
 RUN apt-get update \
-  && apt-get install -y \
+  && apt-get install -y --no-install-recommends \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
     libpng-dev \
@@ -47,16 +48,10 @@ RUN apt-get update \
     libmemcached-dev \
     zlib1g-dev \
     libbz2-dev \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
-
-# Install required dependencies for building GMP from source
-RUN apt-get update && apt-get install -y \
-  wget \
-  build-essential \
-  m4 \
-  libgmp3-dev \
-  && apt-get clean \
+    wget \
+    build-essential \
+    m4 \
+    libgmp3-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Manually download and install GMP library
@@ -83,38 +78,37 @@ RUN mkdir -p /usr/src/php/ext/igbinary \
   && docker-php-ext-enable igbinary
 
 # Install memcached extension using PECL
-RUN pecl install memcached-2.2.0
+RUN pecl install memcached-2.2.0 \
+    && docker-php-ext-enable memcached
 
-# Enable the memcached extension
-RUN docker-php-ext-enable memcached
-
+# Configure PHP extensions
 RUN docker-php-ext-configure \
-  gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+    gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+  && docker-php-ext-install -j "$(nproc)" \
+    opcache \
+    exif \
+    gd \
+    gettext \
+    gmp \
+    hash \
+    igbinary \
+    intl \
+    mbstring \
+    mysql \
+    mysqli \
+    pcntl \
+    pdo_mysql \
+    readline \
+    shmop \
+    soap \
+    sockets \
+    tidy \
+    wddx \
+    xmlrpc \
+    xsl \
+    zip
 
-RUN docker-php-ext-install -j "$(nproc)" \
-  opcache \
-  exif \
-  gd \
-  gettext \
-  gmp \
-  hash \
-  igbinary \
-  intl \
-  mbstring \
-  mysql \
-  mysqli \
-  pcntl \
-  pdo_mysql \
-  readline \
-  shmop \
-  soap \
-  sockets \
-  tidy \
-  wddx \
-  xmlrpc \
-  xsl \
-  zip
-
+# PHP configuration for Cloud Run
 RUN set -ex; \
   { \
     echo "; Cloud Run enforces memory & timeouts"; \
@@ -132,22 +126,13 @@ RUN set -ex; \
 
 # Copy in custom code from the host machine.
 WORKDIR /var/www/html
-
-# Copy project files
 COPY . .
 
-# Set permissions recursively
-RUN chmod -R 775 .
+# Set permissions and ownership
+RUN chmod -R 775 . \
+    && chown -R www-data:www-data /var/www/html/templates_c
 
-# Ensure directory ownership
-RUN chown -R www-data:www-data /var/www/html/templates_c
-
-# Use the PORT environment variable in Apache configuration files.
-# https://cloud.google.com/run/docs/reference/container-contract#port
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
-
-# Configure PHP for development.
-# Switch to the production php.ini for production operations.
-# RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-# https://github.com/docker-library/docs/blob/master/php/README.md#configuration
-RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+# Use PORT environment variable in Apache configuration files
+# Do this dynamically at runtime instead of build time
+CMD sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf \
+    && apache2-foreground
