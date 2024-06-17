@@ -29,7 +29,7 @@ $app->post('/', function (Request $request, Response $response){
     //var_dump( $body );
     try{
       $filePath = getenv('PATH_NETPAY_TRANSACTION_FILE') ?: '';
-      fopen("{$filePath}archivo.txt", "w");
+      $file = fopen("{$filePath}archivo.txt", "w");
       fwrite($file,"{$body}");
       fclose($file);
     }catch( Exception $e ){
