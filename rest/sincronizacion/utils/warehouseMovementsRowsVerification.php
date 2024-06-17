@@ -278,7 +278,7 @@
             $sql = "UPDATE sys_sincronizacion_movimientos_almacen SET id_status_sincronizacion = 3 WHERE registro_llave IN( $uniques_folios )";
             $stm = $this->link->query( $sql );
             if( $logger_id ){
-                $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Error al actualizar detalles (jsons)", $sql );
+                $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualizar detalles (jsons)", $sql );
             }
             if( $this->link->error ){
                 if( $logger_id ){
