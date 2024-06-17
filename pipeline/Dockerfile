@@ -129,7 +129,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Set permissions and ownership
-RUN chmod -R 775 . \
+RUN chmod -R 777 . \
     && chown -R www-data:www-data /var/www/html/templates_c
 
 # Use PORT environment variable in Apache configuration files
