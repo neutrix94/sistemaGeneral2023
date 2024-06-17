@@ -134,10 +134,13 @@ RUN set -ex; \
 WORKDIR /var/www/html
 
 # Copy project files
-COPY . ./
+COPY . .
 
 # Set permissions recursively
 RUN chmod -R 775 .
+
+# Ensure directory ownership
+RUN chown -R www-data:www-data /var/www/html/templates_c
 
 # Use the PORT environment variable in Apache configuration files.
 # https://cloud.google.com/run/docs/reference/container-contract#port
