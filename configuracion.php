@@ -411,9 +411,10 @@
 		}
 		var r_l=$("#ruta_loc").val();
 		if( r_l.length<=0  && system_type == 'general' ){
+		/*Se deshabilita que sea obligatoria la ruta local
 			alert("El campo de Ruta Local no puede ir vacío!!!");
 			$("#ruta_loc").focus();
-			return false;
+			return false;*/
 		}
 		var n_bd_l=$("#nombre_bd_loc").val();
 		if( n_bd_l.length<=0  && system_type == 'general' ){

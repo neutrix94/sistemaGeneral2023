@@ -31,7 +31,7 @@
 		//url += "&user_id=" + user_id;
 		//alert( url );
 		var resp = ajaxR( url );
-		console.log( resp );
+		//console.log( resp );
 		$( '.emergent_content' ).html( resp );
 		$( '.emergent' ).css( 'display', 'block' );
 	} 
@@ -172,7 +172,7 @@
 
     function informar_folio( folio_unico ){
         ws.actualFolio = folio_unico;
-        console.log( folio_unico );
+        //console.log( folio_unico );
         /*{
             folio_unico: folio_unico,
             id_sucursal: $sucursal_websocket,
