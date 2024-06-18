@@ -1663,7 +1663,17 @@
 					WHERE id_sesion_caja_afiliaciones = {$afiliation[0]}";
 				}
 				$stm = $this->link->query( $sql ) or die( "Error al agregar/ actualizar afiliacion a la sesion de caja actual : {$sql} : {$this->link->error}" );
-
+			//sincronizacion de afiliaciones por sesion de caja
+				if( $afiliation[0] == '' || $afiliation[0] == null ){//si no tiene id de detalle
+				//consulta el id insertado de la afiliacion por sesion de caja
+					$sql = "SELECT MAX( id_sesion_caja_afiliaciones ) AS last_id FROM ec_sesion_caja_afiliaciones";
+					$stm = $this->link->query( $sql ) or die( "Error al consultar el ultimo id insertado en ec_sesion_caja_afiliaciones : {$sql} : {$this->link->error}" );
+					$row = $stm->fetch_assoc();
+					$id_sesion_caja_afiliacion = $row['last_id'];
+				//envia a crear registro JSNO de sincronizacion
+					$sql = "CALL SincronizacionSesionCajaAfiliaciones(  'insert', {$id_sesion_caja_afiliacion} );";
+					$stm = $this->link->query( $sql ) or die( "Error al ejecutar procedure para sincronizar terminal en sesion de caja : {$sql} : {$this->link->error}" );
+				}
 			}
 			return 'ok';
 		}
@@ -1734,6 +1744,15 @@
 			$sql = "INSERT INTO ec_sesion_caja_terminales ( id_sesion_caja, id_cajero, id_terminal, habilitado )
 			VALUES ( '{$session_id}', '{$user_id}', '{$terminal_id}', 1 )";
 			$stm = $this->link->query( $sql ) or die( "Error al agregar terminal a la sesion de caja actual : {$this->link->error}" );
+		//sincronizacion de terminales por sesion de caja
+			//consulta el id insertado de la terminal por sesion de caja
+				$sql = "SELECT MAX( id_sesion_caja_terminales ) AS last_id FROM ec_sesion_caja_terminales";
+				$stm = $this->link->query( $sql ) or die( "Error al consultar el ultimo id insertado en ec_sesion_caja_terminales : {$sql} : {$this->link->error}" );
+				$row = $stm->fetch_assoc();
+				$id_sesion_caja_terminal = $row['last_id'];
+			//envia a crear registro JSNO de sincronizacion
+				$sql = "CALL SincronizacionSesionCajaTerminales(  'insert', {$id_sesion_caja_terminal} );";
+				$stm = $this->link->query( $sql ) or die( "Error al ejecutar procedure para sincronizar terminal en sesion de caja : {$sql} : {$this->link->error}" );
 			return 'ok';
 		}
 

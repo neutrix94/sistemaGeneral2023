@@ -126,13 +126,13 @@
 				LEFT JOIN ec_terminales_sucursales_smartaccounts tss
 				ON tss.id_terminal = tis.id_terminal_integracion
 				AND tss.id_sucursal = {$user_sucursal}
-				LEFT JOIN ec_terminales_cajero_smartaccounts tcs 
-				ON tcs.id_terminal = tis.id_terminal_integracion
+				/*LEFT JOIN ec_terminales_cajero_smartaccounts tcs 
+				ON tcs.id_terminal = tis.id_terminal_integracion*/
 				LEFT JOIN ec_sesion_caja_terminales sct
-				ON sct.id_terminal = tcs.id_terminal
-				WHERE tcs.id_cajero = '{$user_id}' 
-				AND tcs.activo = 1 
-				AND tss.estado_suc = 1
+				ON sct.id_terminal = tss.id_terminal
+				WHERE /*tcs.id_cajero = '{$user_id}' 
+				AND tcs.activo = 
+				AND 1*/tss.estado_suc = 1
 				AND tis.id_terminal_integracion > 0
 				AND sct.id_sesion_caja = '{$id_sesion_caja}'";
 			$eje = $this->link->query( $sql )or die("Error al consultar las afiliaciones para este cajero!!!<br>{$this->link->error}");

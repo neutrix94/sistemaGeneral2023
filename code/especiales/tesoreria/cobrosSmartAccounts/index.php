@@ -48,7 +48,7 @@ $url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
 		die( "no se incluyo libreria Encrypt" );
 	}
 	$Encrypt = new Encrypt();
-	$token_websocket = $Encrypt->encryptText( "7dff3c34-faee-11ea-a7be-3d014d7f956c", "" );//hay que recuperar de DB7dff3c34-faee-11ea-a7be-3d014d7f956c
+	$token_websocket = $Encrypt->encryptText( "d4186cb3-7400-4e0f-bbea-55ebc8739b23", "" );//hay que recuperar de DB7dff3c34-faee-11ea-a7be-3d014d7f956c
 //$token_websocket = "";
 	//die( "Token : {$token_websocket}" );
 	$usuario_websocket = $user_id;
