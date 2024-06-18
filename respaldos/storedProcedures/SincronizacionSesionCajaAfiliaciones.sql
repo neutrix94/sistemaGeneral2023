@@ -10,6 +10,8 @@ BEGIN
     
     SET unique_folio = CONCAT( store_prefix, '_SCAFI_', ID_REGISTRO );
 	
+	UPDATE ec_sesion_caja_afiliaciones SET folio_unico = unique_folio WHERE id_sesion_caja_afiliaciones = ID_REGISTRO;
+
     INSERT INTO sys_sincronizacion_registros ( id_sincronizacion_registro, sucursal_de_cambio,
 		id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
 	SELECT

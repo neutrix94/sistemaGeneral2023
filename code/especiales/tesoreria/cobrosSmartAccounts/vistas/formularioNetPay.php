@@ -45,9 +45,9 @@
 
 <script>
 	setTimeout( function (){ 
-		alert();
+		//alert();
 		informar_folio( '<?php echo $resp->folio_unico_transaccion;?>' );
-	}, 1000 );
+	}, 100 );
 // Crea una nueva conexión SSE
 	var server_url = 'ajax/server_events.php?transaction_id=<?php echo $resp->folio_unico_transaccion;?>';
 	var emergent_count_tmp = <?php echo $counter;?>;
