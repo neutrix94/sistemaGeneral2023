@@ -1556,13 +1556,19 @@ var hay_paquete=0;
             aux[5]=0;
             aux[7]=0;
         }
-        //Orden de lista
-        var newCell=newRow.insertCell(0);
+
+        //Checkbox muestra
+         var newCell=newRow.insertCell(0);
+        newCell.innerHTML="este sera el checkobox";
+        newCell.align="center";
+
+        //Producto / Orden de Lista
+        var newCell=newRow.insertCell(1);
         newCell.innerHTML=aux[2];
         newCell.align="center";
         
         //Descripcion
-        var newCell=newRow.insertCell(1);
+        var newCell=newRow.insertCell(2);
         newCell.innerHTML=aux[3];
         newCell.align="left";
     /*implementación de Oscar 13.08.2018*/
@@ -1571,17 +1577,17 @@ var hay_paquete=0;
         }
     /*fin de cambio*/
         //Cantidad
-        var newCell=newRow.insertCell(2);
+        var newCell=newRow.insertCell(3);
         newCell.innerHTML=can2;
         newCell.align="right";
         
         //Precio formato
-        var newCell=newRow.insertCell(3);
+        var newCell=newRow.insertCell(4);
         newCell.innerHTML=aux[4];
         newCell.align="right";
         
         //Oferta
-        var newCell=newRow.insertCell(4);
+        var newCell=newRow.insertCell(5);
         if(ventaTipo==1){
         	newCell.style.display="none";
         }
@@ -1589,7 +1595,7 @@ var hay_paquete=0;
         newCell.align="right";
         
         //monto
-        var newCell=newRow.insertCell(5);
+        var newCell=newRow.insertCell(6);
         newCell.innerHTML=aux[6];
         newCell.align="right";
 
@@ -1600,40 +1606,40 @@ var hay_paquete=0;
         }
 
     //Eliminar        
-        var newCell=newRow.insertCell(6);
+        var newCell=newRow.insertCell(7);
         newCell.innerHTML='<a href="javascript:void(0)" onclick="eliminarItem(this);'+segunda_funcion+'" class="eliminar"><i class="icon-cancel-alt-filled"></i></a>';/*fin de cambio 13.08.2018*/
         newCell.align="center";
         
         //Fila precio oculta
-        var newCell=newRow.insertCell(7);
+        var newCell=newRow.insertCell(8);
         newCell.valor=aux[5];
         newCell.width="0";
         newCell.style="0";
         newCell.style.display="none";
         
         //Fila monto oculta
-        var newCell=newRow.insertCell(8);
+        var newCell=newRow.insertCell(9);
         newCell.valor=aux[7];
         newCell.width="0";
         newCell.border="0";
         newCell.style.display="none";
         
         //Fila regalo oculta
-        var newCell=newRow.insertCell(9);
+        var newCell=newRow.insertCell(10);
         newCell.valor=sig;
         newCell.width="0";
         newCell.border="0";
         newCell.style.display="none";
         
         //Fila familia oculta
-        var newCell=newRow.insertCell(10);
+        var newCell=newRow.insertCell(11);
         newCell.valor=aux[8];
         newCell.width="0";
         newCell.border="0";
         newCell.style.display="none";
         
         //id  oculta
-        var newCell=newRow.insertCell(11);
+        var newCell=newRow.insertCell(12);
         newCell.valor=aux[1];
         newCell.width="0";
         newCell.border="0";
@@ -1644,7 +1650,7 @@ var hay_paquete=0;
         if(referenciaPaquete==1){
             axDisable='disabled';
         }
-        var newCell=newRow.insertCell(12);
+        var newCell=newRow.insertCell(13);
         newCell.width="0";//120px
     /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
         newCell.innerHTML='<input type="text" class="des" style="display:none;" onkeyup="cambiaMonto(this);" '+axDisable+'">';*/
@@ -1652,7 +1658,7 @@ var hay_paquete=0;
         newCell.style.display="none";
 
         //respaldo de monto original
-        var newCell=newRow.insertCell(13);
+        var newCell=newRow.insertCell(14);
         newCell.width="0";
     /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
         newCell.innerHTML='<input type="hidden" value="'+aux[6]+'">';*/
@@ -1660,13 +1666,13 @@ var hay_paquete=0;
         newCell.style.display="none";
 
 /*implementación de Oscar 18.03.2019 para saber de que lista fue tomado el precio y validar promoción*/
-        var newCell=newRow.insertCell(14);
-        newCell.valor=aux[15];
-        newCell.innerHTML=aux[15];
+        var newCell=newRow.insertCell(15);
+        newCell.valor=aux[16];
+        newCell.innerHTML=aux[16];
         newCell.style.display="none";
 /*Fin de cambio Oscar 18.03.2019*/
         sig=0;
-        lista_precios_actual=aux[15];
+        lista_precios_actual=aux[16];
 
     /*implementacion de Oscar 03.05.2018 para insertar en tabla temporal de movimientos*/      
         var urlTmp="ajax/insertaTemporal.php?id_mov_temp="+id_mov_tmp+"&id_prod="+aux[1]+"&cant="+can2;
