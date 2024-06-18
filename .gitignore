@@ -14,4 +14,5 @@ assets/archivoDatosQR.txt
 **/.DS_Store
 *error_log
 *.log
-*log
+/files/packs_img/*
+/files/packs_img_tmp/*
