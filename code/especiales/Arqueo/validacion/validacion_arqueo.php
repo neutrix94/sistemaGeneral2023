@@ -191,7 +191,7 @@
 			return false;
 		}
 		var cantidad_tarjetas=$("#no_tarjetas").val();
-		var cantidad_cheque=$("#no_cheque_transferencia").val();
+		var cantidad_cheque=$( "#listado_cheque_transferencia tr" ).length - 1;//$("#no_cheque_transferencia").val();
 		var id_corte=$("#id_sesion").val();
 		var tarjetas='',cheques='',password='',fecha_ultimo_corte='';
 		var ingreso_efe=0;
@@ -234,10 +234,10 @@
 		for(var i=1;i<=cantidad_cheque;i++){
 				cheques+=$("#caja_"+i).html()+'~';//id de registro de banco
 				cheques+=$("#monto_"+i).html()+'~';//monto
-				cheques+=$("#referencia_"+i).html()+'~';//referencia
+				cheques+=$("#nombre_referencia_"+i).html()+'~';//referencia
 				cheques+=$("#caja_nueva_"+i).html()+'°';//nuevo id de caja
 		}
-		
+		//alert( cheques );
 	//extraemos los datos del ingreso en efectivo
 		//alert($("#monto_en_efectivo").val());return false;
 
@@ -291,7 +291,7 @@
 
 	function llenaReporte(){
 		var cantidad_tarjetas=$("#no_tarjetas").val();
-		var cantidad_cheque=$("#no_cheque_transferencia").val();
+		var cantidad_cheque=$( "#listado_cheque_transferencia tr" ).length - 1;//$("#no_cheque_transferencia").val();
 		var id_corte=$("#id_sesion").val();
 		var tarjetas='',cheques='',password='';
 	//sacamos la fecha del corte 
@@ -330,12 +330,13 @@
 		//alert( `tarjetas : ${tarjetas}` );
 
 	//extraemos los valores de las tarjetas
+	//alert( cantidad_cheque )
 		for(var i=1;i<=cantidad_cheque;i++){
 				cheques+=$("#caja_"+i).html()+'~';//id de banco
 				cheques+=$("#monto_"+i).html()+'~';//monto
 				cheques+=$("#referencia_"+i).html()+'°';//monto
 		}
-//		alert(cheques);
+		//alert(cheques);
 	//generamos el reporte
 		$.ajax({
 			type:'post',
@@ -404,7 +405,7 @@ var cont_cheques_transferencia=0;
 		var tabla=$("#listado_cheque_transferencia");
 		var htmlTags='<tr>'+
         '<td id="caja_'+cont_cheques_transferencia+'" class="td_oculto">nuevo</td>'+
-        '<td align="left">'+texto+'</td>'+
+        '<td id="nombre_referencia_'+cont_cheques_transferencia+'" align="left">'+texto+'</td>'+
         '<td id="monto_'+cont_cheques_transferencia+'" align="center" onclick="edita_celda(this,1);">'+monto+'</td>'+
         '<td id="referencia_'+cont_cheques_transferencia+'" onclick="edita_celda(this,2);" align="left">'+observacion+'</td>'+
         '<td id="caja_nueva_'+cont_cheques_transferencia+'" class="td_oculto">'+caja+'</td>'+

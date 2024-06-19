@@ -213,7 +213,7 @@
 				$cont_chqs++;
 				$pagos_chqs.='<tr id="fila_ch_'.$cont_chqs.'">';
 	        	$pagos_chqs.='<td id="caja_'.$cont_chqs.'" class="td_oculto">'.$r1[0].'</td>';
-	        	$pagos_chqs.='<td align="left">'.$r1[1].'</td>';
+	        	$pagos_chqs.='<td id="nombre_referencia_'.$cont_chqs.'" align="left">'.$r1[1].'</td>';
 	        	$pagos_chqs.='<td id="monto_'.$cont_chqs.'" align="center">'.$r1[2].'</td>';
 	        	$pagos_chqs.='<td id="referencia_'.$cont_chqs.'" align="left">'.$r1[3].'</td>';
 	      		$pagos_chqs.='</tr>';
