@@ -1,5 +1,5 @@
 <?php
-/*version casa 1.0*/
+/*version casa 2.0*/
 //corte anterior
 	$id_corte_anterior=$Arqueo->getSessionBefore( $user_id );
 //afiliaciones
