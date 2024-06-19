@@ -2,9 +2,11 @@
 
 	header('Content-Type: text/html; charset=utf-8');
 
-	if(file_exists('../../conexion_inicial.txt')){
+	$main_path = getenv('PATH_STORAGE') ?: '../..';
+
+	if(file_exists("{$main_path}/conexion_inicial.txt")){
 //1. Elimina el archivo /conexion_inicial.txt si existe
-		unlink('../../conexion_inicial.txt');
+		unlink("{$main_path}/conexion_inicial.txt");
 	}
 //2. Crea la cadena con los datos del formulario
 	$cadena_datos='';
@@ -40,19 +42,18 @@
 	$cadena_datos.= '<>'.$_POST['store_id'];
 	$cadena_datos.= '<>'.$_POST['system_type'];
 				
-
 //3. Crea archivo /conexion_inicial.txt
-	$fp = fopen("../../conexion_inicial.txt", "w");
+	$fp = fopen("{$main_path}/conexion_inicial.txt", "w");
 		fputs($fp,$cadena_datos);
 		fclose($fp);
 
-	if(file_exists('../../config.inc.php')){
+	if(file_exists("{$main_path}/config.inc.php")){
 //4. Elimina archivo /config.inc.php
-		unlink('../../config.inc.php');
+		unlink("{$main_path}/config.inc.php");
 	}
 
 //5. Crea archivo /config.inc.php
-	$ini=fopen("../../config.inc.php", "w");
+	$ini=fopen("{$main_path}/config.inc.php", "w");
 	$datos="<?php\n";
 	$datos.="session_start();\n";
 	$datos.="//Definiciones de base de datos\n";
@@ -81,11 +82,11 @@
 
 	
 //6. Elimina archivo /conexionDoble.php
-	if(file_exists('../../conexionDoble.php')){
-		unlink('../../conexionDoble.php');
+	if(file_exists("{$main_path}/conexionDoble.php")){
+		unlink("{$main_path}/conexionDoble.php");
 	}
 //7. Crea archivo /conexionDoble.php
-	$ini=fopen("../../conexionDoble.php", "w");
+	$ini=fopen("{$main_path}/conexionDoble.php", "w");
 
 	$datos='';
 	$datos.="<?php\n";
