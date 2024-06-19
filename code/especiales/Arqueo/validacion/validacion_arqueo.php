@@ -296,6 +296,7 @@
 		$( '#tarjetas tr' ).each( function ( index ){
 			if( $( this ).hasClass( 'is_card_row' ) ){
 				tarjetas += $("#tarjeta_"+ cards_counter ).val()+'~';//id de afiliacion
+				$("#t" + cards_counter ).prop( 'readonly', false );//se habilitan los campos de las tarjetas
 				if( $("#t" + cards_counter ).val()!='' ){
 					tarjetas += $("#t"+ cards_counter ).val()+'~';//monto
 				}else{ 

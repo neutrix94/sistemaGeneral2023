@@ -138,9 +138,29 @@ $user_id = 784;
 	$cajas = $Arqueo->getAccounts( $user_sucursal );
 //cheques/transferencias del corte de caja
 	$pagos_chqs = $Arqueo->getAdittionalPayments( $user_id, $fecha_sesion, $hora_inicio_sesion );
+	
+//cargamos el monto en efectivo
+	$pagos_efe='';
+	$sql="SELECT scd.id_sesion_caja_detalle,'Efectivo entregado',scd.monto 
+		FROM ec_sesion_caja_detalle scd
+		LEFT JOIN ec_afiliaciones a ON scd.id_afiliacion=a.id_afiliacion
+		WHERE scd.id_corte_caja='$llave' AND scd.observaciones='efectivo'";//die( $sql );
+	$eje=mysql_query($sql)or die("Error al consultar el monto del pago en efectivo!!!<br>".mysql_error());
+	while ($r=mysql_fetch_row($eje)){	
+		$pagos_efe.='<tr>';
+			$pagos_efe.='<td colspan="3" class="subtitulo"><p style="font-size:20px;margin:0;" align="center">Efectivo</p></td>';
+		$pagos_efe.='</tr>';
+		$pagos_efe.='<tr>';
+			$pagos_efe.='<td align="center"><select id="efectivo_pagos" class="filtro" style="width:95%"><option value="'.$r[0].'">'.$r[1].'</option></select></td>';
+			$pagos_efe.='<td align="left"><input type="number" class="entrada" id="monto_en_efectivo" onkeyup="llenaReporte();" value="'.$r[2].'" placeholder="Monto">';
+		$pagos_efe.='</tr>';
+	} 
 ?>
 
 		<table border="1" id="tarjetas">
+			<?php
+				echo $pagos_efe;
+			?>
 			<tr class="informative_row">
 				<th colspan="3" class="text-center">Terminales Sin SmartAccounts</th>
 			</tr>
