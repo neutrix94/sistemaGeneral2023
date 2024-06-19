@@ -824,7 +824,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
                 onclick="solicitar_muestras('muestras');"
                 class="btn btn-warning"
               >
-                <b>Solicitar muestras</b>
+                <b>Productos para devolver</b>
               </button>
             </div>
             <div class="col-2 text-center"><!-- width="20%" align="center" style="border: inset 0pt;" -->

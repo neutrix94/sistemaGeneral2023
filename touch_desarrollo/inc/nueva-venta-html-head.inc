@@ -33,7 +33,7 @@
             if( index > 0 ){
                 var product_array = new Array();
                 $( this ).children( 'td' ).each( function( index_2 ){
-                    if( index_2 != 6 ){
+                    if( index_2 != 7 ){ //indice 7 corresponde al icono para borrar fila
                         var val = $( this ).html();
                         product_array.push( val );
                     }/*else if( index_2 == 13 ){
@@ -68,11 +68,17 @@
         console.log( products_array );
         for( var i = 0; i < products_array.length; i ++ ){
             //console.log( products_array[i] );
-            var tmp_price = products_array[i][3].replace( '$', '' );
+            var tmp_price = products_array[i][4].replace( '$', '' );
             /*if(products_array[i][13] == "undefined" ){
                 products_array[i][13] = null;
             }*/
-            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price );//aux_arr[2]
+            var component_chk = products_array[i][0];
+
+            var contiene_checked = component_chk.includes("checked");
+
+            var select_checkbox = ( contiene_checked ) ? 1: 0;
+            //agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price );//aux_arr[2]
+            agregaFila(null, products_array[i][3], -1, products_array[i][1], products_array[i][14], tmp_price, select_checkbox );//aux_arr[2]
             //f,cant,temp,id_producto_pedido,lista_normal
         }
     }
@@ -554,10 +560,10 @@ function enlista_paquete(arreglo){
             for(i=0;i<filas.length-1;i++){
                 var monto="";
                 var celdas=filas[i+1].getElementsByTagName('td');
-                var aux = celdas[5].innerHTML.split('$');
+                var aux = celdas[6].innerHTML.split('$');
     /*Implementacion Oscar 2024-02-28 para correccion de error al agregar producto de ultimas piezas*/
                 var aux2;
-                if( celdas[5].innerHTML.includes( '$' ) ){
+                if( celdas[6].innerHTML.includes( '$' ) ){
                     aux2 = aux[1].split(",");            
                 }else{
                     aux2 = aux[0].split(",");
@@ -1178,7 +1184,7 @@ var new_sale_window = null;
 
 var hay_paquete=0;
 //agregar fila a tabla del pedido
-    function agregaFila(f,cant,temp,id_producto_pedido,lista_normal, product_price = null){//se implementan las variables cant,temp por Oscar 13.08.2018
+    function agregaFila( f, cant, temp, id_producto_pedido, lista_normal, product_price = null, val_check_muestra = 0 ){//se implementan las variables cant,temp por Oscar 13.08.2018
         //alert(product_price );
     //alert( f + ','+ cant + ',' + temp + ',' + id_producto_pedido + ',' + lista_normal );
        // alert('add_fila');
@@ -1558,8 +1564,9 @@ var hay_paquete=0;
         }
 
         //Checkbox muestra
-         var newCell=newRow.insertCell(0);
-        newCell.innerHTML="este sera el checkobox";
+        var newCell=newRow.insertCell(0);
+        var strCheck = (val_check_muestra == 1) ? '<input type="checkbox" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" onclick="checkMuestra(this)"/>';
+        newCell.innerHTML=strCheck;
         newCell.align="center";
 
         //Producto / Orden de Lista
@@ -2020,9 +2027,9 @@ var hay_paquete=0;
 		//tds=$(item).getElementsByTagName('td');
 		
 		var tds=$(item).parents("tr").children("td");
-		familiaAct=tds[10].valor;
-		lista_precios_actual=tds[14].valor;
-		var id_prod=tds[11].valor;
+		familiaAct=tds[11].valor;
+		lista_precios_actual=tds[15].valor;
+		var id_prod=tds[12].valor;
 		//alert(id_prod);
 		//return false;
 		$(item).parents ("tr.move").first ().remove ();
@@ -2046,10 +2053,10 @@ var hay_paquete=0;
 			
 			//alert(tds[10].valor);
 			
-			if(tds[10].valor == familiaAct && tds[14].valor==lista_precios_actual)/*Oscar 19.03.2019*/
+			if(tds[11].valor == familiaAct && tds[15].valor==lista_precios_actual)/*Oscar 19.03.2019*/
 			{
 				//Validamos si tiene la misma promocion
-				can2+=parseInt(tds[2].innerHTML);
+				can2+=parseInt(tds[3].innerHTML);
                
 				if(familias != '')
 					familias+=",";
@@ -2057,9 +2064,9 @@ var hay_paquete=0;
 				if(cans != '')
 					cans+=",";     
                
-				familias+=tds[11].valor;
-				id_prod=tds[11].valor
-				cans+=tds[2].innerHTML;
+				familias+=tds[12].valor;
+				id_prod=tds[12].valor
+				cans+=tds[3].innerHTML;
 				posiciones[nfams]=i;     
                 
 				nfams++;
@@ -2101,7 +2108,28 @@ var hay_paquete=0;
        }
         calculaTotalVenta();
         setLocalStorageProducts();//implementacion Oscar 2023 para eliminar el producto de LocalStorage
-      }
+    }
+
+    function checkMuestra(item){
+        var valor_chk = $(item).is(":checked");
+
+        var str_checkbox = ( valor_chk ) ? '<input type="checkbox" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" onclick="checkMuestra(this)"/>';
+        
+        var fila_tabla = $(item).parent().parent();
+        var indice = fila_tabla.index();
+
+        //Una vez obtenido el indice, procedemos a actualizar el objeto que se guarda en sessionStorage
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+
+        if( products_array.length > 0 ){
+            //Actualiza contenido de la primer columna
+            //Se resta al indice una unidad ya que el indice cero corresponde al header y ese no se toma en cuenta
+            products_array[indice-1][0] = str_checkbox;
+
+            sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+        }
+    }
 
     /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
       function bloqueaPantalla () {
