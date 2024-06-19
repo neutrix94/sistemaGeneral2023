@@ -9,7 +9,7 @@
 //afiliaciones para cheque o transferencia 
 	$cajas = $Arqueo->getAccounts( $user_sucursal );
 //cheques/transferencias del corte de caja
-	$pagos_chqs = $Arqueo->getAdittionalPayments( $user_id, $fecha_sesion, $hora_inicio_sesion );
+	$pagos_chqs = $Arqueo->getAdittionalPayments( $user_id, $fecha_sesion, $hora_inicio_sesion, $id_sesion_caja );
 ?>
 
 		<table border="1" id="tarjetas">

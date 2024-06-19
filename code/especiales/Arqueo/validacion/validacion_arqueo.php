@@ -203,20 +203,33 @@
 	//obtenemos la contraseña
 		password=$("#password1").val();
 	//extraemos los valores de las tarjetas
-		for(var i=1;i<=cantidad_tarjetas;i++){
+		/*for(var i=1;i<=cantidad_tarjetas;i++){
 			if($("#tarjeta_"+i).val()!=0){
 				tarjetas+=$("#tarjeta_"+i).val()+'~';//id de registros de tarjeta
 			
-		/*Implementacion Oscar 04.12.2019 para evitar el error cuando las tarjetas estan vacias*/
 				if($("#t"+i).val()!=''){
 					tarjetas+=$("#t"+i).val()+'°';//monto
 				}else{
 					tarjetas+='0°';//monto					
 				}
-		/*Fin de cambio Oscar 04.12.2019*/
 		
 			}
-		}
+		}*/
+		
+		var cards_counter = 1;
+		$( '#tarjetas tr' ).each( function ( index ){
+			if( $( this ).hasClass( 'is_card_row' ) ){
+				tarjetas += $("#tarjeta_"+ cards_counter ).val()+'~';//id de afiliacion
+				$("#t" + cards_counter ).prop( 'readonly', false );//se habilitan los campos de las tarjetas
+				if( $("#t" + cards_counter ).val()!='' ){
+					tarjetas += $("#t"+ cards_counter ).val()+'~';//monto
+				}else{ 
+					tarjetas += '0~';//monto					
+				}
+				tarjetas += $( '#card_description_' + cards_counter ).html() + "°";
+				cards_counter ++;
+			}
+		});
 	//extraemos los valores de las tarjetas
 		for(var i=1;i<=cantidad_cheque;i++){
 				cheques+=$("#caja_"+i).html()+'~';//id de registro de banco
