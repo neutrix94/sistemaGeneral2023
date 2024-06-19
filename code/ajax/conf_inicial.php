@@ -1,5 +1,4 @@
 <?php
-
 	header('Content-Type: text/html; charset=utf-8');
 
 	$main_path = getenv('PATH_STORAGE') ?: null;
@@ -193,7 +192,7 @@
 		fwrite($ini, $datos);
 		fclose($ini);
 	}
-	
+
 	fwrite($ini2, $datos);
 	fclose($ini2);
 
