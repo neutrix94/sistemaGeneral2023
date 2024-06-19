@@ -28,11 +28,12 @@ $app->post('/', function (Request $request, Response $response){
     $body = $request->getBody();
     //var_dump( $body );
     try{
-      $file = fopen("archivo.txt", "w");
+      $filePath = getenv('PATH_NETPAY_TRANSACTION_FILE') ?: '';
+      $file = fopen("{$filePath}archivo.txt", "w");
       fwrite($file,"{$body}");
       fclose($file);
     }catch( Exception $e ){
-      die( "Error en escritura de arcchivo.txt : {$e}" );
+      die( "Error en escritura de archivo.txt : {$e}" );
     }
   //}catch( Exception e ){
   //  die( "Error al escribir archivo txt : {$e}" );
