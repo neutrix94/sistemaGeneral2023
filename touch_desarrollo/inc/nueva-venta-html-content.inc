@@ -289,6 +289,10 @@ var packsCatalogue = new Array();
     }
   }
 
+  function solicitar_muestras( param ){
+    alert("MUESTRAAAS: "+ param);
+  }
+
 </script>
 <!-- -->
 
@@ -421,6 +425,20 @@ var packsCatalogue = new Array();
   }
   .orange{
     color : orange !important;
+  }
+
+  .buttonMuestras{
+    background-color: #2d97b2;
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center; /* Centra verticalmente los elementos dentro del grupo */
+    margin-bottom: 10px;
+  }
+
+  .input-group span {
+    margin-right: 10px; /* Espacio entre el span y el input */
   }
 </style>
 <?php
@@ -560,7 +578,7 @@ var packsCatalogue = new Array();
   </div>
 <!-- botones -->
   <div class="row" style="padding: 10px !important;">
-    <div class="col-4 text-center">
+    <div class="col-3 text-center">
     <?php
      /* 
 DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
@@ -595,7 +613,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
         </button>
       </div>
     </div>
-    <div class="col-4 text-center row">
+    <div class="col-3 text-center row">
       <div class="col-6 text-end">
         <img style="top:-10px; position:relative;" src="img/teclado.png" width="50" height="50">
       </div> 
@@ -605,7 +623,19 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
         </p>
       </div>
     </div>
-    <div class="col-4 text-center">
+    <!-- Nuevo botón para Solicitar muestras -->
+    <div class="col-3 text-center row">
+      <div class="col-12 text-center">
+        <button 
+        type="button"
+        onclick="solicitar_muestras('muestras');"
+        class="btn buttonMuestras"
+      >
+        <b>Solicitar muestras</b>
+      </button>
+      </div> 
+    </div>
+    <div class="col-3 text-center">
        <p 
           type="button"
           class="btn" 
@@ -614,7 +644,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
           <i class="icon-eye-off" style="font-size : 200%;"></i>
           Borrar
           <br>
-          Busqueda
+          Búsqueda
         </p>
     </div>
   </div>
@@ -691,9 +721,10 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
     <table id="listaProductos" class="table table-striped table-bordered" cellpadding="0" cellspacing="0">
     <thead class="product_list_header">
       <tr class="cabecera">
-        <th width="100"><p>Prod</p></th>
+        <th width="50"><p>Muestra</p></th>
+        <th width="100"><p>Orden de lista</p></th>
         <th width="350"><p>Descripción</p></th>
-        <th width="100"><p>Cant</p></th>
+        <th width="100"><p>Cantidad</p></th>
         <th width="100"><p>Precio</p></th>
       <!--Cambio de omitir oferta en venta por mayoreo Oscar (31-10.2017)-->
       <?php
@@ -769,7 +800,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
         id="cerrar" 
         class="btn1 btn btn-success form-control" 
         style="min-width:180px; margin-right:50px;"
-        >✔ Cerrar venta</button>
+        >✔ Enviar pedido</button>
       </div>
   </div>
   <!--Termina seccion-->
@@ -786,15 +817,22 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
         </div>
     <!--Descuentos-->
     
-        <div class="row">
-            <div class="col-4 text-center"><!-- width="20%" align="center" style="border: inset 0pt;" -->
-
+        <div class="row" style="align-items: center;justify-content: center;">
+            <div class="col-2 text-center">
+              <button 
+                type="button"
+                onclick="solicitar_muestras('muestras');"
+                class="btn btn-warning"
+              >
+                <b>Productos para devolver</b>
+              </button>
+            </div>
+            <div class="col-2 text-center"><!-- width="20%" align="center" style="border: inset 0pt;" -->
              <fieldset  data-role="controlgroup" data-type="horizontal" style="display :none;">
                <label data-mini="true" style="width:100px;padding:10px;text-align:center;">
                   <input type="checkbox" name="paquete" id="es_paquete"/> <?php echo 'Paquete';?>
                 </label>
               </fieldset>
-
               <br>
               <button 
                 onclick="javascript:activa_paq();" 
@@ -804,15 +842,20 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
                 </p>
               </button>
             </div>
-            <div class="col-4 text-center" onclick="habilitaDesc(1);"><!-- width="20%" align="center"  style="border: inset 0pt;" -->
-               <span style="fontsize=20px;font-weight:bold;" >-%</span>
-                <input type="number" id="porcGeneral" style="padding:10px;width:80%;border:2px solid;fontsize=20px;font-weight:bold;border-radius:5px;background:white;"
-                onkeyup="calculaTotalVenta(1);" class="form-control" value="" ><!--autocomplete="ÑÖcompletes"-->
+            <div class="col-3 text-center" onclick="habilitaDesc(1);">
+              <div class="input-group">
+                <span style="font-size: 20px; font-weight: bold;">-%</span>
+                <input type="number" id="porcGeneral" style="padding: 10px; width: 80%; border: 2px solid; font-size: 20px; font-weight: bold; border-radius: 5px; background: white;"
+                onkeyup="calculaTotalVenta(1);" class="form-control" value="" >
+              </div>
             </div>
-            <div class="col-4 text-center" onclick="habilitaDesc(2);"><!-- width="20%" align="center" style="border: inset 0pt;"-->
-               <span style="fontsize=20px;font-weight:bold;" >-$</span>
-                <input type="number" id="descGeneral" style="padding:10px;width:80%;border:2px solid;fontsize=20px;font-weight:bold;border-radius:5px;background:white;"
-                onkeyup="calculaTotalVenta(2);" value="" class="form-control" name="descGeneral" ><!--x-autocompletetype="" autocomplete="off"-->
+            <div class="col-3 text-center" onclick="habilitaDesc(2);">
+              <div class="input-group">
+                <span style="font-size: 20px; font-weight: bold;">-$</span>
+                <input type="number" id="descGeneral" style="padding: 10px; width: 80%; border: 2px solid; font-size: 20px; font-weight: bold; border-radius: 5px; background: white;"
+                onkeyup="calculaTotalVenta(2);" value="" class="form-control" name="descGeneral">
+              </div>
+               
             </div>
         </div>
 
