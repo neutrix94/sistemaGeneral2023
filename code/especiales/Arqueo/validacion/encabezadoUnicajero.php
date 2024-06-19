@@ -157,7 +157,7 @@ $user_id = 784;
 	} 
 ?>
 
-		<table border="1" id="tarjetas">
+		<table id="tarjetas">
 			<?php
 				echo $pagos_efe;
 			?>
@@ -187,7 +187,7 @@ $user_id = 784;
 				</div>
 			</tr>
 			<tr>
-				<td class="ceques_transferencias" border="1" colspan="3">
+				<td class="ceques_transferencias" colspan="3">
 					<table width="100%" id="listado_cheque_transferencia">
 						<tr style="height: 30px;">
 							<th>Banco</th>
@@ -219,10 +219,10 @@ $user_id = 784;
 				echo '<td>';
 					echo '<input type="text" id="log_cajero" class="form-control" style="background:white;color:black;" value="'.$login_cajero.'" disabled>';
 				echo '</td>';
-				echo '<td>';
+	//			echo '<td>';
 					//echo '<input type="text" id="password" onkeyDown="cambiar(this,event,\'password1\');" placeholder="**Password***" class="form-control" style="width:80%;">';
-					echo '<input type="password" id="password1" class="form-control">';
-				echo '</td>';
+	//				echo '<input type="password" id="password1" class="form-control">';
+	//			echo '</td>';
 			}
 		?>
 				<td align="center">
