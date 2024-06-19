@@ -20,6 +20,14 @@
 	echo '<input type="hidden" id="hora_de_cierre" value="'.$r[4].'">';
 	$info_completa_sesion= "Fecha: {$fecha_sesion} Hora de inicio: {$hora_inicio_sesion} Hora de finalización : {$hora_cierre_sesion}";
 	$pide_cerrar=explode("___", $r[5]);
+//lista las cajas en efectivo
+	$sql="SELECT id_caja_cuenta,nombre FROM ec_caja_o_cuenta WHERE id_tipo_caja=1 AND id_caja_cuenta>0";
+	$eje=mysql_query($sql)or die("Error al consultar las cajas en efectivo!!<br>".mysql_error());
+	$cajas_efe='<select id="caja_destino_efectivo" class="filtro"><option value="0">--SELECCIONAR--</option>';
+	while($r=mysql_fetch_row($eje)){
+		$cajas_efe.='<option value="'.$r[0].'">'.$r[1].'</option>';
+	}
+	$cajas_efe.='</select>';
 	//$llave='';
 /*listamos las cajas en efectivo
 	$sql="SELECT id_caja_cuenta,nombre FROM ec_caja_o_cuenta WHERE id_tipo_caja=1 AND id_caja_cuenta>0";
