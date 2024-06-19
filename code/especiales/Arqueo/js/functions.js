@@ -168,7 +168,7 @@
 			if(document.getElementById('fila_ch_'+i)){
 				cheques+=$("#caja_"+i).html()+'~';//id de banco
 				cheques+=$("#monto_"+i).html()+'~';//monto
-				cheques+=$("#referencia_"+i).html()+'°';//monto
+				cheques+=$("#nombre_referencia_"+i).html()+'°';//monto
 			}
 		}
 		
