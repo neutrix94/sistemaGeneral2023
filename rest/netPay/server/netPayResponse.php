@@ -33,7 +33,7 @@ $app->post('/', function (Request $request, Response $response){
       fwrite($file,"{$body}");
       fclose($file);
     }catch( Exception $e ){
-      die( "Error en escritura de archivo.txt : {$e}" );
+      die( "Error en escritura de arcchivo.txt : {$e}" );
     }
   //}catch( Exception e ){
   //  die( "Error al escribir archivo txt : {$e}" );

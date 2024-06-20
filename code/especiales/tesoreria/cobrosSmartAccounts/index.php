@@ -44,6 +44,7 @@
 // $url_websocket = "ws://localhost:3005/";//"ws://localhost:3000";
 // $url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
 	$url_websocket = getenv('WEBSOCKET_URL') ?: "ws://192.168.1.223:3005/";
+
 //aqui encriptar en token 
 	if( !include( '../../../../rest/netPay/utils/encriptacion_token.php' ) ){
 		die( "no se incluyo libreria Encrypt" );
