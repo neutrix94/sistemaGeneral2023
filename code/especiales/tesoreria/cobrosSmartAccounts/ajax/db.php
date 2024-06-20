@@ -1549,7 +1549,7 @@
 					(monto*-1), 
 					NOW(), 
 					NOW(), 
-					CONCAT( 'Cobro para anular el cobro ', id_cajero_cobro, ' ({$payment_type})' ), 
+					CONCAT( 'Cobro para anular el cobro ', id_cajero_cobro, ' -{$payment_type}-' ), 
 					1, 
 					1
 				FROM ec_cajero_cobros WHERE id_cajero_cobro = {$payment_id}";
