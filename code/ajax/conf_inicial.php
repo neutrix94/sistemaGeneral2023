@@ -1,16 +1,12 @@
 <?php
+/*Version 2024-06-20 (Protocolos https)*/
 	header('Content-Type: text/html; charset=utf-8');
 
-	$main_path = getenv('PATH_STORAGE') ?: null;
+	$main_path = getenv('PATH_STORAGE') ?: '../..';
 
+	if(file_exists("{$main_path}/conexion_inicial.txt")){
 //1. Elimina el archivo /conexion_inicial.txt si existe
-	if( $main_path ){
-		if(file_exists("{$main_path}/conexion_inicial.txt")){
-			unlink("{$main_path}/conexion_inicial.txt");
-		}
-	}
-	if(file_exists("../../conexion_inicial.txt")){
-			unlink("../../conexion_inicial.txt");
+		unlink("{$main_path}/conexion_inicial.txt");
 	}
 //2. Crea la cadena con los datos del formulario
 	$cadena_datos='';
@@ -47,32 +43,17 @@
 	$cadena_datos.= '<>'.$_POST['system_type'];
 				
 //3. Crea archivo /conexion_inicial.txt
-	if( $main_path ){
-		$fp = fopen("{$main_path}/conexion_inicial.txt", "w");
-			fputs($fp,$cadena_datos);
-			fclose($fp);
-	}
+	$fp = fopen("{$main_path}/conexion_inicial.txt", "w");
+		fputs($fp,$cadena_datos);
+		fclose($fp);
 
-	$fp = fopen("../../conexion_inicial.txt", "w");
-	fputs($fp,$cadena_datos);
-	fclose($fp);
-
+	if(file_exists("{$main_path}/config.inc.php")){
 //4. Elimina archivo /config.inc.php
-	if( $main_path ){
-		if(file_exists("{$main_path}/config.inc.php")){
-			unlink("{$main_path}/config.inc.php");
-		}
-	}
-	if(file_exists("../../config.inc.php")){
-		unlink("../../config.inc.php");
+		unlink("{$main_path}/config.inc.php");
 	}
 
 //5. Crea archivo /config.inc.php
-	
-	if( $main_path ){
-		$ini = fopen("{$main_path}/config.inc.php", "w");
-	}
-	$ini2 = fopen("../../config.inc.php", "w");
+	$ini=fopen("{$main_path}/config.inc.php", "w");
 	$datos="<?php\n";
 	$datos.="session_start();\n";
 	$datos.="//Definiciones de base de datos\n";
@@ -81,9 +62,19 @@
 	$datos.="	\$dbPassword='".$_POST['pass_local']."';\n";
 	$datos.="	\$dbName='".$_POST['nombre_local']."';\n";
 	$datos.="//Definicion de rutas\n";
+	
+	$datos.= "	\$isSecure = false;\n";
+	$datos.= "	if (isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] == 'on') {\n";
+	$datos.= "		\$isSecure = true;\n";
+	$datos.= "	}";
+	$datos.= "	elseif (!empty(\$_SERVER['HTTP_X_FORWARDED_PROTO']) && \$_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty(\$_SERVER['HTTP_X_FORWARDED_SSL']) && \$_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') {\n";
+	$datos.= "		\$isSecure = true;\n";
+	$datos.= "	}\n";
+	$datos.= "	\$REQUEST_PROTOCOL = \$isSecure ? 'https://' : 'http://';\n";
 	$datos.="	if(isset(\$_SERVER['HTTP_HOST'])){\n";
 	$datos.="		\$rooturl = ((isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS']=='on') ? 'https://' : 'http://').\$_SERVER['HTTP_HOST'].'/".
-		$_POST['ruta_local']."/';\n";
+/*Modificaciones indicadas por Eugenio 2024-06-20*/
+	$_POST['ruta_local']."/';\n";
 	$datos.="	}\n";
 	$datos.="	\$rootpath = dirname(__FILE__);\n";
 	$datos.="	\$includepath=\$rootpath.'/include/';\n";
@@ -95,7 +86,8 @@
 	$datos.="	\$nombre_session='casaDev';\n";
 	$datos.="	\$dur_session=0;//50000 modificado el Oscar 11.06.2018 para cerrar sesión al cerrar el explorador\n";
 	$datos.="	date_default_timezone_set('America/Mexico_City');\nheader('Content-Type: text/html; charset=utf-8');\n?>";
-	
+/*Fin de modificaciones 2024-06-20*/
+
 	if( $main_path ){
 		fwrite($ini, $datos);
 		fclose($ini);
@@ -106,21 +98,11 @@
 
 	
 //6. Elimina archivo /conexionDoble.php
-	if( $main_path ){
-		if(file_exists("{$main_path}/conexionDoble.php")){
-			unlink("{$main_path}/conexionDoble.php");
-		}
-	}
-
-	if(file_exists("../../conexionDoble.php")){
-		unlink("../../conexionDoble.php");
+	if(file_exists("{$main_path}/conexionDoble.php")){
+		unlink("{$main_path}/conexionDoble.php");
 	}
 //7. Crea archivo /conexionDoble.php
-	if( $main_path ){
-		$ini=fopen("{$main_path}/conexionDoble.php", "w");
-	}
-
-	$ini2=fopen("../../conexionDoble.php", "w");
+	$ini=fopen("{$main_path}/conexionDoble.php", "w");
 
 	$datos='';
 	$datos.="<?php\n";
@@ -187,14 +169,9 @@
 //fin de cambio Oscar 2023
 
 	$datos.="?>";
-	
-	if( $main_path ){
-		fwrite($ini, $datos);
-		fclose($ini);
-	}
 
-	fwrite($ini2, $datos);
-	fclose($ini2);
+	fwrite($ini, $datos);
+	fclose($ini);
 
 	echo 'ok';
 ?>
