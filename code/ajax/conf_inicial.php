@@ -4,9 +4,12 @@
 
 	$main_path = getenv('PATH_STORAGE') ?: '../..';
 
-	if(file_exists("{$main_path}/conexion_inicial.txt")){
 //1. Elimina el archivo /conexion_inicial.txt si existe
-		unlink("{$main_path}/conexion_inicial.txt");
+	if($main_path && file_exists("{$main_path}/conexion_inicial.txt")){
+			unlink("{$main_path}/conexion_inicial.txt");
+	}
+	if(file_exists("../../conexion_inicial.txt")){
+		unlink("../../conexion_inicial.txt");
 	}
 //2. Crea la cadena con los datos del formulario
 	$cadena_datos='';
@@ -43,17 +46,30 @@
 	$cadena_datos.= '<>'.$_POST['system_type'];
 				
 //3. Crea archivo /conexion_inicial.txt
-	$fp = fopen("{$main_path}/conexion_inicial.txt", "w");
+	if( $main_path ){
+		$fp = fopen("{$main_path}/conexion_inicial.txt", "w");
 		fputs($fp,$cadena_datos);
 		fclose($fp);
+		chmod("{$main_path}/conexion_inicial.txt", 0777);
+	}
+	$fp2 = fopen("../../conexion_inicial.txt", "w");
+	fputs($fp2,$cadena_datos);
+	fclose($fp2);
+	chmod("../../conexion_inicial.txt", 0777);
 
-	if(file_exists("{$main_path}/config.inc.php")){
+
+	if($main_path && file_exists("{$main_path}/config.inc.php")){
 //4. Elimina archivo /config.inc.php
 		unlink("{$main_path}/config.inc.php");
 	}
+	unlink("../../config.inc.php");
 
 //5. Crea archivo /config.inc.php
-	$ini=fopen("{$main_path}/config.inc.php", "w");
+	if( $main_path ){
+		$ini=fopen("{$main_path}/config.inc.php", "w");
+	}
+	$ini2=fopen("../../config.inc.php", "w");
+	
 	$datos="<?php\n";
 	$datos.="session_start();\n";
 	$datos.="//Definiciones de base de datos\n";
@@ -94,19 +110,24 @@
 	if( $main_path ){
 		fwrite($ini, $datos);
 		fclose($ini);
+		chmod("{$main_path}/config.inc.php", 0777);
 	}
 
 	fwrite($ini2, $datos);
 	fclose($ini2);
+	chmod("../../config.inc.php", 0777);
 
 	
 //6. Elimina archivo /conexionDoble.php
-	if(file_exists("{$main_path}/conexionDoble.php")){
+	if($main_path && file_exists("{$main_path}/conexionDoble.php")){
 		unlink("{$main_path}/conexionDoble.php");
 	}
+	unlink("../../conexionDoble.php");
 //7. Crea archivo /conexionDoble.php
-	$ini=fopen("{$main_path}/conexionDoble.php", "w");
-
+	if( $main_path ){
+		$ini=fopen("{$main_path}/conexionDoble.php", "w");
+	}
+	$ini2=fopen("../../conexionDoble.php", "w");
 	$datos='';
 	$datos.="<?php\n";
 	$datos.="//incluimos la libreria de configuraciones generales\n";
@@ -172,9 +193,14 @@
 //fin de cambio Oscar 2023
 
 	$datos.="?>";
-
-	fwrite($ini, $datos);
-	fclose($ini);
-
+	
+	if( $main_path ){
+		fwrite($ini, $datos);
+		fclose($ini);
+		chmod("{$main_path}/conexionDoble.php", 0777);
+	}
+	fwrite($ini2, $datos);
+	fclose($ini2);
+	chmod("../../conexionDoble.php", 0777);
 	echo 'ok';
 ?>
