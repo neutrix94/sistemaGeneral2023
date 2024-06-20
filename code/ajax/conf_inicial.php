@@ -1,4 +1,5 @@
 <?php
+/*Version 2024-06-20 (Protocolos https)*/
 	header('Content-Type: text/html; charset=utf-8');
 
 	$main_path = getenv('PATH_STORAGE') ?: null;
@@ -81,9 +82,19 @@
 	$datos.="	\$dbPassword='".$_POST['pass_local']."';\n";
 	$datos.="	\$dbName='".$_POST['nombre_local']."';\n";
 	$datos.="//Definicion de rutas\n";
+	
+	$datos.= "	\$isSecure = false;\n";
+	$datos.= "	if (isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] == 'on') {\n";
+	$datos.= "		\$isSecure = true;\n";
+	$datos.= "	}";
+	$datos.= "	elseif (!empty(\$_SERVER['HTTP_X_FORWARDED_PROTO']) && \$_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty(\$_SERVER['HTTP_X_FORWARDED_SSL']) && \$_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') {\n";
+	$datos.= "		\$isSecure = true;\n";
+	$datos.= "	}\n";
+	$datos.= "	\$REQUEST_PROTOCOL = \$isSecure ? 'https://' : 'http://';\n";
 	$datos.="	if(isset(\$_SERVER['HTTP_HOST'])){\n";
 	$datos.="		\$rooturl = ((isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS']=='on') ? 'https://' : 'http://').\$_SERVER['HTTP_HOST'].'/".
-		$_POST['ruta_local']."/';\n";
+/*Modificaciones indicadas por Eugenio 2024-06-20*/
+	$_POST['ruta_local']."/';\n";
 	$datos.="	}\n";
 	$datos.="	\$rootpath = dirname(__FILE__);\n";
 	$datos.="	\$includepath=\$rootpath.'/include/';\n";
@@ -95,7 +106,7 @@
 	$datos.="	\$nombre_session='casaDev';\n";
 	$datos.="	\$dur_session=0;//50000 modificado el Oscar 11.06.2018 para cerrar sesión al cerrar el explorador\n";
 	$datos.="	date_default_timezone_set('America/Mexico_City');\nheader('Content-Type: text/html; charset=utf-8');\n?>";
-	
+/*Fin de modificaciones 2024-06-20*/
 	if( $main_path ){
 		fwrite($ini, $datos);
 		fclose($ini);
