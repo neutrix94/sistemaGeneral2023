@@ -52,7 +52,7 @@
 		/*$mA="INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, 
 							id_maquila, id_transferencia, id_almacen)
 					VALUES(9, $user_id,$suc,NOW(), NOW(), 'SUMA POR AJUSTE DE INVENTARIO', -1, -1, '', -1,-1,$id_almacen)";*/
-		$mA = "CALL spMovimientoAlmacen_inserta( {$user_id}, 'SUMA POR AJUSTE DE INVENTARIO', {$suc}, {$id_almacen}, 9, -1, -1, -1, -1, 1 )";
+		$mA = "CALL spMovimientoAlmacen_inserta( {$user_id}, 'SUMA POR AJUSTE DE INVENTARIO', {$suc}, {$id_almacen}, 9, -1, -1, -1, -1, 1, NULL )";
 		$ins=mysql_query($mA);
 		if(!$ins){
 			die('Error al insertar movimiento de almacen!!!'."\n".$mA."\n".$mA);
@@ -70,7 +70,7 @@
 				cantidad_surtida,id_pedido_detalle,id_oc_detalle, id_proveedor_producto)
 						VALUES($id_mov_1,$aux[1],$aux[0],$aux[0],-1,-1, $aux[2])";*/
 			$det = "CALL spMovimientoAlmacenDetalle_inserta ( {$id_mov_1}, {$aux[1]}, {$aux[0]}, {$aux[0]}, 
-						-1, -1, {$aux[2]}, 1 )";
+						-1, -1, {$aux[2]}, 1, NULL )";
 			$insDet=mysql_query($det);
 			if(!$insDet){
 				die('Error al insertar detalle en suma!!!'."\n".mysql_error()."\n".$det);
@@ -98,7 +98,7 @@
 		/*$mA="INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, 
 							id_maquila, id_transferencia, id_almacen)
 					VALUES(8, $user_id,$suc,NOW(), NOW(), '/*RESTA POR AJUSTE DE INVENTARIO', -1, -1, '', -1,-1,$id_almacen)";*/
-		$mA = "CALL spMovimientoAlmacen_inserta( {$user_id}, 'RESTA POR AJUSTE DE INVENTARIO', {$suc}, {$id_almacen}, 8, -1, -1, -1, -1, 1 )";
+		$mA = "CALL spMovimientoAlmacen_inserta( {$user_id}, 'RESTA POR AJUSTE DE INVENTARIO', {$suc}, {$id_almacen}, 8, -1, -1, -1, -1, 1, NULL )";
 		$ins=mysql_query($mA);
 		if(!$ins){
 			die('Error al insertar movimiento de almacen!!!'."\n".$mA."\n".$mA);
@@ -114,7 +114,7 @@
 				cantidad_surtida,id_pedido_detalle,id_oc_detalle, id_proveedor_producto)
 						VALUES($id_mov_2,$aux[1],$aux[0],$aux[0],-1,-1, $aux[2])";*/
 			$det = "CALL spMovimientoAlmacenDetalle_inserta ( {$id_mov_2}, {$aux[1]}, {$aux[0]}, {$aux[0]}, 
-						-1, -1, {$aux[2]}, 1 )";
+						-1, -1, {$aux[2]}, 1, NULL )";
 			$insDet=mysql_query($det);
 			if(!$insDet){
 				die('Error al insertar detalles en resta!!!'."\n".mysql_error()."\n".$det);

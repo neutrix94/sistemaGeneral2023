@@ -59,7 +59,7 @@
 			if($num <= 0){
 				$sql = "";
 				if( $id_grid == 9 ){//implementacion Oscar 2024 para insertar detalles de movimientos de almacen con Procedure
-					$sql = "CALL spMovimientoAlmacenDetalle_inserta( '\$LLAVE', {$dato5[$i]}, {$dato7[$i]}, {$dato8[$i]}, {$dato3[$i]}, {$dato4[$i]}, {$dato9[$i]}, 3 )";
+					$sql = "CALL spMovimientoAlmacenDetalle_inserta( '\$LLAVE', {$dato5[$i]}, {$dato7[$i]}, {$dato8[$i]}, {$dato3[$i]}, {$dato4[$i]}, {$dato9[$i]}, 3, NULL )";
 				}else{
 					$sql="INSERT INTO $tabla(";
 					for($j=0;$j<sizeof($campos);$j++){

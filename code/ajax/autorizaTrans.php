@@ -78,7 +78,7 @@ if(isset($_POST['autoriza_transferencia'])){
 		$transfer_row = mysql_fetch_assoc( $transfer_stm );
 	//inserta cabecera de movimiento de almacen por salida de transferencia
 		$sql = "CALL spMovimientoAlmacen_inserta( {$user_id}, 'SALIDA DE TRANSFERENCIA', {$transfer_row['origin_store_id']},
-			{$transfer_row['warehouse_origin_id']} ,6, -1, -1, -1, {$id_transferencia}, 4 )";
+			{$transfer_row['warehouse_origin_id']} ,6, -1, -1, -1, {$id_transferencia}, 4, NULL )";
 		$movement_stm = mysql_query( $sql ) or die( "Error al consultar datos de transferencias para movimientos de almacen : {$sql} : " . mysql_error() );
 	//recupera el id insertado
 		$sql = "SELECT MAX( id_movimiento_almacen ) AS movement_id FROM ec_movimiento_almacen";
@@ -87,9 +87,9 @@ if(isset($_POST['autoriza_transferencia'])){
 	//inserta los detalles
 		while( $detail_row = mysql_fetch_assoc( $detail_stm ) ){
 			$sql = "CALL spMovimientoAlmacenDetalle_inserta( {$movement_row['movement_id']}, {$detail_row['product_id']}, {$detail_row['quantity']}, 
-						{$detail_row['quantity']}, -1, -1, {$detail_row['product_provider_id']}, 4 )";
+						{$detail_row['quantity']}, -1, -1, {$detail_row['product_provider_id']}, 4, NULL )";
 			$movement_detail_stm = mysql_query( $sql ) or die( "Error al insertar detalle de movimiento de almacen : {$sql} : " . mysql_error() );
-		}die('here___');
+		}//die('here___');
 	}
 /*Fin de cambio Oscar 2024-05-30*/
 	//die('here_1');

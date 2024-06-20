@@ -313,7 +313,7 @@
 					//VALUES(2, $user_id, $user_sucursal, NOW(), NOW(), '', {$id_pedido_r}, -1, '', -1, -1, $ro[0])
                     //echo $sql;*/
 					//IF($es_externo=1,almacen_externo,$ro[0])
-                    $sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, '', {$user_sucursal}, {$ro[0]}, 2, {$id_pedido_r}, -1, -1, -1, 11 )";
+                    $sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, '', {$user_sucursal}, {$ro[0]}, 2, {$id_pedido_r}, -1, -1, -1, 11, NULL )";
 					//die( $sql );
 					$ma_stm = mysql_query( $sql ) or die( "Error al mandar llamar procedure : spMovimientoAlmacen_inserta : " . mysql_error() );
 					$ma_stm = mysql_query( "SELECT max( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen" ) or die( "Error al recuperar id ma insertado : " . mysql_error() );
@@ -351,7 +351,7 @@
 								//echo 'suma:'.$dA[1].' * '. $can_s.' = '.$suma;
 								//$sqlAux="INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto, cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle)
 								//	VALUES('$id_mov','$dA[0]','$suma','$suma', '{$id_pedido_detalle}' ,-1)";
-								$sqlAux = "CALL spMovimientoAlmacenDetalle_inserta( {$id_mov}, {$dA[0]}, {$suma}, {$suma}, {$id_pedido_detalle}, -1, NULL, 11 );";
+								$sqlAux = "CALL spMovimientoAlmacenDetalle_inserta( {$id_mov}, {$dA[0]}, {$suma}, {$suma}, {$id_pedido_detalle}, -1, NULL, 11, NULL );";
 								$ejeSqlAux=mysql_query($sqlAux)or die('ERRROR!!!'.$sqlAux);
 								//echo $sqlAux.'<br>';
 							}
@@ -361,7 +361,7 @@
 			//Insertamos detalle   
 //						$sql="INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto, cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle)
 //								VALUES('$id_mov','$id_prod',$can_s,$can_s,'{$id_pedido_detalle}','-1')";
-						$sql = "CALL spMovimientoAlmacenDetalle_inserta( {$id_mov}, {$id_prod}, {$can_s}, {$can_s}, {$id_pedido_detalle}, -1, NULL, 11 );";
+						$sql = "CALL spMovimientoAlmacenDetalle_inserta( {$id_mov}, {$id_prod}, {$can_s}, {$can_s}, {$id_pedido_detalle}, -1, NULL, 11, NULL );";
 						if (!mysql_query($sql)){
 							throw new Exception("Imposible almacenar registro (detalle de pedido).\n\n$sql\n\n" . mysql_error());
 						}

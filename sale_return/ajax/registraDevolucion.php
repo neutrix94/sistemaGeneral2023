@@ -171,7 +171,7 @@
             }
             $insMov.=",-1,null,now() )";*/
             $warehouse_id = ($i==0 ? $id_almacen_principal : $id_almacen_externo );
-            $insMov = "CALL spMovimientoAlmacen_inserta ( {$user_id}, 'DEVOLUCION', {$user_sucursal}, {$warehouse_id}, 12, -1, -1, -1, -1, 15 )";
+            $insMov = "CALL spMovimientoAlmacen_inserta ( {$user_id}, 'DEVOLUCION', {$user_sucursal}, {$warehouse_id}, 12, -1, -1, -1, -1, 15, NULL )";
             $eje=mysql_query($insMov) or die("Error al insertar el encabezado de movimiento de almacén con entrada por devolución2....".$insMov.mysql_error());
         //consulta el id de moviento insertado      
             $ma_stm = mysql_query( "SELECT max( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen" ) or die( "Error al recuperar id ma insertado : " . mysql_error() );
@@ -212,7 +212,7 @@
             }
             while( $dev_row = mysql_fetch_assoc($eje) ){//;$stm->fetch_assoc()
                 $sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$dev_row['movement_header_id']}, {$dev_row['product_id']}, {$dev_row['quantity']}, 
-                    {$dev_row['quantity']}, -1, -1, NULL, 15 )";
+                    {$dev_row['quantity']}, -1, -1, NULL, 15, NULL )";
                 $exc_procedure = mysql_query( $sql ) or die( "Error al llamar procedure spMovimientoAlmacenDetalle_inserta : {$sql} " . mysql_error() );
             }
         }
@@ -305,7 +305,7 @@
             '0'";*/
             $movement_header_id = ( $r[2] == 0 ? $id_nvo_mov_int : $id_nvo_mov_ext );
             $ins_mov_det = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_header_id}, {$get_product_id}, {$get_quantity}, 
-                {$get_quantity}, -1, -1, {$get_product_provider}, 15 )";
+                {$get_quantity}, -1, -1, {$get_product_provider}, 15, NULL )";
             //$exc_procedure = mysql_query( $sql ) or die( "Error al mandar llamar procedure spMovimientoAlmacenDetalle_inserta : {$ins_mov_det} " . mysql_error() );
             /*echo $ins_mov_det;
             die("");*/

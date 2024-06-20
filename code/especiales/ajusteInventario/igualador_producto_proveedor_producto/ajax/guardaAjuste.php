@@ -48,7 +48,7 @@
 			die('Error al insertar movimiento de almacen!!!'."\n".$mA."\n".$mA);
 		}
 		$id_mov_1=mysql_insert_id();*/
-		$mA = "CALL spMovimientoAlmacen_inserta( {$user_id}, 'SUMA POR AJUSTE DE INVENTARIO PARA IGUALAR INVENTARIOS', {$store_id}, {$warehouse_id}, 9, -1, -1, -1, -1, 18 )";
+		$mA = "CALL spMovimientoAlmacen_inserta( {$user_id}, 'SUMA POR AJUSTE DE INVENTARIO PARA IGUALAR INVENTARIOS', {$store_id}, {$warehouse_id}, 9, -1, -1, -1, -1, 18, NULL )";
 		$ins=mysql_query($mA);
 		if(!$ins){
 			die('Error al insertar movimiento de almacen!!!'."\n".$mA."\n".$mA);
@@ -65,7 +65,7 @@
 				cantidad_surtida,id_pedido_detalle,id_oc_detalle, id_proveedor_producto)
 						VALUES($id_mov_1,$aux[1],$aux[0],$aux[0],-1,-1, null)";*/
 			$det = "CALL spMovimientoAlmacenDetalle_inserta ( {$id_mov_1}, {$aux[1]}, {$aux[0]}, {$aux[0]}, 
-				-1, -1, NULL, 18 )";
+				-1, -1, NULL, 18, NULL )";
 			$insDet=mysql_query($det);
 			if(!$insDet){
 				die('Error al insertar detalles en suma!!!'."\n".mysql_error()."\n".$det);
@@ -99,7 +99,7 @@
 		}
 		$id_mov_2=mysql_insert_id();*/
 		
-		$mA = "CALL spMovimientoAlmacen_inserta( {$user_id}, 'RESTA POR AJUSTE DE INVENTARIO PARA IGUALAR INVENTARIOS', {$store_id}, {$warehouse_id}, 8, -1, -1, -1, -1, 18 )";
+		$mA = "CALL spMovimientoAlmacen_inserta( {$user_id}, 'RESTA POR AJUSTE DE INVENTARIO PARA IGUALAR INVENTARIOS', {$store_id}, {$warehouse_id}, 8, -1, -1, -1, -1, 18, NULL )";
 		$ins=mysql_query($mA);
 		if(!$ins){
 			die('Error al insertar movimiento de almacen!!!'."\n".$mA."\n".$mA);
@@ -115,7 +115,7 @@
 				cantidad_surtida,id_pedido_detalle,id_oc_detalle, id_proveedor_producto)
 						VALUES($id_mov_2,$aux[1],$aux[0],$aux[0],-1,-1, null)";*/
 			$det = "CALL spMovimientoAlmacenDetalle_inserta ( {$id_mov_2}, {$aux[1]}, {$aux[0]}, {$aux[0]}, 
-				-1, -1, NULL, 18 )";
+				-1, -1, NULL, 18, NULL )";
 			$insDet=mysql_query($det);
 			if(!$insDet){
 				die('Error al insertar detalles en suma!!!'."\n".mysql_error()."\n".$det);
