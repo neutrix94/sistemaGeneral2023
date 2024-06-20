@@ -152,6 +152,7 @@ $app->post('/', function (Request $request, Response $response){
             /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
           WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
   $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
+
   
   /*if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
     require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago

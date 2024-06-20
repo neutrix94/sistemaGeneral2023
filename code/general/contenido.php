@@ -437,17 +437,27 @@ include( '../especiales/plugins/inventory.php' );//implementación Oscar 2022
 		}
 
 		$sqlCommand=$sqlHead.")".$sqlVals.")";
+		if( $tabla == 'ec_movimiento_almacen' && $accion == 'insertar'){
+			$sqlCommand = "CALL spMovimientoAlmacen_inserta( {$user_id}, '{$observaciones}', {$id_sucursal}, {$id_almacen}, {$id_tipo_movimiento}, {$id_pedido}, {$id_orden_compra}, 
+				{$id_maquila}, -1, 3 )";
+		}
 
 
-//		die($sqlCommand);
+		//die($sqlCommand);
 
-		if(!mysql_query($sqlCommand))
-		{
+		if(!mysql_query($sqlCommand)){
 			mysql_query("ROLLBACK");
 			Muestraerror($smarty, "", "3", mysql_error(), $sqlCommand, "contenido.php");
 		}
-
-		$llave=mysql_insert_id();
+		$llave;
+		if( $tabla == 'ec_movimiento_almacen' && $accion == 'insertar'){
+			$sql_id = "SELECT MAX( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen";
+			$stm_id = mysql_query( $sql_id ) or die( "Error al consultar el id del movimiento de almacen : " . mysql_error() );
+			$row_id = mysql_fetch_assoc( $stm_id );
+			$llave = $row_id['id_movimiento_almacen'];
+		}else{
+			$llave=mysql_insert_id();
+		}
 
 		//ejecutamos las funciones de grid
 
