@@ -69,11 +69,13 @@
 		$ini=fopen("{$main_path}/config.inc.php", "w");
 	}
 	$ini2=fopen("../../config.inc.php", "w");*/
-	
+	putenv("DB_HOST={$_POST['host_local']}");
+
 	$datos="<?php\n";
 	$datos.="session_start();\n";
 	$datos.="//Definiciones de base de datos\n";
-	$datos.="	\$dbHost='".$_POST['host_local']."';\n";
+	//$datos.="	\$dbHost='".$_POST['host_local']."';\n";
+	$datos.="	\$dbHost= getenv('DB_HOST') ?: \"{$_POST['host_local']}\";\n";
 	$datos.="	\$dbUser='".$_POST['usuario_local']."';\n";
 	$datos.="	\$dbPassword='".$_POST['pass_local']."';\n";
 	$datos.="	\$dbName='".$_POST['nombre_local']."';\n";
