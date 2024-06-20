@@ -201,7 +201,9 @@
 			//sumamos al total de ingresos
 				$total_montos_entregados+=$aux[1];
 			}
+			//die( "cheques : {$suma_cheques}" );
 		//sumamos el efectivo al total ingresos
+			$ingreso_efect = ( $ingreso_efect - $suma_cheques );
 			$total_montos_entregados+=$ingreso_efect;
 		?>
 

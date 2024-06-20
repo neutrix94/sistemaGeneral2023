@@ -123,7 +123,7 @@
 		//pending_sales_validation();
 		
 		var cantidad_tarjetas=$("#no_tarjetas").val();
-		var cantidad_cheque=$("#no_cheque_transferencia").val();
+		var cantidad_cheque = $( "#listado_cheque_transferencia tr" ).length;//$("#no_cheque_transferencia").val();
 		var id_corte=$("#id_sesion").val();
 		var tarjetas='',cheques='',password='';
 	//sacamos la fecha del corte 
@@ -168,7 +168,7 @@
 			if(document.getElementById('fila_ch_'+i)){
 				cheques+=$("#caja_"+i).html()+'~';//id de banco
 				cheques+=$("#monto_"+i).html()+'~';//monto
-				cheques+=$("#referencia_"+i).html()+'°';//monto
+				cheques+=$("#nombre_referencia_"+i).html()+'°';//monto
 			}
 		}
 		

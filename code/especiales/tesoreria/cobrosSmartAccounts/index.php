@@ -41,8 +41,10 @@
 	$tarjetas_cajero = $Payments->getTerminals( $user_id, 0, $user_sucursal, $session_id );//afiliaciones por cajero
 	$cajas = $Payments->getBoxesMoney( $sucursal_id );//cheque o transferencia 
 //configuracion del Websocket
-//$url_websocket = "ws://localhost:3005/";//"ws://localhost:3000";
-$url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
+// $url_websocket = "ws://localhost:3005/";//"ws://localhost:3000";
+// $url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
+	$url_websocket = getenv('WEBSOCKET_URL') ?: "ws://192.168.1.223:3005/";
+
 //aqui encriptar en token 
 	if( !include( '../../../../rest/netPay/utils/encriptacion_token.php' ) ){
 		die( "no se incluyo libreria Encrypt" );
