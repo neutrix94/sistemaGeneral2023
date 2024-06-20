@@ -1,16 +1,10 @@
 <?php
+
 	header('Content-Type: text/html; charset=utf-8');
 
-	$main_path = getenv('PATH_STORAGE') ?: null;
-
+	if(file_exists('../../conexion_inicial.txt')){
 //1. Elimina el archivo /conexion_inicial.txt si existe
-	if( $main_path ){
-		if(file_exists("{$main_path}/conexion_inicial.txt")){
-			unlink("{$main_path}/conexion_inicial.txt");
-		}
-	}
-	if(file_exists("../../conexion_inicial.txt")){
-			unlink("../../conexion_inicial.txt");
+		unlink('../../conexion_inicial.txt');
 	}
 //2. Crea la cadena con los datos del formulario
 	$cadena_datos='';
@@ -46,33 +40,19 @@
 	$cadena_datos.= '<>'.$_POST['store_id'];
 	$cadena_datos.= '<>'.$_POST['system_type'];
 				
+
 //3. Crea archivo /conexion_inicial.txt
-	if( $main_path ){
-		$fp = fopen("{$main_path}/conexion_inicial.txt", "w");
-			fputs($fp,$cadena_datos);
-			fclose($fp);
-	}
-
 	$fp = fopen("../../conexion_inicial.txt", "w");
-	fputs($fp,$cadena_datos);
-	fclose($fp);
+		fputs($fp,$cadena_datos);
+		fclose($fp);
 
+	if(file_exists('../../config.inc.php')){
 //4. Elimina archivo /config.inc.php
-	if( $main_path ){
-		if(file_exists("{$main_path}/config.inc.php")){
-			unlink("{$main_path}/config.inc.php");
-		}
-	}
-	if(file_exists("../../config.inc.php")){
-		unlink("../../config.inc.php");
+		unlink('../../config.inc.php');
 	}
 
 //5. Crea archivo /config.inc.php
-	
-	if( $main_path ){
-		$ini = fopen("{$main_path}/config.inc.php", "w");
-	}
-	$ini2 = fopen("../../config.inc.php", "w");
+	$ini=fopen("../../config.inc.php", "w");
 	$datos="<?php\n";
 	$datos.="session_start();\n";
 	$datos.="//Definiciones de base de datos\n";
@@ -96,31 +76,16 @@
 	$datos.="	\$dur_session=0;//50000 modificado el Oscar 11.06.2018 para cerrar sesión al cerrar el explorador\n";
 	$datos.="	date_default_timezone_set('America/Mexico_City');\nheader('Content-Type: text/html; charset=utf-8');\n?>";
 	
-	if( $main_path ){
-		fwrite($ini, $datos);
-		fclose($ini);
-	}
-
-	fwrite($ini2, $datos);
-	fclose($ini2);
+	fwrite($ini, $datos);
+	fclose($ini);
 
 	
 //6. Elimina archivo /conexionDoble.php
-	if( $main_path ){
-		if(file_exists("{$main_path}/conexionDoble.php")){
-			unlink("{$main_path}/conexionDoble.php");
-		}
-	}
-
-	if(file_exists("../../conexionDoble.php")){
-		unlink("../../conexionDoble.php");
+	if(file_exists('../../conexionDoble.php')){
+		unlink('../../conexionDoble.php');
 	}
 //7. Crea archivo /conexionDoble.php
-	if( $main_path ){
-		$ini=fopen("{$main_path}/conexionDoble.php", "w");
-	}
-
-	$ini2=fopen("../../conexionDoble.php", "w");
+	$ini=fopen("../../conexionDoble.php", "w");
 
 	$datos='';
 	$datos.="<?php\n";
@@ -187,14 +152,9 @@
 //fin de cambio Oscar 2023
 
 	$datos.="?>";
-	
-	if( $main_path ){
-		fwrite($ini, $datos);
-		fclose($ini);
-	}
 
-	fwrite($ini2, $datos);
-	fclose($ini2);
+	fwrite($ini, $datos);
+	fclose($ini);
 
 	echo 'ok';
 ?>

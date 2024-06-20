@@ -192,7 +192,7 @@
 			$cajas .= "</select>";
 			return $cajas;
 		}
-		public function getAdittionalPayments( $user_id, $fecha_sesion, $hora_inicio_sesion, $id_sesion_caja = -1000 ){
+		public function getAdittionalPayments( $user_id, $fecha_sesion, $hora_inicio_sesion ){
 			$pagos_chqs = '';
 			$cont_chqs = 0;
 			$sql="SELECT  
@@ -202,18 +202,16 @@
 					cc.observaciones
 				FROM ec_cajero_cobros cc
 				LEFT JOIN ec_caja_o_cuenta coc ON cc.id_banco=coc.id_caja_cuenta
-				WHERE cc.id_sesion_caja = '{$id_sesion_caja}'
-				/*cc.id_cajero = '{$user_id}' 
+				WHERE cc.id_cajero = '{$user_id}' 
 				AND cc.fecha = '{$fecha_sesion}'
-				AND cc.hora>='{$hora_inicio_sesion}' */
-				AND cc.id_tipo_pago IN( 8,9 )
-				AND cc.cobro_cancelado IN( 0 )";
+				AND cc.hora>='{$hora_inicio_sesion}' 
+				AND cc.id_tipo_pago IN( 8,9 )";
 			$eje_chq = $this->link->query( $sql ) or die( "Error al consultar los pagos con cheques y transferencias!!!<br> {$this->link->error}" );
 			while( $r1 = $eje_chq->fetch_row() ){
 				$cont_chqs++;
 				$pagos_chqs.='<tr id="fila_ch_'.$cont_chqs.'">';
 	        	$pagos_chqs.='<td id="caja_'.$cont_chqs.'" class="td_oculto">'.$r1[0].'</td>';
-	        	$pagos_chqs.='<td id="nombre_referencia_'.$cont_chqs.'" align="left">'.$r1[1].'</td>';
+	        	$pagos_chqs.='<td align="left">'.$r1[1].'</td>';
 	        	$pagos_chqs.='<td id="monto_'.$cont_chqs.'" align="center">'.$r1[2].'</td>';
 	        	$pagos_chqs.='<td id="referencia_'.$cont_chqs.'" align="left">'.$r1[3].'</td>';
 	      		$pagos_chqs.='</tr>';

@@ -5,7 +5,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 /*
 * Endpoint: actualiza_peticion
 * Path: /actualiza_peticion
-* Método: POST
+* Método: GET
 * Descripción: Actualizacion de peticion de servidor a cliente
 */
 $app->post('/actualiza_peticion', function (Request $request, Response $response){
@@ -23,13 +23,12 @@ $app->post('/actualiza_peticion', function (Request $request, Response $response
   }
   */
   $resp = array();
-  $local_log = $request->getParam( "local_response_log" );
   $log = $request->getParam( "log" );
 
   $ok_rows = $request->getParam( "ok_rows" );
   $table = $request->getParam( "table" );
   $status = $request->getParam( "status" );
-  //$resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $log["response_string"], $log["unique_folio"] );
+  $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $log["response_string"], $log["unique_folio"] );
   if( $ok_rows != "" && $ok_rows != null ){
     switch ( $log["type_update"] ) {
 
@@ -90,10 +89,6 @@ $app->post('/actualiza_peticion', function (Request $request, Response $response
     }
     $SynchronizationManagmentLog->updateModuleResume( $table, 'bajada', $download_status, $log["destinity_store"] );//actualiza el resumen de modulo/sucursal 
   }
- //actualiza el registro de peticion de local a linea
-    $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $local_log['destinity_time'], $local_log['response_time'], $local_log['response_string'], $local_log['unique_folio'] );
- //actualiza el registro de peticion de linea a local
-    $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $log['destinity_time'], $log['response_time'], $log['response_string'], $log['unique_folio'] );
   return json_encode( $resp );
 
 });

@@ -17,7 +17,7 @@
 			return 'ok';
 		}
 //hacer / obtener jsons de movimientos de almacen
-		public function getSynchronizationProductProviderMovements( $system_store, $limit, $petition_unique_folio ){
+		public function getSynchronizationProductProviderMovements( $system_store, $limit ){
 			$resp = array();
 			$sql = "SELECT 
 						id_sincronizacion_movimiento_proveedor_producto,
@@ -45,10 +45,6 @@
 					
 					array_push( $resp, json_decode($row['data']) );//decodifica el JSON
 					$movements_counter ++;
-				//actualiza al status 2 los registros que va a enviar
-					$sql = "UPDATE sys_sincronizacion_movimientos_proveedor_producto SET id_status_sincronizacion = 2, folio_unico_peticion = '{$petition_unique_folio}' 
-					WHERE id_sincronizacion_movimiento_proveedor_producto = {$row['id_sincronizacion_movimiento_proveedor_producto']}";
-					$stm_2 = $this->link->query( $sql ) or die( "Error al poner registro de sincronizacion de detalle movimiento de almacen proveedor producto en status 2 : {$sql} : {$this->link->error}" );
 				}
 			}
 			//var_dump( $resp );
@@ -72,60 +68,36 @@
 			$resp["tmp_ok"] = "";
 			$resp["tmp_no"] = "";
 			$updates = array();
+			$this->link->autocommit( false );
 			foreach ( $product_providers_movements as $key => $p_p_movement ) {
-				//$ok = true;
-			//consulta el id del detalle a nivel producto
-				$sql = "{$p_p_movement['id_movimiento_almacen_detalle']}";
-				$stm = $this->link->query( $sql );
-				if( $this->link->error ){
+				$ok = true;
+			//inserta cabecera
+				$sql = "INSERT INTO ec_movimiento_detalle_proveedor_producto ( id_movimiento_almacen_detalle, 
+				id_proveedor_producto, cantidad, fecha_registro, id_sucursal, status_agrupacion, 
+				id_tipo_movimiento, id_almacen, id_pedido_validacion, folio_unico, sincronizar, insertado_por_sincronizacion )
+				VALUES ( {$p_p_movement['id_movimiento_almacen_detalle']}, {$p_p_movement['id_proveedor_producto']}, 
+					'{$p_p_movement['cantidad']}', '{$p_p_movement['fecha_registro']}', '{$p_p_movement['id_sucursal']}', 
+					'{$p_p_movement['status_agrupacion']}', '{$p_p_movement['id_tipo_movimiento']}', 
+					'{$p_p_movement['id_almacen']}', '{$p_p_movement['id_pedido_validacion']}', '{$p_p_movement['folio_unico']}', '1', '1' )";
+				$sql = str_replace("' (", "(", $sql);
+				$sql = str_replace("'(", "(", $sql);
+				$sql = str_replace(")'", ")", $sql);
+				$sql = str_replace(") '", ")", $sql);
+				$sql = str_replace("NULL, ,", "NULL, NULL,", $sql);
+				$stm_head = $this->link->query( $sql )or die( "Error al insertar de movimiento de almacen proveedor producto : {$sql} {$this->link->error}" );
+				if( ! $stm_head ){
+					return array( "error"=>"Error al insertar movimiento detalle proveedor producto : {$this->link->error} {$sql}");
 					$ok = false;
-					// or die( "Error al consultar el id de cabecera de movimientos de almacen : {$sql} : {$this->link->error}" );
-				}
-				$row = $stm->fetch_row();
-				$p_p_movement['id_movimiento_almacen_detalle'] = $row[0];
-			//consulta el id de la validacion si es el caso
-				if( $p_p_movement['id_pedido_validacion'] != -1 && $p_p_movement['id_pedido_validacion'] != "-1" ){
-					$sql = "{$p_p_movement['id_pedido_validacion']}";
-					$stm = $this->link->query( $sql );
-					if( $this->link->error ){
-						$ok = false;
-						//die( "Error al consultar el id de la validacion relacionada al detalle pp : {$sql} : {$this->link->error}" );
-					}
-					$row = $stm->fetch_row();
-					$p_p_movement['id_pedido_validacion'] = $row[0];
 				}
 				if( $ok == true ){
-					$this->link->autocommit( false );//declara inicio de la transaccion
-				//inserta registro a nivel proveedor producto
-					$sql = "CALL spMovimientoDetalleProveedorProducto_inserta( {$p_p_movement['id_movimiento_almacen_detalle']}, {$p_p_movement['id_proveedor_producto']}, {$p_p_movement['cantidad']}, 
-								{$p_p_movement['id_sucursal']}, {$p_p_movement['id_tipo_movimiento']}, {$p_p_movement['id_almacen']}, {$p_p_movement['id_pedido_validacion']}, 
-								{$p_p_movement['id_pantalla']}, '{$p_p_movement['folio_unico']}' )";
-					/*$sql = str_replace("' (", "(", $sql);
-					$sql = str_replace("'(", "(", $sql);
-					$sql = str_replace(")'", ")", $sql);
-					$sql = str_replace(") '", ")", $sql);*/
-					$sql = str_replace("NULL, ,", "NULL, NULL,", $sql);
-					$stm_head = $this->link->query( $sql );//or die( "Error al insertar de movimiento de almacen proveedor producto : {$sql} {$this->link->error}" );
-					if( ! $this->link->error ){
-						$this->link->commit();
-						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
-						$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
-						//$ok = false;
-					}else{
-						$this->link->rollback();
-					//inserta el log del error en tabla de errores
-						$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
-									VALUES ( 'sys_sincronizacion_movimientos_proveedor_producto', '{$p_p_movement['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";
-						$stm = $this->link->query( $sql );// or die( "Error al insertar error en sys_sincronizacion_log_errores_registros : {$this->link->error}" );
-						if( $this->link->error ){
-							echo "Error al insertar el log de error en sincronización : {$this->link->error}";
-						}
-						$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
-						$resp["tmp_no"] .= ( $resp["tmp_no"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
-					}
+					$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
+					$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
+				}else{
+					$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
+					$resp["tmp_no"] .= ( $resp["tmp_no"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
 				}
 			}
-			$this->link->close();
+		    $this->link->autocommit( true );
 			return $resp;
 		}
 

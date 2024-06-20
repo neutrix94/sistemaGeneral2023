@@ -39,7 +39,6 @@ BEGIN
 				'"monto" : "', cc.monto, '",',
 				'"fecha" : "', cc.fecha, '",',
 				'"hora" : "', cc.hora, '",',
-				'"cobro_cancelado" : "', cc.cobro_cancelado, '",',
 				'"observaciones" : "', cc.observaciones, '",',
 				'"folio_unico" : "', cc.folio_unico, '",',
 				'"sincronizar" : "0"',

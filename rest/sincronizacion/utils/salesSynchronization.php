@@ -47,7 +47,7 @@
 			return 'ok';
 		}
 //hacer / obtener jsons de movimientos de almacen
-		public function getSynchronizationSales( $destinity_store_id, $limit, $petition_unique_folio ){
+		public function getSynchronizationSales( $destinity_store_id, $limit ){
 			$resp = array();
 			$resp['sales'] = array();
 			$resp['queries'] = array();
@@ -59,7 +59,6 @@
 					WHERE tabla = 'ec_pedidos'
 					AND id_status_sincronizacion IN( 1 )
 					AND id_sucursal_destino = {$destinity_store_id}
-					AND json != ''
 					LIMIT {$limit}";
 		//die( $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los datos de jsons : {$sql} {$this->link->error}" );
@@ -78,9 +77,6 @@
 					
 					array_push( $resp['sales'], json_decode($row['data']) );//decodifica el JSON
 					$movements_counter ++;
-					//actualiza al status 2 los registros que va a enviar
-						$sql = "UPDATE sys_sincronizacion_ventas SET id_status_sincronizacion = 2, folio_unico_peticion = '{$petition_unique_folio}' WHERE id_sincronizacion_venta = {$row['id_sincronizacion_venta']}";
-						$stm_2 = $this->link->query( $sql ) or die( "Error al poner registro de sincronizacion de ventas en status 2 : {$sql} : {$this->link->error}" );	
 				}else{
 					die("No es un JSON {$sql} {$row['data']}");
 				}
@@ -140,9 +136,9 @@
 			$sales = $data["sales"];
 			$queries = $data["queries"];
 			$updates = array();
+			$this->link->autocommit( false );
 			foreach ($sales as $key => $sale) {
 				$ok = true;
-				$this->link->autocommit( false );
 			//inserta cabecera
 				$sql = "INSERT INTO ec_pedidos ( folio_nv, id_cliente, fecha_alta, subtotal, total, pagado, 
 					id_sucursal, id_usuario, descuento, folio_abono, correo, facebook, ultima_sincronizacion, 
@@ -153,86 +149,67 @@
 					'{$sale['ultima_modificacion']}', '{$sale['tipo_pedido']}', '{$sale['id_status_agrupacion']}', '{$sale['id_cajero']}', '{$sale['id_devoluciones']}', 
 					'{$sale['venta_validada']}', '{$sale['folio_unico']}', {$sale['id_sesion_caja']}, '{$sale['tipo_sistema']}' )";
 
-				$stm_head = $this->link->query( $sql );
-				if( $this->link->error ){
-				//inserta el log del error en tabla de errores
-					$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
-					VALUES ( 'sys_sincronizacion_ventas', '{$sale['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";
-					$stm = $this->link->query( $sql );// or die( "Error al insertar error en sys_sincronizacion_log_errores_registros : {$this->link->error}" );
-					if( $this->link->error ){
-						echo "Error al insertar el log de error en sincronización : {$this->link->error}";
-					}
-					$ok = false;
-				}
-				/*if( ! $stm_head ){
+				$stm_head = $this->link->query( $sql )or die( "Error al sincronizar cabecera de venta : {$sql} {$this->link->error}" );;
+				if( ! $stm_head ){
 					return array( "error"=>"Error al insertar cabecera de venta : {$this->link->error} {$sql}");
 					$ok = false;
-				}*/
-				if( $ok == true ){
-					$sql = "SELECT LAST_INSERT_ID() AS last_id";
-					$stm = $this->link->query( $sql );
-					if( $this->link->error ){
-					//inserta el log del error en tabla de errores
-						$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
-						VALUES ( 'sys_sincronizacion_ventas', '{$sale['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";
-						$stm = $this->link->query( $sql );// or die( "Error al insertar error en sys_sincronizacion_log_errores_registros : {$this->link->error}" );
-						if( $this->link->error ){
-							echo "Error al insertar el log de error en sincronización : {$this->link->error}";
-						}
-						$ok = false;
-					}
-					$row = $stm->fetch_assoc();
-					$sale_id = $row['last_id'];
-				//inserta detalle(s) 
+				}
+				$sql = "SELECT LAST_INSERT_ID() AS last_id";
+				$stm = $this->link->query( $sql ) or die( "Error al recuperar el id insertado : {$this->link->error}" );
+				$row = $stm->fetch_assoc();
+				$sale_id = $row['last_id'];
+			//inserta detalle(s) 
+				$sale_detail = $sale['sale_detail'];
+				foreach ($sale_detail as $key2 => $detail) {
 					if( $ok == true ){
-						$sale_detail = $sale['sale_detail'];
-						foreach ($sale_detail as $key2 => $detail) {
-							if( $ok == true ){
-								$sql = "INSERT INTO ec_pedidos_detalle ( id_pedido, id_producto, cantidad, precio, monto, 
-									cantidad_surtida, descuento, es_externo, id_precio, folio_unico ) 
-								VALUES ( '{$sale_id}', '{$detail['id_producto']}', '{$detail['cantidad']}', '{$detail['precio']}', '{$detail['monto']}', 
-									'{$detail['cantidad_surtida']}', '{$detail['descuento']}', '{$detail['es_externo']}', '{$detail['id_precio']}', '{$detail['folio_unico']}' )"; 
-								$stm = $this->link->query( $sql );// or die( "Error al insertar detalle de venta : {$sql} {$this->link->error}");
-								if( $this->link->error ){
-								//inserta el log del error en tabla de errores
-									$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
-									VALUES ( 'sys_sincronizacion_ventas', '{$sale['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";
-									$stm = $this->link->query( $sql );// or die( "Error al insertar error en sys_sincronizacion_log_errores_registros : {$this->link->error}" );
-									if( $this->link->error ){
-										echo "Error al insertar el log de error en sincronización : {$this->link->error}";
-									}
-									$ok = false;
-								}
-							}
-						}
-					//inserta la referencia de la devolucion
-						$return_reference = $sale['return_reference'];
-						foreach ($return_reference as $key2 => $reference) {
-							if( $ok == true ){
-								$sql = "INSERT INTO ec_pedidos_referencia_devolucion ( id_pedido, total_venta, monto_venta_mas_ultima_devolucion, saldo_a_favor, folio_unico, sincronizar )  
-								VALUES ( '{$sale_id}', '{$reference['total_venta']}', '{$reference['monto_venta_mas_ultima_devolucion']}', '{$reference['saldo_a_favor']}', 
-									'{$reference['folio_unico']}', 1 )"; 
-								$stm = $this->link->query( $sql );// or die( "Error al insertar detalle de venta : {$sql} {$this->link->error}");
-								if( $this->link->error ){
-								//inserta el log del error en tabla de errores
-									$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
-									VALUES ( 'sys_sincronizacion_ventas', '{$sale['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";
-									$stm = $this->link->query( $sql );// or die( "Error al insertar error en sys_sincronizacion_log_errores_registros : {$this->link->error}" );
-									if( $this->link->error ){
-										echo "Error al insertar el log de error en sincronización : {$this->link->error}";
-									}
-									$ok = false;
-								}
-							}
+						$sql = "INSERT INTO ec_pedidos_detalle ( id_pedido, id_producto, cantidad, precio, monto, 
+							cantidad_surtida, descuento, es_externo, id_precio, folio_unico ) 
+						VALUES ( '{$sale_id}', '{$detail['id_producto']}', '{$detail['cantidad']}', '{$detail['precio']}', '{$detail['monto']}', 
+							'{$detail['cantidad_surtida']}', '{$detail['descuento']}', '{$detail['es_externo']}', '{$detail['id_precio']}', '{$detail['folio_unico']}' )"; 
+						$stm = $this->link->query( $sql );// or die( "Error al insertar detalle de venta : {$sql} {$this->link->error}");
+						if( ! $stm ){
+							return array( "error"=>"Error al insertar detalle de venta : {$this->link->error}");
+						  $ok = false;
 						}
 					}
 				}
+			//inserta la referencia de la devolucion
+				$return_reference = $sale['return_reference'];
+				foreach ($return_reference as $key2 => $reference) {
+					if( $ok == true ){
+						$sql = "INSERT INTO ec_pedidos_referencia_devolucion ( id_pedido, total_venta, monto_venta_mas_ultima_devolucion, saldo_a_favor, folio_unico, sincronizar )  
+						VALUES ( '{$sale_id}', '{$reference['total_venta']}', '{$reference['monto_venta_mas_ultima_devolucion']}', '{$reference['saldo_a_favor']}', 
+							'{$reference['folio_unico']}', 1 )"; 
+						$stm = $this->link->query( $sql );// or die( "Error al insertar detalle de venta : {$sql} {$this->link->error}");
+						if( ! $stm ){
+							return array( "error"=>"Error al insertar referencia devolucion de venta : {$this->link->error}");
+						  $ok = false;
+						}
+					}
+				}
+
+			/*inserta pago(s) 
+				$sale_payments = $sale['sale_payments'];
+				foreach ($sale_payments as $key2 => $payment) {
+					if( $ok == true ){
+						$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_tipo_pago, fecha, hora, monto,
+						referencia, id_moneda, tipo_cambio, id_nota_credito, id_cxc, exportado, es_externo,
+						id_cajero, folio_unico, id_sesion_caja) 
+						VALUES ( '{$sale_id}', '{$payment['id_tipo_pago']}', '{$payment['fecha']}', '{$payment['hora']}', '{$payment['monto']}',
+						'{$payment['referencia']}', '{$payment['id_moneda']}', '{$payment['tipo_cambio']}', '{$payment['id_nota_credito']}', 
+						'{$payment['id_cxc']}', '{$payment['exportado']}', '{$payment['es_externo']}',
+						'{$payment['id_cajero']}', '{$payment['folio_unico']}', {$payment['id_sesion_caja']} )"; 
+						$stm = $this->link->query( $sql );// or die( "Error al insertar pago de venta : {$sql} {$this->link->error}" );
+						if( ! $stm ){
+							return array( "error"=>"Error al insertar pago de venta : {$sql} {$this->link->error}");
+						  $ok = false;
+						}
+					}
+				}*/
 				if( $ok == true ){
-					$this->link->commit();
 					$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$sale['folio_unico']}'";
 					$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$sale['folio_unico']}'";
 				}else{
-					$this->link->rollback();
 					$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$sale['folio_unico']}'";
 					$resp["tmp_no"] .= ( $resp["tmp_no"] == '' ? '' : ',' ) . "'{$sale['folio_unico']}'";
 				}
@@ -277,16 +254,9 @@
 						$sql = str_replace( ")'", ")", $sql );
 						
 						$stm = $this->link->query( $sql );// or die( "Error al ejecutar consuta adicional : {$sql} {$this->link->error}" );
-						
-						if( $this->link->error ){
-						//inserta el log del error en tabla de errores
-							$sql = "INSERT INTO sys_sincronizacion_log_errores_registros ( tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
-							VALUES ( 'sys_sincronizacion_ventas', '{$sale['folio_unico']}', '{$sql}', '{$this->link->error}', NOW() )";
-							$stm = $this->link->query( $sql );// or die( "Error al insertar error en sys_sincronizacion_log_errores_registros : {$this->link->error}" );
-							if( $this->link->error ){
-								echo "Error al insertar el log de error en sincronización : {$this->link->error}";
-							}
-							$ok = false;
+						if( ! $stm ){
+							return array( "error"=>"Error al insertar pago de venta : {$sql} {$this->link->error}");
+						  $ok = false;
 						}else{
 							$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['folio_unico']}'";
 
@@ -294,12 +264,12 @@
 					break;
 					
 					default:
-						die( "JSON incorrecto ( sin accion ) : {$row['action_type']}" );
+						die( "JSON incorrecto : {$row['action_type']}" );
 					break;
 				}
 			}
 	//
-	//$this->link->autocommit( true );
+		    $this->link->autocommit( true );
 			return $resp;
 		}
 	}

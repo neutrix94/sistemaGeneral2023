@@ -21,7 +21,6 @@ BEGIN
 				'"status_agrupacion" : "', mdpp.status_agrupacion, '",',
 				'"id_tipo_movimiento" : "', mdpp.id_tipo_movimiento, '",',
 				'"id_almacen" : "', mdpp.id_almacen, '",',
-				'"id_pantalla" : "', mdpp.id_pantalla, '",',
 				'"cantidad_surtida" : "',( mdpp.cantidad * tm.afecta ), '",',
 				CONCAT( '"id_pedido_validacion" : "', 
 					IF( mdpp.id_pedido_validacion = -1,

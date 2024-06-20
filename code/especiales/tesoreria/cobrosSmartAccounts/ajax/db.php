@@ -1522,15 +1522,8 @@
 
 		public function delete_payment_saved( $payment_id ){
 			$this->link->autocommit( false );
-			$sql = "SELECT 
-						tp.nombre AS payment_type
-					FROM ec_cajero_cobros cc
-					LEFT JOIN ec_tipos_pago tp
-					ON cc.id_tipo_pago = tp.id_tipo_pago
-					WHERE cc.id_cajero_cobro = {$payment_id}";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar el nombre del tipo de cobro por anular : {$sql} : {$this->link->error}");
-			$row = $stm->fetch_assoc();
-			$payment_type = $row["payment_type"];
+				//	$sql = "DELETE FROM ec_pedido_pagos WHERE id_cajero_cobro = {$payment_id}";
+				//$sql = "DELETE FROM ec_cajero_cobros WHERE id_cajero_cobro = {$payment_id}";
 		//anula cobro
 			$sql = "UPDATE ec_cajero_cobros SET cobro_cancelado = 1 WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al anular el cobro del cajero : {$this->link->error}" );
@@ -1549,7 +1542,7 @@
 					(monto*-1), 
 					NOW(), 
 					NOW(), 
-					CONCAT( 'Cobro para anular el cobro ', id_cajero_cobro, ' ({$payment_type})' ), 
+					CONCAT( 'Cobro para anular el cobro ', id_cajero_cobro ), 
 					1, 
 					1
 				FROM ec_cajero_cobros WHERE id_cajero_cobro = {$payment_id}";

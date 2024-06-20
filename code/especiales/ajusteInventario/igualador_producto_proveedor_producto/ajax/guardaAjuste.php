@@ -40,32 +40,20 @@
 		//echo 'sin accion';
 	}else{
 	//inserta cabecera del movimiento de almacén
-		/*$mA="INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, 
+		$mA="INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, 
 							id_maquila, id_transferencia, id_almacen)
-					VALUES(9, $user_id, {$store_id}, NOW(), NOW(), 'SUMA POR AJUSTE DE INVENTARIO PARA IGUALAR INVENTARIOS', -1, -1, '', -1,-1,{$warehouse_id})";
+					VALUES(9, $user_id, {$store_id}, NOW(), NOW(), '/*SUMA POR AJUSTE DE INVENTARIO PARA IGUALAR INVENTARIOS*/', -1, -1, '', -1,-1,{$warehouse_id})";
 		$ins=mysql_query($mA);
 		if(!$ins){
 			die('Error al insertar movimiento de almacen!!!'."\n".$mA."\n".$mA);
 		}
-		$id_mov_1=mysql_insert_id();*/
-		$mA = "CALL spMovimientoAlmacen_inserta( {$user_id}, 'SUMA POR AJUSTE DE INVENTARIO PARA IGUALAR INVENTARIOS', {$store_id}, {$warehouse_id}, 9, -1, -1, -1, -1, 18, NULL )";
-		$ins=mysql_query($mA);
-		if(!$ins){
-			die('Error al insertar movimiento de almacen!!!'."\n".$mA."\n".$mA);
-		}
-	//consulta el id insertado
-		$sql = "SELECT MAX( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen";
-		$stm = mysql_query( $sql ) or die( "Error al consultar el id de movimiento por SUMA : {$sql}" );
-		$row = mysql_fetch_assoc( $stm );
-		$id_mov_1 = $row['id_movimiento_almacen'];
+		$id_mov_1=mysql_insert_id();
 		for($i=1;$i<=$suma;$i++){
 			$aux=explode(',',$sumas[$i]);
 		//inserta detalle de movimiento de almacen
-			/*$det="INSERT INTO ec_movimiento_detalle(id_movimiento,id_producto,cantidad,
+			$det="INSERT INTO ec_movimiento_detalle(id_movimiento,id_producto,cantidad,
 				cantidad_surtida,id_pedido_detalle,id_oc_detalle, id_proveedor_producto)
-						VALUES($id_mov_1,$aux[1],$aux[0],$aux[0],-1,-1, null)";*/
-			$det = "CALL spMovimientoAlmacenDetalle_inserta ( {$id_mov_1}, {$aux[1]}, {$aux[0]}, {$aux[0]}, 
-				-1, -1, NULL, 18, NULL )";
+						VALUES($id_mov_1,$aux[1],$aux[0],$aux[0],-1,-1, null)";
 			$insDet=mysql_query($det);
 			if(!$insDet){
 				die('Error al insertar detalles en suma!!!'."\n".mysql_error()."\n".$det);
@@ -90,32 +78,19 @@
 	if($resta=='0'){
 		//echo 'sin accion';
 	}else{
-		/*$mA="INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, 
+		$mA="INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, 
 							id_maquila, id_transferencia, id_almacen)
-					VALUES(8, $user_id, {$store_id}, NOW(), NOW(), 'RESTA POR AJUSTE DE INVENTARIO PARA IGUALAR INVENTARIOS', -1, -1, '', -1, -1, {$warehouse_id})";
+					VALUES(8, $user_id, {$store_id}, NOW(), NOW(), '/*RESTA POR AJUSTE DE INVENTARIO PARA IGUALAR INVENTARIOS*/', -1, -1, '', -1, -1, {$warehouse_id})";
 		$ins=mysql_query($mA);
 		if(!$ins){
 			die('Error al insertar movimiento de almacen!!!'."\n".$mA."\n".$mA);
 		}
-		$id_mov_2=mysql_insert_id();*/
-		
-		$mA = "CALL spMovimientoAlmacen_inserta( {$user_id}, 'RESTA POR AJUSTE DE INVENTARIO PARA IGUALAR INVENTARIOS', {$store_id}, {$warehouse_id}, 8, -1, -1, -1, -1, 18, NULL )";
-		$ins=mysql_query($mA);
-		if(!$ins){
-			die('Error al insertar movimiento de almacen!!!'."\n".$mA."\n".$mA);
-		}
-	//consulta el id insertado
-		$sql = "SELECT MAX( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen";
-		$stm = mysql_query( $sql ) or die( "Error al consultar el id de movimiento por SUMA : {$sql}" );
-		$row = mysql_fetch_assoc( $stm );
-		$id_mov_2 = $row['id_movimiento_almacen'];
+		$id_mov_2=mysql_insert_id();
 		for($i=1;$i<=$resta;$i++){
 			$aux=explode(',',$restas[$i]);
-			/*$det="INSERT INTO ec_movimiento_detalle(id_movimiento,id_producto,cantidad,
+			$det="INSERT INTO ec_movimiento_detalle(id_movimiento,id_producto,cantidad,
 				cantidad_surtida,id_pedido_detalle,id_oc_detalle, id_proveedor_producto)
-						VALUES($id_mov_2,$aux[1],$aux[0],$aux[0],-1,-1, null)";*/
-			$det = "CALL spMovimientoAlmacenDetalle_inserta ( {$id_mov_2}, {$aux[1]}, {$aux[0]}, {$aux[0]}, 
-				-1, -1, NULL, 18, NULL )";
+						VALUES($id_mov_2,$aux[1],$aux[0],$aux[0],-1,-1, null)";
 			$insDet=mysql_query($det);
 			if(!$insDet){
 				die('Error al insertar detalles en suma!!!'."\n".mysql_error()."\n".$det);

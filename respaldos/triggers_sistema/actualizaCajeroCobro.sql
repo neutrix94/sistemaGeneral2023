@@ -49,7 +49,6 @@ BEGIN
                 '"monto" : "', new.monto, '",',
                 '"fecha" : "', new.fecha, '",',
                 '"hora" : "', new.hora, '",',
-                '"cobro_cancelado" : "', new.cobro_cancelado, '",',
                 '"observaciones" : "', new.observaciones, '",',
                 '"sincronizar" : "0"',
                 '}'

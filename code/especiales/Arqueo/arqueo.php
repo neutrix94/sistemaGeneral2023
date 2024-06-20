@@ -68,7 +68,7 @@
 		$multicajero=$r[0];
 	//	die($multicajero);
 		if($multicajer0==1){
-			include('encabezadoUnicajero.php');
+			include('encabezadoMulticajero.php');
 		}else{
 			include('encabezadoUnicajero.php');
 		}
