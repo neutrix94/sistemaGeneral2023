@@ -58,17 +58,17 @@
 	chmod("../../conexion_inicial.txt", 0777);
 
 
-	if($main_path && file_exists("{$main_path}/config.inc.php")){
 //4. Elimina archivo /config.inc.php
+	if($main_path && file_exists("{$main_path}/config.inc.php")){
 		unlink("{$main_path}/config.inc.php");
 	}
 	unlink("../../config.inc.php");
 
 //5. Crea archivo /config.inc.php
-	if( $main_path ){
+	/*if( $main_path ){
 		$ini=fopen("{$main_path}/config.inc.php", "w");
 	}
-	$ini2=fopen("../../config.inc.php", "w");
+	$ini2=fopen("../../config.inc.php", "w");*/
 	
 	$datos="<?php\n";
 	$datos.="session_start();\n";
@@ -107,7 +107,7 @@
 	$datos.="	date_default_timezone_set('America/Mexico_City');\nheader('Content-Type: text/html; charset=utf-8');\n?>";
 /*Fin de modificaciones 2024-06-20*/
 
-	if( $main_path ){
+	/*if( $main_path ){
 		fwrite($ini, $datos);
 		fclose($ini);
 		chmod("{$main_path}/config.inc.php", 0777);
@@ -115,8 +115,17 @@
 
 	fwrite($ini2, $datos);
 	fclose($ini2);
+	chmod("../../config.inc.php", 0777);*/
+	if( $main_path ){
+		$fp = fopen("{$main_path}/config.inc.php", "w");
+		fputs($fp,$datos);
+		fclose($fp);
+		chmod("{$main_path}/config.inc.php", 0777);
+	}
+	$fp2 = fopen("../../config.inc.php", "w");
+	fputs($fp2,$datos);
+	fclose($fp2);
 	chmod("../../config.inc.php", 0777);
-
 	
 //6. Elimina archivo /conexionDoble.php
 	if($main_path && file_exists("{$main_path}/conexionDoble.php")){
@@ -124,10 +133,10 @@
 	}
 	unlink("../../conexionDoble.php");
 //7. Crea archivo /conexionDoble.php
-	if( $main_path ){
+	/*if( $main_path ){
 		$ini=fopen("{$main_path}/conexionDoble.php", "w");
 	}
-	$ini2=fopen("../../conexionDoble.php", "w");
+	$ini2=fopen("../../conexionDoble.php", "w");*/
 	$datos='';
 	$datos.="<?php\n";
 	$datos.="//incluimos la libreria de configuraciones generales\n";
@@ -194,13 +203,24 @@
 
 	$datos.="?>";
 	
-	if( $main_path ){
+	/*if( $main_path ){
 		fwrite($ini, $datos);
 		fclose($ini);
 		chmod("{$main_path}/conexionDoble.php", 0777);
 	}
 	fwrite($ini2, $datos);
 	fclose($ini2);
+	chmod("../../conexionDoble.php", 0777);*/
+	
+	if( $main_path ){
+		$fp = fopen("{$main_path}/conexionDoble.php", "w");
+		fputs($fp,$datos);
+		fclose($fp);
+		chmod("{$main_path}/conexionDoble.php", 0777);
+	}
+	$fp2 = fopen("../../conexionDoble.php", "w");
+	fputs($fp2,$datos);
+	fclose($fp2);
 	chmod("../../conexionDoble.php", 0777);
 	echo 'ok';
 ?>
