@@ -73,10 +73,12 @@
 	$datos.= "	\$REQUEST_PROTOCOL = \$isSecure ? 'https://' : 'http://';\n";
 	$datos.="	if(isset(\$_SERVER['HTTP_HOST'])){\n";
 	$datos.= "		\$rooturl = \$REQUEST_PROTOCOL.\$_SERVER['HTTP_HOST'].'/';\n";
-	//$datos.="		\$rooturl = ((isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS']=='on') ? 'https://' : 'http://').\$_SERVER['HTTP_HOST'].'/".
-/*Modificaciones indicadas por Eugenio 2024-06-20*/
-	$_POST['ruta_local']."/';\n";
+	/*Modificaciones indicadas por Eugenio 2024-06-20*/
+	$datos.="		\$rooturl = \$REQUEST_PROTOCOL.\$_SERVER['HTTP_HOST'].'/". $_POST['ruta_local']."/';\n";
+	
+	//$datos.="		\$rooturl = ((isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS']=='on') ? 'https://' : 'http://').\$_SERVER['HTTP_HOST'].'/". $_POST['ruta_local']."/';\n";
 	$datos.="	}\n";
+	//$datos.="	echo \"Request_protocol : {\$REQUEST_PROTOCOL};\n";
 	$datos.="	\$rootpath = dirname(__FILE__);\n";
 	$datos.="	\$includepath=\$rootpath.'/include/';\n";
 	$datos.="	\$smartypath=\$rootpath.'/include/smarty/';\n";
