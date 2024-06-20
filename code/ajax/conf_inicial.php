@@ -69,16 +69,18 @@
 		$ini=fopen("{$main_path}/config.inc.php", "w");
 	}
 	$ini2=fopen("../../config.inc.php", "w");*/
-	putenv("DB_HOST={$_POST['host_local']}");
 
 	$datos="<?php\n";
 	$datos.="session_start();\n";
 	$datos.="//Definiciones de base de datos\n";
 	//$datos.="	\$dbHost='".$_POST['host_local']."';\n";
 	$datos.="	\$dbHost= getenv('DB_HOST') ?: \"{$_POST['host_local']}\";\n";
-	$datos.="	\$dbUser='".$_POST['usuario_local']."';\n";
-	$datos.="	\$dbPassword='".$_POST['pass_local']."';\n";
-	$datos.="	\$dbName='".$_POST['nombre_local']."';\n";
+	//$datos.="	\$dbUser='".$_POST['usuario_local']."';\n";
+	$datos.="	\$dbUser= getenv('DB_USER') ?: \"{$_POST['usuario_local']}\";\n";
+	//$datos.="	\$dbPassword='".$_POST['pass_local']."';\n";
+	$datos.="	\$dbPassword= getenv('DB_PASS') ?: \"{$_POST['pass_local']}\";\n";
+	//$datos.="	\$dbName='".$_POST['nombre_local']."';\n";
+	$datos.="	\$dbName= getenv('DB_NAME') ?: \"{$_POST['nombre_local']}\";\n";
 	$datos.="//Definicion de rutas\n";
 	
 	$datos.= "	\$isSecure = false;\n";
@@ -149,10 +151,17 @@
 	$datos.="//definimos zona horaria\n";
 	$datos.="	date_default_timezone_set('America/Mexico_City');\n";
 
-	$datos.="	\$hostLocal='".$_POST['host_local']."';\n";
+/*	$datos.="	\$hostLocal='".$_POST['host_local']."';\n";
 	$datos.="	\$userLocal='".$_POST['usuario_local']."';\n";
 	$datos.="	\$passLocal='".$_POST['pass_local']."';\n";
-	$datos.="	\$nombreLocal='".$_POST['nombre_local']."';\n";//cdelasluces
+	$datos.="	\$nombreLocal='".$_POST['nombre_local']."';\n";//cdelasluces*/
+	
+	$datos.="//Definiciones de base de datos\n";
+	$datos.="	\$hostLocal= getenv('DB_HOST') ?: \"{$_POST['host_local']}\";\n";
+	$datos.="	\$userLocal= getenv('DB_USER') ?: \"{$_POST['usuario_local']}\";\n";
+	$datos.="	\$passLocal= getenv('DB_PASS') ?: \"{$_POST['pass_local']}\";\n";
+	$datos.="	\$nombreLocal= getenv('DB_NAME') ?: \"{$_POST['nombre_local']}\";\n";
+	
 	$datos.="	\$local=@mysql_connect(\$hostLocal, \$userLocal, \$passLocal);\n";
 	$datos.="	//comprobamos conexion local\n";
 	$datos.="	if(!\$local){	//si no hay conexion\n";
