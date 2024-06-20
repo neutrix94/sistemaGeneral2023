@@ -1,8 +1,35 @@
 <?php
 /*version casa 1.0*/
 	include('../../../../conectMin.php');
+	include('../../../../conexionMysqli.php');
+	include( '../ajax/Arqueo.php' );
+	$llave = $_GET['id_corte'];
+	$Arqueo = new Arqueo( $link );	
+//consultamos login del cajero
+	$login_cajero = $Arqueo->getLogin( $user_id );
+//Consulta los datos del corte
+	$r = $Arqueo->getSessionData( $user_id, $llave );
+	$id_sesion_caja = $llave;
+	$info_folio= ( $llave ? ' disabled' : '' ) . ' value="'.$r[1].'"';
+	$fecha_sesion=$r[2];
+	$hora_inicio_sesion=$r[3];
+	$hora_cierre_sesion=$r[4];
+	echo '<input type="hidden" id="id_sesion" value="'.$id_sesion_caja.'">';
+	echo '<input type="hidden" id="fecha_del_corte" value="'.$fecha_sesion.'">';
+	echo '<input type="hidden" id="hora_de_inicio" value="'.$r[3].'">';
+	echo '<input type="hidden" id="hora_de_cierre" value="'.$r[4].'">';
+	$info_completa_sesion= "Fecha: {$fecha_sesion} Hora de inicio: {$hora_inicio_sesion} Hora de finalización : {$hora_cierre_sesion}";
+	$pide_cerrar=explode("___", $r[5]);
+//lista las cajas en efectivo
+	$sql="SELECT id_caja_cuenta,nombre FROM ec_caja_o_cuenta WHERE id_tipo_caja=1 AND id_caja_cuenta>0";
+	$eje=mysql_query($sql)or die("Error al consultar las cajas en efectivo!!<br>".mysql_error());
+	$cajas_efe='<select id="caja_destino_efectivo" class="filtro"><option value="0">--SELECCIONAR--</option>';
+	while($r=mysql_fetch_row($eje)){
+		$cajas_efe.='<option value="'.$r[0].'">'.$r[1].'</option>';
+	}
+	$cajas_efe.='</select>';
 	//$llave='';
-//listamos las cajas en efectivo
+/*listamos las cajas en efectivo
 	$sql="SELECT id_caja_cuenta,nombre FROM ec_caja_o_cuenta WHERE id_tipo_caja=1 AND id_caja_cuenta>0";
 	$eje=mysql_query($sql)or die("Error al consultar las cajas en efectivo!!<br>".mysql_error());
 	
@@ -32,24 +59,34 @@
 		echo '<input type="hidden" id="fecha_del_corte" value="'.$fecha_sesion.'">';
 		echo '<input type="hidden" id="hora_de_inicio" value="'.$hora_inicio_sesion.'">';
 		echo '<input type="hidden" id="hora_de_cierre" value="'.$r[4].'">';
-		$info_completa_sesion='Fecha: '.$fecha_sesion.' Hora de inicio: '.$hora_inicio_sesion;
+		$info_completa_sesion='Fecha: '.$fecha_sesion.' Hora de inicio: '.$hora_inicio_sesion;*/
 
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 	<title>Validacion de Arqueo de caja</title>
-
-<link rel="stylesheet" type="text/css" href="../../../../css/gridSW_l.css"/>
-<script type="text/javascript" src="../../../../js/calendar.js"></script>
-<script type="text/javascript" src="../../../../js/calendar-es.js"></script>
-<script type="text/javascript" src="../../../../js/calendar-setup.js"></script>
-<script type="text/JavaScript" src="../../../../js/jquery-1.10.2.min.js"></script>
-<script type="text/JavaScript" src="../../../../js/passteriscoByNeutrix.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../../css/gridSW_l.css"/>
+	<script type="text/javascript" src="../../../../js/calendar.js"></script>
+	<script type="text/javascript" src="../../../../js/calendar-es.js"></script>
+	<script type="text/javascript" src="../../../../js/calendar-setup.js"></script>
+	<script type="text/JavaScript" src="../../../../js/jquery-1.10.2.min.js"></script>
+	<script type="text/JavaScript" src="../../../../js/passteriscoByNeutrix.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../../css/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="../../../../css/icons/css/fontello.css">
+	<link rel="stylesheet" type="text/css" href="../css/styles.css">
 </head>
 <body background="../../../../img/img_casadelasluces/bg8.jpg">
 	<center>
-	<div class="encabezado"><b>Validación de Arqueo de Caja <?php echo $info_completa_sesion;?></b>
+	<div class="encabezado">
+		<div class="row">
+			<div class="col-6">
+				<b>Validación de Arqueo de Caja</b>
+			</div>
+			<div class="col-6">
+				<?php echo $info_completa_sesion;?>
+			</div>
+		</div>		
 	</div>
 <?php
 	$sql="SELECT multicajero FROM ec_configuracion_sucursal WHERE id_sucursal=$user_sucursal";
@@ -84,14 +121,14 @@
 <style>
 	.footer{position:absolute;bottom:0;width:100%;/*background:#83B141;*/}
 	body{margin: 0;}
-	.encabezado{padding:5px;
-/*		background:#83B141;*/
-		width:99%;
+	/*.encabezado{padding:5px;
+		width:100%;
+		position : fixed;
 		height:30px;
 		top:0;
 		color:black;
 		font-size:25px; 
-	}
+	}*/
 	.boton{
 		padding:10px;
 		border-radius: 5px;
@@ -154,7 +191,7 @@
 			return false;
 		}
 		var cantidad_tarjetas=$("#no_tarjetas").val();
-		var cantidad_cheque=$("#no_cheque_transferencia").val();
+		var cantidad_cheque=$( "#listado_cheque_transferencia tr" ).length - 1;//$("#no_cheque_transferencia").val();
 		var id_corte=$("#id_sesion").val();
 		var tarjetas='',cheques='',password='',fecha_ultimo_corte='';
 		var ingreso_efe=0;
@@ -166,28 +203,41 @@
 	//obtenemos la contraseña
 		password=$("#password1").val();
 	//extraemos los valores de las tarjetas
-		for(var i=1;i<=cantidad_tarjetas;i++){
+		/*for(var i=1;i<=cantidad_tarjetas;i++){
 			if($("#tarjeta_"+i).val()!=0){
 				tarjetas+=$("#tarjeta_"+i).val()+'~';//id de registros de tarjeta
 			
-		/*Implementacion Oscar 04.12.2019 para evitar el error cuando las tarjetas estan vacias*/
 				if($("#t"+i).val()!=''){
 					tarjetas+=$("#t"+i).val()+'°';//monto
 				}else{
 					tarjetas+='0°';//monto					
 				}
-		/*Fin de cambio Oscar 04.12.2019*/
 		
 			}
-		}
+		}*/
+		
+		var cards_counter = 1;
+		$( '#tarjetas tr' ).each( function ( index ){
+			if( $( this ).hasClass( 'is_card_row' ) ){
+				tarjetas += $("#tarjeta_"+ cards_counter ).val()+'~';//id de afiliacion
+				$("#t" + cards_counter ).prop( 'readonly', false );//se habilitan los campos de las tarjetas
+				if( $("#t" + cards_counter ).val()!='' ){
+					tarjetas += $("#t"+ cards_counter ).val()+'~';//monto
+				}else{ 
+					tarjetas += '0~';//monto					
+				}
+				tarjetas += $( '#card_description_' + cards_counter ).html() + "°";
+				cards_counter ++;
+			}
+		});
 	//extraemos los valores de las tarjetas
 		for(var i=1;i<=cantidad_cheque;i++){
 				cheques+=$("#caja_"+i).html()+'~';//id de registro de banco
 				cheques+=$("#monto_"+i).html()+'~';//monto
-				cheques+=$("#referencia_"+i).html()+'~';//referencia
+				cheques+=$("#nombre_referencia_"+i).html()+'~';//referencia
 				cheques+=$("#caja_nueva_"+i).html()+'°';//nuevo id de caja
 		}
-		
+		//alert( cheques );
 	//extraemos los datos del ingreso en efectivo
 		//alert($("#monto_en_efectivo").val());return false;
 
@@ -241,35 +291,52 @@
 
 	function llenaReporte(){
 		var cantidad_tarjetas=$("#no_tarjetas").val();
-		var cantidad_cheque=$("#no_cheque_transferencia").val();
+		var cantidad_cheque=$( "#listado_cheque_transferencia tr" ).length - 1;//$("#no_cheque_transferencia").val();
 		var id_corte=$("#id_sesion").val();
 		var tarjetas='',cheques='',password='';
 	//sacamos la fecha del corte 
 		var fecha_ultimo_corte=$("#fecha_del_corte").val();
 		var hora_inicio=$("#hora_de_inicio").val();
 		var hora_fin=$("#hora_de_cierre").val();
+		//alert( no_tarjetas );
 	//extraemos los valores de las tarjetas
-		for(var i=1;i<=cantidad_tarjetas;i++){
+		/*for(var i=1;i<=cantidad_tarjetas;i++){
 			if($("#tarjeta_"+i).val()!=0){
 				tarjetas+=$("#tarjeta_"+i).val()+'~';//id de afiliacion
 			
-			/*Implementacion Oscar 04.12.2019 para evitar el error cuando las tarjetas estan vacias*/
 				if($("#t"+i).val()!=''){
 					tarjetas+=$("#t"+i).val()+'°';//monto
 				}else{
 					tarjetas+='0°';//monto					
 				}
-			/*Fin de cambio Oscar 04.12.2019*/
 			
 			}
-		}
+		}*/
+
+		var cards_counter = 1;
+		$( '#tarjetas tr' ).each( function ( index ){
+			if( $( this ).hasClass( 'is_card_row' ) ){
+				tarjetas += $("#tarjeta_"+ cards_counter ).val()+'~';//id de afiliacion
+				$("#t" + cards_counter ).prop( 'readonly', false );//se habilitan los campos de las tarjetas
+				if( $("#t" + cards_counter ).val()!='' ){
+					tarjetas += $("#t"+ cards_counter ).val()+'~';//monto
+				}else{ 
+					tarjetas += '0~';//monto					
+				}
+				tarjetas += $( '#card_description_' + cards_counter ).html() + "°";
+				cards_counter ++;
+			}
+		});
+		//alert( `tarjetas : ${tarjetas}` );
+
 	//extraemos los valores de las tarjetas
+	//alert( cantidad_cheque )
 		for(var i=1;i<=cantidad_cheque;i++){
 				cheques+=$("#caja_"+i).html()+'~';//id de banco
 				cheques+=$("#monto_"+i).html()+'~';//monto
 				cheques+=$("#referencia_"+i).html()+'°';//monto
 		}
-//		alert(cheques);
+		//alert(cheques);
 	//generamos el reporte
 		$.ajax({
 			type:'post',
@@ -285,6 +352,7 @@
 				ingreso_efect:$("#monto_en_efectivo").val()
 			},
 			success:function(dat){
+				//alert( dat );
 				$("#reporte").html(dat);
 		//alert(fF);
 			}
@@ -337,7 +405,7 @@ var cont_cheques_transferencia=0;
 		var tabla=$("#listado_cheque_transferencia");
 		var htmlTags='<tr>'+
         '<td id="caja_'+cont_cheques_transferencia+'" class="td_oculto">nuevo</td>'+
-        '<td align="left">'+texto+'</td>'+
+        '<td id="nombre_referencia_'+cont_cheques_transferencia+'" align="left">'+texto+'</td>'+
         '<td id="monto_'+cont_cheques_transferencia+'" align="center" onclick="edita_celda(this,1);">'+monto+'</td>'+
         '<td id="referencia_'+cont_cheques_transferencia+'" onclick="edita_celda(this,2);" align="left">'+observacion+'</td>'+
         '<td id="caja_nueva_'+cont_cheques_transferencia+'" class="td_oculto">'+caja+'</td>'+

@@ -54,6 +54,7 @@
 	}
 
 //insertamos lo cheques
+	$monto_cheques = 0;
 	for($i=0;$i<sizeof($arr_cheques)-1;$i++){//insertamos las tarjetas
 		$arr=explode("~", $arr_cheques[$i]);
 		if($arr[0]!='nuevo'){
@@ -68,6 +69,7 @@
 			mysql_query("ROLLBACK");//cancelamos la transacción
 			die("Error al validar el detalle de cheques/transferencias en la sesión de caja\n".$error);
 		}
+		$monto_cheques += $arr[1];
 		$total_pagos_corte+=$arr[1];
 	}//fin de for i
 
@@ -395,6 +397,7 @@ class TicketPDF extends FPDF {
 	$ticket->Cell(60, 6, utf8_decode("Total de Gastos: ".$total_gastos), "" ,0, "R");
 //efectivo en caja
 	$ticket->SetXY(10, $ticket->GetY()+5);
+	$efect[1] = $efect[1] - $monto_cheques;
 	$ticket->Cell(60, 6, utf8_decode("Efectivo Entregado: $".($efect[1])), "" ,0, "R");
 
 //diferencia
