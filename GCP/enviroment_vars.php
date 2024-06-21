@@ -20,7 +20,7 @@
     $service = new Google_Service_CloudRun($client);
 
     $serviceName = 'sistemageneral2023';
-    $projectID = 'casa-de-las-luces';
+    $projectID = getenv('PROJECT_ID');
     $regionName = 'us-central1';
 
     $serviceDetails = $service->projects_locations_services->get("projects/$projectID/locations/$regionName/services/$serviceName");
