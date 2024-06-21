@@ -1,4 +1,5 @@
 <?php
+/*version 1.1 2024-06-21*/
 	include('../../../../conectMin.php');
 	include('../../../../conexionMysqli.php');
 //verifica si esta habilitada la funcion de SmartAccounts
