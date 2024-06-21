@@ -1,4 +1,5 @@
 <?php
+/*version 1.1 2024-06-21*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
@@ -284,7 +285,8 @@
 				
 			case 'delete_payment_saved' : 
 				$payment_id = $_GET['payment_id'];
-				echo $Payments->delete_payment_saved( $payment_id );
+				$session_id = $_GET['current_session_id'];
+				echo $Payments->delete_payment_saved( $payment_id, $session_id );
 			break;
 //afiliaciones
 			case 'obtenerListaAfiliaciones' :
@@ -1520,9 +1522,9 @@
 			die( $resp );
 		}
 
-		public function delete_payment_saved( $payment_id ){
-			$this->link->autocommit( false );
+		public function delete_payment_saved( $payment_id, $session_id ){
 			$sql = "SELECT 
+						cc.id_sesion_caja,
 						tp.nombre AS payment_type
 					FROM ec_cajero_cobros cc
 					LEFT JOIN ec_tipos_pago tp
@@ -1531,6 +1533,13 @@
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el nombre del tipo de cobro por anular : {$sql} : {$this->link->error}");
 			$row = $stm->fetch_assoc();
 			$payment_type = $row["payment_type"];
+
+		//validamos que la sesion de cajero sea la misma que la del pago
+			if( $row['id_sesion_caja'] != $session_id ){
+				die( "El cobro no puede ser cancelado porque la sesion de caja actual no corresponde a la sesion que lo cobro!" );// {$row['id_sesion_caja']} != {$session_id}
+			}
+			
+			$this->link->autocommit( false );//inicio de transaccion
 		//anula cobro
 			$sql = "UPDATE ec_cajero_cobros SET cobro_cancelado = 1 WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al anular el cobro del cajero : {$this->link->error}" );
