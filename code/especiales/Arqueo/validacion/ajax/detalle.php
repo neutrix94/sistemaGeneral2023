@@ -1,5 +1,5 @@
 <?php
-/*version casa 1.0*/
+/*version 2.0 2024-06-21*/
 	require('../../../../../conect.php');
 //consultamos las tarjetas
 	$sql="SELECT SUM(IF(cc.id_cajero_cobro IS NULL,0,cc.monto)) 
@@ -203,7 +203,7 @@
 			}
 			//die( "cheques : {$suma_cheques}" );
 		//sumamos el efectivo al total ingresos
-			$ingreso_efect = ( $ingreso_efect - $suma_cheques );
+			$ingreso_efect = ( $ingreso_efect  );//- $suma_cheques
 			$total_montos_entregados+=$ingreso_efect;
 		?>
 

@@ -1,5 +1,5 @@
 <?php
-/*version casa 1.1*/
+/*version 2.0 2024-06-21*/
 	include('../../../conectMin.php');
 	include('../../../conexionMysqli.php');
 	include( 'ajax/Arqueo.php' );

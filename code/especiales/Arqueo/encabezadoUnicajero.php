@@ -1,5 +1,5 @@
 <?php
-/*version casa 2.0*/
+/*version 2.0 2024-06-21*/
 //corte anterior
 	$id_corte_anterior=$Arqueo->getSessionBefore( $user_id );
 //afiliaciones
@@ -113,10 +113,11 @@
 			}
 		?>
 				</td>
-								<td align="center">
+				<td align="center">
 					<button type="button" class="btn btn-success" onclick="llenaReporte(1);">
 						<i>Generar</i>
 					</button>
+				</td>
 				</td>
 			</tr>	
 		</table>
