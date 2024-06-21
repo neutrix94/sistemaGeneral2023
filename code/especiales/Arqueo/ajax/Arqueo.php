@@ -1,4 +1,5 @@
 <?php
+/*version 2.0 2024-06-21*/
 	include( '../../../../conexionMysqli.php' );
 	/**
 	* 
@@ -61,15 +62,11 @@
 					a.id_afiliacion,
 					a.no_afiliacion,
 					sca.insertada_por_error_en_cobro,
-					CONCAT( a.observaciones )/*a.no_afiliacion, ' ', */
+					CONCAT( a.observaciones )
 				FROM ec_afiliaciones a
-				/*LEFT JOIN ec_afiliaciones_cajero ac 
-				ON ac.id_afiliacion = a.id_afiliacion*/
 				LEFT JOIN ec_sesion_caja_afiliaciones sca
 				ON sca.id_afiliacion = a.id_afiliacion 
-				WHERE /*ac.id_cajero='{$user_id}' 
-				AND ac.activo=1
-				AND */a.id_afiliacion>0
+				WHERE a.id_afiliacion>0
 				AND sca.id_sesion_caja = '{$id_sesion_caja}'";
 			$eje = $this->link->query( $sql )or die("Error al consultar las afiliaciones para este cajero!!!<br>{$this->link->error}");
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
@@ -84,10 +81,7 @@
 				$sql="SELECT 
 						SUM( IF( id_cajero_cobro IS NULL,0,monto ) ) 
 						FROM ec_cajero_cobros 
-						WHERE id_cajero = '{$user_id}' 
-						AND fecha = '{$fecha_sesion}' 
-						AND hora >= '{$hora_inicio_sesion}' 
-						AND hora <= '{$hora_cierre_sesion}' 
+						WHERE id_sesion_caja = '{$id_sesion_caja}' 
 						AND id_afiliacion = '{$r[0]}'";
 				$eje_tar = $this->link->query($sql)or die("Error al consultar los pagos con tarjetas!!!<br> {$this->link->error}");
 				$r1 = $eje_tar->fetch_row();
@@ -126,13 +120,9 @@
 				LEFT JOIN ec_terminales_sucursales_smartaccounts tss
 				ON tss.id_terminal = tis.id_terminal_integracion
 				AND tss.id_sucursal = {$user_sucursal}
-				/*LEFT JOIN ec_terminales_cajero_smartaccounts tcs 
-				ON tcs.id_terminal = tis.id_terminal_integracion*/
 				LEFT JOIN ec_sesion_caja_terminales sct
 				ON sct.id_terminal = tss.id_terminal
-				WHERE /*tcs.id_cajero = '{$user_id}' 
-				AND tcs.activo = 
-				AND 1*/tss.estado_suc = 1
+				WHERE tss.estado_suc = 1
 				AND tis.id_terminal_integracion > 0
 				AND sct.id_sesion_caja = '{$id_sesion_caja}'";
 			$eje = $this->link->query( $sql )or die("Error al consultar las afiliaciones para este cajero!!!<br>{$this->link->error}");
@@ -144,10 +134,7 @@
 				$sql="SELECT 
 						SUM( IF( id_cajero_cobro IS NULL,0,monto ) ) 
 						FROM ec_cajero_cobros 
-						WHERE id_cajero = '{$user_id}' 
-						AND fecha = '{$fecha_sesion}' 
-						AND hora >= '{$hora_inicio_sesion}' 
-						AND hora <= '{$hora_cierre_sesion}' 
+						WHERE id_sesion_caja = '{$id_sesion_caja}'
 						AND id_terminal = '{$r[0]}'";
 				$eje_tar = $this->link->query($sql)or die("Error al consultar los pagos con tarjetas!!!<br> {$this->link->error}");
 				$r1 = $eje_tar->fetch_row();
@@ -203,9 +190,6 @@
 				FROM ec_cajero_cobros cc
 				LEFT JOIN ec_caja_o_cuenta coc ON cc.id_banco=coc.id_caja_cuenta
 				WHERE cc.id_sesion_caja = '{$id_sesion_caja}'
-				/*cc.id_cajero = '{$user_id}' 
-				AND cc.fecha = '{$fecha_sesion}'
-				AND cc.hora>='{$hora_inicio_sesion}' */
 				AND cc.id_tipo_pago IN( 8,9 )
 				AND cc.cobro_cancelado IN( 0 )";
 			$eje_chq = $this->link->query( $sql ) or die( "Error al consultar los pagos con cheques y transferencias!!!<br> {$this->link->error}" );
