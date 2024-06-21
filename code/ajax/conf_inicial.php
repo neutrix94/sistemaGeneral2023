@@ -1,13 +1,14 @@
 <?php
+//implementacion de GCP
 /*Version 2024-06-20 (Protocolos https)*/
 	header('Content-Type: text/html; charset=utf-8');
 
 	$main_path = getenv('PATH_STORAGE') ?: '../..';
 
 //1. Elimina el archivo /conexion_inicial.txt si existe
-	if($main_path && file_exists("{$main_path}/conexion_inicial.txt")){
+	/*if($main_path && file_exists("{$main_path}/conexion_inicial.txt")){
 			unlink("{$main_path}/conexion_inicial.txt");
-	}
+	}*/
 	if(file_exists("../../conexion_inicial.txt")){
 		unlink("../../conexion_inicial.txt");
 	}
@@ -31,7 +32,6 @@
 	
 	$cadena_datos.=$_POST['ru_or']."~";
 	$cadena_datos.=$_POST['ru_des'];
-	//die($cadena_datos);
 	$cadena_datos.='<>'.$_POST['archivo_jar'];
 	
 	$cadena_datos .= '<>'.$_POST['impresion'];
@@ -46,12 +46,12 @@
 	$cadena_datos.= '<>'.$_POST['system_type'];
 				
 //3. Crea archivo /conexion_inicial.txt
-	if( $main_path ){
+	/*if( $main_path ){
 		$fp = fopen("{$main_path}/conexion_inicial.txt", "w");
 		fputs($fp,$cadena_datos);
 		fclose($fp);
 		chmod("{$main_path}/conexion_inicial.txt", 0777);
-	}
+	}*/
 	$fp2 = fopen("../../conexion_inicial.txt", "w");
 	fputs($fp2,$cadena_datos);
 	fclose($fp2);
@@ -59,9 +59,9 @@
 
 
 //4. Elimina archivo /config.inc.php
-	if($main_path && file_exists("{$main_path}/config.inc.php")){
+	/*if($main_path && file_exists("{$main_path}/config.inc.php")){
 		unlink("{$main_path}/config.inc.php");
-	}
+	}*/
 	unlink("../../config.inc.php");
 
 //5. Crea archivo /config.inc.php
@@ -69,14 +69,18 @@
 		$ini=fopen("{$main_path}/config.inc.php", "w");
 	}
 	$ini2=fopen("../../config.inc.php", "w");*/
-	
+
 	$datos="<?php\n";
 	$datos.="session_start();\n";
 	$datos.="//Definiciones de base de datos\n";
-	$datos.="	\$dbHost='".$_POST['host_local']."';\n";
-	$datos.="	\$dbUser='".$_POST['usuario_local']."';\n";
-	$datos.="	\$dbPassword='".$_POST['pass_local']."';\n";
-	$datos.="	\$dbName='".$_POST['nombre_local']."';\n";
+	//$datos.="	\$dbHost='".$_POST['host_local']."';\n";
+	$datos.="	\$dbHost= getenv('DB_HOST') ?: \"{$_POST['host_local']}\";\n";
+	//$datos.="	\$dbUser='".$_POST['usuario_local']."';\n";
+	$datos.="	\$dbUser= getenv('DB_USER') ?: \"{$_POST['usuario_local']}\";\n";
+	//$datos.="	\$dbPassword='".$_POST['pass_local']."';\n";
+	$datos.="	\$dbPassword= getenv('DB_PASS') ?: \"{$_POST['pass_local']}\";\n";
+	//$datos.="	\$dbName='".$_POST['nombre_local']."';\n";
+	$datos.="	\$dbName= getenv('DB_NAME') ?: \"{$_POST['nombre_local']}\";\n";
 	$datos.="//Definicion de rutas\n";
 	
 	$datos.= "	\$isSecure = false;\n";
@@ -116,21 +120,21 @@
 	fwrite($ini2, $datos);
 	fclose($ini2);
 	chmod("../../config.inc.php", 0777);*/
-	if( $main_path ){
+	/*if( $main_path ){
 		$fp = fopen("{$main_path}/config.inc.php", "w");
 		fputs($fp,$datos);
 		fclose($fp);
 		chmod("{$main_path}/config.inc.php", 0777);
-	}
+	}*/
 	$fp2 = fopen("../../config.inc.php", "w");
 	fputs($fp2,$datos);
 	fclose($fp2);
 	chmod("../../config.inc.php", 0777);
 	
 //6. Elimina archivo /conexionDoble.php
-	if($main_path && file_exists("{$main_path}/conexionDoble.php")){
+	/*if($main_path && file_exists("{$main_path}/conexionDoble.php")){
 		unlink("{$main_path}/conexionDoble.php");
-	}
+	}*/
 	unlink("../../conexionDoble.php");
 //7. Crea archivo /conexionDoble.php
 	/*if( $main_path ){
@@ -147,10 +151,17 @@
 	$datos.="//definimos zona horaria\n";
 	$datos.="	date_default_timezone_set('America/Mexico_City');\n";
 
-	$datos.="	\$hostLocal='".$_POST['host_local']."';\n";
+/*	$datos.="	\$hostLocal='".$_POST['host_local']."';\n";
 	$datos.="	\$userLocal='".$_POST['usuario_local']."';\n";
 	$datos.="	\$passLocal='".$_POST['pass_local']."';\n";
-	$datos.="	\$nombreLocal='".$_POST['nombre_local']."';\n";//cdelasluces
+	$datos.="	\$nombreLocal='".$_POST['nombre_local']."';\n";//cdelasluces*/
+	
+	$datos.="//Definiciones de base de datos\n";
+	$datos.="	\$hostLocal= getenv('DB_HOST') ?: \"{$_POST['host_local']}\";\n";
+	$datos.="	\$userLocal= getenv('DB_USER') ?: \"{$_POST['usuario_local']}\";\n";
+	$datos.="	\$passLocal= getenv('DB_PASS') ?: \"{$_POST['pass_local']}\";\n";
+	$datos.="	\$nombreLocal= getenv('DB_NAME') ?: \"{$_POST['nombre_local']}\";\n";
+
 	$datos.="	\$local=@mysql_connect(\$hostLocal, \$userLocal, \$passLocal);\n";
 	$datos.="	//comprobamos conexion local\n";
 	$datos.="	if(!\$local){	//si no hay conexion\n";
@@ -212,15 +223,21 @@
 	fclose($ini2);
 	chmod("../../conexionDoble.php", 0777);*/
 	
-	if( $main_path ){
+	/*if( $main_path ){
 		$fp = fopen("{$main_path}/conexionDoble.php", "w");
 		fputs($fp,$datos);
 		fclose($fp);
 		chmod("{$main_path}/conexionDoble.php", 0777);
-	}
+	}*/
 	$fp2 = fopen("../../conexionDoble.php", "w");
 	fputs($fp2,$datos);
 	fclose($fp2);
 	chmod("../../conexionDoble.php", 0777);
-	echo 'ok';
+	
+	
+	if( getenv('PATH_STORAGE') ){
+		require_once( '../../GCP/enviroment_vars.php' );
+	}else{
+		echo 'ok';
+	}
 ?>
