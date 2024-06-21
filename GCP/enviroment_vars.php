@@ -35,10 +35,10 @@
             $envVar->setValue( $_POST['usuario_local'] );
         }
         if ($envVar->getName() === 'DB_NAME') {
-            $envVar->setValue( $_POST['pass_local'] );
+            $envVar->setValue( $_POST['nombre_local'] );
         }
         if ($envVar->getName() === 'DB_PASS') {
-            $envVar->setValue( $_POST['nombre_local'] );
+            $envVar->setValue( $_POST['pass_local'] );
         }
     }
 
