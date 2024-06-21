@@ -1,4 +1,4 @@
-
+/*version 2.0 2024-06-21*/
 	function salir(){
 		location.href="../../../index.php";
 	}
