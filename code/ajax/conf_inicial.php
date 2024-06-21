@@ -47,18 +47,17 @@
 	$cadena_datos.= '<>'.$_POST['system_type'];
 				
 //3. Crea archivo /conexion_inicial.txt
-	/*if( $main_path ){
-		$fp = fopen("{$main_path}/conexion_inicial.txt", "w");
+	if( $is_server ){
+		$fp = fopen("{$is_server}/conexion_inicial.txt", "w");
 		fputs($fp,$cadena_datos);
 		fclose($fp);
-		chmod("{$main_path}/conexion_inicial.txt", 0777);
-	}*/
-	if( !$is_server ){
-		$fp2 = fopen("../../conexion_inicial.txt", "w");
-		fputs($fp2,$cadena_datos);
-		fclose($fp2);
-		chmod("../../conexion_inicial.txt", 0777);
+		chmod("{$is_server}/conexion_inicial.txt", 0777);
 	}
+
+	$fp2 = fopen("../../conexion_inicial.txt", "w");
+	fputs($fp2,$cadena_datos);
+	fclose($fp2);
+	chmod("../../conexion_inicial.txt", 0777);
 
 //4. Elimina archivo /config.inc.php
 	/*if($main_path && file_exists("{$main_path}/config.inc.php")){
