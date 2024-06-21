@@ -6,7 +6,7 @@
         echo "ok";
     }*/
 
-    putenv('GOOGLE_APPLICATION_CREDENTIALS=/storage/casa-de-las-luces-f106cdae4177.json');
+    putenv('GOOGLE_APPLICATION_CREDENTIALS=/storage/projects/sistema-general-2023/casa-de-las-luces-f106cdae4177.json');
     //putenv('GOOGLE_APPLICATION_CREDENTIALS=../../api_credenciales.json');
 
     use Google\Service\CloudRun;
