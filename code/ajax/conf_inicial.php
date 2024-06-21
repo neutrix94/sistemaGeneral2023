@@ -6,13 +6,12 @@
 	$is_server = getenv('PATH_STORAGE') ?: null;
 
 //1. Elimina el archivo /conexion_inicial.txt si existe
-	/*if($main_path && file_exists("{$main_path}/conexion_inicial.txt")){
-			unlink("{$main_path}/conexion_inicial.txt");
-	}*/
-	if( !$is_server ){
-		if(file_exists("../../conexion_inicial.txt")){
-			unlink("../../conexion_inicial.txt");
-		}
+	if($is_server && file_exists("{$is_server}/conexion_inicial.txt")){
+		unlink("{$is_server}/conexion_inicial.txt");
+	}
+
+	if(file_exists("../../conexion_inicial.txt")){
+		unlink("../../conexion_inicial.txt");
 	}
 //2. Crea la cadena con los datos del formulario
 	$cadena_datos='';
@@ -65,10 +64,8 @@
 	/*if($main_path && file_exists("{$main_path}/config.inc.php")){
 		unlink("{$main_path}/config.inc.php");
 	}*/
-	if( !$is_server ){
-		if(file_exists("../../config.inc.php")){
-			unlink("../../config.inc.php");
-		}
+	if(!$is_server && file_exists("../../config.inc.php")){
+		unlink("../../config.inc.php");
 	}
 
 //5. Crea archivo /config.inc.php
@@ -144,10 +141,9 @@
 	/*if($main_path && file_exists("{$main_path}/conexionDoble.php")){
 		unlink("{$main_path}/conexionDoble.php");
 	}*/
-	if( !$is_server ){
-		if(file_exists("../../conexionDoble.php")){
-			unlink("../../conexionDoble.php");
-		}
+
+	if(!$is_server && file_exists("../../conexionDoble.php")){
+		unlink("../../conexionDoble.php");
 	}
 
 //7. Crea archivo /conexionDoble.php
