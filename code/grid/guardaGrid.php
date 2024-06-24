@@ -81,7 +81,7 @@
 								$sql.=",";
 							}
 							$aux="dato".($j+1);
-							$ax=$$aux;			die("here : " . $aux[$i]);		
+							$ax=$$aux;//die("here : " . $aux[$i]);		
 							if($ax[$i] == '$id_usuario'){
 								$sql.=$_SESSION["USR"]->userid;
 							}else{	
