@@ -383,6 +383,13 @@
 			
 		}
 
+		public function getWebSocketURL(){
+			$sql = "SELECT url_websocket_pagos FROM sys_configuracion_sistema LIMIT 1";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar la URL de los WebSockets  de pagos : {$sql} : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			return $row['url_websocket_pagos'];
+		}
+
 		public function check_mannager_password( $sucursal_id, $mannager_password ){
 			$sql = "SELECT 
 						u.id_usuario 
@@ -1445,6 +1452,62 @@
 			if($r[0]!=1){
 				die('<script>alert("Es necesario abrir caja antes de cobrar!!!");location.href="../../../../code/especiales/tesoreria/abreCaja/abrirCaja.php?";</script>');
 			}
+		/*Implementacion Oscar 2024-06-24 para creacion / renovacion de Token */
+		//consulta si tiene token activo
+			$sql = "SELECT token FROM api_token WHERE id_user = {$user_id} AND expired_in > NOW()";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar si hay token activo para pantalla de cobros : {$this->link->error}" );
+		//obtiene el password del usuario
+			$sql = "SELECT 
+						id_usuario AS user_id, 
+						login, 
+						contrasena AS password,
+						( SELECT `value` FROM api_config WHERE `key` = 'api' ) AS api_path 
+					FROM sys_users WHERE id_usuario = '{$user_id}'";
+			$stm2 = $this->link->query( $sql ) or die( "Error al consultar password de usuario : {$this->link->error}" );
+			$user = $stm2->fetch_assoc();
+			if( $stm->num_rows <= 0 ){
+				//die(  "{$user['user_id']} / {$user['login']} / {$user['password']} / {$user['api_path']}" );
+			//consume servcio para obtener token
+				$post_data = json_encode( array( "user"=>"{$user['login']}", "password"=>"{$user['password']}" ) );
+				$result = json_decode( $this->sendPetition( "{$user['api_path']}/rest/netPay/token", $post_data ) );
+				
+				if( $result->status != "OK" && $result->status != "OK" ){
+					die("Error al generar el token para pantalla de cobros : {$result}");
+				}else{
+					//var_dump( $result->result->created_in );die('');
+				//inserta el token en la tabla api_token
+					$sql = "INSERT INTO api_token ( id_user, token, created_in, expired_in ) 
+						VALUES ( {$user_id}, '{$result->result->access_token}', 
+						'{$result->result->created_in}', '{$result->result->expired_in}' )";	//die( $sql );			
+					$stm3 = $this->link->query( $sql ) or die( "Error al insertar token en cliente : {$this->link->error}" );
+				}
+				return array( "status"=>200, "token"=>$result->result->access_token );
+			}else{
+				$row =$stm->fetch_assoc();
+			//validacion / renovacion de token
+				$post_data = null;
+				$result = json_decode( $this->sendPetition( "{$user['api_path']}/rest/netPay/valida_token", $post_data, $row['token'] ) );
+				return array( "status"=>200, "token"=>$row['token'] );
+			}
+		}
+
+		public function sendPetition( $url, $post_data, $token = '' ){
+			//die( $url );
+			$resp = "";
+			$crl = curl_init( $url );
+			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+			curl_setopt($crl, CURLOPT_POST, true);
+			curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+		    curl_setopt($crl, CURLOPT_TIMEOUT, 60000);
+			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+			  'Content-Type: application/json',
+			  'token: ' . "{$token}" )
+			);
+			$resp = curl_exec($crl);//envia peticion
+			curl_close($crl);
+			return $resp;
 		}
 
 		public function getBoxesMoney( $store_id ){	
