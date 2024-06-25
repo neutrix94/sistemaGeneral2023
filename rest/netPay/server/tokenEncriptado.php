@@ -23,7 +23,7 @@ $app->post('/token', function (Request $request, Response $response){
 
     //Recuperar parámetros de petición entrada
     $user = $request->getParam('user');
-    $pass = md5($request->getParam('password'));
+    $pass = $request->getParam('password');//md5()
 
     //Genera sentencia para consultar usuario
     $sqlUsuario="SELECT u.id_usuario FROM sys_users u WHERE u.contrasena='{$pass}' and u.login='{$user}' limit 1";
@@ -53,16 +53,18 @@ $app->post('/token', function (Request $request, Response $response){
                           TIMESTAMPADD(SECOND,{$time_value['value']},NOW())
                         );";
           $db->exec($sqlInsert);
+        //vuelve a consultar datos del token   
+          $sql = "SELECT * FROM api_token WHERE token = '{$tk}'";//Genera sentencia recuperar tiem_value
+          $resultadoToken = $db->query( $sql );
+          $new_token = $resultadoToken->fetch();
           //Regresa token
           $resultado = [];
-          $resultado['access_token']= $tk;//$Encrypt->encryptText($tk, 'CDLL2024');
-          //$resultado['access_token_crypt'] = $Encrypt->encryptText($tk, 'CDLL2024');
-          $resultado['expires_in']=$time_value['value'];
+          $resultado['created_in']= $new_token['created_in'];//$Encrypt->encryptText($tk, 'CDLL2024');
+          $resultado['access_token'] = $tk;
+          $resultado['expired_in']=$new_token['expired_in'];
           $resultado['token_type']='bearer';
           return $rs->successMessage($request->getParsedBody(),$response, $resultado);
-      }
-      //Datos no validos
-      else{
+      }else{ //Datos no validos
           //Define estructura de salida: Usuario/Contraseña no valido
           return $rs->errorMessage($request->getParsedBody(),$response, 'Datos_Invalidos', 'Usuario y/o contraseña no válidos', 400);
       }
