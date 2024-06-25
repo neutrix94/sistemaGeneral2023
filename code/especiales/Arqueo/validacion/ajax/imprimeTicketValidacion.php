@@ -1,5 +1,5 @@
 <?php
-/*version casa 1.0*/
+/*version 2.0 2024-06-21*/
 	define('FPDF_FONTPATH','../../../../../include/fpdf153/font/');
 	include("../../../../../include/fpdf153/fpdf.php");
 	include("../../../../../conectMin.php");
@@ -397,7 +397,7 @@ class TicketPDF extends FPDF {
 	$ticket->Cell(60, 6, utf8_decode("Total de Gastos: ".$total_gastos), "" ,0, "R");
 //efectivo en caja
 	$ticket->SetXY(10, $ticket->GetY()+5);
-	$efect[1] = $efect[1] - $monto_cheques;
+//$efect[1] = $efect[1] - $monto_cheques;
 	$ticket->Cell(60, 6, utf8_decode("Efectivo Entregado: $".($efect[1])), "" ,0, "R");
 
 //diferencia
