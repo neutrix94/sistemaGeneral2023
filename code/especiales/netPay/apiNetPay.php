@@ -6,11 +6,13 @@
 		private $store_id;
 		private $NetPayStoreId;
 		private $system_type;
-		function __construct( $connection, $store_id, $system_type )
+		private $Logger;
+		function __construct( $connection, $store_id, $system_type, $Logger = null )
 		{
 			$this->link = $connection;
 			$this->store_id = $store_id;
 			$this->system_type = $system_type;
+			$this->Logger = $Logger;
 			//$this->NetPayStoreId = $this->getCurrentStoreId();
 			//die( $this->NetPayStoreId );
 		}
@@ -27,7 +29,8 @@
 			return $row['storeId'];
 		}*/
 	//obtencion de endpoints
-		public function getEndpoint( $terminal_id, $endpoint_type ){
+		public function getEndpoint( $terminal_id, $endpoint_type, $log_id = null ){
+			$steep_log_id = 0;
 			$sql = "SELECT 
 						{$endpoint_type} AS endpoint
 					FROM ec_terminales_integracion_smartaccounts tis 
@@ -35,7 +38,17 @@
 					ON tis.id_tipo_terminal = tb.id_tipo_banco
 					WHERE tis.id_terminal_integracion = '{$terminal_id}'
 					OR tis.numero_serie_terminal = '{$terminal_id}'";//die( $sql );
-			$stm = $this->link->query( $sql ) or die( "Error al consultar endpoint {$endpoint_type} : {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta el endpoint de la integracion SmartAccounts", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_terminales_integracion_smartaccounts', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar endpoint {$endpoint_type} : {$this->link->error}" );
+			}
 			$row = $stm->fetch_assoc();
 			return $row['endpoint'];
 		}
@@ -87,7 +100,8 @@
 			return $response;
 		}
 
-		public function getToken( $terminal_id ){
+		public function getToken( $terminal_id, $log_id = null ){
+			$steep_log_id = 0;
 			$sql = "SELECT 
 						id_token_terminal,
 						id_razon_social,
@@ -102,7 +116,18 @@
 					ORDER BY id_token_terminal DESC
 					LIMIT 1";
 			//die( $sql );
-			$stm = $this->link->query( $sql ) or die( "Error al consultar el token corresponsiente de la terminal!" );
+			$stm = $this->link->query( $sql );
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta el token correspondiente de la terminal", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'vf_tokens_terminales_netpay', 
+					'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar el token correspondiente de la terminal!" );
+			}
 			$row = $stm->fetch_assoc();
 			return $row;
 		}
@@ -141,10 +166,20 @@
 			//return $response;
 		}
 
-		public function insertNetPetitionRow( $user_id, $store_id, $terminal_id, $store_id_netpay ){
+		public function insertNetPetitionRow( $user_id, $store_id, $terminal_id, $store_id_netpay, $log_id = null ){
 		//consulta token
 			$sql = "SELECT token FROM api_token WHERE id_user = {$user_id} and expired_in > now() limit 1";//-1
-			$stm = $this->link->query($sql) or die( "Error al consultar el token : {$this->link->error}" );
+			$stm = $this->link->query($sql);
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta token de usario en api token", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'api_token', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar el token : {$this->link->error}" );
+			}
 			$respuesta = $stm->fetch_assoc();
 			$token = $respuesta['token'];
 		//consuta path de API linea
@@ -153,14 +188,30 @@
 						(SELECT value FROM api_config WHERE `name` = 'path' ) AS api_path
 					FROM sys_sucursales 
 					WHERE acceso = 1";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar prefijo de sucural para generar el folio unico : {$this->link->error}" );
+			$stm = $this->link->query( $sql );// 
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta prefijo de sucursal y path de API para generar el folio unico ", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'sys_sucursales', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar prefijo de sucursal y path de API para generar el folio unico : {$this->link->error}" );
+			}
 			$row = $stm->fetch_assoc();
 			$prefix = $row['prefijo'];
 			$path_api = $row['api_path'];
 
-		//consume el webservice para insertar la peticion en en servidor en linea			
+		//consume el webservice para insertar la peticion servidor en linea	
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Envia peticion a api : {$path_api}/rest/netPay/insertar_peticion_transaccion ", "{$post_data}" );
+			}
+
 			$post_data = json_encode( array( "id_usuario"=>"{$user_id}", "id_sucursal"=>"{$store_id}", "terminal_id"=>"{$terminal_id}", "store_id_netpay"=>"{$store_id_netpay}" ) );
 			$curl = curl_init();
+			
 			curl_setopt_array($curl, array(
 				CURLOPT_URL => "{$path_api}/rest/netPay/insertar_peticion_transaccion",
 				CURLOPT_RETURNTRANSFER => true,
@@ -182,16 +233,30 @@
 			$result = json_decode( $response );//json_encode(),
 			//var_dump($result);
 			if( $result->status != '200' && $result->status != 200 ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'sys_sucursales', 'N/A', "{$post_data}", "Error al consumir API para insertar peticion de netPay en servidor linea : {$path_api}/rest/netPay/insertar_peticion_transaccion" );
+				}
 				var_dump( $result );
 				die( "Error al consumir API para insertar peticion de netPay en servidor linea : {$path_api}" . $result->message );
 			}
 			$folio_transaccion = $result->folio_unico_transaccion;
 			$sql = "INSERT INTO vf_transacciones_netpay ( folio_unico, id_cajero, id_sucursal, terminalId, store_id_netpay ) 
 					VALUES ( '{$folio_transaccion}', '{$user_id}', '{$store_id}', '{$terminal_id}', '{$store_id_netpay}' )";
-			$stm = $this->link->query( $sql ) or die( "Error al insertar el id de transaccion netPay en servidor origen : {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta el id de transaccion netPay en servidor origen", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al insertar el id de transaccion netPay en servidor origen : {$this->link->error}" );
+			}
 			return $folio_transaccion;
 		}
-		public function getTerminal( $terminal_id, $store_id ){
+		public function getTerminal( $terminal_id, $store_id, $log_id = null ){
+			$steep_log_id = 0;
 			$sql = "SELECT 
 						tis.numero_serie_terminal AS terminal_serie,
 						tis.imprimir_ticket AS print_ticket,
@@ -205,21 +270,33 @@
 					WHERE tis.id_terminal_integracion = {$terminal_id}
 					OR tis.numero_serie_terminal = {$terminal_id}
 					AND tss.id_sucursal = {$store_id}";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar datos de la terminal : {$sql} {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta datos de la terminal", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_terminales_integracion_smartaccounts / ec_terminales_sucursales_smartaccounts / vf_razones_sociales_emisores', 
+					'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar datos de la terminal : {$sql} {$this->link->error}" );
+			}
 			$row = $stm->fetch_assoc();
 			return $row;
 		}
 	//peticion de venta
-		public function salePetition(  $apiUrl, $amount = 0.01, $terminal_id, $user_id, $store_id, $sale_folio, $session_id, $id_devolucion_relacionada = 0 ){
-			$terminal = $this->getTerminal( $terminal_id, $store_id );
+		public function salePetition(  $apiUrl, $amount = 0.01, $terminal_id, $user_id, $store_id, $sale_folio, $session_id, $id_devolucion_relacionada = 0, $log_id = null ){
+			$steep_log_id = 0;
+			$terminal = $this->getTerminal( $terminal_id, $store_id, $log_id );
 			//var_dump( $terminal );
-			$token = $this->getToken( $terminal['terminal_serie'] );
+			$token = $this->getToken( $terminal['terminal_serie'], $log_id );
 			//var_dump( $token );
 			//return '';
 			if( sizeof($token) == 0 || $token == null ){
 				$token = $this->requireToken( $terminal['terminal_serie'], 'password', 'smartPos', 'netpay' );
 			}
-			$folio_unico_transaccion = $this->insertNetPetitionRow( $user_id, $store_id, $terminal['terminal_serie'], $terminal['store_id'] );
+			$folio_unico_transaccion = $this->insertNetPetitionRow( $user_id, $store_id, $terminal['terminal_serie'], $terminal['store_id'], $log_id );
 		//arreglo de prueba
 			$data = array( 
 						"traceability"=>array(  
@@ -250,6 +327,10 @@ fwrite($file, $post_data);
 fclose($file);
 /**/
 		//envia peticion
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Envia peticion a api netPay : {$apiUrl}", "{$post_data}" );
+			}
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
 			  CURLOPT_URL => $apiUrl,//"http://nubeqa.netpay.com.mx:3334/integration-service/transactions/sale",
@@ -275,12 +356,24 @@ fclose($file);
 			//var_dump($response);die('');
 			if( isset( $result->error ) ){
 				if( $result->error == 'invalid_token' ){//token expirado
-					//die( 'here' );
-					//$this->refreshToken( $token, $terminal['terminal_serie'] );
+					if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', 'N/A', "{$post_data}", "Error al consumir API de NETPAY : {$apiUrl} : {$result}" );
+					}
 					$sql = "DELETE FROM vf_tokens_terminales_netpay";
-					$stm = $this->link->query( $sql ) or die( "Error al eliminar tokens : {$this->link->error}" );
+					$stm = $this->link->query( $sql );//
+				/*Logger*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Elimina token caducado ( NETPAY )", $sql );
+					}
+					if( $this->link->error ){
+						if( $log_id != null ){
+							$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'vf_tokens_terminales_netpay', 
+							'N/A', $sql, $this->link->error );
+						}
+						die( "Error al eliminar token caducado ( NETPAY ) : {$sql} {$this->link->error}" );
+					}
 					return $this->salePetition( $apiUrl, $amount = 0.01, $terminal['terminal_serie'], $user_id, 
-										$store_id, $sale_folio, $session_id, $id_devolucion_relacionada );
+										$store_id, $sale_folio, $session_id, $id_devolucion_relacionada, $log_id );
 					return false;
 				}
 			}
