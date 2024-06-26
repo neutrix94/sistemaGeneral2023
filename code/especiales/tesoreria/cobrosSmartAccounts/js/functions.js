@@ -1,4 +1,4 @@
-
+/*version 1.1 2024-06-21*/
 var total_cobros=0,monto_real=0;
 var respuesta = null;
 var debug_json = "";
@@ -849,10 +849,13 @@ var cont_cheques_transferencia=0;
 	}
 
 	function delete_payment_saved( payment_id, sale_id ){
+	//obtener id de sesion de cajero
+		var current_session_id = $( '#session_id' ).val(); 
 		if( !confirm( "Realmente deseas eliminar el pago?" ) ){
 			return false;
 		}
-		var url = "ajax/db.php?fl=delete_payment_saved&payment_id=" + payment_id;
+		//var url = "ajax/db.php?fl=delete_payment_saved&payment_id=" + payment_id + "&current_session_id=" + current_session_id;
+		var url = `ajax/db.php?fl=delete_payment_saved&payment_id=${payment_id}&current_session_id=${current_session_id}`;
 		var resp = ajaxR( url );
 		if( resp != 'ok' ){
 			alert( "Error al eliminar el pago : " + resp );

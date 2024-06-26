@@ -1,7 +1,9 @@
 <?php
+/*version 1.1 2024-06-21*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
+		include('./Logger.php');
 	/*verifica si esta habilitada la funcion de SmartAccounts
 		$sql = "SELECT 
 					habilitar_smartaccounts_netpay AS is_smart_accounts
@@ -20,12 +22,22 @@
 		$row = $stm->fetch_assoc();
 		$system_type = $row['system_type'];
 		include( '../../../netPay/apiNetPay.php' );
-		$apiNetPay = new apiNetPay( $link, $sucursal_id, $system_type );
-		$Payments = new Payments( $link, $user_sucursal );
+		$Logger = null;
+		$log_id = null;
+		$log = $_GET['log_status'];
+		if( $log == 1 ){
+			$Logger = new Logger( $link );//instancia de clase Logger
+		}
+		$apiNetPay = new apiNetPay( $link, $sucursal_id, $system_type, ( $Logger == null ? null : $Logger ) );
+		$Payments = new Payments( $link, $user_sucursal, ( $Logger == null ? null : $Logger ) );
 		$action = ( isset( $_GET['fl'] ) ? $_GET['fl'] : $_POST['fl'] );
 		switch ( $action ) {
 			case 'sendPaymentPetition' :
-				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_venta' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/sale";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/sale
+				if( $Logger != null ){
+					$log_ = $Logger->insertLoggerRow( 'N/A', $user_id, 'vf_transacciones_netPay', $system_type, ( $system_type != -1 ? $sucursal_id : -1 ) );//inserta cabecera de log
+					$log_id = $log_['id_log'];
+				}
+				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_venta', $log_id );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/sale";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/sale
 				//die( 'here : ' . $apiUrl );
 			//recibe variables
 				$amount = ( isset( $_GET['amount'] ) ? $_GET['amount'] : $_POST['amount'] );
@@ -42,7 +54,7 @@
 				}
 				
 		
-				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $amount );
+				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $amount, $log_id );
 				$terminal_id = ( isset( $_GET['terminal_id'] ) ? $_GET['terminal_id'] : $_POST['terminal_id'] );
 				$counter = ( isset( $_GET['counter'] ) ? $_GET['counter'] : $_POST['counter'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
@@ -50,7 +62,7 @@
 				$id_devolucion_relacionada = ( isset( $_GET['id_devolucion_relacionada'] ) ? $_GET['id_devolucion_relacionada'] : $_POST['id_devolucion_relacionada'] );
 			//consume servicio de venta
 				$req = $apiNetPay->salePetition( $apiUrl, $amount, $terminal_id, $user_id, 
-					$sucursal_id, $sale_folio, $session_id, $id_devolucion_relacionada );
+					$sucursal_id, $sale_folio, $session_id, $id_devolucion_relacionada, $log_id );
 	//die("here");
 				$resp = json_decode( $req );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
@@ -284,7 +296,8 @@
 				
 			case 'delete_payment_saved' : 
 				$payment_id = $_GET['payment_id'];
-				echo $Payments->delete_payment_saved( $payment_id );
+				$session_id = $_GET['current_session_id'];
+				echo $Payments->delete_payment_saved( $payment_id, $session_id );
 			break;
 //afiliaciones
 			case 'obtenerListaAfiliaciones' :
@@ -374,11 +387,20 @@
 	{
 		private $link;
 		private $store_id;
-		function __construct( $connection, $store_id )
+		private $Logger;
+		function __construct( $connection, $store_id, $Logger = null )
 		{
 			$this->link = $connection;
 			$this->store_id = $store_id;
+			$this->Logger = $Logger;
 			
+		}
+
+		public function getWebSocketURL(){
+			$sql = "SELECT url_websocket_pagos FROM sys_configuracion_sistema LIMIT 1";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar la URL de los WebSockets  de pagos : {$sql} : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			return $row['url_websocket_pagos'];
 		}
 
 		public function check_mannager_password( $sucursal_id, $mannager_password ){
@@ -397,7 +419,7 @@
 			}
 		}
 
-		public function validate_payment_is_not_bigger( $sale_id, $ammount ){
+		public function validate_payment_is_not_bigger( $sale_id, $ammount, $log_id = null ){
 		//busqueda por id
 			$sql = "SELECT
 						p.total AS sale_total,
@@ -408,7 +430,18 @@
 					ON pp.id_pedido = p.id_pedido
 					WHERE p.id_pedido = '{$sale_id}'
 					GROUP BY p.id_pedido";//OR foilio_nv = '{$sale_id}'
-			$stm = $this->link->query( $sql ) or die( "Error al consultar pagos para comprobacion : {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta suma de pagos para la comprobacion por id", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar pagos para comprobacion por id : {$this->link->error}" );
+			}
+
 			if( $stm->num_rows <= 0 ){	//busqueda por folio
 			
 				$sql = "SELECT
@@ -420,9 +453,22 @@
 					ON pp.id_pedido = p.id_pedido
 					WHERE p.folio_nv = '{$sale_id}'
 					GROUP BY p.id_pedido";//
-				$stm = $this->link->query( $sql ) or die( "Error al consultar pagos para comprobacion : {$this->link->error}" );
+				$stm = $this->link->query( $sql );
+			/*Logger*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta suma de pagos para la comprobacion por folio", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al consultar pagos para comprobacion por folio : {$this->link->error}" );
+				}
 			}
 			if( $stm->num_rows == 0 ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', "La nota de venta {$sale_id} no fue encontrada.", 'N/A' );
+				}	
 				die( "error|La nota de venta {$sale_id} no fue encontrada." );
 			}
 
@@ -437,7 +483,17 @@
 					LEFT JOIN ec_devolucion d
 					ON dp.id_devolucion = d.id_devolucion
 					WHERE d.id_pedido IN( {$sale_id} )";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar pagos por devolucion para comprobacion : {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+			/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta suma de pagos por devolucion ", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_devolucion / ec_devolucion_pagos', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar pagos por devolucion para comprobacion : {$this->link->error}" );
+			}
 			$devolucion_row = $stm->fetch_assoc();
 			$pagos_dev = $devolucion_row['pagos_devolucion'];
 			$tmp_total =  $payments_total + $ammount - $pagos_dev;//round()
@@ -447,6 +503,9 @@
 
 			}else{
 				if( $tmp_total > $sale_total ){
+					if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', "El pago no puede ser mayor al total de la venta! {$sale_total} - {$tmp_total} = {$rest}", 'N/A' );
+					}	
 					die( "<div class=\"row\" style=\"padding:15px;\">
 						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta! {$sale_total} - {$tmp_total} = {$rest}</h2>
 						<div class=\"col-3\"></div>
@@ -463,21 +522,6 @@
 					</div>" );//error|
 				}
 			}
-			/*
-				<div class=\"row text-center\">
-						<div class=\"col-3 text-primary\">
-							Total : {$sale_total}
-						</div>
-						<div class=\"col-3 text-success\">
-							Total Pagado : {$payments_total}
-						</div>
-						<div class=\"col-3 text-danger\">
-							Restante : {$rest}
-						</div>
-						<div class=\"col-3 text-warning\">
-							Monto Pago : {$ammount}
-						</div>
-			*/
 			return 'ok';
 		}
 
@@ -799,8 +843,9 @@
 			//$sql = "INSERT INTO ec_cajero_cobros";
 		}*/
 
-		public function insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, $saldo_especial = 0, $id_caja_cuenta = -1 ){
-//echo "<br>INSERTPAYMENTDEPENDING<br>";
+		public function insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, $saldo_especial = 0, $id_caja_cuenta = -1, $log_id = null ){
+			$steep_log_id = 0;
+//echo "<br>INSERTPAYMENTDEPENDING<br>{$log_id}";
 			$total_devolver_cajero = 0;
 			$devolucion_interna = 0;
 			$devolucion_externa = 0;
@@ -822,8 +867,18 @@
 					FROM ec_pedidos_relacion_devolucion
 					WHERE id_pedido_relacionado = {$sale_id}
 					AND id_sesion_caja_pedido_relacionado = 0";
-			$stm_1 = $this->link->query( $sql ) or die( "Error al consultar relacion de pedidos y devolucion : {$this->link->error}" );
-//echo $sql . "<br><br>";
+			$stm_1 = $this->link->query( $sql );
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta relacion de pedidos y devolucion", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos_relacion_devolucion', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar relacion de pedidos y devolucion : {$this->link->error}" );
+			}
+		/*</Logger>*/
 			if( $stm_1->num_rows == 1 ){
 				$row = $stm_1->fetch_assoc();
 				$this->reinsertaPagosPorDevolucion( $row['id_pedido_original'], $user_id, $session_id, '$folio_devolucion', $row['monto_interno_por_devolver'], $row['monto_externo_por_devolver'] );
@@ -836,15 +891,36 @@
 						LEFT JOIN ec_pedido_pagos pp
 						ON p.id_pedido = pp.id_pedido 
 						WHERE p.id_pedido = {$row['id_pedido_relacionado']}";
-				$stm_2 = $this->link->query($sql) or die( "Error al consultar si la venta esta pagada : {$this->link->error}" );
-//echo $sql . "<br><br>";
+				$stm_2 = $this->link->query($sql);
+			/*Logger*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta si la venta esta pagada", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos - ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al consultar si la venta esta pagada : {$this->link->error}" );
+				}
+			/*</Logger>*/
 				$row_2 = $stm_2->fetch_assoc();
 			//inserta el pago de la devolucion interna
 				if( $row['monto_interno_por_devolver'] > 0 ){
 					$sql = "INSERT INTO ec_devolucion_pagos( id_devolucion_pago, id_devolucion, id_tipo_pago, monto, es_externo, fecha, hora,
 					id_cajero, id_sesion_caja ) VALUES( NULL, {$row['id_devolucion_interna']}, 1, {$row['monto_interno_por_devolver']}, 0, 
 					NOW(), NOW(), {$user_id}, {$session_id} )";
-					$stm_3 = $this->link->query($sql) or die( "Error al insertar pago de devolucion interna : {$this->link->error}" );
+					$stm_3 = $this->link->query($sql);
+				/*Logger*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta pago de devolucion interna", $sql );
+					}
+					if( $this->link->error ){
+						if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_devolucion_pagos', 'N/A', $sql, $this->link->error );
+						}
+						die( "Error al insertar pago de devolucion interna : {$this->link->error}" );
+					}
+				/*</Logger>*/
 //echo $sql . "<br><br>";
 					$devolucion_interna = $this->link->insert_id;
 					$total_devolver_cajero += $row['monto_interno_por_devolver'];
@@ -854,8 +930,18 @@
 					$sql = "INSERT INTO ec_devolucion_pagos( id_devolucion_pago, id_devolucion, id_tipo_pago, monto, es_externo, fecha, hora,
 					id_cajero, id_sesion_caja ) VALUES( NULL, {$row['id_devolucion_externa']}, 1, {$row['monto_externo_por_devolver']}, 1, 
 					NOW(), NOW(), {$user_id}, {$session_id} )";
-					$stm_4 = $this->link->query($sql) or die( "Error al insertar pago de devolucion externa : {$this->link->error}" );
-//echo $sql . "<br><br>";
+					$stm_4 = $this->link->query($sql);
+				/*Logger*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta pago de devolucion externa", $sql );
+					}
+					if( $this->link->error ){
+						if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_devolucion_pagos', 'N/A', $sql, $this->link->error );
+						}
+						die( "Error al insertar pago de devolucion externa : {$this->link->error}" );
+					}
+				/*</Logger>*/
 					$devolucion_externa = $this->link->insert_id;
 					$total_devolver_cajero += $row['monto_externo_por_devolver'];
 				}
@@ -876,19 +962,51 @@
 				if( $row['monto_devolucion_tomado_a_favor'] > 0 ){
 					$this->insertPayment( $row['monto_devolucion_tomado_a_favor'], $sale_id, $user_id, $session_id, 2 );
 				}
-				$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero en insertPaymentsDepending : {$this->link->error}" );
+				$stm = $this->link->query( $sql );
+			/*Logger*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta el cobro del cajero en insertPaymentsDepending", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_cajero_cobros', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al insertar el cobro del cajero en insertPaymentsDepending : {$this->link->error}" );
+				}
+			/*</Logger>*/
 				$id_cajero_cobro = $this->link->insert_id;
 				
 				$sql = "UPDATE ec_devolucion_pagos 
 							SET id_cajero_cobro = {$id_cajero_cobro} 
 						WHERE id_devolucion_pago IN( {$devolucion_interna}, {$devolucion_externa} )";
-				$stm_update = $this->link->query( $sql ) or die( "Error al actualizar las devoluciones : {$this->link->error}" );
+				$stm_update = $this->link->query( $sql );	
+			/*<Logger>*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Actualiza las devoluciones relacionadas", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_devolucion_pagos', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al actualizar las devoluciones relacionadas : {$this->link->error}" );
+				}
+			/*</Logger>*/
 /**/			
 //echo $sql . "<br><br>";
 				$sql = "UPDATE ec_pedidos_relacion_devolucion 
 					SET id_sesion_caja_pedido_relacionado = {$session_id} 
 				WHERE id_pedido_relacionado = {$row['id_pedido_relacionado']}";
-				$stm = $this->link->query( $sql ) or die( "Error al actualizar ec_pedidos_relacion_devolucion de pagos : {$sql} {$this->link->error}" );
+				$stm = $this->link->query( $sql );
+			/*Logger*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Actualiza ec_pedidos_relacion_devolucion de pagos", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos_relacion_devolucion', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al actualizar ec_pedidos_relacion_devolucion de pagos : {$sql} {$this->link->error}" );
+				}
 //echo $sql . "<br><br>";
 /*Implementacion Oscar 2024-04-11 para imprimir el ticket de la nota dependiente*/
 				
@@ -1096,9 +1214,21 @@
 			$this->link->autocommit(true);
 		}
 
-		public function reinsertaPagosPorDevolucionCaso2 ( $id_venta, $id_cajero, $id_sesion_caja, $folio_devolucion, $monto_dev_interna, $monto_dev_externa ){
+		public function reinsertaPagosPorDevolucionCaso2 ( $id_venta, $id_cajero, $id_sesion_caja, $folio_devolucion, $monto_dev_interna, $monto_dev_externa, $log_id = null ){
+			$steep_log_id = 0;
 			$sql = "SELECT * FROM ec_pedido_pagos WHERE id_pedido = {$id_venta} AND monto > 0 AND referencia = ''";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar los pagos anteriores : {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+		/*<Logger>*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta pagos anteriores", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+				$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar los pagos anteriores : {$this->link->error}" );
+			}
+		/*</Logger>*/
 			$this->link->autocommit(false);
 			$total_pagado = 0;
 			//die( "here" );
@@ -1109,9 +1239,31 @@
 					id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
 					VALUES ( '{$row['id_pedido']}', '{$row['id_cajero_cobro']}', '{$row['id_tipo_pago']}', now(), now(), ( {$row['monto']}*-1 ), 'Pago Anulado por devolucion {$folio_devolucion}', '{$row['id_moneda']}', '{$row['tipo_cambio']}', 
 					'{$row['id_nota_credito']}', '{$row['id_cxc']}', '{$row['exportado']}', '{$row['es_externo']}', '{$id_cajero}', NULL, '{$row['sincronizar']}', '{$id_sesion_caja}')";
-				$insert = $this->link->query( $sql ) or die( "Error al insertar los cobros del cajero : {$this->link->error}" );
+				$insert = $this->link->query( $sql );
+			/*<Logger>*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta los cobros del cajero", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al insertar los cobros del cajero : {$this->link->error}" );
+				}
+			/*</Logger>*/ 
 				$sql = "UPDATE ec_pedido_pagos SET referencia = 'Pago para anular por devolucion {$folio_devolucion}' WHERE id_pedido_pago = {$row['id_pedido_pago']}";
-				$insert = $this->link->query( $sql ) or die( "Error al insertar los cobros del cajero : {$this->link->error}" );
+				$insert = $this->link->query( $sql );
+			/*<Logger>*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Actualiza referencias de los cobros del cajero", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al actualizar referencias de los cobros del cajero : {$this->link->error}" );
+				}
+			/*</Logger>*/
 				$total_pagado += $row['monto'];
 			}
 
@@ -1137,11 +1289,19 @@
 					WHERE pd.id_pedido = {$id_venta}
 				)ax";
 			//die($sql);
-			$stm = $this->link->query( $sql ) or die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+		/*<Logger>*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta porcentajes de pagos", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+				$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos_detalle - ec_pedidos - sys_sucursales_producto', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
+			}
+		/*</Logger>*/
 			$row = $stm->fetch_assoc();
-			//$sql = "SELECT id_cajero_cobro, monto FROM ec_cajero_cobros WHERE id_pedido = {$id_venta}";
-			//$stm_cc = $this->link->query( $sql ) or die( "Error al consultar los cajeros cobros en reinsertaPagosPorDevolucionCaso2 : {$this->link->error}" );
-			//while( $row_cc = $stm_cc->fetch_assoc() ){
 				if( $row['internal_porcent'] > 0 ){
 				//die( "inserta pagos internos" );
 					if( $row['internal_porcent'] >= 0.99 ){
@@ -1152,7 +1312,18 @@
 						id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
 						VALUES ( '{$id_venta}', '1', '1', now(), now(), ROUND( {$total_pagado}*{$row['internal_porcent']}, 4 ), '', '1', '-1', 
 						'-1', '-1', '0', '0', '{$id_cajero}', NULL, '1', '{$id_sesion_caja}')";
-					$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero : {$this->link->error}" );
+					$insert = $this->link->query( $sql );
+				/*<Logger>*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta el pago interno del cajero", $sql );
+					}
+					if( $this->link->error ){
+						if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+						}
+						die( "Error al insertar el pago interno del cajero : {$this->link->error}" );
+					}
+				/*</Logger>*/
 				}
 				if( $row['external_porcent'] > 0 ){
 					if( $row['external_porcent'] >= 0.99 ){
@@ -1163,18 +1334,48 @@
 						id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
 						VALUES ( '{$id_venta}', '1', '1', now(), now(), ROUND( {$total_pagado}*{$row['external_porcent']}, 4 ), '', '1', '-1', 
 						'-1', '-1', '0', '1', '{$id_cajero}', NULL, '1', '{$id_sesion_caja}')";
-					$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero : {$this->link->error}" );
+					$insert = $this->link->query( $sql );
+				/*<Logger>*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta el pago externo del cajero", $sql );
+					}
+					if( $this->link->error ){
+						if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+						}
+						die( "Error al insertar el pago externo del cajero : {$this->link->error}" );
+					}
+				/*</Logger>*/
 				}
 			//}
 		//actualiza la sesion de cabecera de devolucion
 			$sql = "UPDATE ec_devolucion SET id_cajero = {$id_cajero}, id_sesion_caja = {$id_sesion_caja} WHERE id_pedido = {$id_venta}";
-			$stm = $this->link->query( $sql ) or die( "Error al actualizar las cabeceras de devolucion : {$this->link->error}"  );
+			$stm = $this->link->query( $sql );
+		/*<Logger>*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Actualiza las cabeceras de devolucion", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+				$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_devolucion', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al actualizar las cabeceras de devolucion : {$this->link->error}"  );
+			}
+		/*</Logger>*/
 		//actualiza la referencia de la devolucion 
 			$sql = "UPDATE ec_pedidos_referencia_devolucion SET monto_venta_mas_ultima_devolucion = total_venta WHERE id_pedido = {$id_venta}";
-			//echo ( $sql );
-			$stm = $this->link->query( $sql ) or die( "Error al actualizar la referencia de devolucion : {$this->link->error}"  );
-
-
+			$stm = $this->link->query( $sql );
+		/*<Logger>*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Actualiza la referencia de devolucion", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+				$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos_referencia_devolucion', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al actualizar la referencia de devolucion : {$this->link->error}"  );
+			}
+		/*</Logger>*/
 			$this->link->autocommit(true);
 		}
 
@@ -1443,6 +1644,62 @@
 			if($r[0]!=1){
 				die('<script>alert("Es necesario abrir caja antes de cobrar!!!");location.href="../../../../code/especiales/tesoreria/abreCaja/abrirCaja.php?";</script>');
 			}
+		/*Implementacion Oscar 2024-06-24 para creacion / renovacion de Token */
+		//consulta si tiene token activo
+			$sql = "SELECT token FROM api_token WHERE id_user = {$user_id} AND expired_in > NOW()";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar si hay token activo para pantalla de cobros : {$this->link->error}" );
+		//obtiene el password del usuario
+			$sql = "SELECT 
+						id_usuario AS user_id, 
+						login, 
+						contrasena AS password,
+						( SELECT `value` FROM api_config WHERE `key` = 'api' ) AS api_path 
+					FROM sys_users WHERE id_usuario = '{$user_id}'";
+			$stm2 = $this->link->query( $sql ) or die( "Error al consultar password de usuario : {$this->link->error}" );
+			$user = $stm2->fetch_assoc();
+			if( $stm->num_rows <= 0 ){
+				//die(  "{$user['user_id']} / {$user['login']} / {$user['password']} / {$user['api_path']}" );
+			//consume servcio para obtener token
+				$post_data = json_encode( array( "user"=>"{$user['login']}", "password"=>"{$user['password']}" ) );
+				$result = json_decode( $this->sendPetition( "{$user['api_path']}/rest/netPay/token", $post_data ) );
+				
+				if( $result->status != "OK" && $result->status != "OK" ){
+					die("Error al generar el token para pantalla de cobros : {$result}");
+				}else{
+					//var_dump( $result->result->created_in );die('');
+				//inserta el token en la tabla api_token
+					$sql = "INSERT INTO api_token ( id_user, token, created_in, expired_in ) 
+						VALUES ( {$user_id}, '{$result->result->access_token}', 
+						'{$result->result->created_in}', '{$result->result->expired_in}' )";	//die( $sql );			
+					$stm3 = $this->link->query( $sql ) or die( "Error al insertar token en cliente : {$this->link->error}" );
+				}
+				return array( "status"=>200, "token"=>$result->result->access_token );
+			}else{
+				$row =$stm->fetch_assoc();
+			//validacion / renovacion de token
+				$post_data = null;
+				$result = json_decode( $this->sendPetition( "{$user['api_path']}/rest/netPay/valida_token", $post_data, $row['token'] ) );
+				return array( "status"=>200, "token"=>$row['token'] );
+			}
+		}
+
+		public function sendPetition( $url, $post_data, $token = '' ){
+			//die( $url );
+			$resp = "";
+			$crl = curl_init( $url );
+			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+			curl_setopt($crl, CURLOPT_POST, true);
+			curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+		    curl_setopt($crl, CURLOPT_TIMEOUT, 60000);
+			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+			  'Content-Type: application/json',
+			  'token: ' . "{$token}" )
+			);
+			$resp = curl_exec($crl);//envia peticion
+			curl_close($crl);
+			return $resp;
 		}
 
 		public function getBoxesMoney( $store_id ){	
@@ -1520,9 +1777,9 @@
 			die( $resp );
 		}
 
-		public function delete_payment_saved( $payment_id ){
-			$this->link->autocommit( false );
+		public function delete_payment_saved( $payment_id, $session_id ){
 			$sql = "SELECT 
+						cc.id_sesion_caja,
 						tp.nombre AS payment_type
 					FROM ec_cajero_cobros cc
 					LEFT JOIN ec_tipos_pago tp
@@ -1531,6 +1788,13 @@
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el nombre del tipo de cobro por anular : {$sql} : {$this->link->error}");
 			$row = $stm->fetch_assoc();
 			$payment_type = $row["payment_type"];
+
+		//validamos que la sesion de cajero sea la misma que la del pago
+			if( $row['id_sesion_caja'] != $session_id ){
+				die( "El cobro no puede ser cancelado porque la sesion de caja actual no corresponde a la sesion que lo cobro!" );// {$row['id_sesion_caja']} != {$session_id}
+			}
+			
+			$this->link->autocommit( false );//inicio de transaccion
 		//anula cobro
 			$sql = "UPDATE ec_cajero_cobros SET cobro_cancelado = 1 WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al anular el cobro del cajero : {$this->link->error}" );

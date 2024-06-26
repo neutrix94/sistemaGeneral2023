@@ -1,5 +1,5 @@
 <?php
-/*version casa 1.0*/
+/*version 2.0 2024-06-21*/
 	include('../../../../conectMin.php');
 	include('../../../../conexionMysqli.php');
 	include( '../ajax/Arqueo.php' );
@@ -334,9 +334,9 @@
 		for(var i=1;i<=cantidad_cheque;i++){
 				cheques+=$("#caja_"+i).html()+'~';//id de banco
 				cheques+=$("#monto_"+i).html()+'~';//monto
-				cheques+=$("#referencia_"+i).html()+'°';//monto
+				cheques+=$("#nombre_referencia_"+i).html()+'°';//monto
 		}
-		//alert(cheques);
+		alert(cheques);
 	//generamos el reporte
 		$.ajax({
 			type:'post',
