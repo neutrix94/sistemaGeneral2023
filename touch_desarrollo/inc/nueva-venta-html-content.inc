@@ -289,9 +289,187 @@ var packsCatalogue = new Array();
     }
   }
 
-  function solicitar_muestras( param ){
-    alert("MUESTRAAAS: "+ param);
+  function solicitarMuestras( ){
+
+    var baseUrl = window.location.origin;
+    var apiUrl = baseUrl + '/sistemaGeneral2023/rest/v1/surte/Muestra';
+
+    var productosSeleccionados = getProductosMuestras();
+
+    if( productosSeleccionados.length > 0 ){
+        $.ajax({
+          type: 'POST',
+          url: apiUrl,
+          headers: {
+            'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
+          },
+          data: {
+              "productos": productosSeleccionados,
+              "vendedor": "EL VENDEDOR",
+              "pedido": "123"
+          },
+          datatype: 'json',
+          success: function (data) {
+              //var obj = JSON.parse(data);
+              
+              console.log(data);
+              alert(JSON.stringify(data,null,true));
+          },
+          error:function(error){
+            console.log("ERROR".error);
+          }
+        });
+    }else{
+      alert("Favor de seleccionar al menos un producto para muestra");
+    }
   }
+  /**
+   * Función que recorre las filas de la tabla que tienen el checkbox seleccionado
+   */
+  function getProductosMuestras(){
+    
+    var seleccionados = [];
+    var filas = $('#listaProductos tr.move');
+    if( filas.length > 0 ){
+      // Mostrar las filas en la consola
+      filas.each(function(index, fila) {
+        var $row = $(this);
+        var isChecked = $row.find('input[type="checkbox"]').is(':checked');
+        if (isChecked) {
+          var ordenDeLista = $row.find('td:eq(1)').text().trim();
+          var cantidad = $row.find('td:eq(3)').text().trim();
+          seleccionados.push({
+            id: ordenDeLista,
+            cantidad: cantidad
+          });
+        }
+      });
+    }
+    return seleccionados;
+  }
+
+  function openDevolucionProductos(){
+    var filas = $('#listaProductos tr.move');
+    
+    if(filas.length > 0){
+      $('#modalDevolucion').show();
+      //Cada que el modal se muestre, el input se limpia
+      $('#inputDevolucion').val("");
+      $('#inputDevolucion').focus();
+    }else{
+      alert("No se tienen productos en el pedido para devolver.\nFavor de agregar al menos un producto");
+    }
+
+  }
+
+  function closeModal(){
+    $('#modalDevolucion').hide();
+  }
+
+  function detectaEnter( e ){
+    if( e.key ==='Enter' || e.keyCode === 13 ){
+        buscarProducto();
+    }
+  }
+
+  function buscarProducto(){
+
+    var valCodigo = $('#inputDevolucion').val();
+      if( valCodigo == "" ){
+        alert('Favor de ingresar un código de producto');
+      }else{
+        var filas = $('#listaProductos tr.move');   
+        
+        var idsProductos = [];
+        // Mostrar las filas en la consola
+        filas.each(function(index, fila) {
+            console.log('Fila ' + (index + 1) + ':');
+            // Obtener las celdas de la fila actual
+            var celdas = $(fila).find('td');
+            
+            // Mostrar el contenido de cada celda
+            celdas.each(function(indice, celda) {
+                console.log(' Columna ' + (indice + 1) + ': ' + $(celda).text());
+                if( indice == 1 ){ //El indice 1 contiene el número de Orden de lista (Código de Producto)
+                  idsProductos.push($(celda).text());
+                }
+            });
+        });
+
+        if( idsProductos.includes(valCodigo) ){
+          descontarCantidad(valCodigo);
+
+        }else{
+          alert("El código ingresado no existe en el pedido.\nFavor de revisar");
+          $('#inputDevolucion').val("");
+        }
+      }
+  }
+
+  function descontarCantidad(ordenDeLista) {
+    $('#listaProductos tr.move').each(function() {
+      var $row = $(this);
+      var rowOrdenDeLista = $row.find('td:eq(1)').text().trim();
+      if (rowOrdenDeLista === ordenDeLista) {
+        var $cantidadCell = $row.find('td:eq(3)');
+        var cantidad = parseInt($cantidadCell.text().trim());
+        if (cantidad > 0) {
+          var nuevaCantidad = cantidad - 1;
+          $cantidadCell.text(nuevaCantidad);
+          var precio = $row.find('td:eq(4)').text().trim();
+          var precioString = precio.replace(/[^0-9.-]+/g, "");
+          var precio = parseFloat(precioString);
+
+          var nuevoMonto = nuevaCantidad * precio;
+          //Se actualiza la columna 6 que corresponde al monto
+          $row.find('td:eq(6)').text("$" + nuevoMonto.toFixed(2));
+          
+          //Actualizar cantidad en sessionStorage
+          updateCantidadMontoSessionStorage( ordenDeLista, nuevaCantidad, nuevoMonto );
+          //Actualizar el total del pedido
+          calculaTotalVenta();
+
+          closeModal();
+        }
+      }
+    });
+  }
+
+  function updateCantidadMontoSessionStorage( idProducto,nuevaCantidad, nuevoMonto ){
+
+    if( sessionStorage.getItem('SALE_PRODUCTS_LIST') != null && sessionStorage.getItem('SALE_PRODUCTS_LIST') != '' ){
+
+      var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        //var products_array = localStorage.getItem('SALE_PRODUCTS_LIST');
+      products_array = JSON.parse( products_array );
+
+      var indexSessionStorage = getIndexSessionStorage( products_array, idProducto );
+
+      if( indexSessionStorage != null ){
+        //Se actualiza la cantidad que se encuentra en la posición 3
+        products_array[indexSessionStorage][3] = nuevaCantidad;
+        //Se actualiza el monto que se encuentra en la posicion 6
+        products_array[indexSessionStorage][6] = "$"+nuevoMonto;
+
+        sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+      }
+    }
+
+  }
+
+  function getIndexSessionStorage( productsArray, idProducto ){
+    var index = null;
+    for (let i = 0; i < productsArray.length; i++) {
+      // El id de Producto o Número de lista se encuenta en la posición 1, es por eso que se valida  productsArray[i][1]
+      if( productsArray[i][1] == idProducto ){
+        index = i
+        //Instrucción para romper el ciclo y salir de el
+        i = productsArray.length;
+      } 
+    }
+    return index;
+  }
+
 
 </script>
 <!-- -->
@@ -440,6 +618,65 @@ var packsCatalogue = new Array();
   .input-group span {
     margin-right: 10px; /* Espacio entre el span y el input */
   }
+
+  .modal {
+    display: none; /* Oculto por default */
+    position: fixed; 
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4);
+}
+
+/* Modal content */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 40%; 
+    position: relative; 
+    text-align: center;
+}
+
+.close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-input {
+  /* width: 50%; */
+  padding: 10px;
+  margin: 20px 0;
+}
+
+.confirm-btn {
+    padding: 10px 20px;
+    background-color: #0679c8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirm-btn:hover {
+    background-color: #055993;
+}
 </style>
 <?php
  // extract($_GET);
@@ -474,6 +711,16 @@ var packsCatalogue = new Array();
   <p id="cont_emerg" style="color:white;font-size:30px;" align="center">
     
   </p>
+</div>
+
+<!-- Ventana emergente para devolución de productos -->
+<div id="modalDevolucion" class="modal">
+  <div class="modal-content">
+    <span class="close closeModalEscanear" onclick="closeModal()">&times;</span>
+    <h3><b>Escanear código de producto</b></h3>
+    <input id="inputDevolucion" type="text" placeholder="Ingresa código de producto" class="modal-input" onkeyup="detectaEnter(event)">
+    <button class="confirm-btn" onclick="buscarProducto()">Confirmar</button>
+  </div>
 </div>
 
 <input type="hidden" id="tipo_venta" value="<?php echo $tv;?>">
@@ -628,7 +875,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
       <div class="col-12 text-center">
         <button 
         type="button"
-        onclick="solicitar_muestras('muestras');"
+        onclick="solicitarMuestras();"
         class="btn buttonMuestras"
       >
         <b>Solicitar muestras</b>
@@ -821,7 +1068,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
             <div class="col-2 text-center">
               <button 
                 type="button"
-                onclick="solicitar_muestras('muestras');"
+                onclick="openDevolucionProductos();"
                 class="btn btn-warning"
               >
                 <b>Productos para devolver</b>
