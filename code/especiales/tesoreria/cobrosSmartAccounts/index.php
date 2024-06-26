@@ -2,6 +2,13 @@
 /*version 1.1 2024-06-21*/
 	include('../../../../conectMin.php');
 	include('../../../../conexionMysqli.php');
+	//consultamos si esta habiliado el logger
+	$Logger = null;
+	$sql = "SELECT log_habilitado AS log_enabled FROM sys_configuraciones_logs WHERE id_configuracion_log = '2'";
+	$stm = $link->query( $sql ) or die( "Error al consultar si el log de cobros esta habilitado : {$sql} : {$link->error}" );
+	$log_enabled = $stm->fetch_assoc();
+	echo "<input type=\"hidden\" id=\"log_status\" value=\"{$log_enabled['log_enabled']}\">";
+
 //verifica si esta habilitada la funcion de SmartAccounts
 	$sql = "SELECT 
 				habilitar_smartaccounts_netpay AS is_smart_accounts

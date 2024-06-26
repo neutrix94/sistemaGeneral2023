@@ -152,7 +152,7 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
         return json_encode( array( "status"=>400, "message"=>"Error al actualizar datos de la transaccion : {$link->error}" ) );
     }
 //inserta pago
-    require_once( './utils/inserta_pago_con_tarjeta.php' );
+    require_once( '/utils/inserta_pago_con_tarjeta.php' );
     $link->autocommit( true );
 	return json_encode( array( "status"=>200, "message"=>"Registro actualizado exitosamente." ) );
 });
