@@ -20,7 +20,6 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
     $file = fopen("archivo_local.txt", "w");
     fwrite($file,"{$body}");
     fclose($file);
-    
     $token =  (empty($request->getHeader('Token'))) ? '' : implode(" ",$request->getHeader('Token'));
     //$token = $Encrypt->decryptText($token, 'CDLL2024');//desencripta token
     if (empty($token) || strlen($token)<36 ) {
@@ -94,6 +93,7 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
     if( $traceability['folio_unico_transaccion'] != null && $traceability['folio_unico_transaccion'] != '' ){
       $transaction_unique_folio = $traceability['folio_unico_transaccion'];
     }
+
     //traceability
    // $traceability['']
   
@@ -152,7 +152,7 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
         return json_encode( array( "status"=>400, "message"=>"Error al actualizar datos de la transaccion : {$link->error}" ) );
     }
 //inserta pago
-    require_once( '/utils/inserta_pago_con_tarjeta.php' );
+    require_once( './utils/inserta_pago_con_tarjeta.php' );
     $link->autocommit( true );
 	return json_encode( array( "status"=>200, "message"=>"Registro actualizado exitosamente." ) );
 });
