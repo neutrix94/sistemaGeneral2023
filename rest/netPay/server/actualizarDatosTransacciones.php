@@ -39,6 +39,9 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
     if( !include( '../../conexionMysqli.php' ) ){
         die( "No se pudo incluir el archivo de conexion!" );
     }
+    if( !include( '../../code/especiales/tesoreria/cobrosSmartAccounts/ajax/db.php' ) ){
+        die( "No se pudo incluir libreria de Pagos!" );
+    }
 //recibe los parametros de netPay
     $affiliation = $request->getParam( "affiliation" );//1
     $applicationLabel = $request->getParam( "applicationLabel" );//2
@@ -93,7 +96,6 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
     if( $traceability['folio_unico_transaccion'] != null && $traceability['folio_unico_transaccion'] != '' ){
       $transaction_unique_folio = $traceability['folio_unico_transaccion'];
     }
-
     //traceability
    // $traceability['']
   
@@ -153,6 +155,7 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
     }
 //inserta pago
     require_once( './utils/inserta_pago_con_tarjeta.php' );
+    //die('here6');
     $link->autocommit( true );
 	return json_encode( array( "status"=>200, "message"=>"Registro actualizado exitosamente." ) );
 });
