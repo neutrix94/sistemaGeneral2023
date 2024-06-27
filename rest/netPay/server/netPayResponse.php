@@ -109,6 +109,9 @@ $app->post('/', function (Request $request, Response $response){
   if( $Logger != null ){
     $log = $Logger->insertLoggerRow( $traceability['folio_unico_transaccion'], $traceability['id_cajero'], 'vf_transacciones_netpay', -1, $traceability['id_sucursal'] );
     $log_id = $log['id_log'];
+    if( $log_id != null ){
+      $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Respuesta ( JSON ) que llega a NetPay : ", $body );
+    }
   }
   //traceability
  // $traceability['']
