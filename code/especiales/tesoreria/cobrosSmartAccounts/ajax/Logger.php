@@ -25,7 +25,8 @@
             $sql = "SELECT MAX( id_cobro_paso ) AS last_id FROM LOG_cobros_pasos";
             $stm = $this->link->query( $sql ) or die( "Error en recuperar ultimo id insertado en log de pago paso : {$sql} : {$this->link->error}" );
             $row = $stm->fetch_assoc();
-            return array( "status"=>"ok", "id_cobro_paso"=>$row['last_id'] );
+            return $row['last_id'];
+            //return array( "status"=>"ok", "id_cobro_paso"=>$row['last_id'] );
         }
 
         public function insertErrorSteepRow( $step_log_id, $table_name, $row_unique_folio, $sql_query, $sql_error ){

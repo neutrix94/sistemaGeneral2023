@@ -85,7 +85,7 @@
         <tbody>";
         echo "<tr>
             <td>{$content['id_log_cobro']}</td>
-            <td>{$content['folio_unico_sincronizacion']}</td>
+            <td>{$content['folio_unico_cobro']}</td>
             <td>{$content['tabla']}</td>
             <td>{$content['fecha_alta']}</td>
             <td>{$content['id_origen']}</td>

@@ -167,6 +167,7 @@
 		}
 
 		public function insertNetPetitionRow( $user_id, $store_id, $terminal_id, $store_id_netpay, $log_id = null ){
+			$steep_log_id = 0;
 		//consulta token
 			$sql = "SELECT token FROM api_token WHERE id_user = {$user_id} and expired_in > now() limit 1";//-1
 			$stm = $this->link->query($sql);
@@ -245,6 +246,8 @@
 			$stm = $this->link->query( $sql );
 		/*Logger*/
 			if( $log_id != null ){
+				$sql = "UPDATE LOG_cobros SET folio_unico_cobro = '{$folio_transaccion}' WHERE id_log_cobro = {$log_id}";
+				$stm_log = $this->link->query( $sql ) or die( "Error al actualizar el folio unico del log de cobros : {$sql} : {$this->link->error}" );
 				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta el id de transaccion netPay en servidor origen", $sql );
 			}
 			if( $this->link->error ){
@@ -353,12 +356,13 @@ fclose($file);
 
 			$result = json_decode( $response );//json_encode(),
 			$result->folio_unico_transaccion = $folio_unico_transaccion; 
-			//var_dump($response);die('');
+			//var_dump($result);die('');
 			if( isset( $result->error ) ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', 'N/A', "{$post_data}", "Error al consumir API de NETPAY : {$apiUrl} : {$response}" );
+				}
+				//var_dump($result->error);die('here');
 				if( $result->error == 'invalid_token' ){//token expirado
-					if( $log_id != null ){
-						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', 'N/A', "{$post_data}", "Error al consumir API de NETPAY : {$apiUrl} : {$result}" );
-					}
 					$sql = "DELETE FROM vf_tokens_terminales_netpay";
 					$stm = $this->link->query( $sql );//
 				/*Logger*/
