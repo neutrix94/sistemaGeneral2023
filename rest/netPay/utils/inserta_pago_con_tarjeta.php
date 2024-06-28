@@ -178,7 +178,10 @@
             die( "Error al insertar el cobro del cajero : {$link->error}" );
           }
         /*</Logger>*/
-          $paymet_id = $link->insert_id;
+          $sql = "SELECT MAX( id_cajero_cobro ) AS last_id FROM ec_cajero_cobros LIMIT 1";
+          $last_id_stm = $link->query( $sql );
+          $last_id_row = $last_id_stm->fetch_assoc();
+          $payment_id = $last_id_row['last_id'];//$link->insert_id;
       //actualiza el id de sesion de caja del pedido 
           $sql = "UPDATE ec_pedidos SET id_cajero = {$traceability['id_cajero']}, id_sesion_caja = {$traceability['id_sesion_cajero']} WHERE id_pedido = {$row['sale_id']}";
           $stm_pedido = $link->query( $sql );
@@ -195,7 +198,7 @@
       //actualiza el cajero de los cobros
       //actualiza el id de cajero cobro en la transaccion
             $sql = "UPDATE vf_transacciones_netpay 
-                      SET id_cajero_cobro = '{$paymet_id}'
+                      SET id_cajero_cobro = '{$payment_id}'
                     WHERE id_transaccion_netpay = '{$folioNumber}'";
             $stm = $link->query( $sql );
           /*<Logger>*/
@@ -229,7 +232,7 @@
         //actualiza en el pago el id de cajero que cobro el pago Oscar 2023-01-10*/
           //if( $row['sale_id'] != null && $row['sale_id'] != '' ){
             $sql="UPDATE ec_pedido_pagos 
-                    SET id_cajero_cobro = '{$paymet_id}' 
+                    SET id_cajero_cobro = '{$payment_id}' 
                     WHERE id_pedido_pago IN( {$internal_payment_id}, {$external_payment_id} )";
             $stm = $link->query( $sql );
           /*<Logger>*/
