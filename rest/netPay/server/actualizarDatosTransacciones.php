@@ -169,7 +169,8 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
               /*43*/id_cajero = '{$traceability['id_cajero']}', 
               /*44*/folio_venta = '{$traceability['folio_venta']}',
               /*44*/id_sesion_cajero = '{$traceability['id_sesion_cajero']}',
-              /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
+              /*45*/store_id_netpay = '{$traceability['store_id_netpay']}',
+              /*46*/notificacion_vista = '1'
             WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
     $stm = $link->query( $sql );//die( $sql );
     

@@ -36,11 +36,9 @@
             ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Métodos HTTP permitidos
     });
 
-    //cliente
-    //require 'client/domain_test.php';
-
     //webhook de netPay
     require 'server/netPayResponse.php';
+    
     //endpoints de websockets
     require 'server/verificaTokenValido.php';//verifica validez de Token
     require 'server/insertarTransaccionNetpay.php';//insertar solicitudes de peticiones netPay
@@ -50,7 +48,7 @@
     require 'server/recuperarRespuestaPorFolioUnico.php';//obtener respuesta por folio unico
     require 'server/tokenEncriptado.php';//obtener respuesta por folio unico
 
-    //require 'server/test_eugenio.php';//obtener respuesta por folio unico
-    //require 'server/test.php';
+    //endpoints desde ventas
+    require 'server/consultarTransaccionesPorFolio.php';
 
     $app->run();
