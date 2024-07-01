@@ -985,6 +985,14 @@ var cont_cheques_transferencia=0;
 		return false;
 	}
 
+	function show_pending_payment_responses(){
+		var url = 'ajax/db.php?fl=show_pending_payment_responses';
+		var req = ajaxR( url );
+		$( '.emergent_content' ).html( req );
+		$( '.emergent' ).css( 'display', 'block' );
+
+	}
+
 
 //lamadas asincronas
 	function ajaxR( url ){
