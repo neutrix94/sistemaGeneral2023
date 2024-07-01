@@ -299,6 +299,9 @@
 				$token = $this->requireToken( $terminal['terminal_serie'], 'password', 'smartPos', 'netpay' );
 			}
 			$folio_unico_transaccion = $this->insertNetPetitionRow( $user_id, $store_id, $terminal['terminal_serie'], $terminal['store_id'], $sale_folio, $log_id );
+		//actulizamos el monto en relacion al folio unico
+			$sql = "UPDATE vf_transacciones_netpay SET amount = '{$amount}' WHERE folio_unico = '{$folio_unico_transaccion}'";
+			$stm = $this->link->query( $sql ) or die("Error al actualizar el monto de la transaccion en local : {$sql} : {$this->link->error}" );
 		//arreglo de prueba
 			$data = array( 
 						"traceability"=>array(  
@@ -375,7 +378,7 @@ fclose($file);
 						}
 						die( "Error al eliminar token caducado ( NETPAY ) : {$sql} {$this->link->error}" );
 					}
-					return $this->salePetition( $apiUrl, $amount = 0.01, $terminal['terminal_serie'], $user_id, 
+					return $this->salePetition( $apiUrl, $amount, $terminal['terminal_serie'], $user_id, 
 										$store_id, $sale_folio, $session_id, $id_devolucion_relacionada, $log_id );
 					return false;
 				}
