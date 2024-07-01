@@ -6,7 +6,8 @@
 		$clave=$_POST['valor'];
 		$sql="SELECT 
 				id_pedido,
-				folio_nv,pagado 
+				folio_nv,
+				pagado 
 			FROM ec_pedidos 
 			WHERE folio_nv = '{$clave}' 
 			AND id_sucursal=$user_sucursal";
@@ -20,7 +21,7 @@
 	//listamos resultados
 		while($r=mysql_fetch_row($eje)){
 			$c++;//incrementamos contador
-			echo '<tr id="opc_'.$c.'" tabindex="'.$c.'" onclick="carga_pedido('.$r[0].','.$r[2].');" onkeyup="valida_tca_opc(event,'.$c.');" onfocus="marca('.$c.');" onblur="desmarca('.$c.');">';
+			echo '<tr id="opc_'.$c.'" tabindex="'.$c.'" onclick="carga_pedido('.$r[0].','.$r[2].',\'' . $r[1] . '\');" onkeyup="valida_tca_opc(event,'.$c.');" onfocus="marca('.$c.');" onblur="desmarca('.$c.');">';
 				echo '<td class="opc_buscador">'.$r[1].'</td>';
 			echo '<tr>';
 		}
@@ -47,6 +48,25 @@
 	}
 	
 	if($fl=='carga_datos'){
+/*verifica si tiene transacciones pendientes
+		$sql = "SELECT folio_unico AS unique_folio FROM vf_transacciones_netpay WHERE folio_venta = '{$POST['folio']}' AND notificacion_vista = 0";
+		$stm = mysql_query( $sql ) or die( "Error al consultar las transacciones pendientes : ". mysql_error());
+		if( mysql_num_rows( $stm ) > 0){
+			$pending_transactions = array();
+			while ( $row = mysql_fetch_assoc( $stm ) ){
+				$pending_transactions[] = $row;
+			}
+
+			$sql = "SELECT value AS api_path FROM api_config WHERE name = 'path'";
+			$stm = mysql_query( $sql ) or die( "Error al consultar las transacciones pendientes : ". mysql_error());
+			$row = mysql_fetch_assoc( $stm );
+			$url = "{$row["api_path"]}/rest/netPay/consultar_transacciones_por_folio";
+			$post_data = array("transactions"=> $pending_transactions );
+		//consumir el API ( CURL )
+			
+			$result = sendPetition( $url, $post_data, $token = '' );
+			
+		}
 $CONSULTAS_SQL = array();
 		$clave=$_POST['valor'];
 		$monto_saldo_a_favor = 0;
@@ -54,7 +74,6 @@ $CONSULTAS_SQL = array();
 		$id_venta_origen = 0;
 	//consulta si tiene saldo a favor
 		$sql = "SELECT
-				/*SUM( monto_devolucion_interna + monto_devolucion_externa )*/
 				SUM(saldo_a_favor) AS monto_saldo_a_favor,
 				id_pedido_original AS id_venta_origen
 			FROM ec_pedidos_relacion_devolucion
@@ -65,9 +84,7 @@ $CONSULTA_SALDO_FAVOR = $sql;
 		$stm_1 = mysql_query( $sql ) or die( "Error al consultar relacion de pedidos y devolucion : " . mysql_error() );
 		if( mysql_num_rows( $stm_1 ) > 0 ){
 			$tmp = mysql_fetch_assoc( $stm_1 );
-			$monto_saldo_a_favor = $tmp['monto_saldo_a_favor'];//( $tmp['monto_saldo_a_favor'] == null || $tmp['monto_saldo_a_favor'] == '' ? 0 : $tmp['monto_saldo_a_favor'] == null );
-			//var_dump( $tmp );
-		//	die(  'Here'.$monto_saldo_a_favor );
+			$monto_saldo_a_favor = $tmp['monto_saldo_a_favor'];
 		}
 $CONSULTAS_SQL[] = array( "CONSULTA_SALDO_FAVOR"=>$CONSULTA_SALDO_FAVOR, "resultado"=>$tmp );
 	//consulta si tiene pedido relacionado
@@ -81,11 +98,9 @@ $CONSULTAS_SQL[] = array( "CONSULTA_VENTA_RELACIONADA"=>$CONSULTA_VENTA_RELACION
 		if( mysql_num_rows( $stm_1 ) > 0 ){
 			$tmp = mysql_fetch_assoc( $stm_1 );
 			$id_venta_origen = $tmp['id_venta_origen'];
-		//var_dump( $tmp );
 		}
 	//consulta si tiene saldo tomado
 		$sql = "SELECT
-				/*SUM( monto_devolucion_interna + monto_devolucion_externa )*/
 				SUM(saldo_a_favor) AS monto_saldo_tomado,
 				id_pedido_original AS id_venta_origen
 			FROM ec_pedidos_relacion_devolucion
@@ -96,27 +111,20 @@ $CONSULTAS_SQL[] = array( "CONSULTA_SALDO_TOMADO"=>$CONSULTA_SALDO_TOMADO );
 		$stm_1 = mysql_query( $sql ) or die( "Error al consultar relacion de pedidos y devolucion : " . mysql_error() );
 		if( mysql_num_rows( $stm_1 ) > 0 ){
 			$tmp = mysql_fetch_assoc( $stm_1 );
-			$monto_saldo_tomado = $tmp['monto_saldo_tomado'];//( $tmp['monto_saldo_a_favor'] == null || $tmp['monto_saldo_a_favor'] == '' ? 0 : $tmp['monto_saldo_a_favor'] == null );
-			//var_dump( $tmp );
+			$monto_saldo_tomado = $tmp['monto_saldo_tomado'];
 		}
 
 	//checamos los pagos pendientes de cobrar
 		$sql="SELECT
-				p.id_pedido AS id_venta,/*0*/
-				p.folio_nv AS folio_venta,/*1*/
-				IF( p.pagado = 0 AND pp.id_pedido_pago IS NULL, p.monto_pago_inicial, p.total ) AS pagos_pendientes,/*OR pp.id_cajero != 0*/
-				REPLACE( p.id_devoluciones, '~', ',' ) AS devoluciones_relacionadas,/*3*/
-				/*( SELECT
-					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) )
-					FROM ec_cajero_cobros cc
-					WHERE cc.id_pedido = p.id_pedido 
-				)*/ 
-				SUM( IF( pp.id_pedido_pago IS NULL , 0, pp.monto ) ) AS pagos_registrados/*Oscar 2023/10/10 or pp.referencia != ''*//*4*/,
-				p.total AS total_nota/*5*/
+				p.id_pedido AS id_venta,
+				p.folio_nv AS folio_venta,
+				IF( p.pagado = 0 AND pp.id_pedido_pago IS NULL, p.monto_pago_inicial, p.total ) AS pagos_pendientes,
+				REPLACE( p.id_devoluciones, '~', ',' ) AS devoluciones_relacionadas,
+				SUM( IF( pp.id_pedido_pago IS NULL , 0, pp.monto ) ) AS pagos_registrados,
+				p.total AS total_nota
 			FROM ec_pedidos p
 			LEFT JOIN ec_pedido_pagos pp 
 			ON p.id_pedido = pp.id_pedido
-		/*Oscar 2023/10/10*/
 			WHERE p.id_pedido = {$clave}
 			GROUP BY p.id_pedido";
 $CONSULTA_PAGOS_PENDIENTES_DE_COBRAR = $sql;
@@ -151,7 +159,7 @@ $CONSULTAS_SQL[] = array( "CONSULTA_REFERENCIA_DEVOLUCION"=>$CONSULTA_REFERENCIA
 				$tiene_devolucion = 1;
 			}
 		}
-	/*verifica si tiene una devolucion relacionada y el status de esta*/
+	//verifica si tiene una devolucion relacionada y el status de esta
 		$sql="SELECT 
 					IF( d.id_devolucion IS NULL, 0, d.id_devolucion ) As id_devolucion,
 					ROUND( SUM( IF( d.id_devolucion IS NULL, 0, d.monto_devolucion ) ), 2 ) AS monto_devolucion,
@@ -163,7 +171,7 @@ $CONSULTAS_SQL[] = array( "CONSULTA_REFERENCIA_DEVOLUCION"=>$CONSULTA_REFERENCIA
 				WHERE d.id_pedido = {$r['id_venta']} 
 					AND d.id_cajero = 0
 					AND d.id_sesion_caja = 0
-				GROUP BY d.id_devolucion";//die($sql);
+				GROUP BY d.id_devolucion";
 $CONSULTA_VERIFICA_STATUS_DEVOLUCION = $sql;
 $CONSULTAS_SQL[] = array( "CONSULTA_VERIFICA_STATUS_DEVOLUCION"=>$CONSULTA_VERIFICA_STATUS_DEVOLUCION );
 		$eje = mysql_query($sql)or die("Error al consultar las devoluciones relacionadas a esta nota!!!\n".mysql_error().$sql);
@@ -173,7 +181,6 @@ $CONSULTAS_SQL[] = array( "CONSULTA_VERIFICA_STATUS_DEVOLUCION"=>$CONSULTA_VERIF
 				die( "No se puede hacer un cobro sobre una nota con devolucion pendiente, finaliza la devolucion y vuelve a intentar! {$rd[1]}" );
 			}
 		}
-		//if( $r['pagos_pendientes'] <= $r['pagos_registrados'] ){
 //verifica si hay una devolucion ligada al pedido sin cajero
 			$sql = "SELECT 
 						d.id_devolucion AS id_devolucion,
@@ -190,7 +197,6 @@ $CONSULTAS_SQL[] = array( "CONSULTA_VERIFICA_STATUS_DEVOLUCION"=>$CONSULTA_VERIF
 					GROUP BY d.id_pedido";
 $CONSULTA_DEVOLUCION_SIN_CAJERO = $sql;
 $CONSULTAS_SQL[] = array( "CONSULTA_DEVOLUCION_SIN_CAJERO"=>$CONSULTA_DEVOLUCION_SIN_CAJERO );
-//die( $sql );
 			$return_stm = mysql_query( $sql ) or die( "Error al consultar si hay una devolucion pendiente : " . mysql_error() );
 			if( mysql_num_rows( $return_stm ) > 0 ){
 				$return_row = mysql_fetch_assoc( $return_stm );
@@ -199,11 +205,6 @@ $CONSULTAS_SQL[] = array( "CONSULTA_DEVOLUCION_SIN_CAJERO"=>$CONSULTA_DEVOLUCION
 					$pending_ammount = $return_row['monto_devolucion'] - $return_row['monto_pagos_devolucion'];
 				}
 			}
-//die( $sql );
-			//die( "was_payed|Esta nota ya fue pagada exitosamente!" );
-		//}
-
-
 //verifica si hay una devolucion ligada al pedido sin cajero
 		$sql = "SELECT 
 					SUM( dp.monto ) AS monto_pagos_devolucion
@@ -218,17 +219,12 @@ $CONSULTA_DEVOLUCION_RELACIONADA = $sql;
 		if( mysql_num_rows( $return_stm ) > 0 ){
 			$return_row_2 = mysql_fetch_assoc( $return_stm );
 			$return_row['monto_pagos_devolucion'] = $return_row_2['monto_pagos_devolucion'];
-			/*if( $return_row['observaciones'] == 'Dinero regresado al cliente' 
-				&& $return_row['monto_devolucion'] > $return_row['monto_pagos_devolucion'] ){
-				$pending_ammount = $return_row['monto_devolucion'] - $return_row['monto_pagos_devolucion'];
-			}*/
 		}
 $CONSULTAS_SQL[] = array( "CONSULTA_DEVOLUCION_RELACIONADA"=>$CONSULTA_DEVOLUCION_RELACIONADA, "resultado"=>$return_row_2 );
 
 		$return_row['monto_devolucion'] = ( $return_row['monto_devolucion'] == '' || $return_row['monto_devolucion'] == null ? 0 : $return_row['monto_devolucion'] );
 		$return_row['monto_pagos_devolucion'] = ( $return_row['monto_pagos_devolucion'] == '' || $return_row['monto_pagos_devolucion'] == null ? 0 : $return_row['monto_pagos_devolucion'] );
 		$r['pagos_pendientes'] = $r['total_nota'] - ( $r['pagos_registrados'] - $return_row['monto_pagos_devolucion'] - $monto_saldo_tomado ) - $return_row['monto_devolucion'] - $monto_saldo_a_favor;
-		//die( 'here' );
 		if($rd[0]==''){
 			$rd[0]=0;
 		}
@@ -254,7 +250,7 @@ $CONSULTAS_SQL[] = array( "CONSULTA_DEVOLUCION_RELACIONADA"=>$CONSULTA_DEVOLUCIO
 					'CONSULTAS'=>$CONSULTAS_SQL
 				)
 			);
-		die( "ok|{$resp}" );
+		die( "ok|{$resp}" );*/
 	}
 	
 	if($fl=='cobrar'){
@@ -289,5 +285,24 @@ $CONSULTAS_SQL[] = array( "CONSULTA_DEVOLUCION_RELACIONADA"=>$CONSULTA_DEVOLUCIO
 		$stm_update = mysql_query( $sql ) or die( "Error al actualizar el campo total_venta_mas_ultima_devolucion : " . mysql_error() );
 		mysql_query("COMMIT");//autorizamos la transacción
 	die('ok|');
+	}
+
+	function sendPetition( $url, $post_data, $token = '' ){
+		//die( $url );
+		$resp = "";
+		$crl = curl_init( $url );
+		curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+		curl_setopt($crl, CURLOPT_POST, true);
+		curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+		//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+		curl_setopt($crl, CURLOPT_TIMEOUT, 60000);
+		curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+		  'Content-Type: application/json',
+		  'token: ' . "{$token}" )
+		);
+		$resp = curl_exec($crl);//envia peticion
+		curl_close($crl);
+		return $resp;
 	}
 ?>
