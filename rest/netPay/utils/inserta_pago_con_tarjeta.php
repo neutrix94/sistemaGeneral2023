@@ -2,7 +2,7 @@
     if( trim($message_) == 'Transaccion exitosa' && $transType == 'A' ){
         //consulta los datos en relacion al numero de serie de la terminal
           $sql = "";
-          if( isset( $traceability['smart_accounts'] ) && $traceability['smart_accounts'] == true ){
+         // if( isset( $traceability['smart_accounts'] ) && $traceability['smart_accounts'] == true ){
             
             $sql = "SELECT
                     t.id_terminal_integracion AS affiliation_id,
@@ -18,7 +18,7 @@
                   WHERE t.numero_serie_terminal = '{$terminalId}'
                   AND t.store_id = '{$traceability['store_id_netpay']}'";
       
-          }else{
+         /* }else{
           //  die( "here 1" );
             $sql = "SELECT 
                       a.id_afiliacion AS affiliation_id,
@@ -32,7 +32,7 @@
                     LEFT JOIN ec_caja_o_cuenta cc
                     ON a.id_banco = cc.id_caja_cuenta
                     WHERE a.numero_serie_terminal = '{$terminalId}'";
-          }
+          }*/
         //  die( $sql );
           $stm = $link->query( $sql ); 
         /*Logger*/
