@@ -50,6 +50,8 @@ $app->post('/consultar_transacciones_por_folio', function (Request $request, Res
     $sql = "SELECT * FROM vf_transacciones_netpay WHERE folio_unico IN( {$uniques_folios} )";
     $stm = $link->query( $sql ) or die( "Error al consultar respuesta de la transaccion : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
+        $row['traceability'] = array( "folio_unico_transaccion"=>$row['folio_unico'], "id_sucursal"=>$row['id_sucursal'], "id_cajero"=>$row['id_cajero'], 
+            "folio_venta"=>$row['folio_venta'], "id_sesion_cajero"=>$row['id_sesion_cajero'], "store_id_netpay"=>$row['store_id_netpay'] );
         $transacciones[] = $row;
     }  
     return json_encode( array( "status"=>200, "transacciones"=>$transacciones) );
