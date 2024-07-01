@@ -383,6 +383,10 @@
 				$error = ( isset( $_GET['error'] ) ? $_GET['error'] : $_POST['error'] );
 				echo $Payments->agregarTerminalSesion( $session_id, $user_id, $id_terminal );
 			break;
+
+			case 'show_pending_payment_responses' :
+				echo $Payments->show_pending_payment_responses( $sucursal_id );
+			break;
 			
 			default :
 				die( "Access denied on '{$action}'" );
@@ -403,6 +407,39 @@
 			$this->store_id = $store_id;
 			$this->Logger = $Logger;
 			
+		}
+
+		public function show_pending_payment_responses( $store_id ){
+			$resp = "<table class=\"table table-striped table-bordered\">
+				<thead>
+					<tr>
+						<th class=\"text-center\">Folio Venta</th>
+						<th class=\"text-center\">Monto Cobro</th>
+					</tr>
+				<thead>
+				<tbody>";
+			$sql = "SELECT
+						vtn.folio_venta AS sale_folio,
+						IF( vtn.amount = 0 OR vtn.amount = '', '0.0', vtn.amount ) AS amount,
+						vtn.fecha_alta AS date_time
+					FROM vf_transacciones_netpay vtn
+					WHERE vtn.notificacion_vista = 0
+					AND vtn.id_sucursal = {$store_id}
+					ORDER BY vtn.folio_venta desc";
+			$stm = $this->link->query( $sql ) or die( "Error al recuperar las transacciones pendientes de llegar : {$sql} : {$this->link->error}" );
+			
+			while( $row = $stm->fetch_assoc() ){
+				$resp .= "<tr><td class=\"text-start\">{$row['sale_folio']}</td>";
+				$resp .= "<td class=\"text-center\"> $ {$row['amount']}</td>";
+				$resp .= "<td class=\"text-end\">{$row['date_time']}</td></tr>";
+			}
+			$resp .= "</tbody>
+				</table>
+			<br><br>
+			<button type=\"button\" class=\"btn btn-warning\" onclick=\"close_emergent();\">
+				<i>Aceptar y cerrar</i>
+			</button>";
+			return $resp;
 		}
 
 		public function getWebSocketURL(){
