@@ -35,6 +35,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   if( $validation != 'ok' ){
     return $validation;
   }*/
+  $body = $request->getBody();
 
   $resp = array();
   $resp["ok_rows"] = '';
@@ -51,6 +52,22 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
  /* var_dump( $movements );
   return '';*/
 //
+  $sql = "SELECT
+            log_habilitado AS log_is_enabled
+          FROM sys_configuraciones_logs  
+          WHERE id_configuracion_log = 1";
+  $stm = $link->query( $sql ) or die( "Error al consultar si el log esta habilitado : {$sql} : {$this->link->error}" );
+  $row = $stm->fetch_assoc();
+  $LOGGER = ( $row['log_is_enabled'] == 1 ? true : false );
+  //return $row['log_is_enabled'];
+  if( $LOGGER ){
+    $Logger = new Logger( $link );//instancia clase de Logs
+  //inserta la peticion 
+    if( $LOGGER ){
+      $LOGGER = $Logger->insertLoggerRow( "{$log['unique_folio']}", 'sys_sincronizacion_movimientos_almacen', $log['system_store'], -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
+      $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Llega peticion de local a Linea : ', "{$body}" );
+    }
+  }
 /*COMPROBACION 2024*/
   $petition_log = $VERIFICATION["petition"];//recibe folio unico de la peticion
   //var_dump( $petition_log );
