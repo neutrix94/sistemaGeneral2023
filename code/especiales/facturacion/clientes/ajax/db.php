@@ -121,7 +121,7 @@
 			//die( "nombre : " . $name );
 
 			$data = array( "rfc"=>$rfc, "nombre"=>$name, "usoCFDI"=>"G03", "domicilioFiscal"=>$postal_code, 
-				"regimenFiscal"=>$fiscal_regime ); 
+				"regimenFiscal"=>$fiscal_regime );//var_dump( $data );die('');
 			$sql = "select token from api_token where id_user=0 and expired_in > now() limit 1;";
 			$stm = $this->link->query($sql) or die( "Error al consultar el token : {$this->link->error}" );
 			$respuesta = $stm->fetch_assoc();

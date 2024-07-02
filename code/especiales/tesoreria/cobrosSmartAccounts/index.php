@@ -2,6 +2,13 @@
 /*version 1.1 2024-06-21*/
 	include('../../../../conectMin.php');
 	include('../../../../conexionMysqli.php');
+	//consultamos si esta habiliado el logger
+	$Logger = null;
+	$sql = "SELECT log_habilitado AS log_enabled FROM sys_configuraciones_logs WHERE id_configuracion_log = '2'";
+	$stm = $link->query( $sql ) or die( "Error al consultar si el log de cobros esta habilitado : {$sql} : {$link->error}" );
+	$log_enabled = $stm->fetch_assoc();
+	echo "<input type=\"hidden\" id=\"log_status\" value=\"{$log_enabled['log_enabled']}\">";
+
 //verifica si esta habilitada la funcion de SmartAccounts
 	$sql = "SELECT 
 				habilitar_smartaccounts_netpay AS is_smart_accounts
@@ -38,20 +45,26 @@
 	$session_id = $r[2];
 	
 	$Payments = new Payments( $link );//instancia clase de pagos
-	$Payments->checkAccess( $user_id );//verifica permisos
+	$token = $Payments->checkAccess( $user_id );//verifica permisos
 	$tarjetas_cajero = $Payments->getTerminals( $user_id, 0, $user_sucursal, $session_id );//afiliaciones por cajero
 	$cajas = $Payments->getBoxesMoney( $sucursal_id );//cheque o transferencia 
 //configuracion del Websocket
 // $url_websocket = "ws://localhost:3005/";//"ws://localhost:3000";
 // $url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
-	$url_websocket = getenv('WEBSOCKET_URL') ?: "ws://192.168.1.223:3005/";
 
+	$url_websocket = $Payments->getWebSocketURL();// getenv('WEBSOCKET_URL') ?: "ws://192.168.1.223:3005/";
+	if( $url_websocket == '' || $url_websocket == NULL || $url_websocket == null ){
+		die( "<center>
+			<h2>La url del websocket no esta configurada, configurala desde configuracion del sistema!</h2>
+			<br>
+			<a href=\"../../../../index.php?\" class=\"btn btn-success\">Aceptar y Salir</a></center>" );
+	}
 //aqui encriptar en token 
 	if( !include( '../../../../rest/netPay/utils/encriptacion_token.php' ) ){
 		die( "no se incluyo libreria Encrypt" );
 	}
 	$Encrypt = new Encrypt();
-	$token_websocket = $Encrypt->encryptText( "d4186cb3-7400-4e0f-bbea-55ebc8739b23", "" );//hay que recuperar de DB7dff3c34-faee-11ea-a7be-3d014d7f956c
+	$token_websocket = $Encrypt->encryptText( "{$token['token']}", "" );//hay que recuperar de DB7dff3c34-faee-11ea-a7be-3d014d7f956c // d4186cb3-7400-4e0f-bbea-55ebc8739b23
 //$token_websocket = "";
 	//die( "Token : {$token_websocket}" );
 	$usuario_websocket = $user_id;
@@ -120,6 +133,10 @@
 		<div class="col-1 text-center text-light" style="padding-top : 1%;">
 			<button type="button" class="btn btn-success" onclick="show_reprint_view();" >
 				<i class="icon-print"></i>
+			</button>
+
+			<button type="button" class="btn btn-secondary" onclick="show_pending_payment_responses();" >
+				<i class="icon-money-1"></i>
 			</button>
 		</div>
 		<div class="col-10 text-center text-light">

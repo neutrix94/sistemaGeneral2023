@@ -85,13 +85,17 @@ var debug_json = "";
 		}
 	}
 
-	function carga_pedido(id,pagado){
+	function carga_pedido(id,pagado, sale_folio = '' ){
+		var log_enabled = $( "#log_status" ).val();
 	//enviamos datos por ajax
 		$.ajax({
 			type:'post',
-			url:'cobrosBd.php',
+			url:'ajax/db.php',
 			cache:false,
-			data:{flag:'carga_datos',valor:id},
+			data:{fl:'getSaleData', 
+				sale_id : id, 
+				folio : sale_folio,
+				log_status : log_enabled },
 			success:function(dat){
 				var aux=dat.split("|");
 				if(aux[0]!='ok'){
@@ -102,6 +106,7 @@ var debug_json = "";
 						$( '#buscador' ).select();
 						return false;
 					}else{
+						console.log( dat );
 						alert(dat);return false;
 					}
 				}else{
@@ -978,6 +983,14 @@ var cont_cheques_transferencia=0;
 		//alert( url );
 		alert( ajaxR( url ) );
 		return false;
+	}
+
+	function show_pending_payment_responses(){
+		var url = 'ajax/db.php?fl=show_pending_payment_responses';
+		var req = ajaxR( url );
+		$( '.emergent_content' ).html( req );
+		$( '.emergent' ).css( 'display', 'block' );
+
 	}
 
 

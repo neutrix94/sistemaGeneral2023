@@ -1,5 +1,6 @@
 
-	function sendTerminalPetition( counter, terminal_id ){		
+	function sendTerminalPetition( counter, terminal_id ){
+        var log_status = $( "#log_status" ).val();		
 		var sale_id = $( '#id_venta' ).val();
 		var amount = $( `#t${counter}` ).val().replaceAll( ',', '' );
 		var sale_folio = $( `#buscador` ).val().trim();
@@ -13,6 +14,12 @@
 			$( `#t${counter}` ).focus();
 			return false;
 		}
+    
+        if( $( '#tarjeta_' + counter ).val() == '--Seleccionar--' ){/*Implementacion Oscar 2024-06-25 para no permitir envio de transaccion si no se selecciona terminal valida */
+            alert( "Debes seleccionar una terminal valida para continuar!" );
+            $( '#tarjeta_' + counter ).focus();
+            return false;
+        }/*Fin de cambio Oscar 2024-06-25*/
 		var url = "ajax/db.php?fl=sendPaymentPetition&amount=" + amount;
 		url += "&terminal_id=" + $( '#tarjeta_' + counter ).val();
 		url += "&sale_id=" + sale_id;
@@ -27,7 +34,8 @@
         if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
 			url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
 		}
-        //alert( url );return false;
+        url += "&log_status=" + log_status;
+       // alert( url );return false;
 		//url += "&user_id=" + user_id;
 		//alert( url );
 		var resp = ajaxR( url );
@@ -159,6 +167,7 @@
         ws.viewedFolios = [folio_unico, ...folios];
         ws.sendViewedTransactions();
 		close_emergent();
+        carga_pedido( $( '#id_venta' ).val() );
 	}    //marcar notificacion como vista
 	
     function buscar_repuesta_peticion_por_folio( folio_unico ){
