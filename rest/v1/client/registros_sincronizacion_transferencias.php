@@ -38,7 +38,7 @@ $app->get('/obtener_registros_sincronizacion_transferencias', function (Request 
   }
 
   $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros_transferencias' );//consulta registros pendientes de sincronizar
-  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );//inserta request
+  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros_transferencias' );//inserta request
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_registros_sincronizacion_transferencias", $post_data );//envia petición
   $result = json_decode( $result_1 );//decodifica respuesta

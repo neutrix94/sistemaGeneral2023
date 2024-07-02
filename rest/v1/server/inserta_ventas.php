@@ -105,15 +105,15 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
     return json_encode( array( "response" => $setMovements ) );
   }
 
+  $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'VENTAS DESDE LINEA', 'sys_sincronizacion_ventas' );
 //consulta registros pendientes de sincronizar
-  $resp["rows_download"] = $salesSynchronization->getSynchronizationSales( $log['origin_store'], $rows_limit );
+  $resp["rows_download"] = $salesSynchronization->getSynchronizationSales( $log['origin_store'], $rows_limit, $resp["log_download"]["unique_folio"] );
 //var_dump($req["movements"]);
 //die( 'here' );
 //return json_encode( $req["sales"] );
 //Valida path
-  if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
-    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'VENTAS DESDE LINEA' );
-  }
+  //if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
+  //}
   $SynchronizationManagmentLog->updateModuleResume( 'ec_pedidos', 'subida', $resp["status"], $log["origin_store"] );//actualiza el resumen de modulo/sucursal ( subida )
   
 //desbloquea indicador de sincronizacion en tabla
