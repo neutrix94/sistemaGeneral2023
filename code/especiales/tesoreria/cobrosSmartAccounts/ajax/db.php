@@ -410,11 +410,12 @@
 		}
 
 		public function show_pending_payment_responses( $store_id ){
-			$resp = "<table class=\"table table-striped table-bordered\">
+			$resp = "<table class=\"table table-striped table-bordered\" style=\"width : 100%;\" border=\"1\">
 				<thead>
 					<tr>
 						<th class=\"text-center\">Folio Venta</th>
 						<th class=\"text-center\">Monto Cobro</th>
+						<th class=\"text-center\">Fecha</th>
 					</tr>
 				<thead>
 				<tbody>";
@@ -436,9 +437,11 @@
 			$resp .= "</tbody>
 				</table>
 			<br><br>
-			<button type=\"button\" class=\"btn btn-warning\" onclick=\"close_emergent();\">
-				<i>Aceptar y cerrar</i>
-			</button>";
+			<div style=\"text-align: center;\">
+				<button type=\"button\" class=\"btn btn-warning\" onclick=\"close_emergent_window();\">
+					<i>Aceptar y cerrar</i>
+				</button>
+			</div>";
 			return $resp;
 		}
 
