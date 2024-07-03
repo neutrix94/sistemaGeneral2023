@@ -515,7 +515,7 @@ var cont_cheques_transferencia=0;
 			});
 
 			if( montos_smart_accounts != 0 && montos_smart_accounts != 0.00 ){
-				$( '.emergent_content' ).html( `<h2 class="text-center">No se puede finalizar el cobro porque hay pagos de netPay pendientes!</h2>
+				$( '.emergent_content' ).html( `<h2 class="text-center">No se puede finalizar el cobro porque hay pagos de netPay pendientes ${montos_smart_accounts}!</h2>
 				<div class="text-center"><br>
 					<button
 						type="button"
