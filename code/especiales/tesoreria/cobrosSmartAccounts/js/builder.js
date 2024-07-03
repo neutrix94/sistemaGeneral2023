@@ -219,10 +219,11 @@
   	}
 
   	function removePaymentTmp( counter ){
-  		if( ! confirm( "Realmente deseas eliminar el pago?" ) ){
+  		if( ! confirm( "Realmente deseas eliminar el pago?" ) ){//, esta accion va a recargar la pantalla, vuelve a escanear tu ticket de venta
   			return false;
   		}
   		$( '#card_payment_row_' + counter ).remove();
+		//location.reload();
   	}
 
 	function close_emergent(){

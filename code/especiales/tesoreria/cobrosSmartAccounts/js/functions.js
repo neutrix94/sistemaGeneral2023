@@ -85,13 +85,17 @@ var debug_json = "";
 		}
 	}
 
-	function carga_pedido(id,pagado){
+	function carga_pedido(id,pagado, sale_folio = '' ){
+		var log_enabled = $( "#log_status" ).val();
 	//enviamos datos por ajax
 		$.ajax({
 			type:'post',
-			url:'cobrosBd.php',
+			url:'ajax/db.php',
 			cache:false,
-			data:{flag:'carga_datos',valor:id},
+			data:{fl:'getSaleData', 
+				sale_id : id, 
+				folio : sale_folio,
+				log_status : log_enabled },
 			success:function(dat){
 				var aux=dat.split("|");
 				if(aux[0]!='ok'){
@@ -102,6 +106,7 @@ var debug_json = "";
 						$( '#buscador' ).select();
 						return false;
 					}else{
+						console.log( dat );
 						alert(dat);return false;
 					}
 				}else{
@@ -117,7 +122,17 @@ var debug_json = "";
 				//	var payment_ammount = ( aux[3]-aux[4] );
 				//if( respuesta.por_pagar < 0 ){
 					if( respuesta.pagos_pendientes <= 0 ){
-						$( '#efectivo' ).val(respuesta.pagos_pendientes);
+						var format_number_tmp = ''+Math.abs( respuesta.pagos_pendientes )+'';
+						format_number_tmp = format_number_tmp.split( '.' );
+						var format_number = format_number_tmp[0];
+						if( format_number_tmp[1] != null && format_number_tmp[1] != '' ){
+							format_number += '.';
+							for( var i = 0; i<=1; i++ ){
+								format_number += format_number_tmp[1][i];
+							}
+						}
+						$( '#efectivo' ).val( format_number );
+						//$( '#efectivo' ).val(respuesta.pagos_pendientes);
 						$( '#efectivo' ).attr( 'readonly', true );
 						if( respuesta.pagos_pendientes == 0 ){
 							$( '#payment_description' ).html( 'Sin Dif.' );
@@ -143,7 +158,17 @@ var debug_json = "";
 						$( '#id_devolucion' ).val(1);
 						$( '#add_form_btn' ).css( 'display', 'none' );
 					}else{
-						$( '#efectivo' ).val( respuesta.pagos_pendientes );
+						var format_number_tmp = ''+Math.abs( respuesta.pagos_pendientes )+'';
+						format_number_tmp = format_number_tmp.split( '.' );
+						var format_number = format_number_tmp[0];
+						if( format_number_tmp[1] != null && format_number_tmp[1] != '' ){
+							format_number += '.';
+							for( var i = 0; i<=1; i++ ){
+								format_number += format_number_tmp[1][i];
+							}
+						}
+						$( '#efectivo' ).val( format_number );
+						//$( '#efectivo' ).val( respuesta.pagos_pendientes );
 						$( '#payment_description' ).html( 'Cobrar' );
 						$( '#payment_description' ).css( 'color', 'black' );
 						$( '#monto_total' ).css( 'color', 'black' );
@@ -152,8 +177,17 @@ var debug_json = "";
 						$( '#finalizar_cobro_devolucion_contenedor' ).css( 'display', 'none' );
 						$( '#add_form_btn' ).css( 'display', 'flex' );
 					}
-
-					$( '#monto_total' ).val( Math.abs( respuesta.pagos_pendientes ) );
+					var format_number_tmp = ''+Math.abs( respuesta.pagos_pendientes )+'';
+					format_number_tmp = format_number_tmp.split( '.' );
+					var format_number = format_number_tmp[0];
+					if( format_number_tmp[1] != null && format_number_tmp[1] != '' ){
+						format_number += '.';
+						for( var i = 0; i<=1; i++ ){
+							format_number += format_number_tmp[1][i];
+						}
+					}
+//					$( '#monto_total' ).val( Math.abs( respuesta.pagos_pendientes ) );
+					$( '#monto_total' ).val( format_number );
 					$( '#efectivo' ).attr( 'readonly', true );//solo informativo
 					//$("#monto_total").val( payment_ammount );
 					//$("#efectivo").val(payment_ammount);//oscar 2023
@@ -323,7 +357,18 @@ hljs.highlightAll();
 
 //console.log( " total :" + monto_total );
 		//alert('total:'+total);
-		$("#efectivo").val(total);
+
+		var format_number_tmp = ''+total+'';
+		format_number_tmp = format_number_tmp.split( '.' );
+		var format_number = format_number_tmp[0];
+		if( format_number_tmp[1] != null && format_number_tmp[1] != '' ){
+			format_number += '.';
+			for( var i = 0; i<=1; i++ ){
+				format_number += format_number_tmp[1][i];
+			}
+		}
+		$("#efectivo").val(format_number);
+		//$("#efectivo").val(total);
 		total_cobros=total_cobros+total;
 		calcula_cambio();
 	}
@@ -510,7 +555,7 @@ var cont_cheques_transferencia=0;
 			});
 
 			if( montos_smart_accounts != 0 && montos_smart_accounts != 0.00 ){
-				$( '.emergent_content' ).html( `<h2 class="text-center">No se puede finalizar el cobro porque hay pagos de netPay pendientes!</h2>
+				$( '.emergent_content' ).html( `<h2 class="text-center">No se puede finalizar el cobro porque hay pagos de netPay pendientes ${montos_smart_accounts}!</h2>
 				<div class="text-center"><br>
 					<button
 						type="button"
@@ -979,7 +1024,6 @@ var cont_cheques_transferencia=0;
 		alert( ajaxR( url ) );
 		return false;
 	}
-
 
 //lamadas asincronas
 	function ajaxR( url ){

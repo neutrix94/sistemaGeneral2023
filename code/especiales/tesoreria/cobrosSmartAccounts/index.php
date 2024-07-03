@@ -133,6 +133,10 @@
 			<button type="button" class="btn btn-success" onclick="show_reprint_view();" >
 				<i class="icon-print"></i>
 			</button>
+
+			<!--button type="button" class="btn btn-secondary" onclick="show_pending_payment_responses();" >
+				<i class="icon-money-1"></i>
+			</button-->
 		</div>
 		<div class="col-10 text-center text-light">
 			<h3><b class="">Sucursal:</b> <?php echo $sucursal;?></h3>
