@@ -193,7 +193,7 @@ const connectWebSocket = (ws_ref) => {
 					<button
 						type="button"
 						class="btn btn-success"
-						onclick="location.reload();"
+						onclick="close_emergent();"
 					><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
 					</button>
           </div>` );
