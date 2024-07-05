@@ -44,8 +44,10 @@
 	$sucursal = $r[1];
 	$session_id = $r[2];
 	
-	$Payments = new Payments( $link );//instancia clase de pagos
+	$Payments = new Payments( $link, $user_sucursal );//instancia clase de pagos
 	$token = $Payments->checkAccess( $user_id );//verifica permisos
+	//var_dump( $token );die('');
+	echo "<input type=\"hidden\" id=\"max_execution_time\" value=\"{$token['max_execution_time']}\">";
 	$tarjetas_cajero = $Payments->getTerminals( $user_id, 0, $user_sucursal, $session_id );//afiliaciones por cajero
 	$cajas = $Payments->getBoxesMoney( $sucursal_id );//cheque o transferencia 
 //configuracion del Websocket

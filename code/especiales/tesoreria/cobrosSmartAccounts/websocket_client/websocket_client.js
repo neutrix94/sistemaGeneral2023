@@ -193,7 +193,7 @@ const connectWebSocket = (ws_ref) => {
 					<button
 						type="button"
 						class="btn btn-success"
-						onclick="close_emergent();"
+						onclick="marcar_notificacion_vista( '${transaction.traceability ? transaction.traceability.folio_unico_transaccion : transaction.folio_unico }', ${transaction.traceability ? true : false } );"
 					><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
 					</button>
           </div>` );

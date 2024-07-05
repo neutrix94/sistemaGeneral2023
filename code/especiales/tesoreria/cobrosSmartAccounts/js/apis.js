@@ -162,12 +162,14 @@
     } 
     
     //marcar notificacion como vista
-	function marcar_notificacion_vista( folio_unico ){
+	function marcar_notificacion_vista( folio_unico, remove = false ){
         let folios = ws.viewedFolios ? ws.viewedFolios : [];
         ws.viewedFolios = [folio_unico, ...folios];
         ws.sendViewedTransactions();
-        $( '#card_payment_row_' + emergent_count_tmp ).remove();
-		close_emergent();
+        if( remove ){
+            $( '#card_payment_row_' + emergent_count_tmp ).remove();
+        }
+        close_emergent();
         carga_pedido( $( '#id_venta' ).val() );
 	}    //marcar notificacion como vista
 	
