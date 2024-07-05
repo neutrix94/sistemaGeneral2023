@@ -219,13 +219,15 @@
   	}
 
   	function removePaymentTmp( counter ){
-  		if( ! confirm( "Realmente deseas eliminar el pago?" ) ){//, esta accion va a recargar la pantalla, vuelve a escanear tu ticket de venta
+  		if( ! confirm( "Realmente deseas eliminar el pago?\nEsta accion va a recargar la pantalla, vuelve a escanear tu ticket de venta" ) ){//
   			return false;
   		}
-  		$( '#card_payment_row_' + counter ).remove();
-		//location.reload();
+  		//$( '#t' + counter ).val(0);
+  		//$( '#card_payment_row_' + counter ).css('display', 'none');
+		//recalcula();
+		location.reload();
   	}
-
+	
 	function close_emergent(){
 		$( '.emergent_content' ).html( '' );
 		$( '.emergent' ).css( 'display', 'none' );

@@ -1,5 +1,5 @@
 <?php
-/*version 1.1 2024-06-21*/
+/*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
@@ -1666,7 +1666,8 @@
 		public function checkAccess( $user_id ){
 			$sql="SELECT 
 					IF(p.ver=1 OR p.modificar=1,1,0),
-					( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 ) AS system_type
+					( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 ) AS system_type,
+					( SELECT tiempo_espera_respuesta_websocket FROM ec_configuracion_sucursal WHERE id_sucursal = {$this->store_id} ) AS max_execution_time/*1.2 tiempo espera dinamico 2024-07-04*/
 				FROM sys_permisos p
 				LEFT JOIN sys_users_perfiles perf ON perf.id_perfil=p.id_perfil
 				LEFT JOIN sys_users u ON u.tipo_perfil=perf.id_perfil 
@@ -1674,9 +1675,10 @@
 				AND u.id_usuario={$user_id}";
 			//die($sql);
 			//$eje=mysql_query($sql)or die("Error al consultar el permiso de cajero!!!<br>".mysql_error()."<br>".$sql);
-			$stm = $this->link->query( $sql ) or die("Error al consultar el permiso de cajero : {$this->link->error}");
+			$stm = $this->link->query( $sql ) or die("Error al consultar el permiso de cajero : {$sql} : {$this->link->error}");
 			//$es_cajero=mysql_fetch_row($eje);
 			$es_cajero = $stm->fetch_row();
+			$max_execution_time = $es_cajero[2];/*1.2 tiempo espera dinamico 2024-07-04*/
 			$system_type = $es_cajero[1];//tipo de sistema
 			if($es_cajero[0] == 0 ){
 				die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla!!!\nContacte al administrador desl sistema!!!");location.href="../../../../index.php?";</script>');
@@ -1726,13 +1728,21 @@
 						$stm3 = $this->link->query( $sql ) or die( "Error al insertar token en cliente : {$this->link->error}" );
 					}
 				}
-				return array( "status"=>200, "token"=>$result->result->access_token );
+				return array( "status"=>200, "token"=>$result->result->access_token, "max_execution_time"=>$max_execution_time );/*1.2 tiempo espera dinamico 2024-07-04*/
 			}else{
 				$row = $stm->fetch_assoc();
 			//validacion / renovacion de token
 				$post_data = null;
 				$result = json_decode( $this->sendPetition( "{$user['api_path']}/rest/netPay/valida_token", $post_data, $row['token'] ) );
-				return array( "status"=>200, "token"=>$row['token'] );
+				//var_dump($result);die('');
+			//actualiza la caducidad del token en local
+				$sqlAPIConfig="SELECT value FROM api_config c WHERE c.key='token' and name='time_value' limit 1";
+				$resultadoConfig = $this->link->query($sqlAPIConfig) or die( "Error al consultar los parametros del token : {$sql} : {$this->link->error}" );
+				$time_value = $resultadoConfig->fetch_assoc();
+				$sql = "UPDATE api_token SET expired_in = TIMESTAMPADD(SECOND,{$time_value['value']},NOW()) WHERE token = '{$row['token']}'";
+				$stm = $this->link->query( $sql ) or die( "Error al renovar el token en local : {$sql} : {$this->link->error}");
+				return array( "status"=>200, "token"=>$row['token'], "max_execution_time"=>$max_execution_time  );/*1.2 tiempo espera dinamico 2024-07-04*/
+				
 			}
 		}
 
