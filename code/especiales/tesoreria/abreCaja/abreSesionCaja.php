@@ -7,13 +7,13 @@
 	$sql="SELECT DATE_FORMAT(now(),'%Y-%m-%d')";
 	$eje=mysql_query($sql)or die("Error al consultar la fecha actual!!!");
 	$fecha_actual=mysql_fetch_row($eje);
-/*deshabilitado por Oscar 2024-07-04 para desactivar validacion de multicajero/sesion de caja por sucursal
-consultamos si la sucursal es multicajero
+//consultamos si la sucursal es multicajero
 	$sql="SELECT multicajero FROM ec_configuracion_sucursal WHERE id_sucursal=$user_sucursal";
 	$eje=mysql_query($sql)or die("Error al consultar si la  sucursal admite multicajero");
 	$r=mysql_fetch_row($eje);
 	$multicajero=$r[0];
 
+/**********************Validaciones de un solo cajero***********************/
 if($multicajero==0){
 //vemos si hay un logueo del mismo dia
 	$sql="SELECT 
@@ -31,7 +31,7 @@ if($multicajero==0){
 	if($r[0]>0){
 		die("El cajero ".$r[1]." ya esta logueado el día de hoy; Pida que cierre su sesión de caja para continuar!!!");
 	}
-*/
+
 //vemos si hay una sesion del mismo cajero que no fue cerrada
 	$sql="SELECT 
 			sc.id_sesion_caja,
@@ -53,10 +53,10 @@ if($multicajero==0){
 			}
 		}//fin de while
 	}
-//}//fin de si la sucursal no es multicajero
+}//fin de si la sucursal no es multicajero
 
 /**********************Validaciones de multicajero***********************/
-//else if($multicajero==1){
+else if($multicajero==1){
 //verificamos que no exista una sesion del mismo dia, mismo usuario que este abierta
 	$sql="SELECT 
 			COUNT(sc.id_sesion_caja),
@@ -73,7 +73,7 @@ if($multicajero==0){
 	}
 //cerramos la sesión de un día antes si no fue cerrada
 
-//}
+}
 
 
 	mysql_query("BEGIN");//declaramos el inicio de transacción
@@ -164,7 +164,7 @@ if($multicajero==0){
 			LIMIT 1";
 		$eje = mysql_query( $sql ) or die( "Error al consultar el corte de caja Anterior! " . mysql_error() );
 		$r_c_a = mysql_fetch_row( $eje );
-/*Deshabilitado por Oscar 2024-07-04 porque ya no funciona de esta manera con la nueva pantalla y logica de cobros
+	/*Deshabilitado por Oscar 2024-07-04 para no eviar el email
 		if( $r_c_a[0] != $_POST['cambio_caja'] ){
 			include('../../plugins/sendMail.php');
 			$mail = new sendMail( '../../../../' );
