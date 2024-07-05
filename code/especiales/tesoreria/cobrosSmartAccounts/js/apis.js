@@ -42,6 +42,7 @@
 		//console.log( resp );
 		$( '.emergent_content' ).html( resp );
 		$( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
 	} 
 
 	function rePrintByOrderId( transaction_id ){
@@ -52,6 +53,7 @@
 		var resp = ajaxR( url );
 		$( '.emergent_content' ).html( resp );
 		$( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
 	}
 
     function rePrintByOrderIdManual(){
@@ -68,6 +70,7 @@
         var resp = ajaxR( url );
         $( '.emergent_content' ).html( resp );
         $( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
     }
 
 	function cancelByOrderId( transaction_id ){
@@ -75,6 +78,7 @@
 		var resp = ajaxR( url );
 		$( '.emergent_content' ).html( resp );
 		$( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
 	}
 
     function Mascara(mascara, valor){   
@@ -162,14 +166,18 @@
     } 
     
     //marcar notificacion como vista
-	function marcar_notificacion_vista( folio_unico ){
+	function marcar_notificacion_vista( folio_unico, remove = true ){
         let folios = ws.viewedFolios ? ws.viewedFolios : [];
         ws.viewedFolios = [folio_unico, ...folios];
         ws.sendViewedTransactions();
-        $( '#card_payment_row_' + emergent_count_tmp ).remove();
-		close_emergent();
-        carga_pedido( $( '#id_venta' ).val() );
-	}    //marcar notificacion como vista
+        if( remove ){
+            $( '#card_payment_row_' + emergent_count_tmp ).remove();
+        }
+        close_emergent();
+        if( remove ){
+           carga_pedido( $( '#id_venta' ).val() );
+        }
+	}
 	
     function buscar_repuesta_peticion_por_folio( folio_unico ){
         ws.currentTransaction = {
