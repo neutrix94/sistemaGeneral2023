@@ -187,6 +187,7 @@ const connectWebSocket = (ws_ref) => {
       let folios = [];
       jsonMsg.transactions.forEach((transaction) => {//aqui esta la respuesta de transacciones
 /*habilitado por oscar 2024-07-01 para no ver en la vista las transacciones pendientes*/
+      $( '#stop' ).click();
       //aqui brinca la emergente
         $( ".emergent_content" ).html( `<h2 class="text-success text-center">${transaction.message} ( ${transaction.traceability ? transaction.traceability.folio_venta : transaction.folio_venta } ) </h2>
 				<div class="text-center">
@@ -209,6 +210,7 @@ const connectWebSocket = (ws_ref) => {
       ws.sendAcknowledgment(jsonMsg.type);
       ws.actualTransaction = jsonMsg.transaction;//aqui esta la respuesta de transacciones
       //aqui brinca la emergente
+        $( '#stop' ).click();
         $( ".emergent_content" ).html( `<h2 class="text-success text-center">${ws.actualTransaction.message}</h2>
 				<div class="text-center">
 					<button
@@ -223,6 +225,7 @@ const connectWebSocket = (ws_ref) => {
       ws.sendAcknowledgment(jsonMsg.type);
       console.log( jsonMsg.transaction );
      //aqui brinca la emergente
+      $( '#stop' ).click();
       $( ".emergent_content" ).html( `<h2 class="text-success text-center">${jsonMsg.transaction.message}</h2>
       <div class="text-center">
         <button
