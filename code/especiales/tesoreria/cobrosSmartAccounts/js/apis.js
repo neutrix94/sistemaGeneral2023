@@ -42,6 +42,7 @@
 		//console.log( resp );
 		$( '.emergent_content' ).html( resp );
 		$( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
 	} 
 
 	function rePrintByOrderId( transaction_id ){
@@ -52,6 +53,7 @@
 		var resp = ajaxR( url );
 		$( '.emergent_content' ).html( resp );
 		$( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
 	}
 
     function rePrintByOrderIdManual(){
@@ -68,6 +70,7 @@
         var resp = ajaxR( url );
         $( '.emergent_content' ).html( resp );
         $( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
     }
 
 	function cancelByOrderId( transaction_id ){
@@ -75,6 +78,7 @@
 		var resp = ajaxR( url );
 		$( '.emergent_content' ).html( resp );
 		$( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
 	}
 
     function Mascara(mascara, valor){   
