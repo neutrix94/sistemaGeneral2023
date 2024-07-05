@@ -7,7 +7,7 @@
 	if( isset( $is_payment_petition ) && $is_payment_petition == true ){
 ?>
 	<div class="row text-center">
-		<div class="col-6 text-center">
+		<div class="col-12 text-center">
 			<button
 				class="btn btn-info"
 				onclick="buscar_repuesta_peticion_por_folio( '<?php echo $resp->folio_unico_transaccion;?>' );"
@@ -15,14 +15,14 @@
 				<i class="icon-arrows-cw">Recargar respuesta</i>
 			</button>
 		</div>
-		<div class="col-6 text-center">
+		<!--Deshabilitado poroscar 2024-07-05 div class="col-6 text-center">
 			<button
 				class="btn btn-danger"
 				onclick="stop_server_events( '<?php echo $resp->folio_unico_transaccion;?>' );"
 			>
 				<i class="icon-cancel-circled">Cancelar y cerrar</i>
 			</button>
-		</div>
+		</div-->
 		<div id="contador">00:00:00</div>
 		<button style="display:none;" id="start">Start</button>
 		<button style="display:none;" id="stop">Stop</button>
@@ -31,12 +31,12 @@
 <?php
 	}else{
 ?>
-	<button
+	<!--Deshabilitado poroscar 2024-07-05button
 		class="btn btn-danger"
 		onclick="stop_server_events( '<?php echo $resp->folio_unico_transaccion;?>' );"
 	>
 		<i class="icon-cancel-circled">Cancelar y cerrar</i>
-	</button>
+	</button-->
 <?php
 	}
 

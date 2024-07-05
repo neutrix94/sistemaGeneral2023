@@ -24,31 +24,31 @@ $app->post('/', function (Request $request, Response $response){
 	$Logger = null;
   $log_id = null;
   $steep_log_id = 0;
+
+  $body = $request->getBody();
+  if( $body == '' || $body == null ){//cuando es el test de enpoints de terminal
+      $resp = array(
+        "code"=>"00",
+        "message"=>"Peticion para configurar terminal"
+      );
+      return json_encode( $resp );
+  }
+
 	$sql = "SELECT log_habilitado AS log_enabled FROM sys_configuraciones_logs WHERE id_configuracion_log = '2'";
 	$stm = $link->query( $sql ) or die( "Error al consultar si el log de cobros esta habilitado : {$sql} : {$link->error}" );
 	$log = $stm->fetch_assoc();
   if( $log['log_enabled'] == 1 ){
     $Logger = new Logger( $link );//instancia clase de log
   }
-//obtener el json en txt 
-  /*$body = $request->getBody();
-  $file = fopen("test.txt","w");
-  fwrite($file,"{$body}");
-  fclose($file);*/
-  //try{
-    $body = $request->getBody();
-    //var_dump( $body );
-    try{
-      $filePath = getenv('PATH_NETPAY_TRANSACTION_FILE') ?: '';
-      $file = fopen("{$filePath}archivo.txt", "w");
-      fwrite($file,"{$body}");
-      fclose($file);
-    }catch( Exception $e ){
-      die( "Error en escritura de archivo.txt : {$e}" );
-    }
-  //}catch( Exception e ){
-  //  die( "Error al escribir archivo txt : {$e}" );
-  //}
+//obtener el json en txt
+  try{
+    $filePath = getenv('PATH_NETPAY_TRANSACTION_FILE') ?: '';
+    $file = fopen("{$filePath}archivo.txt", "w");
+    fwrite($file,"{$body}");
+    fclose($file);
+  }catch( Exception $e ){
+    die( "Error en escritura de archivo.txt : {$e}" );
+  }
 //respuesta
   $response_message = "Transaccion exitosa!";
 //recibe los parametros de netPay
