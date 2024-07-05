@@ -230,7 +230,7 @@ const connectWebSocket = (ws_ref) => {
 					<button
 						type="button"
 						class="btn btn-success"
-						onclick="marcar_notificacion_vista( '${ws.actualTransaction.traceability.folio_unico_transaccion}' );"
+						onclick="marcar_notificacion_vista( '${ws.actualTransaction.traceability.folio_unico_transaccion}', ${transaction.traceability.folio_unico_transaccion.trim() == 'Transaccion Exitosa' ? true : false } );"
 					><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
 					</button>
           </div>` );
@@ -245,7 +245,7 @@ const connectWebSocket = (ws_ref) => {
         <button
           type="button"
           class="btn btn-success"
-          onclick="marcar_notificacion_vista( '${jsonMsg.transaction.folio_unico}' );"
+          onclick="marcar_notificacion_vista( '${jsonMsg.transaction.folio_unico}', ${transaction.traceability.folio_unico_transaccion.trim() == 'Transaccion Exitosa' ? true : false } );"
         ><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
         </button>
         </div>` );
