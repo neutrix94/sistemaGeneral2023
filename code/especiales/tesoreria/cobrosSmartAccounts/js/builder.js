@@ -229,8 +229,11 @@
   	}
 	
 	function close_emergent(){
-		$( '.emergent_content' ).html( '' );
-		$( '.emergent' ).css( 'display', 'none' );
+		$( '#stop' ).click();
+		setTimeout( function (){
+			$( '.emergent_content' ).html( '' );
+			$( '.emergent' ).css( 'display', 'none' );
+		}, 100 );
 	}
 
 	function close_emergent_2(){
