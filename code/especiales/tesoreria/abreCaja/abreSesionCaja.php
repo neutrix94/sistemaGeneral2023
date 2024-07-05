@@ -53,10 +53,10 @@ if($multicajero==0){
 			}
 		}//fin de while
 	}
-}//fin de si la sucursal no es multicajero
+//}//fin de si la sucursal no es multicajero
 
 /**********************Validaciones de multicajero***********************/
-else if($multicajero==1){
+//else if($multicajero==1){
 //verificamos que no exista una sesion del mismo dia, mismo usuario que este abierta
 	$sql="SELECT 
 			COUNT(sc.id_sesion_caja),
@@ -73,7 +73,7 @@ else if($multicajero==1){
 	}
 //cerramos la sesión de un día antes si no fue cerrada
 
-}
+//}
 
 
 	mysql_query("BEGIN");//declaramos el inicio de transacción
