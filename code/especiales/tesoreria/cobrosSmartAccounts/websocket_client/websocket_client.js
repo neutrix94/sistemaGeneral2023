@@ -189,14 +189,28 @@ const connectWebSocket = (ws_ref) => {
 /*habilitado por oscar 2024-07-01 para no ver en la vista las transacciones pendientes*/
       $( '#stop' ).click();
       //aqui brinca la emergente
-        $( ".emergent_content" ).html( `<h2 class="text-success text-center">${transaction.message} ( ${transaction.traceability ? transaction.traceability.folio_venta : transaction.folio_venta } ) </h2>
-				<div class="text-center">
-					<button
-						type="button"
-						class="btn btn-success"
-						onclick="marcar_notificacion_vista( '${transaction.traceability ? transaction.traceability.folio_unico_transaccion : transaction.folio_unico }', ${transaction.traceability ? true : false } );"
-					><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
-					</button>
+      //aqui brinca la emergente
+        $( ".emergent_content" ).html( `<div class="text-center bg-danger">
+          <br>
+          <br>
+          <h2 class="text-light text-center">${transaction.message} ( ${transaction.traceability ? transaction.traceability.folio_venta : transaction.folio_venta } ) </h2>
+          <h2 class="text-light text-center">Recargar la pagina y volver a escanear el ticket</h2>
+          <br>
+          <br>
+          <div class="row text-center">
+            <div class="col-3"></div>
+            <div class="col-6">
+              <button
+                type="button"
+                class="btn btn-warning form-control"
+                style="font-size:200%;"
+                onclick="marcar_notificacion_vista( '${transaction.traceability ? transaction.traceability.folio_unico_transaccion : transaction.folio_unico }', ${transaction.traceability ? true : false } );"
+              ><i class="icon-spin3">OK</i>
+              </button>
+              <br>
+              <br>
+              </div>
+            </div>
           </div>` );
         $( ".emergent" ).css( "display", "block" );//deshabilitado por Oscar marcar_notificacion_vista( '${transaction.traceability ? transaction.traceability.folio_unico_transaccion : transaction.folio_unico }' );
 //desarrollar boton para indicador de visto
