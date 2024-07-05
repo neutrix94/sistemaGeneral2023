@@ -170,8 +170,10 @@
             $( '#card_payment_row_' + emergent_count_tmp ).remove();
         }
         close_emergent();
-        carga_pedido( $( '#id_venta' ).val() );
-	}    //marcar notificacion como vista
+        if( remove ){
+           carga_pedido( $( '#id_venta' ).val() );
+        }
+	}
 	
     function buscar_repuesta_peticion_por_folio( folio_unico ){
         ws.currentTransaction = {
