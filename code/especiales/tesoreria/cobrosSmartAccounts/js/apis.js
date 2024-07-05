@@ -166,7 +166,7 @@
     } 
     
     //marcar notificacion como vista
-	function marcar_notificacion_vista( folio_unico, remove = false ){
+	function marcar_notificacion_vista( folio_unico, remove = true ){
         let folios = ws.viewedFolios ? ws.viewedFolios : [];
         ws.viewedFolios = [folio_unico, ...folios];
         ws.sendViewedTransactions();
