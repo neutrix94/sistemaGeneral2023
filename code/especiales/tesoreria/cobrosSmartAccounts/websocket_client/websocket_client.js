@@ -7,8 +7,6 @@ const connectWebSocket = (ws_ref) => {
   const QUEUE_INTERVAL = 1000 * 30 + 1000 * 1;
   const RECONNECT_INTERVAL = 1000 * 10 + 1000 * 1;
   const PING_VALUE = 1;
-  const MAX_TRIES = 3;
-  var reconnectTries = 0;
 
   const ACKNOWLEDGEMENT_EVENTS_CLIENTS = [
     events.INFORM_VIEWED_TRANSACTION,
@@ -62,12 +60,8 @@ const connectWebSocket = (ws_ref) => {
   };
 
   const reconnectInterval = () => {
-    if (ws.readyState === ws.CLOSED && reconnectTries < MAX_TRIES) {
-      reconnectTries++;
+    if (ws.readyState === ws.CLOSED) {
       connectWebSocket(ws);
-    } else if (reconnectTries >= MAX_TRIES) {
-      clearInterval(window.reconnectInterval);
-      window.reconnectInterval = null;
     }
   };
 
@@ -94,7 +88,6 @@ const connectWebSocket = (ws_ref) => {
   };
 
   ws.addEventListener('open', (event) => {
-    reconnectTries = 0;
     clearInterval(window.reconnectInterval);
     window.reconnectInterval = null;
     if (ws.onConnection) {
@@ -130,6 +123,7 @@ const connectWebSocket = (ws_ref) => {
 
     clearInterval(ws.queueInterval);
     if (!window.reconnectInterval) {
+      reconnectInterval();
       window.reconnectInterval = setInterval(
         reconnectInterval,
         RECONNECT_INTERVAL,
