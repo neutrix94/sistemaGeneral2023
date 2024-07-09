@@ -176,6 +176,10 @@
         close_emergent();
         if( remove ){
            carga_pedido( $( '#id_venta' ).val() );
+        }else{
+
+            location.reload();//RECARGA
+        
         }
 	}
 	
