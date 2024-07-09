@@ -71,7 +71,8 @@ $app->post('/obtener_configuracion_impresion', function (Request $request, Respo
 			LEFT JOIN sys_impresoras_sucursales i
 			ON i.id_impresora_sucursal = miu.id_impresora_sucursal
 			LEFT JOIN sys_comandos_impresion ci
-			ON ci.id_comando_impresion = miu.id_comando_impresion";
+			ON ci.id_comando_impresion = miu.id_comando_impresion
+			WHERE u.id_sucursal = {$sucursal}";
 	$stm = $link->query( $sql ) or die( "Error al consultar modulos de impresion por usuarios y sus carpetas : {$link->error}" );
 	while ( $row = $stm->fetch_assoc() ) {
 		array_push( $resp['modulos'], $row );
