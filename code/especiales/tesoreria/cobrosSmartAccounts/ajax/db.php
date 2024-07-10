@@ -1802,7 +1802,7 @@
 						p.id_pedido,
 						p.fecha_alta,
 						c.nombre AS costumer_name,
-						SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS payments_amount
+						TRUNCATE( SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ), 2 ) AS payments_amount
 					FROM ec_pedidos p
 					LEFT JOIN sys_users u
 					ON p.id_usuario = u.id_usuario

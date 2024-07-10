@@ -229,7 +229,7 @@ if($id_aprt!=''&&$id_aprt!=null){
 	    				class="form-control"
 	    			>
     			</center>
-    			<input type="hidden" name="totalOrd" id="totalOrd" value="<?php echo $total; ?>">
+    			<input type="hidden" name="totalOrd" id="totalOrd" value="<?php number_format($total, 2); ?>">
 			</form>
 			</center>
 			</div>
@@ -263,7 +263,7 @@ if($id_aprt!=''&&$id_aprt!=null){
 							if(isset($sald_fav) && ($id_aprt==''||$id_aprt==null) ){echo '<p style="position: absolute;width:280px;height: 40px;background:transparent;top:34%;left:55%;z-index: 2;"></p>';}
 			/*Fin de cambio Oscar 03.03.2019*/
 						?>
-						<input type="text" value="<?php if($id_aprt!='' && $id_aprt!=null){echo 0;}else{echo $total;} ?>" class="montoVal form-control" name="dn" id="monEfe" onkeypress="return validarNumero(event,1,'monEfe')" <?php if($id_aprt){ echo 'onkeyup="cambiar_por_pagar();"';}?> onblur="validaMontos(1)">
+						<input type="text" value="<?php if($id_aprt!='' && $id_aprt!=null){echo 0;}else{echo number_format( $total, 2 );} ?>" class="montoVal form-control" name="dn" id="monEfe" onkeypress="return validarNumero(event,1,'monEfe')" <?php if($id_aprt){ echo 'onkeyup="cambiar_por_pagar();"';}?> onblur="validaMontos(1)">
 					
 					</td>
 				</tr>
@@ -361,8 +361,8 @@ if($id_aprt!=''&&$id_aprt!=null){
    	if($id_aprt=='' || $id_aprt==null){
 ?>
 		<form class="col-10 text-center" data-role="controlgroup" data-type="horizontal" data-mini="false" data-ajax="false" name="fticket" id="fticket" action="index.php">
-		<input type="checkbox" name="es_apartado" id="es_apartado">
-		<label for="es_apartado" id="label_apartado">Es apartado</label>
+		<input type="checkbox" name="es_apartado" id="es_apartado" style="display:none;">
+		<label for="es_apartado" id="label_apartado" style="display:none;">Es apartado</label>
    		<!-- <button type="submit" name="submit" class="cerrar"> <span>Cerrar</span></button> -->
    		<button  
    			name="cerrar" 
