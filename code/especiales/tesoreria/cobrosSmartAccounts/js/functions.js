@@ -4,7 +4,7 @@ var respuesta = null;
 var debug_json = "";
 
 	function decimal_format_twice( number ){
-		var format_number_tmp = ''+Math.abs( number )+'';
+		var format_number_tmp = ''+( number )+'';
 		format_number_tmp = format_number_tmp.split( '.' );
 		var format_number = format_number_tmp[0];
 		if( format_number_tmp[1] != null && format_number_tmp[1] != '' ){
@@ -137,17 +137,7 @@ var debug_json = "";
 				//	var payment_ammount = ( aux[3]-aux[4] );
 				//if( respuesta.por_pagar < 0 ){
 					if( respuesta.pagos_pendientes <= 0 ){
-						/*var format_number_tmp = ''+Math.abs( respuesta.pagos_pendientes )+'';
-						format_number_tmp = format_number_tmp.split( '.' );
-						var format_number = format_number_tmp[0];
-						if( format_number_tmp[1] != null && format_number_tmp[1] != '' ){
-							format_number += '.';
-							for( var i = 0; i<=1; i++ ){
-								format_number += format_number_tmp[1][i];
-							}
-						}*/
-						$( '#efectivo' ).val( decimal_format_twice( Math.abs(respuesta.pagos_pendientes) ) );
-						//$( '#efectivo' ).val(respuesta.pagos_pendientes);
+						$( '#efectivo' ).val( decimal_format_twice( respuesta.pagos_pendientes ) );
 						$( '#efectivo' ).attr( 'readonly', true );
 						if( respuesta.pagos_pendientes == 0 ){
 							$( '#payment_description' ).html( 'Sin Dif.' );
@@ -173,16 +163,7 @@ var debug_json = "";
 						$( '#id_devolucion' ).val(1);
 						$( '#add_form_btn' ).css( 'display', 'none' );
 					}else{
-						/*var format_number_tmp = ''+Math.abs( respuesta.pagos_pendientes )+'';
-						format_number_tmp = format_number_tmp.split( '.' );
-						var format_number = format_number_tmp[0];
-						if( format_number_tmp[1] != null && format_number_tmp[1] != '' ){
-							format_number += '.';
-							for( var i = 0; i<=1; i++ ){
-								format_number += format_number_tmp[1][i];
-							}
-						}*/
-						$( '#efectivo' ).val(  decimal_format_twice( Math.abs(respuesta.pagos_pendientes) ) );
+						$( '#efectivo' ).val(  decimal_format_twice( respuesta.pagos_pendientes) );
 						//$( '#efectivo' ).val( respuesta.pagos_pendientes );
 						$( '#payment_description' ).html( 'Cobrar' );
 						$( '#payment_description' ).css( 'color', 'black' );
@@ -192,16 +173,7 @@ var debug_json = "";
 						$( '#finalizar_cobro_devolucion_contenedor' ).css( 'display', 'none' );
 						$( '#add_form_btn' ).css( 'display', 'flex' );
 					}
-					/*var format_number_tmp = ''+Math.abs( respuesta.pagos_pendientes )+'';
-					format_number_tmp = format_number_tmp.split( '.' );
-					var format_number = format_number_tmp[0];
-					if( format_number_tmp[1] != null && format_number_tmp[1] != '' ){
-						format_number += '.';
-						for( var i = 0; i<=1; i++ ){
-							format_number += format_number_tmp[1][i];
-						}
-					}*/
-//					$( '#monto_total' ).val( Math.abs( respuesta.pagos_pendientes ) );
+					
 					$( '#monto_total' ).val( decimal_format_twice( Math.abs( respuesta.pagos_pendientes ) ) );
 					$( '#efectivo' ).attr( 'readonly', true );//solo informativo
 					//$("#monto_total").val( payment_ammount );
