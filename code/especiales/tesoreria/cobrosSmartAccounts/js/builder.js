@@ -83,14 +83,19 @@
 	}
 
 	function get_reverse_form(){
-		var content = `<div class="row">
+		var content = `<div class="row" style="padding:10px !important;">
+			<div class="text-end">
+				<button
+					type="button"
+					class="btn btn-light"
+					onclick="close_emergent();"
+				>
+					<i class="text-danger">X</i>
+				</button>
+			</div>
 			<input type="text" class="form-control" id="reverse_input">
-			<!--button
-				type="button"
-				class="btn btn-danger"
-			>
-				<i class="icon-warning">Cancelar</i>
-			</button-->
+			<p> </p>
+			<p> </p>
 			<button
 				type="button"
 				class="btn btn-info"
@@ -229,8 +234,11 @@
   	}
 	
 	function close_emergent(){
-		$( '.emergent_content' ).html( '' );
-		$( '.emergent' ).css( 'display', 'none' );
+		$( '#stop' ).click();
+		setTimeout( function (){
+			$( '.emergent_content' ).html( '' );
+			$( '.emergent' ).css( 'display', 'none' );
+		}, 100 );
 	}
 
 	function close_emergent_2(){
@@ -248,6 +256,15 @@
 		var afiliaciones = ajaxR( url );
 		var content = `<div>
 			<div class="row">
+				<div class="text-end">
+					<button
+						type="button"
+						class="btn btn-light"
+						onclick="close_emergent();"
+					>
+						<i class="text-danger">X</i>
+					</button>
+				</div>
 				<div class="col-2"></div>
 				<div class="col-8">
 					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
@@ -334,6 +351,15 @@
 		var terminales = ajaxR( url );
 		var content = `<div>
 			<div class="row">
+				<div class="text-end">
+					<button
+						type="button"
+						class="btn btn-light"
+						onclick="close_emergent();"
+					>
+						<i class="text-danger">X</i>
+					</button>
+				</div>
 				<div class="col-2"></div>
 				<div class="col-8">
 					<h2 class="text-center">Selecciona una terminal para agregar : </h2>

@@ -104,12 +104,12 @@
 	<input type="hidden" id="session_id" value="<?php echo $session_id;?>">
 <!--emergentes -->
 	<div class="emergent" style="z-index : 20;" tabindex="1">
-		<div class="text-end" style=" position: relative; top : 120px;right: 1%;z-index:1;"><!-- position: relative; top : 120px; left: 90%; z-index:1; display:none; -->
+		<!--div class="text-end" style=" position: relative; top : 120px;right: 1%;z-index:1;">position: relative; top : 120px; left: 90%; z-index:1; display:none; 
 			<button 
 				class="btn btn-danger"
 				onclick="close_emergent();"
 			>X</button>
-		</div>
+		</div>-->
 		<div class="emergent_content" tabindex="1"></div>
 	</div>
 
