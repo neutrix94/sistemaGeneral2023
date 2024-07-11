@@ -77,8 +77,11 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     return json_encode( array( "response" => $setProductProviderMovements ) );
   }
   $req["product_provider_movements"] = $productProviderMovementsSynchronization->getSynchronizationProductProviderMovements( -1, $product_provider_movements_limit, $req["log"]['unique_folio'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
+//echo $post_data; die( '');//. $post_data .''
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_movimientos_proveedor_producto", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
+var_dump( $result_1 );die( 'here' );
   $result = json_decode( $result_1 );//decodifica respuesta
   if( $result == '' || $result == null ){  
     if( $result_1 == '' || $result_1 == null ){
