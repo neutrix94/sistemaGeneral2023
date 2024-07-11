@@ -50,7 +50,7 @@
             $sql = "SELECT MAX( id_sincronizacion_paso ) AS last_id FROM LOG_sincronizacion_pasos";
             $stm = $this->link->query( $sql ) or die( "Error en recuperar ultimo id insertado en log de sincronizacion paso : {$sql} : {$this->link->error}" );
             $row = $stm->fetch_assoc();
-            return array( "status"=>"ok", "id_sincronizacion_paso"=>$row['last_id'] );
+            return $row['last_id'];//array( "status"=>"ok", "id_sincronizacion_paso"=>$row['last_id'] );
         }
 
         public function insertErrorSteepRow( $synchronization_steep_id, $table_name, $row_unique_folio, $sql_query, $sql_error ){
