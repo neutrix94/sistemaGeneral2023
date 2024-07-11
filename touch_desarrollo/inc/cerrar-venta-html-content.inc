@@ -229,7 +229,7 @@ if($id_aprt!=''&&$id_aprt!=null){
 	    				class="form-control"
 	    			>
     			</center>
-    			<input type="hidden" name="totalOrd" id="totalOrd" value="<?php number_format($total, 2); ?>">
+    			<input type="hidden" name="totalOrd" id="totalOrd" value="<?php echo number_format($total, 2); ?>">
 			</form>
 			</center>
 			</div>
@@ -263,8 +263,8 @@ if($id_aprt!=''&&$id_aprt!=null){
 							if(isset($sald_fav) && ($id_aprt==''||$id_aprt==null) ){echo '<p style="position: absolute;width:280px;height: 40px;background:transparent;top:34%;left:55%;z-index: 2;"></p>';}
 			/*Fin de cambio Oscar 03.03.2019*/
 						?>
-						<input type="text" value="<?php if($id_aprt!='' && $id_aprt!=null){echo 0;}else{echo number_format( $total, 2 );} ?>" class="montoVal form-control" name="dn" id="monEfe" onkeypress="return validarNumero(event,1,'monEfe')" <?php if($id_aprt){ echo 'onkeyup="cambiar_por_pagar();"';}?> onblur="validaMontos(1)">
-					
+						<input type="text" value="<?php if($id_aprt!='' && $id_aprt!=null){echo 0;}else{echo number_format( $total, 2 );} ?>" class="montoVal form-control" name="dn" id="monEfe" onkeypress="return validarNumero(event,1,'monEfe')" <?php if($id_aprt){ echo 'onkeyup="cambiar_por_pagar();"';}?> readonly>
+					<!-- Deshabilitado por Oscar para que no compare pagos vs total onblur="validaMontos(1)"-->
 					</td>
 				</tr>
 				<tr class="move" style="display:none;" >
@@ -283,10 +283,10 @@ if($id_aprt!=''&&$id_aprt!=null){
 			<div class="col-12">
 			<form data-mini="false" data-ajax="false"><!--  style="float:right; margin-right:16em; position:relative;" data-role="controlgroup" data-type="horizontal"-->
 				<center>
-				<label for="nombre">Por pagar</label>
+				<label for="nombre" style="display:none;">Por pagar</label>
 				<div>
 					<!--div style="position:absolute;width:100%;height:70%;z-index:100;border:0px solid;border-radius:8px;"></div-->
-					<div class="row">
+					<div class="row"  style="display:none;">
 						<div class="col-2"></div>
 						<div class="col-8">
 							<input 
