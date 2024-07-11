@@ -17,15 +17,11 @@ $app->post('/obtener_configuracion_impresion', function (Request $request, Respo
 	include( '../../conexionMysqli.php' );
 	$file = array();
 	$sucursal = $request->getParam( 'id_sucursal' );
-	//$resp = array( "message"=>"ok", "status_code"=>200, "store_id"=>$sucursal );
-	//return json_encode( $resp );
+	
+	if( trim($sucursal) == null || trim($sucursal) == '' ){//validacion de la sucursal
+		return json_encode( array( "status"=>400, "message"=> "El id de sucursal es obligatorio.") );
+	}
 //consulta los modulos y sus rutas
-	$sql = "SELECT 
-				CONCAT( 'cache/', s.nombre, '/', mi.nombre_carpeta_modulo ) AS carpeta
-
-			FROM sys_sucursales s
-			JOIN sys_modulos_impresion mi
-			ON s.id_sucursal = {$sucursal}";
 	$sql = "SELECT
 				mi.nombre_modulo AS nombre_modulo,
 				REPLACE( s.nombre, ' ', '_' ) AS usuario,
@@ -34,7 +30,9 @@ $app->post('/obtener_configuracion_impresion', function (Request $request, Respo
 			    ci.comando_impresion,
 			    mis.extension_archivo,
 			    '0' AS habilitado,
-			    mis.endpoint_api_destino
+			    mis.endpoint_api_destino,
+				mis.id_modulo_impresion_sucursal AS id,
+				'sucursal' AS tipo
 			FROM sys_modulos_impresion_sucursales mis
 			LEFT JOIN sys_modulos_impresion mi
 			ON mis.id_modulo_impresion = mi.id_modulo_impresion
@@ -60,7 +58,9 @@ $app->post('/obtener_configuracion_impresion', function (Request $request, Respo
 			    ci.comando_impresion,
 			    miu.extension_archivo,
 			    '0' AS habilitado,
-			    miu.endpoint_api_destino
+			    miu.endpoint_api_destino,
+				miu.id_modulo_impresion_usuario AS id,
+				'usuario' AS tipo
 			FROM sys_modulos_impresion_usuarios miu
 			LEFT JOIN sys_modulos_impresion mi
 			ON miu.id_modulo_impresion = mi.id_modulo_impresion
