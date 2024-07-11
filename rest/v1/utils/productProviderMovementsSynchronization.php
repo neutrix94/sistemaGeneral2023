@@ -5,7 +5,9 @@
 		private $link;
 		private $LOGGER;
 		function __construct( $connection, $Logger = false ){
-			$this->link = $connection;
+			//	die( 'here' );
+			include( '../../conexionMysqli.php' );
+			$this->link = $link;
 			$this->LOGGER = $Logger;
 		}
 		
