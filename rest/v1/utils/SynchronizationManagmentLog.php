@@ -305,7 +305,7 @@
 //actualiza respuesta ( destino )
 		public function updateResponseLog( $response_string, $unique_folio, $logger_id = false ){
 			$log_steep_id = null;
-			$response_string = str_replace( "'", "\'", $response_string );
+			//$response_string = str_replace( "'", "\'", $response_string );
 		    $sql = "UPDATE sys_sincronizacion_peticion 
 		              SET hora_respuesta = NOW(),
 		                contenido_respuesta = \"{$response_string}\"
