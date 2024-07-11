@@ -42,7 +42,7 @@
 					AND id_sucursal_destino = {$system_store}
 					LIMIT {$limit}";
 		//die( $sql );
-			$stm = $this->link->query( $sql ) or die( "Error al consultar los datos de jsons : {$this->link->error}" );
+			$stm = $this->link->query( $sql ) or die( "Error al consultar los datos de jsons : {$sql} : {$this->link->error}" );
 				if( $logger_id ){
 					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta JSONs de Movimientos Proveedor Producto", $sql );
 				}
