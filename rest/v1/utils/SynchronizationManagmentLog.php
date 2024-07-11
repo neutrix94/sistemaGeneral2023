@@ -308,7 +308,7 @@
 			$response_string = str_replace( "'", "\'", $response_string );
 		    $sql = "UPDATE sys_sincronizacion_peticion 
 		              SET hora_respuesta = NOW(),
-		                contenido_respuesta = '{$response_string}'
+		                contenido_respuesta = \"{$response_string}\"
 		            WHERE folio_unico = '{$unique_folio}'";
 		    $stm = $this->link->query( $sql );
 				if( $logger_id ){
