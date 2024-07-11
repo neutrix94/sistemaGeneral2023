@@ -62,7 +62,6 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
       $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'JSON de log de peticion que llega : ', json_encode( $log ) );
     }
 
-
 /*valida que las apis no esten bloqueadas*/
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'] );
   if( $validation != 'ok' ){
@@ -90,11 +89,13 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
 
 //inserta request
   $request_initial_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log, $request_initial_time, $Logger, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log, $request_initial_time, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   //$pending_petitions = $request->getParam( "pending_responses" );
   $request_initial_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   if( sizeof( $product_provider_movements ) > 0 ){
+    
     $insert_validations = $productProviderMovementsSynchronization->insertProductProviderMovements( $product_provider_movements, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+
 //return json_encode( $insert_validations );
     if( $insert_validations["error"] != '' && $insert_validations["error"] != null  ){
     //inserta error si es el caso

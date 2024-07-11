@@ -115,7 +115,7 @@
 			$resp["tmp_no"] = "";
 			$updates = array();
 			foreach ( $product_providers_movements as $key => $p_p_movement ) {
-				//$ok = true;
+				$ok = true;
 			//consulta el id del detalle a nivel producto
 				$sql = "{$p_p_movement['id_movimiento_almacen_detalle']}";
 				$stm = $this->link->query( $sql );
@@ -126,8 +126,8 @@
 				$row = $stm->fetch_row();
 				$p_p_movement['id_movimiento_almacen_detalle'] = $row[0];
 			//consulta el id de la validacion si es el caso
-				if( $p_p_movement['id_pedido_validacion'] != -1 && $p_p_movement['id_pedido_validacion'] != "-1" ){
-					$sql = "{$p_p_movement['id_pedido_validacion']}";
+				if( $p_p_movement['id_pedido_validacion'] != -1 && $p_p_movement['id_pedido_validacion'] != "" ){
+					$sql = "{$p_p_movement['id_pedido_validacion']}";die($sql);
 					$stm = $this->link->query( $sql );
 					if( $this->link->error ){
 						$ok = false;
@@ -135,8 +135,8 @@
 					}
 					$row = $stm->fetch_row();
 					$p_p_movement['id_pedido_validacion'] = $row[0];
-				}
-				if( $ok == true ){
+				}//echo 'here';
+				if( $ok == true ){//echo 'here';
 					$this->link->autocommit( false );//declara inicio de la transaccion
 				//inserta registro a nivel proveedor producto
 					$sql = "CALL spMovimientoDetalleProveedorProducto_inserta( {$p_p_movement['id_movimiento_almacen_detalle']}, {$p_p_movement['id_proveedor_producto']}, {$p_p_movement['cantidad']}, 

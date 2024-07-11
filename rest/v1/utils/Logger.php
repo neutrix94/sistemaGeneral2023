@@ -3,7 +3,8 @@
     {
         private $link;
         function __construct( $connect ){
-            $this->link = $connect;
+            include( '../../conexionMysqli.php' );
+            $this->link = $link;
         }
 
         /*private function connect(){
@@ -37,11 +38,14 @@
             return array( "status"=>"ok", "id_sincronizacion"=>$row['last_id'] );
         }
 
-        public function insertLoggerSteepRow( $synchronization_id, $description, $sql_query ){
+        public function insertLoggerSteepRow( $synchronization_id, $description, $sql_query, $debug = false ){
+            /*if( $debug ){
+                var_dump($this->link);
+            }*/
             $sql_query = str_replace( "'", "\'", $sql_query );
             $sql = "INSERT INTO LOG_sincronizacion_pasos ( id_sincronizacion, descripcion, consulta_sql, fecha_alta )
                 VALUES ( {$synchronization_id}, '{$description}', '{$sql_query}', NOW() )";
-            $stm = $this->link->query( $sql ) or die( "Error en insertLoggerSteepRow : {$sql} : {$this->link->error}" );
+            $stm = $this->link->query( $sql ) or die( "Error en insertLoggerSteepRow : {$this->link->error} : {$sql} " );
         //recupera el registro
             $sql = "SELECT MAX( id_sincronizacion_paso ) AS last_id FROM LOG_sincronizacion_pasos";
             $stm = $this->link->query( $sql ) or die( "Error en recuperar ultimo id insertado en log de sincronizacion paso : {$sql} : {$this->link->error}" );

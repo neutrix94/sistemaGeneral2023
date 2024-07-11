@@ -6,7 +6,9 @@
 		private $LOGGER;
 		function __construct( $connection, $Logger = false ){
 //	die( 'here' );
-			$this->link = $connection;
+            include( '../../conexionMysqli.php' );
+            $this->link = $link;
+			//$this->link = $connection;
 			$this->LOGGER = $Logger;
 		}
 //verificar si las APIS estan bloqueadas
@@ -310,7 +312,7 @@
 		            WHERE folio_unico = '{$unique_folio}'";
 		    $stm = $this->link->query( $sql );
 				if( $logger_id ){
-					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza respuesta de petición", $sql );
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza respuesta de petición", $sql, true );
 				}
 				if( $this->link->error ){
 					if( $logger_id ){
