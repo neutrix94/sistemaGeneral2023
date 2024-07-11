@@ -72,18 +72,14 @@
 			foreach ( $product_providers_movements as $key => $p_p_movement ) {
 				$ok = true;
 			//inserta cabecera
-				$sql = "INSERT INTO ec_movimiento_detalle_proveedor_producto ( id_movimiento_almacen_detalle, 
-				id_proveedor_producto, cantidad, fecha_registro, id_sucursal, status_agrupacion, 
-				id_tipo_movimiento, id_almacen, id_pedido_validacion, folio_unico, sincronizar, insertado_por_sincronizacion )
-				VALUES ( {$p_p_movement['id_movimiento_almacen_detalle']}, {$p_p_movement['id_proveedor_producto']}, 
-					'{$p_p_movement['cantidad']}', '{$p_p_movement['fecha_registro']}', '{$p_p_movement['id_sucursal']}', 
-					'{$p_p_movement['status_agrupacion']}', '{$p_p_movement['id_tipo_movimiento']}', 
-					'{$p_p_movement['id_almacen']}', '{$p_p_movement['id_pedido_validacion']}', '{$p_p_movement['folio_unico']}', '1', '1' )";
-				$sql = str_replace("' (", "(", $sql);
+				$sql = "CALL spMovimientoDetalleProveedorProducto_inserta( {$p_p_movement['id_movimiento_almacen_detalle']}, {$p_p_movement['id_proveedor_producto']}, {$p_p_movement['cantidad']}, 
+				{$p_p_movement['id_sucursal']}, {$p_p_movement['id_tipo_movimiento']}, {$p_p_movement['id_almacen']}, {$p_p_movement['id_pedido_validacion']}, 
+				{$p_p_movement['id_pantalla']}, '{$p_p_movement['folio_unico']}' )";
+				/*$sql = str_replace("' (", "(", $sql);
 				$sql = str_replace("'(", "(", $sql);
 				$sql = str_replace(")'", ")", $sql);
 				$sql = str_replace(") '", ")", $sql);
-				$sql = str_replace("NULL, ,", "NULL, NULL,", $sql);
+				$sql = str_replace("NULL, ,", "NULL, NULL,", $sql);*/
 				$stm_head = $this->link->query( $sql )or die( "Error al insertar de movimiento de almacen proveedor producto : {$sql} {$this->link->error}" );
 				if( ! $stm_head ){
 					return array( "error"=>"Error al insertar movimiento detalle proveedor producto : {$this->link->error} {$sql}");
