@@ -27,6 +27,8 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
   $LOGGER = false;
   
   $body = $request->getBody();
+  $product_provider_movements = $request->getParam( "product_provider_movements" );
+  $log = $request->getParam( "log" );
   $resp = array();
   $resp["ok_rows"] = '';
   $resp["error_rows"] = '';
@@ -64,8 +66,6 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
 
 
 //
-  $product_provider_movements = $request->getParam( "product_provider_movements" );
-  $log = $request->getParam( "log" );
 
 
 
