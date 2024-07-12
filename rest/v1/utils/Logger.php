@@ -42,9 +42,9 @@
             /*if( $debug ){
                 var_dump($this->link);
             }*/
-            //$sql_query = str_replace( "'", "\'", $sql_query );
+            $sql_query = str_replace( "'", "", $sql_query );
             $sql = "INSERT INTO LOG_sincronizacion_pasos ( id_sincronizacion, descripcion, consulta_sql, fecha_alta )
-                VALUES ( {$synchronization_id}, \"{$description}\", \"{$sql_query}\", NOW() )";
+                VALUES ( {$synchronization_id}, '{$description}', '{$sql_query}', NOW() )";
             $stm = $this->link->query( $sql ) or die( "Error en insertLoggerSteepRow : {$this->link->error} : {$sql} " );
         //recupera el registro
             $sql = "SELECT MAX( id_sincronizacion_paso ) AS last_id FROM LOG_sincronizacion_pasos";
@@ -55,8 +55,7 @@
 
         public function insertErrorSteepRow( $synchronization_steep_id, $table_name, $row_unique_folio, $sql_query, $sql_error ){
             
-            $sql_query = str_replace( "'", "\'", $sql_query );
-            $sql_error = str_replace( "'", "\'", $sql_error );
+            $sql_query = str_replace( "'", "", $sql_query );
             $sql = "INSERT INTO LOG_sincronizacion_pasos_errores ( id_sincronizacion_paso, tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
                 VALUES ( {$synchronization_steep_id}, '{$table_name}', '{$row_unique_folio}', '{$sql_query}', '{$sql_error}', NOW() )";
             $stm = $this->link->query( $sql ) or die( "Error en insertErrorSteepRow : {$sql} : {$this->link->error}" );
