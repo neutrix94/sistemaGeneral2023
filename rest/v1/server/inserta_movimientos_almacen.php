@@ -74,7 +74,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
     $Logger = new Logger( $link );//instancia clase de Logs
   //inserta la peticion 
     if( $LOGGER ){
-      $LOGGER = $Logger->insertLoggerRow( "{$log['unique_folio']}", 'sys_sincronizacion_movimientos_almacen', $log['system_store'], -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
+      $LOGGER = $Logger->insertLoggerRow( "{$log['unique_folio']}", 'sys_sincronizacion_movimientos_almacen', $log['origin_store'], -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
       $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Llega peticion de local a Linea : ', "{$body}" );
     }
   }
