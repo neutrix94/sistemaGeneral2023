@@ -17,15 +17,16 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-
-  $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
-  $productProviderMovementsSynchronization = new productProviderMovementsSynchronization( $link );//instancia clase de sincronizacion de movimientos
-/*valida que las apis no esten bloqueadas
-  $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
-  if( $validation != 'ok' ){
-    return $validation;
-  }*/
-
+  if( ! include( 'utils/warehouseProductProviderMovementsRowsVerification.php' ) ){
+    die( "No se incluyó : warehouseProductProviderMovementsRowsVerification.php" );
+  }
+  if( !include( 'utils/Logger.php' ) ){
+    die( "No se pudo incluir la clase Logger.php" );
+  }
+  $Logger = false;
+  $LOGGER = false;
+  
+  $body = $request->getBody();
   $resp = array();
   $resp["ok_rows"] = '';
   $resp["error_rows"] = '';
@@ -34,6 +35,33 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
   
   $tmp_ok = "";
   $tmp_no = "";
+  /*Consulta Configuracion del Log*/
+  $sql = "SELECT
+    log_habilitado AS log_is_enabled
+  FROM sys_configuraciones_logs  
+  WHERE id_configuracion_log = 1";
+  $stm = $link->query( $sql ) or die( "Error al consultar si el log esta habilitado : {$sql} : {$this->link->error}" );
+  $row = $stm->fetch_assoc();
+  $LOGGER = ( $row['log_is_enabled'] == 1 ? true : false );
+
+  if( $LOGGER ){
+    $Logger = new Logger( $link );//instancia clase de Logs
+    //inserta la peticion 
+      if( $LOGGER ){
+        $LOGGER = $Logger->insertLoggerRow( "{$log['unique_folio']}", 'sys_sincronizacion_movimientos_proveedor_producto', $log['origin_store'], -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
+        $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Llega peticion de local a Linea : ', "{$body}" );
+      }
+  }
+
+  $warehouseProductProviderMovementsRowsVerification = new warehouseProductProviderMovementsRowsVerification( $link, $Logger );
+  $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
+  $productProviderMovementsSynchronization = new productProviderMovementsSynchronization( $link, $Logger );//instancia clase de sincronizacion de movimientos
+/*valida que las apis no esten bloqueadas
+  $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
+  if( $validation != 'ok' ){
+    return $validation;
+  }*/
+
 
 //
   $product_provider_movements = $request->getParam( "product_provider_movements" );
