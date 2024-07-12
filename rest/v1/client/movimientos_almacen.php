@@ -89,7 +89,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
 /*Envia Peticion a Linea*/
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_movimientos_almacen", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
   $result = json_decode( $result_1 );//decodifica respuesta
-var_dump( $result );
+var_dump( $result_1 );die( "here" );
   if( $result == '' || $result == null ){ //en caso de que la respuesta este vacia
     if( $result_1 == '' || $result_1 == null ){
       $result_1 = "Posiblemente no hay conexion con el servidor de Linea";

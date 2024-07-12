@@ -162,7 +162,7 @@
 		          FROM api_config WHERE name = 'path'";
 			$stm = $this->link->query( $sql );// or die( "Error al consultar path de api : {$this->link->error}" );			
 			
-			if( $logger_id ){die( "1" );
+			if( $logger_id ){//die( "1" );
 				$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Se consulta la configuracion para el modulo {$table}", $sql );
 			}
 			//die( "1.1" );
