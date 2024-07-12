@@ -86,7 +86,6 @@
                     }
                     die( "Error al consultar detalle de json : {$this->link->error} {$sql}" );
                 }
-            // or die( "Error al consultar detalle de json : {$sql} : {$this->link->error}" );
             $resp['verification'] = ( $stm->num_rows > 0 ? true : false );
             while( $detail = $stm_2->fetch_assoc() ){
                 //echo 'here';
@@ -277,15 +276,15 @@
             }
             $sql = "UPDATE sys_sincronizacion_movimientos_almacen SET id_status_sincronizacion = 3 WHERE registro_llave IN( $uniques_folios )";
             $stm = $this->link->query( $sql );
-            if( $logger_id ){
-                $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualizar detalles (jsons)", $sql );
-            }
-            if( $this->link->error ){
                 if( $logger_id ){
-                    $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al actualizar detalles (jsons)", 'sys_sincronizacion_movimientos_almacen', $sql, $this->link->error );
+                    $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualizar detalles (jsons)", $sql );
                 }
-                die( "Error al actualizar detalles (jsons) local : {$this->link->error} {$sql}" );
-            }
+                if( $this->link->error ){
+                    if( $logger_id ){
+                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al actualizar detalles (jsons)", 'sys_sincronizacion_movimientos_almacen', $sql, $this->link->error );
+                    }
+                    die( "Error al actualizar detalles (jsons) local : {$this->link->error} {$sql}" );
+                }
             $this->link->autocommit( true );
             return 'ok';
         }

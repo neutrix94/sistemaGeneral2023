@@ -63,6 +63,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
       ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
   }
+
 /*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
   $req['verification'] = $warehouseMovementsRowsVerification->getPendingWarehouseMovement( $system_store, -1, 
     ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene los registros de comprobacion de movientos de almacen
@@ -72,11 +73,15 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     'sys_sincronizacion_movimientos_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta log de request
   $setMovements = $movementsSynchronization->setNewSynchronizationMovements( $system_store, $system_store, $store_prefix, 
   $movements_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos de almacen
+  
   if( $setMovements != 'ok' ){
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
     return json_encode( array( "response" => $setMovements ) );
   }
-  $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 1, $req['log']['unique_folio'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+
+  $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 1, $req['log']['unique_folio'], 
+  ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_movimientos_almacen", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
   $result = json_decode( $result_1 );//decodifica respuesta
@@ -98,6 +103,8 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     }
   }
   $verification_req = array();
+
+  
   if( $result->verification_movements->rows_download != null && $result->verification_movements->rows_download != '' ){
     $download = $result->verification_movements->rows_download;
     $petition_log = json_decode(json_encode($download->petition), true);
