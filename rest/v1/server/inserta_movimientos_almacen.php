@@ -175,7 +175,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
 //desbloquea indicador de sincronizacion en tabla
   $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   if( $LOGGER ){
-    $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Respuesta de Linea a local : ', "{$resp}" );
+    $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Respuesta de Linea a local : ', json_encode($resp) );
   }
   return json_encode( $resp );
 
