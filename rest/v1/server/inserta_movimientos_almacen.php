@@ -27,9 +27,9 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   $Logger = false;
   $LOGGER = false;
   
-  $warehouseMovementsRowsVerification = new warehouseMovementsRowsVerification( $link );
-  $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
-  $movementsSynchronization = new movementsSynchronization( $link );//instancia clase de sincronizacion de movimientos
+  $warehouseMovementsRowsVerification = new warehouseMovementsRowsVerification( $link, $Logger );
+  $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
+  $movementsSynchronization = new movementsSynchronization( $link, $Logger );//instancia clase de sincronizacion de movimientos
 /*valida que las apis no esten bloqueadas
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
   if( $validation != 'ok' ){
