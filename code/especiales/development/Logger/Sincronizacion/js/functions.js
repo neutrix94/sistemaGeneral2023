@@ -18,7 +18,12 @@
                 X
             </button>
         </div>`;
-        var val = $( obj ).val();
+        var val = $( obj ).val().trim();
+        val = val.replaceAll( "	            ", "" );
+        val = val.replaceAll( "		       		", "" );
+        val = val.replaceAll( "			", "" );
+        val = val.replaceAll( "		         ", "" );
+        val = val.replaceAll( "                   ", "" );
         $( '.emergent_content' ).html( `${button}<textarea class="textarea_full">${val}</textarea>` );
         $( '.emergent' ).css( 'display', 'block' );
     }

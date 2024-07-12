@@ -6,8 +6,8 @@
     <div class="emergent_content"></div>
 </div>
 <div class="row header bg-warning">
-    <div class="col-6">
-        Buscar por folio unico
+    <div class="col-5">
+        <h6>Buscar por folio unico</h6>
         <div class="input-group">
             <input type="text" class="form-control" id="folio_input">
             <button
@@ -19,8 +19,8 @@
             </button>
         </div>
     </div>
-    <div class="col-6">
-        Filtrar por tablas<br>
+    <div class="col-5">
+        <h6>Filtrar por tablas</h6>
         <?php
             if( !include( '../../../../../conexionMysqli.php' ) ){
                 die( "../../../../../conexionMysqli.php" );
@@ -32,9 +32,23 @@
             echo $LoggerViewer->getTables();
         ?>
     </div>
+    <div class="col-2">
+    <h6>Limite</h6>
+        <input type="number" class="form-control" id="limite_input">
+    </div>
 </div>
 <div class="content">
     <?php
         echo $LoggerViewer->getLoggerRows();
     ?>
+</div>
+
+<div class="footer bg-warning text-center">
+    <button
+        type="button"
+        class="btn btn-light"
+        onclick="location.href='../../../../../index.php?';"
+    >
+        Regresar al Panel
+    </button>
 </div>

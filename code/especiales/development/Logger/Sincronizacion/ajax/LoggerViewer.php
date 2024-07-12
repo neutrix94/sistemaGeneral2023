@@ -30,7 +30,7 @@ final class LoggerViewer
         }
 
         public function getTables(){
-            $resp = "<select class=\"form-select\" style=\"padding:7px;\" onchange=\"filtra_por_tabla( this );\">
+            $resp = "<select class=\"form-select form-control\" style=\"padding:7px;\" onchange=\"filtra_por_tabla( this );\">
             <option value=\"-1\">Todas</option>";
             $sql = "SELECT DISTINCT( tabla ) AS table_name FROM LOG_sincronizaciones";
             $stm = $this->link->query( $sql ) or die( "Error al consultar tablas de logs : {$sql} : {$this->link->error}" );
@@ -68,10 +68,12 @@ final class LoggerViewer
             //$contents = $LoggerViewer->getLoggerRows();
             //var_dump( $contents );
             foreach ($contents as $key => $content) {
-                echo "<div class=\"row mg_30\" >
+                $class = ( $key % 2 != 0 ? "primary" : "success" );
+
+                echo "<div class=\"row mg_30\" style=\"box-shadow:1px 1px 5px rgba( 0,0,225,.5 );\">
                     <table class=\"table table-striped\">
                     <thead>
-                    <tr class=\"btn-primary\">
+                    <tr class=\"btn-{$class}\">
                         <th>ID</th>
                         <th>Folio Unico Sinc</th>
                         <th>Tabla</th>
@@ -95,7 +97,7 @@ final class LoggerViewer
                     <table class=\"table\">
                     <thead onclick=\"show_or_hidde( {$key} );\">
                         <tr>
-                            <th class=\"text-center btn-info\" colspan=\"7\">PASOS : <th>
+                            <th class=\"text-center btn-info\" colspan=\"7\">PASOS : </th>
                         </tr>
                     </thead>
                     <tbody class=\"hidden\" id=\"body_{$key}\">
@@ -106,6 +108,7 @@ final class LoggerViewer
                             <th class=\"text-center\">SQL</th>
                         </tr>";
                     foreach ($content['steps'] as $key2 => $step) {
+                        $step['consulta_sql'] = trim($step['consulta_sql']);
                         echo "<tr>
                             <td>{$content['id_sincronizacion']}.{$key2}</td>
                             <td>{$step['descripcion']}</td>
@@ -124,7 +127,7 @@ final class LoggerViewer
                                 <table class=\"table\">
                                     <thead>
                                         <tr>
-                                            <th class=\"text-center btn-danger\" collspan=\"5\">ERRORES : <th>
+                                            <th class=\"text-center btn-danger\" colspan=\"5\">ERRORES : <th>
                                         </tr>
                                         <tr>
                                             <th class=\"text-center\">Tabla</th>
@@ -154,7 +157,7 @@ final class LoggerViewer
                 }
                 echo "</tbody>
                     </table>
-                </div>";
+                </div><hr>";
             }
         }
 
