@@ -85,11 +85,10 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
 /*Codifica peticion en JSON*/
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
-//return $post_data;
 /*Envia Peticion a Linea*/
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_movimientos_almacen", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
   $result = json_decode( $result_1 );//decodifica respuesta
-var_dump( $result_1 );die( "here" );
+//var_dump( $result_1 );die( "here" );
   if( $result == '' || $result == null ){ //en caso de que la respuesta este vacia
     if( $result_1 == '' || $result_1 == null ){
       $result_1 = "Posiblemente no hay conexion con el servidor de Linea";
@@ -102,13 +101,13 @@ var_dump( $result_1 );die( "here" );
   $response_time = $result->log->response_time;
 /*Procesa Respuesta de comprobacion*/
   if( $result->verification_movements->log_response != null && $result->verification_movements->log_response != '' ){
-    $update_log = $warehouseMovementsRowsVerification->updateLogAndJsonsRows( $resultado->verification_movements->log_response, $resultado->verification_movements->rows_response, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    //var_dump( $result->verification_movements->log_response );
+    $update_log = $warehouseMovementsRowsVerification->updateLogAndJsonsRows( $result->verification_movements->log_response, $result->verification_movements->rows_response, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     if( $update_log != 'ok' ){
       die( "Hubo un error : {$update_log}" );
     }
   }
   $verification_req = array();
-
 /*Procesa comprobaciones de linea a local*/
   if( $result->verification_movements->rows_download != null && $result->verification_movements->rows_download != '' ){
     $download = $result->verification_movements->rows_download;
@@ -116,9 +115,8 @@ var_dump( $result_1 );die( "here" );
     $movements = json_decode(json_encode($download->rows), true);
     if( $download->verification == true ){
       if( sizeof($petition_log) > 0 ){
-        $verification_req['log_response'] = $warehouseMovementsRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta si la peticion existe en local
+        $verification_req['log_response'] = $warehouseMovementsRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta si la peticion existe en local 
         $verification_req['rows_response'] = $warehouseMovementsRowsVerification->warehouseMovementsValidation( $movements, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
-    
         $post_data = json_encode( $verification_req );
         $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_comprobacion_movimientos_almacen", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consume servicio para actualizar la comprobacion en linea
       }
@@ -133,7 +131,7 @@ var_dump( $result_1 );die( "here" );
   if( $result->error_rows != '' && $result->error_rows != null ){
     $local_response_log = $movementsSynchronization->updateMovementSynchronization( $result->error_rows, $req["log"]["unique_folio"], 2, false, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza registros con erores
   }
-  if( $result->log != '' && $result->log != null ){die('here');
+  if( $result->log != '' && $result->log != null ){//die('here');
     $local_response_log = $SynchronizationManagmentLog->updatePetitionLog( $result->log->destinity_time, $result->log->response_time, $result->log->response_string, 
       $result->log->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza respuesta en servidor local
   }

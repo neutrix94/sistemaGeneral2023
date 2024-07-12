@@ -159,7 +159,7 @@
             //consulta la hor actual
                 $sql = "SELECT NOW() AS current_date_time";
                 $stm_2 = $this->link->query( $sql ) or die( "Error al consultar la fecha y hora : {$sql} : {$this->link->error}" );
-                $row = $stm->fetch_assoc();
+                $row = $stm_2->fetch_assoc();
                 $resp['datetime_destinity'] = $row['current_date_time'];
                 $resp['datetime_send_response'] = $row['current_date_time'];
                 $resp['response_content'] = $row['current_date_time'];

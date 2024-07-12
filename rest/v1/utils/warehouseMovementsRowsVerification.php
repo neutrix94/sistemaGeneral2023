@@ -160,7 +160,7 @@
             //consulta la hor actual
                 $sql = "SELECT NOW() AS current_date_time";
                 $stm_2 = $this->link->query( $sql ) or die( "Error al consultar la fecha y hora : {$sql} : {$this->link->error}" );
-                $row = $stm->fetch_assoc();
+                $row = $stm_2->fetch_assoc();
                 $resp['datetime_destinity'] = $row['current_date_time'];
                 $resp['datetime_send_response'] = $row['current_date_time'];
                 $resp['response_content'] = $row['current_date_time'];
@@ -248,7 +248,6 @@
         public function updateLogAndJsonsRows( $log_response, $rows_response, $logger_id = false ){
             $log_steep_id = null;
             $this->link->autocommit( false );
-            //die( "here1" );
             $log_response->response_content = str_replace( "'", "\'", $log_response->response_content );
             $sql = "UPDATE sys_sincronizacion_peticion SET hora_llegada_destino = IF( hora_llegada_destino IS NULL OR hora_llegada_destino = '', '{$log_response->datetime_destinity}', hora_llegada_destino ),
                         hora_respuesta = IF( hora_respuesta IS NULL OR hora_respuesta = '', '{$log_response->datetime_send_response}', hora_respuesta ),
