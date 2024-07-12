@@ -41,24 +41,25 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   if( $LOGGER ){
     $Logger = new Logger( $link );//instancia clase de Logs
   }
-
+/*instancia de clases*/
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
   $warehouseMovementsRowsVerification = new warehouseMovementsRowsVerification( $link, $Logger );//instancia de clase de comprobacion de movimientos de almacen
   $movementsSynchronization = new movementsSynchronization( $link, $Logger );//instancia clase de sincronizacion de movimientos
-//consulta path del sistema central
+//consulta path del sistema central y configuraciones del modulo
   $config = $SynchronizationManagmentLog->getSystemConfiguration( 'ec_movimiento_almacen' );
   $path = trim ( $config['value'] );
   $system_store = $config['system_store'];
   $store_prefix = $config['store_prefix'];
   $initial_time = $config['process_initial_date_time'];
   $movements_limit = $config['rows_limit'];
-  
+  /*LOGGER*/
     if( $LOGGER ){
       $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_movimientos_almacen', $system_store, -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
       $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Se consulta la configuracion de la sucursal y modulo', $config['logger_sql'] );
     }
-
-  if( $system_store == -1 ){//valida que el origen no sea linea
+  /*LOGGER*/
+/*valida que el origen no sea linea*/
+  if( $system_store == -1 ){
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_almacen', 
       ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
@@ -69,23 +70,27 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene los registros de comprobacion de movientos de almacen
 /*Fin de comprobacion de movimientos de almacen*/
 
+/*Inserta Log de peticion*/
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN', 
     'sys_sincronizacion_movimientos_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta log de request
+/*Crea JSONS de movimientos de almacen*/
   $setMovements = $movementsSynchronization->setNewSynchronizationMovements( $system_store, $system_store, $store_prefix, 
   $movements_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos de almacen
-  
   if( $setMovements != 'ok' ){
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
     return json_encode( array( "response" => $setMovements ) );
   }
-
+/*Consulta JSONS de movimeintos de almacen*/
   $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 1, $req['log']['unique_folio'], 
   ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
-  
+/*Codifica peticion en JSON*/
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
+//return $post_data;
+/*Envia Peticion a Linea*/
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_movimientos_almacen", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
   $result = json_decode( $result_1 );//decodifica respuesta
-  if( $result == '' || $result == null ){  
+var_dump( $result );
+  if( $result == '' || $result == null ){ //en caso de que la respuesta este vacia
     if( $result_1 == '' || $result_1 == null ){
       $result_1 = "Posiblemente no hay conexion con el servidor de Linea";
     }
@@ -95,7 +100,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     return json_encode( array( "response" => "Respuesta Erronea : {$result_1}" ) );
   }
   $response_time = $result->log->response_time;
-/*Respuesta de comprobacion*/
+/*Procesa Respuesta de comprobacion*/
   if( $result->verification_movements->log_response != null && $result->verification_movements->log_response != '' ){
     $update_log = $warehouseMovementsRowsVerification->updateLogAndJsonsRows( $resultado->verification_movements->log_response, $resultado->verification_movements->rows_response, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     if( $update_log != 'ok' ){
@@ -104,7 +109,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   }
   $verification_req = array();
 
-  
+/*Procesa comprobaciones de linea a local*/
   if( $result->verification_movements->rows_download != null && $result->verification_movements->rows_download != '' ){
     $download = $result->verification_movements->rows_download;
     $petition_log = json_decode(json_encode($download->petition), true);
@@ -120,6 +125,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     }
   }
 /*Fin de Respuesta de Comprobacion*/
+
   $local_response_log = array();
   if( $result->ok_rows != '' && $result->ok_rows != null ){
     $local_response_log = $movementsSynchronization->updateMovementSynchronization( $result->ok_rows, $req["log"]["unique_folio"], 3, false, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza registros exitosos
@@ -127,7 +133,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   if( $result->error_rows != '' && $result->error_rows != null ){
     $local_response_log = $movementsSynchronization->updateMovementSynchronization( $result->error_rows, $req["log"]["unique_folio"], 2, false, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza registros con erores
   }
-  if( $result->log != '' && $result->log != null ){
+  if( $result->log != '' && $result->log != null ){die('here');
     $local_response_log = $SynchronizationManagmentLog->updatePetitionLog( $result->log->destinity_time, $result->log->response_time, $result->log->response_string, 
       $result->log->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza respuesta en servidor local
   }
