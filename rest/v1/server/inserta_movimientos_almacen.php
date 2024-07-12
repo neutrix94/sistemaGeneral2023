@@ -27,14 +27,13 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   $Logger = false;
   $LOGGER = false;
   
-  $warehouseMovementsRowsVerification = new warehouseMovementsRowsVerification( $link, $Logger );
-  $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
-  $movementsSynchronization = new movementsSynchronization( $link, $Logger );//instancia clase de sincronizacion de movimientos
-/*valida que las apis no esten bloqueadas
-  $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
-  if( $validation != 'ok' ){
-    return $validation;
-  }*/
+  $body = $request->getBody();
+  $resp = array();
+  $resp["ok_rows"] = '';
+  $resp["error_rows"] = '';
+  $resp["status"] = "ok";
+  $resp["verification_movements"] = array();
+  
   $sql = "SELECT
     log_habilitado AS log_is_enabled
   FROM sys_configuraciones_logs  
@@ -46,12 +45,14 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   if( $LOGGER ){
     $Logger = new Logger( $link );//instancia clase de Logs
   }
-  $body = $request->getBody();
-  $resp = array();
-  $resp["ok_rows"] = '';
-  $resp["error_rows"] = '';
-  $resp["status"] = "ok";
-  $resp["verification_movements"] = array();
+  $warehouseMovementsRowsVerification = new warehouseMovementsRowsVerification( $link, $Logger );
+  $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
+  $movementsSynchronization = new movementsSynchronization( $link, $Logger );//instancia clase de sincronizacion de movimientos
+/*valida que las apis no esten bloqueadas
+  $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
+  if( $validation != 'ok' ){
+    return $validation;
+  }*/
   
   $tmp_ok = "";
   $tmp_no = "";
