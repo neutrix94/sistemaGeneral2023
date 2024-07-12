@@ -67,6 +67,21 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
 
 //
 
+/*COMPROBACION 2024*/
+  $petition_log = $VERIFICATION["petition"];//recibe folio unico de la peticion
+  //var_dump( $petition_log );
+  $verification = $VERIFICATION["verification"];
+  //$origin_store = $VERIFICATION->getParam( 'origin_store' );
+  $pending_movements = $VERIFICATION["rows"];
+  if( $verification == true ){
+  //consulta si la peticion existe en linea
+      $resp["verification_movements"]["log_response"] = $warehouseProductProviderMovementsRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      $resp["verification_movements"]["rows_response"] = $warehouseProductProviderMovementsRowsVerification->warehouseProductProviderMovementsValidation( $pending_movements, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
+  }
+  $resp["verification_movements"]["rows_download"] = $warehouseMovementsRowsVerification->getPendingWarehouseMovement( -1, $log['origin_store'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta las comprobaciones pendientes de linea a local
+  //var_dump( $resp );
+  //return json_encode( $resp );
+/*Comprobacion*/
 
 
 /*valida que las apis no esten bloqueadas*/
@@ -135,7 +150,10 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
   $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_detalle_proveedor_producto', 'subida', $resp["status"], $log["origin_store"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );//actualiza el resumen de modulo/sucursal ( subida )
   
 //desbloquea indicador de sincronizacion en tabla
-$update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
+  if( $LOGGER ){
+    $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Respuesta de Linea a local : ', json_encode($resp) );
+  }
   return json_encode( $resp );
 
 });

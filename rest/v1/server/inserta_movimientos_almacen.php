@@ -33,7 +33,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   $resp["error_rows"] = '';
   $resp["status"] = "ok";
   $resp["verification_movements"] = array();
-  
+  /*Consulta Configuracion del Log*/
   $sql = "SELECT
     log_habilitado AS log_is_enabled
   FROM sys_configuraciones_logs  
@@ -62,22 +62,11 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   $movements = $request->getParam( "movements" );
  /* var_dump( $movements );
   return '';*/
-//
-  $sql = "SELECT
-            log_habilitado AS log_is_enabled
-          FROM sys_configuraciones_logs  
-          WHERE id_configuracion_log = 1";
-  $stm = $link->query( $sql ) or die( "Error al consultar si el log esta habilitado : {$sql} : {$this->link->error}" );
-  $row = $stm->fetch_assoc();
-  $LOGGER = ( $row['log_is_enabled'] == 1 ? true : false );
   //return $row['log_is_enabled'];
-  if( $LOGGER ){
-    $Logger = new Logger( $link );//instancia clase de Logs
   //inserta la peticion 
-    if( $LOGGER ){
-      $LOGGER = $Logger->insertLoggerRow( "{$log['unique_folio']}", 'sys_sincronizacion_movimientos_almacen', $log['origin_store'], -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
-      $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Llega peticion de local a Linea : ', "{$body}" );
-    }
+  if( $LOGGER ){
+    $LOGGER = $Logger->insertLoggerRow( "{$log['unique_folio']}", 'sys_sincronizacion_movimientos_almacen', $log['origin_store'], -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
+    $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Llega peticion de local a Linea : ', "{$body}" );
   }
 /*COMPROBACION 2024*/
   $petition_log = $VERIFICATION["petition"];//recibe folio unico de la peticion
