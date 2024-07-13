@@ -84,6 +84,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
 /*codifica peticion en JSON*/
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
+  //return $post_data;
 /*Envia peticion a Servidor en linea*/
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_movimientos_proveedor_producto", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
   $result = json_decode( $result_1 );//decodifica respuesta
