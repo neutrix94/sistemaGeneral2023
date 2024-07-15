@@ -40,6 +40,7 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
   }
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
   $salesSynchronization = new salesSynchronization( $link, $Logger );//instancia clase de sincronizacion de movimientos
+  $SalesRowsVerification = new SalesRowsVerification( $link, $Logger );//instancia clase de sincronizacion de movimientos
 /*valida que las apis no esten bloqueadas
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked();
   if( $validation != 'ok' ){
