@@ -170,17 +170,17 @@
             return $resp;
         }
 
-        public function SalesValidation( $movements, $logger_id = false ){
+        public function SalesValidation( $sales, $logger_id = false ){
             $log_steep_id = null;
             $resp = array();
             $resp['ok_rows'] = "";
             $resp['error_rows'] = "";
-            foreach ($movements as $key => $movement_) {
+            foreach ($sales as $key => $sale_) {
                 $this->link->autocommit( false );
-                $movement = json_decode( $movement_['json'] );
+                $sale = json_decode( $sale_['json'] );
                 //var_dump($movement);
             //consulta si la cabecera existe
-                $sql = "SELECT id_pedido AS sale_id FROM ec_pedidos WHERE folio_unico = '{$movement_['registro_llave']}'";
+                $sql = "SELECT id_pedido AS sale_id FROM ec_pedidos WHERE folio_unico = '{$sale_['registro_llave']}'";
                 $stm = $this->link->query( $sql );
                     if( $logger_id ){
                         $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta si ya existe la cabecera de venta", $sql );
@@ -191,12 +191,16 @@
                         }
                         die( "Error al consultar si ya existe la cabecera de venta : {$this->link->error} {$sql}" );
                     }
-                $movement_header_id = 0;
+                $sale_header_id = 0;
                 if( $stm->num_rows <= 0 ){//no existe
-                    //se inserta cabecera de movimiento de almacen por procedure
-				   /* $sql = "CALL spMovimientoAlmacen_inserta( {$movement->id_usuario}, '{$movement->observaciones} \nInsertado desde API por sincronización', {$movement->id_sucursal},
-                    {$movement->id_almacen}, {$movement->id_tipo_movimiento}, -1, -1, '{$movement->id_maquila}', {$movement->id_transferencia}, {$movement->id_pantalla}, '{$movement->folio_unico}' )";
-                    */
+                    $sql = "INSERT INTO ec_pedidos ( folio_nv, id_cliente, fecha_alta, subtotal, total, pagado, 
+                    id_sucursal, id_usuario, descuento, folio_abono, correo, facebook, ultima_sincronizacion, 
+                    ultima_modificacion, tipo_pedido, id_status_agrupacion, id_cajero, id_devoluciones, 
+                    venta_validada, folio_unico, id_sesion_caja, tipo_sistema )
+                VALUES ( '{$sale['folio_nv']}', {$sale['id_cliente']}, '{$sale['fecha_alta']}', '{$sale['subtotal']}', '{$sale['total']}', '{$sale['pagado']}', 
+                    '{$sale['id_sucursal']}', '{$sale['id_usuario']}', '{$sale['descuento']}', '{$sale['folio_abono']}', '{$sale['correo']}', '{$sale['facebook']}', '{$sale['ultima_sincronizacion']}', 
+                    '{$sale['ultima_modificacion']}', '{$sale['tipo_pedido']}', '{$sale['id_status_agrupacion']}', '{$sale['id_cajero']}', '{$sale['id_devoluciones']}', 
+                    '{$sale['venta_validada']}', '{$sale['folio_unico']}', {$sale['id_sesion_caja']}, '{$sale['tipo_sistema']}' )";
                     $sql = "";
                     $stm = $this->link->query( $sql );
                         if( $logger_id ){
@@ -212,35 +216,39 @@
                     $sql = "SELECT MAX( id_pedido ) AS sale_id FROM ec_pedidos";
                     $stm_3 = $this->link->query( $sql ) or die( "Error al recuperar el id de cabecera de venta : {$sql} : {$this->link->error}" );
                     $row = $stm_3->fetch_assoc();
-                    $movement_header_id = $row['movement_id'];
+                    $sale_header_id = $row['sale_id'];
                 }else{
                     $row = $stm->fetch_assoc();
-                    $movement_header_id = $row['movement_id'];
+                    $sale_header_id = $row['sale_id'];
                 }
             //inserta el detalle
-                $movement_detail = $movement->movimiento_detail;
-                foreach ($movement_detail as $key2 => $detail) {
+                $sale_detail = $sale->sale_detail;
+                foreach ($sale_detail as $key2 => $detail) {
                 //comprueba si existe el folio unico del detalle
                     $sql = "SELECT id_pedido_detalle FROM ec_pedidos_detalle WHERE folio_unico = '{$detail->folio_unico}'";
                     $stm_4 = $this->link->query( $sql ) or die( "Error al consultar si existe el detalle de venta : {$sql} : {$this->link->error}" );
                     if( $stm_4->num_rows <= 0 ){
-                        /*$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_header_id}, {$detail->id_producto}, {$detail->cantidad}, {$detail->cantidad_surtida},
-                                    {$detail->id_pedido_detalle}, {$detail->id_oc_detalle}, {$detail->id_proveedor_producto}, {$movement->id_pantalla}, '{$detail->folio_unico}' )";
-                        $stm_5 = $this->link->query( $sql );
+                        $sql = "INSERT INTO ec_pedidos_detalle ( id_pedido, id_producto, cantidad, precio, monto, 
+                                cantidad_surtida, descuento, es_externo, id_precio, folio_unico ) 
+                            VALUES ( '{$sale_header_id}', '{$detail['id_producto']}', '{$detail['cantidad']}', '{$detail['precio']}', '{$detail['monto']}', 
+                                '{$detail['cantidad_surtida']}', '{$detail['descuento']}', '{$detail['es_externo']}', '{$detail['id_precio']}', '{$detail['folio_unico']}' )";
+
+                        $stm = $this->link->query( $sql );
+                        if( $logger_id ){
+                            $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta detalle de venta", $sql );
+                        }
+                        if( $this->link->error ){
+                            $ok = false;
                             if( $logger_id ){
-                                $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta detalle de movimiento de almacen", $sql );
+                                $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar detalle de venta", 'ec_pedidos', $sql, $this->link->error );
                             }
-                            if( $this->link->error ){
-                                if( $logger_id ){
-                                    $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar detalle de movimiento de almacen", 'ec_movimiento_detalle', $sql, $this->link->error );
-                                }
-                                die( "Error al insertar detalle de movimiento de almacen : {$this->link->error} {$sql}" );
-                            }*/
+                            die( "Error al insertar detalle de venta : {$this->link->error} {$sql}" );
+                        }
                     }
                 }
                 $this->link->autocommit( true );
                 $resp['ok_rows'] .= ( $resp['ok_rows'] == '' ? '' : '|' );
-                $resp['ok_rows'] .= ( $movement_['registro_llave'] );
+                $resp['ok_rows'] .= ( $sale_['registro_llave'] );
             }
             //var_dump( $resp );
             //die( $resp['ok_rows'] );
