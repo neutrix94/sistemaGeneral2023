@@ -29,11 +29,12 @@
     }
 
     function filtra_por_tabla(obj){
-        table_name = $( obj ).val().trim();
+        table_name = $( '#table_filter' ).val().trim();
+        limit = $( '#limite_input' ).val();
 		$.ajax({
 			type : 'post',
 			url : 'ajax/LoggerViewer.php',
-			data : { log_flag : 'filter_by_table', table : table_name },
+			data : { log_flag : 'filter_by_table', table : table_name, rows_limit : limit },
 			success : function( dat ){
                 $( '.content' ).html(dat);
 			}

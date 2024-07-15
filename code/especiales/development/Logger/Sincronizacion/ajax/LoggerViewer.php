@@ -9,7 +9,9 @@
             case 'filter_by_table':
                 $table = ( isset( $_POST['table'] ) ? $_POST['table'] : $_GET['table'] );
                 $table = ( $table == -1 ? null : $table );
-                echo $LoggerViewer->getLoggerRows( $table, null );
+                $limit = ( isset( $_POST['rows_limit'] ) ? $_POST['rows_limit'] : $_GET['rows_limit'] );
+                $limit = ( $table == '' ? null : $limit );
+                echo $LoggerViewer->getLoggerRows( $table, null, $limit );
             break;
             case 'filter_by_folio':
                 $folio = ( isset( $_POST['folio'] ) ? $_POST['folio'] : $_GET['folio'] );
@@ -30,7 +32,7 @@ final class LoggerViewer
         }
 
         public function getTables(){
-            $resp = "<select class=\"form-select form-control\" style=\"padding:7px;\" onchange=\"filtra_por_tabla( this );\">
+            $resp = "<select class=\"form-select form-control\" id=\"table_filter\" style=\"padding:7px;\" onchange=\"filtra_por_tabla( this );\">
             <option value=\"-1\">Todas</option>";
             $sql = "SELECT DISTINCT( tabla ) AS table_name FROM LOG_sincronizaciones";
             $stm = $this->link->query( $sql ) or die( "Error al consultar tablas de logs : {$sql} : {$this->link->error}" );
@@ -40,7 +42,7 @@ final class LoggerViewer
             $resp .= "</select>";
             return $resp;
         }
-        public function getLoggerRows( $table = null, $unique_folio = null ){
+        public function getLoggerRows( $table = null, $unique_folio = null, $limit_rows = null ){
             $resp = array();
             $sql = "SELECT
                         id_sincronizacion,
@@ -53,8 +55,8 @@ final class LoggerViewer
                     WHERE 1=1";
             $sql .= ( $table != null ? " AND tabla = '{$table}'" : "" );
             $sql .= ( $unique_folio != null ? " AND folio_unico_sincronizacion = '{$unique_folio}'" : "" );
-
             $sql .= " ORDER BY id_sincronizacion DESC";
+            $sql .= ( $limit_rows != null ? " LIMIT {$limit_rows}" : "" );
             $stm = $this->link->query( $sql ) or die( "Error en getLoggerRows : {$sql} : {$this->link->error}" );
         //recupera el registro
             while ( $row = $stm->fetch_assoc() ){

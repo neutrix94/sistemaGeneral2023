@@ -34,12 +34,21 @@
     </div>
     <div class="col-2">
     <h6>Limite</h6>
-        <input type="number" class="form-control" id="limite_input">
+        <div class="input-group">
+            <input type="number" class="form-control text-end" id="limite_input" value="100">
+            <button
+                type="button"
+                class="btn btn-success"  
+                onclick="filtra_por_tabla('#table_filter');" 
+            >
+                ->
+            </button>
+        </div>
     </div>
 </div>
 <div class="content">
     <?php
-        echo $LoggerViewer->getLoggerRows();
+        echo $LoggerViewer->getLoggerRows( null, null, 100 );
     ?>
 </div>
 
