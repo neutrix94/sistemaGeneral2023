@@ -23,6 +23,8 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
   if( !include( 'utils/Logger.php' ) ){
     die( "No se pudo incluir la clase Logger.php" );
   }
+  $Logger = false;
+  $LOGGER = false;
 //variables
   $req = [];
   $req["sales"] = array();
@@ -39,10 +41,6 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
   if( $LOGGER ){
     $Logger = new Logger( $link );//instancia clase de Logs
   }
-  if( $LOGGER ){
-    $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_ventas', $system_store, -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
-    //$Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Se consulta la configuracion de la sucursal y modulo', $config['logger_sql'] );
-  }
   $SalesRowsVerification = new SalesRowsVerification( $link, $Logger );//instancia clase de verificacion de ventas
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
   $salesSynchronization = new salesSynchronization( $link, $Logger );//instancia clase de sincronizacion de movimientos
@@ -53,6 +51,11 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
   $store_prefix = $config['store_prefix'];
   $initial_time = $config['process_initial_date_time'];
   $movements_limit = $config['rows_limit'];
+
+  if( $LOGGER ){
+    $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_ventas', $system_store, -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
+    //$Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Se consulta la configuracion de la sucursal y modulo', $config['logger_sql'] );
+  }
 
   if( $system_store == -1 ){//valida que el origen no sea linea
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
