@@ -53,6 +53,7 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
   $resp["rows_download"] = array();//registros por descargar
   $resp["log_download"] = array();//log de registros por descargar
   $resp["status"] = "ok";
+  $resp["verification_sales"] = array();
   
   $tmp_ok = "";
   $tmp_no = "";
@@ -60,11 +61,25 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
 //
   $sales = $request->getParam( "sales" );
   $log = $request->getParam( "log" );
+  $VERIFICATION = $request->getParam( 'verification' );
 
   if( $LOGGER ){
     $LOGGER = $Logger->insertLoggerRow( $log['unique_folio'], 'sys_sincronizacion_ventas', $log['origin_store'], -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
     $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Llega petición de local a linea', "{$body}" );
   }
+  /*COMPROBACION 2024*/
+    $petition_log = $VERIFICATION["petition"];//recibe folio unico de la peticion
+    //var_dump( $petition_log );
+    $verification = $VERIFICATION["verification"];
+    //$origin_store = $VERIFICATION->getParam( 'origin_store' );
+    $pending_sales = $VERIFICATION["rows"];
+    if( $verification == true ){
+    //consulta si la peticion existe en linea
+        $resp["verification_sales"]["log_response"] = $SalesRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+        $resp["verification_sales"]["rows_response"] = $SalesRowsVerification->SalesValidation( $pending_sales, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
+    }
+    $resp["verification_sales"]["rows_download"] = $SalesRowsVerification->getPendingSales( -1, $log['origin_store'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta las comprobaciones pendientes de linea a local
+    
 
 /*valida que las apis no esten bloqueadas*/
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
@@ -123,9 +138,9 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
     return json_encode( array( "response"=>"La sucursal es local y no puede ser servidor." ) );
   }
 //ejecuta el procedure para generar los movimientos de almacen
-  $setMovements = $salesSynchronization->setNewSynchronizationSales( $log['origin_store'], $system_store, $store_prefix, $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  if( $setMovements != 'ok' ){
-    return json_encode( array( "response" => $setMovements ) );
+  $setSales = $salesSynchronization->setNewSynchronizationSales( $log['origin_store'], $system_store, $store_prefix, $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  if( $setSales != 'ok' ){
+    return json_encode( array( "response" => $setSales ) );
   }
 
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'VENTAS DESDE LINEA', 'sys_sincronizacion_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );

@@ -67,9 +67,16 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
     return json_encode( array( "response" => $setMovements ) );
   }
+  
+/*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
+  $req['verification'] = $SalesRowsVerification->getPendingSales( $system_store, -1, 
+  ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene los registros de comprobacion de movientos de almacen
+/*Fin de comprobacion de movimientos de almacen*/
+
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'VENTAS', 'sys_sincronizacion_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta request
   $req["sales"] = $salesSynchronization->getSynchronizationSales( -1, $movements_limit, $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
+//return $post_data;
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_ventas", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
 
   $result = json_decode( $result_1 );//decodifica respuesta

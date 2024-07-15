@@ -25,7 +25,7 @@
             return 'ok';
         }
 
-        public function getPendingWarehouseMovement( $origin_store_id, $destinity_store_id, $logger_id = false){
+        public function getPendingSales( $origin_store_id, $destinity_store_id, $logger_id = false){
             $log_steep_id = null;
             $resp = array();
             $pending_rows = array();
