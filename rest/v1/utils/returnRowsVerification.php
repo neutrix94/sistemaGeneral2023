@@ -167,7 +167,7 @@
                 }
                 //var_dump($movement);
             //consulta si la cabecera existe
-                $sql = "SELECT id_movimiento_almacen AS movement_id FROM ec_movimiento_almacen WHERE folio_unico = '{$return_['registro_llave']}'";
+                $sql = "SELECT id_devolucion AS return_id FROM ec_devolucion WHERE folio_unico = '{$return_['registro_llave']}'";
                 $stm = $this->link->query( $sql );
                     if( $logger_id ){
                         $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta si ya existe la cabecera de movimiento de almacen en la comprobacion", $sql );
@@ -210,7 +210,7 @@
 				$return_detail = $return['return_detail'];
                 foreach ($return_detail as $key2 => $detail) {
                 //comprueba si existe el folio unico del detalle
-                    $sql = "SELECT id_devolucion_detalle FROM ec_devolucion WHERE folio_unico = '{$detail["folio_unico"]}'";
+                    $sql = "SELECT id_devolucion_detalle FROM ec_devolucion_detalle WHERE folio_unico = '{$detail["folio_unico"]}'";
                     $stm_4 = $this->link->query( $sql ) or die( "Error al consultar si existe el detalle de devolución : {$sql} : {$this->link->error}" );
                     if( $stm_4->num_rows <= 0 ){
                         

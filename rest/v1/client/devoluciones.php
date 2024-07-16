@@ -40,6 +40,7 @@ $app->get('/obtener_devoluciones', function (Request $request, Response $respons
   if( $LOGGER ){
     $Logger = new Logger( $link );//instancia clase de Logs
   }
+  $returnRowsVerification = new returnRowsVerification( $link, $Logger );
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
   $returnsSynchronization = new returnsSynchronization( $link, $Logger );//instancia clase de sincronizacion de movimientos
 
@@ -59,6 +60,11 @@ $app->get('/obtener_devoluciones', function (Request $request, Response $respons
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
   }
 
+/*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
+  $req['verification'] = $returnRowsVerification->getPendingValidationReturns( $system_store, -1, 
+    ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene los registros de comprobacion de movientos de almacen
+/*Fin de comprobacion de movimientos de almacen*/
+
   $setReturns= $returnsSynchronization->setNewSynchronizationReturns( $system_store, $system_store, $store_prefix, $returns_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos de almacen
   if( $setReturns != 'ok' ){
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_devolucion', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
@@ -68,6 +74,7 @@ $app->get('/obtener_devoluciones', function (Request $request, Response $respons
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'DEVOLUCIONES', 'sys_sincronizacion_devoluciones', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//forma peticion
   $req["returns"] = $returnsSynchronization->getSynchronizationReturns( -1, $returns_limit, $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
   $post_data = json_encode($req, JSON_PRETTY_PRINT);
+ //return $post_data;
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_devoluciones", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
 
   $result = json_decode( $result_1 );//decodifica respuesta
