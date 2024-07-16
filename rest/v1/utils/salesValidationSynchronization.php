@@ -3,20 +3,30 @@
 	class salesValidationSynchronization
 	{
 		private $link;
-		function __construct( $connection ){
+		private $LOGGER;
+		function __construct( $connection, $Logger = null ){
 			$this->link = $connection;
+            $this->LOGGER = $Logger;
 		}
 //hacer jsons de movimientos de almacen
-		public function setNewSynchronizationsalesValidation( $store_id, $system_store, $origin_store_prefix, $limit ){
+		public function setNewSynchronizationsalesValidation( $store_id, $system_store, $origin_store_prefix, $limit, $logger_id = null ){
+			$log_steep_id = null;
 			$sql = "CALL buscaValidacionesProveedorProductoPendientesDeSincronizar( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
 			$stm = $this->link->query( $sql );
-			if( ! $stm ){
-				return "Error al generar registros de validaciones de ventas por sincronizar : {$this->link->error} {$sql}";
-			}
+				if( $logger_id ){
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Genera registros de validaciones de ventas por sincronizar", $sql );
+				}
+				if( $this->link->error ){
+					if( $logger_id ){
+						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al generar registros de validaciones de ventas por sincronizar", 'sys_sincronizacion_comprobaciones_log', $sql, $this->link->error );
+					}
+					die( "Error al generar registros de validaciones de ventas por sincronizar : {$this->link->error} {$sql}" );
+				}
 			return 'ok';
 		}
 //hacer / obtener jsons de movimientos de almacen
-		public function getSynchronizationsalesValidation( $system_store, $limit ){
+		public function getSynchronizationsalesValidation( $system_store, $limit, $petition_unique_folio, $logger_id = null ){
+			$log_steep_id = null;
 			$resp = array();
 			$sql = "SELECT 
 						id_sincronizacion_validacion,
@@ -27,8 +37,17 @@
 					AND id_status_sincronizacion IN( 1 )
 					AND id_sucursal_destino = {$system_store}
 					LIMIT {$limit}";
+			$stm = $this->link->query( $sql );
+				if( $logger_id ){
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta los datos de jsons", $sql );
+				}
+				if( $this->link->error ){
+					if( $logger_id ){
+						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar los datos de jsons", 'sys_sincronizacion_comprobaciones_log', $sql, $this->link->error );
+					}
+					die( "Error al consultar los datos de jsons : {$this->link->error} {$sql}" );
+				}
 		//die( $sql );
-			$stm = $this->link->query( $sql ) or die( "Error al consultar los datos de jsons : {$this->link->error}" );
 			$movements_counter = 0;
 			//forma arreglo
 			while ( $row = $stm->fetch_assoc() ) {
@@ -44,22 +63,45 @@
 					
 					array_push( $resp, json_decode($row['data']) );//decodifica el JSON
 					$movements_counter ++;
+				//actualiza al status 2 los registros que va a enviar
+					$sql = "UPDATE sys_sincronizacion_validaciones_ventas SET id_status_sincronizacion = 2, folio_unico_peticion = '{$petition_unique_folio}' WHERE id_sincronizacion_validacion = {$row['id_sincronizacion_validacion']}";
+					$stm_2 = $this->link->query( $sql );
+						if( $logger_id ){
+							$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza registro de sincronizacion validacion de ventas a status 2", $sql );
+						}
+						if( $this->link->error ){
+							if( $logger_id ){
+								$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al poner registro de sincronizacion de validacion de ventas en status 2", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+							}
+							die( "Error al poner registro de sincronizacion de validacion de ventas en status 2 : {$this->link->error} {$sql}" );
+						}
 				}
 			}
 			//var_dump( $resp );
 			return $resp;
 		}
 //actualizacion de registros de sincronizacion
-		public function updateSalesValidationSynchronization( $rows, $petition_unique_folio, $status = 3 ){
+		public function updateSalesValidationSynchronization( $rows, $petition_unique_folio, $status = 3, $logger_id = null ){
 			$sql = "";
 				$sql = "UPDATE sys_sincronizacion_validaciones_ventas 
 	              SET id_status_sincronizacion = '{$status}',
 	              	folio_unico_peticion = '{$petition_unique_folio}' 
 	            WHERE registro_llave IN( {$rows} )";
-	   	 	$stm = $this->link->query( $sql ) or die( "Error al actualizar registros de sincronización exitosos : {$this->link->error} {$sql}" );	
+	   	 	$stm = $this->link->query( $sql );
+				if( $logger_id ){
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza registros de sincronización exitosos", $sql );
+				}
+				if( $this->link->error ){
+					if( $logger_id ){
+						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al actualizar registros de sincronización exitosos", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+					}
+					die( "Error al actualizar registros de sincronización exitosos : {$this->link->error} {$sql}" );
+				}
+			// or die( "Error al actualizar registros de sincronización exitosos : {$this->link->error} {$sql}" );	
 		}
 //inserción de movimientos
-		public function insertSalesValidation( $validations ){
+		public function insertSalesValidation( $validations, $logger_id = null ){
+			$log_steep_id = null;
   			$resp = array();
 			$resp["ok_rows"] = '';
 			$resp["error_rows"] = '';
@@ -88,8 +130,16 @@
 					$sql .= "'{$validation['id_proveedor_producto']}' )";
 				}
 				//'{$validation['id_proveedor_producto']}' )";
-				$stm = $this->link->query( $sql ) or die( "Error insertar validacion de venta por sincronizacion : {$sql} {$this->link->error}" );
-				
+				$stm = $this->link->query( $sql );
+					if( $logger_id ){
+						$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta validacion de venta por sincronizacion", $sql );
+					}
+					if( $this->link->error ){
+						if( $logger_id ){
+							$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar validacion de venta por sincronizacion", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+						}
+						die( "Error insertar validacion de venta por sincronizacion : {$sql} {$this->link->error}" );
+					}
 				if( $ok == true ){
 					$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$validation['folio_unico']}'";
 					$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$validation['folio_unico']}'";

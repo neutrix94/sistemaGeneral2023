@@ -145,12 +145,11 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
       $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data_1, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
     }
   }
-
+/*
   $initial_time_2 = $SynchronizationManagmentLog->getCurrentTime();
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, 
-    $initial_time_2, 'ACTUALIZACION DE INVENTARIOS PROVEEDOR PRODUCTO' );//consume API para actualizar los inventarios de productos
-  
-  /*$post_data = json_encode($req, JSON_PRETTY_PRINT);//
+  $initial_time_2, 'ACTUALIZACION DE INVENTARIOS PROVEEDOR PRODUCTO' );//consume API para actualizar los inventarios de productos
+  $post_data = json_encode($req, JSON_PRETTY_PRINT);//
   $result_2 = $SynchronizationManagmentLog->sendPetition( $path.'/rest/v1/actualiza_inventarios_proveedor_producto', $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   $result = json_decode( $result_2 );
   if( $result->error ){

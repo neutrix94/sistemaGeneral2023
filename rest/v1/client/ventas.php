@@ -50,7 +50,7 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
   $system_store = $config['system_store'];
   $store_prefix = $config['store_prefix'];
   $initial_time = $config['process_initial_date_time'];
-  $movements_limit = $config['rows_limit'];
+  $sales_limit = $config['rows_limit'];
 
   if( $LOGGER ){
     $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_ventas', $system_store, -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
@@ -62,10 +62,10 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
   }
 
-  $setMovements = $salesSynchronization->setNewSynchronizationSales( $system_store, $system_store, $store_prefix, $movements_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos de almacen
-  if( $setMovements != 'ok' ){
+  $setSales = $salesSynchronization->setNewSynchronizationSales( $system_store, $system_store, $store_prefix, $sales_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos de almacen
+  if( $setSales != 'ok' ){
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
-    return json_encode( array( "response" => $setMovements ) );
+    return json_encode( array( "response" => $setSales ) );
   }
   
 /*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
@@ -74,7 +74,7 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
 /*Fin de comprobacion de movimientos de almacen*/
 
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'VENTAS', 'sys_sincronizacion_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta request
-  $req["sales"] = $salesSynchronization->getSynchronizationSales( -1, $movements_limit, $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  $req["sales"] = $salesSynchronization->getSynchronizationSales( -1, $sales_limit, $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
 //return $post_data;
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_ventas", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
@@ -89,6 +89,34 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
     return json_encode( array( "response" => "Respuesta Erronea : {$result_1}" ) );
   }
+
+
+  $response_time = $result->log->response_time;
+/*Procesa Respuesta de comprobacion*/
+  if( $result->verification_sales->log_response != null && $result->verification_sales->log_response != '' ){
+    //var_dump( $result->verification_movements->log_response );
+    $update_log = $SalesRowsVerification->updateLogAndJsonsRows( $result->verification_sales->log_response, $result->verification_sales->rows_response, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    if( $update_log != 'ok' ){
+      die( "Hubo un error : {$update_log}" );
+    }
+  }
+  $verification_req = array();
+/*Procesa comprobaciones de linea a local*/
+  if( $result->verification_sales->rows_download != null && $result->verification_sales->rows_download != '' ){
+    $download = $result->verification_sales->rows_download;
+    $petition_log = json_decode(json_encode($download->petition), true);
+    $sales = json_decode(json_encode($download->rows), true);
+    if( $download->verification == true ){
+      if( sizeof($petition_log) > 0 ){
+        $verification_req['log_response'] = $SalesRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta si la peticion existe en local 
+        $verification_req['rows_response'] = $SalesRowsVerification->SalesValidation( $sales, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
+        $post_data = json_encode( $verification_req );
+        $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_comprobacion_ventas", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consume servicio para actualizar la comprobacion en linea
+      }
+    }
+  }
+/*Fin de Respuesta de Comprobacion*/
+  
 //actualiza registros exitosos
   if( $result->ok_rows != '' && $result->ok_rows != null ){
     $salesSynchronization->updateSaleSynchronization( $result->ok_rows, $req["log"]["unique_folio"], 3, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );

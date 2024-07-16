@@ -68,7 +68,7 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
     $LOGGER = $Logger->insertLoggerRow( $log['unique_folio'], 'sys_sincronizacion_ventas', $log['origin_store'], -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
     $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Llega petición de local a linea', "{$body}" );
   }
-  /*COMPROBACION 2024*/
+/*COMPROBACION 2024*/
     $petition_log = $VERIFICATION["petition"];//recibe folio unico de la peticion
     //var_dump( $petition_log );
     $verification = $VERIFICATION["verification"];
@@ -80,17 +80,13 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
         $resp["verification_sales"]["rows_response"] = $SalesRowsVerification->SalesValidation( $pending_sales, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
     }
     $resp["verification_sales"]["rows_download"] = $SalesRowsVerification->getPendingSales( -1, $log['origin_store'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta las comprobaciones pendientes de linea a local
-    
+/*FIN DE COMPROBACION 2024*/
 
 /*valida que las apis no esten bloqueadas*/
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   if( $validation != 'ok' ){
     $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     return $validation;
-  } 
-  
-  if( $LOGGER ){
-    $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Respuesta de Linea a local : ', json_encode($resp) );
   }
 //actualiza indicador de sincronizacion en tabla
   $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 3, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
@@ -98,8 +94,6 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
     return $update_synchronization;
   } 
 /**/
-
-
 
 //inserta request
   $request_initial_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
@@ -148,7 +142,7 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
     return json_encode( array( "response" => $setSales ) );
   }
 
-  $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'VENTAS DESDE LINEA', 'sys_sincronizacion_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'VENTAS DESDE LINEA', 'sys_sincronizacion_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
 //consulta registros pendientes de sincronizar
   $resp["rows_download"] = $salesSynchronization->getSynchronizationSales( $log['origin_store'], $rows_limit, $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
 //var_dump($req["movements"]);
@@ -160,7 +154,10 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
   $SynchronizationManagmentLog->updateModuleResume( 'ec_pedidos', 'subida', $resp["status"], $log["origin_store"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza el resumen de modulo/sucursal ( subida )
   
 //desbloquea indicador de sincronizacion en tabla
-$update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  if( $LOGGER ){
+    $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Respuesta de Linea a local : ', json_encode($resp) );
+  }
   return json_encode( $resp );
 
 });
