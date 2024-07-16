@@ -26,7 +26,7 @@ $app->get('/obtener_registros_sincronizacion_ventas', function (Request $request
   $result = "";
 
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
-  $rowsSynchronization = new rowsSynchronization( $link );//instancia clase de sincronizacion de movimientos
+  $rowsSynchronization = new rowsSynchronization( $link );//instancia clase de sincronizacion de ventas
   $salesSynchronization = new salesSynchronization( $link );
   
   $config = $SynchronizationManagmentLog->getSystemConfiguration( 'ec_pedidos' );//consulta path del sistema central

@@ -93,7 +93,7 @@ $app->get('/obtener_validaciones_ventas', function (Request $request, Response $
   $response_time = $result->log->response_time;
 /*Procesa Respuesta de comprobacion*/
   if( $result->sales_validation->log_response != null && $result->sales_validation->log_response != '' ){
-    //var_dump( $result->verification_movements->log_response );
+    //var_dump( $result->sales_validation->log_response );
     $update_log = $SalesValidationRowsVerification->updateLogAndJsonsRows( $result->sales_validation->log_response, $result->sales_validation->rows_response, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     if( $update_log != 'ok' ){
       die( "Hubo un error : {$update_log}" );
@@ -104,11 +104,11 @@ $app->get('/obtener_validaciones_ventas', function (Request $request, Response $
   if( $result->sales_validation->rows_download != null && $result->sales_validation->rows_download != '' ){
     $download = $result->sales_validation->rows_download;
     $petition_log = json_decode(json_encode($download->petition), true);
-    $movements = json_decode(json_encode($download->rows), true);
+    $sales_validations = json_decode(json_encode($download->rows), true);
     if( $download->verification == true ){
       if( sizeof($petition_log) > 0 ){
         $verification_req['log_response'] = $SalesValidationRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta si la peticion existe en local 
-        $verification_req['rows_response'] = $SalesValidationRowsVerification->warehouseMovementsValidation( $movements, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
+        $verification_req['rows_response'] = $SalesValidationRowsVerification->validationSalesValidation( $sales_validations, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
         $post_data = json_encode( $verification_req );
         $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_comprobacion_validacion_ventas", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consume servicio para actualizar la comprobacion en linea
       }

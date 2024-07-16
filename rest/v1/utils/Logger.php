@@ -56,6 +56,7 @@
         public function insertErrorSteepRow( $synchronization_steep_id, $table_name, $row_unique_folio, $sql_query, $sql_error ){
             
             $sql_query = str_replace( "'", "", $sql_query );
+            $sql_error = str_replace( "'", "", $sql_error );
             $sql = "INSERT INTO LOG_sincronizacion_pasos_errores ( id_sincronizacion_paso, tabla, folio_unico_registro, instruccion_sql, error_sql, fecha_alta )
                 VALUES ( {$synchronization_steep_id}, '{$table_name}', '{$row_unique_folio}', '{$sql_query}', '{$sql_error}', NOW() )";
             $stm = $this->link->query( $sql ) or die( "Error en insertErrorSteepRow : {$sql} : {$this->link->error}" );

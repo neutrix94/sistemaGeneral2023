@@ -10,7 +10,6 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 $app->get('/verificacion_registros', function (Request $request, Response $response){
     $data = array();
     $data['pending'] = array();
-    //die('here');
     if ( ! include( '../../conexionMysqli.php' ) ){
         die( 'no se incluyó conexion' );
     }

@@ -32,7 +32,6 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   if( $check != 'ok' ){
     return json_encode( array( "response"=>$check ) );
   }*/
-
 //consulta path del sistema central
   $config = $SynchronizationManagmentLog->getSystemConfiguration( 'sys_sincronizacion_registros' );
   $path = trim ( $config['value'] );
@@ -53,7 +52,7 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
   //return $post_data;
-    $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_registros_sincronizacion", $post_data, 'sys_sincronizacion_registros' );//envia petición
+    $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_registros_sincronizacion", $post_data );//envia petición
 //return $result_1;
     $result = json_decode( $result_1 );//decodifica respuesta
     if( $result == '' || $result == null ){  

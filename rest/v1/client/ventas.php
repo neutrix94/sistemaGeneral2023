@@ -94,7 +94,7 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
   $response_time = $result->log->response_time;
 /*Procesa Respuesta de comprobacion*/
   if( $result->verification_sales->log_response != null && $result->verification_sales->log_response != '' ){
-    //var_dump( $result->verification_movements->log_response );
+    //var_dump( $result->verification_sales->log_response );
     $update_log = $SalesRowsVerification->updateLogAndJsonsRows( $result->verification_sales->log_response, $result->verification_sales->rows_response, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     if( $update_log != 'ok' ){
       die( "Hubo un error : {$update_log}" );

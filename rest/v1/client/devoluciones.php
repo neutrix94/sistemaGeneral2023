@@ -27,7 +27,6 @@ $app->get('/obtener_devoluciones', function (Request $request, Response $respons
   $LOGGER = false;
 //variables
   $req = [];
-  $req["movements"] = array();
   $result = "";
 
   $sql = "SELECT
