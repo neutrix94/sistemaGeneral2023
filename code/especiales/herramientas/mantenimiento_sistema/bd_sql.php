@@ -6,6 +6,13 @@
 	include( './mysqlDDL.php' );
 	$mysqlDDL = new mysqlDDL( $link );
 
+	if( $fl == 'barrido_general_productos' ){
+		include( '../ajax/productSweep.php' );
+		$productSweep = new productSweep( $link );
+		$productSweep->getProducts( null, null, null );
+		die( 'ok' );
+	}
+
 	if( $fl == 'pause_sinchronization_apis' || $fl == 'renew_sinchronization_apis' ){
 		$value = ( $fl == 'pause_sinchronization_apis' ? 1 : 0 );
 		$action = ( $fl == 'pause_sinchronization_apis' ? 'bloquear' : 'desbloquear' );
