@@ -106,6 +106,20 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
       }
     }
     $verification_req = array();
+  /*Procesa comprobaciones de linea a local*/
+    if( $result->verification_movements->rows_download != null && $result->verification_movements->rows_download != '' ){
+      $download = $result->verification_movements->rows_download;
+      $petition_log = json_decode(json_encode($download->petition), true);
+      $movements = json_decode(json_encode($download->rows), true);
+      if( $download->verification == true ){
+        if( sizeof($petition_log) > 0 ){
+          $verification_req['log_response'] = $warehouseProductProviderMovementsRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta si la peticion existe en local 
+          $verification_req['rows_response'] = $warehouseProductProviderMovementsRowsVerification->warehouseProductProviderMovementsValidation( $movements, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
+          $post_data = json_encode( $verification_req );
+          $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_comprobacion_movimientos_proveedor_producto", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consume servicio para actualizar la comprobacion en linea
+        }
+      }
+    }
 
 
 //actualiza registros exitosos

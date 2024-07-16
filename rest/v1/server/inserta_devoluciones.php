@@ -82,7 +82,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
 /*valida que las apis no esten bloqueadas*/
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   if( $validation != 'ok' ){
-    $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
+    $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     return $validation;
   } 
 //actualiza indicador de sincronizacion en tabla

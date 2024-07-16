@@ -121,7 +121,7 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
 
   $resp["rows_download"] = $salesValidationSynchronization->getSynchronizationsalesValidation( $log['origin_store'], $rows_limit, $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
   if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
-    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $log['origin_store'], -1, $store_prefix, $initial_time, 'VALIDACION VENTAS DESDE LINEA', 'sys_sincronizacion_validaciones_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'VALIDACION VENTAS DESDE LINEA', 'sys_sincronizacion_validaciones_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   }
   
 //desbloquea indicador de sincronizacion en tabla
