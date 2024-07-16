@@ -710,6 +710,33 @@
 			    	</div>
 		    	</div>
 		  	</div>
+	<!-- Facturacion -->		
+			<div class="accordion-item">
+		    	<h2 class="accordion-header" id="heading_1_7">
+			    	<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_1_7"
+			    	aria-expanded="true" aria-controls="collapse_1_7" id="herramienta_1_7" class="opc_btn">
+			        	7. Herramientas de Facturación
+			      	</button>
+		    	</h2>
+		    	<div id="collapse_1_7" class="accordion-collapse collapse description" aria-labelledby="heading_1_7" data-bs-parent="#accordionExample">
+			    	<div class="accordion-body">
+			    		<div class="row">
+			    			<div class="col-4">
+								<button class="btn btn-warning form-control" onclick="insertaProcedures('barrido_general_productos');">
+									Actualizar Productos con barrido General
+								</button>
+			    			</div>
+			    			<div class="col-4">
+			    			</div>
+			    			<div class="col-4">
+			    			</div>
+			    			<div class="col-4">
+			    			</div>
+			    		</div>
+			    	</div>
+		    	</div>
+		  	</div>
+	<!-- fin de modulos de facturacion -->
 			<!--div class="accordion-item">
 		    	<h2 class="accordion-header" id="heading_1_7">
 			    	<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_1_7"
@@ -975,6 +1002,9 @@
 		}
 		if( fl == 'renew_sinchronization_apis_store' ){
 			confirmacion = "Las sincronizacion de la sucursal fue reanudada exitosamente.";
+		}
+		if( fl == 'barrido_general_productos' ){
+			confirmacion = "Productos barrido en Facturación exitosamente.";
 		}
 	
 		if(! confirm( "Desea continuar con esta operación?" )){
