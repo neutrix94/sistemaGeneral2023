@@ -37,6 +37,7 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
 
   $validations = $request->getParam( "validations" );
   $log = $request->getParam( "log" );
+  $VERIFICATION = $request->getParam( "verification" );
   $sql = "SELECT
               log_habilitado AS log_is_enabled
       FROM sys_configuraciones_logs  
@@ -125,6 +126,9 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
   
 //desbloquea indicador de sincronizacion en tabla
   $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  if( $LOGGER ){
+    $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Respuesta de Linea a local : ', json_encode($resp) );
+  }
   return json_encode( $resp );
 });
 

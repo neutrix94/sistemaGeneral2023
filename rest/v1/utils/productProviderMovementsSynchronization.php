@@ -111,8 +111,8 @@
 			$resp["tmp_ok"] = "";
 			$resp["tmp_no"] = "";
 			$updates = array();
-			$this->link->autocommit( false );
 			foreach ( $product_providers_movements as $key => $p_p_movement ) {
+				$this->link->autocommit( false );
 				$ok = true;
 			//inserta cabecera
 				$sql = "CALL spMovimientoDetalleProveedorProducto_inserta( {$p_p_movement['id_movimiento_almacen_detalle']}, {$p_p_movement['id_proveedor_producto']}, {$p_p_movement['cantidad']}, 
@@ -135,14 +135,15 @@
 						//die( "Error al insertar cabecera de movimientos de almacen : {$this->link->error} {$sql}" );
 					}
 				if( $ok == true ){
+					$this->link->commit();
 					$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
 					$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
 				}else{
+					$this->link->rollback();
 					$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
 					$resp["tmp_no"] .= ( $resp["tmp_no"] == '' ? '' : ',' ) . "'{$p_p_movement['folio_unico']}'";
 				}
 			}
-		    $this->link->autocommit( true );
 			return $resp;
 		}
 

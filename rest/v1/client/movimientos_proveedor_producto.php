@@ -100,7 +100,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   $response_time = $result->log->response_time;
   /*Respuesta de comprobacion*/
     if( $result->verification_movements->log_response != null && $result->verification_movements->log_response != '' ){
-      $update_log = $warehouseProductProviderMovementsRowsVerification->updateLogAndJsonsRows( $resultado->verification_movements->log_response, $resultado->verification_movements->rows_response, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      $update_log = $warehouseProductProviderMovementsRowsVerification->updateLogAndJsonsRows( $result->verification_movements->log_response, $result->verification_movements->rows_response, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
       if( $update_log != 'ok' ){
         die( "Hubo un error : {$update_log}" );
       }

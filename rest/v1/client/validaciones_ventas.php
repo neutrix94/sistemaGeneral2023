@@ -78,7 +78,7 @@ $app->get('/obtener_validaciones_ventas', function (Request $request, Response $
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'VALIDACION VENTAS', 'sys_sincronizacion_validaciones_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta request
   $req["validations"] = $salesValidationSynchronization->getSynchronizationSalesValidation( -1, $validation_limits, $req['log']['unique_folio'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );//consulta registros pendientes de sincronizar
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
-return $post_data;
+//echo $post_data;//return $post_data;
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_validaciones_ventas", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );//envia petición
   $result = json_decode( $result_1 );//decodifica respuesta
   if( $result == '' || $result == null ){  

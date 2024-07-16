@@ -1,5 +1,5 @@
 <?php
-    class SalesRowsVerification{
+    class returnRowsVerification{
         private $link;
 		private $LOGGER;
 		function __construct( $connection, $Logger = false ){
@@ -7,25 +7,9 @@
             $this->LOGGER = $Logger;
 		}
 
-        public function insertVerificationLog( $table, $unique_folio, $json_detail, $logger_id = false ){
-            $log_steep_id = null;
-            $json_detail = str_replace( "'", "\'", $json_detail );
-            $sql = "INSERT INTO sys_sincronizacion_comprobaciones_log ( tabla, folio_unico_peticion, json_comprobacion, fecha_alta ) 
-                        VALUES( '{$table}', '{$unique_folio}', '{$json_detail}', NOW() )";
-            $stm = $this->link->query( $sql );
-                if( $logger_id ){
-					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta log de comprobacion", $sql );
-				}
-				if( $this->link->error ){
-					if( $logger_id ){
-						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar log de comprobacion", 'sys_sincronizacion_comprobaciones_log', $sql, $this->link->error );
-					}
-					die( "Error al insertar log de comprobacion : {$this->link->error} {$sql}" );
-				}
-            return 'ok';
-        }
 
-        public function getPendingSales( $origin_store_id, $destinity_store_id, $logger_id = false){
+
+        public function getPendingValidationReturns( $origin_store_id, $destinity_store_id, $logger_id = false ){
             $log_steep_id = null;
             $resp = array();
             $pending_rows = array();
@@ -44,16 +28,16 @@
                         sp.hora_llegada_respuesta AS datetime_response,
                         sp.hora_finalizacion AS datetime_end
                     FROM sys_sincronizacion_peticion sp
-                    LEFT JOIN sys_sincronizacion_ventas sma
-                    ON sma.folio_unico_peticion = sp.folio_unico
-                    WHERE sp.tabla = 'ec_pedidos'
+                    LEFT JOIN sys_sincronizacion_devoluciones sd
+                    ON sd.folio_unico_peticion = sp.folio_unico
+                    WHERE sp.tabla = 'sys_sincronizacion_devoluciones'
                     AND sp.id_sucursal_origen = {$origin_store_id}
                     AND sp.id_sucursal_destino = {$destinity_store_id}
                     AND sp.hora_envio IS NOT NULL
                     AND( sp.hora_llegada_destino IS NULL
                     OR sp.hora_llegada_respuesta IS NULL
                     OR sp.hora_finalizacion IS NULL )
-                    OR sma.id_status_sincronizacion = 2
+                    OR sd.id_status_sincronizacion = 2
                     GROUP BY sp.id_peticion";
             $stm = $this->link->query( $sql );
                 if( $logger_id ){
@@ -73,7 +57,7 @@
                         json,
                         tabla,
                         registro_llave
-                    FROM sys_sincronizacion_ventas
+                    FROM sys_sincronizacion_devoluciones
                     WHERE folio_unico_peticion = '{$petition['unique_folio']}'
                     AND id_status_sincronizacion = 2";
             $stm_2 = $this->link->query( $sql );
@@ -82,7 +66,7 @@
                 }
                 if( $this->link->error ){
                     if( $logger_id ){
-                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar detalle de json", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar detalle de json", 'sys_sincronizacion_devoluciones', $sql, $this->link->error );
                     }
                     die( "Error al consultar detalle de json : {$this->link->error} {$sql}" );
                 }
@@ -94,7 +78,7 @@
             $resp['rows'] = $pending_rows;
             $pending_rows_string = json_encode( $pending_rows );
         //inserta el log
-            $log = $this->insertVerificationLog( 'sys_sincronizacion_ventas', $petition['unique_folio'], $pending_rows_string, $logger_id );
+            $log = $this->insertVerificationLog( 'sys_sincronizacion_movimientos_proveedor_producto', $petition['unique_folio'], $pending_rows_string, $logger_id );
             if( $log != 'ok' ){
                 return false;
             }
@@ -145,7 +129,7 @@
                             hora_envio, hora_llegada_destino, hora_respuesta, contenido_respuesta, hora_llegada_respuesta, hora_finalizacion, folio_unico )
                         VALUES ( {$petition_log['origin_store']}, {$petition_log['destinity_store']}, '{$petition_log['table_name']}', '{$petition_log['petition_type']}', '{$petition_log['datetime_start']}', 
                         '{$petition_log['datetime_send']}', NOW(), NOW(), '', NOW(), NOW(), '{$petition_log['unique_folio']}' )";
-                $stm = $this->link->query( $sql );
+                    $stm = $this->link->query( $sql );
                     if( $logger_id ){
                         $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta peticion en el destino", $sql );
                     }
@@ -155,7 +139,6 @@
                         }
                         die( "Error al insertar peticion en el destino : {$this->link->error} {$sql}" );
                     }
-                // or die( "Error al insertar el registro de sincronizacion en el destino : {$sql} : {$this->link->error}" );
                 $resp = $petition_log;
             //consulta la hor actual
                 $sql = "SELECT NOW() AS current_date_time";
@@ -170,95 +153,116 @@
             return $resp;
         }
 
-        public function SalesValidation( $sales, $logger_id = false ){
+        public function returnsValidation( $returns, $logger_id = false ){
             $log_steep_id = null;
             $resp = array();
             $resp['ok_rows'] = "";
             $resp['error_rows'] = "";
-            foreach ($sales as $key => $sale_) {
+
+            foreach ($returns as $key => $return_) {
                 $this->link->autocommit( false );
-                $sale = json_decode( $sale_['json'] );
-                if (is_object($sale) && get_class($sale) === 'stdClass') {
-                    $sale = json_decode(json_encode($sale), true);
+                $return = json_decode( $return_['json'] );
+                if (is_object($return) && get_class($return) === 'stdClass') {
+                    $return = json_decode(json_encode($return), true);
                 }
+                //var_dump($movement);
             //consulta si la cabecera existe
-                $sql = "SELECT id_pedido AS sale_id FROM ec_pedidos WHERE folio_unico = '{$sale_['registro_llave']}'";
+                $sql = "SELECT id_movimiento_almacen AS movement_id FROM ec_movimiento_almacen WHERE folio_unico = '{$return_['registro_llave']}'";
                 $stm = $this->link->query( $sql );
                     if( $logger_id ){
-                        $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta si ya existe la cabecera de venta", $sql );
+                        $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta si ya existe la cabecera de movimiento de almacen en la comprobacion", $sql );
                     }
                     if( $this->link->error ){
                         if( $logger_id ){
-                            $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar si ya existe la cabecera de venta", 'ec_pedidos', $sql, $this->link->error );
+                            $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar si ya existe la cabecera de movimiento de almacen en la comprobacion", 'ec_movimiento_almacen', $sql, $this->link->error );
                         }
-                        die( "Error al consultar si ya existe la cabecera de venta : {$this->link->error} {$sql}" );
+                        die( "Error al consultar si ya existe la cabecera de movimiento de almacen en la comprobacion : {$this->link->error} {$sql}" );
                     }
-                $sale_header_id = 0;
+                $return_header_id = 0;
                 if( $stm->num_rows <= 0 ){//no existe
-                    $sql = "INSERT INTO ec_pedidos ( folio_nv, id_cliente, fecha_alta, subtotal, total, pagado, 
-                    id_sucursal, id_usuario, descuento, folio_abono, correo, facebook, ultima_sincronizacion, 
-                    ultima_modificacion, tipo_pedido, id_status_agrupacion, id_cajero, id_devoluciones, 
-                    venta_validada, folio_unico, id_sesion_caja, tipo_sistema )
-                VALUES ( '{$sale['folio_nv']}', {$sale['id_cliente']}, '{$sale['fecha_alta']}', '{$sale['subtotal']}', '{$sale['total']}', '{$sale['pagado']}', 
-                    '{$sale['id_sucursal']}', '{$sale['id_usuario']}', '{$sale['descuento']}', '{$sale['folio_abono']}', '{$sale['correo']}', '{$sale['facebook']}', '{$sale['ultima_sincronizacion']}', 
-                    '{$sale['ultima_modificacion']}', '{$sale['tipo_pedido']}', '{$sale['id_status_agrupacion']}', '{$sale['id_cajero']}', '{$sale['id_devoluciones']}', 
-                    '{$sale['venta_validada']}', '{$sale['folio_unico']}', {$sale['id_sesion_caja']}, '{$sale['tipo_sistema']}' )";
-                    $stm = $this->link->query( $sql );
-                        if( $logger_id ){
-                            $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta cabecera de venta", $sql );
-                        }
-                        if( $this->link->error ){
-                            if( $logger_id ){
-                                $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar cabecera de venta", 'ec_pedidos', $sql, $this->link->error );
-                            }
-                            die( "Error al insertar cabecera de venta : {$this->link->error} {$sql}" );
-                        }
-                //recupera el id insertado
-                    $sql = "SELECT MAX( id_pedido ) AS sale_id FROM ec_pedidos";
-                    $stm_3 = $this->link->query( $sql ) or die( "Error al recuperar el id de cabecera de venta : {$sql} : {$this->link->error}" );
-                    $row = $stm_3->fetch_assoc();
-                    $sale_header_id = $row['sale_id'];
-                }else{
-                    $row = $stm->fetch_assoc();
-                    $sale_header_id = $row['sale_id'];
-                }
-            //inserta el detalle
-                $sale_detail = $sale["sale_detail"];
-                foreach ($sale_detail as $key2 => $detail) {
-                //comprueba si existe el folio unico del detalle
-                    $sql = "SELECT id_pedido_detalle FROM ec_pedidos_detalle WHERE folio_unico = '{$detail["folio_unico"]}'";
-                    $stm_4 = $this->link->query( $sql ) or die( "Error al consultar si existe el detalle de venta : {$sql} : {$this->link->error}" );
-                    if( $stm_4->num_rows <= 0 ){
-                        $sql = "INSERT INTO ec_pedidos_detalle ( id_pedido, id_producto, cantidad, precio, monto, 
-                                cantidad_surtida, descuento, es_externo, id_precio, folio_unico ) 
-                            VALUES ( '{$sale_header_id}', '{$detail['id_producto']}', '{$detail['cantidad']}', '{$detail['precio']}', '{$detail['monto']}', 
-                                '{$detail['cantidad_surtida']}', '{$detail['descuento']}', '{$detail['es_externo']}', '{$detail['id_precio']}', '{$detail['folio_unico']}' )";
-
+                //se inserta la cabecera de la devolucion
+                    $sql = "INSERT INTO ec_devolucion ( id_usuario, id_sucursal, fecha, hora, id_pedido, 
+                    folio, es_externo, status, observaciones, tipo_sistema, id_status_agrupacion, folio_unico )
+                    VALUES ( '{$return['id_usuario']}', '{$return['id_sucursal']}', '{$return['fecha']}', 
+                        '{$return['hora']}', {$return['id_pedido']}, '{$return['folio']}', '{$return['es_externo']}', 
+                        '{$return['status']}', '{$return['observaciones']}', '{$return['tipo_sistema']}', 
+                        '{$return['id_status_agrupacion']}', '{$return['folio_unico']}' )";
                         $stm = $this->link->query( $sql );
                         if( $logger_id ){
-                            $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta detalle de venta", $sql );
+                            $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta cabecera de devolución", $sql );
                         }
                         if( $this->link->error ){
-                            $ok = false;
                             if( $logger_id ){
-                                $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar detalle de venta", 'ec_pedidos', $sql, $this->link->error );
+                                $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar cabecera de devolución", 'ec_devolucion', $sql, $this->link->error );
                             }
-                            die( "Error al insertar detalle de venta : {$this->link->error} {$sql}" );
+                            die( "Error al insertar cabecera de devolución : {$this->link->error} {$sql}" );
                         }
+                //recupera el id insertado
+                    $sql = "SELECT MAX( id_devolucion ) AS return_id FROM ec_devolucion";
+                    $stm_3 = $this->link->query( $sql ) or die( "Error al recuperar el id de cabecera de devolución insertada : {$sql} : {$this->link->error}" );
+                    $row = $stm_3->fetch_assoc();
+                    $return_header_id = $row['return_id'];
+                }else{
+                    $row = $stm->fetch_assoc();
+                    $return_header_id = $row['return_id'];
+                }
+            //inserta el detalle
+				$return_detail = $return['return_detail'];
+                foreach ($return_detail as $key2 => $detail) {
+                //comprueba si existe el folio unico del detalle
+                    $sql = "SELECT id_devolucion_detalle FROM ec_devolucion WHERE folio_unico = '{$detail["folio_unico"]}'";
+                    $stm_4 = $this->link->query( $sql ) or die( "Error al consultar si existe el detalle de devolución : {$sql} : {$this->link->error}" );
+                    if( $stm_4->num_rows <= 0 ){
+                        
+						$sql = "INSERT INTO ec_devolucion_detalle ( id_devolucion, id_producto, id_proveedor_producto, 
+						cantidad, folio_unico, id_pedido_detalle ) 
+						VALUES ( '{$return_header_id}', '{$detail['id_producto']}', '{$detail['id_proveedor_producto']}', '{$detail['cantidad']}',
+							'{$detail['folio_unico']}', "; 
+						$sql .= ( $detail['id_pedido_detalle'] != null ? "'{$detail['id_pedido_detalle']}'" : "'0'" ) . " )";
+						
+						$sql = str_replace( "'(", "(", $sql );
+						$sql = str_replace( ")'", ")", $sql );
+                        $stm_5 = $this->link->query( $sql );
+                            if( $logger_id ){
+                                $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta detalle de devolución", $sql );
+                            }
+                            if( $this->link->error ){
+                                if( $logger_id ){
+                                    $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar detalle de devolución", 'ec_movimiento_detalle', $sql, $this->link->error );
+                                }
+                                die( "Error al insertar detalle de devolución : {$this->link->error} {$sql}" );
+                            }
                     }
                 }
                 $this->link->autocommit( true );
                 $resp['ok_rows'] .= ( $resp['ok_rows'] == '' ? '' : '|' );
-                $resp['ok_rows'] .= ( $sale_['registro_llave'] );
+                $resp['ok_rows'] .= ( $return_['registro_llave'] );
             }
-            //var_dump( $resp );
-            //die( $resp['ok_rows'] );
             return $resp;
+        }
+
+        public function insertVerificationLog( $table, $unique_folio, $json_detail, $logger_id = false ){
+            $log_steep_id = null;
+            $json_detail = str_replace( "'", "\'", $json_detail );
+            $sql = "INSERT INTO sys_sincronizacion_comprobaciones_log ( tabla, folio_unico_peticion, json_comprobacion, fecha_alta ) 
+                        VALUES( '{$table}', '{$unique_folio}', '{$json_detail}', NOW() )";
+            $stm = $this->link->query( $sql );
+                if( $logger_id ){
+                    $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta log de comprobacion", $sql );
+                }
+                if( $this->link->error ){
+                    if( $logger_id ){
+                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar log de comprobacion", 'sys_sincronizacion_comprobaciones_log', $sql, $this->link->error );
+                    }
+                    die( "Error al insertar log de comprobacion : {$this->link->error} {$sql}" );
+                }
+            return 'ok';
         }
 
         public function updateLogAndJsonsRows( $log_response, $rows_response, $logger_id = false ){
             $log_steep_id = null;
             $this->link->autocommit( false );
+            //die( "here1" );
             $log_response->response_content = str_replace( "'", "\'", $log_response->response_content );
             $sql = "UPDATE sys_sincronizacion_peticion SET hora_llegada_destino = IF( hora_llegada_destino IS NULL OR hora_llegada_destino = '', '{$log_response->datetime_destinity}', hora_llegada_destino ),
                         hora_respuesta = IF( hora_respuesta IS NULL OR hora_respuesta = '', '{$log_response->datetime_send_response}', hora_respuesta ),
@@ -284,14 +288,14 @@
                 $uniques_folios .= ( $uniques_folios == '' ? '' : ',' );
                 $uniques_folios .= "'{$row}'";
             }
-            $sql = "UPDATE sys_sincronizacion_ventas SET id_status_sincronizacion = 3 WHERE registro_llave IN( $uniques_folios )";
+            $sql = "UPDATE sys_sincronizacion_devoluciones SET id_status_sincronizacion = 3 WHERE registro_llave IN( $uniques_folios )";
             $stm = $this->link->query( $sql );
                 if( $logger_id ){
                     $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualizar detalles (jsons)", $sql );
                 }
                 if( $this->link->error ){
                     if( $logger_id ){
-                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al actualizar detalles (jsons)", 'sys_sincronizacion_ventas', $sql, $this->link->error );
+                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al actualizar detalles (jsons)", 'sys_sincronizacion_devoluciones', $sql, $this->link->error );
                     }
                     die( "Error al actualizar detalles (jsons) local : {$this->link->error} {$sql}" );
                 }
@@ -299,5 +303,4 @@
             return 'ok';
         }
     }
-
 ?>

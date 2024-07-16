@@ -109,8 +109,8 @@
 			$resp["tmp_ok"] = "";
 			$resp["tmp_no"] = "";
 			$updates = array();
-			$this->link->autocommit( false );
 			foreach ( $validations as $key => $validation ) {
+				$this->link->autocommit( false );
 				$ok = true;
 				$sale_detail_id_field  = ( $validation['id_pedido_detalle'] != '' && $validation['id_pedido_detalle'] != null ? "  id_pedido_detalle," : "" );
 				$sale_detail_id_value  = ( $validation['id_pedido_detalle'] != '' && $validation['id_pedido_detalle'] != null ? "  {$validation['id_pedido_detalle']}," : "" );
@@ -135,20 +135,22 @@
 						$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta validacion de venta por sincronizacion", $sql );
 					}
 					if( $this->link->error ){
+						$ok = false;
 						if( $logger_id ){
 							$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar validacion de venta por sincronizacion", 'sys_sincronizacion_peticion', $sql, $this->link->error );
 						}
-						die( "Error insertar validacion de venta por sincronizacion : {$sql} {$this->link->error}" );
+						//die( "Error insertar validacion de venta por sincronizacion : {$sql} {$this->link->error}" );
 					}
 				if( $ok == true ){
+					$this->link->commit();
 					$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$validation['folio_unico']}'";
 					$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$validation['folio_unico']}'";
 				}else{
+					$this->link->rollback();
 					$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$validation['folio_unico']}'";
 					$resp["tmp_no"] .= ( $resp["tmp_no"] == '' ? '' : ',' ) . "'{$validation['folio_unico']}'";
 				}
 			}
-		    $this->link->autocommit( true );
 			return $resp;
 		}
 	}
