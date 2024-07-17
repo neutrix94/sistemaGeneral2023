@@ -127,6 +127,7 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
     $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Respuesta de Linea a local : ', json_encode($resp) );
   }
   return json_encode( $resp );
+
 });
 
 ?>

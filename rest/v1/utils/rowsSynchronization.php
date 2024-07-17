@@ -19,7 +19,7 @@
 					WHERE status_sincronizacion IN( 1 )
 					AND sucursal_de_cambio = {$system_store}
 					AND id_sucursal_destino = {$destinity_store}
-					AND datos_json != ''
+					AND datos_json != '' AND datos_json IS NOT NULL
 					LIMIT {$limit}";
 		//die( $sql );
 			$stm = $this->link->query( $sql );
@@ -62,7 +62,6 @@
 						}
 				}
 			}
-			//var_dump( $resp );
 			return $resp;
 		}
 //inserción de movimientos
@@ -71,15 +70,8 @@
   			$resp = array();
 			$resp["ok_rows"] = '';
 			$resp["error_rows"] = '';
-
-			$resp["tmp_ok"] = "";
-			$resp["tmp_no"] = "";
 			$queries = array();
-			//$this->link->autocommit( false );
 			foreach ($rows as $key => $row) {
-				//$tmp = json_decode($row);
-				//echo $tmp['action_type'];
-				$ok = true;
 				$sql = "";
 				$condition = "";
 				if( isset( $row['primary_key'] ) && isset( $row['primary_key_value'] ) ){
@@ -108,19 +100,23 @@
 						}
 						$fields .= " )";
 						$sql .=  "{$fields} VALUES ( {$values} )";
-						array_push( $queries, $sql );
+						array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id'] ) );
 						if( $row['table_name'] != 'ec_pedidos' && $row['table_name'] != 'ec_pedidos_detalle' ){
-							array_push( $queries, "UPDATE {$row['table_name']} SET sincronizar = 0 {$condition}" );
+							$sql = "UPDATE {$row['table_name']} SET sincronizar = 0 {$condition}";
+							array_push( $queries, array( "query"=>$sql, "row_id"=>"n/a" ) );
 						}
-						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
-
 /*Implementacion Oscar 2024-02-12 para crear carpetas mediante la sincronizacion*/
 						if( $row['table_name'] == 'sys_carpetas' ){
 							mkdir( "../../{$row['`path`']}/{$row['nombre_carpeta']}" , 0777);
+                            if( $logger_id ){
+                                $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "(INSERT); Creacion de carpeta por sincronizacion {$row['table_name']} : ", "mkdir( \"../../{$row['`path`']}/{$row['nombre_carpeta']}\" , 0777);" );
+                            }
 							chmod( "../../{$row['`path`']}/{$row['nombre_carpeta']}" , 0777 );
+                            if( $logger_id ){
+                                $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "(INSERT); Cambia permisos de carpeta por sincronizacion {$row['table_name']} : ", "chmod( \"../../{$row['`path`']}/{$row['nombre_carpeta']}\" , 0777 );" );
+                            }
 						}
 /*fin de cambio Oscar 2024-02-12*/
-
 					break;
 					case 'update' :
 						$sql = "UPDATE {$row['table_name']} SET ";
@@ -134,49 +130,47 @@
 							}
 						}
 						$sql .= "{$fields} {$condition}";
-						array_push( $queries, $sql );
-						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
-						//$sql .= ( $row['action_type'] == 'update' ? " WHERE {$row['primary_key']} = '{$row['primary_key_value']}'" : "" );
+						array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id'] ) );
 					break;
 					case 'delete' :
 						$sql = "DELETE FROM {$row['table_name']} {$condition}";
-						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
-						array_push( $queries, $sql );
-						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
-						array_push( $queries, $sql );
+						array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id'] ) );
 					break;
 
 					case 'sql_instruction' : 
 						$sql = $row['sql'];
 						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
-						array_push( $queries, $sql );
+						array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id'] ) );
 					break;
 					
 					default:
-						//var_dump($row);
-						//die( "JSON incorrecto : {$row['action_type']}" );
 					break;
 				}
 			}
-			$this->link->autocommit(false);
-			foreach ($queries as $key => $query) {
-//die( "here : {$sql}" );
-				$query = str_replace( "'(", "(", $query );
+		//ejecuta las consultas
+			foreach ($queries as $key2 => $query_) {
+				$ok = true;
+				$this->link->autocommit(false);
+				$query = str_replace( "'(", "(", $query_['query'] );
 				$query = str_replace( ")'", ")", $query );
-				//echo $query.'<br>';
 				$stm = $this->link->query( $query );
 					if( $logger_id ){
 						$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Ejecuta consulta SQL", $query );
 					}
 					if( $this->link->error ){
+						$ok = false;
 						if( $logger_id ){
 							$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al ejecutar consulta ", "sys_sincronizacion_registros", $query, $this->link->error );
 						}
-						die( "Error al ejecutar consulta : {$query}" );
 					}
+				if( $ok == true && $query_['row_id'] != 'n/a' ){
+					$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
+					$this->link->commit();
+				}else if( ! $ok && $query_['row_id'] != 'n/a' ){
+					$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
+					$this->link->rollback();
+				}
 			}
-			//die( 'here' );
-			$this->link->autocommit(true);
 			return $resp;
 		}
 
