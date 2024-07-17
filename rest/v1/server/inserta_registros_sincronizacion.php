@@ -18,7 +18,7 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-  if( ! include( 'utils/generalRowsVerification.php' ) ){
+  if( ! include( 'utils/verification/generalRowsVerification.php' ) ){
     die( "No se incluyó : generalRowsVerification.php" );
   }
   if( !include( 'utils/Logger.php' ) ){
@@ -49,7 +49,7 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
   $rowsSynchronization = new rowsSynchronization( $link, $Logger );//instancia clase de sincronizacion de registros generales
 
   if( $LOGGER ){
-    $LOGGER = $Logger->insertLoggerRow( "{$log['unique_folio']}", 'sys_sincronizacion_devoluciones', $log['origin_store'], -1 );//inserta el log de sincronizacion
+    $LOGGER = $Logger->insertLoggerRow( "{$log['unique_folio']}", 'sys_sincronizacion_registros', $log['origin_store'], -1 );//inserta el log de sincronizacion
     $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Llega peticion de local a Linea : ', "{$body}" );
   }
 //variables de respuesta

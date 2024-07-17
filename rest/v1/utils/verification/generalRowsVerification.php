@@ -70,7 +70,9 @@
             //$resp['petition_id'] = $petition['petition_id'];
             //$resp['unique_folio'] = $petition['unique_folio'];
             $sql = "SELECT 
-                        datos_json
+                        datos_json,
+                        id_sincronizacion_registro,
+                        tipo AS synchronization_row_id
                         /*json,
                         tabla,
                         registro_llave*/

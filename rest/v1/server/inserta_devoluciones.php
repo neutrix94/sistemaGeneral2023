@@ -18,7 +18,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-  if( ! include( 'utils/returnRowsVerification.php' ) ){
+  if( ! include( 'utils/verification/returnRowsVerification.php' ) ){
     die( "No se incluyó : returnRowsVerification.php" );
   }
   if( !include( 'utils/Logger.php' ) ){

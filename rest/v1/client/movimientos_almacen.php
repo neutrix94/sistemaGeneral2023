@@ -18,7 +18,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-  if( !include( 'utils/warehouseMovementsRowsVerification.php' ) ){
+  if( !include( 'utils/verification/warehouseMovementsRowsVerification.php' ) ){
     die( "No se pudo incluir la clase warehouseMovementsRowsVerification.php" );
   }
   if( !include( 'utils/Logger.php' ) ){

@@ -18,7 +18,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-  if( !include( 'utils/warehouseProductProviderMovementsRowsVerification.php' ) ){//
+  if( !include( 'utils/verification/warehouseProductProviderMovementsRowsVerification.php' ) ){//
     die( "No se pudo incluir la clase warehouseProductProviderMovementsRowsVerification.php" );
   }
   if( !include( 'utils/Logger.php' ) ){

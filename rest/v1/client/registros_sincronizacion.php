@@ -7,7 +7,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /obtener_registros_sincronizacion
 * Método: POST
 * Descripción: Recupera y envia los registros de sincronizacion que no se han sincronizado ( local a linea )
-* Version 2.1  Log y comprobacion )
+* Version 2.1 ( Log y comprobacion )
 */
 $app->get('/obtener_registros_sincronizacion', function (Request $request, Response $response){
  //die( 'here' );
@@ -20,7 +20,7 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-  if( ! include( 'utils/generalRowsVerification.php' ) ){
+  if( ! include( 'utils/verification/generalRowsVerification.php' ) ){
     die( "No se incluyó : generalRowsVerification.php" );
   }
   if( !include( 'utils/Logger.php' ) ){
@@ -71,14 +71,20 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
     $SynchronizationManagmentLog->release_sinchronization_module( 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
   }
+
+/*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
+  $req['verification'] = $generalRowsVerification->getPendingRows( $system_store, -1, 
+  ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene los registros de comprobacion de registros de sincronizacion
+/*Fin de comprobacion de movimientos de almacen*/
+  
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta request
   $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros', $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
 
    
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
-  //return $post_data;
+//return $post_data;
     $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_registros_sincronizacion", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
-//return $result_1;
+return $result_1;
     $result = json_decode( $result_1 );//decodifica respuesta
     if( $result == '' || $result == null ){  
       if( $result_1 == '' || $result_1 == null ){

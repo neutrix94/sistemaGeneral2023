@@ -18,7 +18,7 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-  if( ! include( 'utils/SalesRowsVerification.php' ) ){
+  if( ! include( 'utils/verification/SalesRowsVerification.php' ) ){
     die( "No se incluyó : SalesRowsVerification.php" );
   }
   if( !include( 'utils/Logger.php' ) ){

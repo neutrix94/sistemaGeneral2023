@@ -17,7 +17,7 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-  if( ! include( 'utils/SalesValidationRowsVerification.php' ) ){
+  if( ! include( 'utils/verification/SalesValidationRowsVerification.php' ) ){
     die( "No se incluyó : SalesValidationRowsVerification.php" );
   }
   if( !include( 'utils/Logger.php' ) ){
