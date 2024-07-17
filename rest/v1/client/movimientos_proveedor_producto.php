@@ -5,8 +5,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Endpoint: obtener_movimientos_proveedor_producto
 * Path: /obtener_movimientos_proveedor_producto
 * Método: POST
-* Descripción: Recupera y envia los movimientos proveedor producto que no se han sincronizado
-*Version 2.1
+* Descripción: Recupera y envia los movimientos proveedor producto que no se han sincronizado ( local a linea )
+* Versión : 2.1 ( Log y comprobacion )
 */
 $app->get('/obtener_movimientos_proveedor_producto', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){

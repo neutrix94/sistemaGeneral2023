@@ -5,7 +5,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Endpoint: obtener_validaciones_ventas
 * Path: /obtener_validaciones_ventas
 * Método: POST
-* Descripción: Recupera y envia las validaciones de ventas que no se han sincronizado
+* Descripción: Recupera y envia las validaciones de ventas que no se han sincronizado ( local a linea )
+* Versión : 2.1 ( Log y comprobacion )
 */
 $app->get('/obtener_validaciones_ventas', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){

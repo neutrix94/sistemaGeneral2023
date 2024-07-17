@@ -5,7 +5,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Endpoint: obtener_devoluciones
 * Path: /obtener_devoluciones
 * Método: POST
-* Descripción: Recupera y envia las devoluciones que no se han sincronizado
+* Descripción: Recupera y envia las devoluciones que no se han sincronizado ( local a linea )
+* Versión : 2.1 ( Log y comprobacion )
 */
 $app->get('/obtener_devoluciones', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -28,7 +29,7 @@ $app->get('/obtener_devoluciones', function (Request $request, Response $respons
 //variables
   $req = [];
   $result = "";
-
+//verifica si el log esta habilitado
   $sql = "SELECT
               log_habilitado AS log_is_enabled
       FROM sys_configuraciones_logs  

@@ -52,7 +52,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
     $LOGGER = $Logger->insertLoggerRow( "{$log['unique_folio']}", 'sys_sincronizacion_devoluciones', $log['origin_store'], -1 );//inserta el log de sincronizacion
     $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Llega peticion de local a Linea : ', "{$body}" );
   }
-
+//variables de respuesta
   $resp = array();
   $resp["ok_rows"] = '';
   $resp["error_rows"] = '';
