@@ -70,8 +70,10 @@
             //$resp['petition_id'] = $petition['petition_id'];
             //$resp['unique_folio'] = $petition['unique_folio'];
             $sql = "SELECT 
-                        datos_json,
-                        registro_llave
+                        datos_json
+                        /*json,
+                        tabla,
+                        registro_llave*/
                     FROM sys_sincronizacion_registros
                     WHERE folio_unico_peticion = '{$petition['unique_folio']}'
                     AND status_sincronizacion = 2";
