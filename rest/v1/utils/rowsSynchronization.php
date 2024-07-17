@@ -49,7 +49,7 @@
 					array_push( $resp, json_decode($row['data']) );//decodifica el JSON
 					$movements_counter ++;
 				//actualiza al status 2 los registros que va a enviar
-					$sql = "UPDATE {$table} SET id_status_sincronizacion = 2, folio_unico_peticion = '{$petition_unique_folio}' WHERE id_sincronizacion_registro = {$row['id_sincronizacion_registro']}";
+					$sql = "UPDATE {$table} SET id_status_sincronizacion = 2, folio_unico_peticion = '{$petition_unique_folio}' WHERE id_sincronizacion_registro = {$row['synchronization_row_id']}";
 					$stm_2 = $this->link->query( $sql );
 						if( $logger_id ){
 							$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza registro de sincronizacion {$table} a status 2", $sql );
