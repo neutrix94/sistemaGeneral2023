@@ -69,14 +69,14 @@
 
 //Servicios de Cliente
 	require 'client/verificacion_registros_pendientes.php';//comprobacion de los registros pendientes
-	require 'client/registros_sincronizacion.php';
+require 'client/registros_sincronizacion.php';
 	require 'client/ventas.php';
 	require 'client/devoluciones.php';
 	require 'client/movimientos_almacen.php';
 	require 'client/validaciones_ventas.php';
 	require 'client/movimientos_proveedor_producto.php';
 	/*implementacion Oscar 2023 para insertar modificaciones en ventas y movimientos de almacen (cliente)*/
-	require 'client/registros_sincronizacion_ventas.php';
+require 'client/registros_sincronizacion_ventas.php';
 	require 'client/registros_sincronizacion_mov_almacen.php';
 	require 'client/registros_sincronizacion_mov_p_p.php';
 	require 'client/registros_sincronizacion_transferencias.php';

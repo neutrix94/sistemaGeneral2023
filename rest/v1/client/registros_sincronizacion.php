@@ -63,7 +63,7 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   $rows_limit = $config['rows_limit'];
 
   if( $LOGGER ){
-    $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_registros', $system_store, -1, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
+    $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_registros_ventas', $system_store, -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
   }
 
   if( $system_store == -1 ){//valida que el origen no sea linea
@@ -73,7 +73,7 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   }
 
 /*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
-  $req['verification'] = $generalRowsVerification->getPendingRows( $system_store, -1, 
+  $req['verification'] = $generalRowsVerification->getPendingRows( $system_store, -1, 'sys_sincronizacion_registros', 
   ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene los registros de comprobacion de registros de sincronizacion
 /*Fin de comprobacion de movimientos de almacen*/
   
@@ -82,9 +82,9 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
 
    
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
-//return $post_data;
+//echo $post_data;
     $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_registros_sincronizacion", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
-return $result_1;
+//return $result_1;
     $result = json_decode( $result_1 );//decodifica respuesta
     if( $result == '' || $result == null ){  
       if( $result_1 == '' || $result_1 == null ){
@@ -95,6 +95,32 @@ return $result_1;
     //liberar el modulo de sincronizacion
       $SynchronizationManagmentLog->release_sinchronization_module( 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
       return json_encode( array( "response" => "Respuesta Erronea : {$result_1}" ) );
+    }
+
+    $response_time = $result->log->response_time;
+/*Procesa Respuesta de comprobacion*/
+    if( $result->rows_validation->log_response != null && $result->rows_validation->log_response != '' ){
+      //var_dump( $result->returns_validation->log_response );
+      $update_log = $generalRowsVerification->updateLogAndJsonsRows( $result->rows_validation->log_response, $result->rows_validation->rows_response, 
+        'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      if( $update_log != 'ok' ){
+        die( "Hubo un error : {$update_log}" );
+      }
+    }
+    $verification_req = array();
+/*Procesa comprobaciones de linea a local*/
+    if( $result->rows_validation->rows_download != null && $result->rows_validation->rows_download != '' ){
+      $download = $result->rows_validation->rows_download;
+      $petition_log = json_decode(json_encode($download->petition), true);
+      $validation_rows = json_decode(json_encode($download->rows), true);
+      if( $download->verification == true ){
+        if( sizeof($petition_log) > 0 ){
+          $verification_req['log_response'] = $generalRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta si la peticion existe en local 
+          $verification_req['rows_response'] = $generalRowsVerification->RowsValidation( $validation_rows, 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
+          $post_data = json_encode( $verification_req );
+          $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_comprobacion_registros_sincronizacion", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consume servicio para actualizar la comprobacion en linea
+        }
+      }
     }
 
     if( $result->ok_rows != '' && $result->ok_rows != null ){//actualiza registros exitosos

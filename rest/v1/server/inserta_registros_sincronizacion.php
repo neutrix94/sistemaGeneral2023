@@ -18,9 +18,9 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-  if( ! include( 'utils/verification/generalRowsVerification.php' ) ){
+  /*if( ! include( 'utils/verification/generalRowsVerification.php' ) ){
     die( "No se incluyó : generalRowsVerification.php" );
-  }
+  }*/
   if( !include( 'utils/Logger.php' ) ){
     die( "No se pudo incluir la clase Logger.php" );
   }
@@ -67,9 +67,9 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
   if( $verification == true ){
   //consulta si la peticion existe en linea
     $resp["rows_validation"]["log_response"] = $generalRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-    $resp["rows_validation"]["rows_response"] = $generalRowsVerification->RowsValidation( $pending_rows_validation, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
+    $resp["rows_validation"]["rows_response"] = $generalRowsVerification->RowsValidation( $pending_rows_validation, 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
   }
-  $resp["rows_validation"]["rows_download"] = $generalRowsVerification->getPendingRows( -1, $log['origin_store'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta las comprobaciones pendientes de linea a local
+  $resp["rows_validation"]["rows_download"] = $generalRowsVerification->getPendingRows( -1, $log['origin_store'], 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta las comprobaciones pendientes de linea a local
 /*FIN DE COMPROBACION 2024*/
 
 /*valida que las apis no esten bloqueadas*/
@@ -114,11 +114,12 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
   $store_prefix = $config['store_prefix'];
   $initial_time = $config['process_initial_date_time'];
   $rows_limit = $config['rows_limit'];
+  $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
-    $rows_limit, 'sys_sincronizacion_registros', $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene registros para descargar
-  if( sizeof( $resp["rows_download"] ) > 0 ){
+  $rows_limit, 'sys_sincronizacion_registros', $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene registros para descargar
+  /*if( sizeof( $resp["rows_download"] ) > 0 ){
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  }
+  }*/
   $SynchronizationManagmentLog->updateModuleResume( 'sys_sincronizacion_registros', 'subida', $resp["status"], $log["origin_store"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza el resumen de modulo/sucursal ( subida )
   
 //desbloquea indicador de sincronizacion en tabla

@@ -1,5 +1,0 @@
-CALL spMovimientoAlmacenDetalle_inserta( 1391074, 3097, 4.0000, 4.0000, -1,
-										-1, IF( 1344 IS NULL OR '1344' = '', NULL, '1344' ), 
-										3, '24LNA_MD_4293280' )
-
-

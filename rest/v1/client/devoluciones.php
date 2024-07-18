@@ -53,7 +53,7 @@ $app->get('/obtener_devoluciones', function (Request $request, Response $respons
   $returns_limit = $config['rows_limit'];
 
   if( $LOGGER ){
-    $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_devoluciones', $system_store, -1, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
+    $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_devoluciones', $system_store, -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
   }
 
   if( $system_store == -1 ){//valida que el origen no sea linea

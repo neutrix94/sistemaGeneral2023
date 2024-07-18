@@ -25,7 +25,7 @@
             return 'ok';
         }
 
-        public function getPendingRows( $origin_store_id, $destinity_store_id, $logger_id = false){
+        public function getPendingRows( $origin_store_id, $destinity_store_id, $table_name, $logger_id = false){
             $log_steep_id = null;
             $resp = array();
             $pending_rows = array();
@@ -44,7 +44,7 @@
                         sp.hora_llegada_respuesta AS datetime_response,
                         sp.hora_finalizacion AS datetime_end
                     FROM sys_sincronizacion_peticion sp
-                    LEFT JOIN sys_sincronizacion_registros sr
+                    LEFT JOIN {$table_name} sr
                     ON sr.folio_unico_peticion = sp.folio_unico
                     WHERE sp.tabla = 'ec_pedidos'
                     AND sp.id_sucursal_origen = {$origin_store_id}
@@ -61,22 +61,17 @@
                 }
                 if( $this->link->error ){
                     if( $logger_id ){
-                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar las peticiones pendientes de alguna respuesta", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar las peticiones pendientes de alguna respuesta", "{$table_name}", $sql, $this->link->error );
                     }
                     die( "Error al consultar las peticiones pendientes de alguna respuesta : {$this->link->error} {$sql}" );
                 }
             $petition = $stm->fetch_assoc();
             $resp['petition'] = $petition;
-            //$resp['petition_id'] = $petition['petition_id'];
-            //$resp['unique_folio'] = $petition['unique_folio'];
             $sql = "SELECT 
                         datos_json,
-                        id_sincronizacion_registro,
-                        tipo AS synchronization_row_id
-                        /*json,
-                        tabla,
-                        registro_llave*/
-                    FROM sys_sincronizacion_registros
+                        id_sincronizacion_registro synchronization_row_id,
+                        tipo AS tabla
+                    FROM {$table_name}
                     WHERE folio_unico_peticion = '{$petition['unique_folio']}'
                     AND status_sincronizacion = 2";
             $stm_2 = $this->link->query( $sql );
@@ -85,9 +80,9 @@
                 }
                 if( $this->link->error ){
                     if( $logger_id ){
-                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar detalle de json", 'sys_sincronizacion_registros', $sql, $this->link->error );
+                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar detalle de json", "{$table_name}", $sql, $this->link->error );
                     }
-                    die( "Error al consultar detalle de json en sys_sincronizacion_registros : {$this->link->error} {$sql}" );
+                    die( "Error al consultar detalle de json en {$table_name} : {$this->link->error} {$sql}" );
                 }
             $resp['verification'] = ( $stm->num_rows > 0 ? true : false );
             while( $detail = $stm_2->fetch_assoc() ){
@@ -97,7 +92,7 @@
             $resp['rows'] = $pending_rows;
             $pending_rows_string = json_encode( $pending_rows );
         //inserta el log
-            $log = $this->insertVerificationLog( 'sys_sincronizacion_registros', $petition['unique_folio'], $pending_rows_string, $logger_id );
+            $log = $this->insertVerificationLog( "{$table_name}", $petition['unique_folio'], $pending_rows_string, $logger_id );
             if( $log != 'ok' ){
                 return false;
             }
@@ -173,15 +168,17 @@
             return $resp;
         }
 
-        public function RowsValidation( $rows, $logger_id = false ){
+        public function RowsValidation( $rows, $table_name, $logger_id = false ){
             $log_steep_id = null;
             $resp = array();
             $resp['ok_rows'] = "";
             $resp['error_rows'] = "";
-
-			foreach ($rows as $key => $row) {
+            $queries = array();
+			foreach ($rows as $key => $row_) {
+               // var_dump( $row_ );
 				$sql = "";
 				$condition = "";
+                $row = json_decode( $row_['datos_json'], true );
 				if( isset( $row['primary_key'] ) && isset( $row['primary_key_value'] ) ){
 					$condition .= "WHERE {$row['primary_key']} = '{$row['primary_key_value']}'";
 				}
@@ -221,13 +218,13 @@
                             }
                             $fields .= " )";
                             $sql .=  "{$fields} VALUES ( {$values} )";
-                            array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id']) );
+                            array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id']) );
                             if( $row['table_name'] != 'ec_pedidos' && $row['table_name'] != 'ec_pedidos_detalle' ){
                                 $sql = "UPDATE {$row['table_name']} SET sincronizar = 0 {$condition}";
                                 array_push( $queries, array( "query"=>$sql, "row_id"=>"n/a") );
                             }
                         }else{//si el registro ya existe en el destino
-                            $resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
+                            $resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row_['synchronization_row_id']}'";
                         }
 /*Implementacion Oscar 2024-02-12 para crear carpetas mediante la sincronizacion*/
 						if( $row['table_name'] == 'sys_carpetas' ){
@@ -254,7 +251,7 @@
 							}
 						}
 						$sql .= "{$fields} {$condition}";
-					    array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id'] ) );
+					    array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id'] ) );
 					break;
 					case 'delete' :
                     //verifica si existe el registro
@@ -262,17 +259,17 @@
                         $verification_stm = $this->link->query( $verification_sql );
                         if( $verification_stm->num_rows > 0) {//si el registro no existe
                             $sql = "DELETE FROM {$row['table_name']} {$condition}";
-                            $resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
-					        array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id'] ) );
+                            //$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row_['synchronization_row_id']}'";
+					        array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id'] ) );
                         }else{//si el registro ya no existe en el destino
-                            $resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
+                            $resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row_['synchronization_row_id']}'";
                         }
 					break;
 
 					case 'sql_instruction' : 
 						$sql = $row['sql'];
 						//$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
-					    array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id'] ) );//se manda ejecutar de nuevo al ser una consulta dinamica
+					    array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id'] ) );//se manda ejecutar de nuevo al ser una consulta dinamica
 					break;
 					
 					default:
@@ -282,24 +279,25 @@
 				}
             //ejecuta instrucciones sql
                 foreach ($queries as $key2 => $query_) {
-                    $ok == true;
+                    $ok = true;
                     $this->link->autocommit(false);
                     $query = str_replace( "'(", "(", $query_['query'] );
                     $query = str_replace( ")'", ")", $query );
-                    $stm = $this->link->query( $query );
+                    $stm = $this->link->query( $query );//
                         if( $logger_id ){
                             $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Ejecuta consulta SQL : ", $query );
                         }
                         if( $this->link->error ){
                             $ok = false;
                             if( $logger_id ){
-                                $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al ejecutar consulta ", "sys_sincronizacion_registros", $query, $this->link->error );
+                                $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al ejecutar consulta ", "$table_name", $query, $this->link->error );
                             }
+                            die( "Error : {$this->link->error}" );
                         }
                     if( $ok == true && $query_['row_id'] != 'n/a' ){
 						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
 						$this->link->commit();
-                    }else if( ! $ok && $query_['row_id'] != 'n/a' ){
+                    }else if( $ok == false  && $query_['row_id'] != 'n/a' ){
 						$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
 						$this->link->rollback();
                     }
@@ -308,7 +306,7 @@
             return $resp;
         }
 
-        public function updateLogAndJsonsRows( $log_response, $rows_response, $logger_id = false ){
+        public function updateLogAndJsonsRows( $log_response, $rows_response, $table_name, $logger_id = false ){
             $log_steep_id = null;
             $this->link->autocommit( false );
             $log_response->response_content = str_replace( "'", "\'", $log_response->response_content );
@@ -330,23 +328,25 @@
                 }
         //actualiza los registros correctos
             $ok_rows = $rows_response->ok_rows;
-            $uniques_folios = '';
+            /*$uniques_folios = '';
             $ok_rows = explode( '|', $ok_rows );//= str_replace( '|', ',', $ok_rows );
             foreach ($ok_rows as $key => $row) {
                 $uniques_folios .= ( $uniques_folios == '' ? '' : ',' );
                 $uniques_folios .= "'{$row}'";
-            }
-            $sql = "UPDATE sys_sincronizacion_ventas SET id_status_sincronizacion = 3 WHERE registro_llave IN( $uniques_folios )";
-            $stm = $this->link->query( $sql );
-                if( $logger_id ){
-                    $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualizar detalles (jsons)", $sql );
-                }
-                if( $this->link->error ){
+            }*/
+            if( $ok_rows != '' ){
+                $sql = "UPDATE {$table_name} SET status_sincronizacion = 3 WHERE id_sincronizacion_registro IN( $ok_rows )";
+                $stm = $this->link->query( $sql );
                     if( $logger_id ){
-                        $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al actualizar detalles (jsons)", 'sys_sincronizacion_ventas', $sql, $this->link->error );
+                        $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualizar detalles (jsons)", $sql );
                     }
-                    die( "Error al actualizar detalles (jsons) local : {$this->link->error} {$sql}" );
-                }
+                    if( $this->link->error ){
+                        if( $logger_id ){
+                            $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al actualizar detalles (jsons)", "{$table_name}", $sql, $this->link->error );
+                        }
+                        die( "Error al actualizar detalles (jsons) local : {$this->link->error} {$sql}" );
+                    }
+            }
             $this->link->autocommit( true );
             return 'ok';
         }
