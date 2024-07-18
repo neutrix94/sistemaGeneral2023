@@ -64,11 +64,11 @@ $app->get('/obtener_registros_sincronizacion_ventas', function (Request $request
   if( $system_store == -1 ){//valida que el origen no sea linea
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
-  }echo 'one';
+  }//echo 'one';
 /*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
   $req['verification'] = $generalRowsVerification->getPendingRows( $system_store, -1, 'sys_sincronizacion_registros_ventas', 
   ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene los registros de comprobacion de registros de sincronizacion
-  echo "two";
+  //echo "two";
 /*Fin de comprobacion de movimientos de almacen*/
   $setPayments = $salesSynchronization->setNewSynchronizationPayments( $system_store, $system_store, $store_prefix, $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar registros de sincronizacion de pagos
   if( $setPayments != 'ok' ){
