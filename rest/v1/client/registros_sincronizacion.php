@@ -65,7 +65,6 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   if( $LOGGER ){
     $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_registros_ventas', $system_store, -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
   }
-
   if( $system_store == -1 ){//valida que el origen no sea linea
   //liberar el modulo de sincronizacion
     $SynchronizationManagmentLog->release_sinchronization_module( 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );

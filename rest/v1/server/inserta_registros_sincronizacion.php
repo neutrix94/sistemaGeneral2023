@@ -18,9 +18,9 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-  /*if( ! include( 'utils/verification/generalRowsVerification.php' ) ){
+  if( ! include( 'utils/verification/generalRowsVerification.php' ) ){
     die( "No se incluyó : generalRowsVerification.php" );
-  }*/
+  }
   if( !include( 'utils/Logger.php' ) ){
     die( "No se pudo incluir la clase Logger.php" );
   }
