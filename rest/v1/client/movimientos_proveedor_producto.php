@@ -87,7 +87,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   //return $post_data;
 /*Envia peticion a Servidor en linea*/
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_movimientos_proveedor_producto", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
- // return $result_1;
+//return $result_1;
   $result = json_decode( $result_1 );//decodifica respuesta
   if( $result == '' || $result == null ){  
     if( $result_1 == '' || $result_1 == null ){
@@ -117,7 +117,9 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
           $verification_req['log_response'] = $warehouseProductProviderMovementsRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta si la peticion existe en local 
           $verification_req['rows_response'] = $warehouseProductProviderMovementsRowsVerification->warehouseProductProviderMovementsValidation( $movements, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
           $post_data = json_encode( $verification_req );
+          echo $post_data;
           $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_comprobacion_movimientos_proveedor_producto", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consume servicio para actualizar la comprobacion en linea
+        echo $result_1;
         }
       }
     }
@@ -142,12 +144,12 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     $rows_download = json_decode(json_encode($result->rows_download), true);
     $log_download = json_decode(json_encode($result->log_download), true );
     $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log_download, $request_initial_time, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta response  
-    $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     
     if( $result->rows_download != '' && $result->rows_download != null ){
       $rows_download = json_decode(json_encode($result->rows_download), true);
       $log_download = json_decode(json_encode($result->log_download), true );
-      $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log_download, $request_initial_time, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta response
+      $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      //$resp["log"] = $SynchronizationManagmentLog->insertResponse( $log_download, $request_initial_time, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta response
       $resp["log"]["type_update"] = "productProviderMovementsSynchronization";
       $insert_rows = $productProviderMovementsSynchronization->insertProductProviderMovements( $rows_download, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso

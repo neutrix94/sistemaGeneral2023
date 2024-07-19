@@ -81,6 +81,7 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
       $resp["verification_movements"]["rows_response"] = $warehouseProductProviderMovementsRowsVerification->warehouseProductProviderMovementsValidation( $pending_movements, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
   }
   $resp["verification_movements"]["rows_download"] = $warehouseProductProviderMovementsRowsVerification->getPendingWarehouseProductProviderMovement( -1, $log['origin_store'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta las comprobaciones pendientes de linea a local
+  //return json_encode($resp["verification_movements"]["rows_download"]);
   //var_dump( $resp );
   //return json_encode( $resp );
 /*Comprobacion*/

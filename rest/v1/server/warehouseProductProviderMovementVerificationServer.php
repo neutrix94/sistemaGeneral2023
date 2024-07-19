@@ -8,7 +8,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Método: POST
 * Descripción: Comprobacion de movimientos almacen a nivel proveedor producto
 */
-$app->post('/actualiza_comprobacion_movimientos_almacen_proveedor_producto', function (Request $request, Response $response){  
+$app->post('/actualiza_comprobacion_movimientos_proveedor_producto', function (Request $request, Response $response){  
     $resp = array();
     //$resp['rows_response'] = array();
     //$resp['rows_download'] = array();
