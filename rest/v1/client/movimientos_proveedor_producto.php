@@ -87,7 +87,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   //return $post_data;
 /*Envia peticion a Servidor en linea*/
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_movimientos_proveedor_producto", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
-  return $result_1;
+  //return $result_1;
   $result = json_decode( $result_1 );//decodifica respuesta
   if( $result == '' || $result == null ){  
     if( $result_1 == '' || $result_1 == null ){
@@ -145,10 +145,10 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     
     if( $result->rows_download != '' && $result->rows_download != null ){
-    $rows_download = json_decode(json_encode($result->rows_download), true);
-    $log_download = json_decode(json_encode($result->log_download), true );
-    $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log_download, $request_initial_time, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta response
-    $insert_rows = $productProviderMovementsSynchronization->insertProductProviderMovements( $rows_download, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      $rows_download = json_decode(json_encode($result->rows_download), true);
+      $log_download = json_decode(json_encode($result->log_download), true );
+      $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log_download, $request_initial_time, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta response
+      $insert_rows = $productProviderMovementsSynchronization->insertProductProviderMovements( $rows_download, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"] );
     //obtiene fecha y hora actual y actualiza registro de petición
@@ -156,7 +156,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
       $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
         $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
       $post_data_1 = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
-      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data_1, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia peticion para actualiza log de registros descargados
+      //$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data_1, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia peticion para actualiza log de registros descargados
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
@@ -205,7 +205,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   $resp["log"]["type_update"] = "productProviderMovementsSynchronization";
   $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );    
   $resp["log"]["destinity_time"] = $response_time;
-  //Forma peticion ( actualizacion de JSONS de linea )
+//Forma peticion ( actualizacion de JSONS de linea )
   $post_data = json_encode(array( "log"=>$resp["log"], 
       "ok_rows"=>$insert_rows["ok_rows"], 
       "error_rows"=>$insert_rows["error_rows"],
