@@ -320,7 +320,7 @@ var packsCatalogue = new Array();
           }
         });
     }else{
-      alert("Favor de seleccionar al menos un producto para muestra");
+      alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
     }
   }
   /**
@@ -968,10 +968,9 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
     <table id="listaProductos" class="table table-striped table-bordered" cellpadding="0" cellspacing="0">
     <thead class="product_list_header">
       <tr class="cabecera">
-        <th width="50"><p>Muestra</p></th>
-        <th width="100"><p>Orden de lista</p></th>
+        <th width="100"><p>Producto</p></th>
         <th width="350"><p>Descripción</p></th>
-        <th width="100"><p>Cantidad</p></th>
+        <th width="100"><p>Cant</p></th>
         <th width="100"><p>Precio</p></th>
       <!--Cambio de omitir oferta en venta por mayoreo Oscar (31-10.2017)-->
       <?php
