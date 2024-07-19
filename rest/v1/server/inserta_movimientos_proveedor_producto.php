@@ -29,7 +29,8 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
   
   $body = $request->getBody();
   $product_provider_movements = $request->getParam( "product_provider_movements" );
-  $log = $request->getParam( "log" );
+  $log = $request->getParam( "log" );  
+  $VERIFICATION = $request->getParam( "verification" );
   $resp = array();
   $resp["ok_rows"] = '';
   $resp["error_rows"] = '';
