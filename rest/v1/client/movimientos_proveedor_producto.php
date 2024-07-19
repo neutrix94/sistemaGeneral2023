@@ -87,6 +87,7 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   //return $post_data;
 /*Envia peticion a Servidor en linea*/
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_movimientos_proveedor_producto", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
+  return $result_1;
   $result = json_decode( $result_1 );//decodifica respuesta
   if( $result == '' || $result == null ){  
     if( $result_1 == '' || $result_1 == null ){
@@ -121,23 +122,28 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
       }
     }
 
-
+  $local_response_log = array();
 //actualiza registros exitosos
   if( $result->ok_rows != '' && $result->ok_rows != null ){
-    $productProviderMovementsSynchronization->updateProductProviderMovementsSynchronization( $result->ok_rows, $req["log"]["unique_folio"], 3, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    $local_response_log = $productProviderMovementsSynchronization->updateProductProviderMovementsSynchronization( $result->ok_rows, $req["log"]["unique_folio"], 3, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   }
 //actualiza erores
   if( $result->error_rows != '' && $result->error_rows != null ){
-    $productProviderMovementsSynchronization->updateProductProviderMovementsSynchronization( $result->error_rows, $req["log"]["unique_folio"], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    $local_response_log = $productProviderMovementsSynchronization->updateProductProviderMovementsSynchronization( $result->error_rows, $req["log"]["unique_folio"], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   }
 //actualiza respuesta
   if( $result->log != '' && $result->log != null ){
-    $SynchronizationManagmentLog->updatePetitionLog( $result->log->destinity_time, $result->log->response_time, $result->log->response_string, 
+    $local_response_log = $SynchronizationManagmentLog->updatePetitionLog( $result->log->destinity_time, $result->log->response_time, $result->log->response_string, 
       $result->log->unique_folio );
   }
 
 /**************************************************Inserta lo que viene de linea**************************************************/
     $post_data_1 = "";
+    $rows_download = json_decode(json_encode($result->rows_download), true);
+    $log_download = json_decode(json_encode($result->log_download), true );
+    $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log_download, $request_initial_time, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta response  
+    $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    
     if( $result->rows_download != '' && $result->rows_download != null ){
     $rows_download = json_decode(json_encode($result->rows_download), true);
     $log_download = json_decode(json_encode($result->log_download), true );
@@ -169,10 +175,12 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     $result->log_download->destinity_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
     $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-    $post_data = json_encode(array( "log"=>$resp["log"] ), JSON_PRETTY_PRINT);//forma peticion
+    $resp["log"]["type_update"] = "productProviderMovementsSynchronization";
+    $post_data_1 = json_encode(array( "log"=>$resp["log"] ), JSON_PRETTY_PRINT);//forma peticion
   }
+  //return $post_data;
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data_1, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
-
+//var_dump($result_1);
   if( $result == '' || $result == null ){  
     if( $result_2 == '' || $result_2 == null ){
       $result_2 = "Posiblemente no hay conexion con el servidor de Linea";
@@ -194,6 +202,16 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     $SynchronizationManagmentLog->updatePetitionLog( $result->log->destinity_time, $result->log->response_time, $result->log->response_string, 
       $result->log->unique_folio );
   }
+  $resp["log"]["type_update"] = "productProviderMovementsSynchronization";
+  $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );    
+  $resp["log"]["destinity_time"] = $response_time;
+  //Forma peticion ( actualizacion de JSONS de linea )
+  $post_data = json_encode(array( "log"=>$resp["log"], 
+      "ok_rows"=>$insert_rows["ok_rows"], 
+      "error_rows"=>$insert_rows["error_rows"],
+      "local_response_log"=>$local_response_log
+    ), JSON_PRETTY_PRINT);
+  $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
   $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto' );//liberar el modulo de sincronizacion
   $link->close();//cierra conexion Mysql
   return 'ok';//regresa respuesta

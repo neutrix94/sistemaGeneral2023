@@ -143,7 +143,7 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
     return json_encode( array( "response" => $setProductProviderMovements ) );
   }
 //consulta registros pendientes de sincronizar
-  $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
+  $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', 'sys_sincronizacion_movimientos_proveedor_producto', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
   $resp["rows_download"] = $productProviderMovementsSynchronization->getSynchronizationProductProviderMovements( $log['origin_store'], $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
   /*if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
