@@ -3,6 +3,7 @@
 	use \Psr\Http\Message\ServerRequestInterface as Request;
 	//use Slim\Factory\AppFactory;
 	/*
+	* Version 2.1 Comprobacion y LOG
 	* Instancia accesos BD
 	*/
 	require '../vendor/autoload.php';

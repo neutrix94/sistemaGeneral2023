@@ -7,6 +7,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_movimientos_almacen
 * Método: GET
 * Descripción: Insercion de movimeintos de almacen a nivel producto
+* Version 2.1 Comprobacion y LOG
 */
 $app->post('/inserta_movimientos_almacen', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){

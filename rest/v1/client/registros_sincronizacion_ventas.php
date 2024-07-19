@@ -45,7 +45,7 @@ $app->get('/obtener_registros_sincronizacion_ventas', function (Request $request
   if( $LOGGER ){
     $Logger = new Logger( $link );//instancia clase de Logs
   }
-
+  $generalRowsVerification = new generalRowsVerification( $link, $Logger );//instancia clases de verificacion de registros de sincronizacion
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
   $rowsSynchronization = new rowsSynchronization( $link, $Logger );//instancia clase de sincronizacion de ventas
   $salesSynchronization = new salesSynchronization( $link, $Logger );
@@ -76,7 +76,7 @@ $app->get('/obtener_registros_sincronizacion_ventas', function (Request $request
     return json_encode( array( "response" => $setPayments ) );
   }
 
-  die("HERE1");
+  //die("HERE1");
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 
     'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta request
   $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros_ventas', $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar

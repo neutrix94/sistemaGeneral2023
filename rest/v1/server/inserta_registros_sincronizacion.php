@@ -6,6 +6,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_registros_sincronizacion
 * Método: GET
 * Descripción: Insercion de registros de sincronizacion
+* Version 2.1 Comprobacion y LOG
 */
 $app->post('/inserta_registros_sincronizacion', function (Request $request, Response $response){
 //incluye librerias

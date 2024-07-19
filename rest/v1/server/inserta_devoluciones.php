@@ -7,6 +7,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_devoluciones
 * Método: GET
 * Descripción: Insercion de devoluciones
+* Version 2.1 Comprobacion y LOG
 */
 $app->post('/inserta_devoluciones', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -136,9 +137,10 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
     return json_encode( array( "response" => $setMovements ) );
   }
 //consulta registros pendientes de sincronizar
-  if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
+  /*if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'DEVOLUCIONES DESDE LINEA', 'sys_sincronizacion_devoluciones', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  }
+  }*/
+  $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'DEVOLUCIONES DESDE LINEA', 'sys_sincronizacion_devoluciones', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   $resp["rows_download"] = $returnsSynchronization->getSynchronizationReturns( $log['origin_store'], $rows_limit, $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   
   $SynchronizationManagmentLog->updateModuleResume( 'ec_devolucion', 'subida', $resp["status"], $log["origin_store"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza el resumen de modulo/sucursal ( subida )

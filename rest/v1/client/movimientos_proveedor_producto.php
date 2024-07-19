@@ -137,39 +137,42 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
   }
 
 /**************************************************Inserta lo que viene de linea**************************************************/
-  if( $result->rows_download != '' && $result->rows_download != null ){
     $post_data_1 = "";
+    if( $result->rows_download != '' && $result->rows_download != null ){
     $rows_download = json_decode(json_encode($result->rows_download), true);
     $log_download = json_decode(json_encode($result->log_download), true );
     $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log_download, $request_initial_time, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta response
     $insert_rows = $productProviderMovementsSynchronization->insertProductProviderMovements( $rows_download, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"] );
+    //obtiene fecha y hora actual y actualiza registro de petición
+      $result->log_download->destinity_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
+        $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
       $post_data_1 = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
       $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data_1, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia peticion para actualiza log de registros descargados
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
-      //$productProviderMovementsSynchronization->updateProductProviderInventory( $rows_download, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//suma el inventario
     //inserta respuesta exitosa
-      $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) ); 
+    //obtiene fecha y hora actual y actualiza registro de petición
+      $result->log_download->destinity_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
+      $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
       $resp["log"]["type_update"] = "productProviderMovementsSynchronization";
     //envia peticion para actualiza log de registros descargados
       $post_data_1 = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
-      $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data_1, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
     }
+  }else{
+  //obtiene fecha y hora actual y actualiza registro de petición
+    $result->log_download->destinity_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
+    $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    $post_data = json_encode(array( "log"=>$resp["log"] ), JSON_PRETTY_PRINT);//forma peticion
   }
-/*
-  $initial_time_2 = $SynchronizationManagmentLog->getCurrentTime();
-  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, 
-  $initial_time_2, 'ACTUALIZACION DE INVENTARIOS PROVEEDOR PRODUCTO' );//consume API para actualizar los inventarios de productos
-  $post_data = json_encode($req, JSON_PRETTY_PRINT);//
-  $result_2 = $SynchronizationManagmentLog->sendPetition( $path.'/rest/v1/actualiza_inventarios_proveedor_producto', $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  $result = json_decode( $result_2 );
-  if( $result->error ){
-    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto' );//liberar el modulo de sincronizacion
-      return json_encode( array( "response" => $result->error ) );    
-  }*/
+  $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data_1, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
+
   if( $result == '' || $result == null ){  
     if( $result_2 == '' || $result_2 == null ){
       $result_2 = "Posiblemente no hay conexion con el servidor de Linea";

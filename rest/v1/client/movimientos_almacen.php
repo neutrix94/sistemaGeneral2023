@@ -140,34 +140,58 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
   $log_download = json_decode(json_encode($result->log_download), true );
   $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log_download, $request_initial_time, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta response  
   $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );  
+//obtiene fecha y hora actual y actualiza registro de petición
+  $result->log_download->destinity_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
+  $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  
   $resp["ok_rows"] = "";
   $resp["error_rows"] = "";
 
+  $post_data = array();
   if( $result->rows_download != '' && $result->rows_download != null ){
     $insert_rows = $movementsSynchronization->insertMovements( $rows_download, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-     // $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
-      //$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/sincronizacion/actualiza_peticion", $post_data );//envia petición
+    //obtiene fecha y hora actual y actualiza registro de petición 
+      $result->log_download->destinity_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
+        $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
     //inserta respuesta exitosa
-      $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-      
+      $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );    
+    //obtiene fecha y hora actual y actualiza registro de petició
+      $result->log_download->destinity_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
+        $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     //envia peticion para actualiza log de registros descargados
-
+      $post_data = json_encode(array( "log"=>$resp["log"] ), JSON_PRETTY_PRINT);//forma peticion
     }
+  }else{//respuesta vacia
+    //obtiene fecha y hora actual y actualiza registro de petición
+    $result->log_download->destinity_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
+    $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+   // var_dump( $resp["log"] );
+    /*$resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "", $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    var_dump( $resp["log"] );*/
+    $post_data = json_encode(array( "log"=>$resp["log"] ), JSON_PRETTY_PRINT);//forma peticion
   }
+//envia peticion para actualizar peticion de linea a local
+  $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  
   $resp["log"]["type_update"] = "movementsSynchronization";
   $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );    
   $resp["log"]["destinity_time"] = $response_time;
-  
+  //Forma peticion ( actualizacion de JSONS de linea )
   $post_data = json_encode(array( "log"=>$resp["log"], 
       "ok_rows"=>$insert_rows["ok_rows"], 
       "error_rows"=>$insert_rows["error_rows"],
       "local_response_log"=>$local_response_log
-    ), JSON_PRETTY_PRINT);//forma peticion
+    ), JSON_PRETTY_PRINT);
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
   $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
   $link->close();//cierra conexion Mysql

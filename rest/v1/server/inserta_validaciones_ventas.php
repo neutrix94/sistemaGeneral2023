@@ -6,6 +6,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_validaciones_ventas
 * Método: POST
 * Descripción: Insercion de validaciones de ventas
+* Version 2.1 Comprobacion y LOG
 */
 $app->post('/inserta_validaciones_ventas', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -118,11 +119,11 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
   if( $setMovements != 'ok' ){
     return json_encode( array( "response" => $setMovements ) );
   }
-
+  $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'VALIDACION VENTAS DESDE LINEA', 'sys_sincronizacion_validaciones_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   $resp["rows_download"] = $salesValidationSynchronization->getSynchronizationsalesValidation( $log['origin_store'], $rows_limit, $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
-  if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
+  /*if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'VALIDACION VENTAS DESDE LINEA', 'sys_sincronizacion_validaciones_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  }
+  }*/
   
 //desbloquea indicador de sincronizacion en tabla
   $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
