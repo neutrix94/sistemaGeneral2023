@@ -15,7 +15,7 @@ $app->post('/actualiza_comprobacion_movimientos_proveedor_producto', function (R
     if ( ! include( '../../conexionMysqli.php' ) ){
         die( 'no se incluyó conexion' );
     }
-    if( ! include( 'utils/warehouseProductProviderMovementsRowsVerification.php' ) ){
+    if( ! include( 'utils/verification/warehouseProductProviderMovementsRowsVerification.php' ) ){
         die( "Error al incluir clase warehouseProductProviderMovementsRowsVerification.php" );
     }
     $warehouseProductProviderMovementsRowsVerification = new warehouseProductProviderMovementsRowsVerification( $link );//instancia clase de comprobacion

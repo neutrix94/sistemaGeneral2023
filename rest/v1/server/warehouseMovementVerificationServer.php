@@ -15,7 +15,7 @@ $app->post('/actualiza_comprobacion_movimientos_almacen', function (Request $req
     if ( ! include( '../../conexionMysqli.php' ) ){
         die( 'no se incluyó conexion' );
     }
-    if( ! include( 'utils/warehouseMovementsRowsVerification.php' ) ){
+    if( ! include( 'utils/verification/warehouseMovementsRowsVerification.php' ) ){
         die( "Error al incluir clase warehouseMovementsRowsVerification.php" );
     }
     $warehouseMovementsRowsVerification = new warehouseMovementsRowsVerification( $link );//instancia clase de comprobacion
