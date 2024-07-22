@@ -15,7 +15,7 @@ $app->post('/actualiza_comprobacion_ventas', function (Request $request, Respons
     if ( ! include( '../../conexionMysqli.php' ) ){
         die( 'no se incluyó conexion' );
     }
-    if( ! include( 'utils/verification/salesRowsVerification.php' ) ){
+    if( ! include( 'utils/verification/SalesRowsVerification.php' ) ){
         die( "Error al incluir clase SalesRowsVerification.php" );
     }
     $SalesRowsVerification = new SalesRowsVerification( $link );//instancia clase de comprobacion
