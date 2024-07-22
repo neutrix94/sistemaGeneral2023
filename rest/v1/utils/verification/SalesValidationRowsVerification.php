@@ -178,8 +178,8 @@
             foreach ($validations as $key => $validation_) {
                 $this->link->autocommit( false );
                 $validation = json_decode( $validation_['json'] );
-                if (is_object($return) && get_class($return) === 'stdClass') {
-                    $return = json_decode(json_encode($return), true);
+                if (is_object($validation) && get_class($validation) === 'stdClass') {
+                    $validation = json_decode(json_encode($validation), true);
                 }
                 $this->link->autocommit( false );
                 $validation = json_decode( $validation_['json'] );
