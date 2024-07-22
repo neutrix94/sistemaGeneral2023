@@ -229,14 +229,14 @@
 					/*11*/0,/*implementado el 17-1-2018*/
 					/*12*/es_externo,
 					/*13*/id_precio,/*implementado el 25.03.2019*/
-					/*14*/0/*id_ equivalente 2022*/
+					/*14*/NULL/*id_ equivalente 2022*/
 				FROM ec_pedidos_detalle_back
 				WHERE id_pedido = {$id_pedido}";
 		$res=mysql_query($sql);
 		
 		if(!$res){
 			//die($sql);
-			throw new Exception("No se pudo insertar la nota de venta\n\n" . mysql_error());
+			throw new Exception("No se pudo insertar detalle de la nota de venta\n\n" . mysql_error());
 		}
 	//Insertamos el movimiento de almacen producto x producto
 		$sql="SELECT
@@ -352,7 +352,7 @@
 								//$sqlAux="INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto, cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle)
 								//	VALUES('$id_mov','$dA[0]','$suma','$suma', '{$id_pedido_detalle}' ,-1)";
 								$sqlAux = "CALL spMovimientoAlmacenDetalle_inserta( {$id_mov}, {$dA[0]}, {$suma}, {$suma}, {$id_pedido_detalle}, -1, NULL, 11, NULL );";
-								$ejeSqlAux=mysql_query($sqlAux)or die('ERRROR!!!'.$sqlAux);
+								$ejeSqlAux=mysql_query($sqlAux)or die('Error al insertar detalle de venta!!!'.$sqlAux);
 								//echo $sqlAux.'<br>';
 							}
 						}
@@ -375,7 +375,6 @@
 					break;                        
 				}
 		}
-
 		//buscamos si hay alerta
             $sql="	SELECT
 					alertas_resurtimiento,
