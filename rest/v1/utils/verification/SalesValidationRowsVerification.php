@@ -178,6 +178,11 @@
             foreach ($validations as $key => $validation_) {
                 $this->link->autocommit( false );
                 $validation = json_decode( $validation_['json'] );
+                if (is_object($return) && get_class($return) === 'stdClass') {
+                    $return = json_decode(json_encode($return), true);
+                }
+                $this->link->autocommit( false );
+                $validation = json_decode( $validation_['json'] );
                 //var_dump($movement);
             //consulta si la cabecera existe
                 $sql = "SELECT id_pedido_validacion AS sale_validation_id FROM ec_pedidos_validacion_usuarios WHERE folio_unico = '{$validation_['registro_llave']}'";
