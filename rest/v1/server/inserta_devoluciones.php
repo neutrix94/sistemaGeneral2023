@@ -117,7 +117,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
     }
   }else{
   //inserta excepcion controlada
-    $response_string = "No llegaron ventas, posiblemente tengas que bajar el limite de registros de sincronizacion de devoluciones!";
+    $response_string = "No llegaron devoluciones, posiblemente tengas que bajar el limite de registros de sincronizacion de devoluciones!";
     $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $response_string, $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   }
   /****************************************** Consulta / Envia ******************************************/
