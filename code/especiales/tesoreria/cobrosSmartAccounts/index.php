@@ -53,6 +53,7 @@
 //configuracion del Websocket
 // $url_websocket = "ws://localhost:3005/";//"ws://localhost:3000";
 // $url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
+
 	$url_websocket = $Payments->getWebSocketURL();// getenv('WEBSOCKET_URL') ?: "ws://192.168.1.223:3005/";
 	if( $url_websocket == '' || $url_websocket == NULL || $url_websocket == null ){
 		die( "<center>
