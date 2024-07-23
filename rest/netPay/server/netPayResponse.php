@@ -40,15 +40,25 @@ $app->post('/', function (Request $request, Response $response){
   if( $log['log_enabled'] == 1 ){
     $Logger = new Logger( $link );//instancia clase de log
   }
-//obtener el json en txt
-  try{
-    $filePath = getenv('PATH_NETPAY_TRANSACTION_FILE') ?: '';
-    $file = fopen("{$filePath}archivo.txt", "w");
-    fwrite($file,"{$body}");
-    fclose($file);
-  }catch( Exception $e ){
-    die( "Error en escritura de archivo.txt : {$e}" );
-  }
+//obtener el json en txt 
+  /*$body = $request->getBody();
+  $file = fopen("test.txt","w");
+  fwrite($file,"{$body}");
+  fclose($file);*/
+  //try{
+    $body = $request->getBody();
+    //var_dump( $body );
+    try{
+      $filePath = getenv('PATH_NETPAY_TRANSACTION_FILE') ?: '';
+      $file = fopen("{$filePath}archivo.txt", "w");
+      fwrite($file,"{$body}");
+      fclose($file);
+    }catch( Exception $e ){
+      die( "Error en escritura de arcchivo.txt : {$e}" );
+    }
+  //}catch( Exception e ){
+  //  die( "Error al escribir archivo txt : {$e}" );
+  //}
 //respuesta
   $response_message = "Transaccion exitosa!";
 //recibe los parametros de netPay

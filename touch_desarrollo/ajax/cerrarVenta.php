@@ -229,14 +229,14 @@
 					/*11*/0,/*implementado el 17-1-2018*/
 					/*12*/es_externo,
 					/*13*/id_precio,/*implementado el 25.03.2019*/
-					/*14*/0/*id_ equivalente 2022*/
+					/*14*/NULL/*id_ equivalente 2022*/
 				FROM ec_pedidos_detalle_back
 				WHERE id_pedido = {$id_pedido}";
 		$res=mysql_query($sql);
 		
 		if(!$res){
 			//die($sql);
-			throw new Exception("No se pudo insertar la nota de venta\n\n" . mysql_error());
+			throw new Exception("No se pudo insertar detalle de la nota de venta\n\n" . mysql_error());
 		}
 	//Insertamos el movimiento de almacen producto x producto
 		$sql="SELECT
@@ -260,7 +260,7 @@
 			$row = mysql_fetch_assoc($res);
 			extract($row);
 	//Buscamos el almacen correspondiente
-			$sql="SELECT
+			/*$sql="SELECT
 					a.id_almacen,
 					a.prioridad,
 					(
@@ -275,7 +275,17 @@
 					FROM ec_almacen a
 					WHERE a.id_sucursal=$user_sucursal
 					AND a.id_almacen <> -1 
-					ORDER BY es_almacen DESC, prioridad";
+					ORDER BY es_almacen DESC, prioridad";*/
+			$sql = "SELECT
+						IF( sp.es_externo = 1, s.almacen_externo, a.id_almacen )
+					FROM sys_sucursales s
+					LEFT JOIN sys_sucursales_producto sp
+					ON s.id_sucursal = sp.id_sucursal
+					LEFT JOIN ec_almacen a
+					ON a.id_sucursal = s.id_sucursal
+					AND a.es_almacen = 1
+					WHERE sp.id_producto = {$id_prod}
+					AND s.id_sucursal = {$user_sucursal}";
       //           die($sql);
 			$re=mysql_query($sql);
 	        if(!$re){
@@ -288,28 +298,36 @@
 	//		echo 'num:'.$nu;
 			for($j=0;$j<1;$j++){
 				$ro=mysql_fetch_row($re);
-				if($j == 0){
+				/*if($j == 0){
 					$almacenPri=$ro[0];
-				}
+				}*/
 				//echo 'jkebfkñwebf';
 			//Si existe inventario en el almacen (aqui modifique deberia de ser mayor a cero)    
 				//echo 'ro2: '.$ro[2];
 				//if($ro[2]>-10000){
 				//echo'here';
 					//Insertamos cabecera
-					$sql="	INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen)
+					/*$sql="	INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen)
 							SELECT 2,$user_id,id_sucursal, now(),now(),'',{$id_pedido_r}, -1, '', -1, -1, IF($es_externo=1,almacen_externo,$ro[0])
-							FROM sys_sucursales WHERE id_sucursal=$user_sucursal";/*Modificado por oscar 07.08.2018*/
+							FROM sys_sucursales WHERE id_sucursal=$user_sucursal";/*Modificado por oscar 07.08.2018
 					//VALUES(2, $user_id, $user_sucursal, NOW(), NOW(), '', {$id_pedido_r}, -1, '', -1, -1, $ro[0])
-                    //echo $sql;
-                    
-					if (!mysql_query($sql)){
+                    //echo $sql;*/
+					//IF($es_externo=1,almacen_externo,$ro[0])
+                    $sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, '', {$user_sucursal}, {$ro[0]}, 2, {$id_pedido_r}, -1, -1, -1, 11, NULL )";
+					//die( $sql );
+					$ma_stm = mysql_query( $sql ) or die( "Error al mandar llamar procedure : spMovimientoAlmacen_inserta : " . mysql_error() );
+					$ma_stm = mysql_query( "SELECT max( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen" ) or die( "Error al recuperar id ma insertado : " . mysql_error() );
+					$id_mov = mysql_fetch_assoc( $ma_stm );
+					$id_mov = $id_mov['id_movimiento_almacen'];//die( "id_movimiento : {$id_mov}" );
+					mysql_free_result($ma_stm);
+					/*if (!mysql_query($sql)){
 						
 			//die($sql);
 						throw new Exception("Imposible almacenar registro (detalle de pedido).\n\n$sql\n\n" . mysql_error());
-					}
-                    
-					$id_mov=mysql_insert_id();
+					}*/
+                  //  $id_mov_row = mysql_fetch_row();
+					//$id_mov = $id_mov_row[0];
+					//$id_mov=mysql_insert_id();
 				//guardamos ids de movimientos	
 					$ids_movs.=$id_mov."|";  
 
@@ -331,17 +349,19 @@
 							while($dA=mysql_fetch_row($ejeAux)){
 								$suma=$dA[1]*$can_s;
 								//echo 'suma:'.$dA[1].' * '. $can_s.' = '.$suma;
-								$sqlAux="INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto, cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle)
-									VALUES('$id_mov','$dA[0]','$suma','$suma', '{$id_pedido_detalle}' ,-1)";
-								$ejeSqlAux=mysql_query($sqlAux)or die('ERRROR!!!'.$sqlAux);
+								//$sqlAux="INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto, cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle)
+								//	VALUES('$id_mov','$dA[0]','$suma','$suma', '{$id_pedido_detalle}' ,-1)";
+								$sqlAux = "CALL spMovimientoAlmacenDetalle_inserta( {$id_mov}, {$dA[0]}, {$suma}, {$suma}, {$id_pedido_detalle}, -1, NULL, 11, NULL );";
+								$ejeSqlAux=mysql_query($sqlAux)or die('Error al insertar detalle de venta!!!'.$sqlAux);
 								//echo $sqlAux.'<br>';
 							}
 						}
 					}else if($maquilado==0){
 						//echo'no maquilado';
 			//Insertamos detalle   
-						$sql="INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto, cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle)
-								VALUES('$id_mov','$id_prod',$can_s,$can_s,'{$id_pedido_detalle}','-1')";
+//						$sql="INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto, cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle)
+//								VALUES('$id_mov','$id_prod',$can_s,$can_s,'{$id_pedido_detalle}','-1')";
+						$sql = "CALL spMovimientoAlmacenDetalle_inserta( {$id_mov}, {$id_prod}, {$can_s}, {$can_s}, {$id_pedido_detalle}, -1, NULL, 11, NULL );";
 						if (!mysql_query($sql)){
 							throw new Exception("Imposible almacenar registro (detalle de pedido).\n\n$sql\n\n" . mysql_error());
 						}
@@ -355,7 +375,6 @@
 					break;                        
 				}
 		}
-
 		//buscamos si hay alerta
             $sql="	SELECT
 					alertas_resurtimiento,

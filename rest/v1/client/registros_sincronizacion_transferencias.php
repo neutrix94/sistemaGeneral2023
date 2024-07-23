@@ -17,13 +17,34 @@ $app->get('/obtener_registros_sincronizacion_transferencias', function (Request 
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
+  if( ! include( 'utils/verification/generalRowsVerification.php' ) ){
+    die( "No se incluyó : generalRowsVerification.php" );
+  }
+  if( !include( 'utils/Logger.php' ) ){
+    die( "No se pudo incluir la clase Logger.php" );
+  }
+  $Logger = false;
+  $LOGGER = false;
 //variables
   $req = [];
   $req["rows"] = array(); 
   $result = "";
+//verifica si el log esta habilitado
+  $sql = "SELECT
+              log_habilitado AS log_is_enabled
+      FROM sys_configuraciones_logs  
+      WHERE id_configuracion_log = 1";
+  $stm = $link->query( $sql ) or die( "Error al consultar si el log esta habilitado : {$sql} : {$this->link->error}" );
+  $row = $stm->fetch_assoc();
+  $LOGGER = ( $row['log_is_enabled'] == 1 ? true : false );
+  
+  if( $LOGGER ){
+    $Logger = new Logger( $link );//instancia clase de Logs
+  }
 
-  $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
-  $rowsSynchronization = new rowsSynchronization( $link );//instancia clase de sincronizacion de movimientos
+  $generalRowsVerification = new generalRowsVerification( $link, $Logger );//instancia clases de verificacion de registros de sincronizacion
+  $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
+  $rowsSynchronization = new rowsSynchronization( $link, $Logger );//instancia clase de sincronizacion de movimientos
 
   $config = $SynchronizationManagmentLog->getSystemConfiguration( 'ec_transferencias' );//consulta path del sistema central
   $path = trim ( $config['value'] );
@@ -32,13 +53,17 @@ $app->get('/obtener_registros_sincronizacion_transferencias', function (Request 
   $initial_time = $config['process_initial_date_time'];
   $rows_limit = $config['rows_limit'];
 
+  if( $LOGGER ){
+    $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_registros_transferencias', $system_store, -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
+  }
+
   if( $system_store == -1 ){//valida que el origen no sea linea
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_transferencias' );//liberar el modulo de sincronizacion
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
   }
 
   $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros_transferencias' );//consulta registros pendientes de sincronizar
-  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );//inserta request
+  $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros_transferencias' );//inserta request
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_registros_sincronizacion_transferencias", $post_data );//envia petición
   $result = json_decode( $result_1 );//decodifica respuesta
