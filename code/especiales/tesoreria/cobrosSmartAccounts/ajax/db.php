@@ -1,5 +1,5 @@
 <?php
-/*version 1.1 2024-06-21*/
+/*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
@@ -410,11 +410,12 @@
 		}
 
 		public function show_pending_payment_responses( $store_id ){
-			$resp = "<table class=\"table table-striped table-bordered\">
+			$resp = "<table class=\"table table-striped table-bordered\" style=\"width : 100%;\" border=\"1\">
 				<thead>
 					<tr>
 						<th class=\"text-center\">Folio Venta</th>
 						<th class=\"text-center\">Monto Cobro</th>
+						<th class=\"text-center\">Fecha</th>
 					</tr>
 				<thead>
 				<tbody>";
@@ -436,9 +437,11 @@
 			$resp .= "</tbody>
 				</table>
 			<br><br>
-			<button type=\"button\" class=\"btn btn-warning\" onclick=\"close_emergent();\">
-				<i>Aceptar y cerrar</i>
-			</button>";
+			<div style=\"text-align: center;\">
+				<button type=\"button\" class=\"btn btn-warning\" onclick=\"close_emergent_window();\">
+					<i>Aceptar y cerrar</i>
+				</button>
+			</div>";
 			return $resp;
 		}
 
@@ -1662,7 +1665,9 @@
 
 		public function checkAccess( $user_id ){
 			$sql="SELECT 
-					IF(p.ver=1 OR p.modificar=1,1,0)
+					IF(p.ver=1 OR p.modificar=1,1,0),
+					( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 ) AS system_type,
+					( SELECT tiempo_espera_respuesta_websocket FROM ec_configuracion_sucursal WHERE id_sucursal = {$this->store_id} ) AS max_execution_time/*1.2 tiempo espera dinamico 2024-07-04*/
 				FROM sys_permisos p
 				LEFT JOIN sys_users_perfiles perf ON perf.id_perfil=p.id_perfil
 				LEFT JOIN sys_users u ON u.tipo_perfil=perf.id_perfil 
@@ -1670,9 +1675,11 @@
 				AND u.id_usuario={$user_id}";
 			//die($sql);
 			//$eje=mysql_query($sql)or die("Error al consultar el permiso de cajero!!!<br>".mysql_error()."<br>".$sql);
-			$stm = $this->link->query( $sql ) or die("Error al consultar el permiso de cajero : {$this->link->error}");
+			$stm = $this->link->query( $sql ) or die("Error al consultar el permiso de cajero : {$sql} : {$this->link->error}");
 			//$es_cajero=mysql_fetch_row($eje);
 			$es_cajero = $stm->fetch_row();
+			$max_execution_time = $es_cajero[2];/*1.2 tiempo espera dinamico 2024-07-04*/
+			$system_type = $es_cajero[1];//tipo de sistema
 			if($es_cajero[0] == 0 ){
 				die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla!!!\nContacte al administrador desl sistema!!!");location.href="../../../../index.php?";</script>');
 			}
@@ -1692,7 +1699,7 @@
 			}
 		/*Implementacion Oscar 2024-06-24 para creacion / renovacion de Token */
 		//consulta si tiene token activo
-			$sql = "SELECT token FROM api_token WHERE id_user = {$user_id} AND expired_in > NOW()";
+			$sql = "SELECT token FROM api_token WHERE id_user = {$user_id}";// AND expired_in > NOW()
 			$stm = $this->link->query( $sql ) or die( "Error al consultar si hay token activo para pantalla de cobros : {$this->link->error}" );
 		//obtiene el password del usuario
 			$sql = "SELECT 
@@ -1714,18 +1721,28 @@
 				}else{
 					//var_dump( $result->result->created_in );die('');
 				//inserta el token en la tabla api_token
-					$sql = "INSERT INTO api_token ( id_user, token, created_in, expired_in ) 
-						VALUES ( {$user_id}, '{$result->result->access_token}', 
-						'{$result->result->created_in}', '{$result->result->expired_in}' )";	//die( $sql );			
-					$stm3 = $this->link->query( $sql ) or die( "Error al insertar token en cliente : {$this->link->error}" );
+					if( $system_type > 0 ){
+						$sql = "INSERT INTO api_token ( id_user, token, created_in, expired_in ) 
+							VALUES ( {$user_id}, '{$result->result->access_token}', 
+							'{$result->result->created_in}', '{$result->result->expired_in}' )";	//die( $sql );			
+						$stm3 = $this->link->query( $sql ) or die( "Error al insertar token en cliente : {$this->link->error}" );
+					}
 				}
-				return array( "status"=>200, "token"=>$result->result->access_token );
+				return array( "status"=>200, "token"=>$result->result->access_token, "max_execution_time"=>$max_execution_time );/*1.2 tiempo espera dinamico 2024-07-04*/
 			}else{
-				$row =$stm->fetch_assoc();
+				$row = $stm->fetch_assoc();
 			//validacion / renovacion de token
 				$post_data = null;
 				$result = json_decode( $this->sendPetition( "{$user['api_path']}/rest/netPay/valida_token", $post_data, $row['token'] ) );
-				return array( "status"=>200, "token"=>$row['token'] );
+				//var_dump($result);die('');
+			//actualiza la caducidad del token en local
+				$sqlAPIConfig="SELECT value FROM api_config c WHERE c.key='token' and name='time_value' limit 1";
+				$resultadoConfig = $this->link->query($sqlAPIConfig) or die( "Error al consultar los parametros del token : {$sql} : {$this->link->error}" );
+				$time_value = $resultadoConfig->fetch_assoc();
+				$sql = "UPDATE api_token SET expired_in = TIMESTAMPADD(SECOND,{$time_value['value']},NOW()) WHERE token = '{$row['token']}'";
+				$stm = $this->link->query( $sql ) or die( "Error al renovar el token en local : {$sql} : {$this->link->error}");
+				return array( "status"=>200, "token"=>$row['token'], "max_execution_time"=>$max_execution_time  );/*1.2 tiempo espera dinamico 2024-07-04*/
+				
 			}
 		}
 
@@ -1785,7 +1802,7 @@
 						p.id_pedido,
 						p.fecha_alta,
 						c.nombre AS costumer_name,
-						SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS payments_amount
+						TRUNCATE( SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ), 2 ) AS payments_amount
 					FROM ec_pedidos p
 					LEFT JOIN sys_users u
 					ON p.id_usuario = u.id_usuario
@@ -2080,91 +2097,81 @@
 		}
 
 		public function getSaleData( $clave, $sale_folio, $user_id, $log_id = null ){
-		//verifica si tiene transacciones pendientes
-			$sql = "SELECT folio_unico AS unique_folio FROM vf_transacciones_netpay WHERE folio_venta = '{$sale_folio}' AND notificacion_vista = 0";
-			$stm = $this->link->query( $sql );
-		/*Logger*/
-			if( $log_id != null ){
-				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta las transacciones pendientes ", $sql );
-			}
-			if( $this->link->error ){
-				if( $log_id != null ){
-					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', $sale_folio, $sql, $this->link->error );
-				}
-				die( "Error al consultar las transacciones pendientes : {$this->link->error}" );
-			}
-			if( $stm->num_rows > 0){
-				$pending_transactions = array();
-				while ( $row = $stm->fetch_assoc() ){
-					$pending_transactions[] = $row;
-				}
-				$sql = "SELECT value AS api_path FROM api_config WHERE name = 'path'";
-				$stm = $this->link->query( $sql );// or die( "Error al consultar las transacciones pendientes : {$this->link->error}" );
+		//consulta el id de sucursal de acceso 
+			$sql = "SELECT id_sucursal AS system_type FROM sys_sucursales WHERE acceso = 1";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$sql} : {$this->link->error}");
+			$row = $stm->fetch_assoc();
+			if( $row["system_type"] > 0 ){//si es diferente de linea
+			//verifica si tiene transacciones pendientes
+				$sql = "SELECT folio_unico AS unique_folio FROM vf_transacciones_netpay WHERE folio_venta = '{$sale_folio}' AND notificacion_vista = 0";
+				$stm = $this->link->query( $sql );
 			/*Logger*/
 				if( $log_id != null ){
-					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Entra en transacciones pendientes y consulta path de api", $sql );
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta las transacciones pendientes ", $sql );
 				}
 				if( $this->link->error ){
 					if( $log_id != null ){
-						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'api_config', 'path', $sql, $this->link->error );
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', $sale_folio, $sql, $this->link->error );
 					}
-					die( "Error al consultar path de api : {$this->link->error}" );
+					die( "Error al consultar las transacciones pendientes : {$this->link->error}" );
 				}
-				$row = $stm->fetch_assoc();
-				$url = "{$row["api_path"]}/rest/netPay/consultar_transacciones_por_folio";
-				$post_data = json_encode( array("transactions"=> $pending_transactions ) );
-				//die( $post_data );
-			/*Logger*/
-				if( $log_id != null ){
-					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consume api para recuperar datos en {$url}", $post_data );
-				}
-			//consumir el API ( CURL )
-				$results = json_decode( $this->sendPetition( $url, $post_data, $token = '' ), true );
-				//var_dump( $results	 );die( "stop" );
-				if( $results['status'] != null && $results['status'] != '' ){				
-					$archivo_path = "../../../../../conexion_inicial.txt";
-					$host = '';
-					$carpeta_path = '';
-					if(file_exists($archivo_path)){
-						$file = fopen($archivo_path,"r");
-						$line=fgets($file);
-						fclose($file);
-						$config=explode("<>",$line);
-						$tmp=explode("~",$config[2]);
-						$ruta_or=$tmp[0];
-						$ruta_des=$tmp[1];
-						$tmp_=explode("~",$config[0]);
-						$host = base64_decode( $tmp_[0] );
-						$carpeta_path = base64_decode( $tmp_[1] );
-					}else{
-						die("No hay archivo de configuración!!!");
+				if( $stm->num_rows > 0){
+					$pending_transactions = array();
+					while ( $row = $stm->fetch_assoc() ){
+						$pending_transactions[] = $row;
 					}
-					$update_endpoint = "{$host}/{$carpeta_path}/rest/netPay/actualizar_datos_transacciones";
-				//consulta token 
-					/*$sql = "SELECT token FROM api_token WHERE id_user = {$user_id} AND expired_in > NOW()";
-					$token_stm = $this->link->query( $sql ) or die( "Error al consultar el token de usuario para actualizar transacciones : {$sql} : {$this->link->error}" );
-					$token_row = $stm->fetch_assoc();
-					$user_token = $token_row["token"];*/
-					
-					$user_token = $this->checkAccess( $user_id );
-					$user_token = $user_token['token'];
-					//die( $user_token );
-					foreach ($results['transacciones'] as $key => $transaction) {
-						//var_dump( $transaction );die('');
-						$post_data = json_encode( $transaction );
-						$update = $this->sendPetition( $update_endpoint, $post_data, $user_token );
-						//var_dump( $update );
-					}
-				}
-//				die("here");
-				
-				/*if( $this->link->error ){
+					$sql = "SELECT value AS api_path FROM api_config WHERE name = 'path'";
+					$stm = $this->link->query( $sql );// or die( "Error al consultar las transacciones pendientes : {$this->link->error}" );
+				/*Logger*/
 					if( $log_id != null ){
-						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'api_config', 'path', $sql, $this->link->error );
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Entra en transacciones pendientes y consulta path de api", $sql );
 					}
-					die( "Error al consultar path de api : {$this->link->error}" );
-				}*/
-				//die("here");
+					if( $this->link->error ){
+						if( $log_id != null ){
+							$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'api_config', 'path', $sql, $this->link->error );
+						}
+						die( "Error al consultar path de api : {$this->link->error}" );
+					}
+					$row = $stm->fetch_assoc();
+					$url = "{$row["api_path"]}/rest/netPay/consultar_transacciones_por_folio";
+					$post_data = json_encode( array("transactions"=> $pending_transactions ) );
+					//die( $post_data );
+				/*Logger*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consume api para recuperar datos en {$url}", $post_data );
+					}
+				//consumir el API ( CURL )
+					$results = json_decode( $this->sendPetition( $url, $post_data, $token = '' ), true );
+					//var_dump( $results	 );die( "stop" );
+					if( $results['status'] != null && $results['status'] != '' ){				
+						$archivo_path = "../../../../../conexion_inicial.txt";
+						$host = '';
+						$carpeta_path = '';
+						if(file_exists($archivo_path)){
+							$file = fopen($archivo_path,"r");
+							$line=fgets($file);
+							fclose($file);
+							$config=explode("<>",$line);
+							$tmp=explode("~",$config[2]);
+							$ruta_or=$tmp[0];
+							$ruta_des=$tmp[1];
+							$tmp_=explode("~",$config[0]);
+							$host = base64_decode( $tmp_[0] );
+							$carpeta_path = base64_decode( $tmp_[1] );
+						}else{
+							die("No hay archivo de configuración!!!");
+						}
+						$update_endpoint = "{$host}/{$carpeta_path}/rest/netPay/actualizar_datos_transacciones";
+					//consulta token
+						$user_token = $this->checkAccess( $user_id );
+						$user_token = $user_token['token'];
+						//die( $user_token );
+						foreach ($results['transacciones'] as $key => $transaction) {
+							$post_data = json_encode( $transaction );
+							$update = $this->sendPetition( $update_endpoint, $post_data, $user_token );
+						}
+					}
+				}
 			}
 	$CONSULTAS_SQL = array();
 			//$clave=$_POST['valor'];

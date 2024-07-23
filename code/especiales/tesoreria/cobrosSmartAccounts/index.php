@@ -44,8 +44,10 @@
 	$sucursal = $r[1];
 	$session_id = $r[2];
 	
-	$Payments = new Payments( $link );//instancia clase de pagos
+	$Payments = new Payments( $link, $user_sucursal );//instancia clase de pagos
 	$token = $Payments->checkAccess( $user_id );//verifica permisos
+	//var_dump( $token );die('');
+	echo "<input type=\"hidden\" id=\"max_execution_time\" value=\"{$token['max_execution_time']}\">";
 	$tarjetas_cajero = $Payments->getTerminals( $user_id, 0, $user_sucursal, $session_id );//afiliaciones por cajero
 	$cajas = $Payments->getBoxesMoney( $sucursal_id );//cheque o transferencia 
 //configuracion del Websocket
@@ -102,13 +104,13 @@
 <div class="global">
 	<input type="hidden" id="session_id" value="<?php echo $session_id;?>">
 <!--emergentes -->
-	<div class="emergent" style="z-index : 20;">
-		<div class="text-end" style=" position: relative; top : 120px;right: 1%;z-index:1;"><!-- position: relative; top : 120px; left: 90%; z-index:1; display:none; -->
+	<div class="emergent" style="z-index : 20;" tabindex="1">
+		<!--div class="text-end" style=" position: relative; top : 120px;right: 1%;z-index:1;">position: relative; top : 120px; left: 90%; z-index:1; display:none; 
 			<button 
 				class="btn btn-danger"
 				onclick="close_emergent();"
 			>X</button>
-		</div>
+		</div>-->
 		<div class="emergent_content" tabindex="1"></div>
 	</div>
 
@@ -135,9 +137,9 @@
 				<i class="icon-print"></i>
 			</button>
 
-			<button type="button" class="btn btn-secondary" onclick="show_pending_payment_responses();" >
+			<!--button type="button" class="btn btn-secondary" onclick="show_pending_payment_responses();" >
 				<i class="icon-money-1"></i>
-			</button>
+			</button-->
 		</div>
 		<div class="col-10 text-center text-light">
 			<h3><b class="">Sucursal:</b> <?php echo $sucursal;?></h3>

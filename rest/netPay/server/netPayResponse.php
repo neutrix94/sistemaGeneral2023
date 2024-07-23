@@ -24,6 +24,16 @@ $app->post('/', function (Request $request, Response $response){
 	$Logger = null;
   $log_id = null;
   $steep_log_id = 0;
+
+  $body = $request->getBody();
+  if( $body == '' || $body == null ){//cuando es el test de enpoints de terminal
+      $resp = array(
+        "code"=>"00",
+        "message"=>"Peticion para configurar terminal"
+      );
+      return json_encode( $resp );
+  }
+
 	$sql = "SELECT log_habilitado AS log_enabled FROM sys_configuraciones_logs WHERE id_configuracion_log = '2'";
 	$stm = $link->query( $sql ) or die( "Error al consultar si el log de cobros esta habilitado : {$sql} : {$link->error}" );
 	$log = $stm->fetch_assoc();

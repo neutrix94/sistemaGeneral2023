@@ -3,6 +3,21 @@ var total_cobros=0,monto_real=0;
 var respuesta = null;
 var debug_json = "";
 
+	function decimal_format_twice( number ){
+		var format_number_tmp = ''+( number )+'';
+		format_number_tmp = format_number_tmp.split( '.' );
+		var format_number = format_number_tmp[0];
+		if( format_number_tmp[1] != null && format_number_tmp[1] != '' ){
+			format_number += '.';
+			for( var i = 0; i<=1; i++ ){
+				if( format_number_tmp[1][i] != null && format_number_tmp[1][i] != '' && format_number_tmp[1][i] != undefined ){
+					format_number += format_number_tmp[1][i];
+				}
+			}
+		}
+		return format_number;
+	}
+
 	function link(flag){
 		if(flag==1 && confirm("Realmente desea regresar al panel?")==true){
 			location.href='../../../../index.php?';
@@ -122,7 +137,7 @@ var debug_json = "";
 				//	var payment_ammount = ( aux[3]-aux[4] );
 				//if( respuesta.por_pagar < 0 ){
 					if( respuesta.pagos_pendientes <= 0 ){
-						$( '#efectivo' ).val(respuesta.pagos_pendientes);
+						$( '#efectivo' ).val( decimal_format_twice( respuesta.pagos_pendientes ) );
 						$( '#efectivo' ).attr( 'readonly', true );
 						if( respuesta.pagos_pendientes == 0 ){
 							$( '#payment_description' ).html( 'Sin Dif.' );
@@ -148,7 +163,8 @@ var debug_json = "";
 						$( '#id_devolucion' ).val(1);
 						$( '#add_form_btn' ).css( 'display', 'none' );
 					}else{
-						$( '#efectivo' ).val( respuesta.pagos_pendientes );
+						$( '#efectivo' ).val(  decimal_format_twice( respuesta.pagos_pendientes) );
+						//$( '#efectivo' ).val( respuesta.pagos_pendientes );
 						$( '#payment_description' ).html( 'Cobrar' );
 						$( '#payment_description' ).css( 'color', 'black' );
 						$( '#monto_total' ).css( 'color', 'black' );
@@ -157,8 +173,8 @@ var debug_json = "";
 						$( '#finalizar_cobro_devolucion_contenedor' ).css( 'display', 'none' );
 						$( '#add_form_btn' ).css( 'display', 'flex' );
 					}
-
-					$( '#monto_total' ).val( Math.abs( respuesta.pagos_pendientes ) );
+					
+					$( '#monto_total' ).val( decimal_format_twice( Math.abs( respuesta.pagos_pendientes ) ) );
 					$( '#efectivo' ).attr( 'readonly', true );//solo informativo
 					//$("#monto_total").val( payment_ammount );
 					//$("#efectivo").val(payment_ammount);//oscar 2023
@@ -328,7 +344,18 @@ hljs.highlightAll();
 
 //console.log( " total :" + monto_total );
 		//alert('total:'+total);
-		$("#efectivo").val(total);
+
+		/*var format_number_tmp = ''+total+'';
+		format_number_tmp = format_number_tmp.split( '.' );
+		var format_number = format_number_tmp[0];
+		if( format_number_tmp[1] != null && format_number_tmp[1] != '' ){
+			format_number += '.';
+			for( var i = 0; i<=1; i++ ){
+				format_number += format_number_tmp[1][i];
+			}
+		}*/
+		$("#efectivo").val( decimal_format_twice( total ) );
+		//$("#efectivo").val(total);
 		total_cobros=total_cobros+total;
 		calcula_cambio();
 	}
@@ -383,7 +410,9 @@ hljs.highlightAll();
 		if( resp == 'ok|' ){
 			alert( "Pago agregado con exito!" );
 			carga_pedido(  $( '#id_venta' ).val()  );
-			$( '#caja_o_cuenta' ).val( '' );
+			$( '#caja_o_cuenta' ).val( '0' );
+			$( '#monto_cheque_transferencia' ).val( '' );
+			$( '#monto_cheque_transferencia' ).focus();
 		}else{
 			alert( "Error : " + resp );
 		}
@@ -515,7 +544,7 @@ var cont_cheques_transferencia=0;
 			});
 
 			if( montos_smart_accounts != 0 && montos_smart_accounts != 0.00 ){
-				$( '.emergent_content' ).html( `<h2 class="text-center">No se puede finalizar el cobro porque hay pagos de netPay pendientes!</h2>
+				$( '.emergent_content' ).html( `<h2 class="text-center">No se puede finalizar el cobro porque hay pagos de netPay pendientes ${montos_smart_accounts}!</h2>
 				<div class="text-center"><br>
 					<button
 						type="button"
@@ -984,15 +1013,6 @@ var cont_cheques_transferencia=0;
 		alert( ajaxR( url ) );
 		return false;
 	}
-
-	function show_pending_payment_responses(){
-		var url = 'ajax/db.php?fl=show_pending_payment_responses';
-		var req = ajaxR( url );
-		$( '.emergent_content' ).html( req );
-		$( '.emergent' ).css( 'display', 'block' );
-
-	}
-
 
 //lamadas asincronas
 	function ajaxR( url ){

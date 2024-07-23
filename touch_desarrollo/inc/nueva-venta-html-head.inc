@@ -344,6 +344,8 @@ function enlista_paquete(arreglo){
                     <br>
                     <input type="password" id="passWord_1" class="form-control"/>
                     <br></br>
+                    <p calsss="text-center" id="password_response_error"></p>
+                    <br></br>
                     <button 
                         type="button" 
                         onclick="regresaEfectivo(1)" 
@@ -374,12 +376,17 @@ function enlista_paquete(arreglo){
             //var url = "index.php?scr=talon_pago&idp=" + $("#id_de_pedido_original").val();
             //"index.php?scr=talon_pago&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
             //u1+="&sald_fav_cl="+s_f+"&favOrig="+s_f_o;
-            $('#emergente_1').html( '<img src="../img/img_casadelasluces/load.gif">' );
+            //$('#emergente_1').html( '<img src="../img/img_casadelasluces/load.gif">' );
             var imp_dev = ajaxR( url );
             //alert( imp_dev );return false;
             if( imp_dev.trim() != 'ok' ){
-                $('#emergente_1').html( imp_dev );
-                $('#emergente_1').css('display','block');
+                $('#password_response_error').html( imp_dev );
+                $('#passWord_1').select();
+                alert_scann( "error" );
+                //$('#emergente_1').css('display','block');
+                setTimeout(() => {
+                    $('#password_response_error').html( "" );
+                }, 3000);
                 return false;
             }else{
                 location.href = "index.php?";
