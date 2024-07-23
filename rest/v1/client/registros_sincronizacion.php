@@ -197,8 +197,10 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
       "error_rows"=>$insert_rows["error_rows"],
       "local_response_log"=>$local_response_log
     ), JSON_PRETTY_PRINT);
+    echo $post_data;
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
-  $SynchronizationManagmentLog->release_sinchronization_module( 'ec_devolucion', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
+  echo ( $result_1 );
+  $SynchronizationManagmentLog->release_sinchronization_module( 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
   $link->close();//cierra conexion Mysql
   return 'ok';
   //return json_encode( array( "response" => "Registros ok" ) );

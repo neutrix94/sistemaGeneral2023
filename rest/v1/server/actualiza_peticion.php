@@ -91,8 +91,10 @@ $app->post('/actualiza_peticion', function (Request $request, Response $response
     $SynchronizationManagmentLog->updateModuleResume( $table, 'bajada', $download_status, $log["destinity_store"] );//actualiza el resumen de modulo/sucursal 
   }
  //actualiza el registro de peticion de local a linea
+  if( $local_log != '' && $local_log != null ){ 
     $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $local_log['destinity_time'], $local_log['response_time'], $local_log['response_string'], $local_log['unique_folio'] );
- //actualiza el registro de peticion de linea a local
+  }
+  //actualiza el registro de peticion de linea a local
     $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $log['destinity_time'], $log['response_time'], $log['response_string'], $log['unique_folio'] );
   return json_encode( $resp );
 
