@@ -118,6 +118,9 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
   }
 /*Fin de Respuesta de Comprobacion*/
   $local_response_log = array();
+  if( $result->log->response_string == ' | ' ){
+    $result->log->response_string = "No llegaron ventas de local a linea";
+  }
 //actualiza registros exitosos
   if( $result->ok_rows != '' && $result->ok_rows != null ){
     $local_response_log = $salesSynchronization->updateSaleSynchronization( $result->ok_rows, $req["log"]["unique_folio"], 3, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );

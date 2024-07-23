@@ -80,7 +80,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
     return json_encode( array( "response" => $setMovements ) );
   }
-/*Consulta JSONS de movimeintos de almacen*/
+/*Consulta JSONS de movimientos de almacen*/
   $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 1, $req['log']['unique_folio'], 
   ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
 /*Codifica peticion en JSON*/
@@ -158,7 +158,7 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
       $result->log_download->response_string = $insert_rows["error"];
       $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
         $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-        $resp["log"]["type_update"] = "movementsSynchronization";
+      $resp["log"]["type_update"] = "movementsSynchronization";
       $post_data = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
