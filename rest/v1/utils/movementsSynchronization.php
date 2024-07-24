@@ -187,8 +187,11 @@
 /*Prueba Oscar de temporizador para insertar otros movimientos de almacen*/
 				sleep(60);//timer de espera de 1 minuto
 /*/Prueba Oscar de temporizador para insertar otros movimientos de almacen*/
-				//recupera el id insertado
-					$movement_id = $this->link->insert_id;
+				//recupera el id insertado	//$movement_id = $this->link->insert_id;
+					$sql = "SELECT LAST_INSERT_ID() AS last_id";
+					$stm = $this->link->query($sql) or die( "Error al recuperar el id insertado : {$sql} : {$this->link->error}" );
+					$row = $stm->fetch_assoc();
+					$movement_id = $row['last_id'];
 					$movement_detail = $movement['movimiento_detail'];
 					if($ok == true ){
 						foreach ($movement_detail as $key2 => $detail) {
