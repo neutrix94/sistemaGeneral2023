@@ -75,6 +75,7 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   $resp["rows_validation"]["rows_download"] = $generalRowsVerification->getPendingRows( -1, $log['origin_store'], 'sys_sincronizacion_registros_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta las comprobaciones pendientes de linea a local
 /*FIN DE COMPROBACION 2024*/
 
+/*valida que las apis no esten bloqueadas*/
   $validation = $SynchronizationManagmentLog->validate_apis_are_not_locked( $log['origin_store'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );/*valida que las apis no esten bloqueadas*/
   if( $validation != 'ok' ){
     $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
@@ -84,7 +85,7 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 3, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza indicador de sincronizacion en tabla
   if( $update_synchronization != 'ok' ){
     return $update_synchronization;
-  } 
+  }
 
 /****************************************** Recibe / Inserta ******************************************/
   $request_initial_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene hora actual
@@ -94,7 +95,7 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
     $insert_rows = $rowsSynchronization->insertRows( $rows, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_rows["error"], $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-      $resp["status"] = "error";
+      $resp["status"] = "error : {$insert_rows["error"]}";
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
