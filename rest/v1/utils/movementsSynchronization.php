@@ -189,9 +189,9 @@
 /*/Prueba Oscar de temporizador para insertar otros movimientos de almacen*/
 				//recupera el id insertado	//$movement_id = $this->link->insert_id;
 					$sql = "SELECT LAST_INSERT_ID() AS last_id";
-					$stm = $this->link->query($sql) or die( "Error al recuperar el id insertado : {$sql} : {$this->link->error}" );
-					$row = $stm->fetch_assoc();
-					$movement_id = $row['last_id'];
+					$stm_last = $this->link->query($sql) or die( "Error al recuperar el id insertado : {$sql} : {$this->link->error}" );
+					$row_last = $stm_last->fetch_assoc();
+					$movement_id = $row_last['last_id'];
 					$movement_detail = $movement['movimiento_detail'];
 					if($ok == true ){
 						foreach ($movement_detail as $key2 => $detail) {
@@ -206,7 +206,7 @@
 									if( $this->link->error ){
 										$ok = false;
 										if( $logger_id ){
-											$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar cabecera de movimientos de almacen", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+											$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar detalle de movimientos de almacen", 'sys_sincronizacion_peticion', $sql, $this->link->error );
 										}
 										//die( "Error al insertar detalle de movimientos de almacen : {$this->link->error} {$sql}" );
 									}
