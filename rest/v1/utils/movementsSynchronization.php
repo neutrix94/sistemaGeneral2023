@@ -178,20 +178,7 @@
 							}
 							//die( "Error al insertar cabecera de movimientos de almacen : {$this->link->error} {$sql}" );
 						}
-				/*1
-					$sql = "SELECT MAX( id_movimiento_almacen ) AS last_id FROM ec_movimiento_almacen";
-				//2
-					$sql = "SELECT LAST_INSERT_ID() AS last_id";
-				//3
-					$this->link->insert_id;
-					
-					$stm = $this->link->query( $sql );
-					if( $this->link->error ){
-						$ok = false;
-						//or die( "Error al recuperar el id insertado : {$sql} :  {$this->link->error}" );
-					}
-					$row = $stm->fetch_assoc();
-					$movement_id = $row['last_id'];*/
+				//recupera el id insertado
 					$movement_id = $this->link->insert_id;
 					$movement_detail = $movement['movimiento_detail'];
 					if($ok == true ){

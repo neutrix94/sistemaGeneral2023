@@ -27,13 +27,13 @@
 	/*
 	* Instancia servicios por exponer
 	*/
-	/*
+	
 	require 'endpoints/token.php';      //Token
 	require 'endpoints/productos.php';  //Products
 	require 'endpoints/ventas.php';     //Ventas
 	require 'endpoints/emails.php';     //Correos
 	require 'endpoints/facturas.php';   //Facturas
-	require 'endpoints/facturaReceptor.php';   //Facturación: Valida contribuyente*/
+	require 'endpoints/facturaReceptor.php';   //Facturación: Valida contribuyente
 
 //Servicios de Servidor
 	require 'server/verificacion_registros.php';//comprobacion de los registros pendientes
