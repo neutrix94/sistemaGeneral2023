@@ -122,7 +122,11 @@
 		}
 //inserción de movimientos
 		public function insertMovements( $movements, $logger_id = false ){
-//oscar 2023
+		//verifica si esta habilitada la transaccion en el módulo de movimientos de almacen
+			$sql = "SELECT habilitar_transaccion AS transaction_configuration FROM sys_limites_sincronizacion WHERE tabla = 'ec_movimiento_almacen'";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar si esta habilitada la transacción en ec_movimiento_almacen : {$sql} : {$this->link->error}" );
+			$transaction_row = $stm->fetch_assoc();
+			$transaction = ( $transaction_row['transaction_configuration'] == 1 ? true : false );
 			$log_steep_id = null;
 			$file = fopen("movements_log.txt", "w");
   			$resp = array();
@@ -133,7 +137,9 @@
 			$resp["tmp_no"] = "";
 			$updates = array();
 			foreach ($movements as $key => $movement) {
-				$this->link->autocommit( false );
+				if( $transaction ){
+					$this->link->autocommit( false );
+				}
 				$ok = true;//{$movement['id_orden_compra']}
 				$movement_detail = $movement['movimiento_detail'];
 				$is_valid = true;
@@ -178,6 +184,9 @@
 							}
 							//die( "Error al insertar cabecera de movimientos de almacen : {$this->link->error} {$sql}" );
 						}
+/*Prueba Oscar de temporizador para insertar otros movimientos de almacen*/
+				sleep(60);//timer de espera de 1 minuto
+/*/Prueba Oscar de temporizador para insertar otros movimientos de almacen*/
 				//recupera el id insertado
 					$movement_id = $this->link->insert_id;
 					$movement_detail = $movement['movimiento_detail'];
@@ -202,11 +211,15 @@
 						}
 					}
 					if( $ok == true ){
-						$this->link->commit();
+						if( $transaction ){
+							$this->link->commit();
+						}
 						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$movement['folio_unico']}'";
 						$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$movement['folio_unico']}'";
 					}else{
-						$this->link->rollback();
+						if( $transaction ){
+							$this->link->rollback();
+						}
 						$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$movement['folio_unico']}'";
 						$resp["tmp_no"] .= ( $resp["tmp_no"] == '' ? '' : ',' ) . "'{$movement['folio_unico']}'";
 					}
