@@ -13,14 +13,16 @@ BEGIN
 	FROM ec_pedidos p
 	LEFT JOIN ec_clientes c
 	ON p.id_cliente = c.id_cliente
-	WHERE p.id_pedido = sale_header_id;
+	WHERE p.id_pedido = sale_header_id
+	LIMIT 1;
 
 	IF( teller_session_id IS NOT NULL AND teller_session_id > 0 )
 	THEN
 		SELECT 
 	        folio_unico INTO teller_session_unique_folio 
         FROM ec_sesion_caja 
-        WHERE id_sesion_caja = teller_session_id;
+        WHERE id_sesion_caja = teller_session_id
+		LIMIT 1;
 	END IF;
 	/*SET GLOBAL group_concat_max_len = 900000;*/
 	INSERT INTO sys_sincronizacion_ventas ( id_sincronizacion_venta, json, tabla, registro_llave, id_sucursal_destino, id_status_sincronizacion )
@@ -97,6 +99,7 @@ BEGIN
 				)
 			FROM ec_pedidos_referencia_devolucion prd
 			WHERE prd.id_pedido = sale_header_id
+			LIMIT 1
 			),
 			'}'
 		),
