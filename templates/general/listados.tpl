@@ -1334,9 +1334,9 @@ $("#imp_csv_prd").change(function(){
 					data:{id_transferencia:id,nval:nval,autoriza_transferencia:1},
 					success:function(datos){
 						var aux=datos.split("|");
-						/*if(aux[0]!='ok'){
-							alert("datos");
-						}*/
+						if(aux[0]!='ok'){
+							alert(datos);
+						}
 						temp=datos;
 						if(temp=="No cuenta con los permisos para realizar esta acción"){
 						document.getElementById('emergenteAutorizaTransfer').style.display='none';//ocultamos mensaje de estado de transferencia
