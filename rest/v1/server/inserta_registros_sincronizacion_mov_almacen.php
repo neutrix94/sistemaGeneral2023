@@ -95,6 +95,7 @@ $app->post('/inserta_registros_sincronizacion_movimientos_almacen', function (Re
     }else{
       $resp["ok_rows"] = $insert_rows["ok_rows"];
       $resp["error_rows"] = $insert_rows["error_rows"];
+    //inserta respuesta exitosa
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     }
   }else{
@@ -115,21 +116,13 @@ $app->post('/inserta_registros_sincronizacion_movimientos_almacen', function (Re
     'REGISTROS DE SINCRONIZACION MOVIMIENTOS DE ALMACEN', 'sys_sincronizacion_registros_movimientos_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
     $rows_limit, 'sys_sincronizacion_registros_movimientos_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene registros para descargar
-  /*if( sizeof( $resp["rows_download"] ) > 0 ){
-    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 
-    'REGISTROS DE SINCRONIZACION MOVIMIENTOS DE ALMACEN', 'sys_sincronizacion_registros_movimientos_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  }*/
   $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_almacen', 'subida', $resp["status"], $log["origin_store"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza el resumen de modulo/sucursal ( subida )
-  
-//desbloquea indicador de sincronizacion en tabla
-//$update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-//desbloquea indicador de sincronizacion en tabla
-  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
+ //desbloquea indicador de sincronizacion en tabla
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   if( $LOGGER ){
     $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Respuesta de Linea a local : ', json_encode($resp) );
   }
-  return json_encode( $resp );
-
+  return json_encode( $resp );//regresa respuesta
 });
 
 ?>

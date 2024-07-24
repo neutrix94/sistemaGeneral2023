@@ -122,17 +122,13 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros_ventas' );
   $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
     $rows_limit, 'sys_sincronizacion_registros_ventas', $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene registros para descargar
-  /*if( sizeof( $resp["rows_download"] ) > 0 ){
-    $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros_ventas' );
-  }*/
   
 //desbloquea indicador de sincronizacion en tabla
-  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2 );
+  $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   if( $LOGGER ){
     $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Respuesta de Linea a local : ', json_encode($resp) );
   }
-  return json_encode( $resp );
-
+  return json_encode( $resp );//regresa respuesta
 });
 
 ?>
