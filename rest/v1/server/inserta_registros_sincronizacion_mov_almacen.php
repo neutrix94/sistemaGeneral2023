@@ -46,6 +46,10 @@ $app->post('/inserta_registros_sincronizacion_movimientos_almacen', function (Re
   $generalRowsVerification = new generalRowsVerification( $link, $Logger );//instancia clase de comprobacion
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
   $rowsSynchronization = new rowsSynchronization( $link, $Logger );//instancia clase de sincronizacion de movimientos de almacen
+  if( $LOGGER ){
+    $LOGGER = $Logger->insertLoggerRow( "{$log['unique_folio']}", 'sys_sincronizacion_registros_movimientos_almacen', $log['origin_store'], -1 );//inserta el log de sincronizacion
+    $Logger->insertLoggerSteepRow( $LOGGER['id_sincronizacion'], 'Llega peticion de local a Linea : ', "{$body}" );
+  }
 //variables de respuesta
   $resp = array();
   $resp["ok_rows"] = '';
