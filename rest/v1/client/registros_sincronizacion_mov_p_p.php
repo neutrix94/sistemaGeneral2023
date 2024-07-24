@@ -102,8 +102,9 @@ $app->get('/obtener_registros_sincronizacion_mov_p_p', function (Request $reques
       if( sizeof($petition_log) > 0 ){
         $verification_req['log_response'] = $generalRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta si la peticion existe en local 
         $verification_req['rows_response'] = $generalRowsVerification->RowsValidation( $validation_rows, 'sys_sincronizacion_registros_movimientos_proveedor_producto', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
+        $verification_req['table_name'] = "sys_sincronizacion_registros_movimientos_proveedor_producto";
         $post_data = json_encode( $verification_req );
-        $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_comprobacion_registros_sincronizacion_movimientos_proveedor_producto", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consume servicio para actualizar la comprobacion en linea
+        $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_comprobacion_registros", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consume servicio para actualizar la comprobacion en linea
       }
     }
   }
