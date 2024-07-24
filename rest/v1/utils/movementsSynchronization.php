@@ -188,7 +188,7 @@
 				sleep(60);//timer de espera de 1 minuto
 /*/Prueba Oscar de temporizador para insertar otros movimientos de almacen*/
 				//recupera el id insertado	//$movement_id = $this->link->insert_id;
-					$sql = "SELECT LAST_INSERT_ID() AS last_id";
+					$sql = "SELECT LAST_INSERT_ID AS last_id";
 					$stm_last = $this->link->query($sql) or die( "Error al recuperar el id insertado : {$sql} : {$this->link->error}" );
 					$row_last = $stm_last->fetch_assoc();
 					$movement_id = $row_last['last_id'];
