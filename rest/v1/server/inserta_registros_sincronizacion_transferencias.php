@@ -114,7 +114,7 @@ $app->post('/inserta_registros_sincronizacion_transferencias', function (Request
   
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros_transferencias' );
   $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
-    $rows_limit, 'sys_sincronizacion_registros_transferencias', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene registros para descargar
+    $rows_limit, 'sys_sincronizacion_registros_transferencias', $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene registros para descargar
   
   $SynchronizationManagmentLog->updateModuleResume( 'sys_sincronizacion_registros_transferencias', 'subida', $resp["status"], $log["origin_store"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza el resumen de modulo/sucursal ( subida )
 //desbloquea indicador de sincronizacion en tabla
