@@ -105,7 +105,7 @@ $app->post('/inserta_registros_sincronizacion_transferencias', function (Request
   }
 
 /****************************************** Consulta / Envia ******************************************/
-  $config = $SynchronizationManagmentLog->getSystemConfiguration( 'sys_sincronizacion_registros_transferencias', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  $config = $SynchronizationManagmentLog->getSystemConfiguration( 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   $path = trim ( $config['value'] );
   $system_store = $config['system_store'];
   $store_prefix = $config['store_prefix'];
