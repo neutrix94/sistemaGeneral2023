@@ -297,7 +297,8 @@ var packsCatalogue = new Array();
     var productosSeleccionados = getProductosMuestras();
 
     if( productosSeleccionados.length > 0 ){
-        $.ajax({
+      if (confirm("Se enviarán a solicitar " + productosSeleccionados.length + " muestras. ¿Confirmas la operación?") == true) {
+          $.ajax({
           type: 'POST',
           url: apiUrl,
           headers: {
@@ -314,14 +315,26 @@ var packsCatalogue = new Array();
               
               console.log(data);
               alert(JSON.stringify(data,null,true));
+              
+              clearAllCheckBox();
+
           },
           error:function(error){
             console.log("ERROR".error);
           }
         });
+        } else {
+          alert("Cancelaste la operación");
+        }
+        
     }else{
       alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
     }
+  }
+
+  function selectAllMuestras(item){
+    var isChecked = $(item).is(':checked'); // Verifica si el checkbox clicado está seleccionado o no
+    $('.cbMuestra').prop('checked', isChecked);
   }
   /**
    * Función que recorre las filas de la tabla que tienen el checkbox seleccionado
@@ -336,8 +349,8 @@ var packsCatalogue = new Array();
         var $row = $(this);
         var isChecked = $row.find('input[type="checkbox"]').is(':checked');
         if (isChecked) {
-          var ordenDeLista = $row.find('td:eq(1)').text().trim();
-          var cantidad = $row.find('td:eq(3)').text().trim();
+          var ordenDeLista = $row.find('td:eq(0)').text().trim();
+          var cantidad = $row.find('td:eq(2)').text().trim();
           seleccionados.push({
             id: ordenDeLista,
             cantidad: cantidad
@@ -346,6 +359,14 @@ var packsCatalogue = new Array();
       });
     }
     return seleccionados;
+  }
+
+  function clearAllCheckBox(){
+    $(".cbSelectAllMuestras").prop('checked', false); 
+    $('.cbMuestra:checked').each(function() {
+        //$(this).prop('checked', false);  // Desmarcar el checkbox
+        $(this).trigger('click');        // Lanzar el evento click
+    });
   }
 
   function openDevolucionProductos(){
@@ -606,7 +627,9 @@ var packsCatalogue = new Array();
   }
 
   .buttonMuestras{
-    background-color: #2d97b2;
+    margin-bottom: 10px;
+    float: right;
+    /* background-color: #2d97b2; */
   }
 
   .input-group {
@@ -870,18 +893,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
         </p>
       </div>
     </div>
-    <!-- Nuevo botón para Solicitar muestras -->
-    <div class="col-3 text-center row">
-      <div class="col-12 text-center">
-        <button 
-        type="button"
-        onclick="solicitarMuestras();"
-        class="btn buttonMuestras"
-      >
-        <b>Solicitar muestras</b>
-      </button>
-      </div> 
-    </div>
+
     <div class="col-3 text-center">
        <p 
           type="button"
@@ -965,7 +977,15 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
   <!---Grid-->
   <div class="row products_list_container">
    <div class="contenedorGrid" id="contenedorGrid">
-    <table id="listaProductos" class="table table-striped table-bordered" cellpadding="0" cellspacing="0">
+    <!-- Nuevo botón para Solicitar muestras -->
+    <button 
+        type="button"
+        onclick="solicitarMuestras();"
+        class="btn btn-primary buttonMuestras"
+      >
+        <b>Solicitar muestras</b>
+      </button>
+    <table id="listaProductos" class="table table-striped table-bordered" style="margin-left:20;" cellpadding="0" cellspacing="0">
     <thead class="product_list_header">
       <tr class="cabecera">
         <th width="100"><p>Producto</p></th>
@@ -983,6 +1003,10 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
         <th width="100"><p>Monto</p></th>
         <th width="100"><p>Quitar</p></th>
         <th colspan="10" width="0" style="display:none;"><p></p></th>
+        <th width="100">
+          <p>Muestra</p>
+          <p><input type="checkbox" class="cbSelectAllMuestras" onclick="selectAllMuestras(this)" title="Seleccionar / Deseleccionar todo"></p>
+        </th>
          <!--  <td width="0"></td>
         <td width="0"></td>
         <td width="0"></td>

@@ -72,14 +72,13 @@
             /*if(products_array[i][13] == "undefined" ){
                 products_array[i][13] = null;
             }*/
-            /*
-            var component_chk = products_array[i][0];
-
+            
+            var component_chk = products_array[i][14];
             var contiene_checked = component_chk.includes("checked");
-
             var select_checkbox = ( contiene_checked ) ? 1: 0;
-            */
-            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price );//aux_arr[2]
+            
+            //agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price );//aux_arr[2]
+            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price, select_checkbox );//aux_arr[2]
             //agregaFila(null, products_array[i][3], -1, products_array[i][1], products_array[i][14], tmp_price, select_checkbox );//aux_arr[2]
             //f,cant,temp,id_producto_pedido,lista_normal
         }
@@ -1186,7 +1185,7 @@ var new_sale_window = null;
 
 var hay_paquete=0;
 //agregar fila a tabla del pedido
-    function agregaFila( f, cant, temp, id_producto_pedido, lista_normal, product_price = null ){//se implementan las variables cant,temp por Oscar 13.08.2018
+    function agregaFila( f, cant, temp, id_producto_pedido, lista_normal, product_price = null, val_check_muestra = 0 ){//se implementan las variables cant,temp por Oscar 13.08.2018
         //alert(product_price );
     //alert( f + ','+ cant + ',' + temp + ',' + id_producto_pedido + ',' + lista_normal );
        // alert('add_fila');
@@ -1685,6 +1684,19 @@ var hay_paquete=0;
         sig=0;
         lista_precios_actual=aux[15];
 
+        //Checkbox muestra
+        var newCell=newRow.insertCell(15);
+        var strCheck = (val_check_muestra == 1) ? '<input type="checkbox" class="cbMuestra" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+        //var strCheck = '<input type="checkbox" onclick="checkMuestra(this)"/>';
+        newCell.innerHTML=strCheck;
+        newCell.align="center";
+        //Una vez establecida la celda con el check, se procede a iluminar la fila
+        if( val_check_muestra ){
+            $(newRow).css('background-color','#D8FAFF');
+        }else{
+            $(newRow).css('background-color','#FFFF');
+        }
+
     /*implementacion de Oscar 03.05.2018 para insertar en tabla temporal de movimientos*/      
         var urlTmp="ajax/insertaTemporal.php?id_mov_temp="+id_mov_tmp+"&id_prod="+aux[1]+"&cant="+can2;
         //alert(aux[0]+"\n"+aux[1]+"\n"+aux[2]);
@@ -2115,8 +2127,13 @@ var hay_paquete=0;
     function checkMuestra(item){
         var valor_chk = $(item).is(":checked");
 
-        var str_checkbox = ( valor_chk ) ? '<input type="checkbox" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" onclick="checkMuestra(this)"/>';
-        
+        var str_checkbox = ( valor_chk ) ? '<input type="checkbox" class="cbMuestra" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+
+        if( valor_chk ){
+            $(item).parent().parent().css('background-color','#D8FAFF');
+        }else{
+            $(item).parent().parent().css('background-color','#FFFF');
+        }
         var fila_tabla = $(item).parent().parent();
         var indice = fila_tabla.index();
 
@@ -2127,7 +2144,7 @@ var hay_paquete=0;
         if( products_array.length > 0 ){
             //Actualiza contenido de la primer columna
             //Se resta al indice una unidad ya que el indice cero corresponde al header y ese no se toma en cuenta
-            products_array[indice-1][0] = str_checkbox;
+            products_array[indice-1][14] = str_checkbox;
 
             sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
         }
