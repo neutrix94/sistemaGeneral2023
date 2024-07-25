@@ -185,7 +185,7 @@
 							//die( "Error al insertar cabecera de movimientos de almacen : {$this->link->error} {$sql}" );
 						}
 /*Prueba Oscar de temporizador para insertar otros movimientos de almacen*/
-				sleep(40);//timer de espera de 1 minuto
+				//sleep(40);//timer de espera de 1 minuto
 /*/Prueba Oscar de temporizador para insertar otros movimientos de almacen*/
 				//recupera el id insertado	//
 					//$movement_id = $this->link->insert_id;
