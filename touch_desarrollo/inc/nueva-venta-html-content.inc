@@ -334,7 +334,16 @@ var packsCatalogue = new Array();
 
   function selectAllMuestras(item){
     var isChecked = $(item).is(':checked'); // Verifica si el checkbox clicado está seleccionado o no
-    $('.cbMuestra').prop('checked', isChecked);
+
+    $('.cbMuestra').each(function() {
+        $(this).prop('checked', isChecked); // Selecciona o deselecciona el checkbox
+        var row = $(this).closest('tr'); // Encuentra la fila correspondiente al checkbox
+        if (isChecked) {
+          row.css('background-color','#D8FAFF');
+        } else {
+          row.css('background-color','#FFFF');
+        }
+    });
   }
   /**
    * Función que recorre las filas de la tabla que tienen el checkbox seleccionado
@@ -444,7 +453,6 @@ var packsCatalogue = new Array();
     var arrProductos = [];
     // Mostrar las filas en la consola
     filas.each(function(index, fila) {
-        //console.log('Fila ' + (index + 1) + ':');
         // Obtener las celdas de la fila actual
         var celdas = $(fila).find('td');
         
