@@ -1132,8 +1132,17 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
   </div-->
   <br>
   <div class="row"><!--class="ui-block-bwidth:48%;float:left;"-->
-    <div class="col-3"></div>
-    <div class="col-6">
+    <div class="col-2"></div>
+    <div class="col-4">
+      <button 
+        type="button"
+        onclick="openDevolucionProductos();"
+        class="btn btn-warning form-control"
+      >
+        <b>Productos para devolver</b>
+      </button>
+    </div>
+    <div class="col-4">
       <button data-theme="a" 
         name="cerrar" 
         id="cerrar" 
@@ -1141,7 +1150,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
         style="min-width:180px; margin-right:50px;"
         >✔ Enviar pedido</button>
       </div>
-      <div class="col-3"></div>
+    <div class="col-2"></div>
   </div>
   <!--Termina seccion-->
   </div>
@@ -1158,15 +1167,6 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
     <!--Descuentos-->
     
         <div class="row" style="align-items: center;justify-content: center;">
-            <div class="col-2 text-center">
-              <button 
-                type="button"
-                onclick="openDevolucionProductos();"
-                class="btn btn-primary"
-              >
-                <b>Productos para devolver</b>
-              </button>
-            </div>
             <div class="col-2 text-center"><!-- width="20%" align="center" style="border: inset 0pt;" -->
              <fieldset  data-role="controlgroup" data-type="horizontal" style="display :none;">
                <label data-mini="true" style="width:100px;padding:10px;text-align:center;">
