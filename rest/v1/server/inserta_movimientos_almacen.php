@@ -157,7 +157,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   if( $setMovements != 'ok' ){
     return json_encode( array( "response" => $setMovements ) );
   }
-  die( "detenido par prueba mov producto" );
+//die( "detenido par prueba mov producto" );
 //consulta registros pendientes de sincronizar
   $resp["rows_download"] = $movementsSynchronization->getSynchronizationMovements( $log['origin_store'], $rows_limit, 1, $resp["log_download"]["unique_folio"], 
     ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
