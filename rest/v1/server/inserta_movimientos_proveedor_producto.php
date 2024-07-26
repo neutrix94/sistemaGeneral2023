@@ -144,6 +144,8 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
   if( $setProductProviderMovements != 'ok' ){
     return json_encode( array( "response" => $setProductProviderMovements ) );
   }
+
+  die( "detenido par prueba mov proveedor producto" );
 //consulta registros pendientes de sincronizar
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', 'sys_sincronizacion_movimientos_proveedor_producto', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
   $resp["rows_download"] = $productProviderMovementsSynchronization->getSynchronizationProductProviderMovements( $log['origin_store'], $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
