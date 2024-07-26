@@ -634,8 +634,8 @@
 			//}
 		//inserta el cobro del cajero en efectivo
 			$sql_cc = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, sincronizar) 
-			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, {$afiliation_id}, -1, 7, {$ammount}, NOW(), NOW(), '{$authorization_number}', 1)";
+				monto, fecha, hora, observaciones, folio_unico, sincronizar) 
+			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, {$afiliation_id}, -1, 7, {$ammount}, NOW(), NOW(), '{$authorization_number}', NULL, 1)";
 			$stm_cc = $this->link->query( $sql_cc ) or die( "Error al insertar el cobro del cajero en setPaymentWhithouthIntegration: {$this->link->error}" );
 			$id_cajero_cobro = $this->link->insert_id;//die( 'here' );
 		//consulta entre interno y externo
@@ -999,12 +999,12 @@
 			//inserta el cobro del cajero en efectivo por devolucion
 				if( $saldo_especial == 0 ){
 					$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-						monto, fecha, hora, observaciones, sincronizar) 
-					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$total_devolver_cajero}, NOW(), NOW(), '', 1)";
+						monto, fecha, hora, observaciones, folio_unico, sincronizar) 
+					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$total_devolver_cajero}, NOW(), NOW(), '', NULL, 1)";
 				}else{
 					$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-						monto, fecha, hora, observaciones, sincronizar) 
-					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$saldo_especial}, NOW(), NOW(), '', 1)";
+						monto, fecha, hora, observaciones, folio_unico, sincronizar) 
+					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$saldo_especial}, NOW(), NOW(), '', NULL, 1)";
 					
 				}
 
@@ -1074,8 +1074,8 @@
 //echo $sql . "<br><br>";
 		//inserta el cobro del cajero en efectivo
 			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, sincronizar ) 
-			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, {$type}, {$ammount}, NOW(), NOW(), '', 1 )";
+				monto, fecha, hora, observaciones, folio_unico, sincronizar ) 
+			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, {$type}, {$ammount}, NOW(), NOW(), '', NULL, 1 )";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero en insertPayment : {$this->link->error}" );
 			$id_cajero_cobro = $this->link->insert_id;
 
@@ -1540,8 +1540,8 @@
 			}
 		//inserta el cobro del cajero en efectivo por devolucion
 			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, sincronizar) 
-			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', 1)";
+				monto, fecha, hora, observaciones, folio_unico, sincronizar) 
+			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', NULL, 1)";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero en insertReturnPayment: {$this->link->error}" );
 			$id_cajero_cobro = $this->link->insert_id;
 			$sql = "UPDATE ec_devolucion_pagos 
@@ -1862,7 +1862,7 @@
 			$sql = "UPDATE ec_cajero_cobros SET cobro_cancelado = 1 WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al anular el cobro del cajero : {$this->link->error}" );
 			$sql = "INSERT INTO ec_cajero_cobros ( id_sucursal, id_pedido, id_devolucion, id_cajero, id_sesion_caja, id_afiliacion, id_terminal, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, cobro_cancelado, sincronizar ) 
+				monto, fecha, hora, observaciones, cobro_cancelado, folio_unico, sincronizar ) 
 				SELECT 
 					id_sucursal, 
 					id_pedido, 
@@ -1878,6 +1878,7 @@
 					NOW(), 
 					CONCAT( 'Cobro para anular el cobro ', id_cajero_cobro, ' -{$payment_type}-' ), 
 					1, 
+					NULL,
 					1
 				FROM ec_cajero_cobros WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al re-insertar el cobro {$this->link->error}" );
