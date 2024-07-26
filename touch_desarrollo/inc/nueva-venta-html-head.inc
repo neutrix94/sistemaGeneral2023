@@ -2141,7 +2141,7 @@ var hay_paquete=0;
         var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
         products_array = JSON.parse( products_array );
 
-        if( products_array.length > 0 ){
+        if( products_array.length > 0 ){ 
             //Actualiza contenido de la primer columna
             //Se resta al indice una unidad ya que el indice cero corresponde al header y ese no se toma en cuenta
             products_array[indice-1][14] = str_checkbox;

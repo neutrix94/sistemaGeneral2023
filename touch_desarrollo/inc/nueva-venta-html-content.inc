@@ -394,67 +394,127 @@ var packsCatalogue = new Array();
   }
 
   function buscarProducto(){
-
+    
     var valCodigo = $('#inputDevolucion').val();
       if( valCodigo == "" ){
         alert('Favor de ingresar un código de producto');
       }else{
-        var filas = $('#listaProductos tr.move');   
-        
-        var idsProductos = [];
-        // Mostrar las filas en la consola
-        filas.each(function(index, fila) {
-            console.log('Fila ' + (index + 1) + ':');
-            // Obtener las celdas de la fila actual
-            var celdas = $(fila).find('td');
-            
-            // Mostrar el contenido de cada celda
-            celdas.each(function(indice, celda) {
-                console.log(' Columna ' + (indice + 1) + ': ' + $(celda).text());
-                if( indice == 1 ){ //El indice 1 contiene el número de Orden de lista (Código de Producto)
-                  idsProductos.push($(celda).text());
-                }
-            });
-        });
 
-        if( idsProductos.includes(valCodigo) ){
-          descontarCantidad(valCodigo);
+        var arrProductosTabla = buildObjetoOrdenListaCodigoBarras();
+
+        if( arrProductosTabla.length > 0 ){
+          //VALIDAR QUE EL CÓDIGO DE BARRAS SE ENCUENTRA EN EL OBJETO DE LA TABLA
+          const listOrder = findListOrderByBarcode(valCodigo, arrProductosTabla);
+
+          if( listOrder != null ){
+
+            descontarCantidad(listOrder);
+          }else{
+            alert("El código ingresado no existe en el pedido.\nFavor de revisar");
+            $('#inputDevolucion').val("");
+          }
 
         }else{
-          alert("El código ingresado no existe en el pedido.\nFavor de revisar");
-          $('#inputDevolucion').val("");
+          alert("No existen productos para devolver.");
+
         }
       }
   }
 
+  function findListOrderByBarcode(barcode, productos) {
+    for (const producto of productos) {
+        if (
+            producto.codigo_barras_pieza_1 && producto.codigo_barras_pieza_1.includes(barcode) ||
+            producto.codigo_barras_pieza_2 && producto.codigo_barras_pieza_2.includes(barcode) ||
+            producto.codigo_barras_pieza_3 && producto.codigo_barras_pieza_3.includes(barcode)
+        ) {
+            return producto.list_order;
+        }
+    }
+    return null; // Devuelve null si no se encuentra el código de barras
+}
+
+
+  function buildObjetoOrdenListaCodigoBarras(){
+
+    productsCatalogueLocal = JSON.parse( localStorage.getItem('productsCatalogue') );
+
+    var filas = $('#listaProductos tr.move');   
+    var idsProductos = [];
+    var arrProductos = [];
+    // Mostrar las filas en la consola
+    filas.each(function(index, fila) {
+        //console.log('Fila ' + (index + 1) + ':');
+        // Obtener las celdas de la fila actual
+        var celdas = $(fila).find('td');
+        
+        // Mostrar el contenido de cada celda
+        celdas.each(function(indice, celda) {
+            //console.log(' Columna ' + (indice + 1) + ': ' + $(celda).text());
+            if( indice == 0 ){ //El indice 0 contiene el número de Orden de lista (Código de Producto)
+              var ordenLista = $(celda).text();
+              
+              var objProductoLocal = findProductByListOrder( productsCatalogueLocal, ordenLista );
+             
+              arrProductos.push(objProductoLocal);
+              //idsProductos.push($(celda).text());
+            }
+        });
+    });
+    console.log("OBJ PRODUCTOS" );
+    console.log(arrProductos);
+
+    return arrProductos;
+  }
+
+  function findProductByListOrder( arrProductosLocal, listOrder ) {
+    return arrProductosLocal.find(producto => producto.list_order === listOrder);
+}
+
   function descontarCantidad(ordenDeLista) {
+    //searchOrdenListaByBarCode();
     $('#listaProductos tr.move').each(function() {
       var $row = $(this);
-      var rowOrdenDeLista = $row.find('td:eq(1)').text().trim();
+      var rowOrdenDeLista = $row.find('td:eq(0)').text().trim();
       if (rowOrdenDeLista === ordenDeLista) {
-        var $cantidadCell = $row.find('td:eq(3)');
+        var $cantidadCell = $row.find('td:eq(2)');
         var cantidad = parseInt($cantidadCell.text().trim());
         if (cantidad > 0) {
           var nuevaCantidad = cantidad - 1;
-          $cantidadCell.text(nuevaCantidad);
-          var precio = $row.find('td:eq(4)').text().trim();
-          var precioString = precio.replace(/[^0-9.-]+/g, "");
-          var precio = parseFloat(precioString);
+          if( nuevaCantidad == 0 ){
+            //Eliminar fila, se manda a ejecutar directamente el click en el botón "quitar"
+            //eq(6) - en la posición 6 de la fila se encuentra el botón para quitar
+            $row.find('td:eq(6)').children().trigger('click');
+            closeModal();
 
-          var nuevoMonto = nuevaCantidad * precio;
-          //Se actualiza la columna 6 que corresponde al monto
-          $row.find('td:eq(6)').text("$" + nuevoMonto.toFixed(2));
+          }else{
+
+            $cantidadCell.text(nuevaCantidad);
+            var precio = $row.find('td:eq(3)').text().trim();
+            var precioString = precio.replace(/[^0-9.-]+/g, "");
+            var precio = parseFloat(precioString);
+
+            var nuevoMonto = nuevaCantidad * precio;
+            //Se actualiza la columna 5 que corresponde al monto
+            $row.find('td:eq(5)').text("$" + nuevoMonto.toFixed(2));
+            
+            //Actualizar cantidad en sessionStorage
+            updateCantidadMontoSessionStorage( ordenDeLista, nuevaCantidad, nuevoMonto );
+            //Actualizar el total del pedido
+            calculaTotalVenta();
+
+            closeModal();
+
+          }
           
-          //Actualizar cantidad en sessionStorage
-          updateCantidadMontoSessionStorage( ordenDeLista, nuevaCantidad, nuevoMonto );
-          //Actualizar el total del pedido
-          calculaTotalVenta();
-
-          closeModal();
         }
       }
     });
   }
+
+  // function searchOrdenListaByBarCode(){
+
+  // }
 
   function updateCantidadMontoSessionStorage( idProducto,nuevaCantidad, nuevoMonto ){
 
@@ -468,9 +528,9 @@ var packsCatalogue = new Array();
 
       if( indexSessionStorage != null ){
         //Se actualiza la cantidad que se encuentra en la posición 3
-        products_array[indexSessionStorage][3] = nuevaCantidad;
+        products_array[indexSessionStorage][2] = nuevaCantidad;
         //Se actualiza el monto que se encuentra en la posicion 6
-        products_array[indexSessionStorage][6] = "$"+nuevoMonto;
+        products_array[indexSessionStorage][5] = "$"+nuevoMonto;
 
         sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
       }
@@ -481,8 +541,8 @@ var packsCatalogue = new Array();
   function getIndexSessionStorage( productsArray, idProducto ){
     var index = null;
     for (let i = 0; i < productsArray.length; i++) {
-      // El id de Producto o Número de lista se encuenta en la posición 1, es por eso que se valida  productsArray[i][1]
-      if( productsArray[i][1] == idProducto ){
+      // El id de Producto o Número de lista se encuenta en la posición 0, es por eso que se valida  productsArray[i][0]
+      if( productsArray[i][0] == idProducto ){
         index = i
         //Instrucción para romper el ciclo y salir de el
         i = productsArray.length;
@@ -628,6 +688,7 @@ var packsCatalogue = new Array();
 
   .buttonMuestras{
     margin-bottom: 10px;
+    margin-top: 10px;
     float: right;
     /* background-color: #2d97b2; */
   }
@@ -1037,11 +1098,11 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
   <!--seccion-->
 <!--  <a class="regalo" id="img_regalo"  href="javascript:void(0)"><span>regalo</span></a>-->
 
-      <div class="row">    
-        <div class="col-5">
+      <div class="row" style="width: 100% !important;max-width: 100% !important;">    
+        <div class="col-7">
 
         </div>
-        <div class="col-7 text-center"><!--data-role="fieldcontain"-->
+        <div class="col-5 text-center"><!--data-role="fieldcontain"-->
           <label>
             <strong style="font-weight:bold; font-size:20px; padding-right: 2px;">
               Total
@@ -1063,15 +1124,16 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
   </div-->
   <br>
   <div class="row"><!--class="ui-block-bwidth:48%;float:left;"-->
-    <div class="col-1"></div>
-    <div class="col-10">
+    <div class="col-3"></div>
+    <div class="col-6">
       <button data-theme="a" 
         name="cerrar" 
         id="cerrar" 
-        class="btn1 btn btn-success form-control" 
+        class="btn1 btn btn-primary form-control" 
         style="min-width:180px; margin-right:50px;"
         >✔ Enviar pedido</button>
       </div>
+      <div class="col-3"></div>
   </div>
   <!--Termina seccion-->
   </div>
@@ -1092,7 +1154,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
               <button 
                 type="button"
                 onclick="openDevolucionProductos();"
-                class="btn btn-warning"
+                class="btn btn-primary"
               >
                 <b>Productos para devolver</b>
               </button>
@@ -1133,10 +1195,10 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
           <div class="col-4"></div>
           <div class="col-8">
             <button
-              class="btn btn-warning"
+              class="btn btn-primary"
               onclick="guardarVenta( 'quotation' );"
             >
-              <i class="icon-dollar">Imprimir Cotizacion</i>
+              <i class="icon-dollar">Imprimir Cotización</i>
             </button>
           </div>
             
