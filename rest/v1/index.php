@@ -67,6 +67,7 @@
 	require 'server/wharehouseProductProviderMovementVerification.php';
 	require 'server/warehouseProductProviderMovementVerificationServer.php';
 	require 'server/salesVerificationServer.php';
+	require 'server/ReturnsVerificationServer.php';
 	require 'server/RowsVerificationServer.php';
 
 
