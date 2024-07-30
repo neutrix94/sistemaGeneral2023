@@ -130,10 +130,10 @@
 				$ok = true;
 			//inserta cabecera
 				$sql = "INSERT INTO ec_devolucion ( id_usuario, id_sucursal, fecha, hora, id_pedido, 
-				folio, es_externo, status, observaciones, tipo_sistema, id_status_agrupacion, folio_unico )
+				folio, es_externo, status, observaciones, tipo_sistema, monto_devolucion, id_status_agrupacion, folio_unico )
 				VALUES ( '{$return['id_usuario']}', '{$return['id_sucursal']}', '{$return['fecha']}', 
 					'{$return['hora']}', {$return['id_pedido']}, '{$return['folio']}', '{$return['es_externo']}', 
-					'{$return['status']}', '{$return['observaciones']}', '{$return['tipo_sistema']}', 
+					'{$return['status']}', '{$return['observaciones']}', '{$return['tipo_sistema']}', '{$return['monto_devolucion']}',
 					'{$return['id_status_agrupacion']}', '{$return['folio_unico']}' )";
 				$sql = str_replace( "'(", "(", $sql );
 				$sql = str_replace( ")'", ")", $sql );
