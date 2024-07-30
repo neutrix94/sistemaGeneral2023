@@ -31,6 +31,9 @@ BEGIN
 
 	INSERT INTO ec_afiliacion_sucursal 
 	SELECT null,id_afiliacion,new.id_sucursal,0,1 FROM ec_afiliaciones WHERE id_afiliacion>0;
+/*inserta la configuracion adicional de la sucursal*/
+	INSERT INTO ec_configuracion_sucursal ( id_sucursal, no_tickets_resolucion, sucursal_impresion_local, ofrecer_productos, dominio_sucursal, endpoint_impresion_remota, tiempo_vida_token_clientes ) 
+	VALUES ( new.id_sucursal, 1, new.id_sucursal, 1, '', '', 3600 );
 
 	SELECT id_sucursal INTO store_id FROM sys_sucursales WHERE acceso=1;
 
