@@ -22,6 +22,7 @@ BEGIN
                 '"primary_key_value" : "', new.id_afiliacion, '",',
                 '"id_banco" : "', new.id_banco, '",',
                 '"no_afiliacion" : "', new.no_afiliacion, '",',
+                '"id_tipo_terminal" : "', new.id_tipo_terminal, '",',
                 '"observaciones" : "', new.observaciones, '",',
                 '"fecha_alta" : "', new.fecha_alta, '",',
                 '"sincronizar" : "0"',
