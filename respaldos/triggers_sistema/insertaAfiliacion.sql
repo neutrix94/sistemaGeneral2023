@@ -34,6 +34,8 @@ BEGIN
                 '"id_banco" : "', new.id_banco, '",',
                 '"no_afiliacion" : "', new.no_afiliacion, '",',
                 '"id_tipo_terminal" : "', new.id_tipo_terminal, '",',
+                '"numero_serie_terminal" : "', new.numero_serie_terminal, '",',
+                '"imprimir_ticket" : "', new.imprimir_ticket, '",',
                 '"observaciones" : "', new.observaciones, '",',
                 '"fecha_alta" : "', new.fecha_alta, '",',
                 '"sincronizar" : "0"',
