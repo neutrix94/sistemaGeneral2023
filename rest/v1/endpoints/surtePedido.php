@@ -65,6 +65,23 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
   
   //Ejecuta lógica para surtimiento
   try {
+    //Inserta Surtido
+    $idSurtido = gen_uuid();
+    $sqlInsert = "INSERT INTO `ec_surtimiento` 
+        (`id`, `no_pedido`, `tipo`, `estado`, `id_vendedor`, `prioridad`, `fecha_creacion`, `creado_por`, `fecha_modificacion`, `modificado_por`) 
+        VALUES ('{$idSurtido}', '{$pedido}', '2', '1', '{$vendedor}', '3', now(), '{$vendedor}', now(), '{$vendedor}');";
+    $db->exec($sqlInsert);
+    
+    //Itera lista de productos para insertar detalle
+    $idSurtidor = '';
+    foreach($productos as $producto) {
+      $idDetalle = gen_uuid();
+      $sqlInsert = "INSERT INTO `ec_surtimiento_detalle` 
+        (`id`, `id_surtimiento`, `id_producto`, `cantidad_solicitada`, `estado`, `id_asignado`, `fecha_creacion`, `creado_por`, `fecha_modificacion`, `modificado_por`) 
+        VALUES ('{$idDetalle}', '{$idSurtido}', '{$producto['id']}', '{$producto['cantidad']}', '1', '{$idSurtidor}', now(), '{$vendedor}', now(), '{$vendedor}');";
+      $db->exec($sqlInsert);
+    }
+    
     $insertsProd['resultado']='Solicitado';
     $insertsProd['descripcion']='Se ha solicitado el pedido de '. $productRow . ' producto(s)';
   }catch (PDOException $e) {
