@@ -175,10 +175,11 @@
             $resp['error_rows'] = "";
             $queries = array();
 			foreach ($rows as $key => $row_) {
-               // var_dump( $row_ );
 				$sql = "";
 				$condition = "";
-                $row = json_decode( $row_['datos_json'], true );
+                $row_['datos_json'] = str_replace( "\n", " ", $row_['datos_json'] );//se eliminan saltos de linea
+                $row = json_decode( $row_['datos_json'], true );//
+                //var_dump( $row );die('here');
 				if( isset( $row['primary_key'] ) && isset( $row['primary_key_value'] ) ){
 					$condition .= "WHERE {$row['primary_key']} = '{$row['primary_key_value']}'";
 				}
@@ -190,7 +191,7 @@
 				switch ( $row['action_type'] ) {
 					case 'insert' :
                     //verifica si existe el registro
-                        $verification_sql = "SELECT folio_unico FROM {$row['table_name']} {$condition}";
+                        $verification_sql = "SELECT {$row['primary_key']} FROM {$row['table_name']} {$condition}";//die( $verification_sql );
                         $verification_stm   = $this->link->query( $verification_sql );
                             if( $logger_id ){
                                 $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "(INSERT); Verifica si existe el registro en tabla {$row['table_name']} : ", $verification_sql );

@@ -159,7 +159,7 @@ $app->get('/obtener_registros_sincronizacion_mov_p_p', function (Request $reques
     $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
       $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     $resp["log"]["type_update"] = "rowsSynchronization";
-    $post_data_1 = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
+    $post_data_1 = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"], "table"=>"sys_sincronizacion_registros_movimientos_proveedor_producto" ), JSON_PRETTY_PRINT);//forma peticion
   }
   //envia peticion para actualizar peticion de linea a local
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data_1, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
@@ -171,7 +171,8 @@ $app->get('/obtener_registros_sincronizacion_mov_p_p', function (Request $reques
   $post_data = json_encode(array( "log"=>$resp["log"], 
       "ok_rows"=>$insert_rows["ok_rows"], 
       "error_rows"=>$insert_rows["error_rows"],
-      "local_response_log"=>$local_response_log
+      "local_response_log"=>$local_response_log, 
+      "table"=>"sys_sincronizacion_registros_movimientos_proveedor_producto"
     ), JSON_PRETTY_PRINT);
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
   $SynchronizationManagmentLog->release_sinchronization_module( 'sys_sincronizacion_registros_movimientos_proveedor_producto', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion

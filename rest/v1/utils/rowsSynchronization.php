@@ -183,8 +183,8 @@
 	              SET status_sincronizacion = '{$status}',
 	              	folio_unico_peticion = '{$petition_unique_folio}' 
 	            WHERE id_sincronizacion_registro IN( {$rows} )";
+	   	 		$stm = $this->link->query( $sql );
 	   		}
-	   	 	$stm = $this->link->query( $sql );
 				if( $logger_id ){
 					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza JSON de sincronizacion a status {$status}", $sql );
 				}

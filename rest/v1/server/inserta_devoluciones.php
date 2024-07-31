@@ -133,6 +133,7 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
   }
 //ejecuta el procedure para generar los movimientos de almacen
   $setMovements = $returnsSynchronization->setNewSynchronizationReturns( $log['origin_store'], $system_store, $store_prefix, $rows_limit );
+  //die( "detenido por prueba sincronizacion" );
   if( $setMovements != 'ok' ){
     return json_encode( array( "response" => $setMovements ) );
   }
