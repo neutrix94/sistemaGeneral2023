@@ -13,6 +13,15 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
   if ( ! include( '../../conexionMysqli.php' ) ){
     die( 'no se incluyó conexion' );
   }
+//consulta el tipo de sistema y path de linea
+  $sql = "SELECT 
+            id_sucursal,
+            ( SELECT value FROM api_config WHERE name = 'path' ) AS api_path
+          FROM sys_sucursales WHERE acceso = 1";
+  $stm = $link->query( $sql ) or die( "Error al consultar configuraciones del sistema : {$link->error}" );
+  $row = $stm->fetch_assoc();
+  $system_store = $row['id_sucursal'];
+  $api_path = $row['api_path'];
 //consulta el intervalo de depuracion
   $sql = "SELECT 
           cs.dias_retardo_limpieza_sincronizacion
@@ -75,6 +84,28 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
   $link->autocommit( true );//autoriza transaccion
 //cierra conexion Mysql
   $link->close();
+  if( $system_store != -1 ){//envia peticion a linea
+    $resp = "";
+    $post_data = "";
+    $url = "{$api_path}/rest/crones/depurar_sincronizacion";
+    $crl = curl_init( $url );
+    curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+    curl_setopt($crl, CURLOPT_POST, true);
+    curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+    //curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+      curl_setopt($crl, CURLOPT_TIMEOUT, 60000);
+    curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+      'Content-Type: application/json',
+      'token: ' . $token)
+    );
+    $resp = curl_exec($crl);//envia peticion
+    curl_close($crl);
+    if( $logger_id ){
+      $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Envia peticion a {$url}", $post_data );
+    }
+    return $resp;
+  }
 //regresa respuesta
   die('ok');
   //return json_encode( array( "response" => "Ventas ok!" ) );
