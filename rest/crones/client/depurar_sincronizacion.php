@@ -8,7 +8,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Método: POST
 * Descripción: Depura registros de sincronizacion ( tablas de sincronizacion )
 */
-$app->post('/depurar_sincronizacion', function (Request $request, Response $response){
+$app->post('/depurar_sincronizacion', function (Request $request, Response $response){//die("here");
 
   if ( ! include( '../../conexionMysqli.php' ) ){
     die( 'no se incluyó conexion' );
@@ -22,11 +22,20 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
         WHERE s.acceso = 1";
   $stm = $link->query( $sql ) or die( "Error al consultar sucursal de logueo : {$link->error}" );
   $row = $stm->fetch_assoc();
-//consula fecha para registros de log
+//consulta fecha para registros de log
   $sql = "SELECT DATE_FORMAT( date_add(NOW(), INTERVAL -{$row['dias_retardo_limpieza_sincronizacion']} DAY), '%Y-%m-%d' ) AS limit_date";
   $stm = $link->query( $sql ) or die( "Error al consultar rango de fecha para depurar registros : {$link->error}" );
   $row = $stm->fetch_assoc();
   $limit_date = $row['limit_date'];
+//consulta el intervalo de depuracion
+  $sql = "SELECT minutos_antiguedad_depuracion FROM sys_configuracion_sistema";
+  $stm = $link->query( $sql ) or die( "Error al consultar la antigüedad para eliminar registros de sincronizacion : {$sql} : {$link->error}" );
+  $row = $stm->fetch_assoc();
+  $minutos_antiguedad = $row['minutos_antiguedad_depuracion'];
+  $sql = "SELECT NOW() AS fecha_hora_actual, DATE_SUB(NOW(), INTERVAL {$minutos_antiguedad} MINUTE) AS fecha_hora_modificada";
+  $stm = $link->query( $sql ) or die( "Error al consultar fecha y hora para eliminar registros de sincronizacion : {$sql} : {$link->error}" );
+  $row = $stm->fetch_assoc();
+  $fecha_antiguedad = $row['fecha_hora_modificada'];
   $link->autocommit( false );//inicio de trasaccion
 //comienza a ejecutar consultas
     $sql = "DELETE FROM sys_sincronizacion_registros WHERE status_sincronizacion = 3 AND fecha <= '{$limit_date} 23:59:59'";   
@@ -54,6 +63,15 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
 
     $sql = "DELETE FROM sys_sincronizacion_peticion WHERE hora_comienzo <= '{$limit_date} 23:59:59'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_ventas : {$link->error}" );
+
+/*Eliminacion de registros de tablas de log*/
+    $sql = "DELETE FROM LOG_sincronizaciones WHERE fecha_alta <= '{$fecha_antiguedad}'";
+    $link->query( $sql ) or die( "Error al eliminar en LOG_sincronizaciones : {$link->error}" );
+    $sql = "DELETE FROM LOG_sincronizacion_pasos WHERE fecha_alta <= '{$fecha_antiguedad}'";
+    $link->query( $sql ) or die( "Error al eliminar en LOG_sincronizacion_pasos : {$link->error}" );
+    $sql = "DELETE FROM LOG_sincronizacion_pasos_errores WHERE fecha_alta <= '{$fecha_antiguedad}'";
+    $link->query( $sql ) or die( "Error al eliminar en LOG_sincronizacion_pasos_errores : {$link->error}" );
+/**/
   $link->autocommit( true );//autoriza transaccion
 //cierra conexion Mysql
   $link->close();
