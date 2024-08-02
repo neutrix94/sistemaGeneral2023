@@ -45,32 +45,169 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
   $stm = $link->query( $sql ) or die( "Error al consultar fecha y hora para eliminar registros de sincronizacion : {$sql} : {$link->error}" );
   $row = $stm->fetch_assoc();
   $fecha_antiguedad = $row['fecha_hora_modificada'];
+  $peticiones_pendientes = "";
+
   $link->autocommit( false );//inicio de trasaccion
-//comienza a ejecutar consultas
+//elimina registros de sincronizacion
     $sql = "DELETE FROM sys_sincronizacion_registros WHERE status_sincronizacion = 3 AND fecha <= '{$fecha_antiguedad}'";  //AND fecha <= '{$limit_date} 23:59:59'
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros : {$link->error}" );
+    $sql = "SELECT 
+              folio_unico
+            FROM sys_sincronizacion_peticion sp
+            LEFT JOIN sys_sincronizacion_registros sr
+            ON sp.folio_unico = sr.folio_unico_peticion
+            WHERE sr.status_sincronizacion > 3";
+    $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion pendientes : {$sql} : {$link->error}" );
+    while( $row = $stm->fetch_assoc() ){
+      $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
+      $peticiones_pendientes .= "'{$row['folio_unico']}'";
+    }
+//elimina registros de sincronizacion de devoluciones
     $sql = "DELETE FROM sys_sincronizacion_devoluciones WHERE id_status_sincronizacion = 3 AND fecha_alta <= '{$fecha_antiguedad}'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_devoluciones : {$link->error}" );
+    $sql = "SELECT 
+              folio_unico
+            FROM sys_sincronizacion_peticion sp
+            LEFT JOIN sys_sincronizacion_devoluciones sd
+            ON sp.folio_unico = sd.folio_unico_peticion
+            WHERE sd.id_status_sincronizacion > 3";
+    $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de ventas pendientes : {$sql} : {$link->error}" );
+    while( $row = $stm->fetch_assoc() ){
+      $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
+      $peticiones_pendientes .= "'{$row['folio_unico']}'";
+    }
+//elimina registros de movimientos de almacen
     $sql = "DELETE FROM sys_sincronizacion_movimientos_almacen WHERE id_status_sincronizacion = 3 AND fecha_alta <= '{$fecha_antiguedad}'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_movimientos_almacen : {$link->error}" );
+    $sql = "SELECT 
+              folio_unico
+            FROM sys_sincronizacion_peticion sp
+            LEFT JOIN sys_sincronizacion_movimientos_almacen sa
+            ON sp.folio_unico = sa.folio_unico_peticion
+            WHERE sa.id_status_sincronizacion > 3";
+    $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de movimientos de almacen pendientes : {$sql} : {$link->error}" );
+    while( $row = $stm->fetch_assoc() ){
+      $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
+      $peticiones_pendientes .= "'{$row['folio_unico']}'";
+    }
+//elimina registros de movimientos de almacen a nivel proveedor producto
     $sql = "DELETE FROM sys_sincronizacion_movimientos_proveedor_producto WHERE id_status_sincronizacion = 3";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_movimientos_proveedor_producto : {$link->error}" );
+    $sql = "SELECT 
+              folio_unico
+            FROM sys_sincronizacion_peticion sp
+            LEFT JOIN sys_sincronizacion_movimientos_proveedor_producto smpp
+            ON sp.folio_unico = smpp.folio_unico_peticion
+            WHERE smpp.id_status_sincronizacion > 3";
+    $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de movimientos de almacen a nivel proveedor producto pendientes : {$sql} : {$link->error}" );
+    while( $row = $stm->fetch_assoc() ){
+      $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
+      $peticiones_pendientes .= "'{$row['folio_unico']}'";
+    }
+//elimina registros de sincronizacion de facturación
     $sql = "DELETE FROM sys_sincronizacion_registros_facturacion WHERE status_sincronizacion = 3 AND fecha <= '{$fecha_antiguedad}'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros_facturacion : {$link->error}" );
+    /*$sql = "SELECT 
+              folio_unico
+            FROM sys_sincronizacion_peticion sp
+            LEFT JOIN sys_sincronizacion_registros_facturacion srf
+            ON sp.folio_unico = srf.folio_unico_peticion
+            WHERE srf.status_sincronizacion > 3";
+    $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de facturación pendientes : {$sql} : {$link->error}" );
+    while( $row = $stm->fetch_assoc() ){
+      $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
+      $peticiones_pendientes .= "'{$row['folio_unico']}'";
+    }*/
+//elimina registros de sincronizacion de actualizaciones de movimientos de almacen
     $sql = "DELETE FROM sys_sincronizacion_registros_movimientos_almacen WHERE status_sincronizacion = 3 AND fecha <= '{$fecha_antiguedad}'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros_movimientos_almacen : {$link->error}" );
+    $sql = "SELECT 
+              folio_unico
+            FROM sys_sincronizacion_peticion sp
+            LEFT JOIN sys_sincronizacion_registros_movimientos_almacen srma
+            ON sp.folio_unico = srma.folio_unico_peticion
+            WHERE srma.status_sincronizacion > 3";
+    $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de actualización de movimientos de almacen pendientes : {$sql} : {$link->error}" );
+    while( $row = $stm->fetch_assoc() ){
+      $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
+      $peticiones_pendientes .= "'{$row['folio_unico']}'";
+    }
+//elimina registros de sincronizacion de actualizaciones de movimientos de almacen proveedor producto
     $sql = "DELETE FROM sys_sincronizacion_registros_movimientos_proveedor_producto WHERE status_sincronizacion = 3 AND fecha <= '{$fecha_antiguedad}'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros_movimientos_proveedor_producto : {$link->error}" );
+    $sql = "SELECT 
+              folio_unico
+            FROM sys_sincronizacion_peticion sp
+            LEFT JOIN sys_sincronizacion_registros_movimientos_proveedor_producto srmpp
+            ON sp.folio_unico = srmpp.folio_unico_peticion
+            WHERE srmpp.status_sincronizacion > 3";
+    $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de actualización de movimientos de almacen proveedor producto pendientes : {$sql} : {$link->error}" );
+    while( $row = $stm->fetch_assoc() ){
+      $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
+      $peticiones_pendientes .= "'{$row['folio_unico']}'";
+    }
+//elimina registros de sincronizacion de transferencias
     $sql = "DELETE FROM sys_sincronizacion_registros_transferencias WHERE status_sincronizacion = 3 AND fecha <= '{$fecha_antiguedad}'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros_transferencias : {$link->error}" );
+    $sql = "SELECT 
+              folio_unico
+            FROM sys_sincronizacion_peticion sp
+            LEFT JOIN sys_sincronizacion_registros_transferencias srt
+            ON sp.folio_unico = srt.folio_unico_peticion
+            WHERE srt.status_sincronizacion > 3";
+    $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de transferencias pendientes : {$sql} : {$link->error}" );
+    while( $row = $stm->fetch_assoc() ){
+      $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
+      $peticiones_pendientes .= "'{$row['folio_unico']}'";
+    }
+//elimina registros de sincronizacion de ventas
     $sql = "DELETE FROM sys_sincronizacion_registros_ventas WHERE status_sincronizacion = 3 AND fecha <= '{$fecha_antiguedad}'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros_ventas : {$link->error}" );
+    $sql = "SELECT 
+              folio_unico
+            FROM sys_sincronizacion_peticion sp
+            LEFT JOIN sys_sincronizacion_registros_ventas srv
+            ON sp.folio_unico = srv.folio_unico_peticion
+            WHERE srv.status_sincronizacion > 3";
+    $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros actualización de ventas pendientes : {$sql} : {$link->error}" );
+    while( $row = $stm->fetch_assoc() ){
+      $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
+      $peticiones_pendientes .= "'{$row['folio_unico']}'";
+    }
+//elimina registros de sincronizacion de validacion de ventas
     $sql = "DELETE FROM sys_sincronizacion_validaciones_ventas WHERE id_status_sincronizacion = 3 AND fecha_alta <= '{$fecha_antiguedad}'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_validaciones_ventas : {$link->error}" );
+    $sql = "SELECT 
+              folio_unico
+            FROM sys_sincronizacion_peticion sp
+            LEFT JOIN sys_sincronizacion_validaciones_ventas svv
+            ON sp.folio_unico = svv.folio_unico_peticion
+            WHERE svv.id_status_sincronizacion > 3";
+    $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros validación de ventas pendientes : {$sql} : {$link->error}" );
+    while( $row = $stm->fetch_assoc() ){
+      $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
+      $peticiones_pendientes .= "'{$row['folio_unico']}'";
+    }
+//elimina registros de sincronizacion de ventas
     $sql = "DELETE FROM sys_sincronizacion_ventas WHERE id_status_sincronizacion = 3 AND fecha_alta <= '{$fecha_antiguedad}'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_ventas : {$link->error}" );
-
+    $sql = "SELECT 
+              folio_unico
+            FROM sys_sincronizacion_peticion sp
+            LEFT JOIN sys_sincronizacion_ventas sv
+            ON sp.folio_unico = sv.folio_unico_peticion
+            WHERE sv.id_status_sincronizacion > 3";
+    $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros actualización de ventas pendientes : {$sql} : {$link->error}" );
+    while( $row = $stm->fetch_assoc() ){
+      $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
+      $peticiones_pendientes .= "'{$row['folio_unico']}'";
+    }
+    
+//elimina las cabeceras de peticiones
     $sql = "DELETE FROM sys_sincronizacion_peticion WHERE hora_comienzo <= '{$fecha_antiguedad}'";   
+    if( $peticiones_pendientes != "" ){//excluye las peticiones con registros pendientes
+      $sql .= " AND folio_unico NOT IN( {$peticiones_pendientes} )";
+    }
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_ventas : {$link->error}" );
 
 /*Eliminacion de registros de tablas de log*/
@@ -104,7 +241,8 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
     if( $logger_id ){
       $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Envia peticion a {$url}", $post_data );
     }
-    return $resp;
+    //var_dump( $resp );
+    //return $resp;
   }
 //regresa respuesta
   die('ok');
