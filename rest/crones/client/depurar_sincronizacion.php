@@ -56,7 +56,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
             FROM sys_sincronizacion_peticion sp
             LEFT JOIN sys_sincronizacion_registros sr
             ON sp.folio_unico = sr.folio_unico_peticion
-            WHERE sr.status_sincronizacion > 3";
+            WHERE sr.status_sincronizacion < 3";
     $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion pendientes : {$sql} : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
       $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
@@ -70,7 +70,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
             FROM sys_sincronizacion_peticion sp
             LEFT JOIN sys_sincronizacion_devoluciones sd
             ON sp.folio_unico = sd.folio_unico_peticion
-            WHERE sd.id_status_sincronizacion > 3";
+            WHERE sd.id_status_sincronizacion < 3";
     $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de ventas pendientes : {$sql} : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
       $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
@@ -84,7 +84,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
             FROM sys_sincronizacion_peticion sp
             LEFT JOIN sys_sincronizacion_movimientos_almacen sa
             ON sp.folio_unico = sa.folio_unico_peticion
-            WHERE sa.id_status_sincronizacion > 3";
+            WHERE sa.id_status_sincronizacion < 3";
     $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de movimientos de almacen pendientes : {$sql} : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
       $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
@@ -98,7 +98,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
             FROM sys_sincronizacion_peticion sp
             LEFT JOIN sys_sincronizacion_movimientos_proveedor_producto smpp
             ON sp.folio_unico = smpp.folio_unico_peticion
-            WHERE smpp.id_status_sincronizacion > 3";
+            WHERE smpp.id_status_sincronizacion < 3";
     $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de movimientos de almacen a nivel proveedor producto pendientes : {$sql} : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
       $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
@@ -112,7 +112,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
             FROM sys_sincronizacion_peticion sp
             LEFT JOIN sys_sincronizacion_registros_facturacion srf
             ON sp.folio_unico = srf.folio_unico_peticion
-            WHERE srf.status_sincronizacion > 3";
+            WHERE srf.status_sincronizacion < 3";
     $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de facturación pendientes : {$sql} : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
       $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
@@ -126,7 +126,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
             FROM sys_sincronizacion_peticion sp
             LEFT JOIN sys_sincronizacion_registros_movimientos_almacen srma
             ON sp.folio_unico = srma.folio_unico_peticion
-            WHERE srma.status_sincronizacion > 3";
+            WHERE srma.status_sincronizacion < 3";
     $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de actualización de movimientos de almacen pendientes : {$sql} : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
       $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
@@ -140,7 +140,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
             FROM sys_sincronizacion_peticion sp
             LEFT JOIN sys_sincronizacion_registros_movimientos_proveedor_producto srmpp
             ON sp.folio_unico = srmpp.folio_unico_peticion
-            WHERE srmpp.status_sincronizacion > 3";
+            WHERE srmpp.status_sincronizacion < 3";
     $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de actualización de movimientos de almacen proveedor producto pendientes : {$sql} : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
       $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
@@ -154,7 +154,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
             FROM sys_sincronizacion_peticion sp
             LEFT JOIN sys_sincronizacion_registros_transferencias srt
             ON sp.folio_unico = srt.folio_unico_peticion
-            WHERE srt.status_sincronizacion > 3";
+            WHERE srt.status_sincronizacion < 3";
     $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros de sincronizacion de transferencias pendientes : {$sql} : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
       $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
@@ -168,7 +168,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
             FROM sys_sincronizacion_peticion sp
             LEFT JOIN sys_sincronizacion_registros_ventas srv
             ON sp.folio_unico = srv.folio_unico_peticion
-            WHERE srv.status_sincronizacion > 3";
+            WHERE srv.status_sincronizacion < 3";
     $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros actualización de ventas pendientes : {$sql} : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
       $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
@@ -182,7 +182,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
             FROM sys_sincronizacion_peticion sp
             LEFT JOIN sys_sincronizacion_validaciones_ventas svv
             ON sp.folio_unico = svv.folio_unico_peticion
-            WHERE svv.id_status_sincronizacion > 3";
+            WHERE svv.id_status_sincronizacion < 3";
     $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros validación de ventas pendientes : {$sql} : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
       $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
@@ -196,7 +196,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
             FROM sys_sincronizacion_peticion sp
             LEFT JOIN sys_sincronizacion_ventas sv
             ON sp.folio_unico = sv.folio_unico_peticion
-            WHERE sv.id_status_sincronizacion > 3";
+            WHERE sv.id_status_sincronizacion < 3";
     $stm = $link->query( $sql ) or die( "Error al consultar registros de petición con registros actualización de ventas pendientes : {$sql} : {$link->error}" );
     while( $row = $stm->fetch_assoc() ){
       $peticiones_pendientes .= ( $peticiones_pendientes == "" ? "" : "," );
