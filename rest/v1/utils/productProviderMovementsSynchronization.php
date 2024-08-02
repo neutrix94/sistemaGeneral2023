@@ -112,17 +112,20 @@
 			$resp["tmp_no"] = "";
 			$updates = array();
 			foreach ( $product_providers_movements as $key => $p_p_movement ) {
-				if( $p_p_movement->id_movimiento_almacen_detalle != -1 && $p_p_movement->id_movimiento_almacen_detalle != '' && $p_p_movement->id_movimiento_almacen_detalle != null ){
-					$sql = $p_p_movement->id_movimiento_almacen_detalle;
+				if( $p_p_movement['id_movimiento_almacen_detalle'] != -1 && $p_p_movement['id_movimiento_almacen_detalle'] != '' && $p_p_movement['id_movimiento_almacen_detalle'] != null ){
+					$sql = $p_p_movement['id_movimiento_almacen_detalle'];
 					$stm = $this->link->query( $sql ) or die( "Error al consultar detalle de movimeinto a nivel producto en inserción de movimientos proveedor producto : {$sql} : {$this->link->error}" );
-					$row = $stm->fetch_assoc();
-					$p_p_movement->id_movimiento_almacen_detalle = $row['id_movimiento_almacen_detalle'];
+					$row = $stm->fetch_row();
+					$p_p_movement['id_movimiento_almacen_detalle'] = $row[0];
 				}
-				if( $p_p_movement->id_pedido_validacion != -1 && $p_p_movement->id_pedido_validacion != '' && $p_p_movement->id_pedido_validacion != null ){
-					$sql = $p_p_movement->id_pedido_validacion;
+				if( $p_p_movement['id_pedido_validacion'] != -1 && $p_p_movement['id_pedido_validacion'] != '' && $p_p_movement['id_pedido_validacion'] != null ){
+					$sql = $p_p_movement['id_pedido_validacion'];
 					$stm = $this->link->query( $sql ) or die( "Error al consultar id de validacion en inserción de movimientos proveedor producto : {$sql} : {$this->link->error}" );
-					$row = $stm->fetch_assoc();
-					$p_p_movement->id_pedido_validacion = $row['id_pedido_validacion'];
+					$row = $stm->fetch_row();
+					$p_p_movement['id_pedido_validacion'] = $row[0];
+					if( $p_p_movement['id_pedido_validacion'] == '' || $p_p_movement['id_pedido_validacion'] == null ){
+						$p_p_movement['id_pedido_validacion']= -1;
+					}
 				}
 				$this->link->autocommit( false );
 				$ok = true;
