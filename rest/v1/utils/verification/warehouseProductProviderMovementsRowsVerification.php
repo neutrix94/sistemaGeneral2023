@@ -190,6 +190,18 @@
                         die( "Error al consultar si ya existe el movimiento proveedor producto en la comprobacion : {$this->link->error} {$sql}" );
                     }
                 if( $stm->num_rows <= 0 ){//no existe
+                    if( $p_p_movement->id_movimiento_almacen_detalle != -1 && $p_p_movement->id_movimiento_almacen_detalle != '' && $p_p_movement->id_movimiento_almacen_detalle != null ){
+                        $sql = $p_p_movement->id_movimiento_almacen_detalle;
+                        $stm = $this->link->query( $sql ) or die( "Error al consultar detalle de movimeinto a nivel producto en comprobacion de movimientos proveedor producto : {$sql} : {$this->link->error}" );
+                        $row = $stm->fetch_assoc();
+                        $p_p_movement->id_movimiento_almacen_detalle = $row['id_movimiento_almacen_detalle'];
+                    }
+                    if( $p_p_movement->id_pedido_validacion != -1 && $p_p_movement->id_pedido_validacion != '' && $p_p_movement->id_pedido_validacion != null ){
+                        $sql = $p_p_movement->id_pedido_validacion;
+                        $stm = $this->link->query( $sql ) or die( "Error al consultar id de validacion en comprobacion de movimientos proveedor producto : {$sql} : {$this->link->error}" );
+                        $row = $stm->fetch_assoc();
+                        $p_p_movement->id_pedido_validacion = $row['id_pedido_validacion'];
+                    }
                 //se inserta movimiento proveedor producto por procedure
                     $sql = "CALL spMovimientoDetalleProveedorProducto_inserta( {$p_p_movement->id_movimiento_almacen_detalle}, {$p_p_movement->id_proveedor_producto}, {$p_p_movement->cantidad}, 
                                 {$p_p_movement->id_sucursal}, {$p_p_movement->id_tipo_movimiento}, {$p_p_movement->id_almacen}, {$p_p_movement->id_pedido_validacion}, 
