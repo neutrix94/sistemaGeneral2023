@@ -175,8 +175,8 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
     }
   }else{
   //obtiene fecha y hora actual y actualiza registro de petición
-    $result->log_download->response_string = "No llegaron registros de sincronizacion de linea a local";
     $result->log_download->destinity_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    $result->log_download->response_string = "No llegaron registros de sincronizacion de linea a local";
     $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
       $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     $resp["log"]["type_update"] = "rowsSynchronization";

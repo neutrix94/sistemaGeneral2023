@@ -115,7 +115,7 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
     return json_encode( array( "response"=>"La sucursal es local y no puede ser servidor." ) );
   }
 
-  $setMovements = $salesValidationSynchronization->setNewSynchronizationsalesValidation( -1, $log['origin_store'], $store_prefix, $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos proveedor producto
+  $setMovements = $salesValidationSynchronization->setNewSynchronizationsalesValidation( $log['origin_store'], -1,  $store_prefix, $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos proveedor producto
   if( $setMovements != 'ok' ){
     return json_encode( array( "response" => $setMovements ) );
   }
