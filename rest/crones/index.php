@@ -13,8 +13,9 @@ $app = new \Slim\App;
 /*
 * Instancia utilities
 */
-/*oscar 2023/11/28 para depuracion de registos de sincronizacion*/
+/*oscar 2023/11/28 para depuracion de registos de sincronizacion y LOGS*/
 	require( 'client/depurar_sincronizacion.php' );
+	require( 'client/depurar_logs.php' );
 	require( 'client/agrupacion_por_dia.php' );
 	//require( 'client/obtenerInformacionSincronizacion.php' );
 	require( 'client/consultar_registros_restantes.php' );
