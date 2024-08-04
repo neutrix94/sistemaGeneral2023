@@ -250,4 +250,3 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
 });
 
 ?>
-

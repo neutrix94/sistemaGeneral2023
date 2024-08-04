@@ -7,7 +7,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Método: POST
 * Descripción: Depura registros de logs ( tablas de Logs )
 */
-$app->post('/depurar_logs', function (Request $request, Response $response){//die("here");
+$app->post('/depurar_logs', function (Request $request, Response $response){die("here");
     if ( ! include( '../../conexionMysqli.php' ) ){
     die( 'no se incluyó conexion' );
     }

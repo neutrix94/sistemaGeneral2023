@@ -14,14 +14,14 @@ $app = new \Slim\App;
 * Instancia utilities
 */
 /*oscar 2023/11/28 para depuracion de registos de sincronizacion y LOGS*/
-	require( 'client/depurar_sincronizacion.php' );
-	require( 'client/depurar_logs.php' );
+	require( 'client/depurar_sincronizacion_1.php' );
+	require( 'client/depurar_logs_1.php' );
 	require( 'client/agrupacion_por_dia.php' );
-	//require( 'client/obtenerInformacionSincronizacion.php' );
 	require( 'client/consultar_registros_restantes.php' );
 
-
+//server
 	require( 'server/obtener_registros_restantes.php' );
+	//require( 'client/obtenerInformacionSincronizacion.php' );
 /*fin de cambio Oscar 2023/11/28*/
 
 $app->run();
