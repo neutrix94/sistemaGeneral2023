@@ -7,6 +7,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /depurar_sincronizacion
 * Método: POST
 * Descripción: Depura registros de sincronizacion ( tablas de sincronizacion )
+* Version 1.1 Para depurar sincronizacion ( 2024-08-03 )
 */
 $app->post('/depurar_sincronizacion', function (Request $request, Response $response){//die("here");
 
