@@ -13,6 +13,10 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
   if ( ! include( '../../conexionMysqli.php' ) ){
     die( 'no se incluyó conexion' );
   }
+  $is_complete = false;
+  if( $request->getParam('is_complete') != null && $request->getParam('is_complete') != false  ){
+      $is_complete = true;
+  }
 //consulta el tipo de sistema y path de linea
   $sql = "SELECT 
             id_sucursal,
@@ -41,6 +45,9 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
   $stm = $link->query( $sql ) or die( "Error al consultar la antigüedad para eliminar registros de sincronizacion : {$sql} : {$link->error}" );
   $row = $stm->fetch_assoc();
   $minutos_antiguedad = $row['minutos_antiguedad_depuracion'];
+  if( $is_complete ){
+    $minutos_antiguedad = 0;
+  }
   $sql = "SELECT NOW() AS fecha_hora_actual, DATE_SUB(NOW(), INTERVAL {$minutos_antiguedad} MINUTE) AS fecha_hora_modificada";
   $stm = $link->query( $sql ) or die( "Error al consultar fecha y hora para eliminar registros de sincronizacion : {$sql} : {$link->error}" );
   $row = $stm->fetch_assoc();

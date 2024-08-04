@@ -55,6 +55,7 @@ $app->post('/depurar_logs', function (Request $request, Response $response){
     $link->autocommit( false );//inicio de trasaccion
 /*Eliminacion de registros de tablas de log de sincronizacion*/
     $sql = "DELETE FROM LOG_sincronizaciones WHERE fecha_alta <= '{$fecha_antiguedad}'";
+    //die( $sql );
     $link->query( $sql ) or die( "Error al eliminar en LOG_sincronizaciones : {$link->error}" );
     $sql = "DELETE FROM LOG_sincronizacion_pasos WHERE fecha_alta <= '{$fecha_antiguedad}'";
     $link->query( $sql ) or die( "Error al eliminar en LOG_sincronizacion_pasos : {$link->error}" );
