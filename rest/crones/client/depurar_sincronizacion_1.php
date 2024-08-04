@@ -231,7 +231,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
   $link->close();
   if( $system_store != -1 ){//envia peticion a linea
     $resp = "";
-    $post_data = array( "is_complete"=>$is_complete );
+    $post_data = json_encode( array( "is_complete"=>$is_complete ) );
     $url = "{$api_path}/rest/crones/depurar_sincronizacion";
     $crl = curl_init( $url );
     curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);

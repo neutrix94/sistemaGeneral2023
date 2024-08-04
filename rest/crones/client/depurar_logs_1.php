@@ -77,7 +77,7 @@ $app->post('/depurar_logs', function (Request $request, Response $response){
   $link->close();
   if( $system_store != -1 ){//envia peticion a linea
     $resp = "";
-    $post_data = "";
+    $post_data = json_encode( array( "is_complete"=>$is_complete ) );
     $url = "{$api_path}/rest/crones/depurar_logs";
     $crl = curl_init( $url );
     curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
