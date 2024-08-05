@@ -2071,7 +2071,7 @@
 			while( $row_2 = $stm2->fetch_assoc() ){
 				$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$row['warehouse_movement_id']}, {$row_2['product_id']}, {$row_2['quantity']}, {$row_2['quantity']},
 							-1, -1, {$row_2['product_provider_id']}, 5 )";
-				$stm_3 = $this->link->query( $sql ) or die( "Error al insertar los detalles de movimientos de la resolución : {$sql} {$link->error}" );
+				$stm_3 = $link->query( $sql ) or die( "Error al insertar los detalles de movimientos de la resolución : {$sql} {$link->error}" );
 			}
 		}
 		$link->autocommit( true );
@@ -2185,7 +2185,7 @@
 		while( $row_2 = $stm2->fetch_assoc() ){
 			$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$mov_id}, {$row_2['product_id']}, {$row_2['quantity']}, {$row_2['quantity']},
 						-1, -1, {$row_2['product_provider_id']}, 5 )";
-			$stm_3 = $this->link->query( $sql ) or die( "Error al insertar los detalles de movimientos de la resolución : {$sql} {$link->error}" );
+			$stm_3 = $link->query( $sql ) or die( "Error al insertar los detalles de movimientos de la resolución : {$sql} {$link->error}" );
 		}
 	//inserta el registro de validación
 		$sql_2 = "INSERT INTO ec_transferencias_validacion_usuarios ( id_transferencia_validacion, id_transferencia_producto,
@@ -2363,7 +2363,7 @@
 			//$mov_header_id = (int) $link->insert_id;
 		//recupera el id insertado
 			$sql = "SELECT MAX(id_movimiento_almacen) AS movement_header_id FROM ec_movimiento_almacen";
-			$stm = $link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado por ajuste ( resta ) : {$sql} : {$this->link->error}" );
+			$stm = $link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado por ajuste ( resta ) : {$sql} : {$link->error}" );
 			$row = $stm->fetch_assoc();
 			$mov_header_id = $row['movement_header_id'];
 			$substraction_array = explode( '|', $substraction );
@@ -2403,7 +2403,7 @@
 
 			//recupera el id insertado
 			$sql = "SELECT MAX(id_movimiento_almacen) AS movement_header_id FROM ec_movimiento_almacen";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado por ajuste ( resta ) : {$sql} : {$this->link->error}" );
+			$stm = $link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado por ajuste ( resta ) : {$sql} : {$link->error}" );
 			$row = $stm->fetch_assoc();
 			$mov_header_id = $row['movement_header_id'];
 
