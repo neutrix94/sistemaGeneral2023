@@ -306,15 +306,18 @@ var packsCatalogue = new Array();
           },
           data: {
               "productos": productosSeleccionados,
-              "vendedor": "EL VENDEDOR",
-              "pedido": "123"
+              "vendedor": <?php echo $user_id; ?>,
+              "pedido": genIdPedido( <?php echo $user_id; ?> ),
           },
           datatype: 'json',
           success: function (data) {
-              //var obj = JSON.parse(data);
-              
+              console.log("RESPUESTA MUESTRA");
               console.log(data);
-              alert(JSON.stringify(data,null,true));
+              if( data.result.resultado == "Solicitado" ){
+                alert(data.result.descripcion);
+              }else{
+                alert("Ha ocurrido un error: "+data.result.descripcion);
+              }
               
               clearAllCheckBox();
 
@@ -330,6 +333,18 @@ var packsCatalogue = new Array();
     }else{
       alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
     }
+  }
+
+  function genIdPedido( id_user ) {
+    var id = "";
+    if( sessionStorage.getItem('ID_PEDIDO_TEMP') != null && sessionStorage.getItem('ID_PEDIDO_TEMP') != '' ){
+      id = sessionStorage.getItem('ID_PEDIDO_TEMP');
+    }else{
+      id = new Date().getMilliseconds() + id_user ;
+      sessionStorage.setItem('ID_PEDIDO_TEMP', id);
+    }
+
+    return id;  
   }
 
   function selectAllMuestras(item){

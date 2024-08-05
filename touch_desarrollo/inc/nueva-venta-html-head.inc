@@ -2263,6 +2263,8 @@ var hay_paquete=0;
             $("#detalle_nota_tmp").val(aux[3]);
         /*fin de cambio Oscar 13.11.2018*/
 			retval = true;
+            //mandamos a consumir servicio para surtir pedido
+            surtePedido();
 		}
 		else{
 			retval = false;
@@ -2285,6 +2287,86 @@ var hay_paquete=0;
 //alert('fin de generaVe');	
 		return retval;
 	}
+
+    function surtePedido( ){
+
+        var baseUrl = window.location.origin;
+        var apiUrl = baseUrl + '/sistemaGeneral2023/rest/v1/surte/Pedido';
+
+        var productosPedido = getProductosPedido();
+
+        var dataSurtePedido = {
+                "productos": productosPedido,
+                "vendedor": <?php echo $user_id; ?>,
+                "pedido": genIdPedido( <?php echo $user_id; ?> ),
+            };
+
+        if( productosPedido.length > 0 ){
+            $.ajax({
+            type: 'POST',
+            url: apiUrl,
+            headers: {
+                'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
+            },
+            data: dataSurtePedido,
+            datatype: 'json',
+            success: function (data) {
+                console.log("RESPUESTA PEDIDO");
+                console.log(data);
+                if( data.result.resultado == "Solicitado" ){
+                    alert(data.result.descripcion);
+                }else{
+                    alert("Ha ocurrido un error: "+data.result.descripcion);
+                }
+
+                sessionStorage.setItem('ID_PEDIDO_TEMP', '');
+                
+                clearAllCheckBox();
+
+            },
+            error:function(error){
+                console.log("ERROR".error);
+            }
+            });
+            
+            
+        }else{
+        alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
+        }
+    }
+
+    function getProductosPedido(){
+    
+        var seleccionados = [];
+        var filas = $('#listaProductos tr.move');
+        if( filas.length > 0 ){
+            // Mostrar las filas en la consola
+            filas.each(function(index, fila) {
+                var $row = $(this);
+                var ordenDeLista = $row.find('td:eq(0)').text().trim();
+                var cantidad = $row.find('td:eq(2)').text().trim();
+                seleccionados.push({
+                    id: ordenDeLista,
+                    cantidad: cantidad
+                });
+                
+            });
+        }
+        return seleccionados;
+    }
+
+    function genIdPedido( id_user ) {
+        var id = "";
+        
+        if( sessionStorage.getItem('ID_PEDIDO_TEMP') != null && sessionStorage.getItem('ID_PEDIDO_TEMP') != '' ){
+            id = sessionStorage.getItem('ID_PEDIDO_TEMP');
+        }else{
+            id = new Date().getMilliseconds() + id_user ;
+            sessionStorage.setItem('ID_PEDIDO_TEMP', id);
+        }
+
+        return id;  
+    }
 
 /*implementacion Oscar 2023 para imprimir, visualizar cotizacion*/
     function quotationEmergent( sale_id ){
@@ -2739,6 +2821,7 @@ var hay_paquete=0;
             });*/
 
             $("#menu_cerrar, #cerrar").on ("click", function (){
+                
 //alert('cierra, AUTORIZADO= '+autorizado);
                 if(autorizado==0){
                     if(!confirm("Esta operación cerrará la venta, ¿desea continuar?")) {
