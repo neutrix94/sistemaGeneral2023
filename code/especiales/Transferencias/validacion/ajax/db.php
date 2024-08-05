@@ -1,4 +1,5 @@
 <?php
+/*Version con insercion de movimientos por Procedure (2024-08-05)*/
 	include( '../../../../../config.inc.php' );
 	include( '../../../../../conect.php' );
 	include( '../../../../../conexionMysqli.php' );
@@ -2362,7 +2363,7 @@
 			//$mov_header_id = (int) $link->insert_id;
 		//recupera el id insertado
 			$sql = "SELECT MAX(id_movimiento_almacen) AS movement_header_id FROM ec_movimiento_almacen";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado por ajuste ( resta ) : {$sql} : {$this->link->error}" );
+			$stm = $link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado por ajuste ( resta ) : {$sql} : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
 			$mov_header_id = $row['movement_header_id'];
 			$substraction_array = explode( '|', $substraction );
