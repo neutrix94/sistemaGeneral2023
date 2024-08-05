@@ -18,7 +18,7 @@ $app->post('/surte/notifica', function (Request $request, Response $response){
   $vt = new tokenValidation();
 
   //Valida token
-  $token =  (empty($request->getHeader('Token'))) ? '' : implode(" ",$request->getHeader('Token'));
+  /*$token =  (empty($request->getHeader('Token'))) ? '' : implode(" ",$request->getHeader('Token'));
   if (empty($token) || strlen($token)<36 ) {
     //Define estructura de salida: Token requerido
     return $rs->errorMessage($request->getParsedBody(),$response, 'Token_Requerido', 'Se requiere el uso de un token', 400);
@@ -32,7 +32,7 @@ $app->post('/surte/notifica', function (Request $request, Response $response){
     }catch (PDOException $e) {
       return $rs->errorMessage($request->getParsedBody(),$response, 'CL_Error', $e->getMessage(), 500);
     }
-  }
+  }*/
 
   //Recuperar parámetros de entrada
   $idVendedor = $request->getParam('idVendedor');
