@@ -2070,7 +2070,7 @@
 			$stm2 = $link->query( $sql ) or die( "Error al consultar los movimientos de la resolución : {$sql} {$link->error}" );
 			while( $row_2 = $stm2->fetch_assoc() ){
 				$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$row['warehouse_movement_id']}, {$row_2['product_id']}, {$row_2['quantity']}, {$row_2['quantity']},
-							-1, -1, {$row_2['product_provider_id']}, 5 )";
+							-1, -1, {$row_2['product_provider_id']}, 5, NULL )";
 				$stm_3 = $link->query( $sql ) or die( "Error al insertar los detalles de movimientos de la resolución : {$sql} {$link->error}" );
 			}
 		}
@@ -2184,7 +2184,7 @@
 		$stm2 = $link->query( $sql )or die( "Error al consultar el detalle del movimiento de almacen : {$sql}" . $link->error );
 		while( $row_2 = $stm2->fetch_assoc() ){
 			$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$mov_id}, {$row_2['product_id']}, {$row_2['quantity']}, {$row_2['quantity']},
-						-1, -1, {$row_2['product_provider_id']}, 5 )";
+						-1, -1, {$row_2['product_provider_id']}, 5, NULL )";
 			$stm_3 = $link->query( $sql ) or die( "Error al insertar los detalles de movimientos de la resolución : {$sql} {$link->error}" );
 		}
 	//inserta el registro de validación
@@ -2358,7 +2358,7 @@
 			//			/*7*/'RESTA POR AJUSTE DE INVENTARIO DESDE VALIDACIÓN', /*8*/-1, /*9*/-1, /*10*/NULL,
 			//			/*11*/-1, /*12*/-1, /*13*/1 )";
 			$sql = "CALL spMovimientoAlmacen_inserta ( {$user}, 'RESTA POR AJUSTE DE INVENTARIO DESDE VALIDACIÓN', 1, 1, 8,
-						-1, -1, -1, -1, 5 )";
+						-1, -1, -1, -1, 5, NULL )";
 			$stm = $link->query( $sql ) or die( "Error al insertar cabecera de movimiento de almacen ( ajuste ): {$sql} : {$link->error}" );
 			//$mov_header_id = (int) $link->insert_id;
 		//recupera el id insertado
@@ -2376,7 +2376,7 @@
 				//		/*8*/id_proveedor_producto ) VALUES ( /*1*/NULL, /*2*/{$mov_header_id},/*3*/{$sub[1]}, /*4*/{$sub[3]}, 
 				//		/*5*/{$sub[3]}, /*6*/-1, /*7*/-1, /*8*/{$sub[2]} )";
 					$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$mov_header_id}, {$sub[1]}, {$sub[3]}, {$sub[3]}, 
-								-1, -1, {$sub[2]}, 5 )";
+								-1, -1, {$sub[2]}, 5, NULL  )";
 					$exc = $link->query( $sql ) or die ( "Error al insertar el detalle del movimiento de almacen 1 : {$link->error}" );	
 					
 					$sql = "UPDATE ec_diferencias_inventario_proveedor_producto
@@ -2397,7 +2397,7 @@
 			//			/*7*/'SUMA POR AJUSTE DE INVENTARIO DESDE VALIDACIÓN', /*8*/-1, /*9*/-1, /*10*/NULL,
 			//			/*11*/-1, /*12*/-1, /*13*/1 )";
 			$sql = "CALL spMovimientoAlmacen_inserta ( {$user}, 'SUMA POR AJUSTE DE INVENTARIO DESDE VALIDACIÓN', 1, 1, 9,
-						-1, -1, -1, -1, 5 )";
+						-1, -1, -1, -1, 5, NULL )";
 			$stm = $link->query( $sql ) or die( "Error al insertar cabecera de movimiento de almacen ( ajuste ): {$link->error}" );
 			//$mov_header_id = (int) $link->insert_id;
 
@@ -2417,7 +2417,7 @@
 			//			/*5*/{$add[3]}, /*6*/-1, /*7*/-1, /*8*/{$add[2]} )";
 					
 					$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$mov_header_id}, {$add[1]}, {$add[3]}, {$add[3]}, 
-								-1, -1, {$add[2]}, 5 )";
+								-1, -1, {$add[2]}, 5, NULL )";
 					$exc = $link->query( $sql) or die( "Error al insertar el detalle del movimiento de almacen 2 : {$link->error}" );	
 					
 					$sql = "UPDATE ec_diferencias_inventario_proveedor_producto
