@@ -2096,7 +2096,7 @@
 		$sql = "SELECT 
 					t.id_transferencia AS transfer_id,
 					/*ma.id_movimiento_almacen AS mov_id,*/
-					( SELECT id_movimiento_almacen FROM ec_movimiento_almacen WHERE id_transferencia IN ( t.id_transferencia ) ) AS mov_id,
+					( SELECT id_movimiento_almacen FROM ec_movimiento_almacen WHERE id_transferencia IN ( t.id_transferencia ) LIMIT 1 ) AS mov_id,
 					SUM( ( tp.cantidad - tp.total_piezas_validacion ) ) AS difference
 				FROM ec_transferencias t
 				LEFT JOIN ec_movimiento_almacen ma
