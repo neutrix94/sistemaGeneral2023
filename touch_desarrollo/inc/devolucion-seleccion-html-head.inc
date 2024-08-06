@@ -423,7 +423,7 @@
     function agregaFila(f){
     //validamos que no sea devolución completa
         if(es_dev_completa==1){
-            if(confirm("No se pueden agregar más productos porque se ha seleccionado una devolución completa!!!\nDesea recargar la pagina para comenzar de nuevo la devolucion")){
+            if(confirm("No se pueden agregar más productos porque se ha seleccionado una devolución completa.\nDeseas recargar la página para comenzar de nuevo la devolucion")){
                 location.reload();
             }
             $("#cantidad2").val("");
@@ -1005,6 +1005,17 @@
       }
 
 	function eliminarItem (item){
+        
+/*Implementación Oscar 2024-08-06 para no dejar eliminar filas si se dió click en el botón de devolución completa*/
+        if(es_dev_completa==1){
+            if( confirm("No se pueden agregar más productos porque se ha seleccionado una devolución completa.\nDeseas recargar la página para comenzar de nuevo la devolución?" ) ){
+                location.reload();
+            }else{
+                return false;
+            }
+        }
+/*Fin de cambio Oscar 2024-08-06*/
+
 		var tds=$(item).parents("tr").children("td");
 		$(item).parents ("tr.move").first ().remove ();
         calculaTotalProd();
