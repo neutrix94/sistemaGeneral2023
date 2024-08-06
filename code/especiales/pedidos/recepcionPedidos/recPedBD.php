@@ -295,7 +295,7 @@ DESHABILITADO POR OSCAR 2022
 				}else if ( $action == "update" ){
 					$sql = "SELECT id_movimiento_almacen_detalle AS movement_detail_id FROM ec_movimiento_detalle WHERE id_oc_detalle = {$id_recepcion_detalle}";
 					$stm_2 = $link->query( $sql ) or die( "Error al consultar el id del detalle recepción : {$sql} : {$link->error}" );
-					$row_detail = $stm->fetch_assoc();
+					$row_detail = $stm_2->fetch_assoc();
 				//actualiza el detalle de movimiento de almacen
 					$sql = "CALL spMovimientoAlmacenDetalle_actualiza ( {$row_detail['movement_detail_id']}, {$d[12]} );";
 					$stm_3 = $link->query( $sql ) or die( "Error al actualizar detalle de movimiento de almacen con Procedure : {$sql} : {$link->error}" );
