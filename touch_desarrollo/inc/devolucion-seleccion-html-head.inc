@@ -17,13 +17,13 @@
     function regresaTodo(){
     /*Implementacion Oscar 04.12.2019 para no dejar devolver todo si hay algun producto en el grid de la devolucion*/
         if($("#listaProductos tr").length>1){
-            alert("Para devolver todo es necesario que no haya productos capturados previamente\n"+
-                "Elimine los productos que haya agregado para poder devolver todo!!!");
+            alert("Para devolver todo es necesario que no haya productos capturados previamente.\n"+
+                "Elimine los productos que haya agregado para poder devolver todo.");
             return false;
         }
     /*Fin de cambio Oscar 04.12.2019*/
         if(es_dev_completa==1){
-            alert("La nota ya fue agregada completamente!!!");
+            alert("La nota ya fue agregada completamente.");
             return false;
         }
         var tabla=document.getElementById("listaProductos");
@@ -463,7 +463,7 @@
 //console.log( url );
 //alert("Respuesta: "+url);
         if(url=='no'){
-            alert('la cantidad de devolución de este producto es mayor a la cantidad vendida!!!');
+            alert('la cantidad de devolución de este producto es mayor a la cantidad vendida.');
             $("#cantidad2").select();
             return false;
         }
@@ -1393,7 +1393,7 @@
             });
 
             $("#salirbtn").on ("click", function () {
-                if (confirm ("¿Realmente desea cerrar sin guardar?")) {
+                if (confirm ("¿Realmente deseas cerrar sin guardar?")) {
                     top.location.href = "index.php";
                 }
             });
@@ -1438,7 +1438,7 @@
 
            
             $("#menu_cerrar, #cerrar").on ("click", function (){
-                    if(!confirm("Esta operación regresará los productos al inventario, ¿Desea continuar?")) {
+                    if(!confirm("Esta operación regresará los productos al inventario, ¿Deseas continuar?")) {
                 //regresamos referencia a un valor vacío
                     sa=0;
                     return false;
@@ -1449,7 +1449,7 @@
                  if (1!=1)//!$("#listaProductos tr.move").length
                  {
                      // Verificar la selección de productos en lista 
-                     alert("Imposible continuar.\nNo ha seleccionado productos para la venta.");
+                     alert("Imposible continuar.\nNo has seleccionado productos para la venta.");
                      $("#buscadorLabel").focus();
                      return false; 
                  }
