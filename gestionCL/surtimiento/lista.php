@@ -49,6 +49,11 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario);
             </tr>
         </thead>
         <tbody>
+        <?php if (empty($surtimientos)): ?>
+            <tr>
+                <td colspan="<?php echo $perfil == 2 ? 6 : 5; ?>" class="text-center">No hay solicitudes de surtimiento</td>
+            </tr>
+        <?php else: ?>
             <?php foreach ($surtimientos as $surtimiento): ?>
                 <tr class="<?php echo $surtimiento['es_complemento'] ? 'complemento-true' : ''; ?>">
                     <td><?php echo $surtimiento['no_pedido']; ?></td>
@@ -65,7 +70,8 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario);
                     </td>
                 </tr>
             <?php endforeach; ?>
-        </tbody>
+        <?php endif; ?>
+    </tbody>
     </table>
 </div>
 
