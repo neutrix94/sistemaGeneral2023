@@ -231,7 +231,7 @@ const connectWebSocket = (ws_ref) => {
 						type="button"
 						class="btn btn-success"
 						onclick="marcar_notificacion_vista( '${ws.actualTransaction.traceability.folio_unico_transaccion}', ${ws.actualTransaction.message.trim() == 'Transacción exitosa' || jsonMsg.transaction.message.trim() == 'Transaccion exitosa' ? true : false } );"
-					><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
+					><i class="icon-ok=circle">Aceptar y marcar notificación como vista</i>
 					</button>
           </div>` );
         $( ".emergent" ).css( "display", "block" );
@@ -246,7 +246,7 @@ const connectWebSocket = (ws_ref) => {
           type="button"
           class="btn btn-success"
           onclick="marcar_notificacion_vista( '${jsonMsg.transaction.folio_unico}', ${jsonMsg.transaction.message.trim() == 'Transacción exitosa' || jsonMsg.transaction.message.trim() == 'Transaccion exitosa' ? true : false } );"
-        ><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
+        ><i class="icon-ok=circle">Aceptar y marcar notificación como vista</i>
         </button>
         </div>` );
       $( ".emergent" ).css( "display", "block" );
