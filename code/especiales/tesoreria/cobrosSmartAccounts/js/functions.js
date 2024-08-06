@@ -760,7 +760,8 @@ var cont_cheques_transferencia=0;
 			<div>
 			<br>
 				Monto :
-				<input type="text" class="form-control" id="ammount_input_tmp">
+				<input type="text" class="form-control" id="ammount_input_tmp" onkeyup="validateNumberInput( this );">
+				<p class="text-start text-danger hidden" id="ammount_input_tmp_alerta">Campo numérico*</p>
 			</div>
 			<div>
 			<br>
@@ -826,7 +827,6 @@ var cont_cheques_transferencia=0;
 				return false;
 			}else{
 				carga_pedido( $( '#id_venta' ).val() );
-				alert( resp );
 				//getHistoricPayment( $( '#id_venta' ).val() );
 				if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null 
 				&& parseInt( $( '#monto_total' ).val().trim() ) == 0 ){
@@ -843,7 +843,7 @@ var cont_cheques_transferencia=0;
 			//recarga vista de cobros
 				$( '#efectivo' ).val( '' );
 				var content = `<div class="text-center">
-					<h2 class="text-success">Pago registrado exitosamente</h2>
+					<h2 class="text-success">Se ha pagado la cantidad ingresada exitosamente.</h2>
 					<button
 						type="button"
 						class="btn btn-success"
