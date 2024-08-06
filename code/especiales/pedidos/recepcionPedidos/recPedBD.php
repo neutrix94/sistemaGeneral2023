@@ -167,39 +167,31 @@ $link->autocommit( false );
 		$dato=explode("|", $dat);
 	//verifica que exista un movimiento relacionado a la cabecera de la remisión
 //echo "<p>verifica que exista un movimiento relacionado a la cabecera de la remisión</p>";
+		$id_movimiento = 0;
 		$sql = "SELECT 
-					ma.id_movimiento_almacen
+					ma.id_movimiento_almacen AS movement_id
 				FROM ec_movimiento_almacen ma
 				WHERE ma.id_orden_compra = '{$id_recepcion}' ";
 		//$stm = mysql_query( $sql ) or die( "Error al consultar el id de movimiento de almacen de la Remisión : " . mysql_error() );
 		$stm = $link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen de la Remisión : {$link->error}" );
 		if( $stm->num_rows <= 0 ){
-
-			$sql = "INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones,
-	id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, status_agrupacion, id_equivalente, ultima_sincronizacion, ultima_actualizacion )
-					SELECT 
-						null, 
-						1, 
-						id_usuario,
-						1, 
-						now(), 
-						now(), 
-						CONCAT('RECEPCIÓN DE NOTA ', folio_referencia_proveedor),
-						-1, 
-						id_oc_recepcion, 
-						null, 
-						-1, 
-						-1, 
-						1, 
-						-1, 
-						0, 
-						'0000-00-00 00:00:00', 
-						now()
-					FROM ec_oc_recepcion 
-					WHERE id_oc_recepcion = '{$id_recepcion}'";	
-			//$stm = mysql_query( $sql ) or die( "Error al reinsertar movimiento de almacen de la Remisión : " . mysql_error() );
-			$stm = $link->query( $sql ) or die( "Error al reinsertar movimiento de almacen de la Remisión : {$link->error}" );
-			
+			$sql = "SELECT 
+						id_usuario AS user_id,
+						CONCAT('RECEPCIÓN DE NOTA ', folio_referencia_proveedor) AS notations,
+						id_oc_recepcion AS reception_id
+					FROM ec_oc_recepcion
+					WHERE id_oc_recepcion = '{$id_recepcion}'";
+		/*inserta cabecera de movimiento de almacen por procedure*/
+			$sql = "CALL spMovimientoAlmacen_inserta ( {$detail_row['user_id']}, '{$detail_row['notations']}', 1, 1, 1, -1, {$detail_row['reception_id']}, -1, -1, 
+						16, NULL )";
+			$stm = $link->query( $sql ) or die( "Error al insertar movimiento de almacen de la Remisión por procedure : {$sql} : {$link->error}" );
+			$sql = "SELECT LAST_INSERT_ID() AS last_id";
+			$stm_3 = $link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado por procedure : {$sql} : {$link->error}" );
+			$movement_row = $stm->fetch_assoc();
+			$id_movimiento = $movement_row['movement_id'];
+		}else{
+			$movement_row = $stm->fetch_assoc();
+			$id_movimiento = $movement_row['movement_id'];
 		}
 		$orders = array();
 		for($i=0;$i<sizeof($dato);$i++){
@@ -211,7 +203,7 @@ $link->autocommit( false );
 						SET cajas_recibidas = {$d[14]},
 						piezas_sueltas_recibidas = {$d[15]}
 					WHERE id_recepcion_bodega_detalle = {$d[7]}";
-			$stm_aux = $link->query( $sql_aux ) or die( "Error al actualizar cajas / piezas recibidas previamente : {$link->error}" ); 
+			$stm_aux = $link->query( $sql_aux ) or die( "Error al actualizar cajas / piezas recibidas previamente : {$link->error}" );
 /*fin de cambio Oscar 2023*/
 		//verificamos si el producto ya existe en la recepcion
 			$sql="SELECT 
@@ -250,6 +242,7 @@ DESHABILITADO POR OSCAR 2022
 						WHERE id_oc_recepcion_detalle=$id_recepcion_detalle";	
 						//die($sql);
 				}else*/
+			$action = "";
 			if($d[3]!=0||$d[1]!=0||$d[0]!='invalida'){
 				$sql = "";
 				if( $d[8] == 0 && $nvo==1 ){// && $nvo==1 modificacion oscar 2023 para que no se duplique el movimiento de almacen
@@ -267,18 +260,8 @@ DESHABILITADO POR OSCAR 2022
 							observaciones = IF( '{$d[0]}' = 'invalida', 'Se recibió en ceros', '' ),
 							porcentaje_descuento = IF( '{$d[0]}' = 'invalida', 0, '{$d[5]}'),
 							id_recepcion_bodega_detalle = '{$d[7]}'";
-/*echo "<p>Inserta detalle de remisión : 
-			<p>id_producto : {$d[1]}</p>, 
-			<p>id_proveedor_producto : {$d[6]} </p>
-			<p>piezas_recibidas : {$d[1]}</p>
-			<p>presentacion_caja : {$d[4]} </p>
-			<p>precio_pieza : {$d[2]}</p>
-			<p>monto : {$d[3]}</p>
-			<textarea style=\"max-width:100%; width : 50%;\">{$sql}</textarea>
-		</p>";*/
-				//echo ( $sql );
-				}else if( $d[8] == 1 || $nvo==0 ){//modificacion oscar 2023 para que no se duplique el movimiento de almacen
-					//$d[7] = $id_recepcion_detalle;//oscar 2023
+					$action = "insert";
+				}else if( $d[8] == 1 || $nvo == 0 ){
 					$sql="UPDATE ec_oc_recepcion_detalle 
 							SET 
 		 					id_oc_recepcion = '{$id_recepcion}', 
@@ -291,27 +274,28 @@ DESHABILITADO POR OSCAR 2022
 							es_valido = IF( '{$d[0]}' = 'invalida', 0, 1 ), 
 							observaciones = IF( '{$d[0]}' = 'invalida', 'Se recibió en ceros', '' ),
 							porcentaje_descuento = IF( '{$d[0]}' = 'invalida', 0, '{$d[5]}')
-						WHERE id_oc_recepcion_detalle = '{$id_recepcion_detalle}'";//id_recepcion_bodega_detalle->id_oc_recepcion_detalle - modificacion oscar 2023 para que no se duplique el movimiento de almacen
-/*echo "<p>Actualiza detalle de remisión
-			<p>id_producto : {$d[1]}</p>, 
-			<p>id_proveedor_producto : {$d[6]} </p>
-			<p>piezas_recibidas : {$d[1]}</p>
-			<p>presentacion_caja : {$d[4]} </p>
-			<p>precio_pieza : {$d[2]}</p>
-			<p>monto : {$d[3]}</p>
-		<textarea style=\"max-width:100%; width : 50%;\">{$sql}</textarea>
-	</p>";*/
+						WHERE id_oc_recepcion_detalle = '{$id_recepcion_detalle}'";
+					$action = "update";
 				}
-//implementacion Oscar 2023
 			}
 //echo ( $sql. "<br>" );
 			if($sql!=""){
 			//ejecutamos la consulta que inserta el detalle
 				$eje=$link->query($sql) or die("Error al insertar/ actualizar detalle de Recepción de Órden de Compra!!!\n\n{$sql} {$link->error}");
-				/*if(!$eje){
-					$error=mysql_error();
-					mysql_query("ROLLBACK");//cancelamos transacción
-				}*/
+				if( $action == "insert" ){
+					$sql = "SELECT LAST_INSERT_ID() AS last_id";
+					$stm = $link->query( $sql ) or die( "Error al consultar el ultimo id insertado de detalle recepción : {$sql} : {$link->error}" );
+					$reception_detail_id = $stm->fetch_assoc();
+				//inserta el detalle de movimiento de almacen
+					$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$id_movimiento}, {$d[0]}, {$d[12]}, {$d[12]}, -1, {$reception_detail_id['last_id']}, {$d[6]}, 16, NULL )";
+				}else if ( $action == "update" ){
+					$sql = "SELECT id_movimiento_almacen_detalle AS movement_detail_id FROM ec_movimiento_detalle WHERE id_oc_detalle = {$id_recepcion_detalle}";
+					$stm_2 = $link->query( $sql ) or die( "Error al consultar el id del detalle recepción : {$sql} : {$link->error}" );
+					$row_detail = $stm->fetch_assoc();
+				//actualiza el detalle de movimiento de almacen
+					$sql = "CALL spMovimientoAlmacenDetalle_actualiza ( {$row_detail['movement_detail_id']}, {$d[12]} );";
+					$stm_3 = $link->query( $sql ) or die( "Error al actualizar detalle de movimiento de almacen con Procedure : {$sql} : {$link->error}" );
+				}
 			//actualizamos lo recibido a la orden de compra
 				$observaciones='se recibio en 0';
 				if($d[0]=='invalida'){
@@ -319,12 +303,7 @@ DESHABILITADO POR OSCAR 2022
 	<textarea style=\"max-width:100%; width : 50%;\">{$sql}</textarea>";*/
 					$sql="DELETE FROM ec_oc_detalle WHERE id_producto=$d[1] AND id_orden_compra=$id_orden";
 					$eje=$link->query($sql) or die("Error al eliminar del detalle de Orden de Compra!!!\n\n {$link->error}");
-					/*if(!$eje){
-						$error=mysql_error();
-						mysql_query("ROLLBACK");//cancelamos transacción
-					}*/
-/*echo "<p>Elimina detalle de orden de compra si entra en condición 'invalida'<br>
-	<textarea style=\"max-width:100%; width : 50%;\">{$sql}</textarea>";*/
+					
 					$d[0]=$d[1];
 					$d[1]=0;
 				}
