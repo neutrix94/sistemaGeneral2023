@@ -556,7 +556,7 @@
 						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', "El pago no puede ser mayor al total de la venta! {$sale_total} - {$tmp_total} = {$rest}", 'N/A' );
 					}	
 					die( "<div class=\"row\" style=\"padding:15px;\">
-						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta! {$sale_total} - {$tmp_total} = {$rest}</h2>
+						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta!</h2>
 						<div class=\"col-3\"></div>
 						<div class=\"col-6\">
 							<br>
@@ -634,8 +634,8 @@
 			//}
 		//inserta el cobro del cajero en efectivo
 			$sql_cc = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, folio_unico, sincronizar) 
-			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, {$afiliation_id}, -1, 7, {$ammount}, NOW(), NOW(), '{$authorization_number}', NULL, 1)";
+				monto, fecha, hora, observaciones, sincronizar) 
+			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, {$afiliation_id}, -1, 7, {$ammount}, NOW(), NOW(), '{$authorization_number}', 1)";
 			$stm_cc = $this->link->query( $sql_cc ) or die( "Error al insertar el cobro del cajero en setPaymentWhithouthIntegration: {$this->link->error}" );
 			$id_cajero_cobro = $this->link->insert_id;//die( 'here' );
 		//consulta entre interno y externo
@@ -999,12 +999,12 @@
 			//inserta el cobro del cajero en efectivo por devolucion
 				if( $saldo_especial == 0 ){
 					$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-						monto, fecha, hora, observaciones, folio_unico, sincronizar) 
-					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$total_devolver_cajero}, NOW(), NOW(), '', NULL, 1)";
+						monto, fecha, hora, observaciones, sincronizar) 
+					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$total_devolver_cajero}, NOW(), NOW(), '', 1)";
 				}else{
 					$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-						monto, fecha, hora, observaciones, folio_unico, sincronizar) 
-					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$saldo_especial}, NOW(), NOW(), '', NULL, 1)";
+						monto, fecha, hora, observaciones, sincronizar) 
+					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$saldo_especial}, NOW(), NOW(), '', 1)";
 					
 				}
 
@@ -1074,8 +1074,8 @@
 //echo $sql . "<br><br>";
 		//inserta el cobro del cajero en efectivo
 			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, folio_unico, sincronizar ) 
-			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, {$type}, {$ammount}, NOW(), NOW(), '', NULL, 1 )";
+				monto, fecha, hora, observaciones, sincronizar ) 
+			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, {$type}, {$ammount}, NOW(), NOW(), '', 1 )";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero en insertPayment : {$this->link->error}" );
 			$id_cajero_cobro = $this->link->insert_id;
 
@@ -1540,8 +1540,8 @@
 			}
 		//inserta el cobro del cajero en efectivo por devolucion
 			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, folio_unico, sincronizar) 
-			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', NULL, 1)";
+				monto, fecha, hora, observaciones, sincronizar) 
+			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', 1)";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero en insertReturnPayment: {$this->link->error}" );
 			$id_cajero_cobro = $this->link->insert_id;
 			$sql = "UPDATE ec_devolucion_pagos 
@@ -1862,7 +1862,7 @@
 			$sql = "UPDATE ec_cajero_cobros SET cobro_cancelado = 1 WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al anular el cobro del cajero : {$this->link->error}" );
 			$sql = "INSERT INTO ec_cajero_cobros ( id_sucursal, id_pedido, id_devolucion, id_cajero, id_sesion_caja, id_afiliacion, id_terminal, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, cobro_cancelado, folio_unico, sincronizar ) 
+				monto, fecha, hora, observaciones, cobro_cancelado, sincronizar ) 
 				SELECT 
 					id_sucursal, 
 					id_pedido, 
@@ -1878,7 +1878,6 @@
 					NOW(), 
 					CONCAT( 'Cobro para anular el cobro ', id_cajero_cobro, ' -{$payment_type}-' ), 
 					1, 
-					NULL,
 					1
 				FROM ec_cajero_cobros WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al re-insertar el cobro {$this->link->error}" );
@@ -2102,7 +2101,9 @@
 			$sql = "SELECT id_sucursal AS system_type FROM sys_sucursales WHERE acceso = 1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$sql} : {$this->link->error}");
 			$row = $stm->fetch_assoc();
-			if( $row["system_type"] > 0 ){//si es diferente de linea
+			$TRANSACCIONES_POR_NOTIFICAR = array();
+			if( $row["system_type"] > 0 && ( $sale_folio != '' && $sale_folio != null ) ){//si es diferente de linea
+				$TRANSACCIONES_POR_NOTIFICAR['entra_en_condicion'] = true;
 			//verifica si tiene transacciones pendientes
 				$sql = "SELECT folio_unico AS unique_folio FROM vf_transacciones_netpay WHERE folio_venta = '{$sale_folio}' AND notificacion_vista = 0";
 				$stm = $this->link->query( $sql );
@@ -2117,9 +2118,11 @@
 					die( "Error al consultar las transacciones pendientes : {$this->link->error}" );
 				}
 				if( $stm->num_rows > 0){
+					$TRANSACCIONES_POR_NOTIFICAR['transacciones_pendientes'] = array();
 					$pending_transactions = array();
 					while ( $row = $stm->fetch_assoc() ){
 						$pending_transactions[] = $row;
+						array_push( $TRANSACCIONES_POR_NOTIFICAR['transacciones_pendientes'], $row );
 					}
 					$sql = "SELECT value AS api_path FROM api_config WHERE name = 'path'";
 					$stm = $this->link->query( $sql );// or die( "Error al consultar las transacciones pendientes : {$this->link->error}" );
@@ -2339,6 +2342,7 @@
 			$FORMULA_PAGOS_COBRADOS = "{$r['pagos_registrados']} = {$r['pagos_registrados']} - {$return_row['monto_pagos_devolucion']}";
 			$resp = json_encode( 
 					array( 'id_venta'=>$r['id_venta'], 
+						'transacciones_netpay_pendientes'=>$TRANSACCIONES_POR_NOTIFICAR,
 						'folio_venta'=>$r['folio_venta'], 
 						'total_venta'=>round( $r['total_nota'], 2 ),
 						'pagos_cobrados'=>round( $r['pagos_registrados'], 2 ), 
