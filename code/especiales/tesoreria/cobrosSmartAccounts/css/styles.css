@@ -91,6 +91,10 @@ input[type=number] { -moz-appearance:textfield; }
 		font-size: 150% !important;
 	}
 
+	.hidden{
+		display:none;
+	}
+
 	@media only screen and (max-width: 600px) {
 		.btn, .form-control, .form-select{
 			font-size: 110% !important;

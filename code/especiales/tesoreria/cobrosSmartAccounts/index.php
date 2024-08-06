@@ -335,13 +335,14 @@
 			</div>
 			<div class="col-5">
 				<div class=" input-group">
-					<input type="number" id="monto_cheque_transferencia" class="form-control">
+					<input type="text" id="monto_cheque_transferencia" class="form-control" onkeyup="validateNumberInput( this );">
 					<button 
 						class="btn btn-primary"
 						onclick="agrega_cheque_transferencia();">
 						<i class="icon-plus"></i>
 					</button>
 				</div>
+				<p class="text-center text-danger hidden" id="monto_cheque_transferencia_alerta">Campo numérico*</p>
 			</div>
 		</div>
 

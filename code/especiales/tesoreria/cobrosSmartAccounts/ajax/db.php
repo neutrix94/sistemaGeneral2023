@@ -1631,7 +1631,7 @@
 					<td class=\"col-6\">
 						<div class=\"input-group\">
 							<input type=\"text\" class=\"form-control text-end\" id=\"t{$c}\" value=\"\" 
-							onkeydown=\"prevenir(event);\" onkeyup=\"valida_tca(this,event,1,'.$c.');\">
+							onkeydown=\"prevenir(event);\" onkeyup=\"validateNumberInput( this );valida_tca(this,event,1,'.$c.');\">
 							<button
 								class=\"btn btn-primary no_visible\"
 								onclick=\"sendTerminalPetition( {$c} );\"
@@ -1654,6 +1654,7 @@
 								<i class=\"icon-cancel-circle\"></i>
 							</button>
 						</div>
+						<p class=\"text-center text-danger hidden\" id=\"t{$c}_alerta\">Campo numérico*</p>
 					</td>
 				</tr>";	
 			//	$c++;
