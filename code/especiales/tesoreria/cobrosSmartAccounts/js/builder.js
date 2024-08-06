@@ -11,7 +11,7 @@
 	function getCashPaymentForm(){
 		var amount = $( '#efectivo' ).val();
 		if( amount <= 0 ){
-			alert( "La cantidad del pago debe de ser mayor a cero!" );
+			alert( "La cantidad del pago debe de ser mayor a cero." );
 			$( '#efectivo' ).select();
 			return false;
 		}
@@ -303,7 +303,6 @@
 						<div class="col-9">${resp}</div>
 						<div class="col-3 text-center">	
 							<button type="button" class="btn btn-info" onclick="show_afiliations_info();">?</span>
-							<!--input type="checkbox" style="display:none">
 							Cobro único :
 							<p id="afiliacion_por_error" error="0" class="icon-toggle-off text-success fs-3 text-center" onclick="cambiar_check_error(this);"></p-->
 						</div>
