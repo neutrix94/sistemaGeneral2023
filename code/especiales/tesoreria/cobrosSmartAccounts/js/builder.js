@@ -25,8 +25,9 @@
 						id="monto_cobro_emergente" 
 						class="form-control" 
 						onkeydown="prevenir(event);" 
-						onkeyup="calcula_cambio();"
+						onkeyup="validateNumberInput( this );calcula_cambio();"
 					>
+				<p class="text-start text-danger hidden" id="monto_cobro_emergente_alerta">Campo numérico*</p>
 			</div>
 			<div class="col-6">
 				<label class="text-primary">Pendiente: </label>
@@ -46,8 +47,9 @@
 						id="efectivo_recibido" 
 						class="form-control" 
 						onkeydown="prevenir(event);" 
-						onkeyup="calcula_cambio();"
+						onkeyup="validateNumberInput( this );calcula_cambio();"
 					>
+				<p class="text-start text-danger hidden" id="efectivo_recibido_alerta">Campo numérico*</p>
 			</div>
 			<div class="col-6">
 				<label class="text-primary">Monto de cambio : </label>

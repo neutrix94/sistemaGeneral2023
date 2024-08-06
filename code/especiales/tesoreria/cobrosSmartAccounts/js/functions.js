@@ -3,6 +3,19 @@ var total_cobros=0,monto_real=0;
 var respuesta = null;
 var debug_json = "";
 
+	function validateNumberInput(input) {
+		//input.value = input.value.replace(/[^0-9]/g, '');
+		if( isNaN( input.value ) ){
+			alert( "En este campo solo puedes capturar números!" );
+			input.value = '';
+			var id = input.id + `_alerta`;
+			$( `#${id}` ).removeClass( "hidden" );
+			setTimeout( function(){
+				$( `#${id}` ).addClass( "hidden" );
+			}, 5000 );
+		}
+	}
+
 	function decimal_format_twice( number ){
 		var format_number_tmp = ''+( number )+'';
 		format_number_tmp = format_number_tmp.split( '.' );
@@ -100,8 +113,11 @@ var debug_json = "";
 		}
 	}
 
-	function carga_pedido(id,pagado, sale_folio = '' ){
+	function carga_pedido( id, pagado, sale_folio = '' ){
 		var log_enabled = $( "#log_status" ).val();
+		/*if( sale_folio == '' ){
+			sale_folio = $( '#buscador' ).val().trim();
+		}*/
 	//enviamos datos por ajax
 		$.ajax({
 			type:'post',
@@ -462,7 +478,7 @@ var venta_actual_impresa = false;
 				url_impresion_venta_actual += "&aditional_object_text=Ticket Actual";
 //alert( url );
 				var resp = ajaxR( url_impresion_venta_actual );
-//alert(resp);
+//alert("Respuesta del ticket 1 : " + resp);
 				if( resp.trim() != 'ok' ){
 					$( '.emergent_content' ).html( resp );
 					$( '.emergent' ).css( 'display', 'block' );
@@ -486,6 +502,7 @@ var venta_actual_impresa = false;
 	function imprimir_ticket_dependiente( reload = false ){
 
 		resp = ajaxR( url_impresion_venta_origen );
+//alert("Respuesta del ticket 2 : " + resp );
 		if( resp != 'ok' ){
 			$( '.emergent_content' ).html( resp );
 			$( '.emergent' ).css( 'display', 'block' );
@@ -574,39 +591,49 @@ var cont_cheques_transferencia=0;
 				if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
 					url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
 				}
-//alert( url ); return false;
+//alert( url );//url de peticion para insertar el cobro//return false;
 				var resp = ajaxR( url ).split( '|' );
 //console.log( resp );return false;
-//alert( resp );
+//alert( resp );//repuesta de peticion para insertar el cobro
 				if( resp[0] != 'ok' ){
-//alert("entra 1");
+//alert( "entra en error de primera peticion : " + resp[0] );
 					$( '.emergent_content' ).html( resp );
 					$( '.emergent' ).css( 'display', 'block' );
 					carga_pedido( $( '#id_venta' ).val() );
+					//alert("carga pedido");
 					setTimeout( function(){
-						if( imprimir_tickets() == true ){
+						var imp_tkt = imprimir_tickets();
+						if( imp_tkt == true ){
 							location.reload();
+						}else{
+//alert( "imprime tickets 1 falló : " + imp_tkt );
 						}
 					}, 100 );
 					return false;
 				}
+//alert( "Pasa de proceso de cobro primera parte" );
 			//}
 		//verifica que el total de pagos sea igual al total de venta
 			var url = "ajax/db.php?fl=validatePayments&sale_id=" + sale_id;
-			//alert( url );
+//alert( "URL SEGUNDA PARTE : " + url );
 			var resp = ajaxR( url ).split( '|' );
 			if( resp[0] != 'ok' ){
+//alert( "entra en error de segunda peticion : " + resp[0] );
 //alert("entra 2");
 				$( '.emergent_content' ).html( resp );
 				$( '.emergent' ).css( 'display', 'block' );
-				carga_pedido( $( '#id_venta' ).val() );			
+				//carga_pedido( $( '#id_venta' ).val() );			
 				setTimeout( function(){
-					if( imprimir_tickets() == true ){
+					var imp_tkt_2 = imprimir_tickets();
+					if( imp_tkt_2 == true ){
 						location.reload();
+					}else{
+//alert( "imprime tickets 2 falló : " + imp_tkt_2 );
 					}
 				}, 100 );
 				return false;
 			}
+//alert( "Pasa de proceso de cobro tercera parte" );
 			//alert( resp );
 
 		//manda impresion del ticket
@@ -633,8 +660,11 @@ var cont_cheques_transferencia=0;
 					//alert(dat);return false;
 					carga_pedido( $( '#id_venta' ).val() );
 					setTimeout( function(){
-						if( imprimir_tickets() == true ){//impresion de tickets
+						var imp_tkt_3 = imprimir_tickets();
+						if( imp_tkt_3 == true ){//impresion de tickets
 							location.reload();
+						}else{
+//alert( "imprime tickets 3 falló : " + imp_tkt_3 );
 						}
 					}, 100);
 				}
