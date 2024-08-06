@@ -1,11 +1,14 @@
 <?php
 require_once '../classes/surtimiento.php';
-//include( '../../conect.php' );
+include('../../conect.php');
 
 // Obtener parámetros de la URL
 $idUsuario = isset($_GET['idUsuario']) ? $_GET['idUsuario'] : null;
 $perfil = isset($_GET['perfil']) ? $_GET['perfil'] : null;
-
+// echo 'user: '.$user_id.'<br>';
+// echo 'sucrusal: '.$sucursal_id;
+// echo 'user_login: '.$user_login;
+// echo 'user_login: '.$user_login;
 $surtimientoCRUD = new SurtimientoCRUD();
 $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario);
 ?>
