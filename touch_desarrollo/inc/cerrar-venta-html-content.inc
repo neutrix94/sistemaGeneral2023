@@ -43,7 +43,7 @@
       	<div class="row">
             <div class="col-1 text-end"><h1 style="font-size : 180% !important;">$</h1></div>
             <div class="col-10 text-center">
-            	<input type="text" id="saldoFavorFinal" value="<?php echo $pagoFinal;?>" style="font-size:120% !important;background:font-weight:bold; color : <?php echo $dev_color;?>;" class="form-control">
+            	<input type="text" id="saldoFavorFinal" value="<?php echo $pagoFinal;?>" style="font-size:120% !important;background:font-weight:bold; color : <?php echo $dev_color;?>;" class="form-control" readonly>
             </div>
       	</div>
       </div>
