@@ -181,10 +181,13 @@ $link->autocommit( false );
 						id_oc_recepcion AS reception_id
 					FROM ec_oc_recepcion
 					WHERE id_oc_recepcion = '{$id_recepcion}'";
+			$stm_2 = $link->query( $sql ) or die( "Error al consultar remisión para insertar movimiento de almacen : {$sql} : {$link->error}" ); 
+			$detail_row = $stm_2->fetch_assoc();
 		/*inserta cabecera de movimiento de almacen por procedure*/
 			$sql = "CALL spMovimientoAlmacen_inserta ( {$detail_row['user_id']}, '{$detail_row['notations']}', 1, 1, 1, -1, {$detail_row['reception_id']}, -1, -1, 
 						16, NULL )";
 			$stm = $link->query( $sql ) or die( "Error al insertar movimiento de almacen de la Remisión por procedure : {$sql} : {$link->error}" );
+
 			$sql = "SELECT LAST_INSERT_ID() AS last_id";
 			$stm_3 = $link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado por procedure : {$sql} : {$link->error}" );
 			$movement_row = $stm->fetch_assoc();
@@ -288,6 +291,7 @@ DESHABILITADO POR OSCAR 2022
 					$reception_detail_id = $stm->fetch_assoc();
 				//inserta el detalle de movimiento de almacen
 					$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$id_movimiento}, {$d[0]}, {$d[12]}, {$d[12]}, -1, {$reception_detail_id['last_id']}, {$d[6]}, 16, NULL )";
+					$stm_3 = $link->query( $sql ) or die( "Error al insertar detalle de movimiento de almacen con Procedure : {$sql} : {$link->error}" );
 				}else if ( $action == "update" ){
 					$sql = "SELECT id_movimiento_almacen_detalle AS movement_detail_id FROM ec_movimiento_detalle WHERE id_oc_detalle = {$id_recepcion_detalle}";
 					$stm_2 = $link->query( $sql ) or die( "Error al consultar el id del detalle recepción : {$sql} : {$link->error}" );
@@ -393,17 +397,7 @@ DESHABILITADO POR OSCAR 2022
 					//die($sql);
 				//actualizamos el proveedor producto, producto
 					$precio_caja=$d[2]*$d[4];
-/*deshabilitado por Oscar 2023 para evitar error de sobreescritura proveedor producto
-					$sql="UPDATE ec_productos p
-						LEFT JOIN ec_proveedor_producto pp 
-						ON p.id_productos = pp.id_producto
-						AND pp.id_proveedor_producto = {$d[6]}
-						SET pp.precio_pieza=$d[2],
-						pp.presentacion_caja=$d[4],
-						pp.precio=$precio_caja,
-						p.precio_compra = IF( $d[2] > 0, $d[2], p.precio_compra ),
-						pp.fecha_ultima_compra = NOW()
-						WHERE pp.id_proveedor_producto=$d[6]";*/
+/*deshabilitado por Oscar 2023 para evitar error de sobreescritura proveedor producto*/
 					$sql = "UPDATE ec_proveedor_producto pp 
 								SET pp.precio_pieza=$d[2],
 									pp.presentacion_caja=$d[4],
@@ -455,10 +449,7 @@ try{
 						piezas_sueltas_recibidas = ( piezas_sueltas_recibidas + {$d[9]}  ),
 						cajas_en_validacion = 0,
 						piezas_sueltas_en_validacion = 0,
-						total_piezas_en_validacion = 0/*
-						piezas_por_caja = '{$d[4]}',
-						piezas_sueltas_recibidas = '{$d[9]}',
-						cajas_recibidas = '{$d[10]}'*/
+						total_piezas_en_validacion = 0
 					WHERE id_recepcion_bodega_detalle = '{$d[7]}'";
 //die( $sql );
 					/*$sql_update = "UPDATE ec_recepcion_bodega_detalle 
