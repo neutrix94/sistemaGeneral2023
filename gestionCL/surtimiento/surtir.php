@@ -5,8 +5,8 @@ require_once '../classes/surtimiento.php';
 $surtimientoCRUD = new SurtimientoCRUD();
 $listaSurtir = $surtimientoCRUD->listaDetalleSurtimiento($id);
 $pendientes = (count($listaSurtir)>0) ? 1: 0 ;
-// error_log(print_r($listaSurtir,true));
-// error_log($listaSurtir[0]['nombre']);
+error_log(print_r($listaSurtir,true));
+error_log($listaSurtir[0]['nombre']);
 $indiceSurtir = 0;
 
 ?>
