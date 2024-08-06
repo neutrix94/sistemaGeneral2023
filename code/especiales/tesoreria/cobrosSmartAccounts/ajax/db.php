@@ -4,19 +4,7 @@
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
 		include('./Logger.php');
-	/*verifica si esta habilitada la funcion de SmartAccounts
-		$sql = "SELECT 
-					habilitar_smartaccounts_netpay AS is_smart_accounts
-				FROM sys_sucursales s
-				WHERE id_sucursal = {$sucursal_id}";
-		$stm = $link->query( $sql ) or die( "Error al consultar si esta habilitado SmartAccounts : {$link->error}" );
-		$row = $stm->fetch_assoc();
-		$is_smart_accounts = $row['is_smart_accounts'];
-		//if( $row['is_smart_accounts'] == 0 ){
-		//	include( '../../../netPay/apiNetPaySinSmartAccount.php' );//sin smartaccounts
-		//}else{
-		//}
-	*/
+		
 		$sql = "SELECT id_sucursal AS system_type FROM sys_sucursales WHERE acceso = 1";
 		$stm = $link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$link->error}" );
 		$row = $stm->fetch_assoc();
@@ -553,10 +541,10 @@
 			}else{
 				if( $tmp_total > $sale_total ){
 					if( $log_id != null ){
-						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', "El pago no puede ser mayor al total de la venta! {$sale_total} - {$tmp_total} = {$rest}", 'N/A' );
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', "El pago no puede ser mayor al total de la venta : {$sale_total} - {$tmp_total} = {$rest}", 'N/A' );
 					}	
 					die( "<div class=\"row\" style=\"padding:15px;\">
-						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta!</h2>
+						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta.</h2>
 						<div class=\"col-3\"></div>
 						<div class=\"col-6\">
 							<br>
@@ -709,7 +697,7 @@
 				$stm = $this->link->query( $sql ) or die( "Error al desahabilitar la afiliacion de sesion de caja por cobro unico {$this->link->error}" );		
 			}
 			$this->link->autocommit( true );
-			return "ok|Pago registrado exitosamente!";
+			return "ok|Pago registrado exitosamente.";
 		}
 
 		public function seekTerminalByQr( $qr_txt, $sucursal_id, $session_id ){
@@ -727,7 +715,7 @@
 					AND sca.habilitado=1";//AND( IF( sca.insertada_por_error_en_cobro = 1, sca.utilizada_en_error = 0, 1=1 ) )
 			$stm = $this->link->query( $sql ) or die( "Error al consultar la afiliacion en la sesion : {$this->link->error}" );
 			if( $stm->num_rows <= 0 ){
-				die( "La terminal '{$qr_txt}' no fue encontrada en la sesion de cajero actual, verifica y vuelve a intentar!" );
+				die( "La terminal '{$qr_txt}' no fue encontrada en la sesion de cajero actual, verifica y vuelve a intentar." );
 			}else{
 				$row = $stm->fetch_assoc();
 				return "ok|" . json_encode( $row );
@@ -775,7 +763,7 @@
 					}
 					$onclick = "delete_payment_saved( {$row['payment_id']}, {$sale_id} );";
 					if( $sale_row['cobro_finalizado'] == 1 || $sale_row['cobro_finalizado'] == '1' ){
-						$onclick = "alert( 'El cobro ya fue finalizado y no es posible eliminar pagos!' );return false;";
+						$onclick = "alert( 'El cobro ya fue finalizado y no es posible eliminar pagos.' );return false;";
 					}
 					$button = "<button
 								type=\"button\"
@@ -1611,12 +1599,8 @@
 				AND tss.id_sucursal = {$store_id}
 				AND sct.id_sesion_caja = {$session_id}
 				AND sct.habilitado = 1";
-				//die( $sql );
-			//$eje=mysql_query($sql)or die("Error al consultar las afiliaciones para este cajero!!!<br>".mysql_error());
 			$stm = $this->link->query( $sql ) or die( "Error al consultar las terminales del cajero : {$this->link->error}" );
-			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
 			$tarjetas_cajero='';
-			//$c=0;//Tarjeta {$c} : <br> <br>
 			$resp .= "<tr id=\"card_payment_row_{$c}\">
 				<td class=\"col-5\">
 					<select id=\"tarjeta_{$c}\" class=\"form-select\">";
@@ -1674,15 +1658,13 @@
 				LEFT JOIN sys_users u ON u.tipo_perfil=perf.id_perfil 
 				WHERE p.id_menu=200
 				AND u.id_usuario={$user_id}";
-			//die($sql);
-			//$eje=mysql_query($sql)or die("Error al consultar el permiso de cajero!!!<br>".mysql_error()."<br>".$sql);
 			$stm = $this->link->query( $sql ) or die("Error al consultar el permiso de cajero : {$sql} : {$this->link->error}");
 			//$es_cajero=mysql_fetch_row($eje);
 			$es_cajero = $stm->fetch_row();
 			$max_execution_time = $es_cajero[2];/*1.2 tiempo espera dinamico 2024-07-04*/
 			$system_type = $es_cajero[1];//tipo de sistema
 			if($es_cajero[0] == 0 ){
-				die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla!!!\nContacte al administrador desl sistema!!!");location.href="../../../../index.php?";</script>');
+				die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla.\nContacta al administrador desl sistema.");location.href="../../../../index.php?";</script>');
 			}
 		//validamos que haya una sesion de caja iniciada con este cajero; de lo contrario avisamos que no hay sesión de caja y no dejamos acceder a esta pantalla
 			$sql="SELECT 
@@ -1691,12 +1673,10 @@
 				WHERE id_cajero=$user_id
 				AND hora_fin='00:00:00' 
 				AND fecha=current_date()";
-		//	die($sql);
-			//$eje=mysql_query($sql)or die("Error al verificar si ya existe una sesion de caja para este cajero!!!\n".mysql_error());
-			$stm = $this->link->query( $sql ) or die( '<script>alert("Es necesario abrir caja antes de cobrar!!!");location.href="../../../../code/especiales/tesoreria/abreCaja/abrirCaja.php?";</script>' );
+			$stm = $this->link->query( $sql ) or die( '<script>alert("Para realizar una venta pide al cajero inciar sesión de caja.");location.href="../../../../code/especiales/tesoreria/abreCaja/abrirCaja.php?";</script>' );
 			$r=$stm->fetch_row();
 			if($r[0]!=1){
-				die('<script>alert("Es necesario abrir caja antes de cobrar!!!");location.href="../../../../code/especiales/tesoreria/abreCaja/abrirCaja.php?";</script>');
+				die('<script>alert("Para realizar una venta pide al cajero inciar sesión de caja.");location.href="../../../../code/especiales/tesoreria/abreCaja/abrirCaja.php?";</script>');
 			}
 		/*Implementacion Oscar 2024-06-24 para creacion / renovacion de Token */
 		//consulta si tiene token activo
@@ -1776,7 +1756,6 @@
 				ON bc.id_caja_cuenta=bcs.id_caja_o_cuenta 
 				WHERE bcs.estado_suc=1
 				AND bcs.id_sucursal = '{$store_id}'";
-			//$eje=mysql_query( $sql )or die("Error al listar los bancos o cajas!!!<br>".mysql_error());
 			$stm = $this->link->query( $sql ) or die("Error al listar los bancos o cajas : {$this->link->error}" );
 			$resp = '<select id="caja_o_cuenta" class="form-select"><option value="0">--SELECCIONAR--</option>';
 			while( $r = $stm->fetch_row() ){
@@ -1855,7 +1834,7 @@
 
 		//validamos que la sesion de cajero sea la misma que la del pago
 			if( $row['id_sesion_caja'] != $session_id ){
-				die( "El cobro no puede ser cancelado porque la sesion de caja actual no corresponde a la sesion que lo cobro!" );// {$row['id_sesion_caja']} != {$session_id}
+				die( "El cobro no puede ser cancelado porque la sesion de caja actual no corresponde a la sesion que lo cobro." );// {$row['id_sesion_caja']} != {$session_id}
 			}
 			
 			$this->link->autocommit( false );//inicio de transaccion
@@ -2164,7 +2143,7 @@
 							$host = base64_decode( $tmp_[0] );
 							$carpeta_path = base64_decode( $tmp_[1] );
 						}else{
-							die("No hay archivo de configuración!!!");
+							die("No hay archivo de configuración.");
 						}
 						$update_endpoint = "{$host}/{$carpeta_path}/rest/netPay/actualizar_datos_transacciones";
 					//consulta token
@@ -2239,7 +2218,7 @@
 				WHERE p.id_pedido = {$clave}
 				GROUP BY p.id_pedido";
 	$CONSULTA_PAGOS_PENDIENTES_DE_COBRAR = $sql;
-			$eje=$this->link->query($sql) or die("Error al consultar los datos del pedido!!!\n {$this->link->error}" );
+			$eje=$this->link->query($sql) or die("Error al consultar los datos del pedido.\n {$this->link->error}" );
 			$r=$eje->fetch_assoc();
 
 	$CONSULTAS_SQL[] = array( "CONSULTA_PAGOS_PENDIENTES_DE_COBRAR"=>$CONSULTA_PAGOS_PENDIENTES_DE_COBRAR, "RESULTADO"=>$r );
@@ -2285,11 +2264,11 @@
 					GROUP BY d.id_devolucion";
 	$CONSULTA_VERIFICA_STATUS_DEVOLUCION = $sql;
 	$CONSULTAS_SQL[] = array( "CONSULTA_VERIFICA_STATUS_DEVOLUCION"=>$CONSULTA_VERIFICA_STATUS_DEVOLUCION );
-			$eje = $this->link->query($sql)or die("Error al consultar las devoluciones relacionadas a esta nota!!!\n{$this->link->error} : {$sql}" );
+			$eje = $this->link->query($sql)or die("Error al consultar las devoluciones relacionadas a esta nota.\n{$this->link->error} : {$sql}" );
 			if( $eje->num_rows > 0 ){
 				$rd = $eje->fetch_assoc();
 				if( $rd['status'] != 3 && $rd['status'] != '' ){
-					die( "No se puede hacer un cobro sobre una nota con devolucion pendiente, finaliza la devolucion y vuelve a intentar! {$rd[1]}" );
+					die( "No se puede hacer un cobro sobre una nota con devolucion pendiente, finaliza la devolucion y vuelve a intentar. {$rd[1]}" );
 				}
 			}
 	//verifica si hay una devolucion ligada al pedido sin cajero

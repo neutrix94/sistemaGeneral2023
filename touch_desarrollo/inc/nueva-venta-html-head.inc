@@ -1735,7 +1735,7 @@ var hay_paquete=0;
 		aux=res.split('|');
 		/**/
         if(aux[0]=='sin_sesion_caja'){
-            alert("No se pueden hacer ventas porque el cajero no ha iniciado sesión de caja\nPida al cajero que inicie su sesión de caja.");
+            alert("No se pueden hacer ventas porque el cajero no ha iniciado sesión de caja.\nPide al cajero que inicie su sesión de caja.");
             return false;
         }
 

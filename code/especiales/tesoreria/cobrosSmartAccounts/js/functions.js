@@ -6,7 +6,7 @@ var debug_json = "";
 	function validateNumberInput(input) {
 		//input.value = input.value.replace(/[^0-9]/g, '');
 		if( isNaN( input.value ) ){
-			alert( "En este campo solo puedes capturar números!" );
+			alert( "En este campo solo puedes capturar números." );
 			input.value = '';
 			var id = input.id + `_alerta`;
 			$( `#${id}` ).removeClass( "hidden" );
@@ -92,7 +92,7 @@ var debug_json = "";
 						alert(dat);return false;
 					}else{
 						if( aux[2] == 'sin_sesion' ){
-							alert( "No hay sesion de cajero activa, inicia sesion para continuar!" );
+							alert( "No hay sesion de cajero activa, inicia sesion para continuar." );
 							location.reload();
 							return false;
 						}else{
@@ -389,7 +389,7 @@ hljs.highlightAll();
 			$("#efectivo_devolver").val(parseFloat(recibido-monto_pago));//total_cobros
 			//$( '#monto_cobro_emergente' ).val();
 		}else if( monto_pago == 0 || monto_pago == '' || monto_pago < 0 ){
-			alert( "El pago debe de ser mayor a cero!" );
+			alert( "El pago debe de ser mayor a cero." );
 			$( '#monto_cobro_emergente' ).focus();
 			return false;
 		}		
@@ -399,13 +399,13 @@ hljs.highlightAll();
 	function agrega_cheque_transferencia(){
 		var id_caja_cuenta = $( '#caja_o_cuenta' ).val();
 		if( id_caja_cuenta <= 0 ){
-			alert( "Es necesario que elijas una caja o cuenta correcta para continuar!" );
+			alert( "Es necesario que elijas una caja o cuenta correcta para continuar." );
 			$( '#tarjeta_0' ).focus();
 			return false;
 		}
 		var amount = $( '#monto_cheque_transferencia' ).val();
 		if( amount <= 0 ){
-			alert( "El monto no puede ir vacio!" );
+			alert( "El monto no puede ir vacio." );
 			return false;
 		}
 		var url = "ajax/db.php?fl=insertCashPayment&ammount=" + amount + "&tipo_pago=8";
@@ -424,7 +424,7 @@ hljs.highlightAll();
 		var resp = ajaxR( url );
 		//alert( resp );
 		if( resp == 'ok|' ){
-			alert( "Pago agregado con exito!" );
+			alert( "Pago agregado con exito." );
 			carga_pedido(  $( '#id_venta' ).val()  );
 			$( '#caja_o_cuenta' ).val( '0' );
 			$( '#monto_cheque_transferencia' ).val( '' );
@@ -518,7 +518,7 @@ var cont_cheques_transferencia=0;
 	function agregar_fila(caja,monto,texto){
 		var observacion=$("#referencia_cheque_transferencia").val();
 		if(observacion.length<=0){
-			alert("La referencia no puede ir vacía!!!");
+			alert("La referencia no puede ir vacía.");
 			return false;
 		}
 		cont_cheques_transferencia+=1;
@@ -560,8 +560,8 @@ var cont_cheques_transferencia=0;
 				}
 			});
 
-			if( montos_smart_accounts != 0 && montos_smart_accounts != 0.00 ){
-				$( '.emergent_content' ).html( `<h2 class="text-center">No se puede finalizar el cobro porque hay pagos de netPay pendientes ${montos_smart_accounts}!</h2>
+			if( montos_smart_accounts != 0 && montos_smart_accounts != 0.00 ){//${montos_smart_accounts}
+				$( '.emergent_content' ).html( `<h2 class="text-center">No se puede finalizar el cobro porque hay pagos de netPay pendientes .</h2>
 				<div class="text-center"><br>
 					<button
 						type="button"
@@ -704,7 +704,7 @@ var cont_cheques_transferencia=0;
 			amount_sum += parseFloat( $( '#t' + index ).val().replaceAll( ',', '' ) );
 		});
 		if( stop != false ){
-			alert( "Hay cobros con tarjeta sin monto, verfica y vuelve a intentar!" );
+			alert( "Hay cobros con tarjeta sin monto, verfica y vuelve a intentar." );
 			$( '#t' + stop ).select();
 			return false;
 		}
@@ -712,7 +712,7 @@ var cont_cheques_transferencia=0;
 			amount_sum += parseFloat( $( '#efectivo' ).val() );
 		}
 		if( amount_sum != amount_total ){
-			alert( "La suma de los montos es diferente del total!" );
+			alert( "La suma de los montos es diferente del total." );
 			return false;
 		}
 	//muestra los botones para enviar la peticion
@@ -733,7 +733,7 @@ var cont_cheques_transferencia=0;
 	//obtiene el valor del qr de la terminal
 		var qr_txt = $( '#terminal_qr_input' ).val().trim();
 		if( qr_txt == '' ){
-			alert( "El codigo qr no puede ir vacio!" );
+			alert( "El codigo qr no puede ir vacio." );
 			$( '#terminal_qr_input' ).focus();
 			return false;
 		}	
@@ -798,7 +798,7 @@ var cont_cheques_transferencia=0;
 		//inserta pago en efectivo
 			amount = $( '#monto_cobro_emergente' ).val();
 			if( amount <= 0 ){
-				alert( "El monto del pago debe de ser mayor a cero!" );
+				alert( "El monto del pago debe de ser mayor a cero." );
 				$( '#monto_cobro_emergente' ).focus();
 				return false;
 			}
@@ -860,19 +860,19 @@ var cont_cheques_transferencia=0;
 	function setPaymentWhithouthIntegration(){
 		var afiliation_id = $( '#afiliation_select_tmp' ).val();
 		if( afiliation_id == '' || afiliation_id == 0 ){
-			alert( "La afiliacion es invalida!" );
+			alert( "La afiliacion es invalida." );
 			$( '#afiliation_select_tmp' ).focus();
 			return false;
 		}
 		var ammount = $( '#ammount_input_tmp' ).val();
 		if( ammount <= 0 ){
-			alert( "El monto debe de ser mayor a cero!" );
+			alert( "El monto debe de ser mayor a cero." );
 			$( '#ammount_input_tmp' ).focus();
 			return false;
 		}
 		var authorization_number = $( '#authorization_input_tmp' ).val();
 		if( authorization_number <= 0 ){
-			alert( "El número de autorizacion no puede ir vacío!" );
+			alert( "El número de autorizacion no puede ir vacío." );
 			$( '#authorization_input_tmp' ).focus();
 			return false;
 		}
@@ -924,7 +924,7 @@ var cont_cheques_transferencia=0;
 		if( resp != 'ok' ){
 			alert( "Error al eliminar el pago : " + resp );
 		}else{
-			alert( "El pago fue eliminado exitosamente!" );
+			alert( "El pago fue eliminado exitosamente." );
 			carga_pedido( sale_id );
 		}
 	}
@@ -943,11 +943,11 @@ var cont_cheques_transferencia=0;
 		//console.log( curent_afiliations_tmp );
 		var afiliation_id = $( '#afiliacion_combo_tmp' ).val();
 		if( afiliation_id == '' || afiliation_id == null || afiliation_id == 0 || afiliation_id == '0' ){
-			alert( "Pimero elije una afiliación válida!" );
+			alert( "Pimero elije una afiliación válida." );
 			return false;
 		}
 		if( curent_afiliations_tmp.indexOf( afiliation_id ) != -1 ){
-			alert( "Esta terminal ya existe y no puede ser agregada nuevamente!" );
+			alert( "Esta terminal ya existe y no puede ser agregada nuevamente." );
 			return false;
 		}
 		var afiliation_description = $( '#afiliacion_combo_tmp option:selected' ).text();
@@ -986,7 +986,7 @@ var cont_cheques_transferencia=0;
 		var password = $( '#mannager_password' ).val();
 		var afiliation_id = $( '#afiliacion_combo_tmp' ).val();
 		if( password.length <= 0 ){
-			alert( "La contraseña del encargado no puede ir vacía!" );
+			alert( "La contraseña del encargado no puede ir vacía." );
 			return false;
 		}
 		var session_id = $( '#session_id' ).val();
@@ -1013,11 +1013,11 @@ var cont_cheques_transferencia=0;
 		var password = $( '#mannager_password' ).val();
 		var terminal_id = $( '#terminal_combo_tmp' ).val();
 		if( terminal_id == '' || terminal_id == null || terminal_id == 0 || terminal_id == '0' ){
-			alert( "Pimero elije una afiliación válida!" );
+			alert( "Pimero elije una afiliación válida." );
 			return false;
 		}	
 		if( password.length <= 0 ){
-			alert( "La contraseña del encargado no puede ir vacía!" );
+			alert( "La contraseña del encargado no puede ir vacía." );
 			return false;
 		}
 		var url = "ajax/db.php?fl=agregarTerminalSesion&session_id=" + session_id;
