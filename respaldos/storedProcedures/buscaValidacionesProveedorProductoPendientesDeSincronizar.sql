@@ -14,7 +14,7 @@ BEGIN
 		FROM ec_pedidos_validacion_usuarios pvu
 		LEFT JOIN ec_pedidos_detalle pd
 		ON pvu.id_pedido_detalle = pd.id_pedido_detalle
-		WHERE pvu.id_sucursal = ( store_id = -1, origin_store_id, store_id )
+		WHERE pvu.id_sucursal = store_id
 		AND ( pvu.folio_unico IS NULL )
 		AND pvu.validacion_finalizada = 1/*3-Julio se agrega validacion_finalizada*/
 		AND IF( pd.id_pedido_detalle IS NOT NULL, pd.folio_unico IS NOT NULL, 1 = 1 )
