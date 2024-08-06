@@ -84,7 +84,18 @@
 
 	function get_reverse_form(){
 		var content = `<div class="row" style="padding:10px !important;">
-			<div class="text-end">
+		<div class="row">
+			<div class="col-6">
+				<button
+					type="button"
+					class="btn btn-warning"
+					onclick="rePrintByOrderIdManualHelper();"
+					style="border-radius:100% !important;"
+				>
+					<i class="">?</i>
+				</button>
+			</div>
+			<div class="col-6 text-end">
 				<button
 					type="button"
 					class="btn btn-light"
@@ -92,8 +103,10 @@
 				>
 					<i class="text-danger">X</i>
 				</button>
+				<br><br>
 			</div>
-			<input type="text" class="form-control" id="reverse_input">
+		</div>
+			<input type="text" class="form-control" id="reverse_input" placeholder="RNN-Terminal">
 			<p> </p>
 			<p> </p>
 			<button
@@ -106,6 +119,22 @@
 		</div>`;
 		$( '.emergent_content' ).html( content );
 		$( '.emergent' ).css( 'display', 'block' );
+	}
+
+	function rePrintByOrderIdManualHelper(){
+		var content = `<div class="row">
+				<div class="text-end"><button class="btn btn-light" onclick="close_emergent_2();">X</button></div>
+				<h2 class="text-center">La función de reimpresión se genera ingresado el order id, cuya estructura es el valor <b class="text-success">RRN</b>-<b class="text-primary">Terminal</b> del boucher que se imprime al realizar un cobro</h2>
+				<div class="row">
+					<div class="col-2"></div>
+					<div class="col-8 text-center">
+						<img src="../../../../img/NetPay/boucher_netpay.png" width="40%">
+						<h2><b class="text-success">240806114259</b>-<b class="text-primary">1494113054</b></h2>
+					</div>
+				</div>
+			</div>`;
+		$( '.emergent_content_2' ).html( content );
+		$( '.emergent_2' ).css( 'display', 'block' );
 	}
 
 	function show_reprint_view(){
