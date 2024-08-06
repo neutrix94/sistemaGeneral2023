@@ -190,7 +190,7 @@ $link->autocommit( false );
 
 			$sql = "SELECT LAST_INSERT_ID() AS last_id";
 			$stm_3 = $link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado por procedure : {$sql} : {$link->error}" );
-			$movement_row = $stm->fetch_assoc();
+			$movement_row = $stm_3->fetch_assoc();
 			$id_movimiento = $movement_row['movement_id'];
 		}else{
 			$movement_row = $stm->fetch_assoc();
