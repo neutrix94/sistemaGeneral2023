@@ -27,7 +27,7 @@ $indiceSurtir = 0;
     <!-- Tabla principal -->
     <div class="container mt-5">
         <center><p id="indexSurtimiento">Partida: <span id="index">0 de 0</span></p></center>
-        <h2 id="nombreProducto">Nombre del Producto</h2>
+        <center><h2 id="nombreProducto">Nombre del Producto</h2></center>
         <h3 id="ubicacionProducto">Ubicación del Producto</h3>
         <b><p id="cantidadPiezas">Piezas: <span id="cantidad">0</span></p></b>
         
@@ -58,7 +58,7 @@ $indiceSurtir = 0;
                 </div>
                 <div class="modal-body">
                     <h6 class="text-dark">No hay más productos por surtir.</h6>
-                    <p class="text-muted">Entrega la mercancía a: <span id="nombreVendedor"></span></p>
+                    <p class="text-muted">Entrega la mercancía a: <b><span id="nombreVendedor"></span></b></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" onclick="window.location.href='lista.php'">Aceptar</button>
@@ -92,7 +92,7 @@ $indiceSurtir = 0;
                 alert('Por favor, ingrese el código del producto.');
                 return;
             }
-            if(codigoProducto == listaSurtir[indiceSurtir].codigo_barras_4 ){
+            if(listaSurtir[indiceSurtir].codigos_barras.split(",").includes(codigoProducto)){
                 document.getElementById('surtidoGroup').style.display = 'block';
                 document.getElementById('cantidadSurtida').value = Number(listaSurtir[indiceSurtir].cantidad_solicitada);
                 document.getElementById('cantidadSurtida').focus();
@@ -177,14 +177,6 @@ $indiceSurtir = 0;
                   }
               });
               
-              indiceSurtir++;
-              if(indiceSurtir >= listaSurtir.length){
-                //Concluyó asignación
-                surtidoCompletado();
-              }else{
-                //Sigue con siguiente producto
-                refreshView();
-              }
               //Limpia inputs
               document.getElementById('cantidadSurtida').value = '';
               document.getElementById('codigoProducto').value = '';
