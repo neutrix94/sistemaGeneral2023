@@ -257,7 +257,7 @@ class SurtimientoCRUD {
                         pp.id_producto
                 ) AS pp_data ON pp_data.id_producto = sd.id_producto
             WHERE  
-                sd.id_surtimiento = 'cd46c94a-4bc7-4146-93f3-3569c46ef278'
+                sd.id_surtimiento = '{$id}'
                 -- and sd.id_asignado='104'
                 AND sd.estado IN (1,2);");
         
@@ -274,9 +274,20 @@ class SurtimientoCRUD {
     }
     
     public function productoSurtido($item = null){
+        //Actualiza detalle
         $query = "UPDATE ec_surtimiento_detalle sd SET sd.fecha_modificacion = now(), sd.estado = '3', sd.cantidad_surtida ='".$item['cantidad_surtida']."' WHERE sd.id = '".$item['id']."';";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
+        //Actualiza cabecera
+        $queryS = "UPDATE ec_surtimiente s SET s.fecha_modificacion = now(), sd.estado = '3' WHERE s.id IN
+          (SELECT sd.id_surtimiento
+            FROM ec_surtimiento_detalle sd
+            WHERE sd.id_surtimiento='".$item['id']."'
+            GROUP BY sd.id_surtimiento
+            HAVING SUM(CASE WHEN sd.estado NOT IN (1, 2) THEN 0 ELSE 1 END) = 0 );";
+        $stmt = $this->conn->prepare($queryS);
+        $stmt->execute();
+        
         $stmt->close();
         $this->conn->close();
     }
