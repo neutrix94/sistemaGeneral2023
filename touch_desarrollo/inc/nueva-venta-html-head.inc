@@ -1777,14 +1777,18 @@ var hay_paquete=0;
 		return retval;
 	}
 
+    function change_to_upercase( obj ){
+        obj.value = obj.value.toUpperCase();
+    }
+
 /*implementacion Oscar 2023 para imprimir, visualizar cotizacion*/
     function quotationEmergent( sale_id ){
         var quotation_content = `<div class="row text-center" id="quotation_container" style="background-color : white;">
-                <h2>Escribe "Es cotizacion" para continuar</h2>
+                <h2>Escribe "ES COTIZACION" para continuar</h2>
                 <div class="col-2"></div>
                 <div class="col-8">
                 <br>
-                <input type="text" placeholder="Es cotizacion" class="form-control" id="quotation_words">
+                <input type="text" placeholder="ES COTIZACION" class="form-control" id="quotation_words" onkeyup="change_to_upercase( this );">
                     <br><br>
                     <button
                         class="btn btn-warning form-control"
@@ -1805,12 +1809,15 @@ var hay_paquete=0;
         </div>`;
         $( '#contEmerge' ).html( quotation_content );
         $( '#emergePermisos' ).css( 'display', 'block' );
+            setTimeout(() => {
+                $( '#quotation_words' ).focus();
+            }, 200 );    
     }
 
     function printQuotation( sale_id, pdf = false ){
     //valida frase
-        if( $( '#quotation_words' ).val().toLowerCase() != 'es cotizacion' ){
-            alert( 'Es necesario que escribas "Es cotizacion"' );
+        if( $( '#quotation_words' ).val().toLowerCase() != 'es cotizacion' && $( '#quotation_words' ).val().toLowerCase() != 'es cotización' ){
+            alert( 'Es necesario que escribas "ES COTIZACION"' );
             $( '#quotation_words' ).select();
             return false;
         }
