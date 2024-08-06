@@ -73,10 +73,10 @@ CREATE PROCEDURE spMovimientoAlmacenDetalle_actualiza ( IN id_movimiento_detalle
 
 	IF( cantidad_nueva != cantidad_antes )
 	THEN
-        UPDATE ec_movimiento_detalle SET cantidad = cantidad_nueva, cantidad_surtida = cantidad_nueva WHERE id_movimiento_almacen = id_movimiento_detalle;
+        UPDATE ec_movimiento_detalle SET cantidad = cantidad_nueva, cantidad_surtida = cantidad_nueva WHERE id_movimiento_almacen_detalle = id_movimiento_detalle;
 	/*resta la cantidad anterior*/
 		UPDATE ec_almacen_producto ap
-			SET ap.inventario = ( ap.inventario - ( cantidad_antes * tipo_afecta ) ) + ( cantidad_antes * tipo_afecta )
+			SET ap.inventario = ( ap.inventario - ( cantidad_antes * tipo_afecta ) ) + ( cantidad_nueva * tipo_afecta )
 		WHERE ap.id_almacen = warehouse_id
 		AND ap.id_producto = product_id;
 /*Modifica el movimiento a nivel proveedor producto*/

@@ -19,13 +19,15 @@ CREATE PROCEDURE spMovimientoDetalleProveedorProducto_actualiza( IN id_movimient
         mdpp.folio_unico,
         mdpp.cantidad,
         mdpp.id_sucursal,
-        mdpp.id_almacen
+        mdpp.id_almacen,
+        tm.afecta
     INTO 
         product_provider_movement_id,
         product_provider_movement_unique_folio,
         cantidad_anterior,
         movement_store_id,
-        warehouse_id
+        warehouse_id,
+        movement_type
     FROM ec_movimiento_detalle_proveedor_producto mdpp
     LEFT JOIN ec_movimiento_detalle md
     ON md.id_movimiento_almacen_detalle = mdpp.id_movimiento_almacen_detalle
