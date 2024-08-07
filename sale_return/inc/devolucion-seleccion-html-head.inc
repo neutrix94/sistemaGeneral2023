@@ -977,7 +977,7 @@
         
 /*Implementación Oscar 2024-08-06 para no dejar eliminar filas si se dió click en el botón de devolución completa*/
         if(es_dev_completa==1){
-            if( confirm("No se pueden agregar más productos porque se ha seleccionado una devolución completa.\nDeseas recargar la página para comenzar de nuevo la devolución?" ) ){
+            if( confirm("No se pueden quitar productos porque se ha seleccionado una devolución completa.\nDeseas recargar la página para comenzar de nuevo la devolución?" ) ){
                 location.reload();
             }else{
                 return false;
