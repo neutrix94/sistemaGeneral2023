@@ -1,20 +1,15 @@
 <?php
   class tokenValidation{
-  class tokenValidation{
       public function validaToken($token){
-      public function validaToken($token){
-        $db = new db();
+
         $db = new db();
         $db = $db->conectDB();
-        $db = $db->conectDB();
-        $sqlToken = "SELECT token FROM api_token WHERE token='{$token}' AND expired_in>now();";
         $sqlToken = "SELECT token FROM api_token WHERE token='{$token}' AND expired_in>now();";
         $resultadoToken = $db->query($sqlToken);
-        $resultadoToken = $db->query($sqlToken);
-        return $resultadoToken;
+
         return $resultadoToken;
       }
-      }
+
       public function verificaExistenciaToken( $token ){
         $db = new db();
         $db = $db->conectDB();
@@ -31,6 +26,7 @@
           }
         }
       }
+
       public function refrescar_token( $token, $db ){
         $sqlAPIConfig="SELECT value FROM api_config c WHERE c.key='token' and name='time_value' limit 1";//Genera sentencia recuperar tiem_value
         $resultadoConfig = $db->query($sqlAPIConfig);
@@ -44,6 +40,4 @@
         }
       }
   }
-  }
-?>
 ?>
