@@ -17,13 +17,13 @@
     function regresaTodo(){
     /*Implementacion Oscar 04.12.2019 para no dejar devolver todo si hay algun producto en el grid de la devolucion*/
         if($("#listaProductos tr").length>1){
-            alert("Para devolver todo es necesario que no haya productos capturados previamente\n"+
-                "Elimine los productos que haya agregado para poder devolver todo!!!");
+            alert("Para devolver todo es necesario que no haya productos capturados previamente.\n"+
+                "Elimina los productos que hayas agregado para poder devolver todo.");
             return false;
         }
     /*Fin de cambio Oscar 04.12.2019*/
         if(es_dev_completa==1){
-            alert("La nota ya fue agregada completamente!!!");
+            alert("La nota ya fue agregada completamente.");
             return false;
         }
         var tabla=document.getElementById("listaProductos");
@@ -458,7 +458,7 @@
     function agregaFila(f){
     //validamos que no sea devolución completa
         if(es_dev_completa==1){
-            if(confirm("No se pueden agregar más productos porque se ha seleccionado una devolución completa!!!\nDeseas recargar la pagina para comenzar de nuevo la devolución?")){
+            if(confirm("No se pueden agregar más productos porque se ha seleccionado una devolución completa.\nDeseas recargar la página para comenzar de nuevo la devolución?")){
                 location.reload();
             }
             $("#cantidad2").val("");
@@ -503,7 +503,7 @@
         //console.log( url );
         //alert("Respuesta: "+url);
         if(url=='no'){
-            alert('la cantidad de devolución de este producto es mayor a la cantidad vendida!!!');
+            alert('la cantidad de devolución de este producto es mayor a la cantidad vendida.');
             $("#cantidad2").select();
             return false;
         }
@@ -974,6 +974,17 @@
       }
 
 	function eliminarItem (item){
+        
+/*Implementación Oscar 2024-08-06 para no dejar eliminar filas si se dió click en el botón de devolución completa*/
+        if(es_dev_completa==1){
+            if( confirm("No se pueden quitar productos porque se ha seleccionado una devolución completa.\nDeseas recargar la página para comenzar de nuevo la devolución?" ) ){
+                location.reload();
+            }else{
+                return false;
+            }
+        }
+/*Fin de cambio Oscar 2024-08-06*/
+        
 		var tds=$(item).parents("tr").children("td");
 		$(item).parents ("tr.move").first ().remove ();
         calculaTotalProd();
@@ -1351,7 +1362,7 @@ return false;*/
             });
 
             $("#salirbtn").on ("click", function () {
-                if (confirm ("¿Realmente desea cerrar sin guardar?")) {
+                if (confirm ("¿Realmente deseas cerrar sin guardar?")) {
                     top.location.href = "index.php";
                 }
             });
@@ -1396,7 +1407,7 @@ return false;*/
 
            
             $("#menu_cerrar, #cerrar").on ("click", function (){
-                    if(!confirm("Esta operación regresará los productos al inventario, ¿Desea continuar?")) {
+                    if(!confirm("Esta operación regresará los productos al inventario, ¿Deseas continuar?")) {
                 //regresamos referencia a un valor vacío
                     sa=0;
                     return false;

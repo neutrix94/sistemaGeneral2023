@@ -11,7 +11,7 @@
 	function getCashPaymentForm(){
 		var amount = $( '#efectivo' ).val();
 		if( amount <= 0 ){
-			alert( "La cantidad del pago debe de ser mayor a cero!" );
+			alert( "La cantidad del pago debe de ser mayor a cero." );
 			$( '#efectivo' ).select();
 			return false;
 		}
@@ -25,8 +25,9 @@
 						id="monto_cobro_emergente" 
 						class="form-control" 
 						onkeydown="prevenir(event);" 
-						onkeyup="calcula_cambio();"
+						onkeyup="validateNumberInput( this );calcula_cambio();"
 					>
+				<p class="text-start text-danger hidden" id="monto_cobro_emergente_alerta">Campo numérico*</p>
 			</div>
 			<div class="col-6">
 				<label class="text-primary">Pendiente: </label>
@@ -46,8 +47,9 @@
 						id="efectivo_recibido" 
 						class="form-control" 
 						onkeydown="prevenir(event);" 
-						onkeyup="calcula_cambio();"
+						onkeyup="validateNumberInput( this );calcula_cambio();"
 					>
+				<p class="text-start text-danger hidden" id="efectivo_recibido_alerta">Campo numérico*</p>
 			</div>
 			<div class="col-6">
 				<label class="text-primary">Monto de cambio : </label>
@@ -84,7 +86,18 @@
 
 	function get_reverse_form(){
 		var content = `<div class="row" style="padding:10px !important;">
-			<div class="text-end">
+		<div class="row">
+			<div class="col-6">
+				<button
+					type="button"
+					class="btn btn-warning"
+					onclick="rePrintByOrderIdManualHelper();"
+					style="border-radius:100% !important;"
+				>
+					<i class="">?</i>
+				</button>
+			</div>
+			<div class="col-6 text-end">
 				<button
 					type="button"
 					class="btn btn-light"
@@ -92,8 +105,10 @@
 				>
 					<i class="text-danger">X</i>
 				</button>
+				<br><br>
 			</div>
-			<input type="text" class="form-control" id="reverse_input">
+		</div>
+			<input type="text" class="form-control" id="reverse_input" placeholder="RNN-Terminal">
 			<p> </p>
 			<p> </p>
 			<button
@@ -106,6 +121,22 @@
 		</div>`;
 		$( '.emergent_content' ).html( content );
 		$( '.emergent' ).css( 'display', 'block' );
+	}
+
+	function rePrintByOrderIdManualHelper(){
+		var content = `<div class="row">
+				<div class="text-end"><button class="btn btn-light" onclick="close_emergent_2();">X</button></div>
+				<h2 class="text-center">La función de reimpresión se genera ingresado el order id, cuya estructura es el valor <b class="text-success">RRN</b>-<b class="text-primary">Terminal</b> del boucher que se imprime al realizar un cobro</h2>
+				<div class="row">
+					<div class="col-2"></div>
+					<div class="col-8 text-center">
+						<img src="../../../../img/NetPay/boucher_netpay.png" width="40%">
+						<h2><b class="text-success">240806114259</b>-<b class="text-primary">1494113054</b></h2>
+					</div>
+				</div>
+			</div>`;
+		$( '.emergent_content_2' ).html( content );
+		$( '.emergent_2' ).css( 'display', 'block' );
 	}
 
 	function show_reprint_view(){
@@ -272,7 +303,6 @@
 						<div class="col-9">${resp}</div>
 						<div class="col-3 text-center">	
 							<button type="button" class="btn btn-info" onclick="show_afiliations_info();">?</span>
-							<!--input type="checkbox" style="display:none">
 							Cobro único :
 							<p id="afiliacion_por_error" error="0" class="icon-toggle-off text-success fs-3 text-center" onclick="cambiar_check_error(this);"></p-->
 						</div>
