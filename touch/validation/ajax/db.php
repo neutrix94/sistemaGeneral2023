@@ -1300,6 +1300,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 								type=\"number\" 
 								class=\"form-control\"
 								id=\"pieces_quantity_tmp\"
+								min=\"1\"
 								onkeyup=\"validate_no_decimals( this );\"
 							>
 							<br>
@@ -1404,11 +1405,11 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 							<td id=\"{$prefix}vrs_row_1_{$counter}\" class=\"text-center\" width=\"33.3%\">{$row['provider_clue']}</td>
 							<td class=\"text-end\" width=\"33.3%\">
 								<input 
-									type=\"number\" 
+									type=\"text\"
 									id=\"{$prefix}vrs_row_2_{$counter}\"
 									value=\"\"
 									min=\"0\"
-									onkeyup=\"prevent_negative_number( this, event );\"
+									onkeyup=\"prevent_negative_number_( this, event );\"
 									class=\"form-control text-end\"
 									" . ( $is_editable != true ? ' readonly' : '' ) . 
 									( $is_editable == true ? "onchange=\"recalculateReturnProduct();\"" : "" ) 

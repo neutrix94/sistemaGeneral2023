@@ -7,7 +7,7 @@
 				id="return_seeker" 
 				class="form-control"
 				placeholder="Escaner código de barras / Buscar producto"
-				onkeyup="seek_product_to_return( this, event );"
+				onkeyup="evitarCaracteresEspeciales( event );seek_product_to_return( this, event );"
 			>
 			<button
 				type="button"
@@ -101,7 +101,7 @@
 			WHERE 1/*ax.quantity > 0 deshabilitado por Oscar 2023*/
 			GROUP BY ax.row_id";
 		//echo $sql;
-		$eje = $link->query($sql)or die( "Error al consultar las herramientas!!!<br>{$link->error}<br><textarea>{$sql}</textarea>" );
+		$eje = $link->query($sql)or die( "Error al consultar las herramientas : <br>{$link->error}<br><textarea>{$sql}</textarea>" );
 
 		while( $r = $eje->fetch_row() ){
 			$resp .= '<div class="accordion-item">';
@@ -194,11 +194,11 @@
 						<div class="col-12 text-center">
 							<h5 style="font-size : 300%;">Obligatorio revisar físicamente este producto. </h5>
 							<h5 style="font-size : 200%;">En caso de tener este producto empacado, debes sacarlo para contarlo</h5>
-							<p style="font-size : 150%;">Escribe la palabra 'desempacado' para continuar</p>
+							<p style="font-size : 150%;">Escribe la palabra 'DESEMPACADO' para continuar</p>
 						</div>
 						<div class="col-2"></div>
 						<div class="col-8">
-							<input type="text" id="return_msg_validation" class="form-control">
+							<input type="text" id="return_msg_validation" class="form-control" onkeyup="string_to_upper_case( this );">
 							<br>
 							<button
 								class="btn btn-success form-control"
@@ -213,15 +213,19 @@
 		$( '.emergent_content_2' ).html( resp );
 		$( '.emergent_2' ).css( 'display', 'block' );
 	}
+
+	function string_to_upper_case( obj ){
+		$( obj ).val( $( obj ).val().toUpperCase() );
+	}
 	function hide_return_message(){
 		if( $( '#return_msg_validation' ).val() == '' ){
-			alert( "El campo de confirmación no puede ir vacío!" );
+			alert( "El campo de confirmación no puede ir vacío." );
 			$( '#return_msg_validation' ).focus();
 			return false;
 		}
 
 		if( $( '#return_msg_validation' ).val().toLowerCase() != 'desempacado' ){
-			alert( "El mesnaje de confirmación es incorrecto, escribe la palabra 'desempacado' para continuar!" );
+			alert( "El mesnaje de confirmación es incorrecto, escribe la palabra 'DESEMPACADO' para continuar." );
 			$( '#return_msg_validation' ).select();
 			return false;
 		}
@@ -315,5 +319,22 @@
 		}
 		global_ticket_has_return = 1;
 		close_emergent();
+	}
+
+	function prevent_negative_number_( obj, e ){
+		if( isNaN( obj.value ) ){
+			alert( "En este campo solo puedes capturar números." );
+			obj.value = '';
+			var id = obj.id + `_alerta`;
+			$( `#${id}` ).removeClass( "hidden" );
+			setTimeout( function(){
+				$( `#${id}` ).addClass( "hidden" );
+			}, 5000 );
+		}
+		if( obj <= 0 ){
+			alert( "No son admitidos valores menores a cero." );
+			$( obj ).val('');
+			return false;
+		}
 	}
 </script>
