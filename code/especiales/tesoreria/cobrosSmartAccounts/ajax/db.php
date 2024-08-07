@@ -2077,6 +2077,33 @@
 		}
 
 		public function getSaleData( $clave, $sale_folio, $user_id, $log_id = null ){
+		//consulta si tiene devolucion pendiente
+			$sql = "SELECT
+						prd.id_sesion_caja_pedido_relacionado,
+						p.folio_nv,
+						p1.folio_nv AS folio_origen
+					FROM ec_pedidos_relacion_devolucion prd
+					LEFT JOIN ec_pedidos p
+					ON p.id_pedido = prd.id_pedido_relacionado
+					LEFT JOIN ec_pedidos p1
+					ON p1.id_pedido = prd.id_pedido_original
+					WHERE prd.id_pedido_original = {$clave}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar si tiene devolucion pendiente : {$sql} : {$this->link->error}");
+			if( $stm->num_rows > 0 ){
+				$row = $stm->fetch_assoc();
+				if( $row['id_sesion_caja_pedido_relacionado'] == 0 ){
+					die( "<div class=\"text-center\">
+							<h2 class=\"\">El ticket <b class=\"text-danger\">{$row['folio_origen']}</b> tiene una devolución pendiente, escanea el ticket <b class=\"text-success\">{$row['folio_nv']}</b> para continuar.</h2>
+							<br><br>
+							<button 
+								type=\"\button\"
+								class=\"btn btn-success\"
+								onclick=\"location.reload();\"
+							>Aceptar y recargar página
+							</button>
+						</div>" );//definir mensaje
+				}
+			}
 		//consulta el id de sucursal de acceso 
 			$sql = "SELECT id_sucursal AS system_type FROM sys_sucursales WHERE acceso = 1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$sql} : {$this->link->error}");

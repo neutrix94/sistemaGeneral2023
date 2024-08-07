@@ -8,17 +8,17 @@
 ?>
 	<div class="row text-center">
 		<div class="col-12 text-center">
-			<button
+			<!--button
 				class="btn btn-danger"
 				onclick="close_emergent();"
 			>
 				<i class="icon-cancel-circled">Cancelar y cerrar</i>
-			</button>
+			</button-->
 		</div>
 		<!--Deshabilitado poroscar 2024-07-05 div class="col-6 text-center">
 			<button
 				class="btn btn-info"
-				onclick="buscar_repuesta_peticion_por_folio( '<?php echo $resp->folio_unico_transaccion;?>' );"
+				onclick="buscar_repuesta_peticion_por_folio( '<?php //echo $resp->folio_unico_transaccion;?>' );"
 			>
 				<i class="icon-arrows-cw">Recargar respuesta</i>
 			</button>

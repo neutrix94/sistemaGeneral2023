@@ -137,8 +137,10 @@ var debug_json = "";
 						$( '#buscador' ).select();
 						return false;
 					}else{
-						console.log( dat );
-						alert(dat);return false;
+						$( '.emergent_content' ).html( dat );
+						$( '.emergent' ).css( 'display', 'block' );
+						//console.log( dat );
+						//alert(dat);return false;
 					}
 				}else{
 					respuesta = JSON.parse( aux[1] );
@@ -397,6 +399,12 @@ hljs.highlightAll();
 	
 	/*Agregar cheque o transferencia*/
 	function agrega_cheque_transferencia(){
+		var sale_id = $( '#id_venta' ).val();
+		if( sale_id == 0 ){
+			alert( "Es necesario que selecciones una nota de venta para continuar." );
+			$( '#buscador' ).select();
+			return false;
+		}
 		var id_caja_cuenta = $( '#caja_o_cuenta' ).val();
 		if( id_caja_cuenta <= 0 ){
 			alert( "Es necesario que elijas una caja o cuenta correcta para continuar." );
@@ -542,8 +550,12 @@ var cont_cheques_transferencia=0;
 	}
 
 		function cobrar( amount_type, permission = false ){
-		//alert(`here : cobrar , ${amount_type}, ${permission}`);
 			var sale_id = $( '#id_venta' ).val();
+			if( sale_id == 0 ){
+				alert( "Es necesario que selecciones una nota de venta para continuar." );
+				$( '#buscador' ).select();
+				return false;
+			}
 			var pago_efectivo =  parseFloat( $( '#efectivo' ).val() );
 			if( pago_efectivo == '' || pago_efectivo == null || pago_efectivo == 'undefined' ||  pago_efectivo == undefined ){
 				pago_efectivo = 0;
@@ -675,7 +687,7 @@ var cont_cheques_transferencia=0;
 /*funcion para agregar pagos con tarjeta*/
 	function addPaymetCard( user_id ){
 		if( $( '#id_venta' ).val() == 0 ){
-			alert( "Es necesario que selecciones una nota de venta para continuar" );
+			alert( "Es necesario que selecciones una nota de venta para continuar." );
 			$( '#buscador' ).select();
 			return false;
 		}
@@ -691,6 +703,12 @@ var cont_cheques_transferencia=0;
 	}
 //habilitar pagos
 	function enable_payments(){
+		var sale_id = $( '#id_venta' ).val();
+		if( sale_id == 0 ){
+			alert( "Es necesario que selecciones una nota de venta para continuar." );
+			$( '#buscador' ).select();
+			return false;
+		}
 		var amount_total = parseFloat( $( '#monto_total' ).val() );
 		var amount_sum = 0;
 		var stop = false;
@@ -730,6 +748,12 @@ var cont_cheques_transferencia=0;
 		if( e.keyCode != 13 && e != 'intro' ){
 			return false;
 		}
+		var sale_id = $( '#id_venta' ).val();
+		if( sale_id == 0 ){
+			alert( "Es necesario que selecciones una nota de venta para continuar." );
+			$( '#buscador' ).select();
+			return false;
+		}
 	//obtiene el valor del qr de la terminal
 		var qr_txt = $( '#terminal_qr_input' ).val().trim();
 		if( qr_txt == '' ){
@@ -765,8 +789,9 @@ var cont_cheques_transferencia=0;
 			</div>
 			<div>
 			<br>
-				Numero de autorizacion :
-				<input type="text" class="form-control" id="authorization_input_tmp">
+				Número de autorización :
+				<input type="text" class="form-control" id="authorization_input_tmp" onkeyup="validateNumberInput( this );">
+				<p class="text-start text-danger hidden" id="authorization_input_tmp_alerta">Campo numérico*</p>
 			</div>
 			<div>
 			<br>

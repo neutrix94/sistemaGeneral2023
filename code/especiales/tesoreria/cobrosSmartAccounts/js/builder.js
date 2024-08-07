@@ -9,6 +9,12 @@
 	}
 
 	function getCashPaymentForm(){
+		var sale_id = $( '#id_venta' ).val();
+		if( sale_id == 0 ){
+			alert( "Es necesario que selecciones una nota de venta para continuar." );
+			$( '#buscador' ).select();
+			return false;
+		}
 		var amount = $( '#efectivo' ).val();
 		if( amount <= 0 ){
 			alert( "La cantidad del pago debe de ser mayor a cero." );
@@ -255,6 +261,12 @@
   	}
 
   	function removePaymentTmp( counter ){
+		var sale_id = $( '#id_venta' ).val();
+		if( sale_id == 0 ){
+			alert( "Es necesario que selecciones una nota de venta para continuar." );
+			$( '#buscador' ).select();
+			return false;
+		}
   		if( ! confirm( "Realmente deseas eliminar el pago?\nEsta accion va a recargar la pantalla, vuelve a escanear tu ticket de venta" ) ){//
   			return false;
   		}

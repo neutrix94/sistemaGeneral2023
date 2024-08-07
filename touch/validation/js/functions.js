@@ -33,6 +33,15 @@ var global_view = '';
 		}
 	}, false);
 
+	function evitarCaracteresEspeciales(event) {
+		const input = event.target;
+		const valor = input.value;
+		const valorFiltrado = valor.replace(/[^a-zA-Z0-9 /=-]/g, ''); // Filtra caracteres que no sean letras o números
+		if (valor !== valorFiltrado) {
+			input.value = valorFiltrado;
+		}
+	}
+
 //mostrar / ocultar vistas del menú
 	function show_view( obj, view ){
 		if( view == '.check_ticket_detail' ){
@@ -514,7 +523,11 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 		if( tmp_val.includes( '.' ) ){
 			alert( "Los decimales no son permitidos, verifica y vuelve a intentar." );
 		}
-
+		if( tmp_val <= 0 ){
+			alert( "Solo se permiten cantidades mayores a cero." );
+			$( obj ).val( '' );
+			return false;
+		}
 		tmp_val = tmp_val.replaceAll( 'e', '' );
 		tmp_val = tmp_val.replaceAll( '.', '' );
 		$( obj ).focus().val( '' ).val( tmp_val );
