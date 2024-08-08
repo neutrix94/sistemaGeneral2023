@@ -1,10 +1,11 @@
+<!-- Version 2024-08-08 ( Se quita boton de cerrar reimpresión de nota por OrderId y se pone contador de tiempo al reimprimir por OrderId ) -->
 <div class="row" style="padding : 20px;">
 	<div id="message-container" class="text-center">
 		<h2 class="text-center"><?php echo $resp->message;?></h2>
 		<img src="../../../../img/img_casadelasluces/load.gif">
 	</div>
 <?php
-	if( isset( $is_payment_petition ) && $is_payment_petition == true ){
+	//if( isset( $is_payment_petition ) && $is_payment_petition == true ){
 ?>
 	<div class="row text-center">
 		<div class="col-12 text-center">
@@ -29,16 +30,17 @@
 		<button style="display:none;" id="reset">Reset</button>
 	</div>
 <?php
-	}else{
+	//}else{
 ?>
-	<button
+	<!--Deshabiltado por Oscar 2024-08-08 para deshabilitar boton de cerrar
+	button
 		class="btn btn-danger"
 		onclick="close_emergent();"
 	>
 		<i class="icon-cancel-circled">Cancelar y cerrar</i>
-	</button>
+	</button-->
 <?php
-	}
+	//}
 
 	/*echo "<script type=\"text/JavaScript\">
 	console.log( \"Si entra bien\" );
