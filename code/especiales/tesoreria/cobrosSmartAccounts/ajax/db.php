@@ -551,7 +551,7 @@
 							<button
 								type=\"button\"
 								class=\"btn btn-danger form-control\"
-								onclick=\"close_emergent();\"	
+								onclick=\"close_emergent_2();\"	
 							>
 								<i class=\"icon-ok-circled\">Aceptar</i>
 							</button>

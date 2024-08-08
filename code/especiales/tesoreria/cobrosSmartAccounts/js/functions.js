@@ -1,4 +1,4 @@
-/*version 1.1 2024-06-21*/
+/*version 1.2 2024-08-08 ( Se modifica mensaje ambiguo cuando el pago  con inbursa es mayor al monto restante por cobrar )*/
 var total_cobros=0,monto_real=0;
 var respuesta = null;
 var debug_json = "";
@@ -917,7 +917,11 @@ var cont_cheques_transferencia=0;
 //alert( url );
 		var resp = ajaxR( url ).split( '|' );
 		if( resp[0] != 'ok' ){
-			alert( "Error : \n" + resp );
+			//alert( "Error : \n" + resp );
+			$( '.emergent_content_2' ).html( resp );			
+			$( '.emergent_2' ).css( 'display', 'block' );
+			$( '#ammount_input_tmp' ).val( '' );
+
 		}else{
 			
 			alert( resp[1] );
