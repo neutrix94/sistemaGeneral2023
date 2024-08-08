@@ -6,7 +6,7 @@ include('../../conect.php');
 $surtimientoCRUD = new SurtimientoCRUD();
 $idUsuario = isset($user_id) ? $user_id : null;
 $usuario =  $surtimientoCRUD->getUserProfile($idUsuario);
-$perfil = (isset($usuario[0]) && ($usuario[0].tipo_perfil == '4' || $usuario[0].tipo_perfil == '8') &&  $usuario[0].id_encargado == $idUsuario ) ? '2': '1';
+$perfil = (isset($usuario[0]) && ($usuario[0]['tipo_perfil'] == '4' || $usuario[0]['tipo_perfil'] == '8') &&  $usuario[0]['id_encargado'] == $idUsuario ) ? '2': '1';
 $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id);
 
 ?>
