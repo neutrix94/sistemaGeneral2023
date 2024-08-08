@@ -4,7 +4,7 @@ var respuesta = null;
 var debug_json = "";
 
 	function validateNumberInput(input) {
-		//input.value = input.value.replace(/[^0-9]/g, '');
+		input.value = input.value.replace(/[^0-9]/g, '');
 		if( isNaN( input.value ) ){
 			alert( "En este campo solo puedes capturar números." );
 			input.value = '';
@@ -745,6 +745,7 @@ var cont_cheques_transferencia=0;
 	}
 //buscador de la terminal por QR
 	function seekTerminalByQr( e ){
+		$( '#terminal_qr_input' ).val( $( '#terminal_qr_input' ).val().replace(/[^0-9]/g, '') );
 		if( e.keyCode != 13 && e != 'intro' ){
 			return false;
 		}
