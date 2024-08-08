@@ -745,7 +745,7 @@ var cont_cheques_transferencia=0;
 	}
 //buscador de la terminal por QR
 	function seekTerminalByQr( e ){
-		$( '#terminal_qr_input' ).val( $( '#terminal_qr_input' ).val().replace(/[^0-9-]/g, '') );
+		$( '#terminal_qr_input' ).val( $( '#terminal_qr_input' ).val().replace(/[^a-zA-Z0-9 -]/g, '') );
 		if( e.keyCode != 13 && e != 'intro' ){
 			return false;
 		}
