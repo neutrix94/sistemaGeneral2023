@@ -1,5 +1,5 @@
 <?php
-
+/* ( 2024-08-08 ) Se agrega condicion para actualizar detalles de movimientos en libreria de registros de sincronizacion*/
 	class rowsSynchronization
 	{
 		private $link;
