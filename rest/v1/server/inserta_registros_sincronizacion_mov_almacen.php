@@ -66,9 +66,9 @@ $app->post('/inserta_registros_sincronizacion_movimientos_almacen', function (Re
   if( $verification == true ){
   //consulta si la peticion existe en linea
     $resp["rows_validation"]["log_response"] = $generalRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-    $resp["rows_validation"]["rows_response"] = $generalRowsVerification->RowsValidation( $pending_rows_validation, 'sys_sincronizacion_registros_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
+    $resp["rows_validation"]["rows_response"] = $generalRowsVerification->RowsValidation( $pending_rows_validation, 'sys_sincronizacion_registros_movimientos_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
   }
-  $resp["rows_validation"]["rows_download"] = $generalRowsVerification->getPendingRows( -1, $log['origin_store'], 'sys_sincronizacion_registros_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta las comprobaciones pendientes de linea a local
+  $resp["rows_validation"]["rows_download"] = $generalRowsVerification->getPendingRows( -1, $log['origin_store'], 'sys_sincronizacion_registros_movimientos_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta las comprobaciones pendientes de linea a local
 /*FIN DE COMPROBACION 2024*/
 
 /*valida que las apis no esten bloqueadas*/
