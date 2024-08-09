@@ -70,6 +70,6 @@ CREATE PROCEDURE spMovimientoAlmacenDetalle_elimina ( IN id_movimiento_detalle B
     IF( product_provider_id != '' AND product_provider_id IS NOT NULL AND product_provider_id != -1 )
     THEN
     /*actualiza el detalle a nivel proveedor producto*/
-        CALL spMovimientoDetalleProveedorProducto_elimina( id_movimiento_detalle, NULL );
+        CALL spMovimientoDetalleProveedorProducto_elimina( id_movimiento_detalle, product_provider_id, NULL );
     END IF;
 END $$

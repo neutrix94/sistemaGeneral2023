@@ -1,6 +1,6 @@
 DROP PROCEDURE IF EXISTS spMovimientoDetalleProveedorProducto_elimina|
 DELIMITER $$
-CREATE PROCEDURE spMovimientoDetalleProveedorProducto_elimina( IN id_movimiento_detalle BIGINT, IN product_provider_id INTEGER, IN cantidad_nueva FLOAT( 15, 4 ), IN sincronizar_registro INTEGER )
+CREATE PROCEDURE spMovimientoDetalleProveedorProducto_elimina( IN id_movimiento_detalle BIGINT, IN product_provider_id INTEGER, IN sincronizar_registro INTEGER )
     BEGIN
 /*verificado 13-07-2023*/
 	DECLARE store_id INTEGER;
