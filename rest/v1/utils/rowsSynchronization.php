@@ -141,6 +141,13 @@
 					break;
 					case 'delete' :
 						$sql = "DELETE FROM {$row['table_name']} {$condition}";
+						if( $row['table_name'] == 'ec_movimiento_detalle' ){
+						//procedure aqui
+							$aux = "SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '{$row['primary_key_value']}'";
+							$aux_stm = $this->link->query( $aux );// or die( "Error al consultar id de detalle mov almacen :" );
+							$aux_row = $aux_stm->fetch_assoc();
+							$sql = "CALL spMovimientoAlmacenDetalle_elimina( {$aux_row['detail_id']}, NULL );";
+						}
 						array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id'] ) );
 					break;
 

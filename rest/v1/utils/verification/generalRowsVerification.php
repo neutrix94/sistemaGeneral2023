@@ -263,11 +263,17 @@
 					break;
 					case 'delete' :
                     //verifica si existe el registro
-                        $verification_sql = "SELECT folio_unico FROM {$row['table_name']} {$condition}";
+                        $verification_sql = "SELECT {$row['primary_key']} FROM {$row['table_name']} {$condition}";
                         $verification_stm = $this->link->query( $verification_sql );
                         if( $verification_stm->num_rows > 0) {//si el registro no existe
                             $sql = "DELETE FROM {$row['table_name']} {$condition}";
-                            //$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row_['synchronization_row_id']}'";
+						    if( $row['table_name'] == 'ec_movimiento_detalle' ){
+                            //procedure aqui
+                                $aux = "SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '{$row['primary_key_value']}'";
+                                $aux_stm = $this->link->query( $aux );// or die( "Error al consultar id de detalle mov almacen :" );
+                                $aux_row = $aux_stm->fetch_assoc();
+                                $sql = "CALL spMovimientoAlmacenDetalle_elimina( {$aux_row['detail_id']}, NULL );";
+                            }
 					        array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id'] ) );
                         }else{//si el registro ya no existe en el destino
                             $resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row_['synchronization_row_id']}'";
