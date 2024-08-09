@@ -46,7 +46,7 @@
                     FROM sys_sincronizacion_peticion sp
                     LEFT JOIN {$table_name} sr
                     ON sr.folio_unico_peticion = sp.folio_unico
-                    WHERE sp.tabla = 'ec_pedidos'
+                    WHERE sp.tabla = '{$table_name}'
                     AND sp.id_sucursal_origen = {$origin_store_id}
                     AND sp.id_sucursal_destino = {$destinity_store_id}
                     AND sp.hora_envio IS NOT NULL
@@ -252,6 +252,13 @@
 							}
 						}
 						$sql .= "{$fields} {$condition}";
+						if( $row['table_name'] == 'ec_movimiento_detalle' ){
+						//procedure aqui
+							$aux = "SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '{$row['primary_key_value']}'";
+							$aux_stm = $this->link->query( $aux );// or die( "Error al consultar id de detalle mov almacen :" );
+							$aux_row = $aux_stm->fetch_assoc();
+                            $sql = "CALL spMovimientoAlmacenDetalle_actualiza( {$aux_row['detail_id']}, {$row['cantidad']}, NULL );";
+						}
 					    array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id'] ) );
 					break;
 					case 'delete' :
@@ -293,7 +300,7 @@
                             if( $logger_id ){
                                 $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al ejecutar consulta ", "$table_name", $query, $this->link->error );
                             }
-                            die( "Error : {$this->link->error}" );
+                            die( "Error : {$sql} : {$this->link->error}" );
                         }
                     if( $ok == true && $query_['row_id'] != 'n/a' ){
 						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
