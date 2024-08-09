@@ -502,8 +502,8 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-3"></div>
-			<div class="col-3">
+			<div class="col-1"></div>
+			<div class="col-5">
 				<button
 					class="btn btn-danger"
 					onclick="desactivate_product_form();clean_product_form();clean_location_form( 'source' );clean_messages_descriptions();close_emergent();"
@@ -511,7 +511,7 @@
 					<i class="icon-cancel-circled">Cancelar y cerrar</i>
 				</button>
 			</div>
-			<div class="col-3">
+			<div class="col-5">
 				<button
 					class="btn btn-success"
 					onclick="setTotalQuantitiesPerProduct();"
