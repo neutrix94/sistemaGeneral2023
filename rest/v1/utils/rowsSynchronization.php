@@ -133,8 +133,9 @@
 						if( $row['table_name'] == 'ec_movimiento_detalle' ){
 						//procedure aqui
 							$aux = "SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '{$row['folio_unico']}'";
-							$aux_row = $this->link->query( $aux );// or die( "Error al consultar id de detalle mov almacen :" );
-							$sql = "CALL spMovimientoAlmacenDetalle_actualiza( {$aux_row}, {$row['cantidad']} );";
+							$aux_stm = $this->link->query( $aux );// or die( "Error al consultar id de detalle mov almacen :" );
+							$aux_row = $aux_stm->fetch_assoc();
+                            $sql = "CALL spMovimientoAlmacenDetalle_actualiza( {$aux_row['id_movimiento_almacen_detalle']}, {$row['cantidad']} );";
 						}
 						array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id'] ) );
 					break;
