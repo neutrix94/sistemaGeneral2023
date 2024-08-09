@@ -1,6 +1,6 @@
 DROP PROCEDURE IF EXISTS spMovimientoAlmacenDetalle_actualiza|
 DELIMITER $$
-CREATE PROCEDURE spMovimientoAlmacenDetalle_actualiza ( IN id_movimiento_detalle BIGINT, IN cantidad_nueva FLOAT(15,4) )
+CREATE PROCEDURE spMovimientoAlmacenDetalle_actualiza ( IN id_movimiento_detalle BIGINT, IN cantidad_nueva FLOAT(15,4), IN sincronizar_registro INTEGER )
     BEGIN
 /*verificado 13-07-2023*/
 	DECLARE cantidad_antes FLOAT( 15, 4);    
@@ -44,7 +44,7 @@ CREATE PROCEDURE spMovimientoAlmacenDetalle_actualiza ( IN id_movimiento_detalle
     ON ma.id_tipo_movimiento = tm.id_tipo_movimiento
 	WHERE md.id_movimiento_almacen_detalle = id_movimiento_detalle;
    
-    IF( folio_unico_movimiento_detalle IS NOT NULL )
+    IF( folio_unico_movimiento_detalle IS NOT NULL AND sincronizar_registro IS NOT NULL )
     THEN
         SELECT id_sucursal INTO store_id FROM sys_sucursales WHERE acceso=1;
  	/*inserta registro sincronizacion de movimiento*/

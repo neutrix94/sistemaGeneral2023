@@ -31,12 +31,19 @@
     function filtra_por_tabla(obj){
         table_name = $( '#table_filter' ).val().trim();
         limit = $( '#limite_input' ).val();
+        //setTimeout( function(){
+            $( '.emergent_content' ).html( "Cargando..." );
+            $( '.emergent' ).css( "display", "block" );
+        //}, 500);
 		$.ajax({
 			type : 'post',
 			url : 'ajax/LoggerViewer.php',
 			data : { log_flag : 'filter_by_table', table : table_name, rows_limit : limit },
 			success : function( dat ){
                 $( '.content' ).html(dat);
+                setTimeout( function(){
+                    close_emergent();
+                }, 500);
 			}
 		});
     }
@@ -47,12 +54,19 @@
             $( obj ).focus();
             $( obj ).select();
         }
+        setTimeout( function(){
+            $( '.emergent_content' ).html( "Cargando..." );
+            $( '.emergent' ).css( "display", "block" );
+        }, 500);
 		$.ajax({
 			type : 'post',
 			url : 'ajax/LoggerViewer.php',
 			data : { log_flag : 'filter_by_folio', folio : folio },
 			success : function( dat ){
                 $( '.content' ).html(dat);
+                setTimeout( function(){
+                    close_emergent();
+                }, 500);
 			}
 		});
     }
