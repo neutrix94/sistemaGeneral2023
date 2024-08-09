@@ -27,6 +27,7 @@ $app->post('/inserta_registros_sincronizacion_movimientos_almacen', function (Re
   $Logger = false;
   $LOGGER = false;
 //variables que llegan
+  $body = $request->getBody();
   $rows = $request->getParam( "rows" );
   $log = $request->getParam( "log" );
   $VERIFICATION = $request->getParam( "verification" );
