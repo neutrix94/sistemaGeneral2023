@@ -60,16 +60,16 @@ CREATE PROCEDURE spMovimientoAlmacenDetalle_elimina ( IN id_movimiento_detalle B
 		WHERE id_sucursal = IF( store_id = -1, destinity_store_id, -1 );
 	END IF;
 
+/*Modifica el movimiento a nivel proveedor producto*/
+    IF( product_provider_id != '' AND product_provider_id IS NOT NULL AND product_provider_id != -1 )
+    THEN
+        CALL spMovimientoDetalleProveedorProducto_elimina( id_movimiento_detalle, product_provider_id, NULL );
+    END IF;
+/*elimina el detalle de movimiento a nivel producto*/
     DELETE FROM ec_movimiento_detalle WHERE id_movimiento_almacen_detalle = id_movimiento_detalle;
 /*resta la cantidad anterior*/
     UPDATE ec_almacen_producto ap
         SET ap.inventario = ( ap.inventario - ( cantidad_antes * tipo_afecta ) )
     WHERE ap.id_almacen = warehouse_id
     AND ap.id_producto = product_id;
-/*Modifica el movimiento a nivel proveedor producto*/
-    IF( product_provider_id != '' AND product_provider_id IS NOT NULL AND product_provider_id != -1 )
-    THEN
-    /*actualiza el detalle a nivel proveedor producto*/
-        CALL spMovimientoDetalleProveedorProducto_elimina( id_movimiento_detalle, product_provider_id, NULL );
-    END IF;
 END $$
