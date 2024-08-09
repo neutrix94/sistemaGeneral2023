@@ -46,7 +46,7 @@
                     FROM sys_sincronizacion_peticion sp
                     LEFT JOIN {$table_name} sr
                     ON sr.folio_unico_peticion = sp.folio_unico
-                    WHERE sp.tabla = 'ec_pedidos'
+                    WHERE sp.tabla = '{$table_name}'
                     AND sp.id_sucursal_origen = {$origin_store_id}
                     AND sp.id_sucursal_destino = {$destinity_store_id}
                     AND sp.hora_envio IS NOT NULL
