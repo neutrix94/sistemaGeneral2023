@@ -55,7 +55,7 @@ BEGIN
 	ON d.id_devolucion = cc.id_devolucion
 	WHERE cc.id_cajero_cobro = payment_id
 	GROUP BY cc.id_cajero_cobro;
-/*Transaccion netPay*/
+/*Transaccion netPay
 	SELECT id_transaccion_netpay INTO netpay_transaction_id FROM vf_transacciones_netpay WHERE id_cajero_cobro = payment_id;
 	IF( netpay_transaction_id IS NOT NULL AND netpay_transaction_id > 0 AND netpay_transaction_id != '' )
 	THEN
@@ -125,6 +125,6 @@ BEGIN
 			1
 		FROM vf_transacciones_netpay t
 		WHERE t.id_cajero_cobro = payment_id;
-	END IF;
+	END IF;*/
 /**/
 END $$
