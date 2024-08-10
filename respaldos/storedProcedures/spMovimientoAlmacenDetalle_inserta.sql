@@ -74,7 +74,7 @@ VALUES (varid,'ec_movimiento_detalle',idpantalla,1,query);
     AND ap.id_almacen = id_almacen;  
 
     IF( id_proveedor_producto != '' AND id_proveedor_producto IS NOT NULL AND id_proveedor_producto != -1 
-      AND ( folio_unico_movimiento_almacen IS NULL OR folio_unico_movimiento_almacen = '' ) ) 
+      AND ( folio_unico_movimiento_pp IS NULL OR folio_unico_movimiento_pp = '' ) ) 
     THEN
       /*INSERT INTO ec_movimiento_detalle_proveedor_producto ( id_movimiento_detalle_proveedor_producto, id_movimiento_almacen_detalle,
       id_proveedor_producto, cantidad, fecha_registro, id_sucursal, status_agrupacion, id_tipo_movimiento, id_almacen,id_pantalla )

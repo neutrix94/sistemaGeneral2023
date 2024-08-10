@@ -3694,3 +3694,279 @@
 [19/6/2024 17:18:53][INFO] {"response":"Respuesta Erronea : Error al ejecutar consulta : INSERT INTO ec_cajero_cobros ( id_sucursal, id_pedido, id_devolucion, id_cajero, id_sesion_caja, id_afiliacion, id_terminal, id_banco, id_tipo_pago, monto, fecha, hora, observaciones, folio_unico, sincronizar ) VALUES ( '1', ( SELECT id_pedido FROM ec_pedidos WHERE folio_unico = '24MAT_VTA_508687' ), '-1', '784', ( SELECT id_sesion_caja FROM ec_sesion_caja WHERE folio_unico = '24MAT_SC_3031' LIMIT 1 ), '-1', '0', '2', '3', '-100.00', '2024-06-19', '15:27:19', 'Cobro para anular el cobro 27 (Transferencia), '24MAT_COBRO_28', '0' )  ::: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '24MAT_COBRO_28', '0' )' at line 1"}
 [19/6/2024 21:46:12][INFO] {"response":"Respuesta Erronea : Posiblemente no hay conexion con el servidor de Linea"}
 [19/6/2024 21:46:12][INFO] {"response":"Respuesta Erronea : Posiblemente no hay conexion con el servidor de Linea"}
+[25/7/2024 20:39:8][INFO] Error : Cannot delete or update a parent row: a foreign key constraint fails (`wwsist_desarrollo_movimientos_almacen`.`ec_movimiento_detalle_proveedor_producto`, CONSTRAINT `ec_movimiento_detalle_proveedor_producto_ibfk_7` FOREIGN KEY (`id_pedido_validacion`) REFERENCES)
+[25/7/2024 20:39:8][INFO] Error : Cannot delete or update a parent row: a foreign key constraint fails (`wwsist_desarrollo_movimientos_almacen`.`ec_movimiento_detalle_proveedor_producto`, CONSTRAINT `ec_movimiento_detalle_proveedor_producto_ibfk_7` FOREIGN KEY (`id_pedido_validacion`) REFERENCES)
+[25/7/2024 20:39:33][INFO] Error : Cannot delete or update a parent row: a foreign key constraint fails (`wwsist_desarrollo_movimientos_almacen`.`ec_movimiento_detalle_proveedor_producto`, CONSTRAINT `ec_movimiento_detalle_proveedor_producto_ibfk_7` FOREIGN KEY (`id_pedido_validacion`) REFERENCES)
+[25/7/2024 20:39:33][INFO] Error : Cannot delete or update a parent row: a foreign key constraint fails (`wwsist_desarrollo_movimientos_almacen`.`ec_movimiento_detalle_proveedor_producto`, CONSTRAINT `ec_movimiento_detalle_proveedor_producto_ibfk_7` FOREIGN KEY (`id_pedido_validacion`) REFERENCES)
+[25/7/2024 20:39:58][INFO] Error : Cannot delete or update a parent row: a foreign key constraint fails (`wwsist_desarrollo_movimientos_almacen`.`ec_movimiento_detalle_proveedor_producto`, CONSTRAINT `ec_movimiento_detalle_proveedor_producto_ibfk_7` FOREIGN KEY (`id_pedido_validacion`) REFERENCES)
+[25/7/2024 20:39:58][INFO] Error : Cannot delete or update a parent row: a foreign key constraint fails (`wwsist_desarrollo_movimientos_almacen`.`ec_movimiento_detalle_proveedor_producto`, CONSTRAINT `ec_movimiento_detalle_proveedor_producto_ibfk_7` FOREIGN KEY (`id_pedido_validacion`) REFERENCES)
+[25/7/2024 20:40:24][INFO] Error : Cannot delete or update a parent row: a foreign key constraint fails (`wwsist_desarrollo_movimientos_almacen`.`ec_movimiento_detalle_proveedor_producto`, CONSTRAINT `ec_movimiento_detalle_proveedor_producto_ibfk_7` FOREIGN KEY (`id_pedido_validacion`) REFERENCES)
+[25/7/2024 20:40:24][INFO] Error : Cannot delete or update a parent row: a foreign key constraint fails (`wwsist_desarrollo_movimientos_almacen`.`ec_movimiento_detalle_proveedor_producto`, CONSTRAINT `ec_movimiento_detalle_proveedor_producto_ibfk_7` FOREIGN KEY (`id_pedido_validacion`) REFERENCES)
+[25/7/2024 20:40:50][INFO] Error : Cannot delete or update a parent row: a foreign key constraint fails (`wwsist_desarrollo_movimientos_almacen`.`ec_movimiento_detalle_proveedor_producto`, CONSTRAINT `ec_movimiento_detalle_proveedor_producto_ibfk_7` FOREIGN KEY (`id_pedido_validacion`) REFERENCES)
+[25/7/2024 20:40:50][INFO] Error : Cannot delete or update a parent row: a foreign key constraint fails (`wwsist_desarrollo_movimientos_almacen`.`ec_movimiento_detalle_proveedor_producto`, CONSTRAINT `ec_movimiento_detalle_proveedor_producto_ibfk_7` FOREIGN KEY (`id_pedido_validacion`) REFERENCES)
+[26/7/2024 19:21:14][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:21:14][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:21:41][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:21:41][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:22:7][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:22:7][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:22:34][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:22:34][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:23:1][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:23:1][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:23:28][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:23:28][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:23:54][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:23:54][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:24:20][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:24:20][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:24:46][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:24:46][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:25:12][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:25:12][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:25:41][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:25:41][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:26:12][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:26:12][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:26:38][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:26:38][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:27:3][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:27:3][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:27:30][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:27:30][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:27:56][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:27:56][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:28:24][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:28:24][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:28:50][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:28:50][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:29:16][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:29:16][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:29:44][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:29:44][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:30:11][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:30:11][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:30:37][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:30:37][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:31:3][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:31:3][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:31:30][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:31:30][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:31:57][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:31:57][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:32:28][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:32:28][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:32:54][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:32:54][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:33:20][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:33:20][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:33:47][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:33:47][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:34:13][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:34:13][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:34:39][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:34:39][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:35:6][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:35:6][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:35:31][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:35:31][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:36:0][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:36:0][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:36:27][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:36:27][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:36:54][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:36:54][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:37:21][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:37:21][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:37:47][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:37:47][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:38:13][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:38:13][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:38:41][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:38:41][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:39:8][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:39:8][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:39:36][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:39:36][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:40:3][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:40:3][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:40:29][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:40:29][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:40:56][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:40:56][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:41:22][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:41:22][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:41:49][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:41:49][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:42:15][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:42:15][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:42:41][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:42:41][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:43:10][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:43:10][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:43:38][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:43:38][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:44:6][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:44:6][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:44:32][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:44:32][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:44:59][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:44:59][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:45:26][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[26/7/2024 19:45:26][INFO] Error al generar registros de ventas : Duplicate entry '24MAT_REFDEV_50' for key 'folio_unico' CALL buscaVentasPendientesDeSincronizar( 1, 1, '24MAT', 50 )
+[30/7/2024 10:45:55][INFO] {"response":"Respuesta Erronea : Error : Duplicate entry '24MAT_COBRO_79' for key 'folio_unico'"}
+[30/7/2024 10:45:55][INFO] {"response":"Respuesta Erronea : Error : Duplicate entry '24MAT_COBRO_79' for key 'folio_unico'"}
+[30/7/2024 10:46:55][INFO] {"response":"Respuesta Erronea : Error : Duplicate entry '24MAT_COBRO_80' for key 'folio_unico'"}
+[30/7/2024 10:46:55][INFO] {"response":"Respuesta Erronea : Error : Duplicate entry '24MAT_COBRO_80' for key 'folio_unico'"}
+[30/7/2024 10:53:58][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:53:58][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:54:26][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:54:26][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:54:56][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:54:56][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:55:29][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:55:29][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:55:58][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:55:58][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:56:28][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:56:28][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:56:57][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:56:57][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:57:26][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:57:26][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:57:57][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:57:57][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:58:25][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:58:25][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:58:54][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:58:54][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:59:23][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:59:23][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:59:52][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 10:59:52][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:0:20][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:0:20][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:0:49][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:0:49][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:1:18][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:1:18][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:1:47][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:1:47][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:2:18][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:2:18][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:2:48][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:2:48][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:3:17][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:3:17][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:3:48][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:3:48][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:4:17][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:4:17][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:4:46][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:4:46][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:5:15][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:5:15][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:5:45][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:5:45][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:6:14][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:6:14][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:6:43][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:6:43][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:7:12][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:7:12][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:7:41][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:7:41][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:8:10][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:8:10][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:8:39][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:8:39][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:9:7][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:9:7][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:9:36][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:9:36][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:10:5][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:10:5][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:10:34][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:10:34][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:11:3][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:11:3][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:14:3][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:14:3][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:14:32][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:14:32][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:15:1][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:15:1][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:15:30][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:15:30][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:15:59][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:15:59][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:16:28][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:16:28][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:17:57][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:17:57][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:18:26][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:18:26][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:19:31][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:19:31][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:23:4][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:23:4][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:23:32][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:23:32][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:24:2][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[30/7/2024 11:24:2][INFO] {"response":"Respuesta Erronea : Error : Column 'id_sesion_caja' cannot be null"}
+[9/8/2024 11:58:33][INFO] Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 11:58:33][INFO] Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 11:59:1][INFO] Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 11:59:1][INFO] Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 11:59:28][INFO] Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 11:59:28][INFO] Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 11:59:55][INFO] Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 11:59:55][INFO] Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 12:0:22][INFO] Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 12:0:22][INFO] Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 12:0:48][INFO] Error : CALL spMovimientoAlmacenDetalle_actualiza( , 336.0000 ); : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 12:0:48][INFO] Error : CALL spMovimientoAlmacenDetalle_actualiza( , 336.0000 ); : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 12:1:15][INFO] UPDATE ec_movimiento_detalle SET cantidad = '336.0000', cantidad_surtida = '336.0000', sincronizar = '0' WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:1:15][INFO] UPDATE ec_movimiento_detalle SET cantidad = '336.0000', cantidad_surtida = '336.0000', sincronizar = '0' WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:1:43][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = ''
+[9/8/2024 12:1:43][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = ''
+[9/8/2024 12:2:9][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:2:9][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:2:37][INFO] Error : CALL spMovimientoAlmacenDetalle_actualiza( , 336.0000 ); : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 12:2:37][INFO] Error : CALL spMovimientoAlmacenDetalle_actualiza( , 336.0000 ); : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 12:3:4][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:3:4][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:3:32][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:3:32][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:3:59][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:3:59][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:4:26][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:4:26][INFO] SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '24LNA_MD_4677439'
+[9/8/2024 12:4:53][INFO] array(1) {  ["detail_id"]=>  string(7) "4677423"}Error : CALL spMovimientoAlmacenDetalle_actualiza( , 336.0000 ); : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 12:4:53][INFO] array(1) {  ["detail_id"]=>  string(7) "4677423"}Error : CALL spMovimientoAlmacenDetalle_actualiza( , 336.0000 ); : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' 336.0000 )' at line 1
+[9/8/2024 12:5:11][INFO] 
+[9/8/2024 12:5:11][INFO] 
+[9/8/2024 12:5:12][INFO] 
+[9/8/2024 12:5:12][INFO] 
+[9/8/2024 12:6:14][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:6:14][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:6:41][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:6:41][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:7:8][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:7:8][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:7:35][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:7:35][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:8:2][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:8:2][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:8:29][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:8:29][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:8:56][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:8:56][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:9:24][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:9:24][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:9:51][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:9:51][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:10:18][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:10:18][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:10:45][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}
+[9/8/2024 12:10:45][INFO] {"response":"Respuesta Erronea : Error : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' 336.0000 )' at line 1"}

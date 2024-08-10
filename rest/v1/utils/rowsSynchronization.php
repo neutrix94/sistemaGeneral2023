@@ -1,5 +1,5 @@
 <?php
-
+/* ( 2024-08-08 ) Se agrega condicion para actualizar detalles de movimientos en libreria de registros de sincronizacion*/
 	class rowsSynchronization
 	{
 		private $link;
@@ -130,10 +130,24 @@
 							}
 						}
 						$sql .= "{$fields} {$condition}";
+						if( $row['table_name'] == 'ec_movimiento_detalle' ){
+						//procedure aqui
+							$aux = "SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '{$row['primary_key_value']}'";
+							$aux_stm = $this->link->query( $aux );// or die( "Error al consultar id de detalle mov almacen :" );
+							$aux_row = $aux_stm->fetch_assoc();
+                            $sql = "CALL spMovimientoAlmacenDetalle_actualiza( {$aux_row['detail_id']}, {$row['cantidad']}, NULL );";
+						}
 						array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id'] ) );
 					break;
 					case 'delete' :
 						$sql = "DELETE FROM {$row['table_name']} {$condition}";
+						if( $row['table_name'] == 'ec_movimiento_detalle' ){
+						//procedure aqui
+							$aux = "SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '{$row['primary_key_value']}'";
+							$aux_stm = $this->link->query( $aux );// or die( "Error al consultar id de detalle mov almacen :" );
+							$aux_row = $aux_stm->fetch_assoc();
+							$sql = "CALL spMovimientoAlmacenDetalle_elimina( {$aux_row['detail_id']}, NULL );";
+						}
 						array_push( $queries, array( "query"=>$sql, "row_id"=>$row['synchronization_row_id'] ) );
 					break;
 
@@ -183,8 +197,8 @@
 	              SET status_sincronizacion = '{$status}',
 	              	folio_unico_peticion = '{$petition_unique_folio}' 
 	            WHERE id_sincronizacion_registro IN( {$rows} )";
+	   	 		$stm = $this->link->query( $sql );
 	   		}
-	   	 	$stm = $this->link->query( $sql );
 				if( $logger_id ){
 					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza JSON de sincronizacion a status {$status}", $sql );
 				}

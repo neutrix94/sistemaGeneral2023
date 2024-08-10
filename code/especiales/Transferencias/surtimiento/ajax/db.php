@@ -1,4 +1,5 @@
 <?php
+/*Version con insercion de movimientos por Procedure (2024-08-05)*/
 	if ( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../config.inc.php' );
 		include( '../../../../../conect.php' );
@@ -764,7 +765,7 @@
 					$mov_id = $exc->fetch_row();
 //echo 'mov_id : ' . $sql . ' ||| ';
 				//inserta el nuevo detalle de movimiento almacen
-					$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
+					/*$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
 							id_pedido_detalle, id_oc_detalle, id_proveedor_producto )
 							SELECT 
 								'{$mov_id[0]}',
@@ -776,7 +777,18 @@
 								tp.id_proveedor_producto
 							FROM ec_transferencia_productos tp
 							WHERE tp.id_transferencia_producto = '{$new_detail_id}'";
-					$exc = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen : " . $link->error );
+					$exc = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen : " . $link->error );*/
+					$sql = "SELECT 
+								tp.id_producto_or,
+								tp.cantidad,
+								tp.id_proveedor_producto
+							FROM ec_transferencia_productos tp
+							WHERE tp.id_transferencia_producto = '{$new_detail_id}'";
+					$stm_detail_ = $link->query( $sql ) or die( "Error al consultar el detalle de transferencias para insertar movimiento por procedure : {$sql} : {$link->error}" );
+					$row_detail = $stm_detail_->fetch_assoc();
+					$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$mov_id[0]}, {$row_detail['id_producto_or']}, {$row_detail['cantidad']}, {$row_detail['cantidad']}, 
+								-1, -1, {$row_detail['id_proveedor_producto']}, 20, NULL )";
+					$exc = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen por procedure : " . $link->error .  $sql );
 				}
 			}//fin de foreach
 		}//fin de else
@@ -949,7 +961,8 @@
 						$mov_id = $exc->fetch_row();
 	//echo 'mov_id : ' . $sql . ' ||| ';
 					//inserta el nuevo detalle de movimiento almacen
-						$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
+		/*implementacion Oscar 2024-08-03*/
+						/*$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
 								id_pedido_detalle, id_oc_detalle, id_proveedor_producto )
 								SELECT 
 									'{$mov_id[0]}',
@@ -960,7 +973,17 @@
 									-1, 
 									tp.id_proveedor_producto
 								FROM ec_transferencia_productos tp
+								WHERE tp.id_transferencia_producto = '{$new_detail_id}'";*/
+						$sql = "SELECT 
+									tp.id_producto_or,
+									tp.cantidad,
+									tp.id_proveedor_producto
+								FROM ec_transferencia_productos tp
 								WHERE tp.id_transferencia_producto = '{$new_detail_id}'";
+						$stm_detail_ = $link->query( $sql ) or die( "Error al consultar el detalle de transferencias : {$sql} : {$link->error}" );
+						$row_detail = $stm_detail_->fetch_assoc();
+						$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$mov_id[0]}, {$row_detail['id_producto_or']}, {$row_detail['cantidad']}, {$row_detail['cantidad']}, 
+									-1, -1, {$row_detail['id_proveedor_producto']}, 20, NULL )";
 						$exc = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen : " . $link->error .  $sql );
 					}
 

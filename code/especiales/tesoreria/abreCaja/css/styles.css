@@ -45,6 +45,15 @@
 		max-height: 600px;
 		overflow: auto;
 	}
+
+	.footer{
+		position: fixed;
+		bottom: 0;
+		width: 100%;
+		left : 0;
+		padding-top : 10px;
+		padding-bottom : 10px;
+	}
 	
 /*responsive*/
 	@media only screen and (max-width: 600px) {

@@ -1,3 +1,4 @@
+/*Se agregan los atributos de llave primary y su valor para comprobacion en sincronizacion (2024-08-08) */
 DROP PROCEDURE IF EXISTS generaRegistroSincronizacionDetalleMovimientoAlmacen| 
 DELIMITER $$
 CREATE PROCEDURE generaRegistroSincronizacionDetalleMovimientoAlmacen( IN movement_detail_id BIGINT, IN origin_store_id INTEGER(11) )/*IN folio_unico_movimiento_almacen VARCHAR( 30 )*/
@@ -12,6 +13,8 @@ BEGIN
 		CONCAT(
 			'{',
 				'"table_name" : "ec_movimiento_detalle",',
+				'"primary_key" : "folio_unico",',
+				'"primary_key_value" : "', md.folio_unico,'",',
 				'"action_type" : "insert",',
 				'"id_movimiento" : "( SELECT id_movimiento_almacen FROM ec_movimiento_almacen WHERE folio_unico = \'', ma.folio_unico , '\' )",',
 				'"id_producto" : "', md.id_producto, '",',

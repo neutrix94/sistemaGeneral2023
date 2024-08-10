@@ -46,7 +46,7 @@
                     FROM sys_sincronizacion_peticion sp
                     LEFT JOIN {$table_name} sr
                     ON sr.folio_unico_peticion = sp.folio_unico
-                    WHERE sp.tabla = 'ec_pedidos'
+                    WHERE sp.tabla = '{$table_name}'
                     AND sp.id_sucursal_origen = {$origin_store_id}
                     AND sp.id_sucursal_destino = {$destinity_store_id}
                     AND sp.hora_envio IS NOT NULL
@@ -175,10 +175,11 @@
             $resp['error_rows'] = "";
             $queries = array();
 			foreach ($rows as $key => $row_) {
-               // var_dump( $row_ );
 				$sql = "";
 				$condition = "";
-                $row = json_decode( $row_['datos_json'], true );
+                $row_['datos_json'] = str_replace( "\n", " ", $row_['datos_json'] );//se eliminan saltos de linea
+                $row = json_decode( $row_['datos_json'], true );//
+                //var_dump( $row );die('here');
 				if( isset( $row['primary_key'] ) && isset( $row['primary_key_value'] ) ){
 					$condition .= "WHERE {$row['primary_key']} = '{$row['primary_key_value']}'";
 				}
@@ -190,7 +191,7 @@
 				switch ( $row['action_type'] ) {
 					case 'insert' :
                     //verifica si existe el registro
-                        $verification_sql = "SELECT folio_unico FROM {$row['table_name']} {$condition}";
+                        $verification_sql = "SELECT {$row['primary_key']} FROM {$row['table_name']} {$condition}";//die( $verification_sql );
                         $verification_stm   = $this->link->query( $verification_sql );
                             if( $logger_id ){
                                 $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "(INSERT); Verifica si existe el registro en tabla {$row['table_name']} : ", $verification_sql );
@@ -251,15 +252,28 @@
 							}
 						}
 						$sql .= "{$fields} {$condition}";
+						if( $row['table_name'] == 'ec_movimiento_detalle' ){
+						//procedure aqui
+							$aux = "SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '{$row['primary_key_value']}'";
+							$aux_stm = $this->link->query( $aux );// or die( "Error al consultar id de detalle mov almacen :" );
+							$aux_row = $aux_stm->fetch_assoc();
+                            $sql = "CALL spMovimientoAlmacenDetalle_actualiza( {$aux_row['detail_id']}, {$row['cantidad']}, NULL );";
+						}
 					    array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id'] ) );
 					break;
 					case 'delete' :
                     //verifica si existe el registro
-                        $verification_sql = "SELECT folio_unico FROM {$row['table_name']} {$condition}";
+                        $verification_sql = "SELECT {$row['primary_key']} FROM {$row['table_name']} {$condition}";
                         $verification_stm = $this->link->query( $verification_sql );
                         if( $verification_stm->num_rows > 0) {//si el registro no existe
                             $sql = "DELETE FROM {$row['table_name']} {$condition}";
-                            //$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row_['synchronization_row_id']}'";
+						    if( $row['table_name'] == 'ec_movimiento_detalle' ){
+                            //procedure aqui
+                                $aux = "SELECT id_movimiento_almacen_detalle AS detail_id FROM ec_movimiento_detalle WHERE folio_unico = '{$row['primary_key_value']}'";
+                                $aux_stm = $this->link->query( $aux );// or die( "Error al consultar id de detalle mov almacen :" );
+                                $aux_row = $aux_stm->fetch_assoc();
+                                $sql = "CALL spMovimientoAlmacenDetalle_elimina( {$aux_row['detail_id']}, NULL );";
+                            }
 					        array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id'] ) );
                         }else{//si el registro ya no existe en el destino
                             $resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row_['synchronization_row_id']}'";
@@ -292,7 +306,7 @@
                             if( $logger_id ){
                                 $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al ejecutar consulta ", "$table_name", $query, $this->link->error );
                             }
-                            die( "Error : {$this->link->error}" );
+                            die( "Error : {$sql} : {$this->link->error}" );
                         }
                     if( $ok == true && $query_['row_id'] != 'n/a' ){
 						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";

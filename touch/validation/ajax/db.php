@@ -79,7 +79,7 @@
 			break;
 
 			default:
-				die( "Permission Denied!" );
+				die( "Permission Denied." );
 			break;
 		}
 	}
@@ -573,7 +573,7 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 					LIMIT 1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar código de barras del ticket : {$this->link->error} {$sql}" );
 			if( $stm->num_rows <= 0 ){
-				$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no fue encontrada.<br>Verifica y vuelve a intentar!</p>";
+				$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no fue encontrada.<br>Verifica y vuelve a intentar.</p>";
 				$resp .= "<div class=\"row\">";
 					$resp .= "<div class=\"col-2\"></div>";
 					$resp .= "<div class=\"col-8\">";
@@ -606,7 +606,7 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 
 				$difference = round( $row_aux['payments_total'] - $pagos_dev ) - round( $row['total'] );
 				if( ( $difference != -1 && $difference != 0 && $difference != -1 ) && $row['pagado'] == 1 ){//venta no liquidada $row_aux['payments_total'] < $row['total']
-					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no ah sido liquidada<br>Verifica y vuelve a intentar!</p>";
+					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no ha sido liquidada<br>Verifica y vuelve a intentar.</p>";
 					$resp .= "<h5>{$row_aux['payments_total']} VS {$row['total']} = {$difference}, {$row['pagado']}</h5>";
 					$resp .= "<div class=\"row\">";
 						$resp .= "<div class=\"col-2\"></div>";
@@ -619,7 +619,7 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 					$resp .= "</div><br><br>";
 					return $resp;
 				}else if( $row_aux['payments_total'] == 0 && $row['pagado'] == 0 ){//apartado sin pagos
-					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas <b class=\"text-primary\">( apartado )</b> con el folio : <b>{$barcode}</b> no tiene pagos registrados<br>Verifica y vuelve a intentar!</p>";
+					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas <b class=\"text-primary\">( apartado )</b> con el folio : <b>{$barcode}</b> no tiene pagos registrados<br>Verifica y vuelve a intentar.</p>";
 					$resp .= "<div class=\"row\">";
 						$resp .= "<div class=\"col-2\"></div>";
 						$resp .= "<div class=\"col-8\">";
@@ -1007,7 +1007,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 			//$resp .= "<div class=\"row\">";
 			//	$resp .= "<div class=\"col-2\"></div>";
 			//	$resp .= "<div class=\"col-8\">";
-					$resp = "ok|<h5 style=\"color : white;\">Producto validado!</h5>";
+					$resp = "ok|<h5 style=\"color : white;\">Producto validado.</h5>";
 					//$resp .= "<button class=\"btn btn-success form-control\" onclick=\"close_emergent( null, '#barcode_seeker' );\">";
 					//	$resp .= "<i class=\"icon-ok-circle\">Aceptar</i>";
 					//$resp .= "</button>";
@@ -1300,6 +1300,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 								type=\"number\" 
 								class=\"form-control\"
 								id=\"pieces_quantity_tmp\"
+								min=\"1\"
 								onkeyup=\"validate_no_decimals( this );\"
 							>
 							<br>
@@ -1404,11 +1405,11 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 							<td id=\"{$prefix}vrs_row_1_{$counter}\" class=\"text-center\" width=\"33.3%\">{$row['provider_clue']}</td>
 							<td class=\"text-end\" width=\"33.3%\">
 								<input 
-									type=\"number\" 
+									type=\"text\"
 									id=\"{$prefix}vrs_row_2_{$counter}\"
 									value=\"\"
 									min=\"0\"
-									onkeyup=\"prevent_negative_number( this, event );\"
+									onkeyup=\"prevent_negative_number_( this, event );\"
 									class=\"form-control text-end\"
 									" . ( $is_editable != true ? ' readonly' : '' ) . 
 									( $is_editable == true ? "onchange=\"recalculateReturnProduct();\"" : "" ) 
@@ -1420,7 +1421,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 				$validated_total += $row['validated_quantity']; 
 				$return_total += 0; 
 			}
-		//consulta la cantidad que no se ah validado
+		//consulta la cantidad que no se ha validado
 
 			$sql = "SELECT 
 						pd.id_pedido_detalle AS sale_detail_id,
@@ -1952,7 +1953,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 				return "<div class=\"row\">
 					<h5>Esta venta fue hecha en sistema <b>{$sale_system_type}.</b></h5>
 					<p class=\"text-center\">Si deseas validarla en <b>{$this->system_type} escribe la palabra '{$this->system_type}'</b></p>
-					<h5 style=\"color : green;\">IMPORTANTE : DEBERAS DE VOLVER A DESEMPACAR TODO Y VOLVER A VALIDAR TODOS LOS PRODUCTOS DE ESTA VENTA!</h5>
+					<h5 style=\"color : green;\">IMPORTANTE : DEBERAS DE VOLVER A DESEMPACAR TODO Y VOLVER A VALIDAR TODOS LOS PRODUCTOS DE ESTA VENTA.</h5>
 					<div class=\"col-4\"></div>
 					<div class=\"col-4\">
 						<input type=\"text\" id=\"validation_tmp_word\">

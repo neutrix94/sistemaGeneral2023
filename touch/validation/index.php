@@ -110,9 +110,9 @@
 				<div class="col-2 txt_alg_left">
 					<button 
 						class="btn btn-light"
-						onclick="redirect('home');"
+						onclick="if( confirm( 'Realmente deseas salir al panel principal?' ) ){location.href='../../index.php?';}"
 					>
-						<i class="icon-home-1"></i>
+						<i class="icon-home-1">Regresar al panel</i>
 					</button>
 				</div>
 
@@ -127,11 +127,11 @@
 					</button>
 				</div>
 
-				<div class="col-2 txt_alg_right">
+				<!--div class="col-2 txt_alg_right">
 					<button class="btn btn-light">
 						<i class="icon-off"></i>
 					</button>
-				</div>
+				</div-->
 			</div>
 		</div>
 	</div>

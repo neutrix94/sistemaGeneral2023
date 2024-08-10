@@ -48,12 +48,7 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   $generalRowsVerification = new generalRowsVerification( $link, $Logger );//instancia clase de comprobacion
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link, $Logger );//instancia clase de Peticiones Log
   $rowsSynchronization = new rowsSynchronization( $link, $Logger );//instancia clase de sincronizacion de registros generales
-
-/*verfifica que no este sincronizando / marca sincronizando
-  $check = $SynchronizationManagmentLog->block_sinchronization_module( 'sys_sincronizacion_registros' );
-  if( $check != 'ok' ){
-    return json_encode( array( "response"=>$check ) );
-  }*/
+  
 //consulta path del sistema central
   $config = $SynchronizationManagmentLog->getSystemConfiguration( 'sys_sincronizacion_registros' );
   $path = trim ( $config['value'] );
@@ -63,7 +58,7 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   $rows_limit = $config['rows_limit'];
 
   if( $LOGGER ){
-    $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_registros_ventas', $system_store, -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
+    $LOGGER = $Logger->insertLoggerRow( '', 'sys_sincronizacion_registros', $system_store, -1 );//inserta el log de sincronizacion $LOGGER['id_sincronziacion']
   }
   if( $system_store == -1 ){//valida que el origen no sea linea
   //liberar el modulo de sincronizacion
@@ -71,10 +66,10 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
   }
 
-/*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
+/*Comprobacion de registros de sincronizacion ( peticiones anteriores ) 2024*/
   $req['verification'] = $generalRowsVerification->getPendingRows( $system_store, -1, 'sys_sincronizacion_registros', 
   ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene los registros de comprobacion de registros de sincronizacion
-/*Fin de comprobacion de movimientos de almacen*/
+/*Fin de comprobacion de registros de sincronizacion*/
   
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta request
   $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros', $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
@@ -116,20 +111,25 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
         if( sizeof($petition_log) > 0 ){
           $verification_req['log_response'] = $generalRowsVerification->validateIfExistsPetitionLog( $petition_log, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta si la peticion existe en local 
           $verification_req['rows_response'] = $generalRowsVerification->RowsValidation( $validation_rows, 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//realiza proceso de comprobacion
+          $verification_req['table_name'] = "sys_sincronizacion_registros";
           $post_data = json_encode( $verification_req );
-          $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_comprobacion_registros_sincronizacion", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consume servicio para actualizar la comprobacion en linea
+          //return $post_data;
+          $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_comprobacion_registros", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consume servicio para actualizar la comprobacion en linea
+          //echo $result_1;
         }
       }
     }
+/*Fin de Respuesta de Comprobacion*/
 
+    $local_response_log = array();
     if( $result->ok_rows != '' && $result->ok_rows != null ){//actualiza registros exitosos
-      $rowsSynchronization->updateRowSynchronization( $result->ok_rows, $req["log"]["unique_folio"], 'sys_sincronizacion_registros', 3, false, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      $local_response_log = $rowsSynchronization->updateRowSynchronization( $result->ok_rows, $req["log"]["unique_folio"], 'sys_sincronizacion_registros', 3, false, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     }
     if( $result->error_rows != '' && $result->error_rows != null ){//actualiza erores
-      $rowsSynchronization->updateRowSynchronization( $result->error_rows, $req["log"]["unique_folio"], 'sys_sincronizacion_registros', 2, false, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+      $local_response_log = $rowsSynchronization->updateRowSynchronization( $result->error_rows, $req["log"]["unique_folio"], 'sys_sincronizacion_registros', 2, false, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     }
     if( $result->log != '' && $result->log != null ){//actualiza respuesta
-      $SynchronizationManagmentLog->updatePetitionLog( $result->log->destinity_time, $result->log->response_time, $result->log->response_string, 
+      $local_response_log = $SynchronizationManagmentLog->updatePetitionLog( $result->log->destinity_time, $result->log->response_time, $result->log->response_string, 
         $result->log->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     }
 /**************************************************Inserta lo que viene de linea**************************************************/
@@ -146,11 +146,9 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
   $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
 
-
   if( $result->rows_download != '' && $result->rows_download != null ){
     $rows_download = json_decode(json_encode($result->rows_download), true);//json_encode($result->rows_download);
     $log_download = json_decode(json_encode($result->log_download), true );
-    //$resp["log"] = $SynchronizationManagmentLog->insertResponse( $log_download, $request_initial_time, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta response
     $insert_rows = $rowsSynchronization->insertRows( $rows_download, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
 //return json_encode($insert_rows);
     if( $insert_rows["error"] != '' && $insert_rows["error"] != null  ){//inserta error si es el caso
@@ -168,22 +166,21 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
       $result->response_string = "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}";
     //inserta respuesta exitosa
       $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$insert_rows["ok_rows"]} | {$insert_rows["error_rows"]}", $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-      
     //obtiene fecha y hora actual y actualiza registro de petición
       $result->log_download->destinity_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
       $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
         $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
       $resp["log"]["type_update"] = "rowsSynchronization";
-      $post_data_1 = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
+      $post_data_1 = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"], "table"=>"sys_sincronizacion_registros" ), JSON_PRETTY_PRINT);//forma peticion
     }
   }else{
   //obtiene fecha y hora actual y actualiza registro de petición
-    $result->log_download->response_string = "No llegaron registros de sincronizacion de linea a local";
     $result->log_download->destinity_time = $SynchronizationManagmentLog->getCurrentTime( ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    $result->log_download->response_string = "No llegaron registros de sincronizacion de linea a local";
     $resp["log"] = $SynchronizationManagmentLog->updatePetitionLog( $result->log_download->destinity_time, $result->log_download->response_time, $result->log_download->response_string, 
       $result->log_download->unique_folio, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     $resp["log"]["type_update"] = "rowsSynchronization";
-    $post_data_1 = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"] ), JSON_PRETTY_PRINT);//forma peticion
+    $post_data_1 = json_encode(array( "log"=>$resp["log"], "ok_rows"=>$insert_rows["ok_rows"], "table"=>"sys_sincronizacion_registros" ), JSON_PRETTY_PRINT);//forma peticion
   }
 //envia peticion para actualizar peticion de linea a local
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data_1, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
@@ -195,13 +192,13 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   $post_data = json_encode(array( "log"=>$resp["log"], 
       "ok_rows"=>$insert_rows["ok_rows"], 
       "error_rows"=>$insert_rows["error_rows"],
-      "local_response_log"=>$local_response_log
+      "local_response_log"=>$local_response_log,
+      "table"=>"sys_sincronizacion_registros"
     ), JSON_PRETTY_PRINT);
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/actualiza_peticion", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición
-  $SynchronizationManagmentLog->release_sinchronization_module( 'ec_devolucion', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
+  $SynchronizationManagmentLog->release_sinchronization_module( 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
   $link->close();//cierra conexion Mysql
-  return 'ok';
-  //return json_encode( array( "response" => "Registros ok" ) );
+  return 'ok';//regresa respuesta
 });
 
 ?>

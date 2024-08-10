@@ -43,7 +43,19 @@
 	$usuario = $r[0];
 	$sucursal = $r[1];
 	$session_id = $r[2];
-	
+//consulta si esta habilitado el log del JSON
+	$sql = "SELECT
+				p.ver AS permission
+			FROM sys_permisos p
+			LEFT JOIN sys_users_perfiles up
+			ON up.id_perfil = p.id_perfil
+			LEFT JOIN sys_users u
+			ON u.tipo_perfil = up.id_perfil
+			WHERE p.id_menu = 310
+			AND u.id_usuario = {$user_id}";
+	$stm = $link->query( $sql ) or die( "Error al consultar permiso de LOG JSON : {$sql} : {$link->error}" );
+	$json_log = $stm->fetch_assoc();
+
 	$Payments = new Payments( $link, $user_sucursal );//instancia clase de pagos
 	$token = $Payments->checkAccess( $user_id );//verifica permisos
 	//var_dump( $token );die('');
@@ -53,7 +65,6 @@
 //configuracion del Websocket
 // $url_websocket = "ws://localhost:3005/";//"ws://localhost:3000";
 // $url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
-
 	$url_websocket = $Payments->getWebSocketURL();// getenv('WEBSOCKET_URL') ?: "ws://192.168.1.223:3005/";
 	if( $url_websocket == '' || $url_websocket == NULL || $url_websocket == null ){
 		die( "<center>
@@ -148,14 +159,19 @@
 	</div>
 <!-- Cancelaciones /reimpresiones manuales -->
 	<div class="reverse_form_btn">
-		
-		<button
-			type="button"
-			class="btn btn-info"
-			onclick="show_debug_json();"
-		>
-			<i class="icon-file-code"></i>
-		</button>
+	<?php
+		if( $json_log['permission'] == 1 ){
+	?>
+			<button
+				type="button"
+				class="btn btn-info"
+				onclick="show_debug_json();"
+			>
+				<i class="icon-file-code"></i>
+			</button>
+	<?php
+		}
+	?>
 
 		<button
 			type="button"
@@ -319,13 +335,14 @@
 			</div>
 			<div class="col-5">
 				<div class=" input-group">
-					<input type="number" id="monto_cheque_transferencia" class="form-control">
+					<input type="text" id="monto_cheque_transferencia" class="form-control" onkeyup="validateNumberInput( this );">
 					<button 
 						class="btn btn-primary"
 						onclick="agrega_cheque_transferencia();">
 						<i class="icon-plus"></i>
 					</button>
 				</div>
+				<p class="text-center text-danger hidden" id="monto_cheque_transferencia_alerta">Campo numérico*</p>
 			</div>
 		</div>
 

@@ -10,8 +10,6 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 */
 $app->post('/actualiza_comprobacion_devoluciones', function (Request $request, Response $response){  
     $resp = array();
-    //$resp['rows_response'] = array();
-    //$resp['rows_download'] = array();
     if ( ! include( '../../conexionMysqli.php' ) ){
         die( 'no se incluyó conexion' );
     }
@@ -21,8 +19,6 @@ $app->post('/actualiza_comprobacion_devoluciones', function (Request $request, R
     $returnRowsVerification = new returnRowsVerification( $link );//instancia clase de comprobacion
     $petition_log = json_decode( json_encode( $request->getParam( 'log_response' ) ) );//recibe folio unico de la peticion
     $rows_response = json_decode( json_encode( $request->getParam( 'rows_response' ) ) );//recibe folio unico de la peticion
-    //$verification = $request->getParam( 'verification' );
-    //$origin_store = $request->getParam( 'origin_store' );
     if( $petition_log != null && $petition_log != '' ){
         $update_log = $returnRowsVerification->updateLogAndJsonsRows( $petition_log, $rows_response );
         if( $update_log != 'ok' ){

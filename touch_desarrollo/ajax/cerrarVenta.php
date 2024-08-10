@@ -741,11 +741,11 @@
 			$sql = "INSERT INTO ec_pedidos_relacion_devolucion ( /*1*/id_pedido_relacion_devolucion, /*2*/id_pedido_original, /*3*/monto_pedido_original,
 			/*4*/id_sesion_caja_pedido_orginal, /*5*/id_devolucion_interna, /*6*/monto_devolucion_interna, /*7*/id_devolucion_externa, 
 			/*8*/monto_devolucion_externa, /*9*/id_pedido_relacionado, /*10*/monto_pedido_relacionado, /*11*/id_sesion_caja_pedido_relacionado, 
-			/*12*/saldo_a_favor, /*13*/monto_devolucion_tomado_a_favor, /*14*/monto_interno_por_devolver, /*15*/monto_externo_por_devolver )
+			/*12*/saldo_a_favor, /*13*/monto_devolucion_tomado_a_favor, /*14*/monto_interno_por_devolver, /*15*/monto_externo_por_devolver, /*16*/folio_unico )
 			VALUES ( /*1*/NULL, /*2*/{$row['original_sale_id']}, /*3*/{$row['payments_total']}, /*4*/{$row['original_sale_session_id']}, 
 			/*5*/{$devs_array[0]}, /*6*/{$return_internal_ammount}, /*7*/{$devs_array[1]}, /*8*/{$return_external_ammount}, 
 			/*9*/{$id_pedido_r}, /*10*/{$new_total}, /*11*/0, /*12*/{$saldo_favor}, /*13*/{$monto_devolucion_tomado_a_favor}, 
-			/*14*/{$monto_saldo_devolver_interno}, /*15*/{$monto_saldo_devolver_externo} )";
+			/*14*/{$monto_saldo_devolver_interno}, /*15*/{$monto_saldo_devolver_externo}, /*16*/NULL )";
 			$stm = mysql_query( $sql ) or die( "Error al insertar la relacion entre pedidos : {$sql} " . mysql_error() );
 
 			$sql="UPDATE ec_pedidos SET id_devoluciones='$id_devoluciones' WHERE id_pedido=$id_pedido_r";
