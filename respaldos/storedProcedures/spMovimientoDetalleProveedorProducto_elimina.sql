@@ -1,6 +1,6 @@
-DROP PROCEDURE IF EXISTS spMovimientoDetalleProveedorProducto_actualiza|
+DROP PROCEDURE IF EXISTS spMovimientoDetalleProveedorProducto_elimina|
 DELIMITER $$
-CREATE PROCEDURE spMovimientoDetalleProveedorProducto_actualiza( IN id_movimiento_detalle BIGINT, IN product_provider_id INTEGER, IN cantidad_nueva FLOAT( 15, 4 ), IN sincronizar_registro INTEGER )
+CREATE PROCEDURE spMovimientoDetalleProveedorProducto_elimina( IN id_movimiento_detalle BIGINT, IN product_provider_id INTEGER, IN sincronizar_registro INTEGER )
     BEGIN
 /*verificado 13-07-2023*/
 	DECLARE store_id INTEGER;
@@ -33,19 +33,15 @@ CREATE PROCEDURE spMovimientoDetalleProveedorProducto_actualiza( IN id_movimient
     ON md.id_movimiento_almacen_detalle = mdpp.id_movimiento_almacen_detalle
     LEFT JOIN ec_tipos_movimiento tm
     ON tm.id_tipo_movimiento = mdpp.id_tipo_movimiento
-    WHERE mdpp.id_movimiento_almacen_detalle = id_movimiento_detalle
-    AND mdpp.id_proveedor_producto = product_provider_id;
+    WHERE mdpp.id_movimiento_almacen_detalle = id_movimiento_detalle;
 
-    IF( cantidad_nueva != cantidad_anterior )
-    THEN
-    /*Actualiza el detalle de movimiento proveedor producto*/
-        UPDATE ec_movimiento_detalle_proveedor_producto SET cantidad = cantidad_nueva WHERE id_movimiento_almacen_detalle = id_movimiento_detalle
-        AND id_proveedor_producto = product_provider_id;
-	/*Actualiza el inventario acumulado*/
-        SET final_inventory = ( ( cantidad_nueva * movement_type ) - ( cantidad_anterior * movement_type ) );
-		UPDATE ec_inventario_proveedor_producto SET inventario = ( inventario + final_inventory)  
-		WHERE id_proveedor_producto = product_provider_id AND id_almacen = warehouse_id;
-    END IF;
+/*elimina el detalle de movimiento proveedor producto*/
+    DELETE FROM ec_movimiento_detalle_proveedor_producto WHERE id_movimiento_almacen_detalle = id_movimiento_detalle
+    AND id_proveedor_producto = product_provider_id;
+/*Actualiza el inventario acumulado (resta)*/
+    SET final_inventory = ( cantidad_anterior * movement_type ) ;
+    UPDATE ec_inventario_proveedor_producto SET inventario = ( inventario - final_inventory)  
+    WHERE id_proveedor_producto = product_provider_id AND id_almacen = warehouse_id;
     
 	IF( product_provider_movement_unique_folio IS NOT NULL AND sincronizar_registro IS NOT NULL )
 	THEN
@@ -65,7 +61,7 @@ CREATE PROCEDURE spMovimientoDetalleProveedorProducto_actualiza( IN id_movimient
 				'}'
 			),
 			NOW(),
-			'spMovimientoDetalleProveedorProducto_actualiza',
+			'spMovimientoDetalleProveedorProducto_elimina',
 			1
 		FROM sys_sucursales 
 		WHERE id_sucursal = IF( store_id = -1, movement_store_id, -1 );

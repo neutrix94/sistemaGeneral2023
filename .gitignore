@@ -10,6 +10,8 @@ templates_c/*
 /code/pdf/transferencias/*
 /img/codigos_barra/*
 assets/archivoDatosQR.txt
+/sincronizacion/log.txt
+/sincronizacion/ruta.txt
 
 **/.DS_Store
 *error_log

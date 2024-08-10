@@ -83,7 +83,7 @@ CREATE PROCEDURE spMovimientoAlmacenDetalle_actualiza ( IN id_movimiento_detalle
 	   IF( product_provider_id != '' AND product_provider_id IS NOT NULL AND product_provider_id != -1 )
 		THEN
         /*actualiza el detalle a nivel proveedor producto*/
-            CALL spMovimientoDetalleProveedorProducto_actualiza( id_movimiento_detalle, product_provider_id, cantidad_nueva );
+            CALL spMovimientoDetalleProveedorProducto_actualiza( id_movimiento_detalle, product_provider_id, cantidad_nueva, sincronizar_registro );
 			/*UPDATE ec_movimiento_detalle_proveedor_producto
 			SET cantidad = cantidad_nueva
 			WHERE id_movimiento_almacen_detalle = movement_detail_id
