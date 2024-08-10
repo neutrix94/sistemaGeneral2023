@@ -837,6 +837,7 @@
 		$sql = "SELECT 
 					t.id_usuario, 
 					t.id_sucursal_origen,
+					t.id_sucursal_destino,
 					t.id_transferencia, 
 					t.id_almacen_origen,
 					t.id_almacen_destino
@@ -845,7 +846,7 @@
 		$stm_1 = $link->query( $sql ) or die( "Error al consultar datos de la transferencia : {$sql} : {$link->error}" );
 		$transfer_row = $stm_1->fetch_assoc();
 	//inserta cabecera de movimiento de almacen
-		$sql = "CALL spMovimientoAlmacen_inserta ( {$transfer_row['id_usuario']}, 'ENTRADA POR TRANSFERENCIA', {$transfer_row['id_sucursaldestino']}, {$transfer_row['id_almacen_destino']}, 5,
+		$sql = "CALL spMovimientoAlmacen_inserta ( {$transfer_row['id_usuario']}, 'ENTRADA POR TRANSFERENCIA', {$transfer_row['id_sucursal_destino']}, {$transfer_row['id_almacen_destino']}, 5,
 				-1, -1, -1, {$transfer}, 4, NULL )";
 		$stm_2 = $link->query( $sql ) or die( "Error al insertar el movimiento de almacen por Procedure : {$sql} : {$link->error}" );
 	//recupera id insertado
