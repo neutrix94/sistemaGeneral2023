@@ -857,7 +857,7 @@
 	//consulta datos del detalle de la transferencia
 		$sql = "SELECT 
 				tp.id_producto_or,
-				tp.cantidad,
+				tp.total_piezas_recibidas,
 				tp.id_proveedor_producto
 				FROM ec_transferencia_productos tp
 				WHERE tp.id_transferencia = {$transfer}
@@ -865,8 +865,8 @@
 		$stm_4 = $link->query( $sql ) or die( "Error al consultar el detalle de productos de la transferencia : {$sql} : {$link->error}" );
 	//inserta detalle de movimientos de almacen
 		while( $detail_row = $stm_4->fetch_assoc() ){
-			$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_id}, {$detail_row['id_producto_or']}, {$detail_row['cantidad']}, 
-						{$detail_row['cantidad']}, -1, -1, {$detail_row['id_proveedor_producto']}, 8, NULL )";
+			$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_id}, {$detail_row['id_producto_or']}, {$detail_row['total_piezas_recibidas']}, 
+						{$detail_row['total_piezas_recibidas']}, -1, -1, {$detail_row['id_proveedor_producto']}, 8, NULL )";
 			$stm_5 = $link->query( $sql ) or die( "Error al insertar detalle de movimiento de almacen desde procedure : {$sql} : {$link->error}" );
 		}
 	}
