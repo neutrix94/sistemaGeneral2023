@@ -36,6 +36,7 @@ require 'endpoints/facturaReceptor.php';   //Facturación: Valida contribuyente
 require 'endpoints/surteMuestra.php';   //Surtimeinto: Solicitud de muestra
 require 'endpoints/surtePedido.php';   //Surtimeinto: Solicitud para pedido
 require 'endpoints/notiPedido.php';   //Surtimeinto: Notifica surtimiento
+require 'endpoints/notificacionesPendientes.php';   //Surtimeinto: Obtiene notificaciones pendientes
 
 //implementacion Oscar 2023 para sincronizacion ( Servidor )
 require 'server/inserta_registros_sincronizacion.php';
