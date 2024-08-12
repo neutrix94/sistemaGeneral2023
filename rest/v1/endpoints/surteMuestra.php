@@ -78,7 +78,7 @@ $app->post('/surte/Muestra', function (Request $request, Response $response){
       $idDetalle = gen_uuid();
       $sqlInsert = "INSERT INTO `ec_surtimiento_detalle` 
         (`id`, `id_surtimiento`, `id_producto`, `cantidad_solicitada`, `estado`, `id_asignado`, `fecha_creacion`, `creado_por`, `fecha_modificacion`, `modificado_por`) 
-        VALUES ('{$idDetalle}', '{$idSurtido}', '{$producto['id']}', '{$producto['cantidad']}', '1', '{$idSurtidor}', now(), '{$vendedor}', now(), '{$vendedor}');";
+        SELECT  '{$idDetalle}', '{$idSurtido}', p.id_productos, '1', '1', '{$idSurtidor}', now(), '{$vendedor}', now(), '{$vendedor}'  from ec_productos p where p.orden_lista='{$producto['id']}';";
       $db->exec($sqlInsert);
     }
     

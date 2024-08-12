@@ -16,8 +16,17 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id);
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<nav class="navbar navbar-default navbar-fixed-top" style="background-color: #b10015;">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../index.php" style="color: #fff">
+        Casa de las Luces 🎄✨
+      </a>
+    </div>
+  </div>
+</nav>
 <div class="container mt-5">
-    <h1 class="text-center">Asignar Ítem</h1>
+    <h1 class="text-center">Asignación</h1>
     <table class="table table-bordered">
         <tbody>
             <tr>
@@ -59,10 +68,11 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id);
             <!-- Las filas se agregarán dinámicamente aquí -->
         </tbody>
     </table>
-    
-    <button class="btn btn-success" onclick="guardarAsignacion()">Guardar asignación</button>
-    <button class="btn btn-warning" onclick="pausarSurtimiento()">Pausar Surtimiento</button>
-    <button class="btn btn-danger" onclick="cancelarSurtimiento()">Cancelar Surtimiento</button>
+    <br>
+    <button class="btn btn-primary" onclick="priorizarSurtimiento()">⭐️ Priorizar surtimiento</button>
+    <button class="btn btn-success" onclick="guardarAsignacion()">✔️ Guardar asignación</button>
+    <button class="btn btn-warning" onclick="pausarSurtimiento()">⏸️ Pausar surtimiento</button>
+    <button class="btn btn-danger" onclick="cancelarSurtimiento()">✖️ Cancelar surtimiento</button>
 </div>
 
 <script>
@@ -208,6 +218,27 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id);
                   },
                   error: function(xhr, status, error) {
                       alert('Hubo un error al cancelar la asignación: ' + error);
+                  }
+              });
+        }
+    }
+    
+    function priorizarSurtimiento() {
+        // Lógica para pausar el surtimiento en la base de datos
+        if (confirm('¿Estás seguro de subir el nivel de prioridad?')) {
+              $.ajax({
+                  url: '../classes/surtimiento.php',
+                  type: 'POST',
+                  data: {
+                      action: 'priorizarSurtimiento',
+                      id: '<?php echo $id; ?>',
+                      prioridad: '1'
+                  },
+                  success: function(response) {
+                      window.location.href = 'lista.php';
+                  },
+                  error: function(xhr, status, error) {
+                      alert('Hubo un error al priorizar el surtimiento: ' + error);
                   }
               });
         }

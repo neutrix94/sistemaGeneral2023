@@ -5,8 +5,6 @@ require_once '../classes/surtimiento.php';
 $surtimientoCRUD = new SurtimientoCRUD();
 $listaSurtir = $surtimientoCRUD->listaDetalleSurtimiento($id);
 $pendientes = (count($listaSurtir)>0) ? 1: 0 ;
-// error_log(print_r($listaSurtir,true));
-// error_log($listaSurtir[0]['nombre']);
 $indiceSurtir = 0;
 
 ?>
@@ -24,16 +22,29 @@ $indiceSurtir = 0;
 
 </head>
 <body>
+    <!-- header -->
+    <nav class="navbar navbar-default navbar-fixed-top" style="background-color: #b10015;">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="../../index.php" style="color: #fff">
+            Casa de las Luces 🎄✨
+          </a>
+        </div>
+      </div>
+    </nav>
     <!-- Tabla principal -->
     <div class="container mt-5">
-        <center><p id="indexSurtimiento">Partida: <span id="index">0 de 0</span></p></center>
-        <h2 id="nombreProducto">Nombre del Producto</h2>
+        <center><p id="indexSurtimiento"><b>Partida: </b><span id="index">0 de 0</span></p></center>
+        <center><h2 id="nombreProducto">Nombre del Producto</h2></center>
+        <center>
+          <span id="claves_proveedor"></span>
+        </center>
         <h3 id="ubicacionProducto">Ubicación del Producto</h3>
         <b><p id="cantidadPiezas">Piezas: <span id="cantidad">0</span></p></b>
-        
         <div class="form-group">
             <label for="codigoProducto">Escanear</label>
             <input type="text" id="codigoProducto" class="form-control" onkeypress="if(event.key === 'Enter') leerCodigo()">
+            <span id="codigos_barras">0</span>
         </div>
         
         <div class="form-group" id="surtidoGroup" style="display: none;">
@@ -41,9 +52,9 @@ $indiceSurtir = 0;
             <input type="number" id="cantidadSurtida" class="form-control">
         </div>
         
-        <button class="btn btn-danger" onclick="noHayExistencia()">No hay Existencia</button>
-        <button class="btn btn-warning" onclick="abandonarSurtimiento()">Abandonar Surtimiento</button>
-        <button class="btn btn-primary" onclick="siguiente()">Siguiente</button>
+        <button class="btn btn-danger" onclick="noHayExistencia()">➖ No hay Existencia</button>
+        <button class="btn btn-warning" onclick="abandonarSurtimiento()">✖️ Abandonar Surtimiento</button>
+        <button class="btn btn-primary" onclick="siguiente()">✔️ Siguiente</button>
     </div>
 
     <!-- Modal -->
@@ -58,7 +69,7 @@ $indiceSurtir = 0;
                 </div>
                 <div class="modal-body">
                     <h6 class="text-dark">No hay más productos por surtir.</h6>
-                    <p class="text-muted">Entrega la mercancía a: <span id="nombreVendedor"></span></p>
+                    <p class="text-muted">Entrega la mercancía a: <b><span id="nombreVendedor"></span></b></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" onclick="window.location.href='lista.php'">Aceptar</button>
@@ -92,7 +103,7 @@ $indiceSurtir = 0;
                 alert('Por favor, ingrese el código del producto.');
                 return;
             }
-            if(codigoProducto == listaSurtir[indiceSurtir].codigo_barras_4 ){
+            if(listaSurtir[indiceSurtir].codigos_barras.split(",").includes(codigoProducto)){
                 document.getElementById('surtidoGroup').style.display = 'block';
                 document.getElementById('cantidadSurtida').value = Number(listaSurtir[indiceSurtir].cantidad_solicitada);
                 document.getElementById('cantidadSurtida').focus();
@@ -177,14 +188,6 @@ $indiceSurtir = 0;
                   }
               });
               
-              indiceSurtir++;
-              if(indiceSurtir >= listaSurtir.length){
-                //Concluyó asignación
-                surtidoCompletado();
-              }else{
-                //Sigue con siguiente producto
-                refreshView();
-              }
               //Limpia inputs
               document.getElementById('cantidadSurtida').value = '';
               document.getElementById('codigoProducto').value = '';
@@ -199,6 +202,20 @@ $indiceSurtir = 0;
             document.getElementById('ubicacionProducto').textContent = 'Ubicación: '+ listaSurtir[indiceSurtir].numero_ubicacion_desde + '-' +listaSurtir[indiceSurtir].altura_desde;
             document.getElementById('cantidad').textContent = listaSurtir[indiceSurtir].cantidad_solicitada;
             document.getElementById('index').textContent = Number(indiceSurtir)+1 +' de '+ Number(listaSurtir.length);  
+            document.getElementById('codigos_barras').textContent = '**(Sólo habilitado para pruebas) Códigos de barras permitidos: '+ listaSurtir[indiceSurtir].codigos_barras ;
+            
+            if(listaSurtir[indiceSurtir].claves_proveedor !== undefined && listaSurtir[indiceSurtir].claves_proveedor !== null){
+              var htmlClaves = '';
+              Object.keys(listaSurtir[indiceSurtir].claves_proveedor.split(',')).forEach(key=>{
+                  console.log(listaSurtir[indiceSurtir].claves_proveedor.split(',')[key]);
+                  if (listaSurtir[indiceSurtir].claves_proveedor.split(',')[key] == listaSurtir[indiceSurtir].clave_prioridad_maxima) {
+                    htmlClaves += '<span class="badge badge-primary">'+listaSurtir[indiceSurtir].claves_proveedor.split(',')[key]+'</span>';
+                  }else{
+                    htmlClaves += '<span class="badge badge-secondary">'+listaSurtir[indiceSurtir].claves_proveedor.split(',')[key]+'</span>';
+                  }
+              })
+              document.getElementById('claves_proveedor').innerHTML = htmlClaves;
+            }
         }
         
         function surtidoCompletado(){

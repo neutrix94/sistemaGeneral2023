@@ -5,6 +5,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     $action = isset($_POST['action']) ? $_POST['action'] : '';
     $id = isset($_POST['id']) ? $_POST['id'] : '';
     $item = isset($_POST['item']) ? $_POST['item'] : [];
+    $prioridad = isset($_POST['prioridad']) ? $_POST['prioridad'] : '';
     $listaAsignacion = isset($_POST['listaAsignacion']) ? $_POST['listaAsignacion'] : '';
 
     if ($action == 'cancelarSurtimiento') {
@@ -27,6 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
         $surtimientoCRUD = new SurtimientoCRUD();
         $surtimientoCRUD->productoSurtido($item);
     }
+    if ($action == 'priorizarSurtimiento') {
+        $surtimientoCRUD = new SurtimientoCRUD();
+        $surtimientoCRUD->priorizarSurtimiento($id, $prioridad);
+    }
     
 }
 
@@ -44,7 +49,8 @@ class SurtimientoCRUD {
         return $stmt->execute();
     }
 
-    public function listaSurtir($perfil=null,$idUsuario=null) {
+    public function listaSurtir($perfil=null,$idUsuario=null,$sucursal=null) {
+        $estados = $perfil=='2' ? "'1','2','3','4','5'" : "'1','2'" ;
         $result = $this->conn->query("SELECT 
             s.id,
             s.no_pedido,
@@ -61,8 +67,15 @@ class SurtimientoCRUD {
                 WHEN s.estado = 5 THEN 'Cancelada'
                 ELSE s.estado
             END AS estado,
+            s.estado estado_id,
             concat(u.nombre, ' ', u.apellido_paterno) AS nombre_vendedor,
-            s.prioridad,
+            CASE 
+                WHEN s.prioridad = 1 THEN 'Alto'
+                WHEN s.prioridad = 2 THEN 'Medio'
+                WHEN s.prioridad = 3 THEN 'Normal'
+                ELSE s.prioridad
+            END AS prioridad,
+            s.prioridad prioridad_id,
             s.es_complemento,
             s.vendedor_notificado,
             s.surtidor_notificado,
@@ -73,7 +86,18 @@ class SurtimientoCRUD {
             s.rango_ubicaciones
         FROM ec_surtimiento s
         LEFT JOIN sys_users u ON u.id_usuario = s.id_vendedor
-        ORDER BY prioridad asc;");
+        WHERE u.id_sucursal = '{$sucursal}'
+        AND s.estado in ({$estados})
+        ORDER BY s.estado, s.prioridad asc;");
+        
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+    
+    public function getUserProfile($idUsuario=null) {
+        $result = $this->conn->query("SELECT  u.id_usuario, u.nombre, u.apellido_paterno, u.apellido_materno, u.puesto, u.id_sucursal, u.tipo_perfil, s.id_encargado
+            FROM sys_users u
+            LEFT JOIN sys_sucursales s on s.id_sucursal = u.id_sucursal
+            WHERE u.id_usuario='{$idUsuario}' limit 1;");
         
         return $result->fetch_all(MYSQLI_ASSOC);
     }
@@ -126,9 +150,10 @@ class SurtimientoCRUD {
         }
         
         // Obtener lista de items x surtidor
-        $itemsResult = $this->conn->query("SELECT count(*) partidas, sd.id_asignado id_surtidor, concat(u.nombre, ' ', u.apellido_paterno) AS nombre_surtidor
+        $itemsResult = $this->conn->query("SELECT count(*) partidas, sd.id_asignado id_surtidor, concat(u.nombre, ' ', u.apellido_paterno) AS nombre_surtidor, s.id_pedido
             from ec_surtimiento_detalle sd
             left join sys_users u on u.id_usuario = sd.id_asignado
+            left join ec_surtimiento s on s.id = sd.id_surtimiento
             where sd.id_surtimiento = '{$id}'
             and sd.id_asignado != '' and sd.id_asignado is not null
             group by sd.id_asignado
@@ -141,6 +166,7 @@ class SurtimientoCRUD {
                   'partidas' => $row['partidas'], 
                   'id_surtidor' => $row['id_surtidor'],
                   'nombre_surtidor' => $row['nombre_surtidor'],
+                  'id_pedido' => $row['id_pedido'],
                   'asignado' => 1
                 );
             }
@@ -151,7 +177,7 @@ class SurtimientoCRUD {
             'pendienteSurtir' => $pendienteSurtir,
             'pendienteAsignar' => $pendienteAsignar,
             'Surtidores' => $surtidores,
-            'items' => $items
+            'items' => $items    
         );
 
         $this->conn->close();
@@ -189,6 +215,15 @@ class SurtimientoCRUD {
         //return true;
     }
     
+    public function priorizarSurtimiento($id = null, $prioridad=null) {
+        $query = "UPDATE ec_surtimiento SET fecha_modificacion = now(), prioridad = '{$prioridad}' WHERE id = '{$id}';";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $stmt->close();
+        $this->conn->close();
+        //return true;
+    }
+    
     public function actualizaAsignacion($data=null) {
         //error_log(print_r($data,true));
         //Limpia asignaciones
@@ -212,29 +247,55 @@ class SurtimientoCRUD {
     
     public function listaDetalleSurtimiento($id=null) {
         $result = $this->conn->query("SELECT 
-              sd.id,
-              sd.id_producto,
-              sd.id_asignado,
-              p.nombre,
-              p.clave,
-              p.codigo_barras_4,
-              p.orden_lista,
-              ub.numero_ubicacion_desde,
-              ub.altura_desde,
-              sd.cantidad_solicitada,
-              sd.cantidad_surtida,
-              sd.estado,
-              sd.sin_inventario,
-              s.id_vendedor,
-              concat(u.nombre, ' ', u.apellido_paterno) AS nombre_vendedor
-           from ec_surtimiento_detalle sd
-           left join ec_productos p on p.id_productos = sd.id_producto
-           left join ec_sucursal_producto_ubicacion_almacen ub on ub.id_producto = sd.id_producto and ub.id_sucursal = '4'
-           inner join ec_surtimiento s on s.id = sd.id_surtimiento
-           left join sys_users u on u.id_usuario = s.id_vendedor
-           WHERE  sd.id_surtimiento = '{$id}'
-            -- and sd.id_asignado='104'
-            and sd.estado in (1,2);");
+                sd.id,
+                sd.id_producto,
+                sd.id_asignado,
+                sd.id_surtimiento,
+                p.nombre,
+                p.clave,
+                p.codigo_barras_4,
+                p.orden_lista,
+                ub.numero_ubicacion_desde,
+                ub.altura_desde,
+                sd.cantidad_solicitada,
+                sd.cantidad_surtida,
+                sd.estado,
+                sd.sin_inventario,
+                s.id_vendedor,
+                concat(u.nombre, ' ', u.apellido_paterno) AS nombre_vendedor,
+                pp_data.claves_proveedor,
+                pp_data.codigos_barras,
+                pp_data.max_prioridad_surtimiento,
+                pp_data.clave_prioridad_maxima
+            FROM ec_surtimiento_detalle sd
+            LEFT JOIN ec_productos p ON p.id_productos = sd.id_producto
+            LEFT JOIN ec_sucursal_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto AND ub.id_sucursal = '4'
+            INNER JOIN ec_surtimiento s ON s.id = sd.id_surtimiento
+            LEFT JOIN sys_users u ON u.id_usuario = s.id_vendedor
+            LEFT JOIN 
+                (
+                    SELECT 
+                        pp.id_producto,
+                        group_concat(pp.clave_proveedor ORDER BY pp.prioridad_surtimiento DESC) AS claves_proveedor,
+                        replace(group_concat(concat_ws(',',pp.codigo_barras_pieza_1, pp.codigo_barras_pieza_2, pp.codigo_barras_pieza_3) SEPARATOR ','),' ','') AS codigos_barras,
+                        max(pp.prioridad_surtimiento) AS max_prioridad_surtimiento,
+                        (SELECT pp2.clave_proveedor 
+                         FROM ec_proveedor_producto pp2 
+                         WHERE pp2.id_producto = pp.id_producto 
+                         AND pp2.habilitado = 1 
+                         ORDER BY pp2.prioridad_surtimiento DESC 
+                         LIMIT 1) AS clave_prioridad_maxima
+                    FROM 
+                        ec_proveedor_producto pp
+                    WHERE 
+                        pp.habilitado = 1
+                    GROUP BY 
+                        pp.id_producto
+                ) AS pp_data ON pp_data.id_producto = sd.id_producto
+            WHERE  
+                sd.id_surtimiento = '{$id}'
+                -- and sd.id_asignado='104'
+                AND sd.estado IN (1,2);");
         
         return $result->fetch_all(MYSQLI_ASSOC);
     }
@@ -249,9 +310,21 @@ class SurtimientoCRUD {
     }
     
     public function productoSurtido($item = null){
+        //Actualiza detalle
         $query = "UPDATE ec_surtimiento_detalle sd SET sd.fecha_modificacion = now(), sd.estado = '3', sd.cantidad_surtida ='".$item['cantidad_surtida']."' WHERE sd.id = '".$item['id']."';";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
+        //Actualiza cabecera
+        $queryS = "UPDATE ec_surtimiento s SET s.fecha_modificacion = now(), s.estado = '3' WHERE s.id IN
+          (SELECT sd.id_surtimiento
+            FROM ec_surtimiento_detalle sd
+            WHERE sd.id_surtimiento='".$item['id_surtimiento']."'
+            GROUP BY sd.id_surtimiento
+            HAVING SUM(CASE WHEN sd.estado NOT IN (1, 2) THEN 0 ELSE 1 END) = 0 );";
+        //error_log('queryS: '. $queryS);
+        $stmt = $this->conn->prepare($queryS);
+        $stmt->execute();
+        
         $stmt->close();
         $this->conn->close();
     }
