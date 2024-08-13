@@ -271,6 +271,7 @@
 	function build_row( $r, $c, $provider_id, $type, $link ){
 		$resp = "";
 		$background = "";
+		$check_disabled = "";
 		if( $r[12] <= 0 ){
 			$background = 'rgba( 225, 0, 0, .5)';
 		}
@@ -279,6 +280,7 @@
 		}
 		if( $r[13] == 1 ){
 			$background = 'green; color : white !important';
+			$check_disabled = "disabled";
 		}
 		if( $r[20] == '' || $r[20] == null ){
 			$r[20] = 0;
@@ -321,9 +323,9 @@
 				$r[11] = $provider_id;
 			}
 			if( $type == null ){
-				$resp .= getProductProviders( $r[1], $r[10], $r[11], $c, $link, $r[0] );
+				$resp .= getProductProviders( $r[1], $r[10], $r[11], $c, $link, $r[0], $check_disabled );
 			}else{
-				$resp .= getProductProviders( $r[1], $r[10], $r[11], $c, $link );
+				$resp .= getProductProviders( $r[1], $r[10], $r[11], $c, $link, null, $check_disabled );
 			}
 			$resp .= '</td>';
 		//pedidos pendientes
@@ -374,7 +376,7 @@
 		return $resp;
 	}
 	
-	function getProductProviders( $product_id, $product_provider_id, $provider_id, $counter, $link, $reception_detail_id = null ){
+	function getProductProviders( $product_id, $product_provider_id, $provider_id, $counter, $link, $reception_detail_id = null, $check_disabled = null ){
 	//verifica si el registro tiene pendiente un posible proveedor prodsucto por validar
 		$color = "";
 		if( $reception_detail_id != null ){
@@ -390,7 +392,7 @@
 			}
 		}
 		$resp = '<select id="13_'.$counter.'" class="form-control" onchange="changeProductProvider( this,'
-			. $product_id . ', ' . $counter . ');" ' . $color . '>';
+			. $product_id . ', ' . $counter . ');" ' . $color . ' ' . $check_disabled .'>';
 			
 			$resp .= '<option value="0">Seleccionar</option>';
 
