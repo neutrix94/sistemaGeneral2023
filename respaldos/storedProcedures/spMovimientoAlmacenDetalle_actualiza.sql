@@ -1,10 +1,11 @@
 DROP PROCEDURE IF EXISTS spMovimientoAlmacenDetalle_actualiza|
 DELIMITER $$
-CREATE PROCEDURE spMovimientoAlmacenDetalle_actualiza ( IN id_movimiento_detalle BIGINT, IN cantidad_nueva FLOAT(15,4), IN sincronizar_registro INTEGER )
+CREATE PROCEDURE spMovimientoAlmacenDetalle_actualiza ( IN id_movimiento_detalle BIGINT, IN cantidad_nueva FLOAT(15,4), IN new_product_provider_id INTEGER, IN sincronizar_registro INTEGER )
     BEGIN
 /*verificado 13-07-2023*/
 	DECLARE cantidad_antes FLOAT( 15, 4);    
 	DECLARE tipo_afecta INT;
+	DECLARE old_inventory FLOAT( 15, 4 );
 	DECLARE new_inventory FLOAT( 15, 4 );
 	DECLARE folio_unico_movimiento_almacen VARCHAR( 30 );
 	DECLARE folio_unico_movimiento_detalle VARCHAR( 30 );
@@ -61,6 +62,7 @@ CREATE PROCEDURE spMovimientoAlmacenDetalle_actualiza ( IN id_movimiento_detalle
 				'"primary_key_value" : "', folio_unico_movimiento_detalle, '",',
 				'"cantidad" : "', cantidad_nueva, '",',
 				'"cantidad_surtida" : "', cantidad_nueva, '",',
+				'"id_proveedor_producto" : "', new_product_provider_id, '",',
 				'"sincronizar" : "0"',
 				'}'
 			),
@@ -71,23 +73,26 @@ CREATE PROCEDURE spMovimientoAlmacenDetalle_actualiza ( IN id_movimiento_detalle
 		WHERE id_sucursal = IF( store_id = -1, destinity_store_id, -1 );
 	END IF;
 
-	IF( cantidad_nueva != cantidad_antes )
-	THEN
-        UPDATE ec_movimiento_detalle SET cantidad = cantidad_nueva, cantidad_surtida = cantidad_nueva WHERE id_movimiento_almacen_detalle = id_movimiento_detalle;
-	/*resta la cantidad anterior*/
-		UPDATE ec_almacen_producto ap
-			SET ap.inventario = ( ap.inventario - ( cantidad_antes * tipo_afecta ) ) + ( cantidad_nueva * tipo_afecta )
-		WHERE ap.id_almacen = warehouse_id
-		AND ap.id_producto = product_id;
+	/*IF( cantidad_nueva != cantidad_antes )
+	THEN*/
+	UPDATE ec_movimiento_detalle SET cantidad = cantidad_nueva, cantidad_surtida = cantidad_nueva, id_proveedor_producto = new_product_provider_id WHERE id_movimiento_almacen_detalle = id_movimiento_detalle;
+	SET old_inventory = cantidad_antes * tipo_afecta;
+	SET new_inventory = cantidad_nueva * tipo_afecta;
+/*resta la cantidad anterior*/
+	UPDATE ec_almacen_producto ap
+		SET ap.inventario = ( ap.inventario - old_inventory )
+	WHERE ap.id_almacen = warehouse_id
+	AND ap.id_producto = product_id;
+/*suma la cantidad nueva*/
+	UPDATE ec_almacen_producto ap
+		SET ap.inventario = ( ap.inventario + new_inventory )
+	WHERE ap.id_almacen = warehouse_id
+	AND ap.id_producto = product_id;
 /*Modifica el movimiento a nivel proveedor producto*/
-	   IF( product_provider_id != '' AND product_provider_id IS NOT NULL AND product_provider_id != -1 )
-		THEN
-        /*actualiza el detalle a nivel proveedor producto*/
-            CALL spMovimientoDetalleProveedorProducto_actualiza( id_movimiento_detalle, product_provider_id, cantidad_nueva, sincronizar_registro );
-			/*UPDATE ec_movimiento_detalle_proveedor_producto
-			SET cantidad = cantidad_nueva
-			WHERE id_movimiento_almacen_detalle = movement_detail_id
-			AND id_proveedor_producto = product_provider_id;*/
-	  	END IF;
+	IF( product_provider_id != '' AND product_provider_id IS NOT NULL AND product_provider_id != -1 )
+	THEN
+	/*actualiza el detalle a nivel proveedor producto*/
+		CALL spMovimientoDetalleProveedorProducto_actualiza( id_movimiento_detalle, new_product_provider_id, cantidad_nueva, sincronizar_registro );
 	END IF;
+	/*END IF;*/
 END $$

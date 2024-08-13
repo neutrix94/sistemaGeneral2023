@@ -1,5 +1,6 @@
 <?php
-/*Version con insercion de movimientos por Procedure (2024-08-05)*/
+/*1.1 Version con insercion de movimientos por Procedure (2024-08-05)*/
+/*1.2 Version con validacion para no volver a aconvertir productos maquilados que ya fueron convertidos en el front-end (2024-08-13)*/
 	if ( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../config.inc.php' );
 		include( '../../../../../conect.php' );
@@ -638,15 +639,20 @@
 			//	if( $product[8] > 0 ){
 		//die( 'here' );
 /*Oscar 2023/10/05 para conversion de maquilados*/
-				$sql_maquiled = "SELECT
-						( {$product[5]} * pd.cantidad ) AS presentation_quantity
-						FROM ec_productos_detalle pd 
-						WHERE pd.id_producto_ordigen = {$product[1]}";
-				$stm_maquiled = $link->query( $sql_maquiled ) or die( "error|Error al consultar detalle del producto maquilado : {$sql_maquiled} {$link->error}" );
-				if( $stm_maquiled->num_rows > 0 ){
-					$row = $stm_maquiled->fetch_assoc();
-					$product[5] = $row['presentation_quantity'];
+				if( $case_id != 1 && $case_id != 2 && $case_id != 5 ){//condicion Oscar 2024-08-13 para validar los casos de surtimiento
+					if( ctype_digit( $product[5] ) ){//condicion Oscar 2024-08-13 para validar que no sea decimal el numero de piezas
+						$sql_maquiled = "SELECT
+								( {$product[5]} * pd.cantidad ) AS presentation_quantity
+								FROM ec_productos_detalle pd 
+								WHERE pd.id_producto_ordigen = {$product[1]}";
+						$stm_maquiled = $link->query( $sql_maquiled ) or die( "error|Error al consultar detalle del producto maquilado : {$sql_maquiled} {$link->error}" );
+						if( $stm_maquiled->num_rows > 0 ){
+							$row = $stm_maquiled->fetch_assoc();
+							$product[5] = $row['presentation_quantity'];
+						}
+					}
 				}
+			//	die( "here : {$product[5]}" );
 /*fin de cambio Oscar 2023/10/05*/
 				//consulta si el producto 
 					$sql = "INSERT INTO ec_transferencias_surtimiento_usuarios ( /*1*/id_surtimiento_usuario, /*2*/id_transferencia_producto,
