@@ -1,5 +1,5 @@
 <?php
-//echo 'here';
+//Modificacion para deshabilitar check de proveedor producto cuando un producto ya fue validado ( 2024-08-12 )
 	include( '../../../../../config.inc.php' );
 	include( '../../../../../conectMin.php' );
 	include( '../../../../../conexionMysqli.php' );
