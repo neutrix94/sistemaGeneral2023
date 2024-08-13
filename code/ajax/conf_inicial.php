@@ -45,6 +45,8 @@
 	$cadena_datos .= '<>'.$_POST['puerto_sis_imp'];
 	$cadena_datos.= '<>'.$_POST['store_id'];
 	$cadena_datos.= '<>'.$_POST['system_type'];
+	$cadena_datos.= '<>'.$_POST['path_api_local'];
+	$cadena_datos.= '<>'.$_POST['antiguedad_depuracion'];
 				
 //3. Crea archivo /conexion_inicial.txt
 	if( $is_server ){

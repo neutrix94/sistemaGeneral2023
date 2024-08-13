@@ -5,18 +5,18 @@
 		var amount = $( `#t${counter}` ).val().replaceAll( ',', '' );
 		var sale_folio = $( `#buscador` ).val().trim();
 		if( sale_id == 0 || sale_folio == '' ){
-			alert( "Es necesario elegir una nota de venta para continuar!" );
+			alert( "Es necesario elegir una nota de venta para continuar." );
 			$( `#buscador` ).select();
 			return false;
 		}
 		if( amount <= 0 ){
-			alert( "El monto debe de ser mayor a cero!" );
+			alert( "El monto debe de ser mayor a cero." );
 			$( `#t${counter}` ).focus();
 			return false;
 		}
     
         if( $( '#tarjeta_' + counter ).val() == '--Seleccionar--' ){/*Implementacion Oscar 2024-06-25 para no permitir envio de transaccion si no se selecciona terminal valida */
-            alert( "Debes seleccionar una terminal valida para continuar!" );
+            alert( "Debes seleccionar una terminal valida para continuar." );
             $( '#tarjeta_' + counter ).focus();
             return false;
         }/*Fin de cambio Oscar 2024-06-25*/
@@ -59,7 +59,7 @@
     function rePrintByOrderIdManual(){
         var orderId = $( '#reverse_input' ).val();
         if( orderId == '' ){
-            alert( "Debes ingresar un folio valido para continuar!" );
+            alert( "Debes ingresar un folio valido para continuar." );
             $( '#reverse_input' ).focus();
             return false;
         }
