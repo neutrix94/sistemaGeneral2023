@@ -1,4 +1,6 @@
 <?php
+/*1.1 Version con insercion de movimientos por Procedure (2024-08-05)*/
+/*1.2 Version con validacion para no volver a aconvertir productos maquilados que ya fueron convertidos en el front-end (2024-08-13)*/
 	if ( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../config.inc.php' );
 		include( '../../../../../conect.php' );
@@ -637,15 +639,20 @@
 			//	if( $product[8] > 0 ){
 		//die( 'here' );
 /*Oscar 2023/10/05 para conversion de maquilados*/
-				$sql_maquiled = "SELECT
-						( {$product[5]} * pd.cantidad ) AS presentation_quantity
-						FROM ec_productos_detalle pd 
-						WHERE pd.id_producto_ordigen = {$product[1]}";
-				$stm_maquiled = $link->query( $sql_maquiled ) or die( "error|Error al consultar detalle del producto maquilado : {$sql_maquiled} {$link->error}" );
-				if( $stm_maquiled->num_rows > 0 ){
-					$row = $stm_maquiled->fetch_assoc();
-					$product[5] = $row['presentation_quantity'];
+				if( $case_id != 1 && $case_id != 2 && $case_id != 5 ){//condicion Oscar 2024-08-13 para validar los casos de surtimiento
+					if( ctype_digit( $product[5] ) ){//condicion Oscar 2024-08-13 para validar que no sea decimal el numero de piezas
+						$sql_maquiled = "SELECT
+								( {$product[5]} * pd.cantidad ) AS presentation_quantity
+								FROM ec_productos_detalle pd 
+								WHERE pd.id_producto_ordigen = {$product[1]}";
+						$stm_maquiled = $link->query( $sql_maquiled ) or die( "error|Error al consultar detalle del producto maquilado : {$sql_maquiled} {$link->error}" );
+						if( $stm_maquiled->num_rows > 0 ){
+							$row = $stm_maquiled->fetch_assoc();
+							$product[5] = $row['presentation_quantity'];
+						}
+					}
 				}
+			//	die( "here : {$product[5]}" );
 /*fin de cambio Oscar 2023/10/05*/
 				//consulta si el producto 
 					$sql = "INSERT INTO ec_transferencias_surtimiento_usuarios ( /*1*/id_surtimiento_usuario, /*2*/id_transferencia_producto,
@@ -764,7 +771,7 @@
 					$mov_id = $exc->fetch_row();
 //echo 'mov_id : ' . $sql . ' ||| ';
 				//inserta el nuevo detalle de movimiento almacen
-					$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
+					/*$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
 							id_pedido_detalle, id_oc_detalle, id_proveedor_producto )
 							SELECT 
 								'{$mov_id[0]}',
@@ -776,7 +783,18 @@
 								tp.id_proveedor_producto
 							FROM ec_transferencia_productos tp
 							WHERE tp.id_transferencia_producto = '{$new_detail_id}'";
-					$exc = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen : " . $link->error );
+					$exc = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen : " . $link->error );*/
+					$sql = "SELECT 
+								tp.id_producto_or,
+								tp.cantidad,
+								tp.id_proveedor_producto
+							FROM ec_transferencia_productos tp
+							WHERE tp.id_transferencia_producto = '{$new_detail_id}'";
+					$stm_detail_ = $link->query( $sql ) or die( "Error al consultar el detalle de transferencias para insertar movimiento por procedure : {$sql} : {$link->error}" );
+					$row_detail = $stm_detail_->fetch_assoc();
+					$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$mov_id[0]}, {$row_detail['id_producto_or']}, {$row_detail['cantidad']}, {$row_detail['cantidad']}, 
+								-1, -1, {$row_detail['id_proveedor_producto']}, 20, NULL )";
+					$exc = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen por procedure : " . $link->error .  $sql );
 				}
 			}//fin de foreach
 		}//fin de else
@@ -949,7 +967,8 @@
 						$mov_id = $exc->fetch_row();
 	//echo 'mov_id : ' . $sql . ' ||| ';
 					//inserta el nuevo detalle de movimiento almacen
-						$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
+		/*implementacion Oscar 2024-08-03*/
+						/*$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
 								id_pedido_detalle, id_oc_detalle, id_proveedor_producto )
 								SELECT 
 									'{$mov_id[0]}',
@@ -960,7 +979,17 @@
 									-1, 
 									tp.id_proveedor_producto
 								FROM ec_transferencia_productos tp
+								WHERE tp.id_transferencia_producto = '{$new_detail_id}'";*/
+						$sql = "SELECT 
+									tp.id_producto_or,
+									tp.cantidad,
+									tp.id_proveedor_producto
+								FROM ec_transferencia_productos tp
 								WHERE tp.id_transferencia_producto = '{$new_detail_id}'";
+						$stm_detail_ = $link->query( $sql ) or die( "Error al consultar el detalle de transferencias : {$sql} : {$link->error}" );
+						$row_detail = $stm_detail_->fetch_assoc();
+						$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$mov_id[0]}, {$row_detail['id_producto_or']}, {$row_detail['cantidad']}, {$row_detail['cantidad']}, 
+									-1, -1, {$row_detail['id_proveedor_producto']}, 20, NULL )";
 						$exc = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen : " . $link->error .  $sql );
 					}
 

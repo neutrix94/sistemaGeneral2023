@@ -60,7 +60,11 @@
 			$row = $stm->fetch_assoc( $stm );
 			$ruta_or = $row['store_dns'];
 			$origen = "{$ruta_origen}/{$ruta_salida}/";
+			$origen = str_replace("https://","protocol_dev_var_ssl", $origen );
+			$origen = str_replace("http://","protocol_dev_var_hhtp", $origen );
 			$origen = str_replace('//', '/', $origen);
+			$origen = str_replace("protocol_dev_var_ssl", "https://", $origen );
+			$origen = str_replace("protocol_dev_var_hhtp", "http://", $origen );
 			$sql = "INSERT INTO sys_archivos_descarga SET 
 					id_archivo = null,
 					tipo_archivo = '{$tipo}',

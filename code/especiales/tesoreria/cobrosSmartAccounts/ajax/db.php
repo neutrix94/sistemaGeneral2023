@@ -1,31 +1,40 @@
 <?php
+/*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
-	/*verifica si esta habilitada la funcion de SmartAccounts
-		$sql = "SELECT 
-					habilitar_smartaccounts_netpay AS is_smart_accounts
-				FROM sys_sucursales s
-				WHERE id_sucursal = {$sucursal_id}";
-		$stm = $link->query( $sql ) or die( "Error al consultar si esta habilitado SmartAccounts : {$link->error}" );
-		$row = $stm->fetch_assoc();
-		$is_smart_accounts = $row['is_smart_accounts'];
-		//if( $row['is_smart_accounts'] == 0 ){
-		//	include( '../../../netPay/apiNetPaySinSmartAccount.php' );//sin smartaccounts
-		//}else{
-		//}
-	*/
+		include('./Logger.php');
+		
 		$sql = "SELECT id_sucursal AS system_type FROM sys_sucursales WHERE acceso = 1";
 		$stm = $link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$link->error}" );
 		$row = $stm->fetch_assoc();
 		$system_type = $row['system_type'];
 		include( '../../../netPay/apiNetPay.php' );
-		$apiNetPay = new apiNetPay( $link, $sucursal_id, $system_type );
-		$Payments = new Payments( $link, $user_sucursal );
+		$Logger = null;
+		$log_id = null;
+		$log = ( isset( $_GET['log_status'] ) ? $_GET['log_status'] : $_POST['log_status'] );
+		if( $log == 1 ){
+			$Logger = new Logger( $link );//instancia de clase Logger
+		}
+		$apiNetPay = new apiNetPay( $link, $sucursal_id, $system_type, ( $Logger == null ? null : $Logger ) );
+		$Payments = new Payments( $link, $user_sucursal, ( $Logger == null ? null : $Logger ) );
 		$action = ( isset( $_GET['fl'] ) ? $_GET['fl'] : $_POST['fl'] );
 		switch ( $action ) {
+			case 'getSaleData':
+				$sale_id = ( isset( $_GET['sale_id'] ) ? $_GET['sale_id'] : $_POST['sale_id'] );
+				$sale_folio = ( isset( $_GET['folio'] ) ? $_GET['folio'] : $_POST['folio'] );
+				if( $Logger != null ){
+					$log_ = $Logger->insertLoggerRow( $sale_folio, $user_id, 'ec_pedidos/ec_cajero_cobros/ec_pedido_pagos/ec_devolucion_pagos', $system_type, ( $system_type != -1 ? $sucursal_id : -1 ) );//inserta cabecera de log
+					$log_id = $log_['id_log'];
+				}
+				$Payments->getSaleData( $sale_id, $sale_folio, $user_id, $log_id );
+			break;
 			case 'sendPaymentPetition' :
-				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_venta' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/sale";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/sale
+				if( $Logger != null ){
+					$log_ = $Logger->insertLoggerRow( 'N/A', $user_id, 'vf_transacciones_netPay', $system_type, ( $system_type != -1 ? $sucursal_id : -1 ) );//inserta cabecera de log
+					$log_id = $log_['id_log'];
+				}
+				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_venta', $log_id );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/sale";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/sale
 				//die( 'here : ' . $apiUrl );
 			//recibe variables
 				$amount = ( isset( $_GET['amount'] ) ? $_GET['amount'] : $_POST['amount'] );
@@ -42,7 +51,7 @@
 				}
 				
 		
-				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $amount );
+				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $amount, $log_id );
 				$terminal_id = ( isset( $_GET['terminal_id'] ) ? $_GET['terminal_id'] : $_POST['terminal_id'] );
 				$counter = ( isset( $_GET['counter'] ) ? $_GET['counter'] : $_POST['counter'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
@@ -50,7 +59,7 @@
 				$id_devolucion_relacionada = ( isset( $_GET['id_devolucion_relacionada'] ) ? $_GET['id_devolucion_relacionada'] : $_POST['id_devolucion_relacionada'] );
 			//consume servicio de venta
 				$req = $apiNetPay->salePetition( $apiUrl, $amount, $terminal_id, $user_id, 
-					$sucursal_id, $sale_folio, $session_id, $id_devolucion_relacionada );
+					$sucursal_id, $sale_folio, $session_id, $id_devolucion_relacionada, $log_id );
 	//die("here");
 				$resp = json_decode( $req );
 				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
@@ -284,7 +293,8 @@
 				
 			case 'delete_payment_saved' : 
 				$payment_id = $_GET['payment_id'];
-				echo $Payments->delete_payment_saved( $payment_id );
+				$session_id = $_GET['current_session_id'];
+				echo $Payments->delete_payment_saved( $payment_id, $session_id );
 			break;
 //afiliaciones
 			case 'obtenerListaAfiliaciones' :
@@ -361,6 +371,10 @@
 				$error = ( isset( $_GET['error'] ) ? $_GET['error'] : $_POST['error'] );
 				echo $Payments->agregarTerminalSesion( $session_id, $user_id, $id_terminal );
 			break;
+
+			case 'show_pending_payment_responses' :
+				echo $Payments->show_pending_payment_responses( $sucursal_id );
+			break;
 			
 			default :
 				die( "Access denied on '{$action}'" );
@@ -374,11 +388,56 @@
 	{
 		private $link;
 		private $store_id;
-		function __construct( $connection, $store_id )
+		private $Logger;
+		function __construct( $connection, $store_id, $Logger = null )
 		{
 			$this->link = $connection;
 			$this->store_id = $store_id;
+			$this->Logger = $Logger;
 			
+		}
+
+		public function show_pending_payment_responses( $store_id ){
+			$resp = "<table class=\"table table-striped table-bordered\" style=\"width : 100%;\" border=\"1\">
+				<thead>
+					<tr>
+						<th class=\"text-center\">Folio Venta</th>
+						<th class=\"text-center\">Monto Cobro</th>
+						<th class=\"text-center\">Fecha</th>
+					</tr>
+				<thead>
+				<tbody>";
+			$sql = "SELECT
+						vtn.folio_venta AS sale_folio,
+						IF( vtn.amount = 0 OR vtn.amount = '', '0.0', vtn.amount ) AS amount,
+						vtn.fecha_alta AS date_time
+					FROM vf_transacciones_netpay vtn
+					WHERE vtn.notificacion_vista = 0
+					AND vtn.id_sucursal = {$store_id}
+					ORDER BY vtn.folio_venta desc";
+			$stm = $this->link->query( $sql ) or die( "Error al recuperar las transacciones pendientes de llegar : {$sql} : {$this->link->error}" );
+			
+			while( $row = $stm->fetch_assoc() ){
+				$resp .= "<tr><td class=\"text-start\">{$row['sale_folio']}</td>";
+				$resp .= "<td class=\"text-center\"> $ {$row['amount']}</td>";
+				$resp .= "<td class=\"text-end\">{$row['date_time']}</td></tr>";
+			}
+			$resp .= "</tbody>
+				</table>
+			<br><br>
+			<div style=\"text-align: center;\">
+				<button type=\"button\" class=\"btn btn-warning\" onclick=\"close_emergent_window();\">
+					<i>Aceptar y cerrar</i>
+				</button>
+			</div>";
+			return $resp;
+		}
+
+		public function getWebSocketURL(){
+			$sql = "SELECT url_websocket_pagos FROM sys_configuracion_sistema LIMIT 1";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar la URL de los WebSockets  de pagos : {$sql} : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			return $row['url_websocket_pagos'];
 		}
 
 		public function check_mannager_password( $sucursal_id, $mannager_password ){
@@ -397,7 +456,7 @@
 			}
 		}
 
-		public function validate_payment_is_not_bigger( $sale_id, $ammount ){
+		public function validate_payment_is_not_bigger( $sale_id, $ammount, $log_id = null ){
 		//busqueda por id
 			$sql = "SELECT
 						p.total AS sale_total,
@@ -408,7 +467,18 @@
 					ON pp.id_pedido = p.id_pedido
 					WHERE p.id_pedido = '{$sale_id}'
 					GROUP BY p.id_pedido";//OR foilio_nv = '{$sale_id}'
-			$stm = $this->link->query( $sql ) or die( "Error al consultar pagos para comprobacion : {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta suma de pagos para la comprobacion por id", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar pagos para comprobacion por id : {$this->link->error}" );
+			}
+
 			if( $stm->num_rows <= 0 ){	//busqueda por folio
 			
 				$sql = "SELECT
@@ -420,9 +490,22 @@
 					ON pp.id_pedido = p.id_pedido
 					WHERE p.folio_nv = '{$sale_id}'
 					GROUP BY p.id_pedido";//
-				$stm = $this->link->query( $sql ) or die( "Error al consultar pagos para comprobacion : {$this->link->error}" );
+				$stm = $this->link->query( $sql );
+			/*Logger*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta suma de pagos para la comprobacion por folio", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al consultar pagos para comprobacion por folio : {$this->link->error}" );
+				}
 			}
 			if( $stm->num_rows == 0 ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', "La nota de venta {$sale_id} no fue encontrada.", 'N/A' );
+				}	
 				die( "error|La nota de venta {$sale_id} no fue encontrada." );
 			}
 
@@ -437,7 +520,17 @@
 					LEFT JOIN ec_devolucion d
 					ON dp.id_devolucion = d.id_devolucion
 					WHERE d.id_pedido IN( {$sale_id} )";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar pagos por devolucion para comprobacion : {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta suma de pagos por devolucion ", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_devolucion / ec_devolucion_pagos', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar pagos por devolucion para comprobacion : {$this->link->error}" );
+			}
 			$devolucion_row = $stm->fetch_assoc();
 			$pagos_dev = $devolucion_row['pagos_devolucion'];
 			$tmp_total =  $payments_total + $ammount - $pagos_dev;//round()
@@ -447,15 +540,18 @@
 
 			}else{
 				if( $tmp_total > $sale_total ){
+					if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', "El pago no puede ser mayor al total de la venta : {$sale_total} - {$tmp_total} = {$rest}", 'N/A' );
+					}	
 					die( "<div class=\"row\" style=\"padding:15px;\">
-						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta! {$sale_total} - {$tmp_total} = {$rest}</h2>
+						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta.</h2>
 						<div class=\"col-3\"></div>
 						<div class=\"col-6\">
 							<br>
 							<button
 								type=\"button\"
 								class=\"btn btn-danger form-control\"
-								onclick=\"close_emergent();\"	
+								onclick=\"close_emergent_2();\"	
 							>
 								<i class=\"icon-ok-circled\">Aceptar</i>
 							</button>
@@ -463,21 +559,6 @@
 					</div>" );//error|
 				}
 			}
-			/*
-				<div class=\"row text-center\">
-						<div class=\"col-3 text-primary\">
-							Total : {$sale_total}
-						</div>
-						<div class=\"col-3 text-success\">
-							Total Pagado : {$payments_total}
-						</div>
-						<div class=\"col-3 text-danger\">
-							Restante : {$rest}
-						</div>
-						<div class=\"col-3 text-warning\">
-							Monto Pago : {$ammount}
-						</div>
-			*/
 			return 'ok';
 		}
 
@@ -616,7 +697,7 @@
 				$stm = $this->link->query( $sql ) or die( "Error al desahabilitar la afiliacion de sesion de caja por cobro unico {$this->link->error}" );		
 			}
 			$this->link->autocommit( true );
-			return "ok|Pago registrado exitosamente!";
+			return "ok|Pago registrado exitosamente.";
 		}
 
 		public function seekTerminalByQr( $qr_txt, $sucursal_id, $session_id ){
@@ -634,7 +715,7 @@
 					AND sca.habilitado=1";//AND( IF( sca.insertada_por_error_en_cobro = 1, sca.utilizada_en_error = 0, 1=1 ) )
 			$stm = $this->link->query( $sql ) or die( "Error al consultar la afiliacion en la sesion : {$this->link->error}" );
 			if( $stm->num_rows <= 0 ){
-				die( "La terminal '{$qr_txt}' no fue encontrada en la sesion de cajero actual, verifica y vuelve a intentar!" );
+				die( "La terminal '{$qr_txt}' no fue encontrada en la sesion de cajero actual, verifica y vuelve a intentar." );
 			}else{
 				$row = $stm->fetch_assoc();
 				return "ok|" . json_encode( $row );
@@ -682,7 +763,7 @@
 					}
 					$onclick = "delete_payment_saved( {$row['payment_id']}, {$sale_id} );";
 					if( $sale_row['cobro_finalizado'] == 1 || $sale_row['cobro_finalizado'] == '1' ){
-						$onclick = "alert( 'El cobro ya fue finalizado y no es posible eliminar pagos!' );return false;";
+						$onclick = "alert( 'El cobro ya fue finalizado y no es posible eliminar pagos.' );return false;";
 					}
 					$button = "<button
 								type=\"button\"
@@ -799,8 +880,9 @@
 			//$sql = "INSERT INTO ec_cajero_cobros";
 		}*/
 
-		public function insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, $saldo_especial = 0, $id_caja_cuenta = -1 ){
-//echo "<br>INSERTPAYMENTDEPENDING<br>";
+		public function insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, $saldo_especial = 0, $id_caja_cuenta = -1, $log_id = null ){
+			$steep_log_id = 0;
+//echo "<br>INSERTPAYMENTDEPENDING<br>{$log_id}";
 			$total_devolver_cajero = 0;
 			$devolucion_interna = 0;
 			$devolucion_externa = 0;
@@ -822,8 +904,18 @@
 					FROM ec_pedidos_relacion_devolucion
 					WHERE id_pedido_relacionado = {$sale_id}
 					AND id_sesion_caja_pedido_relacionado = 0";
-			$stm_1 = $this->link->query( $sql ) or die( "Error al consultar relacion de pedidos y devolucion : {$this->link->error}" );
-//echo $sql . "<br><br>";
+			$stm_1 = $this->link->query( $sql );
+		/*Logger*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta relacion de pedidos y devolucion", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos_relacion_devolucion', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar relacion de pedidos y devolucion : {$this->link->error}" );
+			}
+		/*</Logger>*/
 			if( $stm_1->num_rows == 1 ){
 				$row = $stm_1->fetch_assoc();
 				$this->reinsertaPagosPorDevolucion( $row['id_pedido_original'], $user_id, $session_id, '$folio_devolucion', $row['monto_interno_por_devolver'], $row['monto_externo_por_devolver'] );
@@ -836,15 +928,36 @@
 						LEFT JOIN ec_pedido_pagos pp
 						ON p.id_pedido = pp.id_pedido 
 						WHERE p.id_pedido = {$row['id_pedido_relacionado']}";
-				$stm_2 = $this->link->query($sql) or die( "Error al consultar si la venta esta pagada : {$this->link->error}" );
-//echo $sql . "<br><br>";
+				$stm_2 = $this->link->query($sql);
+			/*Logger*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta si la venta esta pagada", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos - ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al consultar si la venta esta pagada : {$this->link->error}" );
+				}
+			/*</Logger>*/
 				$row_2 = $stm_2->fetch_assoc();
 			//inserta el pago de la devolucion interna
 				if( $row['monto_interno_por_devolver'] > 0 ){
 					$sql = "INSERT INTO ec_devolucion_pagos( id_devolucion_pago, id_devolucion, id_tipo_pago, monto, es_externo, fecha, hora,
 					id_cajero, id_sesion_caja ) VALUES( NULL, {$row['id_devolucion_interna']}, 1, {$row['monto_interno_por_devolver']}, 0, 
 					NOW(), NOW(), {$user_id}, {$session_id} )";
-					$stm_3 = $this->link->query($sql) or die( "Error al insertar pago de devolucion interna : {$this->link->error}" );
+					$stm_3 = $this->link->query($sql);
+				/*Logger*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta pago de devolucion interna", $sql );
+					}
+					if( $this->link->error ){
+						if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_devolucion_pagos', 'N/A', $sql, $this->link->error );
+						}
+						die( "Error al insertar pago de devolucion interna : {$this->link->error}" );
+					}
+				/*</Logger>*/
 //echo $sql . "<br><br>";
 					$devolucion_interna = $this->link->insert_id;
 					$total_devolver_cajero += $row['monto_interno_por_devolver'];
@@ -854,8 +967,18 @@
 					$sql = "INSERT INTO ec_devolucion_pagos( id_devolucion_pago, id_devolucion, id_tipo_pago, monto, es_externo, fecha, hora,
 					id_cajero, id_sesion_caja ) VALUES( NULL, {$row['id_devolucion_externa']}, 1, {$row['monto_externo_por_devolver']}, 1, 
 					NOW(), NOW(), {$user_id}, {$session_id} )";
-					$stm_4 = $this->link->query($sql) or die( "Error al insertar pago de devolucion externa : {$this->link->error}" );
-//echo $sql . "<br><br>";
+					$stm_4 = $this->link->query($sql);
+				/*Logger*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta pago de devolucion externa", $sql );
+					}
+					if( $this->link->error ){
+						if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_devolucion_pagos', 'N/A', $sql, $this->link->error );
+						}
+						die( "Error al insertar pago de devolucion externa : {$this->link->error}" );
+					}
+				/*</Logger>*/
 					$devolucion_externa = $this->link->insert_id;
 					$total_devolver_cajero += $row['monto_externo_por_devolver'];
 				}
@@ -876,19 +999,51 @@
 				if( $row['monto_devolucion_tomado_a_favor'] > 0 ){
 					$this->insertPayment( $row['monto_devolucion_tomado_a_favor'], $sale_id, $user_id, $session_id, 2 );
 				}
-				$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero en insertPaymentsDepending : {$this->link->error}" );
+				$stm = $this->link->query( $sql );
+			/*Logger*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta el cobro del cajero en insertPaymentsDepending", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_cajero_cobros', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al insertar el cobro del cajero en insertPaymentsDepending : {$this->link->error}" );
+				}
+			/*</Logger>*/
 				$id_cajero_cobro = $this->link->insert_id;
 				
 				$sql = "UPDATE ec_devolucion_pagos 
 							SET id_cajero_cobro = {$id_cajero_cobro} 
 						WHERE id_devolucion_pago IN( {$devolucion_interna}, {$devolucion_externa} )";
-				$stm_update = $this->link->query( $sql ) or die( "Error al actualizar las devoluciones : {$this->link->error}" );
+				$stm_update = $this->link->query( $sql );	
+			/*<Logger>*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Actualiza las devoluciones relacionadas", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_devolucion_pagos', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al actualizar las devoluciones relacionadas : {$this->link->error}" );
+				}
+			/*</Logger>*/
 /**/			
 //echo $sql . "<br><br>";
 				$sql = "UPDATE ec_pedidos_relacion_devolucion 
 					SET id_sesion_caja_pedido_relacionado = {$session_id} 
 				WHERE id_pedido_relacionado = {$row['id_pedido_relacionado']}";
-				$stm = $this->link->query( $sql ) or die( "Error al actualizar ec_pedidos_relacion_devolucion de pagos : {$sql} {$this->link->error}" );
+				$stm = $this->link->query( $sql );
+			/*Logger*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Actualiza ec_pedidos_relacion_devolucion de pagos", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos_relacion_devolucion', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al actualizar ec_pedidos_relacion_devolucion de pagos : {$sql} {$this->link->error}" );
+				}
 //echo $sql . "<br><br>";
 /*Implementacion Oscar 2024-04-11 para imprimir el ticket de la nota dependiente*/
 				
@@ -1096,9 +1251,21 @@
 			$this->link->autocommit(true);
 		}
 
-		public function reinsertaPagosPorDevolucionCaso2 ( $id_venta, $id_cajero, $id_sesion_caja, $folio_devolucion, $monto_dev_interna, $monto_dev_externa ){
+		public function reinsertaPagosPorDevolucionCaso2 ( $id_venta, $id_cajero, $id_sesion_caja, $folio_devolucion, $monto_dev_interna, $monto_dev_externa, $log_id = null ){
+			$steep_log_id = 0;
 			$sql = "SELECT * FROM ec_pedido_pagos WHERE id_pedido = {$id_venta} AND monto > 0 AND referencia = ''";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar los pagos anteriores : {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+		/*<Logger>*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta pagos anteriores", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+				$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar los pagos anteriores : {$this->link->error}" );
+			}
+		/*</Logger>*/
 			$this->link->autocommit(false);
 			$total_pagado = 0;
 			//die( "here" );
@@ -1109,9 +1276,31 @@
 					id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
 					VALUES ( '{$row['id_pedido']}', '{$row['id_cajero_cobro']}', '{$row['id_tipo_pago']}', now(), now(), ( {$row['monto']}*-1 ), 'Pago Anulado por devolucion {$folio_devolucion}', '{$row['id_moneda']}', '{$row['tipo_cambio']}', 
 					'{$row['id_nota_credito']}', '{$row['id_cxc']}', '{$row['exportado']}', '{$row['es_externo']}', '{$id_cajero}', NULL, '{$row['sincronizar']}', '{$id_sesion_caja}')";
-				$insert = $this->link->query( $sql ) or die( "Error al insertar los cobros del cajero : {$this->link->error}" );
+				$insert = $this->link->query( $sql );
+			/*<Logger>*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta los cobros del cajero", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al insertar los cobros del cajero : {$this->link->error}" );
+				}
+			/*</Logger>*/ 
 				$sql = "UPDATE ec_pedido_pagos SET referencia = 'Pago para anular por devolucion {$folio_devolucion}' WHERE id_pedido_pago = {$row['id_pedido_pago']}";
-				$insert = $this->link->query( $sql ) or die( "Error al insertar los cobros del cajero : {$this->link->error}" );
+				$insert = $this->link->query( $sql );
+			/*<Logger>*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Actualiza referencias de los cobros del cajero", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+					$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+					}
+					die( "Error al actualizar referencias de los cobros del cajero : {$this->link->error}" );
+				}
+			/*</Logger>*/
 				$total_pagado += $row['monto'];
 			}
 
@@ -1137,11 +1326,19 @@
 					WHERE pd.id_pedido = {$id_venta}
 				)ax";
 			//die($sql);
-			$stm = $this->link->query( $sql ) or die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+		/*<Logger>*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta porcentajes de pagos", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+				$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos_detalle - ec_pedidos - sys_sucursales_producto', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al consultar porcentajes de pagos : {$sql} {$this->link->error}" );
+			}
+		/*</Logger>*/
 			$row = $stm->fetch_assoc();
-			//$sql = "SELECT id_cajero_cobro, monto FROM ec_cajero_cobros WHERE id_pedido = {$id_venta}";
-			//$stm_cc = $this->link->query( $sql ) or die( "Error al consultar los cajeros cobros en reinsertaPagosPorDevolucionCaso2 : {$this->link->error}" );
-			//while( $row_cc = $stm_cc->fetch_assoc() ){
 				if( $row['internal_porcent'] > 0 ){
 				//die( "inserta pagos internos" );
 					if( $row['internal_porcent'] >= 0.99 ){
@@ -1152,7 +1349,18 @@
 						id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
 						VALUES ( '{$id_venta}', '1', '1', now(), now(), ROUND( {$total_pagado}*{$row['internal_porcent']}, 4 ), '', '1', '-1', 
 						'-1', '-1', '0', '0', '{$id_cajero}', NULL, '1', '{$id_sesion_caja}')";
-					$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero : {$this->link->error}" );
+					$insert = $this->link->query( $sql );
+				/*<Logger>*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta el pago interno del cajero", $sql );
+					}
+					if( $this->link->error ){
+						if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+						}
+						die( "Error al insertar el pago interno del cajero : {$this->link->error}" );
+					}
+				/*</Logger>*/
 				}
 				if( $row['external_porcent'] > 0 ){
 					if( $row['external_porcent'] >= 0.99 ){
@@ -1163,18 +1371,48 @@
 						id_nota_credito, id_cxc, exportado, es_externo, id_cajero, folio_unico, sincronizar, id_sesion_caja )
 						VALUES ( '{$id_venta}', '1', '1', now(), now(), ROUND( {$total_pagado}*{$row['external_porcent']}, 4 ), '', '1', '-1', 
 						'-1', '-1', '0', '1', '{$id_cajero}', NULL, '1', '{$id_sesion_caja}')";
-					$insert = $this->link->query( $sql ) or die( "Error al insertar el cobro interno del cajero : {$this->link->error}" );
+					$insert = $this->link->query( $sql );
+				/*<Logger>*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Inserta el pago externo del cajero", $sql );
+					}
+					if( $this->link->error ){
+						if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $this->link->error );
+						}
+						die( "Error al insertar el pago externo del cajero : {$this->link->error}" );
+					}
+				/*</Logger>*/
 				}
 			//}
 		//actualiza la sesion de cabecera de devolucion
 			$sql = "UPDATE ec_devolucion SET id_cajero = {$id_cajero}, id_sesion_caja = {$id_sesion_caja} WHERE id_pedido = {$id_venta}";
-			$stm = $this->link->query( $sql ) or die( "Error al actualizar las cabeceras de devolucion : {$this->link->error}"  );
+			$stm = $this->link->query( $sql );
+		/*<Logger>*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Actualiza las cabeceras de devolucion", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+				$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_devolucion', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al actualizar las cabeceras de devolucion : {$this->link->error}"  );
+			}
+		/*</Logger>*/
 		//actualiza la referencia de la devolucion 
 			$sql = "UPDATE ec_pedidos_referencia_devolucion SET monto_venta_mas_ultima_devolucion = total_venta WHERE id_pedido = {$id_venta}";
-			//echo ( $sql );
-			$stm = $this->link->query( $sql ) or die( "Error al actualizar la referencia de devolucion : {$this->link->error}"  );
-
-
+			$stm = $this->link->query( $sql );
+		/*<Logger>*/
+			if( $log_id != null ){
+				$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Actualiza la referencia de devolucion", $sql );
+			}
+			if( $this->link->error ){
+				if( $log_id != null ){
+				$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos_referencia_devolucion', 'N/A', $sql, $this->link->error );
+				}
+				die( "Error al actualizar la referencia de devolucion : {$this->link->error}"  );
+			}
+		/*</Logger>*/
 			$this->link->autocommit(true);
 		}
 
@@ -1361,12 +1599,8 @@
 				AND tss.id_sucursal = {$store_id}
 				AND sct.id_sesion_caja = {$session_id}
 				AND sct.habilitado = 1";
-				//die( $sql );
-			//$eje=mysql_query($sql)or die("Error al consultar las afiliaciones para este cajero!!!<br>".mysql_error());
 			$stm = $this->link->query( $sql ) or die( "Error al consultar las terminales del cajero : {$this->link->error}" );
-			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
 			$tarjetas_cajero='';
-			//$c=0;//Tarjeta {$c} : <br> <br>
 			$resp .= "<tr id=\"card_payment_row_{$c}\">
 				<td class=\"col-5\">
 					<select id=\"tarjeta_{$c}\" class=\"form-select\">";
@@ -1381,7 +1615,7 @@
 					<td class=\"col-6\">
 						<div class=\"input-group\">
 							<input type=\"text\" class=\"form-control text-end\" id=\"t{$c}\" value=\"\" 
-							onkeydown=\"prevenir(event);\" onkeyup=\"valida_tca(this,event,1,'.$c.');\">
+							onkeydown=\"prevenir(event);\" onkeyup=\"validateNumberInput( this );valida_tca(this,event,1,'.$c.');\">
 							<button
 								class=\"btn btn-primary no_visible\"
 								onclick=\"sendTerminalPetition( {$c} );\"
@@ -1404,6 +1638,7 @@
 								<i class=\"icon-cancel-circle\"></i>
 							</button>
 						</div>
+						<p class=\"text-center text-danger hidden\" id=\"t{$c}_alerta\">Campo numérico*</p>
 					</td>
 				</tr>";	
 			//	$c++;
@@ -1415,19 +1650,21 @@
 
 		public function checkAccess( $user_id ){
 			$sql="SELECT 
-					IF(p.ver=1 OR p.modificar=1,1,0)
+					IF(p.ver=1 OR p.modificar=1,1,0),
+					( SELECT id_sucursal FROM sys_sucursales WHERE acceso = 1 LIMIT 1 ) AS system_type,
+					( SELECT tiempo_espera_respuesta_websocket FROM ec_configuracion_sucursal WHERE id_sucursal = {$this->store_id} ) AS max_execution_time/*1.2 tiempo espera dinamico 2024-07-04*/
 				FROM sys_permisos p
 				LEFT JOIN sys_users_perfiles perf ON perf.id_perfil=p.id_perfil
 				LEFT JOIN sys_users u ON u.tipo_perfil=perf.id_perfil 
 				WHERE p.id_menu=200
 				AND u.id_usuario={$user_id}";
-			//die($sql);
-			//$eje=mysql_query($sql)or die("Error al consultar el permiso de cajero!!!<br>".mysql_error()."<br>".$sql);
-			$stm = $this->link->query( $sql ) or die("Error al consultar el permiso de cajero : {$this->link->error}");
+			$stm = $this->link->query( $sql ) or die("Error al consultar el permiso de cajero : {$sql} : {$this->link->error}");
 			//$es_cajero=mysql_fetch_row($eje);
 			$es_cajero = $stm->fetch_row();
+			$max_execution_time = $es_cajero[2];/*1.2 tiempo espera dinamico 2024-07-04*/
+			$system_type = $es_cajero[1];//tipo de sistema
 			if($es_cajero[0] == 0 ){
-				die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla!!!\nContacte al administrador desl sistema!!!");location.href="../../../../index.php?";</script>');
+				die('<script>alert("Este tipo de usuario no puede acceder a esta pantalla.\nContacta al administrador desl sistema.");location.href="../../../../index.php?";</script>');
 			}
 		//validamos que haya una sesion de caja iniciada con este cajero; de lo contrario avisamos que no hay sesión de caja y no dejamos acceder a esta pantalla
 			$sql="SELECT 
@@ -1436,13 +1673,77 @@
 				WHERE id_cajero=$user_id
 				AND hora_fin='00:00:00' 
 				AND fecha=current_date()";
-		//	die($sql);
-			//$eje=mysql_query($sql)or die("Error al verificar si ya existe una sesion de caja para este cajero!!!\n".mysql_error());
-			$stm = $this->link->query( $sql ) or die( '<script>alert("Es necesario abrir caja antes de cobrar!!!");location.href="../../../../code/especiales/tesoreria/abreCaja/abrirCaja.php?";</script>' );
+			$stm = $this->link->query( $sql ) or die( '<script>alert("Para realizar una venta pide al cajero inciar sesión de caja.");location.href="../../../../code/especiales/tesoreria/abreCaja/abrirCaja.php?";</script>' );
 			$r=$stm->fetch_row();
 			if($r[0]!=1){
-				die('<script>alert("Es necesario abrir caja antes de cobrar!!!");location.href="../../../../code/especiales/tesoreria/abreCaja/abrirCaja.php?";</script>');
+				die('<script>alert("Para realizar una venta pide al cajero inciar sesión de caja.");location.href="../../../../code/especiales/tesoreria/abreCaja/abrirCaja.php?";</script>');
 			}
+		/*Implementacion Oscar 2024-06-24 para creacion / renovacion de Token */
+		//consulta si tiene token activo
+			$sql = "SELECT token FROM api_token WHERE id_user = {$user_id}";// AND expired_in > NOW()
+			$stm = $this->link->query( $sql ) or die( "Error al consultar si hay token activo para pantalla de cobros : {$this->link->error}" );
+		//obtiene el password del usuario
+			$sql = "SELECT 
+						id_usuario AS user_id, 
+						login, 
+						contrasena AS password,
+						( SELECT `value` FROM api_config WHERE `key` = 'api' ) AS api_path 
+					FROM sys_users WHERE id_usuario = '{$user_id}'";
+			$stm2 = $this->link->query( $sql ) or die( "Error al consultar password de usuario : {$this->link->error}" );
+			$user = $stm2->fetch_assoc();
+			if( $stm->num_rows <= 0 ){
+				//die(  "{$user['user_id']} / {$user['login']} / {$user['password']} / {$user['api_path']}" );
+			//consume servcio para obtener token
+				$post_data = json_encode( array( "user"=>"{$user['login']}", "password"=>"{$user['password']}" ) );
+				$result = json_decode( $this->sendPetition( "{$user['api_path']}/rest/netPay/token", $post_data ) );
+				
+				if( $result->status != "OK" && $result->status != "OK" ){
+					die("Error al generar el token para pantalla de cobros : {$result}");
+				}else{
+					//var_dump( $result->result->created_in );die('');
+				//inserta el token en la tabla api_token
+					if( $system_type > 0 ){
+						$sql = "INSERT INTO api_token ( id_user, token, created_in, expired_in ) 
+							VALUES ( {$user_id}, '{$result->result->access_token}', 
+							'{$result->result->created_in}', '{$result->result->expired_in}' )";	//die( $sql );			
+						$stm3 = $this->link->query( $sql ) or die( "Error al insertar token en cliente : {$this->link->error}" );
+					}
+				}
+				return array( "status"=>200, "token"=>$result->result->access_token, "max_execution_time"=>$max_execution_time );/*1.2 tiempo espera dinamico 2024-07-04*/
+			}else{
+				$row = $stm->fetch_assoc();
+			//validacion / renovacion de token
+				$post_data = null;
+				$result = json_decode( $this->sendPetition( "{$user['api_path']}/rest/netPay/valida_token", $post_data, $row['token'] ) );
+				//var_dump($result);die('');
+			//actualiza la caducidad del token en local
+				$sqlAPIConfig="SELECT value FROM api_config c WHERE c.key='token' and name='time_value' limit 1";
+				$resultadoConfig = $this->link->query($sqlAPIConfig) or die( "Error al consultar los parametros del token : {$sql} : {$this->link->error}" );
+				$time_value = $resultadoConfig->fetch_assoc();
+				$sql = "UPDATE api_token SET expired_in = TIMESTAMPADD(SECOND,{$time_value['value']},NOW()) WHERE token = '{$row['token']}'";
+				$stm = $this->link->query( $sql ) or die( "Error al renovar el token en local : {$sql} : {$this->link->error}");
+				return array( "status"=>200, "token"=>$row['token'], "max_execution_time"=>$max_execution_time  );/*1.2 tiempo espera dinamico 2024-07-04*/
+				
+			}
+		}
+
+		public function sendPetition( $url, $post_data, $token = '' ){
+			//die( $url );
+			$resp = "";
+			$crl = curl_init( $url );
+			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($crl, CURLINFO_HEADER_OUT, true);
+			curl_setopt($crl, CURLOPT_POST, true);
+			curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+		    curl_setopt($crl, CURLOPT_TIMEOUT, 60000);
+			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
+			  'Content-Type: application/json',
+			  'token: ' . "{$token}" )
+			);
+			$resp = curl_exec($crl);//envia peticion
+			curl_close($crl);
+			return $resp;
 		}
 
 		public function getBoxesMoney( $store_id ){	
@@ -1455,7 +1756,6 @@
 				ON bc.id_caja_cuenta=bcs.id_caja_o_cuenta 
 				WHERE bcs.estado_suc=1
 				AND bcs.id_sucursal = '{$store_id}'";
-			//$eje=mysql_query( $sql )or die("Error al listar los bancos o cajas!!!<br>".mysql_error());
 			$stm = $this->link->query( $sql ) or die("Error al listar los bancos o cajas : {$this->link->error}" );
 			$resp = '<select id="caja_o_cuenta" class="form-select"><option value="0">--SELECCIONAR--</option>';
 			while( $r = $stm->fetch_row() ){
@@ -1482,7 +1782,7 @@
 						p.id_pedido,
 						p.fecha_alta,
 						c.nombre AS costumer_name,
-						SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS payments_amount
+						TRUNCATE( SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ), 2 ) AS payments_amount
 					FROM ec_pedidos p
 					LEFT JOIN sys_users u
 					ON p.id_usuario = u.id_usuario
@@ -1520,10 +1820,24 @@
 			die( $resp );
 		}
 
-		public function delete_payment_saved( $payment_id ){
-			$this->link->autocommit( false );
-				//	$sql = "DELETE FROM ec_pedido_pagos WHERE id_cajero_cobro = {$payment_id}";
-				//$sql = "DELETE FROM ec_cajero_cobros WHERE id_cajero_cobro = {$payment_id}";
+		public function delete_payment_saved( $payment_id, $session_id ){
+			$sql = "SELECT 
+						cc.id_sesion_caja,
+						tp.nombre AS payment_type
+					FROM ec_cajero_cobros cc
+					LEFT JOIN ec_tipos_pago tp
+					ON cc.id_tipo_pago = tp.id_tipo_pago
+					WHERE cc.id_cajero_cobro = {$payment_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar el nombre del tipo de cobro por anular : {$sql} : {$this->link->error}");
+			$row = $stm->fetch_assoc();
+			$payment_type = $row["payment_type"];
+
+		//validamos que la sesion de cajero sea la misma que la del pago
+			if( $row['id_sesion_caja'] != $session_id ){
+				die( "El cobro no puede ser cancelado porque la sesion de caja actual no corresponde a la sesion que lo cobro." );// {$row['id_sesion_caja']} != {$session_id}
+			}
+			
+			$this->link->autocommit( false );//inicio de transaccion
 		//anula cobro
 			$sql = "UPDATE ec_cajero_cobros SET cobro_cancelado = 1 WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al anular el cobro del cajero : {$this->link->error}" );
@@ -1542,7 +1856,7 @@
 					(monto*-1), 
 					NOW(), 
 					NOW(), 
-					CONCAT( 'Cobro para anular el cobro ', id_cajero_cobro ), 
+					CONCAT( 'Cobro para anular el cobro ', id_cajero_cobro, ' -{$payment_type}-' ), 
 					1, 
 					1
 				FROM ec_cajero_cobros WHERE id_cajero_cobro = {$payment_id}";
@@ -1663,7 +1977,17 @@
 					WHERE id_sesion_caja_afiliaciones = {$afiliation[0]}";
 				}
 				$stm = $this->link->query( $sql ) or die( "Error al agregar/ actualizar afiliacion a la sesion de caja actual : {$sql} : {$this->link->error}" );
-
+			//sincronizacion de afiliaciones por sesion de caja
+				if( $afiliation[0] == '' || $afiliation[0] == null ){//si no tiene id de detalle
+				//consulta el id insertado de la afiliacion por sesion de caja
+					$sql = "SELECT MAX( id_sesion_caja_afiliaciones ) AS last_id FROM ec_sesion_caja_afiliaciones";
+					$stm = $this->link->query( $sql ) or die( "Error al consultar el ultimo id insertado en ec_sesion_caja_afiliaciones : {$sql} : {$this->link->error}" );
+					$row = $stm->fetch_assoc();
+					$id_sesion_caja_afiliacion = $row['last_id'];
+				//envia a crear registro JSNO de sincronizacion
+					$sql = "CALL SincronizacionSesionCajaAfiliaciones(  'insert', {$id_sesion_caja_afiliacion} );";
+					$stm = $this->link->query( $sql ) or die( "Error al ejecutar procedure para sincronizar terminal en sesion de caja : {$sql} : {$this->link->error}" );
+				}
 			}
 			return 'ok';
 		}
@@ -1734,6 +2058,15 @@
 			$sql = "INSERT INTO ec_sesion_caja_terminales ( id_sesion_caja, id_cajero, id_terminal, habilitado )
 			VALUES ( '{$session_id}', '{$user_id}', '{$terminal_id}', 1 )";
 			$stm = $this->link->query( $sql ) or die( "Error al agregar terminal a la sesion de caja actual : {$this->link->error}" );
+		//sincronizacion de terminales por sesion de caja
+			//consulta el id insertado de la terminal por sesion de caja
+				$sql = "SELECT MAX( id_sesion_caja_terminales ) AS last_id FROM ec_sesion_caja_terminales";
+				$stm = $this->link->query( $sql ) or die( "Error al consultar el ultimo id insertado en ec_sesion_caja_terminales : {$sql} : {$this->link->error}" );
+				$row = $stm->fetch_assoc();
+				$id_sesion_caja_terminal = $row['last_id'];
+			//envia a crear registro JSNO de sincronizacion
+				$sql = "CALL SincronizacionSesionCajaTerminales(  'insert', {$id_sesion_caja_terminal} );";
+				$stm = $this->link->query( $sql ) or die( "Error al ejecutar procedure para sincronizar terminal en sesion de caja : {$sql} : {$this->link->error}" );
 			return 'ok';
 		}
 
@@ -1741,6 +2074,301 @@
 			$sql = "UPDATE ec_sesion_caja_terminales SET habilitado = '{$enabled}' WHERE id_sesion_caja_terminales = {$session_terminal_id}";//die($sql);
 			$stm = $this->link->query( $sql ) or die( "Error al actualizar el status de terminal en la sesion de caja : {$this->link->error}" );
 			return "Status de terminal actualizado exitsamente.";
+		}
+
+		public function getSaleData( $clave, $sale_folio, $user_id, $log_id = null ){
+		//consulta si tiene devolucion pendiente
+			$sql = "SELECT
+						prd.id_sesion_caja_pedido_relacionado,
+						p.folio_nv,
+						p1.folio_nv AS folio_origen
+					FROM ec_pedidos_relacion_devolucion prd
+					LEFT JOIN ec_pedidos p
+					ON p.id_pedido = prd.id_pedido_relacionado
+					LEFT JOIN ec_pedidos p1
+					ON p1.id_pedido = prd.id_pedido_original
+					WHERE prd.id_pedido_original = {$clave}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar si tiene devolucion pendiente : {$sql} : {$this->link->error}");
+			if( $stm->num_rows > 0 ){
+				$row = $stm->fetch_assoc();
+				if( $row['id_sesion_caja_pedido_relacionado'] == 0 ){
+					die( "<div class=\"text-center\">
+							<h2 class=\"\">El ticket <b class=\"text-danger\">{$row['folio_origen']}</b> tiene una devolución pendiente, escanea el ticket <b class=\"text-success\">{$row['folio_nv']}</b> para continuar.</h2>
+							<br><br>
+							<button 
+								type=\"\button\"
+								class=\"btn btn-success\"
+								onclick=\"location.reload();\"
+							>Aceptar y recargar página
+							</button>
+						</div>" );//definir mensaje
+				}
+			}
+		//consulta el id de sucursal de acceso 
+			$sql = "SELECT id_sucursal AS system_type FROM sys_sucursales WHERE acceso = 1";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$sql} : {$this->link->error}");
+			$row = $stm->fetch_assoc();
+			$TRANSACCIONES_POR_NOTIFICAR = array();
+			if( $row["system_type"] > 0 && ( $sale_folio != '' && $sale_folio != null ) ){//si es diferente de linea
+				$TRANSACCIONES_POR_NOTIFICAR['entra_en_condicion'] = true;
+			//verifica si tiene transacciones pendientes
+				$sql = "SELECT folio_unico AS unique_folio FROM vf_transacciones_netpay WHERE folio_venta = '{$sale_folio}' AND notificacion_vista = 0";
+				$stm = $this->link->query( $sql );
+			/*Logger*/
+				if( $log_id != null ){
+					$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consulta las transacciones pendientes ", $sql );
+				}
+				if( $this->link->error ){
+					if( $log_id != null ){
+						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', $sale_folio, $sql, $this->link->error );
+					}
+					die( "Error al consultar las transacciones pendientes : {$this->link->error}" );
+				}
+				if( $stm->num_rows > 0){
+					$TRANSACCIONES_POR_NOTIFICAR['transacciones_pendientes'] = array();
+					$pending_transactions = array();
+					while ( $row = $stm->fetch_assoc() ){
+						$pending_transactions[] = $row;
+						array_push( $TRANSACCIONES_POR_NOTIFICAR['transacciones_pendientes'], $row );
+					}
+					$sql = "SELECT value AS api_path FROM api_config WHERE name = 'path'";
+					$stm = $this->link->query( $sql );// or die( "Error al consultar las transacciones pendientes : {$this->link->error}" );
+				/*Logger*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Entra en transacciones pendientes y consulta path de api", $sql );
+					}
+					if( $this->link->error ){
+						if( $log_id != null ){
+							$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'api_config', 'path', $sql, $this->link->error );
+						}
+						die( "Error al consultar path de api : {$this->link->error}" );
+					}
+					$row = $stm->fetch_assoc();
+					$url = "{$row["api_path"]}/rest/netPay/consultar_transacciones_por_folio";
+					$post_data = json_encode( array("transactions"=> $pending_transactions ) );
+					//die( $post_data );
+				/*Logger*/
+					if( $log_id != null ){
+						$steep_log_id = $this->Logger->insertLoggerSteepRow( $log_id, "Consume api para recuperar datos en {$url}", $post_data );
+					}
+				//consumir el API ( CURL )
+					$results = json_decode( $this->sendPetition( $url, $post_data, $token = '' ), true );
+					//var_dump( $results	 );die( "stop" );
+					if( $results['status'] != null && $results['status'] != '' ){				
+						$archivo_path = "../../../../../conexion_inicial.txt";
+						$host = '';
+						$carpeta_path = '';
+						if(file_exists($archivo_path)){
+							$file = fopen($archivo_path,"r");
+							$line=fgets($file);
+							fclose($file);
+							$config=explode("<>",$line);
+							$tmp=explode("~",$config[2]);
+							$ruta_or=$tmp[0];
+							$ruta_des=$tmp[1];
+							$tmp_=explode("~",$config[0]);
+							$host = base64_decode( $tmp_[0] );
+							$carpeta_path = base64_decode( $tmp_[1] );
+						}else{
+							die("No hay archivo de configuración.");
+						}
+						$update_endpoint = "{$host}/{$carpeta_path}/rest/netPay/actualizar_datos_transacciones";
+					//consulta token
+						$user_token = $this->checkAccess( $user_id );
+						$user_token = $user_token['token'];
+						//die( $user_token );
+						foreach ($results['transacciones'] as $key => $transaction) {
+							$post_data = json_encode( $transaction );
+							$update = $this->sendPetition( $update_endpoint, $post_data, $user_token );
+						}
+					}
+				}
+			}
+	$CONSULTAS_SQL = array();
+			//$clave=$_POST['valor'];
+			$monto_saldo_a_favor = 0;
+			$monto_saldo_tomado = 0;
+			$id_venta_origen = 0;
+		//consulta si tiene saldo a favor
+			$sql = "SELECT
+					SUM(saldo_a_favor) AS monto_saldo_a_favor,
+					id_pedido_original AS id_venta_origen
+				FROM ec_pedidos_relacion_devolucion
+				WHERE id_pedido_relacionado = {$clave}
+				AND id_sesion_caja_pedido_relacionado = 0";
+	$CONSULTA_SALDO_FAVOR = $sql;
+			$tmp = "";
+			$stm_1 = $this->link->query( $sql ) or die( "Error al consultar relacion de pedidos y devolucion : {$this->link->error}" );
+			if( $stm_1->num_rows > 0 ){
+				$tmp = $stm_1->fetch_assoc();
+				$monto_saldo_a_favor = $tmp['monto_saldo_a_favor'];
+			}
+	$CONSULTAS_SQL[] = array( "CONSULTA_SALDO_FAVOR"=>$CONSULTA_SALDO_FAVOR, "resultado"=>$tmp );
+		//consulta si tiene pedido relacionado
+			$sql = "SELECT
+					id_pedido_original AS id_venta_origen
+				FROM ec_pedidos_relacion_devolucion
+				WHERE id_pedido_relacionado = {$clave}";
+	$CONSULTA_VENTA_RELACIONADA = $sql;
+	$CONSULTAS_SQL[] = array( "CONSULTA_VENTA_RELACIONADA"=>$CONSULTA_VENTA_RELACIONADA );
+			$stm_1 = $this->link->query( $sql ) or die( "Error al consultar relacion de pedidos y devolucion : {$this->link->error}" );
+			if( $stm_1->num_rows > 0 ){
+				$tmp = $stm_1->fetch_assoc();
+				$id_venta_origen = $tmp['id_venta_origen'];
+			}
+		//consulta si tiene saldo tomado
+			$sql = "SELECT
+					SUM(saldo_a_favor) AS monto_saldo_tomado,
+					id_pedido_original AS id_venta_origen
+				FROM ec_pedidos_relacion_devolucion
+				WHERE id_pedido_original = {$clave}
+				AND id_sesion_caja_pedido_relacionado = 0";
+	$CONSULTA_SALDO_TOMADO = $sql;
+	$CONSULTAS_SQL[] = array( "CONSULTA_SALDO_TOMADO"=>$CONSULTA_SALDO_TOMADO );
+			$stm_1 = $this->link->query( $sql ) or die( "Error al consultar relacion de pedidos y devolucion : {$this->link->error}" );
+			if( $stm_1->num_rows > 0 ){
+				$tmp = $stm_1->fetch_assoc();
+				$monto_saldo_tomado = $tmp['monto_saldo_tomado'];
+			}
+
+		//checamos los pagos pendientes de cobrar
+			$sql="SELECT
+					p.id_pedido AS id_venta,
+					p.folio_nv AS folio_venta,
+					IF( p.pagado = 0 AND pp.id_pedido_pago IS NULL, p.monto_pago_inicial, p.total ) AS pagos_pendientes,
+					REPLACE( p.id_devoluciones, '~', ',' ) AS devoluciones_relacionadas,
+					SUM( IF( pp.id_pedido_pago IS NULL , 0, pp.monto ) ) AS pagos_registrados,
+					p.total AS total_nota
+				FROM ec_pedidos p
+				LEFT JOIN ec_pedido_pagos pp 
+				ON p.id_pedido = pp.id_pedido
+				WHERE p.id_pedido = {$clave}
+				GROUP BY p.id_pedido";
+	$CONSULTA_PAGOS_PENDIENTES_DE_COBRAR = $sql;
+			$eje=$this->link->query($sql) or die("Error al consultar los datos del pedido.\n {$this->link->error}" );
+			$r=$eje->fetch_assoc();
+
+	$CONSULTAS_SQL[] = array( "CONSULTA_PAGOS_PENDIENTES_DE_COBRAR"=>$CONSULTA_PAGOS_PENDIENTES_DE_COBRAR, "RESULTADO"=>$r );
+			$sql = "SELECT 
+					ROUND( total_venta, 2 ) AS total_venta,
+					ROUND( monto_venta_mas_ultima_devolucion, 2 ) AS monto_venta_mas_ultima_devolucion
+				FROM ec_pedidos_referencia_devolucion
+				WHERE id_pedido = {$clave}";//die( $sql );
+			$reference_stm = $this->link->query( $sql ) or die( "Error al consultar la referencia de la venta y devolucion  : {$this->link->error}" );
+			$reference_row = $reference_stm->fetch_assoc();
+			$r['total_real'] = round( $r['total_nota'], 2 );
+			$r['total_nota'] = $reference_row['monto_venta_mas_ultima_devolucion'];
+
+	$CONSULTA_REFERENCIA_DEVOLUCION = $sql;
+	$CONSULTAS_SQL[] = array( "CONSULTA_REFERENCIA_DEVOLUCION"=>$CONSULTA_REFERENCIA_DEVOLUCION );
+		//checamos si hay devoluciones que dependan de este pedido y no esten pagadas
+			$condicion_devoluciones = "IN('{$r['devoluciones_relacionadas']}')";
+			$caso = 1;//no cobrada
+			$tiene_devolucion = 0;
+			if( $r['pagos_registrados'] == '' || $r['pagos_registrados'] == null ){
+				$r['pagos_registrados'] = '0';
+			}
+			if( $r['pagos_registrados'] < $r['total_nota'] && $r['pagos_registrados'] > 0 ){//pagos < total_venta ( pagada parcialmente )
+				$caso = 2;
+			}else if( $r['pagos_registrados'] >= $r['total_nota'] ){//pagos >= total_venta ( pagada completamente )
+				$caso = 3;
+				if( $r['pagos_registrados'] > $r['total_nota'] ){
+					$tiene_devolucion = 1;
+				}
+			}
+		//verifica si tiene una devolucion relacionada y el status de esta
+			$sql="SELECT 
+						IF( d.id_devolucion IS NULL, 0, d.id_devolucion ) As id_devolucion,
+						ROUND( SUM( IF( d.id_devolucion IS NULL, 0, d.monto_devolucion ) ), 2 ) AS monto_devolucion,
+						ROUND( SUM( IF( dp.id_devolucion IS NULL ,0, dp.monto ) ), 2 ) AS pagos_devolucion,
+						IF( d.id_devolucion IS NULL, '', d.status ) AS status
+					FROM ec_devolucion d
+					LEFT JOIN ec_devolucion_pagos dp
+					ON dp.id_devolucion = d.id_devolucion 
+					WHERE d.id_pedido = {$r['id_venta']} 
+						AND d.id_cajero = 0
+						AND d.id_sesion_caja = 0
+					GROUP BY d.id_devolucion";
+	$CONSULTA_VERIFICA_STATUS_DEVOLUCION = $sql;
+	$CONSULTAS_SQL[] = array( "CONSULTA_VERIFICA_STATUS_DEVOLUCION"=>$CONSULTA_VERIFICA_STATUS_DEVOLUCION );
+			$eje = $this->link->query($sql)or die("Error al consultar las devoluciones relacionadas a esta nota.\n{$this->link->error} : {$sql}" );
+			if( $eje->num_rows > 0 ){
+				$rd = $eje->fetch_assoc();
+				if( $rd['status'] != 3 && $rd['status'] != '' ){
+					die( "No se puede hacer un cobro sobre una nota con devolucion pendiente, finaliza la devolucion y vuelve a intentar. {$rd[1]}" );
+				}
+			}
+	//verifica si hay una devolucion ligada al pedido sin cajero
+				$sql = "SELECT 
+							d.id_devolucion AS id_devolucion,
+							d.folio AS folio_devolucion, 
+							SUM( dp.monto ) AS monto_pagos_devolucion,
+							d.observaciones,
+							SUM( d.monto_devolucion ) AS monto_devolucion
+						FROM ec_devolucion d 
+						LEFT JOIN ec_devolucion_pagos dp
+						ON d.id_devolucion = dp.id_devolucion
+						WHERE d.id_pedido = '{$clave}'
+						AND d.id_cajero = 0
+						AND d.id_sesion_caja = 0
+						GROUP BY d.id_pedido";
+	$CONSULTA_DEVOLUCION_SIN_CAJERO = $sql;
+	$CONSULTAS_SQL[] = array( "CONSULTA_DEVOLUCION_SIN_CAJERO"=>$CONSULTA_DEVOLUCION_SIN_CAJERO );
+				$return_stm = $this->link->query( $sql ) or die( "Error al consultar si hay una devolucion pendiente : {$this->link->error}" );
+				if( $return_stm->num_rows > 0 ){
+					$return_row = $return_stm->fetch_assoc();
+					if( $return_row['observaciones'] == 'Dinero regresado al cliente' 
+						&& $return_row['monto_devolucion'] > $return_row['monto_pagos_devolucion'] ){
+						$pending_ammount = $return_row['monto_devolucion'] - $return_row['monto_pagos_devolucion'];
+					}
+				}
+	//verifica si hay una devolucion ligada al pedido sin cajero
+			$sql = "SELECT 
+						SUM( dp.monto ) AS monto_pagos_devolucion
+					FROM ec_devolucion d 
+					LEFT JOIN ec_devolucion_pagos dp
+					ON d.id_devolucion = dp.id_devolucion
+					WHERE d.id_pedido = '{$clave}'
+					GROUP BY d.id_pedido";
+	$CONSULTA_DEVOLUCION_RELACIONADA = $sql;
+			$return_stm = $this->link->query( $sql ) or die( "Error al consultar pagos de devolucion : {$this->link->error}" );
+			$return_row_2 = "";
+			if( $return_stm->num_rows > 0 ){
+				$return_row_2 = $return_stm->fetch_assoc();
+				$return_row['monto_pagos_devolucion'] = $return_row_2['monto_pagos_devolucion'];
+			}
+	$CONSULTAS_SQL[] = array( "CONSULTA_DEVOLUCION_RELACIONADA"=>$CONSULTA_DEVOLUCION_RELACIONADA, "resultado"=>$return_row_2 );
+
+			$return_row['monto_devolucion'] = ( $return_row['monto_devolucion'] == '' || $return_row['monto_devolucion'] == null ? 0 : $return_row['monto_devolucion'] );
+			$return_row['monto_pagos_devolucion'] = ( $return_row['monto_pagos_devolucion'] == '' || $return_row['monto_pagos_devolucion'] == null ? 0 : $return_row['monto_pagos_devolucion'] );
+			$r['pagos_pendientes'] = $r['total_nota'] - ( $r['pagos_registrados'] - $return_row['monto_pagos_devolucion'] - $monto_saldo_tomado ) - $return_row['monto_devolucion'] - $monto_saldo_a_favor;
+			if($rd[0]==''){
+				$rd[0]=0;
+			}
+			$r['pagos_registrados'] = $r['pagos_registrados'] - $return_row['monto_pagos_devolucion'];
+			$FORMULA_PAGOS_COBRADOS = "{$r['pagos_registrados']} = {$r['pagos_registrados']} - {$return_row['monto_pagos_devolucion']}";
+			$resp = json_encode( 
+					array( 'id_venta'=>$r['id_venta'], 
+						'transacciones_netpay_pendientes'=>$TRANSACCIONES_POR_NOTIFICAR,
+						'folio_venta'=>$r['folio_venta'], 
+						'total_venta'=>round( $r['total_nota'], 2 ),
+						'pagos_cobrados'=>round( $r['pagos_registrados'], 2 ), 
+						'FORMULA_PAGOS_COBRADOS'=>$FORMULA_PAGOS_COBRADOS,
+						
+						'id_devolucion'=>$return_row['id_devolucion'], 
+						'monto_devolucion'=>round( $return_row['monto_devolucion'], 2 ), 
+						'monto_pagos_devolucion'=>round( $return_row['monto_pagos_devolucion'], 2 ),
+						'monto_saldo_a_favor'=>round( $monto_saldo_a_favor, 2 ),
+						'pagos_pendientes'=>( ($r['pagos_pendientes'] >= -1 && $r['pagos_pendientes'] <= 1) ? '0' : $r['pagos_pendientes'] ), 
+						'FORMULA_PAGOS_PENDIENTES'=>"(pagos_pendientes){$r['pagos_pendientes']} = (total_nota){$r['total_nota']} - ( (pagos_registrados){$r['pagos_registrados']} - (monto_pagos_devolucion){$return_row['monto_pagos_devolucion']} - (monto_saldo_tomado){$monto_saldo_tomado} ) - (monto_devolucion){$return_row['monto_devolucion']} - (monto_saldo_a_favor){$monto_saldo_a_favor}",
+						
+						'total_real'=>$r['total_real'],
+						'id_venta_origen'=>$id_venta_origen,
+						'monto_saldo_tomado'=>$monto_saldo_tomado,
+						'CONSULTAS'=>$CONSULTAS_SQL
+					)
+				);
+			die( "ok|{$resp}" );
 		}
 	}
 

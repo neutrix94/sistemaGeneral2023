@@ -1,6 +1,14 @@
 <?php
+/*version 1.1 2024-06-21*/
 	include('../../../../conectMin.php');
 	include('../../../../conexionMysqli.php');
+	//consultamos si esta habiliado el logger
+	$Logger = null;
+	$sql = "SELECT log_habilitado AS log_enabled FROM sys_configuraciones_logs WHERE id_configuracion_log = '2'";
+	$stm = $link->query( $sql ) or die( "Error al consultar si el log de cobros esta habilitado : {$sql} : {$link->error}" );
+	$log_enabled = $stm->fetch_assoc();
+	echo "<input type=\"hidden\" id=\"log_status\" value=\"{$log_enabled['log_enabled']}\">";
+
 //verifica si esta habilitada la funcion de SmartAccounts
 	$sql = "SELECT 
 				habilitar_smartaccounts_netpay AS is_smart_accounts
@@ -35,20 +43,41 @@
 	$usuario = $r[0];
 	$sucursal = $r[1];
 	$session_id = $r[2];
-	
-	$Payments = new Payments( $link );//instancia clase de pagos
-	$Payments->checkAccess( $user_id );//verifica permisos
+//consulta si esta habilitado el log del JSON
+	$sql = "SELECT
+				p.ver AS permission
+			FROM sys_permisos p
+			LEFT JOIN sys_users_perfiles up
+			ON up.id_perfil = p.id_perfil
+			LEFT JOIN sys_users u
+			ON u.tipo_perfil = up.id_perfil
+			WHERE p.id_menu = 310
+			AND u.id_usuario = {$user_id}";
+	$stm = $link->query( $sql ) or die( "Error al consultar permiso de LOG JSON : {$sql} : {$link->error}" );
+	$json_log = $stm->fetch_assoc();
+
+	$Payments = new Payments( $link, $user_sucursal );//instancia clase de pagos
+	$token = $Payments->checkAccess( $user_id );//verifica permisos
+	//var_dump( $token );die('');
+	echo "<input type=\"hidden\" id=\"max_execution_time\" value=\"{$token['max_execution_time']}\">";
 	$tarjetas_cajero = $Payments->getTerminals( $user_id, 0, $user_sucursal, $session_id );//afiliaciones por cajero
 	$cajas = $Payments->getBoxesMoney( $sucursal_id );//cheque o transferencia 
 //configuracion del Websocket
-//$url_websocket = "ws://localhost:3005/";//"ws://localhost:3000";
-$url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
+// $url_websocket = "ws://localhost:3005/";//"ws://localhost:3000";
+// $url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
+	$url_websocket = $Payments->getWebSocketURL();// getenv('WEBSOCKET_URL') ?: "ws://192.168.1.223:3005/";
+	if( $url_websocket == '' || $url_websocket == NULL || $url_websocket == null ){
+		die( "<center>
+			<h2>La url del websocket no esta configurada, configurala desde configuracion del sistema!</h2>
+			<br>
+			<a href=\"../../../../index.php?\" class=\"btn btn-success\">Aceptar y Salir</a></center>" );
+	}
 //aqui encriptar en token 
 	if( !include( '../../../../rest/netPay/utils/encriptacion_token.php' ) ){
 		die( "no se incluyo libreria Encrypt" );
 	}
 	$Encrypt = new Encrypt();
-	$token_websocket = $Encrypt->encryptText( "7dff3c34-faee-11ea-a7be-3d014d7f956c", "" );//hay que recuperar de DB7dff3c34-faee-11ea-a7be-3d014d7f956c
+	$token_websocket = $Encrypt->encryptText( "{$token['token']}", "" );//hay que recuperar de DB7dff3c34-faee-11ea-a7be-3d014d7f956c // d4186cb3-7400-4e0f-bbea-55ebc8739b23
 //$token_websocket = "";
 	//die( "Token : {$token_websocket}" );
 	$usuario_websocket = $user_id;
@@ -86,13 +115,13 @@ $url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
 <div class="global">
 	<input type="hidden" id="session_id" value="<?php echo $session_id;?>">
 <!--emergentes -->
-	<div class="emergent" style="z-index : 20;">
-		<div class="text-end" style=" position: relative; top : 120px;right: 1%;z-index:1;"><!-- position: relative; top : 120px; left: 90%; z-index:1; display:none; -->
+	<div class="emergent" style="z-index : 20;" tabindex="1">
+		<!--div class="text-end" style=" position: relative; top : 120px;right: 1%;z-index:1;">position: relative; top : 120px; left: 90%; z-index:1; display:none; 
 			<button 
 				class="btn btn-danger"
 				onclick="close_emergent();"
 			>X</button>
-		</div>
+		</div>-->
 		<div class="emergent_content" tabindex="1"></div>
 	</div>
 
@@ -118,6 +147,10 @@ $url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
 			<button type="button" class="btn btn-success" onclick="show_reprint_view();" >
 				<i class="icon-print"></i>
 			</button>
+
+			<!--button type="button" class="btn btn-secondary" onclick="show_pending_payment_responses();" >
+				<i class="icon-money-1"></i>
+			</button-->
 		</div>
 		<div class="col-10 text-center text-light">
 			<h3><b class="">Sucursal:</b> <?php echo $sucursal;?></h3>
@@ -126,14 +159,19 @@ $url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
 	</div>
 <!-- Cancelaciones /reimpresiones manuales -->
 	<div class="reverse_form_btn">
-		
-		<button
-			type="button"
-			class="btn btn-info"
-			onclick="show_debug_json();"
-		>
-			<i class="icon-file-code"></i>
-		</button>
+	<?php
+		if( $json_log['permission'] == 1 ){
+	?>
+			<button
+				type="button"
+				class="btn btn-info"
+				onclick="show_debug_json();"
+			>
+				<i class="icon-file-code"></i>
+			</button>
+	<?php
+		}
+	?>
 
 		<button
 			type="button"
@@ -297,13 +335,14 @@ $url_websocket = "ws://192.168.1.223:3005/";//"ws://localhost:3000";
 			</div>
 			<div class="col-5">
 				<div class=" input-group">
-					<input type="number" id="monto_cheque_transferencia" class="form-control">
+					<input type="text" id="monto_cheque_transferencia" class="form-control" onkeyup="validateNumberInput( this );">
 					<button 
 						class="btn btn-primary"
 						onclick="agrega_cheque_transferencia();">
 						<i class="icon-plus"></i>
 					</button>
 				</div>
+				<p class="text-center text-danger hidden" id="monto_cheque_transferencia_alerta">Campo numérico*</p>
 			</div>
 		</div>
 

@@ -1,5 +1,5 @@
 <?php
-/*version casa 1.0*/
+/*version 2.0 2024-06-21*/
 //corte anterior
 	$id_corte_anterior=$Arqueo->getSessionBefore( $user_id );
 //afiliaciones
@@ -9,7 +9,7 @@
 //afiliaciones para cheque o transferencia 
 	$cajas = $Arqueo->getAccounts( $user_sucursal );
 //cheques/transferencias del corte de caja
-	$pagos_chqs = $Arqueo->getAdittionalPayments( $user_id, $fecha_sesion, $hora_inicio_sesion );
+	$pagos_chqs = $Arqueo->getAdittionalPayments( $user_id, $fecha_sesion, $hora_inicio_sesion, $id_sesion_caja );
 ?>
 
 		<table border="1" id="tarjetas">
@@ -113,10 +113,11 @@
 			}
 		?>
 				</td>
-								<td align="center">
+				<td align="center">
 					<button type="button" class="btn btn-success" onclick="llenaReporte(1);">
 						<i>Generar</i>
 					</button>
+				</td>
 				</td>
 			</tr>	
 		</table>

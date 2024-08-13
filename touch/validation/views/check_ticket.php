@@ -56,7 +56,7 @@
 					id="barcode_seeker"
 					class="form-control"
 					placeholder="Escaner código de barras del Ticket"
-					onkeyup="seekTicketBarcode( event, this, 'seekTicketBarcode' );"
+					onkeyup="evitarCaracteresEspeciales( event );seekTicketBarcode( event, this, 'seekTicketBarcode' );"
 				>
 				<!-- 
 					onblur="focus_again( this );" -->

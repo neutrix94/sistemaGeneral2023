@@ -79,7 +79,7 @@
 			break;
 
 			default:
-				die( "Permission Denied!" );
+				die( "Permission Denied." );
 			break;
 		}
 	}
@@ -573,7 +573,7 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 					LIMIT 1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar código de barras del ticket : {$this->link->error} {$sql}" );
 			if( $stm->num_rows <= 0 ){
-				$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no fue encontrada.<br>Verifica y vuelve a intentar!</p>";
+				$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no fue encontrada.<br>Verifica y vuelve a intentar.</p>";
 				$resp .= "<div class=\"row\">";
 					$resp .= "<div class=\"col-2\"></div>";
 					$resp .= "<div class=\"col-8\">";
@@ -606,7 +606,7 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 
 				$difference = round( $row_aux['payments_total'] - $pagos_dev ) - round( $row['total'] );
 				if( ( $difference != -1 && $difference != 0 && $difference != -1 ) && $row['pagado'] == 1 ){//venta no liquidada $row_aux['payments_total'] < $row['total']
-					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no ah sido liquidada<br>Verifica y vuelve a intentar!</p>";
+					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no ha sido liquidada<br>Verifica y vuelve a intentar.</p>";
 					$resp .= "<h5>{$row_aux['payments_total']} VS {$row['total']} = {$difference}, {$row['pagado']}</h5>";
 					$resp .= "<div class=\"row\">";
 						$resp .= "<div class=\"col-2\"></div>";
@@ -619,7 +619,7 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 					$resp .= "</div><br><br>";
 					return $resp;
 				}else if( $row_aux['payments_total'] == 0 && $row['pagado'] == 0 ){//apartado sin pagos
-					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas <b class=\"text-primary\">( apartado )</b> con el folio : <b>{$barcode}</b> no tiene pagos registrados<br>Verifica y vuelve a intentar!</p>";
+					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas <b class=\"text-primary\">( apartado )</b> con el folio : <b>{$barcode}</b> no tiene pagos registrados<br>Verifica y vuelve a intentar.</p>";
 					$resp .= "<div class=\"row\">";
 						$resp .= "<div class=\"col-2\"></div>";
 						$resp .= "<div class=\"col-8\">";
@@ -1007,7 +1007,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 			//$resp .= "<div class=\"row\">";
 			//	$resp .= "<div class=\"col-2\"></div>";
 			//	$resp .= "<div class=\"col-8\">";
-					$resp = "ok|<h5 style=\"color : white;\">Producto validado!</h5>";
+					$resp = "ok|<h5 style=\"color : white;\">Producto validado.</h5>";
 					//$resp .= "<button class=\"btn btn-success form-control\" onclick=\"close_emergent( null, '#barcode_seeker' );\">";
 					//	$resp .= "<i class=\"icon-ok-circle\">Aceptar</i>";
 					//$resp .= "</button>";
@@ -1300,6 +1300,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 								type=\"number\" 
 								class=\"form-control\"
 								id=\"pieces_quantity_tmp\"
+								min=\"1\"
 								onkeyup=\"validate_no_decimals( this );\"
 							>
 							<br>
@@ -1404,11 +1405,11 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 							<td id=\"{$prefix}vrs_row_1_{$counter}\" class=\"text-center\" width=\"33.3%\">{$row['provider_clue']}</td>
 							<td class=\"text-end\" width=\"33.3%\">
 								<input 
-									type=\"number\" 
+									type=\"text\"
 									id=\"{$prefix}vrs_row_2_{$counter}\"
 									value=\"\"
 									min=\"0\"
-									onkeyup=\"prevent_negative_number( this, event );\"
+									onkeyup=\"prevent_negative_number_( this, event );\"
 									class=\"form-control text-end\"
 									" . ( $is_editable != true ? ' readonly' : '' ) . 
 									( $is_editable == true ? "onchange=\"recalculateReturnProduct();\"" : "" ) 
@@ -1420,7 +1421,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 				$validated_total += $row['validated_quantity']; 
 				$return_total += 0; 
 			}
-		//consulta la cantidad que no se ah validado
+		//consulta la cantidad que no se ha validado
 
 			$sql = "SELECT 
 						pd.id_pedido_detalle AS sale_detail_id,
@@ -1608,24 +1609,21 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 
 		public function insertMovementProviderProduct( $ticket_id, $sucursal, $validation_id, $movement_type = 1, 
 			$sale_detail_id, $quantity = 0 ){
-			$sql = "INSERT INTO ec_movimiento_detalle_proveedor_producto ( /*1*/id_movimiento_detalle_proveedor_producto, 
-				/*2*/id_movimiento_almacen_detalle, /*3*/id_proveedor_producto, /*4*/cantidad, /*5*/fecha_registro, 
-				/*6*/id_sucursal, /*7*/status_agrupacion, /*8*/id_tipo_movimiento, /*9*/id_almacen,
-				/*10*/id_pedido_validacion/*7,id_equivalente */)
-				SELECT
-				/*1*/NULL,
-				/*2*/ax.id_movimiento_almacen_detalle,
-			    /*3*/pvu.id_proveedor_producto,
-			    /*4*/IF( {$quantity} = 0,
+		//consulta los movimientos almacen		
+			$sql = "SELECT
+					NULL,
+					ax.id_movimiento_almacen_detalle AS movement_detail_id,
+					pvu.id_proveedor_producto AS product_provider_id,
+					IF( {$quantity} = 0,
 			    		IF( pvu.id_pedido_validacion IS NULL, 0, SUM( pvu.piezas_validadas - pvu.piezas_devueltas ) ),
 			    		{$quantity}
-			    	),
-			    /*5*/NOW(),
-			    /*6*/'{$sucursal}',
-			    /*7*/-1,
-			    /*8*/IF( {$movement_type} = 1, ax.id_tipo_movimiento, 12 ),
-			    /*9*/ax.id_almacen,
-			    /*10*/'{$validation_id}'
+			    	) AS quantity,
+					NOW() AS date_time,
+					'{$sucursal}' AS store_id,
+					-1 AS group_status,
+					IF( {$movement_type} = 1, ax.id_tipo_movimiento, 12 ) AS movement_type,
+					ax.id_almacen AS warehouse_id,
+					'{$validation_id}' AS validation_id
 				FROM
 				(
 				    SELECT 
@@ -1649,6 +1647,11 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 //		die( $sql );
 //echo ( "<br>" . $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al insertar los detalles de movimiento almacen proveedor producto : {$this->link->error}" );
+			while( $row = $stm->fetch_assoc() ){
+				$sql = "CALL spMovimientoDetalleProveedorProducto_inserta( {$row['movement_detail_id']}, {$row['product_provider_id']}, {$row['quantity']}, 
+				{$row['store_id']}, {$row['movement_type']}, {$row['warehouse_id']}, {$row['validation_id']}, 12, NULL )";
+				$procedure_stm = $this->link->query( $sql ) or die( "Error al ejecutar procedure spMovimientoDetalleProveedorProducto_inserta : {$this->link->error} {$sql}" );
+			}
 			return 'ok';
 		}
 
@@ -1865,19 +1868,25 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 							}
 						}
 					//insertamos cabecera
-						$sql="INSERT INTO ec_movimiento_almacen ( /*1*/id_tipo_movimiento, /*2*/id_usuario, 
-							/*3*/id_sucursal, /*4*/fecha, /*5*/hora, /*6*/observaciones, /*7*/id_almacen, /*8*/id_pedido ) 
-						VALUES ( /*1*/{$movement_type},/*2*/{$user_id},/*3*/{$store_id},/*4*/now(),/*5*/now(), 
-							/*6*/'{$obs}', /*7*/{$warehouse_id}, /*8*/-1 )";
+						//$sql="INSERT INTO ec_movimiento_almacen ( /*1*/id_tipo_movimiento, /*2*/id_usuario, 
+						//	/*3*/id_sucursal, /*4*/fecha, /*5*/hora, /*6*/observaciones, /*7*/id_almacen, /*8*/id_pedido ) 
+						//VALUES ( /*1*/{$movement_type},/*2*/{$user_id},/*3*/{$store_id},/*4*/now(),/*5*/now(), 
+						//	/*6*/'{$obs}', /*7*/{$warehouse_id}, /*8*/-1 )";
+						
+						$sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, '{$obs}', {$store_id}, {$warehouse_id}, {$movement_type}, -1, -1, -1, -1, 12, NULL )";
 						$stm = $this->link->query( $sql ) or die( "Error al insertar la cabecera del movimiento almacen : {$this->link->error} {$sql}" );			
-						$sql = "SELECT LAST_INSERT_ID()";
+						/*$sql = "SELECT LAST_INSERT_ID()";
 						$stm_2 = $this->link->query( $sql ) or die( "Error al consultar id de cabecera de movimiento almacen : {$this->link->error} {$sql}" );
-						$header_id = $stm_2->fetch_row();
-						$header_id = $header_id[0];
+						$header_id = $stm_2->fetch_row();*/
+						$ma_stm = $this->link->query( "SELECT max( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen" ) or die( "Error al recuperar id ma insertado : " . mysql_error() );
+						$id_mov = $ma_stm->fetch_assoc();
+						$header_id = $id_mov['id_movimiento_almacen'];
 					//inserta detalles	
-						$sql = "INSERT INTO ec_movimiento_detalle( id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						/*$sql = "INSERT INTO ec_movimiento_detalle( id_movimiento, id_producto, cantidad, cantidad_surtida, 
 						id_proveedor_producto, id_pedido_detalle ) VALUES ( {$header_id}, {$prods_row['product_id']}, {$prods_row['quantity']},
-						{$prods_row['quantity']}, {$prods_row['product_provider_id']}, /*8*/-1 )";
+						{$prods_row['quantity']}, {$prods_row['product_provider_id']}, -1 )";/*8*/
+						$sql = "CALL spMovimientoAlmacenDetalle_inserta( {$header_id}, {$prods_row['product_id']}, {$prods_row['quantity']}, {$prods_row['quantity']}, 
+						-1, -1, {$prods_row['product_provider_id']}, 12, NULL );";
 						$stm_2 = $this->link->query( $sql ) or die( "Error al insertar detalles de movimiento almacen por exhibicion : {$this->link->error} {$sql}" );
 					}
 				}
@@ -1944,7 +1953,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 				return "<div class=\"row\">
 					<h5>Esta venta fue hecha en sistema <b>{$sale_system_type}.</b></h5>
 					<p class=\"text-center\">Si deseas validarla en <b>{$this->system_type} escribe la palabra '{$this->system_type}'</b></p>
-					<h5 style=\"color : green;\">IMPORTANTE : DEBERAS DE VOLVER A DESEMPACAR TODO Y VOLVER A VALIDAR TODOS LOS PRODUCTOS DE ESTA VENTA!</h5>
+					<h5 style=\"color : green;\">IMPORTANTE : DEBERAS DE VOLVER A DESEMPACAR TODO Y VOLVER A VALIDAR TODOS LOS PRODUCTOS DE ESTA VENTA.</h5>
 					<div class=\"col-4\"></div>
 					<div class=\"col-4\">
 						<input type=\"text\" id=\"validation_tmp_word\">

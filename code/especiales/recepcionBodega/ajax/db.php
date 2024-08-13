@@ -742,16 +742,21 @@
 		$link->autocommit( false );
 	//verifica si tiene un detalle validado
 		$sql = "SELECT 
-					id_oc_recepcion_detalle AS oc_reception_detail_id
-				FROM ec_oc_recepcion_detalle
-				WHERE id_recepcion_bodega_detalle = {$reception_detail_id}";
+					rd.id_oc_recepcion_detalle AS oc_reception_detail_id,
+					md.id_movimiento_almacen_detalle AS movement_detail_id
+				FROM ec_oc_recepcion_detalle rd
+				LEFT JOIN ec_movimiento_detalle md
+				ON md.id_oc_detalle = rd.id_oc_recepcion_detalle
+				WHERE rd.id_recepcion_bodega_detalle = {$reception_detail_id}";
 		$stm = $link->query( $sql ) or die( "Error al consultar si el detalle fue validado : {$link->error}" );
 		if( $stm->num_rows > 0 ){
 	//elimina detalle de validación; activa trigger para eliminar movimientos
 			while ( $row = $stm->fetch_assoc() ) {
-		//echo 'here';
+		//elimina el detalle de movimiento de almacen con Procedure
+				$sql = "CALL spMovimientoAlmacenDetalle_elimina ( {$row['movement_detail_id']}, 1 )";
+				$stm_1 = $link->query( $sql ) or die( "Error al eliminar detalle de moviiento de almacen con Procedure : {$sql} : {$link->error}" );
 				$sql = "DELETE FROM ec_oc_recepcion_detalle WHERE id_oc_recepcion_detalle = {$row['oc_reception_detail_id']}";
-				$stm_1 = $link->query( $sql ) or die( "Error al eliminar detalle de validación : {$link->error}" );
+				$stm_2 = $link->query( $sql ) or die( "Error al eliminar detalle de validación : {$sql} : {$link->error}" );
 			}
 		}
 	//elimina detalle de recepción 

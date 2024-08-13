@@ -7,8 +7,6 @@ const connectWebSocket = (ws_ref) => {
   const QUEUE_INTERVAL = 1000 * 30 + 1000 * 1;
   const RECONNECT_INTERVAL = 1000 * 10 + 1000 * 1;
   const PING_VALUE = 1;
-  const MAX_TRIES = 3;
-  var reconnectTries = 0;
 
   const ACKNOWLEDGEMENT_EVENTS_CLIENTS = [
     events.INFORM_VIEWED_TRANSACTION,
@@ -62,12 +60,8 @@ const connectWebSocket = (ws_ref) => {
   };
 
   const reconnectInterval = () => {
-    if (ws.readyState === ws.CLOSED && reconnectTries < MAX_TRIES) {
-      reconnectTries++;
+    if (ws.readyState === ws.CLOSED) {
       connectWebSocket(ws);
-    } else if (reconnectTries >= MAX_TRIES) {
-      clearInterval(window.reconnectInterval);
-      window.reconnectInterval = null;
     }
   };
 
@@ -94,7 +88,6 @@ const connectWebSocket = (ws_ref) => {
   };
 
   ws.addEventListener('open', (event) => {
-    reconnectTries = 0;
     clearInterval(window.reconnectInterval);
     window.reconnectInterval = null;
     if (ws.onConnection) {
@@ -130,6 +123,7 @@ const connectWebSocket = (ws_ref) => {
 
     clearInterval(ws.queueInterval);
     if (!window.reconnectInterval) {
+      reconnectInterval();
       window.reconnectInterval = setInterval(
         reconnectInterval,
         RECONNECT_INTERVAL,
@@ -192,17 +186,33 @@ const connectWebSocket = (ws_ref) => {
     } else if (jsonMsg.type == events.INFORM_TRANSACTIONS) {//aqui llegan las transacciones
       let folios = [];
       jsonMsg.transactions.forEach((transaction) => {//aqui esta la respuesta de transacciones
+/*habilitado por oscar 2024-07-01 para no ver en la vista las transacciones pendientes*/
+      $( '#stop' ).click();
       //aqui brinca la emergente
-        $( ".emergent_content" ).html( `<h2 class="text-success text-center">${transaction.message}</h2>
-				<div class="text-center">
-					<button
-						type="button"
-						class="btn btn-success"
-						onclick="marcar_notificacion_vista( '${transaction.traceability ? transaction.traceability.folio_unico_transaccion : transaction.folio_unico }' );"
-					><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
-					</button>
+      //aqui brinca la emergente
+        $( ".emergent_content" ).html( `<div class="text-center bg-danger">
+          <br>
+          <br>
+          <h2 class="text-light text-center">${transaction.message} ( ${transaction.traceability ? transaction.traceability.folio_venta : transaction.folio_venta } ) </h2>
+          <h2 class="text-light text-center">Recargar la pagina y volver a escanear el ticket</h2>
+          <br>
+          <br>
+          <div class="row text-center">
+            <div class="col-3"></div>
+            <div class="col-6">
+              <button
+                type="button"
+                class="btn btn-warning form-control"
+                style="font-size:200%;"
+                onclick="marcar_notificacion_vista( '${transaction.traceability ? transaction.traceability.folio_unico_transaccion : transaction.folio_unico }', ${transaction.traceability ? true : false } );"
+              ><i class="icon-spin3">OK</i>
+              </button>
+              <br>
+              <br>
+              </div>
+            </div>
           </div>` );
-        $( ".emergent" ).css( "display", "block" );
+        $( ".emergent" ).css( "display", "block" );//deshabilitado por Oscar marcar_notificacion_vista( '${transaction.traceability ? transaction.traceability.folio_unico_transaccion : transaction.folio_unico }' );
 //desarrollar boton para indicador de visto
         folios.push(transaction.folio_unico);
       });
@@ -214,13 +224,14 @@ const connectWebSocket = (ws_ref) => {
       ws.sendAcknowledgment(jsonMsg.type);
       ws.actualTransaction = jsonMsg.transaction;//aqui esta la respuesta de transacciones
       //aqui brinca la emergente
+        $( '#stop' ).click();
         $( ".emergent_content" ).html( `<h2 class="text-success text-center">${ws.actualTransaction.message}</h2>
 				<div class="text-center">
 					<button
 						type="button"
 						class="btn btn-success"
-						onclick="marcar_notificacion_vista( '${ws.actualTransaction.traceability.folio_unico_transaccion}' );"
-					><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
+						onclick="marcar_notificacion_vista( '${ws.actualTransaction.traceability.folio_unico_transaccion}', ${ws.actualTransaction.message.trim() == 'Transacción exitosa' || jsonMsg.transaction.message.trim() == 'Transaccion exitosa' ? true : false } );"
+					><i class="icon-ok=circle">Aceptar y marcar notificación como vista</i>
 					</button>
           </div>` );
         $( ".emergent" ).css( "display", "block" );
@@ -228,13 +239,14 @@ const connectWebSocket = (ws_ref) => {
       ws.sendAcknowledgment(jsonMsg.type);
       console.log( jsonMsg.transaction );
      //aqui brinca la emergente
+      $( '#stop' ).click();
       $( ".emergent_content" ).html( `<h2 class="text-success text-center">${jsonMsg.transaction.message}</h2>
       <div class="text-center">
         <button
           type="button"
           class="btn btn-success"
-          onclick="marcar_notificacion_vista( '${jsonMsg.transaction.folio_unico}' );"
-        ><i class="icon-ok=circle">Aceptar y marcar notificacion como vista</i>
+          onclick="marcar_notificacion_vista( '${jsonMsg.transaction.folio_unico}', ${jsonMsg.transaction.message.trim() == 'Transacción exitosa' || jsonMsg.transaction.message.trim() == 'Transaccion exitosa' ? true : false } );"
+        ><i class="icon-ok=circle">Aceptar y marcar notificación como vista</i>
         </button>
         </div>` );
       $( ".emergent" ).css( "display", "block" );

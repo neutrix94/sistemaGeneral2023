@@ -1,3 +1,4 @@
+/*Se agregan los atributos de llave primary y su valor para comprobacion en sincronizacion (2024-08-08) */
 DROP PROCEDURE IF EXISTS generaRegistroSincronizacionDetalleVenta| 
 DELIMITER $$
 CREATE PROCEDURE generaRegistroSincronizacionDetalleVenta( IN sale_detail_id BIGINT, IN sale_unique_folio VARCHAR( 30 ), IN origin_store_id INTEGER(11) )/*IN folio_unico_movimiento_almacen VARCHAR( 30 )*/
@@ -16,6 +17,8 @@ BEGIN
 		CONCAT(
 			'{',
 				'"action_type" : "insert",',
+				'"primary_key" : "folio_unico",',
+				'"primary_key_value" : "', pd.folio_unico,'",',
 				'"table_name" : "ec_pedidos_detalle",\n',
 				'"id_pedido" : "( SELECT id_pedido FROM ec_pedidos WHERE folio_unico = \'', sale_unique_folio ,'\' )",\n',
 				'"id_producto" : "', pd.id_producto, '",\n',
