@@ -1,3 +1,4 @@
+/*Version 1.1 Actualizacion de Proveedor Producto*/
 DROP PROCEDURE IF EXISTS spMovimientoDetalleProveedorProducto_actualiza|
 DELIMITER $$
 CREATE PROCEDURE spMovimientoDetalleProveedorProducto_actualiza( IN id_movimiento_detalle BIGINT, IN product_provider_id INTEGER, IN cantidad_nueva FLOAT( 15, 4 ), IN sincronizar_registro INTEGER )
@@ -37,8 +38,7 @@ CREATE PROCEDURE spMovimientoDetalleProveedorProducto_actualiza( IN id_movimient
     ON md.id_movimiento_almacen_detalle = mdpp.id_movimiento_almacen_detalle
     LEFT JOIN ec_tipos_movimiento tm
     ON tm.id_tipo_movimiento = mdpp.id_tipo_movimiento
-    WHERE mdpp.id_movimiento_almacen_detalle = id_movimiento_detalle
-    AND mdpp.id_proveedor_producto = product_provider_id;
+    WHERE mdpp.id_movimiento_almacen_detalle = id_movimiento_detalle;
 /*Setea variables*/
     SET old_inventory = ( cantidad_anterior * movement_type );
     SET final_inventory = ( cantidad_nueva * movement_type );
@@ -46,8 +46,8 @@ CREATE PROCEDURE spMovimientoDetalleProveedorProducto_actualiza( IN id_movimient
     UPDATE ec_movimiento_detalle_proveedor_producto 
         SET cantidad = cantidad_nueva, 
         id_proveedor_producto = product_provider_id 
-    WHERE id_movimiento_almacen_detalle = id_movimiento_detalle
-    AND id_proveedor_producto = product_provider_id; 
+    WHERE id_movimiento_almacen_detalle = id_movimiento_detalle;
+    /*AND id_proveedor_producto = product_provider_id;*/
 /*Actualiza el inventario acumulado (anterior)*/
     UPDATE ec_inventario_proveedor_producto 
     SET inventario = ( inventario - old_inventory)  
