@@ -289,6 +289,292 @@ var packsCatalogue = new Array();
     }
   }
 
+  function solicitarMuestras( ){
+
+    var baseUrl = window.location.origin;
+    var apiUrl = baseUrl + '/sistemaGeneral2023/rest/v1/surte/Muestra';
+
+    var productosSeleccionados = getProductosMuestras();
+
+    if( productosSeleccionados.length > 0 ){
+      if (confirm("Se enviarán a solicitar " + productosSeleccionados.length + " muestras. ¿Confirmas la operación?") == true) {
+          $.ajax({
+          type: 'POST',
+          url: apiUrl,
+          headers: {
+            'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
+          },
+          data: {
+              "productos": productosSeleccionados,
+              "vendedor": <?php echo $user_id; ?>,
+              "pedido": genIdPedido( <?php echo $user_id; ?> ),
+          },
+          datatype: 'json',
+          success: function (data) {
+              console.log("RESPUESTA MUESTRA");
+              console.log(data);
+              if( data.result.resultado == "Solicitado" ){
+                alert(data.result.descripcion);
+              }else{
+                alert("Ha ocurrido un error: "+data.result.descripcion);
+              }
+              
+              clearAllCheckBox();
+
+          },
+          error:function(error){
+            console.log("ERROR".error);
+          }
+        });
+        } else {
+          alert("Cancelaste la operación");
+        }
+        
+    }else{
+      alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
+    }
+  }
+
+  function genIdPedido( id_user ) {
+    var id = "";
+    if( sessionStorage.getItem('ID_PEDIDO_TEMP') != null && sessionStorage.getItem('ID_PEDIDO_TEMP') != '' ){
+      id = sessionStorage.getItem('ID_PEDIDO_TEMP');
+    }else{
+      id = new Date().getMilliseconds() + id_user ;
+      sessionStorage.setItem('ID_PEDIDO_TEMP', id);
+    }
+
+    return id;  
+  }
+
+  function selectAllMuestras(item){
+    var isChecked = $(item).is(':checked'); // Verifica si el checkbox clicado está seleccionado o no
+
+    $('.cbMuestra').each(function() {
+        $(this).prop('checked', isChecked); // Selecciona o deselecciona el checkbox
+        var row = $(this).closest('tr'); // Encuentra la fila correspondiente al checkbox
+        if (isChecked) {
+          row.css('background-color','#D8FAFF');
+        } else {
+          row.css('background-color','#FFFF');
+        }
+    });
+  }
+  /**
+   * Función que recorre las filas de la tabla que tienen el checkbox seleccionado
+   */
+  function getProductosMuestras(){
+    
+    var seleccionados = [];
+    var filas = $('#listaProductos tr.move');
+    if( filas.length > 0 ){
+      // Mostrar las filas en la consola
+      filas.each(function(index, fila) {
+        var $row = $(this);
+        var isChecked = $row.find('input[type="checkbox"]').is(':checked');
+        if (isChecked) {
+          var ordenDeLista = $row.find('td:eq(0)').text().trim();
+          var cantidad = $row.find('td:eq(2)').text().trim();
+          seleccionados.push({
+            id: ordenDeLista,
+            cantidad: cantidad
+          });
+        }
+      });
+    }
+    return seleccionados;
+  }
+
+  function clearAllCheckBox(){
+    $(".cbSelectAllMuestras").prop('checked', false); 
+    $('.cbMuestra:checked').each(function() {
+        //$(this).prop('checked', false);  // Desmarcar el checkbox
+        $(this).trigger('click');        // Lanzar el evento click
+    });
+  }
+
+  function openDevolucionProductos(){
+    var filas = $('#listaProductos tr.move');
+    
+    if(filas.length > 0){
+      $('#modalDevolucion').show();
+      //Cada que el modal se muestre, el input se limpia
+      $('#inputDevolucion').val("");
+      $('#inputDevolucion').focus();
+    }else{
+      alert("No se tienen productos en el pedido para devolver.\nFavor de agregar al menos un producto");
+    }
+
+  }
+
+  function closeModal(){
+    $('#modalDevolucion').hide();
+  }
+
+  function detectaEnter( e ){
+    if( e.key ==='Enter' || e.keyCode === 13 ){
+        buscarProducto();
+    }
+  }
+
+  function buscarProducto(){
+    
+    var valCodigo = $('#inputDevolucion').val();
+      if( valCodigo == "" ){
+        alert('Favor de ingresar un código de producto');
+      }else{
+
+        var arrProductosTabla = buildObjetoOrdenListaCodigoBarras();
+
+        if( arrProductosTabla.length > 0 ){
+          //VALIDAR QUE EL CÓDIGO DE BARRAS SE ENCUENTRA EN EL OBJETO DE LA TABLA
+          const listOrder = findListOrderByBarcode(valCodigo, arrProductosTabla);
+
+          if( listOrder != null ){
+
+            descontarCantidad(listOrder);
+          }else{
+            alert("El código ingresado no existe en el pedido.\nFavor de revisar");
+            $('#inputDevolucion').val("");
+          }
+
+        }else{
+          alert("No existen productos para devolver.");
+
+        }
+      }
+  }
+
+  function findListOrderByBarcode(barcode, productos) {
+    for (const producto of productos) {
+        if (
+            producto.codigo_barras_pieza_1 && producto.codigo_barras_pieza_1.includes(barcode) ||
+            producto.codigo_barras_pieza_2 && producto.codigo_barras_pieza_2.includes(barcode) ||
+            producto.codigo_barras_pieza_3 && producto.codigo_barras_pieza_3.includes(barcode)
+        ) {
+            return producto.list_order;
+        }
+    }
+    return null; // Devuelve null si no se encuentra el código de barras
+}
+
+
+  function buildObjetoOrdenListaCodigoBarras(){
+
+    productsCatalogueLocal = JSON.parse( localStorage.getItem('productsCatalogue') );
+
+    var filas = $('#listaProductos tr.move');   
+    var idsProductos = [];
+    var arrProductos = [];
+    // Mostrar las filas en la consola
+    filas.each(function(index, fila) {
+        // Obtener las celdas de la fila actual
+        var celdas = $(fila).find('td');
+        
+        // Mostrar el contenido de cada celda
+        celdas.each(function(indice, celda) {
+            //console.log(' Columna ' + (indice + 1) + ': ' + $(celda).text());
+            if( indice == 0 ){ //El indice 0 contiene el número de Orden de lista (Código de Producto)
+              var ordenLista = $(celda).text();
+              
+              var objProductoLocal = findProductByListOrder( productsCatalogueLocal, ordenLista );
+             
+              arrProductos.push(objProductoLocal);
+              //idsProductos.push($(celda).text());
+            }
+        });
+    });
+    console.log("OBJ PRODUCTOS" );
+    console.log(arrProductos);
+
+    return arrProductos;
+  }
+
+  function findProductByListOrder( arrProductosLocal, listOrder ) {
+    return arrProductosLocal.find(producto => producto.list_order === listOrder);
+}
+
+  function descontarCantidad(ordenDeLista) {
+    //searchOrdenListaByBarCode();
+    $('#listaProductos tr.move').each(function() {
+      var $row = $(this);
+      var rowOrdenDeLista = $row.find('td:eq(0)').text().trim();
+      if (rowOrdenDeLista === ordenDeLista) {
+        var $cantidadCell = $row.find('td:eq(2)');
+        var cantidad = parseInt($cantidadCell.text().trim());
+        if (cantidad > 0) {
+          var nuevaCantidad = cantidad - 1;
+          if( nuevaCantidad == 0 ){
+            //Eliminar fila, se manda a ejecutar directamente el click en el botón "quitar"
+            //eq(6) - en la posición 6 de la fila se encuentra el botón para quitar
+            $row.find('td:eq(6)').children().trigger('click');
+            closeModal();
+
+          }else{
+
+            $cantidadCell.text(nuevaCantidad);
+            var precio = $row.find('td:eq(3)').text().trim();
+            var precioString = precio.replace(/[^0-9.-]+/g, "");
+            var precio = parseFloat(precioString);
+
+            var nuevoMonto = nuevaCantidad * precio;
+            //Se actualiza la columna 5 que corresponde al monto
+            $row.find('td:eq(5)').text("$" + nuevoMonto.toFixed(2));
+            
+            //Actualizar cantidad en sessionStorage
+            updateCantidadMontoSessionStorage( ordenDeLista, nuevaCantidad, nuevoMonto );
+            //Actualizar el total del pedido
+            calculaTotalVenta();
+
+            closeModal();
+
+          }
+          
+        }
+      }
+    });
+  }
+
+  // function searchOrdenListaByBarCode(){
+
+  // }
+
+  function updateCantidadMontoSessionStorage( idProducto,nuevaCantidad, nuevoMonto ){
+
+    if( sessionStorage.getItem('SALE_PRODUCTS_LIST') != null && sessionStorage.getItem('SALE_PRODUCTS_LIST') != '' ){
+
+      var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        //var products_array = localStorage.getItem('SALE_PRODUCTS_LIST');
+      products_array = JSON.parse( products_array );
+
+      var indexSessionStorage = getIndexSessionStorage( products_array, idProducto );
+
+      if( indexSessionStorage != null ){
+        //Se actualiza la cantidad que se encuentra en la posición 3
+        products_array[indexSessionStorage][2] = nuevaCantidad;
+        //Se actualiza el monto que se encuentra en la posicion 6
+        products_array[indexSessionStorage][5] = "$"+nuevoMonto;
+
+        sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+      }
+    }
+
+  }
+
+  function getIndexSessionStorage( productsArray, idProducto ){
+    var index = null;
+    for (let i = 0; i < productsArray.length; i++) {
+      // El id de Producto o Número de lista se encuenta en la posición 0, es por eso que se valida  productsArray[i][0]
+      if( productsArray[i][0] == idProducto ){
+        index = i
+        //Instrucción para romper el ciclo y salir de el
+        i = productsArray.length;
+      } 
+    }
+    return index;
+  }
+
+
 </script>
 <!-- -->
 
@@ -422,6 +708,82 @@ var packsCatalogue = new Array();
   .orange{
     color : orange !important;
   }
+
+  .buttonMuestras{
+    margin-bottom: 10px;
+    margin-top: 10px;
+    float: right;
+    /* background-color: #2d97b2; */
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center; /* Centra verticalmente los elementos dentro del grupo */
+    margin-bottom: 10px;
+  }
+
+  .input-group span {
+    margin-right: 10px; /* Espacio entre el span y el input */
+  }
+
+  .modal {
+    display: none; /* Oculto por default */
+    position: fixed; 
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4);
+}
+
+/* Modal content */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 40%; 
+    position: relative; 
+    text-align: center;
+}
+
+.close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-input {
+  /* width: 50%; */
+  padding: 10px;
+  margin: 20px 0;
+}
+
+.confirm-btn {
+    padding: 10px 20px;
+    background-color: #0679c8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirm-btn:hover {
+    background-color: #055993;
+}
 </style>
 <?php
  // extract($_GET);
@@ -456,6 +818,16 @@ var packsCatalogue = new Array();
   <p id="cont_emerg" style="color:white;font-size:30px;" align="center">
     
   </p>
+</div>
+
+<!-- Ventana emergente para devolución de productos -->
+<div id="modalDevolucion" class="modal">
+  <div class="modal-content">
+    <span class="close closeModalEscanear" onclick="closeModal()">&times;</span>
+    <h3><b>Escanear código de producto</b></h3>
+    <input id="inputDevolucion" type="text" placeholder="Ingresa código de producto" class="modal-input" onkeyup="detectaEnter(event)">
+    <button class="confirm-btn" onclick="buscarProducto()">Confirmar</button>
+  </div>
 </div>
 
 <input type="hidden" id="tipo_venta" value="<?php echo $tv;?>">
@@ -560,7 +932,7 @@ var packsCatalogue = new Array();
   </div>
 <!-- botones -->
   <div class="row" style="padding: 10px !important;">
-    <div class="col-4 text-center">
+    <div class="col-3 text-center">
     <?php
      /* 
 DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
@@ -595,7 +967,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
         </button>
       </div>
     </div>
-    <div class="col-4 text-center row">
+    <div class="col-3 text-center row">
       <div class="col-6 text-end">
         <img style="top:-10px; position:relative;" src="img/teclado.png" width="50" height="50">
       </div> 
@@ -605,7 +977,8 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
         </p>
       </div>
     </div>
-    <div class="col-4 text-center">
+
+    <div class="col-3 text-center">
        <p 
           type="button"
           class="btn" 
@@ -614,7 +987,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
           <i class="icon-eye-off" style="font-size : 200%;"></i>
           Borrar
           <br>
-          Busqueda
+          Búsqueda
         </p>
     </div>
   </div>
@@ -688,10 +1061,18 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
   <!---Grid-->
   <div class="row products_list_container">
    <div class="contenedorGrid" id="contenedorGrid">
-    <table id="listaProductos" class="table table-striped table-bordered" cellpadding="0" cellspacing="0">
+    <!-- Nuevo botón para Solicitar muestras -->
+    <button 
+        type="button"
+        onclick="solicitarMuestras();"
+        class="btn btn-primary buttonMuestras"
+      >
+        <b>Solicitar muestras</b>
+      </button>
+    <table id="listaProductos" class="table table-striped table-bordered" style="margin-left:20;" cellpadding="0" cellspacing="0">
     <thead class="product_list_header">
       <tr class="cabecera">
-        <th width="100"><p>Prod</p></th>
+        <th width="100"><p>Producto</p></th>
         <th width="350"><p>Descripción</p></th>
         <th width="100"><p>Cant</p></th>
         <th width="100"><p>Precio</p></th>
@@ -706,6 +1087,10 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
         <th width="100"><p>Monto</p></th>
         <th width="100"><p>Quitar</p></th>
         <th colspan="10" width="0" style="display:none;"><p></p></th>
+        <th width="100">
+          <p>Muestra</p>
+          <p><input type="checkbox" class="cbSelectAllMuestras" onclick="selectAllMuestras(this)" title="Seleccionar / Deseleccionar todo"></p>
+        </th>
          <!--  <td width="0"></td>
         <td width="0"></td>
         <td width="0"></td>
@@ -736,11 +1121,11 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
   <!--seccion-->
 <!--  <a class="regalo" id="img_regalo"  href="javascript:void(0)"><span>regalo</span></a>-->
 
-      <div class="row">    
-        <div class="col-5">
+      <div class="row" style="width: 100% !important;max-width: 100% !important;">    
+        <div class="col-7">
 
         </div>
-        <div class="col-7 text-center"><!--data-role="fieldcontain"-->
+        <div class="col-5 text-center"><!--data-role="fieldcontain"-->
           <label>
             <strong style="font-weight:bold; font-size:20px; padding-right: 2px;">
               Total
@@ -762,15 +1147,25 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
   </div-->
   <br>
   <div class="row"><!--class="ui-block-bwidth:48%;float:left;"-->
-    <div class="col-1"></div>
-    <div class="col-10">
+    <div class="col-2"></div>
+    <div class="col-4">
+      <button 
+        type="button"
+        onclick="openDevolucionProductos();"
+        class="btn btn-warning form-control"
+      >
+        <b>Productos para devolver</b>
+      </button>
+    </div>
+    <div class="col-4">
       <button data-theme="a" 
         name="cerrar" 
         id="cerrar" 
-        class="btn1 btn btn-success form-control" 
+        class="btn1 btn btn-primary form-control" 
         style="min-width:180px; margin-right:50px;"
-        >✔ Cerrar venta</button>
+        >✔ Enviar pedido</button>
       </div>
+    <div class="col-2"></div>
   </div>
   <!--Termina seccion-->
   </div>
@@ -786,15 +1181,13 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
         </div>
     <!--Descuentos-->
     
-        <div class="row">
-            <div class="col-4 text-center"><!-- width="20%" align="center" style="border: inset 0pt;" -->
-
+        <div class="row" style="align-items: center;justify-content: center;">
+            <div class="col-2 text-center"><!-- width="20%" align="center" style="border: inset 0pt;" -->
              <fieldset  data-role="controlgroup" data-type="horizontal" style="display :none;">
                <label data-mini="true" style="width:100px;padding:10px;text-align:center;">
                   <input type="checkbox" name="paquete" id="es_paquete"/> <?php echo 'Paquete';?>
                 </label>
               </fieldset>
-
               <br>
               <button 
                 onclick="javascript:activa_paq();" 
@@ -804,15 +1197,20 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
                 </p>
               </button>
             </div>
-            <div class="col-4 text-center" onclick="habilitaDesc(1);"><!-- width="20%" align="center"  style="border: inset 0pt;" -->
-               <span style="fontsize=20px;font-weight:bold;" >-%</span>
-                <input type="number" id="porcGeneral" style="padding:10px;width:80%;border:2px solid;fontsize=20px;font-weight:bold;border-radius:5px;background:white;"
-                onkeyup="calculaTotalVenta(1);" class="form-control" value="" ><!--autocomplete="ÑÖcompletes"-->
+            <div class="col-3 text-center" onclick="habilitaDesc(1);">
+              <div class="input-group">
+                <span style="font-size: 20px; font-weight: bold;">-%</span>
+                <input type="number" id="porcGeneral" style="padding: 10px; width: 80%; border: 2px solid; font-size: 20px; font-weight: bold; border-radius: 5px; background: white;"
+                onkeyup="calculaTotalVenta(1);" class="form-control" value="" >
+              </div>
             </div>
-            <div class="col-4 text-center" onclick="habilitaDesc(2);"><!-- width="20%" align="center" style="border: inset 0pt;"-->
-               <span style="fontsize=20px;font-weight:bold;" >-$</span>
-                <input type="number" id="descGeneral" style="padding:10px;width:80%;border:2px solid;fontsize=20px;font-weight:bold;border-radius:5px;background:white;"
-                onkeyup="calculaTotalVenta(2);" value="" class="form-control" name="descGeneral" ><!--x-autocompletetype="" autocomplete="off"-->
+            <div class="col-3 text-center" onclick="habilitaDesc(2);">
+              <div class="input-group">
+                <span style="font-size: 20px; font-weight: bold;">-$</span>
+                <input type="number" id="descGeneral" style="padding: 10px; width: 80%; border: 2px solid; font-size: 20px; font-weight: bold; border-radius: 5px; background: white;"
+                onkeyup="calculaTotalVenta(2);" value="" class="form-control" name="descGeneral">
+              </div>
+               
             </div>
         </div>
 
@@ -820,10 +1218,10 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
           <div class="col-4"></div>
           <div class="col-8">
             <button
-              class="btn btn-warning"
+              class="btn btn-primary"
               onclick="guardarVenta( 'quotation' );"
             >
-              <i class="icon-dollar">Imprimir Cotizacion</i>
+              <i class="icon-dollar">Imprimir Cotización</i>
             </button>
           </div>
             

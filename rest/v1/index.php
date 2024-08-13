@@ -24,18 +24,22 @@
 	require 'utils/manageResponse.php';
 	require 'utils/validaToken.php';
 
-	/*
-	* Instancia servicios por exponer
-	*/
-	
-	require 'endpoints/token.php';      //Token
-	require 'endpoints/productos.php';  //Products
-	require 'endpoints/ventas.php';     //Ventas
-	require 'endpoints/emails.php';     //Correos
-	require 'endpoints/facturas.php';   //Facturas
-	require 'endpoints/facturaReceptor.php';   //Facturación: Valida contribuyente
+  /*
+  * Instancia servicios por exponer
+  */
+  require 'endpoints/token.php';      //Token
+  require 'endpoints/productos.php';  //Products
+  require 'endpoints/ventas.php';     //Ventas
+  require 'endpoints/emails.php';     //Correos
+  require 'endpoints/facturas.php';   //Facturas
+  require 'endpoints/facturaReceptor.php';   //Facturación: Valida contribuyente
+  require 'endpoints/surteMuestra.php';   //Surtimeinto: Solicitud de muestra
+  require 'endpoints/surtePedido.php';   //Surtimeinto: Solicitud para pedido
+  require 'endpoints/notiPedido.php';   //Surtimeinto: Notifica surtimiento
+  require 'endpoints/notificacionesPendientes.php';   //Surtimeinto: Obtiene notificaciones pendientes
 
-//Servicios de Servidor
+
+  //Servicios de Servidor
 	require 'server/verificacion_registros.php';//comprobacion de los registros pendientes
 	require 'server/inserta_registros_sincronizacion.php';
 	require 'server/actualiza_inventarios_productos.php';
