@@ -75,10 +75,12 @@
             
             var component_chk = products_array[i][14];
             var contiene_checked = component_chk.includes("checked");
+            var contiene_texto_muestra = component_chk.includes("number-muestra");
             var select_checkbox = ( contiene_checked ) ? 1: 0;
+            var es_muestra = ( contiene_texto_muestra ) ? 1: 0;
             
             //agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price );//aux_arr[2]
-            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price, select_checkbox );//aux_arr[2]
+            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price, select_checkbox, es_muestra );
             //agregaFila(null, products_array[i][3], -1, products_array[i][1], products_array[i][14], tmp_price, select_checkbox );//aux_arr[2]
             //f,cant,temp,id_producto_pedido,lista_normal
         }
@@ -1185,7 +1187,7 @@ var new_sale_window = null;
 
 var hay_paquete=0;
 //agregar fila a tabla del pedido
-    function agregaFila( f, cant, temp, id_producto_pedido, lista_normal, product_price = null, val_check_muestra = 0 ){//se implementan las variables cant,temp por Oscar 13.08.2018
+    function agregaFila( f, cant, temp, id_producto_pedido, lista_normal, product_price = null, val_check_muestra = 0, es_muestra = 0 ){//se implementan las variables cant,temp por Oscar 13.08.2018
         //alert(product_price );
     //alert( f + ','+ cant + ',' + temp + ',' + id_producto_pedido + ',' + lista_normal );
        // alert('add_fila');
@@ -1687,6 +1689,10 @@ var hay_paquete=0;
         //Checkbox muestra
         var newCell=newRow.insertCell(15);
         var strCheck = (val_check_muestra == 1) ? '<input type="checkbox" class="cbMuestra" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+
+        if( es_muestra == 1 ){
+            strCheck = strCheck.replace('onclick="checkMuestra(this)"', 'onclick="checkMuestra(this)" number-muestra="1"');
+        }
         //var strCheck = '<input type="checkbox" onclick="checkMuestra(this)"/>';
         newCell.innerHTML=strCheck;
         newCell.align="center";
@@ -2126,8 +2132,14 @@ var hay_paquete=0;
 
     function checkMuestra(item){
         var valor_chk = $(item).is(":checked");
+        var es_muestra = $(item).attr('number-muestra');
 
         var str_checkbox = ( valor_chk ) ? '<input type="checkbox" class="cbMuestra" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+
+        if( es_muestra == '1' ){
+
+            str_checkbox = str_checkbox.replace('onclick="checkMuestra(this)"', 'onclick="checkMuestra(this)" number-muestra="1"');
+        }
 
         if( valor_chk ){
             $(item).parent().parent().css('background-color','#D8FAFF');
@@ -2345,6 +2357,8 @@ var hay_paquete=0;
                 var $row = $(this);
                 var ordenDeLista = $row.find('td:eq(0)').text().trim();
                 var cantidad = $row.find('td:eq(2)').text().trim();
+                var numberMuestra = $row.find('td:eq(15)').children().eq(0).attr('number-muestra');
+                if(numberMuestra=="1") cantidad = cantidad -1;
                 seleccionados.push({
                     id: ordenDeLista,
                     cantidad: cantidad
