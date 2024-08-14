@@ -2,6 +2,12 @@
 
 {include file="../../conectMin.php" pagetitle="example"}
 {include file="general/emergents.tpl" pagetitle="$contentheader"}
+{literal}
+	<script>
+		var file_control_version = "1.1 Separación de Proceso Transferencias rápidas ( 2024-08-12 )";
+		var current_file_name = "/templates/general/<b>listados.tpl";
+	</script>
+{/literal}
 <!--implementacion Oscar 28.08.2019 para el botón de editar desde la pantalla de pedidos-->
 	{if $tabla eq 'ZWNfb3JkZW5lc19jb21wcmE=' && $no_tabla eq "MQ=="}
 		<button style="position:absolute;top:340px;left:70%;background:transparent;border:0;" onclick="abrePedido('null',0)">
@@ -1191,7 +1197,95 @@ $("#imp_csv_prd").change(function(){
 
 /*implementacion Oscar 2023 para modificar los status de las transferencias rapidas*/
 		function authorize_transfers( pos ){
-			update_fast_transfer_status( pos, 'transferAuthorization', null, null );
+			var transfer_id = celdaValorXY('listado', 0, pos);
+			var url = "../../code/especiales/Transferencias_desarrollo/ajax/fastTransfers.php?freeTransferFl=buildEmergent&transfer_id=" + transfer_id;
+			
+			var resp = ajaxR( url );
+			$( '.emergent_content' ).html( resp );
+			$( '.emergent' ).css( 'display', 'block' );
+			$( '#btn_close_emergent' ).css( 'display', 'block' );
+		//alerta log
+			/*$( '.emergent_3' ).css( 'display', 'block' );$( '.emergent_3' ).css( 'display', 'block' );
+			$( '.emergent_content_3' ).css( 'background', 'blue' );
+			$( '.emergent_content_3' ).css( 'color', 'white' );
+			$( '.emergent_content_3' ).css( 'top', '50%' );
+			$( '.emergent_content_3' ).html( `<h3>Versión : ${file_control_version}</h3>
+			<h3>Ruta y nombre archivo : ${current_file_name}</b></h3>
+			<h3>Función : authorize_transfers( pos ) ( Lanza emergente que indica proceso de autorización de transferencias rápidas )</b></h3>
+			<h3>Url petición : ${url}</h3>
+			<div style="text-align : center;">
+				<button
+					type="button"
+					onclick="close_emergent_3();"
+				>
+					<i class="icon-ok-circled" onclick="start_fast_transfer_proccess( ${transfer_id} )">Aceptar y continuar</i>
+				</button>
+			</div>` );*/
+
+			setTimeout( ()=>{start_fast_transfer_proccess( transfer_id );}, 1000 );
+			//alert( "here" );return false;
+			//update_fast_transfer_status( pos, 'transferAuthorization', null, null );
+		}
+		function start_fast_transfer_proccess( transfer_id ){
+		//primer paso
+			var url = "../../code/especiales/Transferencias_desarrollo/ajax/fastTransfers.php?freeTransferFl=updateTransfer&transfer_id=" + transfer_id;
+			var resp = ajaxR( url );//alert( resp );
+			resp = resp.replaceAll(`\r\n\t\t\t\t\t`, `\n`);
+			resp = resp.replaceAll(`\r\n\t\t\t\t`, `\n`);
+			resp = resp.replaceAll(`\n\t\t\t\t\t\t`, `\n`);
+			resp = resp.replaceAll(``, `\n`);
+			resp = resp.replaceAll(`\r\n\t\t\t`, `\n`);
+			resp = resp.replaceAll(`\\t`, `    `);
+			resp = resp.replaceAll(`\\r\\n`, `\n`);
+			resp = resp.replaceAll(`,"`, `,\n"`);
+			resp = resp.replaceAll(`,{`, `,\n{`);
+			if( resp.trim() == '' ){
+				resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
+			}
+			$( '#json_steep_one' ).html( resp );
+			//hljs.initHighlighting.called = false;
+			//hljs.highlightAll();
+			setTimeout( function(){
+			//alert( resp );
+		//segundo paso
+				var url = "../../code/especiales/Transferencias_desarrollo/ajax/fastTransfers.php?freeTransferFl=updateTransfer&transfer_id=" + transfer_id;
+				var resp = ajaxR( url );//alert( resp );
+				resp = resp.replaceAll(`\r\n\t\t\t\t\t`, `\n`);
+				resp = resp.replaceAll(`\r\n\t\t\t\t`, `\n`);
+				resp = resp.replaceAll(`\n\t\t\t\t\t\t`, `\n`);
+				resp = resp.replaceAll(`\r\n\t\t\t`, `\n`);
+				resp = resp.replaceAll(`\\t`, `    `);
+				resp = resp.replaceAll(`\\r\\n`, `\n`);
+				resp = resp.replaceAll(`,"`, `,\n"`);
+				resp = resp.replaceAll(`,{`, `,\n{`);
+				if( resp.trim() == '' ){
+					resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
+				}
+				$( '#json_steep_two' ).html( resp );
+			}, 1000 );
+			//hljs.initHighlighting.called = false;
+			//hljs.highlightAll();
+			setTimeout( function(){
+			//tercer paso
+				var url = "../../code/especiales/Transferencias_desarrollo/ajax/fastTransfers.php?freeTransferFl=updateTransfer&transfer_id=" + transfer_id;
+				var resp = ajaxR( url );//alert( resp );
+				resp = resp.replaceAll(`\r\n\t\t\t\t\t`, `\n`);
+				resp = resp.replaceAll(`\r\n\t\t\t\t`, `\n`);//\n\t\t\t\t\t\t
+				resp = resp.replaceAll(`\n\t\t\t\t\t\t`, `\n`);
+				resp = resp.replaceAll(`\r\n\t\t\t`, `\n`);
+				resp = resp.replaceAll(`\\t`, `    `);
+				resp = resp.replaceAll(`\\r\\n`, `\n`);
+				resp = resp.replaceAll(`,"`, `,\n"`);
+				resp = resp.replaceAll(`,{`, `,\n{`);
+				if( resp.trim() == '' ){
+					resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
+				}
+				$( '#json_steep_three' ).html( resp );
+				hljs.initHighlighting.called = false;
+				hljs.highlightAll();
+			}, 1000 );
+			$( '#btn_close_emergent' ).css( 'display', 'block' )
+			//setTimeout( function(){close_emergent_3()}, 1000 );
 		}
 
 		function finish_transfer_by_button( pos ){
@@ -1252,7 +1346,7 @@ $("#imp_csv_prd").change(function(){
 
 		function update_fast_transfer_status( pos, flag, status = null, observations = null ){
 			var url = "../../code/especiales/Transferencias_desarrollo/ajax/fastTransfers.php?freeTransferFl=" + flag;
-			url += "&transfer_id=" + celdaValorXY('listado', 0, pos);
+			url += "&transfer_id=" + celdaValorXY('listado', 0, pos);alert( "URL : " + url );return false;
 			if( status != null ){
 				url += "&transfer_status=" + status;
 			}	
