@@ -401,7 +401,7 @@
 					<button
 						type=\"button\"
 						class=\"btn btn-success\"
-						onclick=\"close_emergent();\"
+						onclick=\"close_emergent();location.reload();\"
 						id=\"btn_close_emergent\" 
 						style=\"display:none;\"
 					>
