@@ -180,8 +180,8 @@
 		}
 
 		public function lock_and_unlock_synchronization_apis( $status ){
-			$sql = "UPDATE sys_sincronizacion SET bloquear_apis_sincronizacion = {$status}";
-			$this->link->query( $sql ) or die( "Error al actualizar APIS de sincronización a : {$status}. : {$sql} : {$this->link->error}" );
+			$sql = "UPDATE sys_configuracion_sistema SET bloquear_apis_sincronizacion = {$status}";
+			$this->link->query( $sql ) or die( json_encode( array( "Error"=>"Error al actualizar APIS de sincronización a : {$status}. : {$sql} : {$this->link->error}" ) ) );
 		}
 		public function getTransferInfo( $transfer_id ){
 			$sql = "SELECT 
