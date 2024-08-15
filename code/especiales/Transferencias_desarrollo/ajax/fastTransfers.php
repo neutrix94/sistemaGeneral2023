@@ -19,11 +19,18 @@
 				$transfer_info = $fT->getTransferInfo( $transfer_id );
 				$id_estado = $transfer_info['transfer_status'];
 				$id_tipo = $transfer_info['transfer_type'];
+				$sql = "SELECT bloquear_apis_en_transferencia_rapida AS lock_synchronization FROM sys_configuracion_sistema";
+				$stm = $link->query( $sql ) or die( "Error al consultar bloqueos de APIS : {$sql} : {$link->error}" );
+				$row = $stm->fetch_assoc();
+				$lock_synchronization = $row['lock_synchronization'];
 				switch( $id_tipo ){
 					case '10' ://Transferencia entre la misma sucursal
 					case '6' ://Vaciado de almacen
 						switch( $id_estado ){
 							case '1' :
+								if( $lock_synchronization = 1 ){
+									$fT->lock_and_unlock_synchronization_apis( 1 );
+								}
 								echo json_encode( $fT->updateTransferStatus( $user_id, $transfer_id, 2 ) );//pasa a pendiente de surtir para hacer movimientos de almacen de salida
 							break;
 							case '2' :
@@ -33,14 +40,18 @@
 							break;
 							case '7' :
 								echo json_encode( $fT->updateTransferStatus( $user_id, $transfer_id, 9 ) );//finzalizacion de transferencias
+								if( $lock_synchronization = 1 ){
+									$fT->lock_and_unlock_synchronization_apis( 0 );
+								}
 							break;
 						}
 					break;
 					case '11' ://Transferencia a otra sucursal
 						switch( $id_estado ){
-							case '1' ://die("here");
-								//$this->link->autocommit( false );
-								//die('"here":"example"');//updateTransferStatus( $user_id, $transfer_id, $status_id, $observations = "" )
+							case '1' :
+								if( $lock_synchronization = 1 ){
+									$fT->lock_and_unlock_synchronization_apis( 1 );
+								}
 								echo json_encode( $fT->updateTransferStatus( $user_id, $transfer_id, 2, "SALIDA TRANSFERENCIA" ) );//pasa a pendiente de surtir para hacer movimientos de almacen de salida
 							break;
 							case '2' :
@@ -50,6 +61,9 @@
 							break;
 							case '6' :
 								echo json_encode( $fT->updateTransferStatus( $user_id, $transfer_id, 7, $observations ) );//pasa a Revision Finalizada para que se reciba desde el listado
+								if( $lock_synchronization = 1 ){
+									$fT->lock_and_unlock_synchronization_apis( 0 );
+								}
 							break;
 						}
 					break;
@@ -165,6 +179,10 @@
 			return $row['date_time'];
 		}
 
+		public function lock_and_unlock_synchronization_apis( $status ){
+			$sql = "UPDATE sys_sincronizacion SET bloquear_apis_sincronizacion = {$status}";
+			$this->link->query( $sql ) or die( "Error al actualizar APIS de sincronización a : {$status}. : {$sql} : {$this->link->error}" );
+		}
 		public function getTransferInfo( $transfer_id ){
 			$sql = "SELECT 
 					id_estado AS transfer_status,

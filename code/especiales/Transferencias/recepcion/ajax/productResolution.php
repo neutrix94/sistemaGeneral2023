@@ -313,7 +313,7 @@
 				/*23*/'{$ommit_origin_movement}',
 				/*24*/'{$ommit_destinity_movement}'";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el nuevo registro en la transferencia {$sql} " . $this->link->error );
-			$new_detail_id  = $link->insert_id;
+			$new_detail_id  = $this->link->insert_id;
 
 /*actualiza deralles de transferencias
 			$sql = "UPDATE ec_transferencia_productos SET resuelto = '1'
