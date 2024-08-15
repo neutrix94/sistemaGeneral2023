@@ -21,6 +21,14 @@
 			$( ".emergent_content" ).html( '' );
 			$( ".emergent" ).css( 'display', 'none' );
 		}
+		function close_emergent_2(){
+			$( ".emergent_content_2" ).html( '' );
+			$( ".emergent_2" ).css( 'display', 'none' );
+		}
+		function close_emergent_3(){
+			$( ".emergent_content_3" ).html( '' );
+			$( ".emergent_3" ).css( 'display', 'none' );
+		}
 	</script>
 
 	<style type="text/css">

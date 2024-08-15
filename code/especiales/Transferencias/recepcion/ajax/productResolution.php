@@ -43,8 +43,9 @@
 			$this->transfers = $this->getTransfersByBlock();
 		}
 
-		public function finishResolutionTransfers(){
-		//die( 'here' );
+		public function finishResolutionTransfers( $user ){
+		//consulta si esta habilitado el bloqueo de APIS de sincronizacion
+			$sql = "";
 			$this->link->autocommit( false );
 
 			$sql = "SELECT
@@ -67,14 +68,24 @@
 			$transfers_ids = $transfer_rows['transfers_ids'];
 			$sql = "UPDATE ec_transferencias SET id_estado = 2 WHERE id_transferencia IN( $transfers_ids )";
 			$stm = $this->link->query( $sql ) or die( "error|Error actualizar transferencia a autorizada : {$this->link->error}" );
-
+/*Implementacion Oscar 2024-08-14 para hacer movimientos de almacen de salida*/
+			$transfers_array = explode( ",", $transfers_ids );
+			foreach ($transfers_array as $key => $transfer_id) {
+				$movements = $this->insertTransferMovements( $user, $transfer_id, 2 );
+			}
 			$sql = "UPDATE ec_transferencias SET id_estado = 9 WHERE id_transferencia IN( $transfers_ids )";
+			/*Implementaciion Oscar 2024-08-14 para hacer movimientos de almacen de entrada*/
 			$stm = $this->link->query( $sql ) or die( "error|Error actualizar transferencia a terminada : {$this->link->error}" );
+			foreach ($transfers_array as $key => $transfer_id) {
+				$movements = $this->insertTransferMovements( $user, $transfer_id, 9 );
+			}
 		//actualiza el bloque a recibido
 			$sql = "UPDATE ec_bloques_transferencias_recepcion SET recibido = '1' WHERE id_bloque_transferencia_recepcion = {$this->reception_block_id}";
 			$stm = $this->link->query( $sql ) or die( "error|Error actualizar bloque a recibido : {$this->link->error}" );
 			
 			$this->link->autocommit( true );
+		//libera el bloqueo de APIS de sincronizacion si es el caso
+			$sql = "";
 
 			return "ok|<div class=\"row\">
 						<div class=\"col-1\"></div>
@@ -93,6 +104,50 @@
 							</button>
 						</div>
 					</div>";
+		}
+
+		public function insertTransferMovements( $user_id, $transfer_id, $transfer_status ){
+			$sql = "";
+			$sql_detail = "";
+			$action_note = "";
+			$movement_type = 0;
+			$resp = array();
+			if( $transfer_status == 2 ){//autorizacion de transferencia
+				$sql = "SELECT id_sucursal_origen AS store_id, id_almacen_origen AS warehouse_id FROM ec_transferencias WHERE id_transferencia = {$transfer_id}";
+				$sql_detail = "SELECT cantidad AS quantity, id_producto_or AS product_id, id_proveedor_producto AS product_provider_id FROM ec_transferencia_productos WHERE id_transferencia = {$transfer_id}";
+				$action_note = "SALIDA DE TRANSFERENCIA";
+				$movement_type = 6;
+			}else if( $transfer_status == 9 ){//recepcion de transferencia
+				$sql = "SELECT id_sucursal_destino AS store_id, id_almacen_destino AS warehouse_id FROM ec_transferencias WHERE id_transferencia = {$transfer_id}";
+				$sql_detail = "SELECT total_piezas_recibidas AS quantity, id_producto_or AS product_id, id_proveedor_producto AS product_provider_id FROM ec_transferencia_productos WHERE id_transferencia = {$transfer_id}";
+				$action_note = "ENTRADA DE TRANSFERENCIAS";
+				$movement_type = 5;
+			}else{
+				die( "La actualización del status '{$transfer_status}' no requiere movimientos de almacen." );
+			}//die("HERE1");
+			$stm = $this->link->query( $sql ) or die( "Error al consultar datos generales de transferencia para hacer movimiento de almacen : {$sql} : {$this->link->error}" );
+			$resp['consulta_datos_transferencia'] = $sql;
+			$row = $stm->fetch_assoc();
+		//inserta la cabecera del movimiento de almacen
+			$sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, '{$action_note}', {$row['store_id']}, {$row['warehouse_id']}, {$movement_type}, -1, -1, -1, {$transfer_id}, 21, NULL )";
+			$resp['inserta_cabecera_movimiento'] = $sql;
+			$stm = $this->link->query( $sql ) or die( "Error al insertar movimiento por {$action_note} por Procedure : {$sql} : {$this->link->error}" );
+		//recupera el id de cabecera de movimiento de almacen
+			$sql = "SELECT LAST_INSERT_ID() AS last_id";
+			$stm2 = $this->link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado : {$sql} : {$this->link->error}" );
+			$resp['recupera_id_cabecera_movimiento'] = $sql;
+			$row = $stm2->fetch_assoc();
+			$movement_id = $row['last_id'];
+		//consulta el detalle de la transferencia para insertar detalle de movmiento de almacen
+			$stm_3 = $this->link->query( $sql_detail ) or die( "Error al consultar el detalle de transferecia para insertar detalles de movimiento de almacen : {$sql} : {$this->link->error}" );
+			$resp['consulta_detalle_transferencia'] = $sql;
+			$resp['inserta_detalle_movimiento'] = array();
+			while( $row = $stm_3->fetch_assoc() ){
+				$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_id}, {$row['product_id']}, {$row['quantity']}, {$row['quantity']}, -1, -1, {$row['product_provider_id']}, 21, NULL )";
+				$stm_4 = $this->link->query( $sql ) or die( "Error al insertar detalle por procedure : {$sql} : {$this->link->error}" );
+				array_push( $resp['inserta_detalle_movimiento'], $sql );
+			}
+			return $resp;
 		}	
 
 		public function getBlockTransferResolution( $type, $user ){
@@ -258,7 +313,7 @@
 				/*23*/'{$ommit_origin_movement}',
 				/*24*/'{$ommit_destinity_movement}'";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el nuevo registro en la transferencia {$sql} " . $this->link->error );
-			$new_detail_id  = $link->insert_id;
+			$new_detail_id  = $this->link->insert_id;
 
 /*actualiza deralles de transferencias
 			$sql = "UPDATE ec_transferencia_productos SET resuelto = '1'
@@ -344,7 +399,7 @@
 			if( $stm->num_rows > 0 ){
 				return $resp;
 			}*/
-			return $this->finishResolutionTransfers();
+			return $this->finishResolutionTransfers( $user );
 			$this->link->autocommit( true );
 
 		}
