@@ -4,10 +4,11 @@ var respuesta = null;
 var debug_json = "";
 
 	function validateNumberInput(input) {
-		input.value = input.value.replace(/[^0-9]/g, '');
+		input.value = input.value.replace(/[^0-9.]/g, '');
 		if( isNaN( input.value ) ){
 			alert( "En este campo solo puedes capturar números." );
 			input.value = '';
+			input.select();
 			var id = input.id + `_alerta`;
 			$( `#${id}` ).removeClass( "hidden" );
 			setTimeout( function(){
@@ -330,7 +331,7 @@ hljs.highlightAll();
 			if($("#t"+i).val()!=''){
 				total_tarjetas+=parseFloat($("#t"+i).val().replaceAll( ',', '' ));
 			}else{
-				$("#t"+i).val(0);
+				$("#t"+i).val('');
 			}
 		}
 		total_cobros+=parseFloat(total_tarjetas);
@@ -438,7 +439,11 @@ hljs.highlightAll();
 			$( '#monto_cheque_transferencia' ).val( '' );
 			$( '#monto_cheque_transferencia' ).focus();
 		}else{
-			alert( "Error : " + resp );
+			$( ".emergent_content_2" ).html( resp );
+			$( ".emergent_2" ).css( 'display', 'block' );
+			$( "#monto_cheque_transferencia" ).val( '' );
+			return false;
+			//alert( "Error : " + resp );
 		}
 			
 		setTimeout( function(){
