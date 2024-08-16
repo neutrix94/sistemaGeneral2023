@@ -397,13 +397,13 @@
 			$resp .= "<div class=\"\">
 				<h2 class=\"text-center text-success\" style=\"text-align : center;\">Procesando Transferencia...</h2>
 				{$actions}
-				<div style=\"text-align:center;\" >
+				<div class=\"text-center\">
 					<button
 						type=\"button\"
 						class=\"btn btn-success\"
 						onclick=\"close_emergent();location.reload();\"
 						id=\"btn_close_emergent\" 
-						style=\"display:none;\"
+						style=\"display:none !important;\"
 					>
 						<i class=\"icon-ok-circled\">Aceptar</i>
 					</button>
