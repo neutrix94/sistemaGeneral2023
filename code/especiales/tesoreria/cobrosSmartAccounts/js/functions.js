@@ -5,6 +5,7 @@ var debug_json = "";
 
 	function validateNumberInput(input) {
 		input.value = input.value.replace(/[^0-9.]/g, '');
+		let value = input.value;
 		if( isNaN( input.value ) ){
 			alert( "En este campo solo puedes capturar números." );
 			input.value = '';
@@ -15,6 +16,17 @@ var debug_json = "";
 				$( `#${id}` ).addClass( "hidden" );
 			}, 5000 );
 		}
+		value = value.replace(/[^0-9.]/g, '');
+		let parts = value.split('.');
+		if (parts.length >= 2) {
+			value = parts[0] + '.' + parts[1];
+		}
+		// Limita a dos decimales
+		if (parts[1]) {
+			parts[1] = parts[1].substring(0, 2);
+			value = parts.join('.');
+		}
+		input.value = value;
 	}
 
 	function decimal_format_twice( number ){
