@@ -15,6 +15,11 @@
 		</div>
 	</div>
 
+	<div class="emergent_4">
+		<div class="emergent_content_4">
+		</div>
+	</div>
+
 {literal}
 	<script type="text/javascript">
 		function close_emergent(){
@@ -29,12 +34,17 @@
 			$( ".emergent_content_3" ).html( '' );
 			$( ".emergent_3" ).css( 'display', 'none' );
 		}
+		function close_emergent_4(){
+			$( ".emergent_content_4" ).html( '' );
+			$( ".emergent_4" ).css( 'display', 'none' );
+		}
 	</script>
 
 	<style type="text/css">
 	.emergent,
 	.emergent_2,
-	.emergent_3{
+	.emergent_3,
+	.emergent_4{
 		position: fixed;
 		width: 100%;
 		height: 100%;
@@ -46,7 +56,8 @@
 	}
 	.emergent_content,
 	.emergent_content_2,
-	.emergent_content_3{
+	.emergent_content_3,
+	.emergent_content_4{
 		position: relative;
 		top : 100px;
 		width: 95%;
