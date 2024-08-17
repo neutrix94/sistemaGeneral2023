@@ -1261,6 +1261,14 @@ $("#imp_csv_prd").change(function(){
 						resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
 					}
 					$( '#json_steep_one' ).html( resp );
+					var json_tmp = JSON.parse( resp );
+					if( json_tmp.tiempo ){
+						$( '#initial_datetime_steep_one' ).html( json_tmp.tiempo.inicio );
+						$( '#final_datetime_steep_one' ).html( json_tmp.tiempo.fin );
+					}else{
+						$( '#initial_datetime_steep_one' ).html( 'n/a' );
+						$( '#final_datetime_steep_one' ).html( 'n/a' );
+					}
 					if( $( '#log_alerts_enabled' ).val() == 1 ){
 						$( '.emergent_content_4' ).html( `<div class="text-center"><button type="button" class="btn btn-success" onclick="start_fast_transfer_proccess( ${transfer_id}, 2 );"><i class="icon-ok-circled">Continuar segundo paso</button></div>` );
 						$( '.emergent_4' ).css( 'display', 'block' );
@@ -1287,6 +1295,14 @@ $("#imp_csv_prd").change(function(){
 						resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
 					}
 					$( '#json_steep_two' ).html( resp );
+					var json_tmp = JSON.parse( resp );
+					if( json_tmp.tiempo ){
+						$( '#initial_datetime_steep_two' ).html( json_tmp.tiempo.inicio );
+						$( '#final_datetime_steep_two' ).html( json_tmp.tiempo.fin );
+					}else{
+						$( '#initial_datetime_steep_two' ).html( 'n/a' );
+						$( '#final_datetime_steep_two' ).html( 'n/a' );
+					}
 					if( $( '#log_alerts_enabled' ).val() == 1 ){
 						$( '.emergent_content_4' ).html( `<div class="text-center"><button type="button" class="btn btn-success" onclick="start_fast_transfer_proccess( ${transfer_id}, 3 );"><i class="icon-ok-circled">Continuar tercer paso</button></div>` );
 						$( '.emergent_4' ).css( 'display', 'block' );
@@ -1312,6 +1328,14 @@ $("#imp_csv_prd").change(function(){
 						resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
 					}
 					$( '#json_steep_three' ).html( resp );
+					var json_tmp = JSON.parse( resp );
+					if( json_tmp.tiempo ){
+						$( '#initial_datetime_steep_three' ).html( json_tmp.tiempo.inicio );
+						$( '#final_datetime_steep_three' ).html( json_tmp.tiempo.fin );
+					}else{
+						$( '#initial_datetime_steep_three' ).html( 'n/a' );
+						$( '#final_datetime_steep_three' ).html( 'n/a' );
+					}
 					$( '#btn_close_emergent' ).css( 'display', 'block' );
 					close_emergent_4();
 					hljs.initHighlighting.called = false;

@@ -144,7 +144,8 @@
 			$( '.emergent_2' ).css( 'display', 'block' );
 			getResolutionForms();
 		}else{
-			alert( response );
+			$( '.emergent_content' ).html( response );
+			$( '.emergent' ).css( 'display', 'block' );
 		}
 	}
 
@@ -191,6 +192,10 @@
 					resp = resp.replaceAll(`,{`, `,\n{`);
 					if( resp.trim() == '' ){
 						resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
+					}else{
+						var tmp_json = JSON.parse( resp );
+						$( '#initial_date_time_steep_one' ).html( tmp_json.tiempo.inicio );
+						$( '#final_date_time_steep_one' ).html( tmp_json.tiempo.fin );
 					}
 					if( $( "#alert_log_enabled" ).val() == 1 ){
 						$( '#json_steep_one' ).html( resp );
@@ -217,6 +222,10 @@
 					resp = resp.replaceAll(`,{`, `,\n{`);
 					if( resp.trim() == '' ){
 						resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
+					}else{
+						var tmp_json = JSON.parse( resp );
+						$( '#initial_date_time_steep_two' ).html( tmp_json.tiempo.inicio );
+						$( '#final_date_time_steep_two' ).html( tmp_json.tiempo.fin );
 					}
 					if( $( "#alert_log_enabled" ).val() == 1 ){
 						$( '#json_steep_two' ).html( resp );
@@ -242,6 +251,10 @@
 					resp = resp.replaceAll(`,{`, `,\n{`);
 					if( resp.trim() == '' ){
 						resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
+					}else{
+						var tmp_json = JSON.parse( resp );
+						$( '#initial_date_time_steep_three' ).html( tmp_json.tiempo.inicio );
+						$( '#final_date_time_steep_three' ).html( tmp_json.tiempo.fin );
 					}
 					$( '#json_steep_three' ).html( resp );
 					$( '#btn_close_emergent' ).css( 'display', 'block' );

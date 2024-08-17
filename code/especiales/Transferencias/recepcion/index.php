@@ -8,12 +8,12 @@ Version 1.1 con resolucion de Transferencias seccionada por procesos 2024-08-16*
 	include( 'ajax/db.php' );
 //consulta si estan habilitadas las alertas
 	$sql = "SELECT
-	ald.alertas_habilitadas AS alert_log_enabled
-	FROM sys_alertas_log al
-	LEFT JOIN sys_alertas_log_detalle ald
-	ON ald.id_alerta_log = al.id_alerta_log
-	WHERE al.id_alerta_log = 2";
-	$stm = $link->query($sql) or die( "Error al consultar el log de alerta : {$sql} : " . mysql_error() );
+			ald.alertas_habilitadas AS alert_log_enabled
+		FROM sys_alertas_log al
+		LEFT JOIN sys_alertas_log_detalle ald
+		ON ald.id_alerta_log = al.id_alerta_log
+		WHERE al.id_alerta_log = 2";
+	$stm = $link->query($sql) or die( "Error al consultar el log de alerta : {$sql} : {$link->error}" );
 	$row = $stm->fetch_assoc();
 	$alert_log_enabled = $row['alert_log_enabled'];
 ?>

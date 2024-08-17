@@ -54,12 +54,15 @@
 						echo json_encode( array( "tiempo"=>$tiempo, "proceso"=>$proccess ) );//pasa a pendiente de surtir para hacer movimientos de almacen de salida
 					break;
 					case '9' :
+						$tiempo = array();
+						$tiempo['inicio'] = $ProductResolution->getCurrentTime();
 						if( $lock_synchronization = 1 ){
 							$ProductResolution->lock_and_unlock_synchronization_apis( 0 );
 						}
 						$sql = "UPDATE ec_bloques_transferencias_recepcion SET recibido = '1' WHERE id_bloque_transferencia_recepcion = {$reception_block_id}";
 						$stm = $link->query( $sql ) or die( "error|Error actualizar bloque a recibido : {$link->error}" );
-						echo json_encode( array( "Respuesta"=>"Transferencia(s) terminada(s)", "instruccion"=>$sql ) );
+						$tiempo['fin'] = $ProductResolution->getCurrentTime();
+						echo json_encode( array( "tiempo"=>$tiempo, "Respuesta"=>"Transferencia(s) terminada(s)", "proceso"=>$sql ) );
 					break;
 					default:
 						die('default');
@@ -368,9 +371,9 @@
 			if( $stm->num_rows > 0 ){
 				return $resp . $stm->num_rows;
 			}
+		//$this->link->autocommit( true );
 			return $this->build_steeps_form( $this->reception_block_id );
 			//return $this->finishResolutionTransfers( $user );
-			$this->link->autocommit( true );
 
 		}
 
@@ -397,18 +400,33 @@
 			$resp = "<div class=\"row\">
 				<h2 class=\"text-center\">Procesando Transferencias por resolución...</h2>
 				<div class=\"row\">
-					<p class=\"icon-ok-circled text-secondary\" id=\"step_1_icon\">Transferencia(s) insertada(s) por resolución : </p>
-					<b class=\"text-primary\">{$transfers}</b>
-					<div class=\"\"><pre><code class=\"json\" id=\"json_steep_one\"></code></pre></div>
+					<div class=\"col-8\">
+						<p class=\"icon-ok-circled text-secondary\" id=\"step_1_icon\">Transferencia(s) insertada(s) por resolución : </p>
+						<b class=\"text-primary\">{$transfers}</b>
+					</div>
+					<div class=\"col-2\" id=\"initial_date_time_steep_one\"></div>
+					<div class=\"col-2\" id=\"final_date_time_steep_one\"></div>
 				</div>
+				<div class=\"row\"><pre><code class=\"json\" id=\"json_steep_one\"></code></pre></div>
+
 				<div class=\"row\">
-					<p class=\"icon-ok-circled text-secondary\" id=\"step_2_icon\">Autorizar Transferencia y hacer movimientos de salida en almacen origen</p>
-					<div class=\"\"><pre><code class=\"json\" id=\"json_steep_two\"></code></pre></div>
+					<div class=\"col-8\">
+						<p class=\"icon-ok-circled text-secondary\" id=\"step_2_icon\">Autorizar Transferencia y hacer movimientos de salida en almacen origen</p>
+					</div>
+					<div class=\"col-2\" id=\"initial_date_time_steep_two\"></div>
+					<div class=\"col-2\" id=\"final_date_time_steep_two\"></div>
 				</div>
+				<div class=\"row\"><pre><code class=\"json\" id=\"json_steep_two\"></code></pre></div>
+				
 				<div class=\"row\">
-					<p class=\"icon-ok-circled text-secondary\" id=\"step_3_icon\">Finalizar Transferencia y hacer movimientos de entrada en almacen destino</p>
-					<div class=\"\"><pre><code class=\"json\" id=\"json_steep_three\"></code></pre></div>
+					<div class=\"col-8\">
+						<p class=\"icon-ok-circled text-secondary\" id=\"step_3_icon\">Finalizar Transferencia y hacer movimientos de entrada en almacen destino</p>
+					</div>
+					<div class=\"col-2\" id=\"initial_date_time_steep_three\"></div>
+					<div class=\"col-2\" id=\"final_date_time_steep_three\"></div>
 				</div>
+				<div class=\"row\"><pre><code class=\"json\" id=\"json_steep_three\"></code></pre></div>
+				
 				<div class=\"text-center hidden\" id=\"log_close_emergent_btn_container\">
 					<button
 						type=\"button\"
