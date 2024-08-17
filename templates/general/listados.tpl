@@ -8,6 +8,13 @@
 		var current_file_name = "/templates/general/<b>listados.tpl";
 	</script>
 {/literal}
+
+<!--implementacion Oscar 2024-08-16 para el botón de editar desde la pantalla de pedidos-->
+	{if $log_alerts_enabled}
+		<input type="hidden" id="log_alerts_enabled" value ="{$log_alerts_enabled}">
+	{/if}
+<!--Fin de cambio Oscar Oscar 2024-08-16-->
+
 <!--implementacion Oscar 28.08.2019 para el botón de editar desde la pantalla de pedidos-->
 	{if $tabla eq 'ZWNfb3JkZW5lc19jb21wcmE=' && $no_tabla eq "MQ=="}
 		<button style="position:absolute;top:340px;left:70%;background:transparent;border:0;" onclick="abrePedido('null',0)">
@@ -1226,13 +1233,18 @@ $("#imp_csv_prd").change(function(){
 			//alert( "here" );return false;
 			//update_fast_transfer_status( pos, 'transferAuthorization', null, null );
 		}
+
 		function start_fast_transfer_proccess( transfer_id, steep = 0 ){
 			if( steep == 0 ){
-				$( '.emergent_content_4' ).html( `<div class="text-center"><button type="button" class="btn btn-success" onclick="start_fast_transfer_proccess( ${transfer_id}, 1 );"><i class="icon-ok-circled">Comenzar primer paso</button></div>` );
-				$( '.emergent_4' ).css( 'display', 'block' );
-			}
-		
-			else if( steep == 1 ){//primer paso
+				if( $( '#log_alerts_enabled' ).val() == 1 ){
+					$( '.emergent_content_4' ).html( `<div class="text-center"><button type="button" class="btn btn-success" onclick="start_fast_transfer_proccess( ${transfer_id}, 1 );"><i class="icon-ok-circled">Comenzar primer paso</button></div>` );
+					$( '.emergent_4' ).css( 'display', 'block' );
+				}else{
+					setTimeout( function(){
+						start_fast_transfer_proccess( transfer_id, 1 );
+					}, 500 );
+				}
+			}else if( steep == 1 ){//primer paso
 				close_emergent_4();
 				setTimeout( function(){
 					var url = "../../code/especiales/Transferencias_desarrollo/ajax/fastTransfers.php?freeTransferFl=updateTransfer&transfer_id=" + transfer_id;
@@ -1240,7 +1252,6 @@ $("#imp_csv_prd").change(function(){
 					resp = resp.replaceAll(`\r\n\t\t\t\t\t`, `\n`);
 					resp = resp.replaceAll(`\r\n\t\t\t\t`, `\n`);
 					resp = resp.replaceAll(`\n\t\t\t\t\t\t`, `\n`);
-					resp = resp.replaceAll(``, `\n`);
 					resp = resp.replaceAll(`\r\n\t\t\t`, `\n`);
 					resp = resp.replaceAll(`\\t`, `    `);
 					resp = resp.replaceAll(`\\r\\n`, `\n`);
@@ -1250,15 +1261,16 @@ $("#imp_csv_prd").change(function(){
 						resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
 					}
 					$( '#json_steep_one' ).html( resp );
-					$( '.emergent_content_4' ).html( `<div class="text-center"><button type="button" class="btn btn-success" onclick="start_fast_transfer_proccess( ${transfer_id}, 2 );"><i class="icon-ok-circled">Continuar segundo paso</button></div>` );
-					$( '.emergent_4' ).css( 'display', 'block' );
+					if( $( '#log_alerts_enabled' ).val() == 1 ){
+						$( '.emergent_content_4' ).html( `<div class="text-center"><button type="button" class="btn btn-success" onclick="start_fast_transfer_proccess( ${transfer_id}, 2 );"><i class="icon-ok-circled">Continuar segundo paso</button></div>` );
+						$( '.emergent_4' ).css( 'display', 'block' );
+					}else{
+						setTimeout( function(){
+							start_fast_transfer_proccess( transfer_id, 2 );
+						}, 500 );
+					}
 				}, 500 );
-			}
-			//hljs.initHighlighting.called = false;
-			//hljs.highlightAll();
-			//setTimeout( function(){
-			//alert( resp );
-			else if( steep == 2 ){//segundo paso
+			}else if( steep == 2 ){//segundo paso
 				close_emergent_4();
 				setTimeout( function(){
 					var url = "../../code/especiales/Transferencias_desarrollo/ajax/fastTransfers.php?freeTransferFl=updateTransfer&transfer_id=" + transfer_id;
@@ -1275,16 +1287,16 @@ $("#imp_csv_prd").change(function(){
 						resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
 					}
 					$( '#json_steep_two' ).html( resp );
-					$( '.emergent_content_4' ).html( `<div class="text-center"><button type="button" class="btn btn-success" onclick="start_fast_transfer_proccess( ${transfer_id}, 3 );"><i class="icon-ok-circled">Continuar tercer paso</button></div>` );
-					$( '.emergent_4' ).css( 'display', 'block' );
+					if( $( '#log_alerts_enabled' ).val() == 1 ){
+						$( '.emergent_content_4' ).html( `<div class="text-center"><button type="button" class="btn btn-success" onclick="start_fast_transfer_proccess( ${transfer_id}, 3 );"><i class="icon-ok-circled">Continuar tercer paso</button></div>` );
+						$( '.emergent_4' ).css( 'display', 'block' );
+					}else{
+						setTimeout( function(){
+							start_fast_transfer_proccess( transfer_id, 3 );
+						}, 500 );
+					}
 				}, 500 );
-			}
-			//}, 1000 );
-			//hljs.initHighlighting.called = false;
-			//hljs.highlightAll();
-			//setTimeout( function(){
-			
-			else if( steep == 3 ){//tercer paso
+			}else if( steep == 3 ){//tercer paso
 				setTimeout( function(){
 					var url = "../../code/especiales/Transferencias_desarrollo/ajax/fastTransfers.php?freeTransferFl=updateTransfer&transfer_id=" + transfer_id;
 					var resp = ajaxR( url );//alert( resp );
@@ -1306,8 +1318,6 @@ $("#imp_csv_prd").change(function(){
 					hljs.highlightAll();
 				}, 500 );
 			}
-			//}, 1000 );
-			//setTimeout( function(){close_emergent_3()}, 1000 );
 		}
 
 		function finish_transfer_by_button( pos ){
