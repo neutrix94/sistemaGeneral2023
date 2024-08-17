@@ -165,4 +165,74 @@
 		close_emergent();
 	}
 
+	
+	function start_resolution_transfer_proccess( steep = 0 ){
+			if( steep == 0 ){
+				$( '.emergent_content_4' ).html( `<div class="text-center"><button type="button" class="btn btn-success" onclick="start_resolution_transfer_proccess( 1 );"><i class="icon-ok-circled">Comenzar primer paso</button></div>` );
+				$( '.emergent_4' ).css( 'display', 'block' );
+			}else if( steep == 1 ){//primer paso
+				close_emergent_4();
+				setTimeout( function(){
+					var url = "ajax/productResolution.php?resolution_fl=updateTransfer&reception_block_id=" + global_current_reception_blocks;
+					var resp = ajaxR( url );alert( "resp" + resp );
+					resp = resp.replaceAll(`\r\n\t\t\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\r\n\t\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\n\t\t\t\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\r\n\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\\t`, `    `);
+					resp = resp.replaceAll(`\\r\\n`, `\n`);
+					resp = resp.replaceAll(`,"`, `,\n"`);
+					resp = resp.replaceAll(`,{`, `,\n{`);
+					if( resp.trim() == '' ){
+						resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
+					}
+					$( '#json_steep_one' ).html( resp );
+					$( '.emergent_content_4' ).html( `<div class="text-center"><button type="button" class="btn btn-success" onclick="start_resolution_transfer_proccess( 2 );"><i class="icon-ok-circled">Continuar segundo paso</button></div>` );
+					$( '.emergent_4' ).css( 'display', 'block' );
+				}, 500 );
+			}else if( steep == 2 ){//segundo paso
+				close_emergent_4();
+				setTimeout( function(){
+					var url = "ajax/productResolution.php?resolution_fl=updateTransfer&reception_block_id=" + global_current_reception_blocks;
+					var resp = ajaxR( url );//alert( resp );
+					resp = resp.replaceAll(`\r\n\t\t\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\r\n\t\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\n\t\t\t\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\r\n\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\\t`, `    `);
+					resp = resp.replaceAll(`\\r\\n`, `\n`);
+					resp = resp.replaceAll(`,"`, `,\n"`);
+					resp = resp.replaceAll(`,{`, `,\n{`);
+					if( resp.trim() == '' ){
+						resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
+					}
+					$( '#json_steep_two' ).html( resp );
+					$( '.emergent_content_4' ).html( `<div class="text-center"><button type="button" class="btn btn-success" onclick="start_resolution_transfer_proccess( 3 );"><i class="icon-ok-circled">Continuar tercer paso</button></div>` );
+					$( '.emergent_4' ).css( 'display', 'block' );
+				}, 500 );
+			}else if( steep == 3 ){//tercer paso
+				setTimeout( function(){
+					var url = "ajax/productResolution.php?resolution_fl=updateTransfer&reception_block_id=" + global_current_reception_blocks;
+					var resp = ajaxR( url );//alert( resp );
+					resp = resp.replaceAll(`\r\n\t\t\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\r\n\t\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\n\t\t\t\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\r\n\t\t\t`, `\n`);
+					resp = resp.replaceAll(`\\t`, `    `);
+					resp = resp.replaceAll(`\\r\\n`, `\n`);
+					resp = resp.replaceAll(`,"`, `,\n"`);
+					resp = resp.replaceAll(`,{`, `,\n{`);
+					if( resp.trim() == '' ){
+						resp = `{"respuesta" : "Este proceso ya se habia realizado."}`;
+					}
+					$( '#json_steep_three' ).html( resp );
+					$( '#btn_close_emergent' ).css( 'display', 'block' );
+					close_emergent_4();
+					hljs.initHighlighting.called = false;
+					hljs.highlightAll();
+					$( '#log_close_emergent_btn_container' ).removeClass( 'hidden' );
+				}, 500 );
+			}
+		} 
+
 </script>
