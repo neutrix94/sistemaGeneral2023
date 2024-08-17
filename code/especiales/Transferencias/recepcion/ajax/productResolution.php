@@ -368,7 +368,7 @@
 			if( $stm->num_rows > 0 ){
 				return $resp . $stm->num_rows;
 			}
-			return $this->build_steeps_form();
+			return $this->build_steeps_form( $this->reception_block_id );
 			//return $this->finishResolutionTransfers( $user );
 			$this->link->autocommit( true );
 
