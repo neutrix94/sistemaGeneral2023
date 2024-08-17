@@ -28,21 +28,30 @@
 					case '6' ://Vaciado de almacen
 						switch( $id_estado ){
 							case '1' :
+								$time = array();
+								$time['inicio'] =  $fT->getCurrentTime();
 								if( $lock_synchronization = 1 ){
 									$fT->lock_and_unlock_synchronization_apis( 1 );
 								}
-								echo json_encode( $fT->updateTransferStatus( $user_id, $transfer_id, 2 ) );//pasa a pendiente de surtir para hacer movimientos de almacen de salida
+								$time['fin'] =  $fT->getCurrentTime();
+								echo json_encode( array( "tiempo"=>$time, "proceso"=>$fT->updateTransferStatus( $user_id, $transfer_id, 2 ) ) );//pasa a pendiente de surtir para hacer movimientos de almacen de salida
 							break;
 							case '2' :
+								$time = array();
+								$time['inicio'] =  $fT->getCurrentTime();
 								$actualizacion_transferencia = $fT->updateTransferStatus( $user_id, $transfer_id, 7 );//
 								$actualizacion_detalle_transferencia = $fT->updateTransferDetail( $transfer_id );//actualiza cantidades recibidas
-								echo json_encode( array( "actualizacion_transferencia"=>$actualizacion_transferencia, "actualizacion_detalle_transferencia"=>$actualizacion_detalle_transferencia ) );
+								$time['fin'] =  $fT->getCurrentTime();
+								echo json_encode( array( "tiempo"=>$time, "actualizacion_transferencia"=>$actualizacion_transferencia, "actualizacion_detalle_transferencia"=>$actualizacion_detalle_transferencia ) );
 							break;
 							case '7' :
-								echo json_encode( $fT->updateTransferStatus( $user_id, $transfer_id, 9 ) );//finzalizacion de transferencias
+								$time = array();
+								$time['inicio'] =  $fT->getCurrentTime();
 								if( $lock_synchronization = 1 ){
 									$fT->lock_and_unlock_synchronization_apis( 0 );
 								}
+								$time['fin'] =  $fT->getCurrentTime();
+								echo json_encode( array( "tiempo"=>$time, "proceso"=>$fT->updateTransferStatus( $user_id, $transfer_id, 9 ) ) );//finzalizacion de transferencias
 							break;
 						}
 					break;
@@ -339,8 +348,8 @@
 							<td>
 								<p class=\"icon-ok-circle {$class_one}\" id=\"step_1_icon\">{$text_one}</p>
 							</td>
-							<td></td>
-							<td></td>
+							<td id=\"initial_datetime_steep_one\"></td>
+							<td id=\"final_datetime_steep_one\"></td>
 							<td class=\"text-center\">
 								<button 
 									type=\"button\"
@@ -358,8 +367,8 @@
 							<td>
 								<p class=\"icon-ok-circle {$class_two}\" id=\"step_2_icon\">{$text_two}</p>
 							</td>
-							<td>{$steep_one_start}</td>
-							<td>{$steep_one_finish}</td>
+							<td id=\"initial_datetime_steep_two\"></td>
+							<td id=\"final_datetime_steep_two\"></td>
 							<td class=\"text-center\">
 								<button 
 									type=\"button\"
@@ -377,8 +386,8 @@
 							<td>
 								<p class=\"icon-ok-circle {$class_three}\" id=\"step_3_icon\">{$text_three}</p>
 							</td>
-							<td></td>
-							<td></td>
+							<td id=\"initial_datetime_steep_three\"></td>
+							<td id=\"final_datetime_steep_three\"></td>
 							<td class=\"text-center\">
 								<button 
 									type=\"button\"
