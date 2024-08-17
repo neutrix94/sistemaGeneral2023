@@ -141,6 +141,19 @@
 	$smarty->assign("perfil_id",$perfil_usuario);
 /**/
 
+/*implementacion Oscar 2024-08-16 para permiso especial de alertas log*/
+	$sql = "SELECT
+				ald.alertas_habilitadas AS alert_log_enabled
+			FROM sys_alertas_log al
+			LEFT JOIN sys_alertas_log_detalle ald
+			ON ald.id_alerta_log = al.id_alerta_log
+			WHERE al.id_alerta_log = 1";
+	$stm = mysql_query($sql) or die( "Error al consultar el log de alerta : {$sql} : " . mysql_error() );
+	$row = mysql_fetch_assoc($stm);
+	$smarty->assign("log_alerts_enabled",$row['alert_log_enabled']);
+
+/*Fin de cambio Oscar 2024-08-16 para permiso especial de alertas log*/
+
 /*implementacion Oscar 01.11.2019 para recargar los listados*
 	if($tabla='ec_sesion_caja' && $no_tabla=='0'){
 		if(isset($filt_suc)){
