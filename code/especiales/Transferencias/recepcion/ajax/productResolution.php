@@ -20,6 +20,53 @@
 					$_GET['transfer_block_resolution_id'], $_GET['product_resolution_id'], $user_id );
 			break;
 
+			case 'updateTransfer' : 
+				$reception_block_id = ( isset( $_POST['reception_block_id'] ) ? $_POST['reception_block_id'] : $_GET['reception_block_id'] );
+				$transfer_info = $ProductResolution->getResolutionTransferInfo( $reception_block_id );
+				//var_dump( $transfer_info );die('');
+				$transfers_ids = $transfer_info['transfers_ids'];
+				$transfers_status = $transfer_info['transfers_status'];
+				$sql = "SELECT bloquear_apis_en_resolucion_transferencias AS lock_synchronization FROM sys_configuracion_sistema";
+				$stm = $link->query( $sql ) or die( "Error al consultar bloqueos de APIS : {$sql} : {$link->error}" );
+				$row = $stm->fetch_assoc();
+				$lock_synchronization = $row['lock_synchronization'];
+				switch( $transfers_status ){
+					case '1' :
+						$resp = array();
+						$tiempo = array();
+						$tiempo['inicio'] = $ProductResolution->getCurrentTime();
+						if( $lock_synchronization = 1 ){
+							$ProductResolution->lock_and_unlock_synchronization_apis( 1 );
+						}
+						$proccess = $ProductResolution->update_transfers_status( $user_id, $reception_block_id, $transfers_ids, 2 );
+						$tiempo['fin'] = $ProductResolution->getCurrentTime();
+						echo json_encode( array( "tiempo"=>$tiempo, "proceso"=>$proccess ) );//pasa a pendiente de surtir para hacer movimientos de almacen de salida
+					break;
+					case '2' :
+						$resp = array();
+						$tiempo = array();
+						$tiempo['inicio'] = $ProductResolution->getCurrentTime();
+						//echo json_encode( $ProductResolution->update_transfers_status( $user_id, $reception_block_id, $transfers_ids, 9 ) );//pasa a pendiente de surtir para hacer movimientos de almacen de entrada
+						//$actualizacion_detalle_transferencia = $ProductResolution->updateTransferDetail( $transfer_id );//actualiza cantidades recibidas
+						//echo json_encode( array( "actualizacion_transferencia"=>$actualizacion_transferencia, "actualizacion_detalle_transferencia"=>$actualizacion_detalle_transferencia ) );
+						$proccess = $ProductResolution->update_transfers_status( $user_id, $reception_block_id, $transfers_ids, 9 );
+						$tiempo['fin'] = $ProductResolution->getCurrentTime();
+						echo json_encode( array( "tiempo"=>$tiempo, "proceso"=>$proccess ) );//pasa a pendiente de surtir para hacer movimientos de almacen de salida
+					break;
+					case '9' :
+						if( $lock_synchronization = 1 ){
+							$ProductResolution->lock_and_unlock_synchronization_apis( 0 );
+						}
+						$sql = "UPDATE ec_bloques_transferencias_recepcion SET recibido = '1' WHERE id_bloque_transferencia_recepcion = {$reception_block_id}";
+						$stm = $link->query( $sql ) or die( "error|Error actualizar bloque a recibido : {$link->error}" );
+						echo json_encode( array( "Respuesta"=>"Transferencia(s) terminada(s)", "instruccion"=>$sql ) );
+					break;
+					default:
+						die('default');
+					break;
+				}
+			break;
+
 			default:
 				die( 'Permission denied' );	
 			break;
@@ -43,17 +90,23 @@
 			$this->transfers = $this->getTransfersByBlock();
 		}
 
-		public function finishResolutionTransfers( $user ){
-		//consulta si esta habilitado el bloqueo de APIS de sincronizacion
-			$sql = "";
-			$this->link->autocommit( false );
-
+		public function getCurrentTime(){
+			$sql = "SELECT NOW() AS date_time";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar fecha y hora actual : {$sql} : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			return $row['date_time'];
+		}
+		public function lock_and_unlock_synchronization_apis( $status ){
+			$sql = "UPDATE sys_configuracion_sistema SET bloquear_apis_sincronizacion = {$status}";
+			$this->link->query( $sql ) or die( json_encode( array( "Error"=>"Error al actualizar APIS de sincronización a : {$status}. : {$sql} : {$this->link->error}" ) ) );
+		}
+		public function getResolutionTransferInfo( $reception_block_id ){
+			$resp = array();
+			$transfers_ids = "";
+			$transfer_status = 0;
 			$sql = "SELECT
-					GROUP_CONCAT( t.id_transferencia SEPARATOR ',' ) AS transfers_ids,
-					t.id_sucursal_origen AS origin_store_id,
-					t.id_sucursal_destino AS destinity_store_id,
-					t.id_almacen_origen AS warehouse_origin,
-					t.id_almacen_destino AS warehouse_destinity
+					t.id_transferencia AS transfer_id,
+					t.id_estado AS transfer_status
 				FROM ec_bloques_transferencias_recepcion_detalle btrd
 				LEFT JOIN ec_bloques_transferencias_validacion btv
 				ON btrd.id_bloque_transferencia_validacion = btv.id_bloque_transferencia_validacion
@@ -61,51 +114,28 @@
 				ON btvd.id_bloque_transferencia_validacion = btv.id_bloque_transferencia_validacion
 				LEFT JOIN ec_transferencias t
 				ON t.id_transferencia = btvd.id_transferencia
-				WHERE btrd.id_bloque_transferencia_recepcion = {$this->reception_block_id}
-				AND t.id_tipo IN( 9, 12 )";
-			$stm = $this->link->query( $sql ) or die( "error|Error al consultar los ids transferencias Resolución : {$this->link->error}" );
-			$transfer_rows = $stm->fetch_assoc();
-			$transfers_ids = $transfer_rows['transfers_ids'];
-			$sql = "UPDATE ec_transferencias SET id_estado = 2 WHERE id_transferencia IN( $transfers_ids )";
-			$stm = $this->link->query( $sql ) or die( "error|Error actualizar transferencia a autorizada : {$this->link->error}" );
-/*Implementacion Oscar 2024-08-14 para hacer movimientos de almacen de salida*/
-			$transfers_array = explode( ",", $transfers_ids );
-			foreach ($transfers_array as $key => $transfer_id) {
-				$movements = $this->insertTransferMovements( $user, $transfer_id, 2 );
-			}
-			$sql = "UPDATE ec_transferencias SET id_estado = 9 WHERE id_transferencia IN( $transfers_ids )";
-			/*Implementaciion Oscar 2024-08-14 para hacer movimientos de almacen de entrada*/
-			$stm = $this->link->query( $sql ) or die( "error|Error actualizar transferencia a terminada : {$this->link->error}" );
-			foreach ($transfers_array as $key => $transfer_id) {
-				$movements = $this->insertTransferMovements( $user, $transfer_id, 9 );
-			}
-		//actualiza el bloque a recibido
-			$sql = "UPDATE ec_bloques_transferencias_recepcion SET recibido = '1' WHERE id_bloque_transferencia_recepcion = {$this->reception_block_id}";
-			$stm = $this->link->query( $sql ) or die( "error|Error actualizar bloque a recibido : {$this->link->error}" );
+				WHERE btrd.id_bloque_transferencia_recepcion = {$reception_block_id}
+				AND t.id_tipo IN ( 9, 12 )";
+			$stm = $this->link->query( $sql ) or die( "Error en getResolutionTransferInfo al consultar transferencias de resolucion del bloque : {$sql} : {$this->link->error}" );
 			
-			$this->link->autocommit( true );
-		//libera el bloqueo de APIS de sincronizacion si es el caso
-			$sql = "";
-
-			return "ok|<div class=\"row\">
-						<div class=\"col-1\"></div>
-						<div class=\"col-10\">
-							<h5>La resolucion fue terminada exitosamente.</h5>
-						</div>
-						<div class=\"col-1\"></div>
-						<div class=\"col-4\"></div>
-						<div class=\"col-4 text-center\">
-							<button
-								type=\"button\"
-								class=\"btn btn-success form-control\"
-								onclick=\"location.reload();\"
-							>
-								<i class=\"icon-ok-circle\">Aceptar</i>
-							</button>
-						</div>
-					</div>";
+			while( $row = $stm->fetch_assoc() ){
+				$transfers_ids .= ( $transfers_ids == "" ? "" : "," );
+				$transfers_ids .= $row['transfer_id'];
+				$transfer_status = $row['transfer_status'];
+			}
+			return array( "transfers_ids"=>$transfers_ids, "transfers_status"=>$transfer_status );
 		}
-
+		public function update_transfers_status( $user_id, $reception_block_id, $transfers_ids, $new_status_id ){//die("update_transfers_status");
+			$transfers_queries = array();
+			$transfers = explode( ",", $transfers_ids );
+			foreach ( $transfers as $key => $transfer ) {
+				$sql = "UPDATE ec_transferencias SET id_estado = {$new_status_id} WHERE id_transferencia = {$transfer}";
+				array_push( $transfers_queries, $sql );
+				$stm = $this->link->query( $sql ) or die( "Error al actualizar el status de las transferencias : {$sql} : {$this->link->error}" );
+				$transfers_queries['movements'] = $this->insertTransferMovements( $user_id, $transfer, $new_status_id );
+			}
+			return $transfers_queries;
+		}
 		public function insertTransferMovements( $user_id, $transfer_id, $transfer_status ){
 			$sql = "";
 			$sql_detail = "";
@@ -114,12 +144,12 @@
 			$resp = array();
 			if( $transfer_status == 2 ){//autorizacion de transferencia
 				$sql = "SELECT id_sucursal_origen AS store_id, id_almacen_origen AS warehouse_id FROM ec_transferencias WHERE id_transferencia = {$transfer_id}";
-				$sql_detail = "SELECT cantidad AS quantity, id_producto_or AS product_id, id_proveedor_producto AS product_provider_id FROM ec_transferencia_productos WHERE id_transferencia = {$transfer_id}";
+				$sql_detail = "SELECT cantidad AS quantity, id_producto_or AS product_id, id_proveedor_producto AS product_provider_id FROM ec_transferencia_productos WHERE id_transferencia = {$transfer_id} AND omite_movimiento_origen = 0";
 				$action_note = "SALIDA DE TRANSFERENCIA";
 				$movement_type = 6;
 			}else if( $transfer_status == 9 ){//recepcion de transferencia
 				$sql = "SELECT id_sucursal_destino AS store_id, id_almacen_destino AS warehouse_id FROM ec_transferencias WHERE id_transferencia = {$transfer_id}";
-				$sql_detail = "SELECT total_piezas_recibidas AS quantity, id_producto_or AS product_id, id_proveedor_producto AS product_provider_id FROM ec_transferencia_productos WHERE id_transferencia = {$transfer_id}";
+				$sql_detail = "SELECT total_piezas_recibidas AS quantity, id_producto_or AS product_id, id_proveedor_producto AS product_provider_id FROM ec_transferencia_productos WHERE id_transferencia = {$transfer_id} AND omite_movimiento_destino = 0";
 				$action_note = "ENTRADA DE TRANSFERENCIAS";
 				$movement_type = 5;
 			}else{
@@ -238,9 +268,6 @@
 
 		public function save_resolution_row( $quantity, $type, $product_id, $product_provider_id, $resolution_id, $movement_type, 
 			$transfer_block_resolution_id, $product_resolution_id, $user ){
-
-			//$this->link->autocommit( false );//pba oscar 2023
-
 //$this->link->autocommit( false );
 
 			$transfer_id = $this->getBlockTransferResolution( $_GET['type'], $user );
@@ -276,7 +303,6 @@
 				$ommit_origin_movement = '1';
 				$ommit_destinity_movement = '1';
 			}
-//die( "omitir {$ommit_origin_movement} : {$ommit_destinity_movement}" );
 		//inserta el detalle  de la  resolucion
 			$sql = "INSERT INTO ec_transferencia_productos( /*1*/id_transferencia, /*2*/id_producto_or, 
 				/*3*/id_presentacion, /*4*/cantidad_presentacion, /*5*/cantidad, /*6*/id_producto_de, 
@@ -314,38 +340,13 @@
 				/*24*/'{$ommit_destinity_movement}'";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el nuevo registro en la transferencia {$sql} " . $this->link->error );
 			$new_detail_id  = $this->link->insert_id;
-
-/*actualiza deralles de transferencias
-			$sql = "UPDATE ec_transferencia_productos SET resuelto = '1'
-					WHERE id_transferencia_producto
-					IN(
-						SELECT
-							ax.transfer_product_id
-						FROM(
-							SELECT 
-								tp.id_transferencia_producto AS transfer_product_id
-							FROM ec_transferencia_productos tp
-							LEFT JOIN ec_transferencias t
-							ON tp.id_transferencia = t.id_transferencia
-							LEFT JOIN ec_bloques_transferencias_validacion_detalle btvd
-							ON btvd.id_transferencia = t.id_transferencia
-							LEFT JOIN ec_bloques_transferencias_recepcion_detalle btrd
-							ON btrd.id_bloque_transferencia_validacion = btvd.id_bloque_transferencia_validacion
-							WHERE btrd.id_bloque_transferencia_recepcion = {$this->reception_block_id}
-							AND tp.resuelto = 0
-							AND tp.id_proveedor_producto = {$product_provider_id}
-							AND tp.total_piezas_validacion != tp.total_piezas_recibidas
-							GROUP BY tp.id_transferencia_producto
-						)ax
-					)";
-			$stm = $this->link->query( $sql ) or die( "error|Error al actualizar detalles de transferencias a resueltos : {$sql} " . $this->link->error );
-*/
+			
 		//actualiza a resuelto el detalle de la resolucion
 			if( $transfer_block_resolution_id != '' && $transfer_block_resolution_id != null ){	
 				$sql = "UPDATE ec_bloques_transferencias_resolucion 
 							SET resuelto = 1 
 						WHERE id_bloque_transferencia_resolucion = {$transfer_block_resolution_id}";
-		//die($sql);
+						
 				$stm = $this->link->query( $sql ) or die( "error|Error al actualizar registro de resolucion prov prod transferencia {$sql} " . $this->link->error );
 			}
 
@@ -356,12 +357,7 @@
 				//die( $sql );
 				$stm = $this->link->query( $sql ) or die( "error|Error al actualizar registro de resolucion producto transferencia {$sql} " . $this->link->error );
 			}
-		//verifica que no tenga pendientes de resolver ( sobrante / no corresponde )
-			/*$sql = "SELECT
-						id_producto_resolucion
-					FROM ec_productos_resoluciones_tmp
-					WHERE id_bloque_transferencia_recepcion = {$this->reception_block_id}
-					AND resuelto = '0'";*/
+
 			$sql = "SELECT
 						id_bloque_transferencia_resolucion
 					FROM ec_bloques_transferencias_resolucion
@@ -372,41 +368,67 @@
 			if( $stm->num_rows > 0 ){
 				return $resp . $stm->num_rows;
 			}
-		/*	$sql = "SELECT
-						id_producto_resolucion
-					FROM ec_productos_resoluciones_tmp
-					WHERE id_bloque_transferencia_recepcion = {$this->reception_block_id}";
-		die( $sql );
-			$stm = $this->link->query( $sql ) or die( "error|Error al consultar las resoluciones pendientes : {$this->link->error}" );
-			if( $stm->num_rows > 0 ){
-				return $resp . 2;
-			}*/
-		//verifica que no tenga pendiente ( faltante )
-		/*	$sql = "SELECT
-						id_transferencia_producto
-					FROM ec_transferencia_productos tp
-					LEFT JOIN ec_transferencias t
-					ON tp.id_transferencia = t.id_transferencia
-					LEFT JOIN ec_bloques_transferencias_validacion_detalle btvd
-					ON btvd.id_transferencia = t.id_transferencia
-					LEFT JOIN ec_bloques_transferencias_recepcion_detalle btrd
-					ON btrd.id_bloque_transferencia_validacion = btvd.id_bloque_transferencia_validacion
-					WHERE btrd.id_bloque_transferencia_recepcion = {$this->reception_block_id}
-					AND tp.resuelto = 0
-					AND tp.total_piezas_validacion != tp.total_piezas_recibidas
-					GROUP BY tp.id_transferencia_producto";
-			$stm = $this->link->query( $sql ) or die( "error|Error al consultar las resoluciones pendientes ( faltante ) : {$this->link->error}" );
-			if( $stm->num_rows > 0 ){
-				return $resp;
-			}*/
-			return $this->finishResolutionTransfers( $user );
+			return $this->build_steeps_form();
+			//return $this->finishResolutionTransfers( $user );
 			$this->link->autocommit( true );
 
 		}
 
+		public function build_steeps_form( $reception_block_id ){
+			$sql = "SELECT
+					t.id_transferencia AS transfer_id,
+					t.folio AS transfer_folio,
+					t.id_estado
+				FROM ec_bloques_transferencias_recepcion_detalle btrd
+				LEFT JOIN ec_bloques_transferencias_validacion btv
+				ON btrd.id_bloque_transferencia_validacion = btv.id_bloque_transferencia_validacion
+				LEFT JOIN ec_bloques_transferencias_validacion_detalle btvd
+				ON btvd.id_bloque_transferencia_validacion = btv.id_bloque_transferencia_validacion
+				LEFT JOIN ec_transferencias t
+				ON t.id_transferencia = btvd.id_transferencia
+				WHERE btrd.id_bloque_transferencia_recepcion = {$reception_block_id}
+				AND t.id_tipo IN( 9, 12 )";//die($sql);
+			$stm = $this->link->query( $sql ) or die( "Errror al consultar la(s) Transferencia(s) por resolución del bloque : {$sql} : {$this->link->error}" );
+			$transfers = "<ul>";
+			while( $transfer = $stm->fetch_assoc() ){
+				$transfers .= "<li>{$transfer['transfer_folio']}</li>";
+			}
+			$transfers .= "</ul>";
+			$resp = "<div class=\"row\">
+				<h2 class=\"text-center\">Procesando Transferencias por resolución...</h2>
+				<div class=\"row\">
+					<p class=\"icon-ok-circled text-secondary\" id=\"step_1_icon\">Transferencia(s) insertada(s) por resolución : </p>
+					<b class=\"text-primary\">{$transfers}</b>
+					<div class=\"\"><pre><code class=\"json\" id=\"json_steep_one\"></code></pre></div>
+				</div>
+				<div class=\"row\">
+					<p class=\"icon-ok-circled text-secondary\" id=\"step_2_icon\">Autorizar Transferencia y hacer movimientos de salida en almacen origen</p>
+					<div class=\"\"><pre><code class=\"json\" id=\"json_steep_two\"></code></pre></div>
+				</div>
+				<div class=\"row\">
+					<p class=\"icon-ok-circled text-secondary\" id=\"step_3_icon\">Finalizar Transferencia y hacer movimientos de entrada en almacen destino</p>
+					<div class=\"\"><pre><code class=\"json\" id=\"json_steep_three\"></code></pre></div>
+				</div>
+				<div class=\"text-center hidden\" id=\"log_close_emergent_btn_container\">
+					<button
+						type=\"button\"
+						class=\"btn btn-success icon-ok-circled\"
+						onclick=\"location.reload();\"
+					>Aceptar y cerrar ventana</button>
+				</div>
+			</div>
+			
+			<script>
+				setTimeout( function(){
+					start_resolution_transfer_proccess( 0 );
+				}, 500 );
+			</script>";
+			return $resp;
+		}
+
 		public function getResolutionForm( $user, $numero = 1 ){
 			$resp = "";
-		//consulta si tiene el permiso para conntinuar con la resolucion
+		//consulta si tiene el permiso para continuar con la resolucion
 			$sql = "SELECT 
 					perm.id_menu AS menu_id,
 					IF( perm.ver = 1 OR perm.modificar = 1 OR perm.eliminar = 1 
@@ -431,14 +453,19 @@
 						prt.conteo_fisico AS fisic_counter,
 						prt.conteo_excedente AS excedent_counter
 					FROM ec_productos_resoluciones_tmp prt
+					LEFT JOIN ec_bloques_transferencias_resolucion btr
+					ON btr.id_producto_resolucion = prt.id_producto_resolucion
 					LEFT JOIN ec_productos p
 					ON p.id_productos = prt.id_producto
 					WHERE prt.id_bloque_transferencia_recepcion = {$this->reception_block_id}
 					AND prt.resuelto = 0
+					AND btr.resuelto = 0
 					GROUP BY prt.id_producto";
 	//die( $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los productos que entraron en resolucion : {$this->link->error}" );
-			
+			if( $stm->num_rows <= 0 ){
+				return $this->build_steeps_form( $this->reception_block_id );
+			}
 			$resp .= "<div class=\"text-end\">
 						<button 
 							class=\"btn btn-danger\"
@@ -486,43 +513,12 @@
 			  	$resp .= '</div>';
 				$counter  ++;
 			}
-		//$resp .= '<input type="hidden" id="contador_herramientas_' . $numero . '" value="' . $cont . '">';
 			$resp .= '</div>';
 			return $resp;
 		}
 
 		public function getProductProviderLevel( $product_id, $product_resolution_id, $resolution_special_permission ){
 			$resp = "";
-			/*$sql = "SELECT
-						ax.product_provider_id,
-						ax.product_id,
-						ax.provider_clue,
-						ax.validated,
-						ax.received,
-						( ax.validated - ax.received ) AS difference
-					FROM(
-						SELECT 
-							tp.id_proveedor_producto AS product_provider_id,
-							tp.id_producto_or AS product_id,
-							pp.clave_proveedor AS provider_clue,
-							SUM( tp.total_piezas_validacion ) AS validated,
-							SUM( tp.total_piezas_recibidas ) AS received
-						FROM ec_transferencia_productos tp
-						LEFT JOIN ec_productos p
-						ON p.id_productos = tp.id_producto_or
-						LEFT JOIN ec_proveedor_producto pp
-						ON pp.id_proveedor_producto = tp.id_proveedor_producto
-						WHERE tp.id_transferencia IN( {$this->transfers} )
-						AND tp.id_producto_or = {$product_id}
-						AND tp.resuelto = 0
-						GROUP BY tp.id_proveedor_producto
-					)ax
-					WHERE ( ax.validated - ax.received ) != 0
-					GROUP BY ax.product_provider_id";
-			$stm = $this->link->query( $sql ) or die( "Error al consultar diferencias en recepciones : {$sql} {$this->link->error}" );
-			
-			$resp .= $this-> build_resolution_rows( $stm, $product_resolution_id, 1, $resolution_special_permission );
-*/
 			$sql = "SELECT
 						btr.id_bloque_transferencia_resolucion AS transfer_block_resolution_id,
 						btr.id_proveedor_producto AS product_provider_id,
@@ -540,17 +536,10 @@
 					ON p.id_productos = btr.id_producto
 					LEFT JOIN  ec_proveedor_producto pp
 					ON pp.id_proveedor_producto = btr.id_proveedor_producto
-					/*LEFT JOIN ec_transferencia_productos tp
-					ON tp.id_producto_or  = btr.id_producto
-					AND tp.id_proveedor_producto =  btr.id_proveedor_producto
-					AND tp.id_transferencia IN( $this->transfers )*/
 					WHERE btr.id_bloque_transferencia_recepcion = {$this->reception_block_id}
 					AND btr.id_producto = {$product_id}
-					/*AND ( btr.piezas_no_corresponden > 0
-					OR btr.piezas_sobrantes > 0 )*/
 					AND btr.resuelto = 0
-					GROUP BY btr.id_bloque_transferencia_resolucion
-					/*AND tp.id_proveedor_producto IS NOT NULL*/";
+					GROUP BY btr.id_bloque_transferencia_resolucion";
 //die( $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar diferencias en recepciones : {$sql} {$this->link->error}" );
 			$resp .= $this-> build_resolution_rows( $stm, $product_resolution_id, 2, $resolution_special_permission );
@@ -617,15 +606,6 @@
 					</div>
 					<br>
 					<div class=\"row\">";
-								/*
-									
-								<div class=\"col-2 text-end\">
-									0
-								</div>
-								*/
-
-						//movement types
-							//1 - mov_origen,  2 - mov_dest , 3 - 2_movs, 4 - no_movs
 							$movement_type = 3;
 							if( $missing > 0 ){
 								$movement_type = 2;
@@ -724,14 +704,7 @@
 					$this->link->query( $sql ) or die( "Error al insertar resolución a nivel producto 1 : {$sql} {$this->link->error}" );
 					$resolution_tmp_id = ( $resolution[7] != '' ? $resolution[7] : $this->link->insert_id );
 					if( $resolution[5] != '' && $resolution[5] != null && $resolution[7] == '' ){//&& $resolution[7] == ''  agregado por Oscar 2023
-						$transfer_products = str_replace('/', ',', $transfer_products ) ;// explode( '/', $resolution[5] );
-						//foreach ($transfer_products as $key => $transfer_product_id ) {
-					/*deshabilitado por Oscar 2023 por error de resolucion
-							$sql = "UPDATE ec_transferencia_productos 
-										SET id_producto_resolucion = {$resolution_tmp_id} 
-									WHERE id_transferencia_producto = {$transfer_product_id}";
-							$this->link->query( $sql ) or die( "Error al relacionar transferencia producto con resolucion tmp : {$sql} {$this->link->error}" );
-//echo $sql;*/
+						$transfer_products = str_replace('/', ',', $transfer_products ) ;
 					//implementacion Oscar 2023
 						$sql = "INSERT INTO ec_bloques_transferencias_resolucion ( /*1*/id_bloque_transferencia_resolucion, 
 							/*2*/id_bloque_transferencia_recepcion, /*3*/id_usuario, /*4*/id_producto, /*5*/id_proveedor_producto, 
@@ -783,33 +756,6 @@
 				}
 			}
 
-//die( 'here : ' . $case_2 );
-			//$case_2_array = explode( '|~|', $case_2 );
-
-			/*foreach ($case_2_array as $key => $value) {
-				$resolution = explode( '~', $value );
-				if( $resolution[0] != ''  ){
-					$missing = '0';
-					$excedent = '0';
-					$doesnt_correspond = '0';
-					$sql = "INSERT INTO ec_productos_resoluciones_tmp SET 
-								id_producto_resolucion = NULL, 
-								id_bloque_transferencia_recepcion = {$this->reception_block_id}, 
-								id_usuario = {$user}, 
-								id_producto = {$resolution[0]},
-								conteo_fisico = {$resolution[1]},
-								conteo_excedente = {$resolution[2]},
-								inventario = {$resolution[3]},
-								cantidad_faltante = '{$missing}', 
-								cantidad_excedente = '{$resolution[4]}', 
-								cantidad_no_corresponde = '{$doesnt_correspond}',
-								recibido = '{$resolution[4]}', 
-								resuelto = '0'";
-//die( $sql );
-					$this->link->query( $sql ) or die( "Error al insertar resolución a nivel producto 2 : {$sql} {$this->link->error}" );
-				}
-			}*/
-		//commit
 			$this->link->autocommit( true );
 			return "<h5 style=\"color : green; font-size : 200%;\">Resolucion Guardada exitosamente</h5>
 					<br><br>
@@ -848,4 +794,68 @@
 			return $row['transfers_ids'];
 		}
 	}
+
+/*		public function finishResolutionTransfers( $user ){
+		//consulta si esta habilitado el bloqueo de APIS de sincronizacion
+			$sql = "";
+			$this->link->autocommit( false );
+
+			$sql = "SELECT
+					GROUP_CONCAT( t.id_transferencia SEPARATOR ',' ) AS transfers_ids,
+					t.id_sucursal_origen AS origin_store_id,
+					t.id_sucursal_destino AS destinity_store_id,
+					t.id_almacen_origen AS warehouse_origin,
+					t.id_almacen_destino AS warehouse_destinity
+				FROM ec_bloques_transferencias_recepcion_detalle btrd
+				LEFT JOIN ec_bloques_transferencias_validacion btv
+				ON btrd.id_bloque_transferencia_validacion = btv.id_bloque_transferencia_validacion
+				LEFT JOIN ec_bloques_transferencias_validacion_detalle btvd
+				ON btvd.id_bloque_transferencia_validacion = btv.id_bloque_transferencia_validacion
+				LEFT JOIN ec_transferencias t
+				ON t.id_transferencia = btvd.id_transferencia
+				WHERE btrd.id_bloque_transferencia_recepcion = {$this->reception_block_id}
+				AND t.id_tipo IN( 9, 12 )";
+			$stm = $this->link->query( $sql ) or die( "error|Error al consultar los ids transferencias Resolución : {$this->link->error}" );
+			$transfer_rows = $stm->fetch_assoc();
+			$transfers_ids = $transfer_rows['transfers_ids'];
+			$sql = "UPDATE ec_transferencias SET id_estado = 2 WHERE id_transferencia IN( $transfers_ids )";
+			$stm = $this->link->query( $sql ) or die( "error|Error actualizar transferencia a autorizada : {$this->link->error}" );
+//Implementacion Oscar 2024-08-14 para hacer movimientos de almacen de salida
+			$transfers_array = explode( ",", $transfers_ids );
+			foreach ($transfers_array as $key => $transfer_id) {
+				$movements = $this->insertTransferMovements( $user, $transfer_id, 2 );
+			}
+			$sql = "UPDATE ec_transferencias SET id_estado = 9 WHERE id_transferencia IN( $transfers_ids )";
+			//Implementaciion Oscar 2024-08-14 para hacer movimientos de almacen de entrada
+			$stm = $this->link->query( $sql ) or die( "error|Error actualizar transferencia a terminada : {$this->link->error}" );
+			foreach ($transfers_array as $key => $transfer_id) {
+				$movements = $this->insertTransferMovements( $user, $transfer_id, 9 );
+			}
+		//actualiza el bloque a recibido
+			$sql = "UPDATE ec_bloques_transferencias_recepcion SET recibido = '1' WHERE id_bloque_transferencia_recepcion = {$this->reception_block_id}";
+			$stm = $this->link->query( $sql ) or die( "error|Error actualizar bloque a recibido : {$this->link->error}" );
+			
+			$this->link->autocommit( true );
+		//libera el bloqueo de APIS de sincronizacion si es el caso
+			$sql = "";
+
+			return "ok|<div class=\"row\">
+						<div class=\"col-1\"></div>
+						<div class=\"col-10\">
+							<h5>La resolucion fue terminada exitosamente.</h5>
+						</div>
+						<div class=\"col-1\"></div>
+						<div class=\"col-4\"></div>
+						<div class=\"col-4 text-center\">
+							<button
+								type=\"button\"
+								class=\"btn btn-success form-control\"
+								onclick=\"location.reload();\"
+							>
+								<i class=\"icon-ok-circle\">Aceptar</i>
+							</button>
+						</div>
+					</div>";
+		}*/
+
 ?>
