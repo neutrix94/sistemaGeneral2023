@@ -783,7 +783,12 @@ var cont_cheques_transferencia=0;
 		url += "&session_id=" + $( '#session_id' ).val();
 		var resp = ajaxR( url ).split( '|' );
 		if( resp[0] != 'ok' ){
-			alert( "Error : \n" + resp );
+			resp += `<div class="text-center">
+					<button type="button" onclick="close_emergent();" class="btn btn-danger">Aceptar y cerrar</button>
+				</div>`;
+			$( '.emergent_content' ).html( resp );
+			$( '.emergent' ).css( 'display', 'block' );
+			//alert( "Error : \n" + resp );
 		}else{
 			$( '#terminal_qr_input' ).val( '' );
 			var terminal = JSON.parse( resp[1] );
