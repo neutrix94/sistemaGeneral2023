@@ -312,17 +312,35 @@
 				<div class="col-8">
 					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
 					<div class="row">
-						<div class="col-9">${resp}</div>
+						<div class="col-9">
+							<div class="input-group">
+								${resp}
+								<button
+									class="btn btn-light"
+								>	
+									<i class="icon-ok-circled text-secondary" id="afiliation_validation_btn_icon"></i>
+								</button>	
+							</div>
+							<br>
+							<div class="input-group">
+								<input type="password" id="afiliation_validation_input" onkeyup="validate_afiliation( event );" placeholder="escanea la terminal" class="form-control">
+								<button
+									onclick="validate_afiliation( 'intro' );"
+									class="btn btn-warning icon-qrcode"
+								>	
+								</button>	
+							</div>
+						</div>
 						<div class="col-3 text-center">	
 							<button type="button" class="btn btn-info" onclick="show_afiliations_info();">?</span>
-							Cobro único :
+							<!--Cobro único :
 							<p id="afiliacion_por_error" error="0" class="icon-toggle-off text-success fs-3 text-center" onclick="cambiar_check_error(this);"></p-->
 						</div>
 					</div>
 					<br>
-					<button class="btn btn-success form-control" onclick="agregarAfiliacionSesion();">
+					<!--button class="btn btn-success form-control" onclick="agregarAfiliacionSesion();">
 						<i class="icon-plus">Agregar</i>
-					</button>
+					</button-->
 					<br>
 					<h1>Afiliaciones activas : </h1>
 					${afiliaciones}
@@ -344,9 +362,45 @@
 		$( '.emergent' ).css( 'display', 'block' );
 	}
 
+	function validate_afiliation( e ){
+		if( e.keyCode != 13 && e != 'intro' ){
+			return false;
+		}
+		var combo_val = $( '#afiliacion_combo_tmp' ).val();
+		if( combo_val == 0 ){
+			alert( "Debes seleccionar una terminal válida para continuar." );
+			$( '#afiliacion_combo_tmp' ).focus();
+			return false;
+		}else{
+			combo_val = $( '#afiliacion_combo_tmp' ).find('option:selected').text();
+		}
+		var input_val = $( '#afiliation_validation_input' ).val();
+		if( input_val == 0 ){
+			alert( "El campo de comprobación de terminal no puede ir vacío." );
+			$( '#afiliation_validation_input' ).focus();
+			return false;
+		}
+		if( combo_val == input_val){
+			$( '#afiliation_validation_btn_icon' ).removeClass( "text-secondary" );
+			$( '#afiliation_validation_btn_icon' ).removeClass( "text-danger" );
+			$( '#afiliation_validation_btn_icon' ).addClass( "text-success" );
+			setTimeout( function(){
+				agregarAfiliacionSesion();
+			}, 500 );
+		}else{
+			alert( "El escaneo no coincide con la terminal seleccionada" );
+			$( '#afiliation_validation_btn_icon' ).removeClass( "text-secondary" );
+			$( '#afiliation_validation_btn_icon' ).addClass( "text-danger" );
+			$( '#afiliation_validation_input' ).select();
+		}
+	}
+
 	function show_afiliations_info(){
 		var content = `<div class="row">
-			Se pueden agregar terminales
+			<h3>Instrucciones para agregar terminales : </h3>
+			<p>1.- Selecciona la terminal en el combo</p>
+			<p>2.- Escanea la terminal en la caja de texto para confirmar</p>
+			<p>3.- Pide al cajero que ingrese su contraseña.</p>
 			<button
 				type="button"
 				class="btn btn-success"

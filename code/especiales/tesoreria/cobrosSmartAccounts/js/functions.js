@@ -1007,6 +1007,11 @@ var cont_cheques_transferencia=0;
 
 		$( '#afiliations_table_body' ).append( new_row );
 		$( '#afiliations_changes_container' ).removeClass( 'no_visible' );
+		$( '#afiliacion_combo_tmp' ).val( '0' );
+		$( '#afiliation_validation_btn_icon' ).removeClass( 'text-success' );
+		$( '#afiliation_validation_btn_icon' ).addClass( 'text-secondary' );
+		$( '#afiliation_validation_input' ).val( '' );
+		$( '#mannager_password' ).focus();
 	}
 
 	function saveAfiliationsChanges(){
