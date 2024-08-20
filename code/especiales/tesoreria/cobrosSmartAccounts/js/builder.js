@@ -323,9 +323,9 @@
 							</div>
 							<br>
 							<div class="input-group">
-								<input type="password" id="afiliation_validation_input" onkeyup="validate_afiliation( event );" placeholder="escanea la terminal" class="form-control">
+								<input type="password" id="afiliation_validation_input" onkeyup="validate_terminal( event, 'sin_integracion' );" placeholder="escanea la terminal" class="form-control">
 								<button
-									onclick="validate_afiliation( 'intro' );"
+									onclick="validate_terminal( 'intro', 'sin_integracion' );"
 									class="btn btn-warning icon-qrcode"
 								>	
 								</button>	
@@ -362,36 +362,50 @@
 		$( '.emergent' ).css( 'display', 'block' );
 	}
 
-	function validate_afiliation( e ){
+	function validate_terminal( e, type ){
+		var combo_id, input_id, icon_id;
 		if( e.keyCode != 13 && e != 'intro' ){
 			return false;
 		}
-		var combo_val = $( '#afiliacion_combo_tmp' ).val();
+		if( type == 'sin_integracion' ){
+			combo_id = '#afiliacion_combo_tmp';
+			input_id = '#afiliation_validation_input';
+			icon_id = '#afiliation_validation_btn_icon';
+		}else if( type == 'con_integracion' ){
+			combo_id = '#terminal_combo_tmp';
+			input_id = '#terminal_validation_input';
+			icon_id = '#terminal_validation_btn_icon';
+		}
+		var combo_val = $( combo_id ).val();
 		if( combo_val == 0 ){
 			alert( "Debes seleccionar una terminal válida para continuar." );
-			$( '#afiliacion_combo_tmp' ).focus();
+			$( combo_id ).focus();
 			return false;
 		}else{
-			combo_val = $( '#afiliacion_combo_tmp' ).find('option:selected').text();
+			combo_val = $( combo_id ).find('option:selected').text();
 		}
-		var input_val = $( '#afiliation_validation_input' ).val();
+		var input_val = $( input_id ).val();
 		if( input_val == 0 ){
 			alert( "El campo de comprobación de terminal no puede ir vacío." );
-			$( '#afiliation_validation_input' ).focus();
+			$( input_id ).focus();
 			return false;
 		}
 		if( combo_val == input_val){
-			$( '#afiliation_validation_btn_icon' ).removeClass( "text-secondary" );
-			$( '#afiliation_validation_btn_icon' ).removeClass( "text-danger" );
-			$( '#afiliation_validation_btn_icon' ).addClass( "text-success" );
+			$( icon_id ).removeClass( "text-secondary" );
+			$( icon_id ).removeClass( "text-danger" );
+			$( icon_id ).addClass( "text-success" );
 			setTimeout( function(){
-				agregarAfiliacionSesion();
+				if( type == 'sin_integracion' ){
+					agregarAfiliacionSesion();
+				}else if( type == 'con_integracion' ){
+					//agregarTerminalSesion();
+				}
 			}, 500 );
 		}else{
 			alert( "El escaneo no coincide con la terminal seleccionada" );
-			$( '#afiliation_validation_btn_icon' ).removeClass( "text-secondary" );
-			$( '#afiliation_validation_btn_icon' ).addClass( "text-danger" );
-			$( '#afiliation_validation_input' ).select();
+			$( icon_id ).removeClass( "text-secondary" );
+			$( icon_id ).addClass( "text-danger" );
+			$( input_id ).select();
 		}
 	}
 
@@ -461,6 +475,20 @@
 					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
 					<div class="input-group">
 						${resp}
+						<button
+							class="btn btn-light"
+						>
+							<i class="icon-ok-circled text-secondary" id="terminal_validation_btn_icon"></i>
+						</button>
+					</div>
+					<br>
+					<div class="input-group">
+						<input type="password" id="terminal_validation_input" onkeyup="validate_terminal( event, 'con_integracion' );" placeholder="escanea la terminal" class="form-control">
+						<button
+							onclick="validate_terminal( 'intro', 'con_integracion' );"
+							class="btn btn-warning icon-qrcode"
+						>	
+						</button>	
 					</div>
 					<br>
 					<h2>Pide al encargado que ingrese su contraseña para continuar : </h2>

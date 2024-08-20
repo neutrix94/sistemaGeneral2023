@@ -1066,6 +1066,10 @@ var cont_cheques_transferencia=0;
 	}
 //agregar afiliacion 
 	function agregarTerminalSesion(){
+		if( ! $( '#terminal_validation_btn_icon' ).hasClass( 'text-success' ) ){
+			alert( "Es necesario que escanees la terminal para continuar." );
+			return false;
+		}
 		var session_id = $( '#session_id' ).val();
 		var password = $( '#mannager_password' ).val();
 		var terminal_id = $( '#terminal_combo_tmp' ).val();
