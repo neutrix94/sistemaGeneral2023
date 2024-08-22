@@ -169,7 +169,8 @@
 //die( "response : {$cant}>{$rw[0]} , {$rw[2]}" );
 /*Implementación Oscar 14.11.2018*/
 	$msg=str_replace("<br>La cantidad de venta es mayor al inventario del producto\nVerifique existencia en almacen!!!",'<br>',$rw[1]);
-	$sql="INSERT INTO ec_productos_sin_inventario VALUES(null,$id_prod,$user_sucursal,$user_id,now(),'".$msg." existencias: ".$rw[0]."',1)";
+	$sql="INSERT INTO ec_productos_sin_inventario ( id_prod_sin_inv, id_producto, id_sucursal, id_usuario, alta, observaciones, sincronizar )
+		VALUES( null, {$id_prod}, {$user_sucursal}, {$user_id}, now(),'{$msg} existencias: {$rw[0]}', 1 )";
 	$ejecuta=mysql_query($sql)or die("Error al insertar el registro de falta de inventario en la sucursal!!!\n\n".mysql_error());
 	$second_onclick= "";
 	if( $is_exhibition == 1 ){

@@ -30,6 +30,9 @@
   <audio id="enabled_exhibition" controls style="display : none;">
     <source type="audio/wav" src="../files/sales/enabled_exhibition.mp3">
   </audio>
+  <audio id="error" controls style="display : none;">
+    <source type="audio/wav" src="../files/sounds/error.mp3">
+  </audio>
 <!-- -->
 <?php
 /**/

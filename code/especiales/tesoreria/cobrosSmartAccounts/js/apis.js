@@ -1,18 +1,25 @@
 
-	function sendTerminalPetition( counter, terminal_id ){		
+	function sendTerminalPetition( counter, terminal_id ){
+        var log_status = $( "#log_status" ).val();		
 		var sale_id = $( '#id_venta' ).val();
 		var amount = $( `#t${counter}` ).val().replaceAll( ',', '' );
 		var sale_folio = $( `#buscador` ).val().trim();
 		if( sale_id == 0 || sale_folio == '' ){
-			alert( "Es necesario elegir una nota de venta para continuar!" );
+			alert( "Es necesario elegir una nota de venta para continuar." );
 			$( `#buscador` ).select();
 			return false;
 		}
 		if( amount <= 0 ){
-			alert( "El monto debe de ser mayor a cero!" );
+			alert( "El monto debe de ser mayor a cero." );
 			$( `#t${counter}` ).focus();
 			return false;
 		}
+    
+        if( $( '#tarjeta_' + counter ).val() == '--Seleccionar--' ){/*Implementacion Oscar 2024-06-25 para no permitir envio de transaccion si no se selecciona terminal valida */
+            alert( "Debes seleccionar una terminal valida para continuar." );
+            $( '#tarjeta_' + counter ).focus();
+            return false;
+        }/*Fin de cambio Oscar 2024-06-25*/
 		var url = "ajax/db.php?fl=sendPaymentPetition&amount=" + amount;
 		url += "&terminal_id=" + $( '#tarjeta_' + counter ).val();
 		url += "&sale_id=" + sale_id;
@@ -27,13 +34,15 @@
         if( respuesta.id_devolucion != null && respuesta.id_devolucion != 'null' && respuesta.id_devolucion != 0  ){
 			url += "&id_devolucion_relacionada=" + respuesta.id_devolucion;
 		}
-        //alert( url );return false;
+        url += "&log_status=" + log_status;
+       // alert( url );return false;
 		//url += "&user_id=" + user_id;
 		//alert( url );
 		var resp = ajaxR( url );
-		console.log( resp );
+		//console.log( resp );
 		$( '.emergent_content' ).html( resp );
 		$( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
 	} 
 
 	function rePrintByOrderId( transaction_id ){
@@ -44,12 +53,13 @@
 		var resp = ajaxR( url );
 		$( '.emergent_content' ).html( resp );
 		$( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
 	}
 
     function rePrintByOrderIdManual(){
         var orderId = $( '#reverse_input' ).val();
         if( orderId == '' ){
-            alert( "Debes ingresar un folio valido para continuar!" );
+            alert( "Debes ingresar un folio valido para continuar." );
             $( '#reverse_input' ).focus();
             return false;
         }
@@ -60,6 +70,7 @@
         var resp = ajaxR( url );
         $( '.emergent_content' ).html( resp );
         $( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
     }
 
 	function cancelByOrderId( transaction_id ){
@@ -67,6 +78,7 @@
 		var resp = ajaxR( url );
 		$( '.emergent_content' ).html( resp );
 		$( '.emergent' ).css( 'display', 'block' );
+        $( '.emergent' ).focus();
 	}
 
     function Mascara(mascara, valor){   
@@ -154,11 +166,22 @@
     } 
     
     //marcar notificacion como vista
-	function marcar_notificacion_vista( folio_unico ){
-        ws.viewedFolios = [folio_unico, ...ws.viewedFolios];
+	function marcar_notificacion_vista( folio_unico, remove = true ){
+        let folios = ws.viewedFolios ? ws.viewedFolios : [];
+        ws.viewedFolios = [folio_unico, ...folios];
         ws.sendViewedTransactions();
-		close_emergent();
-	}    //marcar notificacion como vista
+        if( remove ){
+            $( '#card_payment_row_' + emergent_count_tmp ).remove();
+        }
+        close_emergent();
+        if( remove ){
+           carga_pedido( $( '#id_venta' ).val() );
+        }else{
+
+            location.reload();//RECARGA
+        
+        }
+	}
 	
     function buscar_repuesta_peticion_por_folio( folio_unico ){
         ws.currentTransaction = {
@@ -171,7 +194,7 @@
 
     function informar_folio( folio_unico ){
         ws.actualFolio = folio_unico;
-        console.log( folio_unico );
+        //console.log( folio_unico );
         /*{
             folio_unico: folio_unico,
             id_sucursal: $sucursal_websocket,

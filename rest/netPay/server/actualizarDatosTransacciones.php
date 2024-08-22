@@ -20,7 +20,6 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
     $file = fopen("archivo_local.txt", "w");
     fwrite($file,"{$body}");
     fclose($file);
-    
     $token =  (empty($request->getHeader('Token'))) ? '' : implode(" ",$request->getHeader('Token'));
     //$token = $Encrypt->decryptText($token, 'CDLL2024');//desencripta token
     if (empty($token) || strlen($token)<36 ) {
@@ -40,6 +39,22 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
     if( !include( '../../conexionMysqli.php' ) ){
         die( "No se pudo incluir el archivo de conexion!" );
     }
+    if( !include( '../../code/especiales/tesoreria/cobrosSmartAccounts/ajax/db.php' ) ){
+        die( "No se pudo incluir libreria de Pagos!" );
+    }
+    if( ! include( '../../code/especiales/tesoreria/cobrosSmartAccounts/ajax/Logger.php' ) ){/*Logger*/
+      die( "Error al incluir libreria de Logs!" );
+    }
+	$Logger = null;
+    $log_id = null;
+    $steep_log_id = 0;
+        $sql = "SELECT log_habilitado AS log_enabled FROM sys_configuraciones_logs WHERE id_configuracion_log = '2'";
+        $stm = $link->query( $sql ) or die( "Error al consultar si el log de cobros esta habilitado : {$sql} : {$link->error}" );
+        $log = $stm->fetch_assoc();
+    if( $log['log_enabled'] == 1 ){
+        $Logger = new Logger( $link );//instancia clase de log
+    }
+    //var_dump( $Logger ); //die( 'here' );
 //recibe los parametros de netPay
     $affiliation = $request->getParam( "affiliation" );//1
     $applicationLabel = $request->getParam( "applicationLabel" );//2
@@ -94,6 +109,15 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
     if( $traceability['folio_unico_transaccion'] != null && $traceability['folio_unico_transaccion'] != '' ){
       $transaction_unique_folio = $traceability['folio_unico_transaccion'];
     }
+
+    /*Logger*/
+    if( $Logger != null ){
+        $log = $Logger->insertLoggerRow( $traceability['folio_unico_transaccion'], $traceability['id_cajero'], 'vf_transacciones_netpay', -1, $traceability['id_sucursal'] );
+        $log_id = $log['id_log'];
+        if( $log_id != null ){
+            $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Respuesta ( JSON ) que llega al servicio /actualizar_datos_transacciones : ", $body );
+        }
+    }
     //traceability
    // $traceability['']
   
@@ -145,14 +169,25 @@ $app->post('/actualizar_datos_transacciones', function (Request $request, Respon
               /*43*/id_cajero = '{$traceability['id_cajero']}', 
               /*44*/folio_venta = '{$traceability['folio_venta']}',
               /*44*/id_sesion_cajero = '{$traceability['id_sesion_cajero']}',
-              /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
+              /*45*/store_id_netpay = '{$traceability['store_id_netpay']}',
+              /*46*/notificacion_vista = '1'
             WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
     $stm = $link->query( $sql );//die( $sql );
+    
+/*Logger*/
+    if( $log_id != null ){
+    $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el registro de transaccion en servidor local", $sql );
+    }
     if( $link->error ){
-        return json_encode( array( "status"=>400, "message"=>"Error al actualizar datos de la transaccion : {$link->error}" ) );
+    if( $log_id != null ){
+        $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', $traceability['folio_unico_transaccion'], $sql, $link->error );
+    }
+    return json_encode( array( "status"=>400, "message"=>"Error al actualizar datos de la transaccion en servidor local : {$link->error}" ) );
+    //die( "Error al actualizar el registro de transaccion en Webhook : {$link->error}" );
     }
 //inserta pago
     require_once( './utils/inserta_pago_con_tarjeta.php' );
+    //die('here6');
     $link->autocommit( true );
 	return json_encode( array( "status"=>200, "message"=>"Registro actualizado exitosamente." ) );
 });

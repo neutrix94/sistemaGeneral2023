@@ -1,0 +1,442 @@
+INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, 
+				id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, status_agrupacion, folio_unico, insertado_por_sincronizacion, id_pantalla, sincronizar )
+				VALUES ( NULL, 9, 259, 1, '2024-06-03', '14:53:39', 
+				'24MATS1390884R1390885 
+Insertado desde API por sincronización', -1, 
+				'-1', '-1', '-1', '-1', 
+				'1', '-1', '24LNA_MA_1390884', '1', '7', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '1859', '12.0000', '12.0000', 
+						-1, -1, IF( 1469 IS NULL OR '1469' = '', NULL, '1469' ), '0', 
+						'1', '24LNA_MD_4293013', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2622', '7.9900', '7.9900', 
+						-1, -1, IF( 303 IS NULL OR '303' = '', NULL, '303' ), '0', 
+						'1', '24LNA_MD_4293014', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2623', '5.8300', '5.8300', 
+						-1, -1, IF( 1555 IS NULL OR '1555' = '', NULL, '1555' ), '0', 
+						'1', '24LNA_MD_4293015', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '3551', '33.0000', '33.0000', 
+						-1, -1, IF( 1240 IS NULL OR '1240' = '', NULL, '1240' ), '0', 
+						'1', '24LNA_MD_4293016', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '3552', '7.0000', '7.0000', 
+						-1, -1, IF( 1242 IS NULL OR '1242' = '', NULL, '1242' ), '0', 
+						'1', '24LNA_MD_4293017', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2126', '17.0000', '17.0000', 
+						-1, -1, IF( 1489 IS NULL OR '1489' = '', NULL, '1489' ), '0', 
+						'1', '24LNA_MD_4293018', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2713', '13.0000', '13.0000', 
+						-1, -1, IF( 1926 IS NULL OR '1926' = '', NULL, '1926' ), '0', 
+						'1', '24LNA_MD_4293019', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '3026', '323.4900', '323.4900', 
+						-1, -1, IF( 2145 IS NULL OR '2145' = '', NULL, '2145' ), '0', 
+						'1', '24LNA_MD_4293020', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2700', '14.0000', '14.0000', 
+						-1, -1, IF( 1919 IS NULL OR '1919' = '', NULL, '1919' ), '0', 
+						'1', '24LNA_MD_4293021', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2703', '3.0000', '3.0000', 
+						-1, -1, IF( 1920 IS NULL OR '1920' = '', NULL, '1920' ), '0', 
+						'1', '24LNA_MD_4293022', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2265', '15.0000', '15.0000', 
+						-1, -1, IF( 711 IS NULL OR '711' = '', NULL, '711' ), '0', 
+						'1', '24LNA_MD_4293023', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2272', '10.0000', '10.0000', 
+						-1, -1, IF( 710 IS NULL OR '710' = '', NULL, '710' ), '0', 
+						'1', '24LNA_MD_4293024', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2846', '598.0000', '598.0000', 
+						-1, -1, IF( 2032 IS NULL OR '2032' = '', NULL, '2032' ), '0', 
+						'1', '24LNA_MD_4293025', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '3089', '3.2500', '3.2500', 
+						-1, -1, IF( 2205 IS NULL OR '2205' = '', NULL, '2205' ), '0', 
+						'1', '24LNA_MD_4293026', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '3027', '5.6600', '5.6600', 
+						-1, -1, IF( 2146 IS NULL OR '2146' = '', NULL, '2146' ), '0', 
+						'1', '24LNA_MD_4293027', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '3024', '81.6200', '81.6200', 
+						-1, -1, IF( 2143 IS NULL OR '2143' = '', NULL, '2143' ), '0', 
+						'1', '24LNA_MD_4293028', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2616', '100.0000', '100.0000', 
+						-1, -1, IF( 736 IS NULL OR '736' = '', NULL, '736' ), '0', 
+						'1', '24LNA_MD_4293029', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2572', '10.0000', '10.0000', 
+						-1, -1, IF( 178 IS NULL OR '178' = '', NULL, '178' ), '0', 
+						'1', '24LNA_MD_4293030', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2570', '4.0000', '4.0000', 
+						-1, -1, IF( 493 IS NULL OR '493' = '', NULL, '493' ), '0', 
+						'1', '24LNA_MD_4293031', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2809', '1.0000', '1.0000', 
+						-1, -1, IF( 2022 IS NULL OR '2022' = '', NULL, '2022' ), '0', 
+						'1', '24LNA_MD_4293032', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390890', '2832', '25.0000', '25.0000', 
+						-1, -1, IF( 2024 IS NULL OR '2024' = '', NULL, '2024' ), '0', 
+						'1', '24LNA_MD_4293033', '1' )
+
+
+INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, 
+				id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, status_agrupacion, folio_unico, insertado_por_sincronizacion, id_pantalla, sincronizar )
+				VALUES ( NULL, 8, 259, 1, '2024-06-03', '14:53:39', 
+				'24MATS1390884R1390885 
+Insertado desde API por sincronización', -1, 
+				'-1', '-1', '-1', '-1', 
+				'1', '-1', '24LNA_MA_1390885', '1', '7', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2624', '0.6800', '0.6800', 
+						-1, -1, IF( 1556 IS NULL OR '1556' = '', NULL, '1556' ), '0', 
+						'1', '24LNA_MD_4293034', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3550', '5.0000', '5.0000', 
+						-1, -1, IF( 1241 IS NULL OR '1241' = '', NULL, '1241' ), '0', 
+						'1', '24LNA_MD_4293035', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2697', '8.0000', '8.0000', 
+						-1, -1, IF( 1916 IS NULL OR '1916' = '', NULL, '1916' ), '0', 
+						'1', '24LNA_MD_4293036', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '4133', '41.0000', '41.0000', 
+						-1, -1, IF( 1917 IS NULL OR '1917' = '', NULL, '1917' ), '0', 
+						'1', '24LNA_MD_4293037', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2699', '26.0000', '26.0000', 
+						-1, -1, IF( 1918 IS NULL OR '1918' = '', NULL, '1918' ), '0', 
+						'1', '24LNA_MD_4293038', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2122', '48.0000', '48.0000', 
+						-1, -1, IF( 1492 IS NULL OR '1492' = '', NULL, '1492' ), '0', 
+						'1', '24LNA_MD_4293039', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2124', '12.0000', '12.0000', 
+						-1, -1, IF( 1493 IS NULL OR '1493' = '', NULL, '1493' ), '0', 
+						'1', '24LNA_MD_4293040', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2125', '16.0000', '16.0000', 
+						-1, -1, IF( 1494 IS NULL OR '1494' = '', NULL, '1494' ), '0', 
+						'1', '24LNA_MD_4293041', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2127', '8.0000', '8.0000', 
+						-1, -1, IF( 1490 IS NULL OR '1490' = '', NULL, '1490' ), '0', 
+						'1', '24LNA_MD_4293042', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2129', '9.0000', '9.0000', 
+						-1, -1, IF( 1491 IS NULL OR '1491' = '', NULL, '1491' ), '0', 
+						'1', '24LNA_MD_4293043', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2134', '23.0000', '23.0000', 
+						-1, -1, IF( 1499 IS NULL OR '1499' = '', NULL, '1499' ), '0', 
+						'1', '24LNA_MD_4293044', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2133', '6.0000', '6.0000', 
+						-1, -1, IF( 1498 IS NULL OR '1498' = '', NULL, '1498' ), '0', 
+						'1', '24LNA_MD_4293045', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2858', '29.0000', '29.0000', 
+						-1, -1, IF( 136 IS NULL OR '136' = '', NULL, '136' ), '0', 
+						'1', '24LNA_MD_4293046', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2859', '42.0000', '42.0000', 
+						-1, -1, IF( 138 IS NULL OR '138' = '', NULL, '138' ), '0', 
+						'1', '24LNA_MD_4293047', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2860', '10.0000', '10.0000', 
+						-1, -1, IF( 137 IS NULL OR '137' = '', NULL, '137' ), '0', 
+						'1', '24LNA_MD_4293048', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2704', '20.0000', '20.0000', 
+						-1, -1, IF( 1921 IS NULL OR '1921' = '', NULL, '1921' ), '0', 
+						'1', '24LNA_MD_4293049', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2277', '28.0000', '28.0000', 
+						-1, -1, IF( 885 IS NULL OR '885' = '', NULL, '885' ), '0', 
+						'1', '24LNA_MD_4293050', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2266', '20.0000', '20.0000', 
+						-1, -1, IF( 712 IS NULL OR '712' = '', NULL, '712' ), '0', 
+						'1', '24LNA_MD_4293051', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2271', '5.0000', '5.0000', 
+						-1, -1, IF( 708 IS NULL OR '708' = '', NULL, '708' ), '0', 
+						'1', '24LNA_MD_4293052', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3553', '28.0000', '28.0000', 
+						-1, -1, IF( 1238 IS NULL OR '1238' = '', NULL, '1238' ), '0', 
+						'1', '24LNA_MD_4293053', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3554', '19.0000', '19.0000', 
+						-1, -1, IF( 1239 IS NULL OR '1239' = '', NULL, '1239' ), '0', 
+						'1', '24LNA_MD_4293054', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3555', '40.0000', '40.0000', 
+						-1, -1, IF( 1237 IS NULL OR '1237' = '', NULL, '1237' ), '0', 
+						'1', '24LNA_MD_4293055', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2131', '53.0000', '53.0000', 
+						-1, -1, IF( 1500 IS NULL OR '1500' = '', NULL, '1500' ), '0', 
+						'1', '24LNA_MD_4293056', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2705', '9.0000', '9.0000', 
+						-1, -1, IF( 1922 IS NULL OR '1922' = '', NULL, '1922' ), '0', 
+						'1', '24LNA_MD_4293057', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2706', '14.0000', '14.0000', 
+						-1, -1, IF( 1923 IS NULL OR '1923' = '', NULL, '1923' ), '0', 
+						'1', '24LNA_MD_4293058', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2709', '50.0000', '50.0000', 
+						-1, -1, IF( 1924 IS NULL OR '1924' = '', NULL, '1924' ), '0', 
+						'1', '24LNA_MD_4293059', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3091', '4.4200', '4.4200', 
+						-1, -1, IF( 2207 IS NULL OR '2207' = '', NULL, '2207' ), '0', 
+						'1', '24LNA_MD_4293060', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2872', '3.0000', '3.0000', 
+						-1, -1, IF( 134 IS NULL OR '134' = '', NULL, '134' ), '0', 
+						'1', '24LNA_MD_4293061', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2873', '6.0000', '6.0000', 
+						-1, -1, IF( 135 IS NULL OR '135' = '', NULL, '135' ), '0', 
+						'1', '24LNA_MD_4293062', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3546', '7.0000', '7.0000', 
+						-1, -1, IF( 1247 IS NULL OR '1247' = '', NULL, '1247' ), '0', 
+						'1', '24LNA_MD_4293063', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3547', '1.0000', '1.0000', 
+						-1, -1, IF( 1248 IS NULL OR '1248' = '', NULL, '1248' ), '0', 
+						'1', '24LNA_MD_4293064', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2614', '1.0000', '1.0000', 
+						-1, -1, IF( 737 IS NULL OR '737' = '', NULL, '737' ), '0', 
+						'1', '24LNA_MD_4293065', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2615', '1.0000', '1.0000', 
+						-1, -1, IF( 738 IS NULL OR '738' = '', NULL, '738' ), '0', 
+						'1', '24LNA_MD_4293066', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2843', '8.0000', '8.0000', 
+						-1, -1, IF( 83 IS NULL OR '83' = '', NULL, '83' ), '0', 
+						'1', '24LNA_MD_4293067', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2138', '8.0000', '8.0000', 
+						-1, -1, IF( 1495 IS NULL OR '1495' = '', NULL, '1495' ), '0', 
+						'1', '24LNA_MD_4293068', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2140', '9.0000', '9.0000', 
+						-1, -1, IF( 1496 IS NULL OR '1496' = '', NULL, '1496' ), '0', 
+						'1', '24LNA_MD_4293069', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2147', '27.0000', '27.0000', 
+						-1, -1, IF( 1497 IS NULL OR '1497' = '', NULL, '1497' ), '0', 
+						'1', '24LNA_MD_4293070', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2168', '5.0000', '5.0000', 
+						-1, -1, IF( 1501 IS NULL OR '1501' = '', NULL, '1501' ), '0', 
+						'1', '24LNA_MD_4293071', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3556', '4.0000', '4.0000', 
+						-1, -1, IF( 1243 IS NULL OR '1243' = '', NULL, '1243' ), '0', 
+						'1', '24LNA_MD_4293072', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3558', '9.0000', '9.0000', 
+						-1, -1, IF( 1322 IS NULL OR '1322' = '', NULL, '1322' ), '0', 
+						'1', '24LNA_MD_4293073', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3559', '4.0000', '4.0000', 
+						-1, -1, IF( 1236 IS NULL OR '1236' = '', NULL, '1236' ), '0', 
+						'1', '24LNA_MD_4293074', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2571', '8.0000', '8.0000', 
+						-1, -1, IF( 494 IS NULL OR '494' = '', NULL, '494' ), '0', 
+						'1', '24LNA_MD_4293075', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2100', '39.0000', '39.0000', 
+						-1, -1, IF( 1681 IS NULL OR '1681' = '', NULL, '1681' ), '0', 
+						'1', '24LNA_MD_4293076', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '1957', '91.0000', '91.0000', 
+						-1, -1, IF( 1764 IS NULL OR '1764' = '', NULL, '1764' ), '0', 
+						'1', '24LNA_MD_4293077', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2732', '13.0000', '13.0000', 
+						-1, -1, IF( 1952 IS NULL OR '1952' = '', NULL, '1952' ), '0', 
+						'1', '24LNA_MD_4293078', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2733', '7.0000', '7.0000', 
+						-1, -1, IF( 1953 IS NULL OR '1953' = '', NULL, '1953' ), '0', 
+						'1', '24LNA_MD_4293079', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2734', '46.0000', '46.0000', 
+						-1, -1, IF( 1954 IS NULL OR '1954' = '', NULL, '1954' ), '0', 
+						'1', '24LNA_MD_4293080', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2806', '4.0000', '4.0000', 
+						-1, -1, IF( 2019 IS NULL OR '2019' = '', NULL, '2019' ), '0', 
+						'1', '24LNA_MD_4293081', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2807', '12.0000', '12.0000', 
+						-1, -1, IF( 2020 IS NULL OR '2020' = '', NULL, '2020' ), '0', 
+						'1', '24LNA_MD_4293082', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2808', '127.0000', '127.0000', 
+						-1, -1, IF( 2021 IS NULL OR '2021' = '', NULL, '2021' ), '0', 
+						'1', '24LNA_MD_4293083', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3009', '412.0000', '412.0000', 
+						-1, -1, IF( 2127 IS NULL OR '2127' = '', NULL, '2127' ), '0', 
+						'1', '24LNA_MD_4293084', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3059', '2.0000', '2.0000', 
+						-1, -1, IF( 2172 IS NULL OR '2172' = '', NULL, '2172' ), '0', 
+						'1', '24LNA_MD_4293085', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '3058', '197.0000', '197.0000', 
+						-1, -1, IF( 2171 IS NULL OR '2171' = '', NULL, '2171' ), '0', 
+						'1', '24LNA_MD_4293086', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2818', '57.0000', '57.0000', 
+						-1, -1, IF( 2023 IS NULL OR '2023' = '', NULL, '2023' ), '0', 
+						'1', '24LNA_MD_4293087', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390891', '2411', '74.0000', '74.0000', 
+						-1, -1, IF( 188 IS NULL OR '188' = '', NULL, '188' ), '0', 
+						'1', '24LNA_MD_4293088', '1' )
+
+
+INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, 
+				id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, status_agrupacion, folio_unico, insertado_por_sincronizacion, id_pantalla, sincronizar )
+				VALUES ( NULL, 14, 259, 1, '2024-06-03', '16:09:30', 
+				'0 
+Insertado desde API por sincronización', -1, 
+				'-1', '-1', '-1', '-1', 
+				'1', '-1', '24LNA_MA_1391019', '1', '3', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390892', '1946', '6.0000', '6.0000', 
+						-1, -1, IF( 325 IS NULL OR '325' = '', NULL, '325' ), '0', 
+						'1', '24LNA_MD_4293222', '1' )
+
+
+( SELECT id_pedido_detalle FROM ec_pedidos_detalle WHERE folio_unico = '24LNA_VTADET_2122738' LIMIT 1 )
+INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, 
+				id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, status_agrupacion, folio_unico, insertado_por_sincronizacion, id_pantalla, sincronizar )
+				VALUES ( NULL, 2, 259, 1, '2024-06-03', '15:10:26', 
+				'0 
+Insertado desde API por sincronización', -1, 
+				'-1', '-1', '-1', '-1', 
+				'1', '-1', '24LNA_MA_1390887', '1', '11', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390893', '2891', '1.0000', '1.0000', 
+						( SELECT id_pedido_detalle FROM ec_pedidos_detalle WHERE folio_unico = '24LNA_VTADET_2122738' LIMIT 1 ), -1, IF( NULL IS NULL OR 'NULL' = '', NULL, 'NULL' ), '0', 
+						'1', '24LNA_MD_4293090', '1' )
+
+
+( SELECT id_pedido_detalle FROM ec_pedidos_detalle WHERE folio_unico = '24LNA_VTADET_2122880' LIMIT 1 )
+INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, 
+				id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, status_agrupacion, folio_unico, insertado_por_sincronizacion, id_pantalla, sincronizar )
+				VALUES ( NULL, 2, 259, 1, '2024-06-03', '16:43:43', 
+				'0 
+Insertado desde API por sincronización', -1, 
+				'-1', '-1', '-1', '-1', 
+				'1', '-1', '24LNA_MA_1391037', '1', '11', '1' )
+INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, id_producto, cantidad, cantidad_surtida, 
+						id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente, sincronizar, folio_unico, insertado_por_sincronizacion ) 
+						VALUES ( NULL, '1390894', '2893', '10.0000', '10.0000', 
+						( SELECT id_pedido_detalle FROM ec_pedidos_detalle WHERE folio_unico = '24LNA_VTADET_2122880' LIMIT 1 ), -1, IF( NULL IS NULL OR 'NULL' = '', NULL, 'NULL' ), '0', 
+						'1', '24LNA_MD_4293240', '1' )
+
+

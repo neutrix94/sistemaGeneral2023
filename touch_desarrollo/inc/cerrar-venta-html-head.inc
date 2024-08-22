@@ -77,7 +77,7 @@
 	function recargar_por_error(){
 		var pss_enc=$("#pass_enc").val();
 		if(pss_enc.length<=0){//validamos que el campo de passsword no este vacío
-			alert("El campo de contraseña no puede ir vacío!!!");
+			alert("El campo de contraseña no puede ir vacío.");
 			$("#pass_enc_1").focus();
 			return false;
 		}
@@ -89,7 +89,7 @@
 			data:{clave:pss_enc},
 			success:function(dat){
 				if(dat!='ok'){//si la contraseña es incorrecta
-					alert("La contraseña del encargado es incorrecta!!!");
+					alert("La contraseña del encargado es incorrecta.");
 					$("#pass_enc").val('');
 					$("#pass_enc_1").val('');
 					$("#pass_enc_1").focus();
@@ -116,11 +116,11 @@
 					//alert(data);return false;
 					var aux = data.split('|');
 					if(aux[0]!='exito'){
-						alert("Error!!!\n"+data);
+						alert("Error : \n"+data);
 						return false;
 					}
 			}).fail (function () {
-				alert("Error!!\n"+data);
+				alert("Error : \n"+data);
 				return false;
 			});
 			}
@@ -332,7 +332,7 @@ var regresar_efectivo_devolucion = 0;
 	function confirmaDevolucion(){
 		var pass = $( '#password_encargado' ).val();
 		if ( pass.length <= 0 ){
-			alert( "La contraseña de encargado es obligatoria!" );
+			alert( "La contraseña de encargado es obligatoria." );
 			$( '#password_encargado' ).focus();
 			return false;
 		}
@@ -343,7 +343,7 @@ var regresar_efectivo_devolucion = 0;
 				data : { clave : pass },
 				success : function ( dat ){
 					if( dat == 'no' ){
-						alert( "La contraseña del encargado es incorrecta!");
+						alert( "La contraseña del encargado es incorrecta.");
 						$( '#password_encargado' ).select();
 					}else{
 						regresar_efectivo_devolucion = 1;
@@ -485,13 +485,13 @@ function bloquea_pantalla(){
 			url: 'ajax/verificaSesionCajero.php'
 			}).done (function (data){
 				if(data!='ok'){
-					alert('no hay sesion de caja; pida al cajero que inicie sesion de Caja para poder continuar con la venta!!!');
+					alert('Para realizar una venta pide al cajero inciar sesión de caja.');
 					return true;
 				}
 			});
 /*Fin de cambio Oscar 04.12.2019*/
 		if(hay_proceso==1){
-			alert('Ya había presionado el botón de "Cerrar Venta"\nVerifique con el encargado si la venta ya fue generada!!!');
+			alert('Ya había presionado el botón de "Cerrar Venta"\nVerifique con el encargado si la venta ya fue generada.');
 		/*Implementación Oscar 28.02.2019 para recargar ´página cuando sale el mensaje de que ya se había dado click*/	
 			location.reload();
 		/*Fin de cambio Oscar 28.02.2019*/
@@ -906,7 +906,7 @@ var monto_minimo=0;
 		if(!es_ok)
 		{
 			// Alguna validación detectó una falla con la captura 
-			alert ("Introduzca adecuadamente los datos del cliente.\n Es requerido el nombre, y al menos un telefono");
+			alert ("Introduzca adecuadamente los datos del cliente.\n Es requerido el nombre, y al menos un telefono.");
 			return false;
 		}
 		else

@@ -13,13 +13,13 @@ DECLARE id_movimiento_detalle BIGINT;
 	FROM ec_movimiento_detalle
 	WHERE id_oc_detalle = old.id_oc_recepcion=old.id_oc_recepcion_detalle;
 	
-
+/*
 	DELETE FROM ec_movimiento_detalle_proveedor_producto 
 	WHERE id_movimiento_almacen_detalle = id_movimiento_detalle;
 
 	DELETE FROM ec_movimiento_detalle 
 	WHERE id_oc_detalle = old.id_oc_recepcion_detalle;
-
+*/
 	SELECT SUM(piezas_recibidas),SUM(monto) INTO piezas_recibido,total_recibido
 	FROM ec_oc_recepcion_detalle WHERE id_oc_recepcion=old.id_oc_recepcion;
 	

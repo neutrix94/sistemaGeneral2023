@@ -63,9 +63,9 @@ BEGIN
 				'"codigo_barras_caja_1" : "', new.codigo_barras_caja_1, '",',
 				'"codigo_barras_caja_2" : "', new.codigo_barras_caja_2, '",',
 				'"precio" : "', new.precio, '",',
-				'"solo_pieza" : "', new.solo_pieza, '",',
+				'"solo_pieza" : "', new.solo_pieza, '",',/* deshabilitado por Oscar 
 				'"contador_cajas" : "', new.contador_cajas, '",',
-				'"contador_paquetes" : "', new.contador_paquetes, '",',
+				'"contador_paquetes" : "', new.contador_paquetes, '",',*/
 				'"prefijo_codigos_unicos" : "', new.prefijo_codigos_unicos, '",',
 				'"es_modelo_codigo_repetido" : "', new.es_modelo_codigo_repetido, '",',
 				'"fecha_alta" : "', new.fecha_alta, '",',

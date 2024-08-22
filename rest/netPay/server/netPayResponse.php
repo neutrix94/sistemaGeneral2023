@@ -18,7 +18,28 @@ $app->post('/', function (Request $request, Response $response){
   if( ! include( '../../code/especiales/tesoreria/cobrosSmartAccounts/ajax/db.php' ) ){//oscar 2024-02-15
     die( "Error al incluir libreria de cobros!" );
   }
-  //die( "here" );
+  if( ! include( '../../code/especiales/tesoreria/cobrosSmartAccounts/ajax/Logger.php' ) ){/*Logger*/
+    die( "Error al incluir libreria de Logs!" );
+  }
+	$Logger = null;
+  $log_id = null;
+  $steep_log_id = 0;
+
+  $body = $request->getBody();
+  if( $body == '' || $body == null ){//cuando es el test de enpoints de terminal
+      $resp = array(
+        "code"=>"00",
+        "message"=>"Peticion para configurar terminal"
+      );
+      return json_encode( $resp );
+  }
+
+	$sql = "SELECT log_habilitado AS log_enabled FROM sys_configuraciones_logs WHERE id_configuracion_log = '2'";
+	$stm = $link->query( $sql ) or die( "Error al consultar si el log de cobros esta habilitado : {$sql} : {$link->error}" );
+	$log = $stm->fetch_assoc();
+  if( $log['log_enabled'] == 1 ){
+    $Logger = new Logger( $link );//instancia clase de log
+  }
 //obtener el json en txt 
   /*$body = $request->getBody();
   $file = fopen("test.txt","w");
@@ -28,7 +49,8 @@ $app->post('/', function (Request $request, Response $response){
     $body = $request->getBody();
     //var_dump( $body );
     try{
-      $file = fopen("archivo.txt", "w");
+      $filePath = getenv('PATH_NETPAY_TRANSACTION_FILE') ?: '';
+      $file = fopen("{$filePath}archivo.txt", "w");
       fwrite($file,"{$body}");
       fclose($file);
     }catch( Exception $e ){
@@ -93,6 +115,14 @@ $app->post('/', function (Request $request, Response $response){
   if( $traceability['folio_unico_transaccion'] != null && $traceability['folio_unico_transaccion'] != '' ){
     $transaction_unique_folio = $traceability['folio_unico_transaccion'];
   }
+/*Logger*/
+  if( $Logger != null ){
+    $log = $Logger->insertLoggerRow( $traceability['folio_unico_transaccion'], $traceability['id_cajero'], 'vf_transacciones_netpay', -1, $traceability['id_sucursal'] );
+    $log_id = $log['id_log'];
+    if( $log_id != null ){
+      $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Respuesta ( JSON ) que llega a NetPay : ", $body );
+    }
+  }
   //traceability
  // $traceability['']
 //consulta el tipo de sistema en relacion al campo de acceso
@@ -150,7 +180,17 @@ $app->post('/', function (Request $request, Response $response){
             /*44*/id_sesion_cajero = '{$traceability['id_sesion_cajero']}',
             /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
           WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
-  $stm = $link->query( $sql ) or die( "Error al actualizar el registro de transaccion : {$link->error}" );
+  $stm = $link->query( $sql );
+/*Logger*/
+  if( $log_id != null ){
+    $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el registro de transaccion en Webhook", $sql );
+  }
+  if( $link->error ){
+    if( $log_id != null ){
+      $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', $traceability['folio_unico_transaccion'], $sql, $link->error );
+    }
+    die( "Error al actualizar el registro de transaccion en Webhook : {$link->error}" );
+  }
   
   /*if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
     require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago
@@ -162,10 +202,18 @@ $app->post('/', function (Request $request, Response $response){
 
   if( isset( $traceability['tipo_sistema'] ) ){
     if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
+    /*Logger*/
+      if( $log_id != null ){
+        $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Entra en proceso de peticion desde linea", "" );
+      }
       require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago
       $link->autocommit( true );
       $urlWebsocket = 'wss://websocketserverlocal-sqk76fij5a-uc.a.run.app/';
     }else{//peticion desde local
+    /*Logger*/
+      if( $log_id != null ){
+        $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Entra en proceso de peticion desde local", "" );
+      }
       $link->autocommit( true );
       $urlWebsocket = 'wss://websocketserver-sqk76fij5a-uc.a.run.app/';
     }
@@ -174,7 +222,7 @@ $app->post('/', function (Request $request, Response $response){
     return json_encode( array( "code"=>"00", "message"=>"falta el parametro tracebility->tipo_sistema" ) );
   }
 
-ob_start();
+  ob_start();
   $resp = array(
     "code"=>"00",
     "message"=>$message_

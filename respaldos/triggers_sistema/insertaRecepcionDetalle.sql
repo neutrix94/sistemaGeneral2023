@@ -23,7 +23,7 @@ BEGIN
 	UPDATE ec_oc_recepcion SET status=(IF((SELECT count(*) FROM ec_oc_recepcion_detalle
 	WHERE id_oc_recepcion=new.id_oc_recepcion
 	AND es_valido=1 AND precio_pieza='0.00')>0,1,2)) where id_oc_recepcion=new.id_oc_recepcion;
-
+/*
 	IF(new.es_valido=1)
 	THEN
 	SELECT id_movimiento_almacen INTO mov_alm FROM ec_movimiento_almacen WHERE id_orden_compra=new.id_oc_recepcion;
@@ -42,7 +42,7 @@ BEGIN
 	'0',
 	'1');
 	END IF;
-
+*/
 	UPDATE ec_productos SET precio_compra=IF(new.precio_pieza>0,new.precio_pieza,precio_compra),precio_venta_mayoreo=new.porcentaje_descuento
 	WHERE id_productos=new.id_producto;
 END $$
