@@ -312,17 +312,35 @@
 				<div class="col-8">
 					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
 					<div class="row">
-						<div class="col-9">${resp}</div>
+						<div class="col-9">
+							<div class="input-group">
+								${resp}
+								<button
+									class="btn btn-light"
+								>	
+									<i class="icon-ok-circled text-secondary" id="afiliation_validation_btn_icon"></i>
+								</button>	
+							</div>
+							<br>
+							<div class="input-group">
+								<input type="password" id="afiliation_validation_input" onkeyup="validate_terminal( event, 'sin_integracion' );" placeholder="escanea la terminal" class="form-control">
+								<button
+									onclick="validate_terminal( 'intro', 'sin_integracion' );"
+									class="btn btn-warning icon-qrcode"
+								>	
+								</button>	
+							</div>
+						</div>
 						<div class="col-3 text-center">	
 							<button type="button" class="btn btn-info" onclick="show_afiliations_info();">?</span>
-							Cobro único :
+							<!--Cobro único :
 							<p id="afiliacion_por_error" error="0" class="icon-toggle-off text-success fs-3 text-center" onclick="cambiar_check_error(this);"></p-->
 						</div>
 					</div>
 					<br>
-					<button class="btn btn-success form-control" onclick="agregarAfiliacionSesion();">
+					<!--button class="btn btn-success form-control" onclick="agregarAfiliacionSesion();">
 						<i class="icon-plus">Agregar</i>
-					</button>
+					</button-->
 					<br>
 					<h1>Afiliaciones activas : </h1>
 					${afiliaciones}
@@ -344,9 +362,59 @@
 		$( '.emergent' ).css( 'display', 'block' );
 	}
 
+	function validate_terminal( e, type ){
+		var combo_id, input_id, icon_id;
+		if( e.keyCode != 13 && e != 'intro' ){
+			return false;
+		}
+		if( type == 'sin_integracion' ){
+			combo_id = '#afiliacion_combo_tmp';
+			input_id = '#afiliation_validation_input';
+			icon_id = '#afiliation_validation_btn_icon';
+		}else if( type == 'con_integracion' ){
+			combo_id = '#terminal_combo_tmp';
+			input_id = '#terminal_validation_input';
+			icon_id = '#terminal_validation_btn_icon';
+		}
+		var combo_val = $( combo_id ).val();
+		if( combo_val == 0 ){
+			alert( "Debes seleccionar una terminal válida para continuar." );
+			$( combo_id ).focus();
+			return false;
+		}else{
+			combo_val = $( combo_id ).find('option:selected').text();
+		}
+		var input_val = $( input_id ).val();
+		if( input_val == 0 ){
+			alert( "El campo de comprobación de terminal no puede ir vacío." );
+			$( input_id ).focus();
+			return false;
+		}
+		if( combo_val == input_val){
+			$( icon_id ).removeClass( "text-secondary" );
+			$( icon_id ).removeClass( "text-danger" );
+			$( icon_id ).addClass( "text-success" );
+			setTimeout( function(){
+				if( type == 'sin_integracion' ){
+					agregarAfiliacionSesion();
+				}else if( type == 'con_integracion' ){
+					//agregarTerminalSesion();
+				}
+			}, 500 );
+		}else{
+			alert( "El escaneo no coincide con la terminal seleccionada" );
+			$( icon_id ).removeClass( "text-secondary" );
+			$( icon_id ).addClass( "text-danger" );
+			$( input_id ).select();
+		}
+	}
+
 	function show_afiliations_info(){
 		var content = `<div class="row">
-			Se pueden agregar terminales
+			<h3>Instrucciones para agregar terminales : </h3>
+			<p>1.- Selecciona la terminal en el combo</p>
+			<p>2.- Escanea la terminal en la caja de texto para confirmar</p>
+			<p>3.- Pide al cajero que ingrese su contraseña.</p>
 			<button
 				type="button"
 				class="btn btn-success"
@@ -407,6 +475,20 @@
 					<h2 class="text-center">Selecciona una terminal para agregar : </h2>
 					<div class="input-group">
 						${resp}
+						<button
+							class="btn btn-light"
+						>
+							<i class="icon-ok-circled text-secondary" id="terminal_validation_btn_icon"></i>
+						</button>
+					</div>
+					<br>
+					<div class="input-group">
+						<input type="password" id="terminal_validation_input" onkeyup="validate_terminal( event, 'con_integracion' );" placeholder="escanea la terminal" class="form-control">
+						<button
+							onclick="validate_terminal( 'intro', 'con_integracion' );"
+							class="btn btn-warning icon-qrcode"
+						>	
+						</button>	
 					</div>
 					<br>
 					<h2>Pide al encargado que ingrese su contraseña para continuar : </h2>

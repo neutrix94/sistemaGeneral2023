@@ -341,7 +341,7 @@ hljs.highlightAll();
 		var tope_tarjetas=$("#payments_list tr").length;
 		for( var i=0;i <tope_tarjetas; i++ ){
 			if($("#t"+i).val()!=''){
-				total_tarjetas+=parseFloat($("#t"+i).val().replaceAll( ',', '' ));
+				total_tarjetas+=parseFloat($("#t"+i).val().replace( ',', '' ));//All
 			}else{
 				$("#t"+i).val('');
 			}
@@ -395,7 +395,7 @@ hljs.highlightAll();
 		var monto_pago = parseFloat( $( '#monto_cobro_emergente' ).val() );
 		if( monto_pago > 0 ){
 			var total_tarjetas=0,total_cheques=0,total_cobros=0;
-			var recibido=$("#efectivo_recibido").val().replaceAll( ',', '' );
+			var recibido=$("#efectivo_recibido").val().replace( ',', '' );//All
 			var devolver=$("#efectivo_devolver").val();
 			if(recibido<=0){
 				return true;
@@ -736,7 +736,8 @@ var cont_cheques_transferencia=0;
 				stop = index;
 				return false;
 			}
-			amount_sum += parseFloat( $( '#t' + index ).val().replaceAll( ',', '' ) );
+			//amount_sum += parseFloat( $( '#t' + index ).val().replaceAll( ',', '' ) );
+			amount_sum += parseFloat( $( '#t' + index ).val().replace( ',', '' ) );
 		});
 		if( stop != false ){
 			alert( "Hay cobros con tarjeta sin monto, verfica y vuelve a intentar." );
@@ -747,7 +748,7 @@ var cont_cheques_transferencia=0;
 			amount_sum += parseFloat( $( '#efectivo' ).val() );
 		}
 		if( amount_sum != amount_total ){
-			alert( "La suma de los montos es diferente del total." );
+			alert( "La suma de los montos es diferente del total." + `${amount_sum} != ${amount_total}` );
 			return false;
 		}
 	//muestra los botones para enviar la peticion
@@ -758,7 +759,6 @@ var cont_cheques_transferencia=0;
 		});
 		$( '#start_payments_btn' ).addClass( 'no_visible' );
 		$( '#add_card_btn' ).addClass( 'no_visible' );
-
 	}
 //buscador de la terminal por QR
 	function seekTerminalByQr( e ){
@@ -783,7 +783,12 @@ var cont_cheques_transferencia=0;
 		url += "&session_id=" + $( '#session_id' ).val();
 		var resp = ajaxR( url ).split( '|' );
 		if( resp[0] != 'ok' ){
-			alert( "Error : \n" + resp );
+			resp += `<div class="text-center">
+					<button type="button" onclick="close_emergent();" class="btn btn-danger">Aceptar y cerrar</button>
+				</div>`;
+			$( '.emergent_content' ).html( resp );
+			$( '.emergent' ).css( 'display', 'block' );
+			//alert( "Error : \n" + resp );
 		}else{
 			$( '#terminal_qr_input' ).val( '' );
 			var terminal = JSON.parse( resp[1] );
@@ -1002,6 +1007,11 @@ var cont_cheques_transferencia=0;
 
 		$( '#afiliations_table_body' ).append( new_row );
 		$( '#afiliations_changes_container' ).removeClass( 'no_visible' );
+		$( '#afiliacion_combo_tmp' ).val( '0' );
+		$( '#afiliation_validation_btn_icon' ).removeClass( 'text-success' );
+		$( '#afiliation_validation_btn_icon' ).addClass( 'text-secondary' );
+		$( '#afiliation_validation_input' ).val( '' );
+		$( '#mannager_password' ).focus();
 	}
 
 	function saveAfiliationsChanges(){
@@ -1056,6 +1066,10 @@ var cont_cheques_transferencia=0;
 	}
 //agregar afiliacion 
 	function agregarTerminalSesion(){
+		if( ! $( '#terminal_validation_btn_icon' ).hasClass( 'text-success' ) ){
+			alert( "Es necesario que escanees la terminal para continuar." );
+			return false;
+		}
 		var session_id = $( '#session_id' ).val();
 		var password = $( '#mannager_password' ).val();
 		var terminal_id = $( '#terminal_combo_tmp' ).val();
