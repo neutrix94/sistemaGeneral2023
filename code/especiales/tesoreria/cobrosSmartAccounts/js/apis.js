@@ -58,7 +58,7 @@
 
     function rePrintByOrderIdManual(){
         var orderId = $( '#reverse_input' ).val();
-        if( orderId == '' ){
+        if( orderId.trim() == '' ){
             alert( "Debes ingresar un folio valido para continuar." );
             $( '#reverse_input' ).focus();
             return false;
@@ -68,6 +68,18 @@
         url += "&session_id=" + $( '#session_id' ).val();
         url += "&orderId=" + orderId;
         var resp = ajaxR( url );
+        if( resp.trim() != 'Transaccion exitosa' && resp.trim() != 'Transacción exitosa' ){
+            resp = `<h2 class="text-danger text-center">El dato ingresado es incorrecto, verifica y vuelve a intentar.</h2>
+            <div class="row text-center">
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    onclick="get_reverse_form();"
+                >
+                    <i class="icon-ok-circled">Aceptar y volver a intentar</i>
+                </button>
+            </div>`;
+        }
         $( '.emergent_content' ).html( resp );
         $( '.emergent' ).css( 'display', 'block' );
         $( '.emergent' ).focus();

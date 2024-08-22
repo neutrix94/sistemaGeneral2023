@@ -1760,7 +1760,7 @@ $movement = $this->insertMovementProviderProduct( $ticket_id, $sucursal, $valida
 			$aditional_message = "";
 			$no_visible = "";
 			if( $url != '' ){
-				$aditional_message = "<h6>Esta pantalla te redireccionara a la url : {$url}</h6>"; 
+				$aditional_message = "<h6 class=\"hidden\">Esta pantalla te redireccionara a la url : {$url}</h6>"; 
 				$no_visible = "style=\"display : none;\"";
 			}
 			$response = array();
