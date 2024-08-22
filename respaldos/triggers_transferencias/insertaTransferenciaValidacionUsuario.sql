@@ -44,21 +44,59 @@ BEGIN
 				'"action_type" : "insert",',
 				'"primary_key" : "folio_unico",',
 				'"primary_key_value" : "', new.folio_unico, '",',
-				'"id_transferencia_producto" : "', 
-				'( SELECT id_transferencia_producto FROM ec_transferencia_productos WHERE folio_unico = \'',
-					transfer_detail_unique_folio, '\' LIMIT 1 )",',
-				'"id_usuario" : "', new.id_usuario, '",',
-				'"id_producto" : "', new.id_producto, '",',
-				'"id_proveedor_producto" : "', new.id_proveedor_producto, '",',
-				'"cantidad_cajas_validadas" : "', new.cantidad_cajas_validadas, '",',
-				'"cantidad_paquetes_validados" : "', new.cantidad_paquetes_validados, '",',
-				'"cantidad_piezas_validadas" : "', new.cantidad_piezas_validadas, '",',
-				'"fecha_validacion" : "', new.fecha_validacion, '",',
-				'"id_status" : "', new.id_status, '",',
-				'"validado_por_nombre" : "', new.validado_por_nombre, '",',
-				'"codigo_barras" : "', new.codigo_barras, '",',
-				'"codigo_unico" : "', new.codigo_unico, '",',
-				'"folio_unico" : "', new.folio_unico, '",',
+				IF( transfer_detail_unique_folio IS NULL, 
+					'',
+					CONCAT( '"id_transferencia_producto" : "( SELECT id_transferencia_producto FROM ec_transferencia_productos WHERE folio_unico = \'',
+					transfer_detail_unique_folio, '\' LIMIT 1 )",')
+				),
+				IF( new.id_usuario IS NULL, 
+					'',
+					CONCAT( '"id_usuario" : "', new.id_usuario, '",' ) 
+				),
+				IF( new.id_producto IS NULL, 
+					'',
+					CONCAT( '"id_producto" : "', new.id_producto, '",' )
+				),
+				IF( new.id_proveedor_producto IS NULL, 
+					'',
+					CONCAT( '"id_proveedor_producto" : "', new.id_proveedor_producto, '",' )
+				),
+				IF( new.cantidad_cajas_validadas IS NULL, 
+					'',
+					CONCAT( '"cantidad_cajas_validadas" : "', new.cantidad_cajas_validadas, '",' )
+				),
+				IF( new.cantidad_paquetes_validados IS NULL, 
+					'',
+					CONCAT( '"cantidad_paquetes_validados" : "', new.cantidad_paquetes_validados, '",' )
+				),
+				IF( new.cantidad_piezas_validadas IS NULL, 
+					'',
+					CONCAT( '"cantidad_piezas_validadas" : "', new.cantidad_piezas_validadas, '",' )
+				),
+				IF( new.fecha_validacion IS NULL, 
+					'',
+					CONCAT( '"fecha_validacion" : "', new.fecha_validacion, '",' )
+				),
+				IF( new.id_status IS NULL, 
+					'',
+					CONCAT( '"id_status" : "', new.id_status, '",' )
+				),
+				IF( new.validado_por_nombre IS NULL, 
+					'',
+					CONCAT( '"validado_por_nombre" : "', new.validado_por_nombre, '",' )
+				),
+				IF( new.codigo_barras IS NULL, 
+					'',
+					CONCAT( '"codigo_barras" : "', new.codigo_barras, '",' )
+				),
+				IF( new.codigo_unico IS NULL, 
+					'',
+					CONCAT( '"codigo_unico" : "', new.codigo_unico, '",' )
+				),
+				IF( new.folio_unico IS NULL, 
+					'',
+					CONCAT( '"folio_unico" : "', new.folio_unico, '",' )
+				),
 				'"sincronizar" : "0"',
 				'}'
 			),
