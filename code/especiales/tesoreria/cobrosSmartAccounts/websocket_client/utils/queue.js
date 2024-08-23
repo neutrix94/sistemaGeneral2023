@@ -4,7 +4,7 @@ class Queue {
   }
 
   add(element) {
-    if (!(element in this.elements)) {
+    if (!(this.elements.includes(element))) {
       this.elements.push(element);
     }
   }
