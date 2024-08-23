@@ -24,19 +24,6 @@
 	require 'utils/manageResponse.php';
 	require 'utils/validaToken.php';
 
-  /*
-  * Instancia servicios por exponer
-  */
-  require 'endpoints/token.php';      //Token
-  require 'endpoints/productos.php';  //Products
-  require 'endpoints/ventas.php';     //Ventas
-  require 'endpoints/emails.php';     //Correos
-  require 'endpoints/facturas.php';   //Facturas
-  require 'endpoints/facturaReceptor.php';   //Facturación: Valida contribuyente
-  require 'endpoints/surteMuestra.php';   //Surtimeinto: Solicitud de muestra
-  require 'endpoints/surtePedido.php';   //Surtimeinto: Solicitud para pedido
-  require 'endpoints/notiPedido.php';   //Surtimeinto: Notifica surtimiento
-  require 'endpoints/notificacionesPendientes.php';   //Surtimeinto: Obtiene notificaciones pendientes
 /*
 * Instancia servicios por exponer
 */
@@ -50,7 +37,8 @@ require 'endpoints/surteMuestra.php';   //Surtimeinto: Solicitud de muestra
 require 'endpoints/surtePedido.php';   //Surtimeinto: Solicitud para pedido
 require 'endpoints/notiPedido.php';   //Surtimeinto: Notifica surtimiento
 require 'endpoints/notificacionesPendientes.php';   //Surtimeinto: Obtiene notificaciones pendientes
-require 'endpoints/getPerfilUsuario.php';   //Surtimeinto: Obtiene notificaciones pendientes
+require 'endpoints/getPerfilUsuario.php';   //Surtimiento: Obtiene perfil de usuario
+require 'endpoints/getDetallePedido.php';   //Surtimiento: Obtiene detalle del pedido
 
 
   //Servicios de Servidor
