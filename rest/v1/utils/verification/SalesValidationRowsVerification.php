@@ -1,4 +1,7 @@
 <?php
+/*
+     * Version 1.1 donde se corrige error de comprobación que tomaba comprobaciones de registros otras sucursales
+*/
     class SalesValidationRowsVerification{
         private $link;
 		private $LOGGER;
@@ -52,8 +55,8 @@
                     AND sp.hora_envio IS NOT NULL
                     AND( sp.hora_llegada_destino IS NULL
                     OR sp.hora_llegada_respuesta IS NULL
-                    OR sp.hora_finalizacion IS NULL )
-                    OR svv.id_status_sincronizacion = 2
+                    OR sp.hora_finalizacion IS NULL 
+                    OR svv.id_status_sincronizacion = 2 )
                     GROUP BY sp.id_peticion";
             $stm = $this->link->query( $sql );
                 if( $logger_id ){
