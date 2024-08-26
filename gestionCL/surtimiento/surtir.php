@@ -105,10 +105,10 @@ $indiceSurtir = 0;
             }
             if(listaSurtir[indiceSurtir].codigos_barras.split(",").includes(codigoProducto)){
                 document.getElementById('surtidoGroup').style.display = 'block';
-                document.getElementById('cantidadSurtida').value = Number(listaSurtir[indiceSurtir].cantidad_solicitada);
+                document.getElementById('cantidadSurtida').value = '';//Number(listaSurtir[indiceSurtir].cantidad_solicitada);
                 document.getElementById('cantidadSurtida').focus();
             }else{
-                alert('El código de borradas no coincide con el producto.');
+                alert('El producto no coincide con el solicitado, favor de validar!');
             }
 
 

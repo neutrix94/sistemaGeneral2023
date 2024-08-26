@@ -1,8 +1,9 @@
 <?php
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 require_once '../classes/surtimiento.php';
+include('../../conect.php');
 $surtimientoCRUD = new SurtimientoCRUD();
-$listaAsignacion = $surtimientoCRUD->listaAsignacion($id);
+$listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
 //echo json_encode($listaAsignacion);
 
 ?>
@@ -26,6 +27,7 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id);
   </div>
 </nav>
 <div class="container mt-5">
+    <a href="javascript: history.go(-1)">⬅️ Lista de pedidos</a><br>
     <h1 class="text-center">Asignación</h1>
     <table class="table table-bordered">
         <tbody>
@@ -69,10 +71,10 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id);
         </tbody>
     </table>
     <br>
-    <button class="btn btn-primary" onclick="priorizarSurtimiento()">⭐️ Priorizar surtimiento</button>
-    <button class="btn btn-success" onclick="guardarAsignacion()">✔️ Guardar asignación</button>
-    <button class="btn btn-warning" onclick="pausarSurtimiento()">⏸️ Pausar surtimiento</button>
-    <button class="btn btn-danger" onclick="cancelarSurtimiento()">✖️ Cancelar surtimiento</button>
+    <button id="btnPrioriza" class="btn btn-primary" onclick="priorizarSurtimiento()">⭐️ Priorizar surtimiento</button>
+    <button id="btnAsigna" class="btn btn-success" onclick="guardarAsignacion()">✔️ Guardar asignación</button>
+    <button id="btnPausa" class="btn btn-warning" onclick="pausarSurtimiento()">⏸️ Pausar surtimiento</button>
+    <button id="btnCancela" class="btn btn-danger" onclick="cancelarSurtimiento()">✖️ Cancelar surtimiento</button>
 </div>
 
 <script>
@@ -80,7 +82,9 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id);
         pendienteSurtir: 0,
         pendienteAsignar: 0,
         Surtidores: [],
-        items: []
+        items: [],
+        cancelado: 0,
+        pausado: 0
     };
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -90,10 +94,18 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id);
         listaAsignacion.Surtidores =<?php echo json_encode($listaAsignacion['Surtidores']) ?>; 
         listaAsignacion.items = <?php echo json_encode($listaAsignacion['items']) ?>; 
         listaAsignacion.id = '<?php echo $id ?>'; 
+        listaAsignacion.cancelado = <?php echo $listaAsignacion['cancelado'] ?>;
+        listaAsignacion.pausado = <?php echo $listaAsignacion['pausado'] ?>;
         
         document.getElementById('pendientesSurtir').textContent = listaAsignacion.pendienteSurtir;
         document.getElementById('pendientesAsignar').textContent = listaAsignacion.pendienteAsignar;
         document.getElementById('partidasInput').value = listaAsignacion.pendienteAsignar;
+        if(listaAsignacion.cancelado){
+          document.getElementById('btnCancela').style.display = 'none';
+        }
+        if(listaAsignacion.pausado){
+          document.getElementById('btnPausa').style.display = 'none';
+        }
         poblarSurtidorSelect();
         actualizarTablaAsignaciones();
     
@@ -114,6 +126,15 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id);
     function asignarPartidas() {
         var id_surtidor = document.getElementById('surtidorSelect').value;
         var partidas = parseInt(document.getElementById('partidasInput').value);
+        
+        if(partidas == 0){
+            alert('Debe indicar el número de partidad por asignar.');
+            return;
+        }
+        if(partidas < 0){
+            alert('No puede indicar partidas negativas');
+            return;
+        }
         
         if (partidas > listaAsignacion.pendienteAsignar) {
             alert('El número de partidas no puede ser mayor al pendiente de asignar.');
