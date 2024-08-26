@@ -1,4 +1,6 @@
-<!--version 2024-26-08 para que grid de proveedor producto solo sea informativo en pantalla de productos-->
+<!--version 2024-26-08 para que grid de proveedor producto solo sea informativo en pantalla de productos
+	Contexto : Cuando estabamos por empezar las pruebas de transferencias se detectaron codigos de caja repetidos en diferente proveedor, al intentar eliminarlos se multiplicaron en el campo de codigo de barras 3.
+-->
 <!-- 1. Incluye archivo /templates/_header.tpl -->
 {include file="_header.tpl" pagetitle="$contentheader"}
 
