@@ -1,4 +1,4 @@
-<!--version 30.10.2019-->
+<!--version 2024-26-08 para que grid de proveedor producto solo sea informativo en pantalla de productos-->
 <!-- 1. Incluye archivo /templates/_header.tpl -->
 {include file="_header.tpl" pagetitle="$contentheader"}
 
@@ -2245,7 +2245,7 @@
 				{/literal}
 
 					{section loop=$gridArray name=x}
-						{if $gridArray[x][11] neq 'false' && $gridArray[x][0] neq '84' && $gridArray[x][0] neq '54' && $gridArray[x][0] neq '90' }// && $gridArray[x][0] neq '84' Se agrega por Oscar 2023 para hacer solo informativo el grid de detalle proveedor producto
+						{if $gridArray[x][11] neq 'false' && $gridArray[x][0] neq '84' && $gridArray[x][0] neq '54' && $gridArray[x][0] neq '90' && $gridArray[x][0] neq '48' }// && $gridArray[x][0] neq '84' Se agrega por Oscar 2023 para hacer solo informativo el grid de detalle proveedor producto / Se agrega proveedor producto neq '48' Oscar 2024-08-26
 						//alert( '{$gridArray[x][2]}');
 							{if $gridArray[x][4] neq ''}
 								var aux={$gridArray[x][4]};
