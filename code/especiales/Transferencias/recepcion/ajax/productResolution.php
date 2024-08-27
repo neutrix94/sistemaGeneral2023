@@ -1,4 +1,7 @@
 <?php
+/*
+	*Version 2024-08-26 para poner pantalla correcta a StoredProcedures de Movimientos de almacen
+*/
 	if( isset( $_GET['resolution_fl'] ) ){
 		//include( '../../../../../config.inc.php' );
 		include( '../../../../../conect.php' );
@@ -162,7 +165,7 @@
 			$resp['consulta_datos_transferencia'] = $sql;
 			$row = $stm->fetch_assoc();
 		//inserta la cabecera del movimiento de almacen
-			$sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, '{$action_note}', {$row['store_id']}, {$row['warehouse_id']}, {$movement_type}, -1, -1, -1, {$transfer_id}, 21, NULL )";
+			$sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, '{$action_note}', {$row['store_id']}, {$row['warehouse_id']}, {$movement_type}, -1, -1, -1, {$transfer_id}, 9, NULL )";
 			$resp['inserta_cabecera_movimiento'] = $sql;
 			$stm = $this->link->query( $sql ) or die( "Error al insertar movimiento por {$action_note} por Procedure : {$sql} : {$this->link->error}" );
 		//recupera el id de cabecera de movimiento de almacen
@@ -176,7 +179,7 @@
 			$resp['consulta_detalle_transferencia'] = $sql;
 			$resp['inserta_detalle_movimiento'] = array();
 			while( $row = $stm_3->fetch_assoc() ){
-				$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_id}, {$row['product_id']}, {$row['quantity']}, {$row['quantity']}, -1, -1, {$row['product_provider_id']}, 21, NULL )";
+				$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_id}, {$row['product_id']}, {$row['quantity']}, {$row['quantity']}, -1, -1, {$row['product_provider_id']}, 9, NULL )";
 				$stm_4 = $this->link->query( $sql ) or die( "Error al insertar detalle por procedure : {$sql} : {$this->link->error}" );
 				array_push( $resp['inserta_detalle_movimiento'], $sql );
 			}
