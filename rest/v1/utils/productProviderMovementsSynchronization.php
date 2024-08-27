@@ -84,6 +84,9 @@
 //actualizacion de registros de sincronizacion
 		public function updateProductProviderMovementsSynchronization( $rows, $petition_unique_folio, $status = 3, $logger_id = false ){
 			$log_steep_id = null;
+			if( $petition_unique_folio == '' || $petition_unique_folio == null ){
+				die( "Error : el folio unico de peticion esta vacio." );
+			}
 			$sql = "";
 				$sql = "UPDATE sys_sincronizacion_movimientos_proveedor_producto 
 	              SET id_status_sincronizacion = '{$status}',
