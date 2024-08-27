@@ -7,7 +7,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /depurar_sincronizacion
 * Método: POST
 * Descripción: Depura registros de sincronizacion ( tablas de sincronizacion )
-* Version 1.1 Para depurar sincronizacion ( 2024-08-03 )
+* Version 1.2 Se corrige depuracion de regitros Proveedor Producto ( 2024-08-27 )
 */
 $app->post('/depurar_sincronizacion', function (Request $request, Response $response){//die("here");
 
@@ -99,7 +99,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
       $peticiones_pendientes .= "'{$row['folio_unico']}'";
     }
 //elimina registros de movimientos de almacen a nivel proveedor producto
-    $sql = "DELETE FROM sys_sincronizacion_movimientos_proveedor_producto WHERE id_status_sincronizacion = 3";   
+    $sql = "DELETE FROM sys_sincronizacion_movimientos_proveedor_producto WHERE id_status_sincronizacion = 3 AND fecha_alta <= '{$fecha_antiguedad}'";   
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_movimientos_proveedor_producto : {$link->error}" );
     $sql = "SELECT 
               folio_unico
