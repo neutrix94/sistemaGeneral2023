@@ -386,6 +386,31 @@ var packsCatalogue = new Array();
   }
 
   function clearAllCheckBox(){
+    $('.cbMuestra:checked').each(function() {
+        //Antes de limpiar el check, se procede a habilitar bandera pra saber a qué producto se le descuenta 1 unidad
+        $(this).attr('number-muestra', 1);
+        
+        //Se establece en sessionStorage el atributo 'number-muestra' del producto para saber si ya se solicitó muestra
+        var fila_tabla = $(this).parent().parent();
+        var indice = fila_tabla.index();
+
+        //Una vez obtenido el indice, procedemos a actualizar el objeto que se guarda en sessionStorage
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+
+        if( products_array.length > 0 ){ 
+
+          var string_actual = products_array[indice-1][14];
+
+          var modifiedString = string_actual.replace('checked', 'number-muestra="1"');
+          //Se resta al indice una unidad ya que el indice cero corresponde al header y ese no se toma en cuenta
+          products_array[indice-1][14] = modifiedString;
+
+          sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+        }
+       
+    });
+
     $(".cbSelectAllMuestras").prop('checked', false); 
     $('.cbMuestra:checked').each(function() {
         //$(this).prop('checked', false);  // Desmarcar el checkbox
