@@ -6,7 +6,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_movimientos_proveedor_producto
 * Método: POST
 * Descripción: Insercion de movimientos proveedor producto
-* Version 2.1 Comprobacion y LOG
+* Version 2.1 Se corrige error de movimientos proveedor producto sin folio unico ( 2024-08-28 )
 */
 $app->post('/inserta_movimientos_proveedor_producto', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
