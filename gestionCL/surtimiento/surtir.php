@@ -77,6 +77,26 @@ $indiceSurtir = 0;
             </div>
         </div>
     </div>
+    <!-- Modal: Alertas -->
+    <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alertModalLabel">Título de la Alerta</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="alertModalContent">Contenido de la alerta...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="alertModalCancelButton" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="alertModalAcceptButton">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -92,23 +112,49 @@ $indiceSurtir = 0;
               listaSurtir = <?php echo json_encode($listaSurtir) ?>;
               refreshView();
             }else{
-              alert('No hay partidas pendientes de surtir');
-              window.location.href = 'lista.php';
+              //alert('No hay partidas pendientes de surtir');
+              showAlertModal(
+                'Sin partidas',
+                'No hay partidas pendientes de surtir',
+                false,
+                '',
+                true,
+                'Aceptar'
+              ); 
+              $('#alertModalAcceptButton').off('click').on('click', function() {
+                  $('#alertModal').modal('hide');  
+                  window.location.href = 'lista.php';
+              });
+              
             }
         });
 
         function leerCodigo() {
             const codigoProducto = document.getElementById('codigoProducto').value;
             if (!codigoProducto) {
-                alert('Por favor, ingrese el código del producto.');
+                showAlertModal(
+                  'Producto incorrecto',
+                  'Por favor, ingrese el código del producto',
+                  true,
+                  'Cerrar',
+                  false,
+                  'Aceptar'
+                ); 
                 return;
             }
             if(listaSurtir[indiceSurtir].codigos_barras.split(",").includes(codigoProducto)){
                 document.getElementById('surtidoGroup').style.display = 'block';
-                document.getElementById('cantidadSurtida').value = Number(listaSurtir[indiceSurtir].cantidad_solicitada);
+                document.getElementById('cantidadSurtida').value = '';//Number(listaSurtir[indiceSurtir].cantidad_solicitada);
                 document.getElementById('cantidadSurtida').focus();
             }else{
-                alert('El código de borradas no coincide con el producto.');
+                showAlertModal(
+                  'Producto incorrecto',
+                  'El producto no coincide con el solicitado, favor de validar!',
+                  false,
+                  '',
+                  true,
+                  'Aceptar'
+                ); 
             }
 
 
@@ -116,52 +162,93 @@ $indiceSurtir = 0;
 
         function noHayExistencia() {
           // Lógica para pausar el surtimiento en la base de datos
-          if (confirm('¿Estás seguro de marcar sin existencia este producto?')) {
-                $.ajax({
-                    url: '../classes/surtimiento.php',
-                    type: 'POST',
-                    data: {
-                        action: 'sinInventario',
-                        id: listaSurtir[indiceSurtir].id
-                    },
-                    success: function(response) {
-                        indiceSurtir++;
-                        if(indiceSurtir >= listaSurtir.length){
-                          //Concluyó asignación
-                          surtidoCompletado();
-                        }else{
-                          //Sigue con siguiente producto
-                          refreshView();
-                        }
-                        
-                        
-                    },
-                    error: function(xhr, status, error) {
-                        alert('Hubo un error al cancelar la asignación: ' + error);
-                    }
-                });
-          }
+          showAlertModal(
+            'Sin existencia',
+            '¿Estás seguro de marcar sin existencia este producto?',
+            true,
+            'Cancelar',
+            true,
+            'Aceptar'
+          ); 
+          $('#alertModalAcceptButton').off('click').on('click', function() {
+              $.ajax({
+                  url: '../classes/surtimiento.php',
+                  type: 'POST',
+                  data: {
+                      action: 'sinInventario',
+                      id: listaSurtir[indiceSurtir].id
+                  },
+                  success: function(response) {
+                      indiceSurtir++;
+                      if(indiceSurtir >= listaSurtir.length){
+                        //Concluyó asignación
+                        surtidoCompletado();
+                      }else{
+                        //Sigue con siguiente producto
+                        refreshView();
+                      }
+                      
+                      
+                  },
+                  error: function(xhr, status, error) {
+                      alert('Hubo un error al cancelar la asignación: ' + error);
+                  }
+              });
+              $('#alertModal').modal('hide');                
+          });
+
         }
 
         function abandonarSurtimiento() {
             // Lógica para abandonar surtimiento
             if(perfil != 2){
-                alert('No puedes realizar esta acción, pide al encargado que lo realice');
+                showAlertModal(
+                  'Sin permisos',
+                  'No puedes realizar esta acción, pide al encargado que lo realice',
+                  false,
+                  '',
+                  true,
+                  'Aceptar'
+                ); 
                 return;
             }
-            if (confirm('¿Estás seguro de abandonar el surtimiento?')) {
+            
+            showAlertModal(
+              'Abandonar surtimiento',
+              '¿Estás seguro de abandonar el surtimiento?',
+              true,
+              'Cancelar',
+              true,
+              'Aceptar'
+            ); 
+            $('#alertModalAcceptButton').off('click').on('click', function() {
+                $('#alertModal').modal('hide');
                 window.location.href = 'asignar.php?id=' +'<?php echo $id ?>';
-            }
+            });
         }
 
         function siguiente() {
             if(Number($('#cantidadSurtida').val()) == 0){
-                alert('Ingresa la cantidad surtida');
+                showAlertModal(
+                  'Información incorrecta',
+                  'Ingresa la cantidad surtida',
+                  true,
+                  'Cerrar',
+                  false,
+                  ''
+                ); 
                 return;
             }
             // Lógica para ir al siguiente producto
             if( Number($('#cantidadSurtida').val()) > Number(listaSurtir[indiceSurtir].cantidad_solicitada)){
-               alert('No puedes ingresar una cantidad mayor a la solicitada');
+               showAlertModal(
+                 'Información incorrecta',
+                 'No puedes ingresar una cantidad mayor a la solicitada',
+                 true,
+                 'Cerrar',
+                 false,
+                 ''
+               ); 
             }else{
               listaSurtir[indiceSurtir].cantidad_surtida = document.getElementById('cantidadSurtida').value;
               $.ajax({
@@ -222,6 +309,28 @@ $indiceSurtir = 0;
            //Surtimiento completado
            document.getElementById('nombreVendedor').innerText = listaSurtir[0].nombre_vendedor;
            $('#surtidoModal').modal('show');
+        }
+        
+        function showAlertModal(title, content, showCancel, titleCancel, showAccept, titleAccept) {
+            //Establece título y contenido
+            document.getElementById('alertModalLabel').innerText = title;
+            document.getElementById('alertModalContent').innerText = content;
+            //Habilita botón cancelar
+            if(showCancel){
+              $('#alertModalCancelButton').show();
+              $('#alertModalCancelButton').text(titleCancel);
+
+            }else{
+              $('#alertModalCancelButton').hide();
+            }
+            //Habilita botón aceptar
+            if(showAccept){
+              $('#alertModalAcceptButton').show();
+              $('#alertModalAcceptButton').text(titleAccept);
+            }else{
+              $('#alertModalAcceptButton').hide();
+            }
+            $('#alertModal').modal('show');
         }
     </script>
 </body>

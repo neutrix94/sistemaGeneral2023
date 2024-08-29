@@ -108,7 +108,7 @@ class SurtimientoCRUD {
         return $stmt->execute();
     }
 
-    public function listaAsignacion($id=null) {
+    public function listaAsignacion($id=null,$id_sucursal) {
         if(!$id){
           return '';
         }
@@ -117,8 +117,8 @@ class SurtimientoCRUD {
         $surtidoresResult = $this->conn->query("SELECT u.id_usuario, 
                    CONCAT(u.nombre, ' ', u.apellido_paterno) AS nombre
             FROM sys_users u
-            WHERE id_sucursal = 4
-              AND tipo_perfil IN ('14', '15', '16');");
+            WHERE id_sucursal = '{$id_sucursal}'
+              AND tipo_perfil IN ('3');");
 
         $surtidores = array();
         if ($surtidoresResult->num_rows > 0) {
@@ -150,7 +150,7 @@ class SurtimientoCRUD {
         }
         
         // Obtener lista de items x surtidor
-        $itemsResult = $this->conn->query("SELECT count(*) partidas, sd.id_asignado id_surtidor, concat(u.nombre, ' ', u.apellido_paterno) AS nombre_surtidor, s.id_pedido
+        $itemsResult = $this->conn->query("SELECT count(*) partidas, sd.id_asignado id_surtidor, concat(u.nombre, ' ', u.apellido_paterno) AS nombre_surtidor, s.no_pedido, s.estado
             from ec_surtimiento_detalle sd
             left join sys_users u on u.id_usuario = sd.id_asignado
             left join ec_surtimiento s on s.id = sd.id_surtimiento
@@ -161,6 +161,8 @@ class SurtimientoCRUD {
 
         $items = array();
         if ($itemsResult->num_rows > 0) {
+            $cancelado =0;
+            $pausado = 0;
             while($row = $itemsResult->fetch_assoc()) {
                 $items[] = array(
                   'partidas' => $row['partidas'], 
@@ -169,6 +171,8 @@ class SurtimientoCRUD {
                   'id_pedido' => $row['id_pedido'],
                   'asignado' => 1
                 );
+                $cancelado = ($row['estado'] == '5') ? 1 : $cancelado;
+                $pausado = ($row['estado'] == '4') ? 1 : $pausado;
             }
         }
 
@@ -177,7 +181,9 @@ class SurtimientoCRUD {
             'pendienteSurtir' => $pendienteSurtir,
             'pendienteAsignar' => $pendienteAsignar,
             'Surtidores' => $surtidores,
-            'items' => $items    
+            'items' => $items,
+            'cancelado' => $cancelado,
+            'pausado' => $pausado,
         );
 
         $this->conn->close();
@@ -185,11 +191,11 @@ class SurtimientoCRUD {
         return $data;
     }
     
-    public function listaSurtidores() {
+    public function listaSurtidores($sucursal_id) {
         $result = $this->conn->query("SELECT u.id_usuario, 
                    CONCAT(u.nombre, ' ', u.apellido_paterno) AS nombre
             FROM sys_users u
-            WHERE id_sucursal = 4
+            WHERE id_sucursal = '{$sucursal_id}'
               AND tipo_perfil IN ('14', '15', '16');");
         
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -294,6 +300,8 @@ class SurtimientoCRUD {
                 ) AS pp_data ON pp_data.id_producto = sd.id_producto
             WHERE  
                 sd.id_surtimiento = '{$id}'
+                and ub.habilitado = 1
+                and ub.es_principal = 1
                 -- and sd.id_asignado='104'
                 AND sd.estado IN (1,2);");
         

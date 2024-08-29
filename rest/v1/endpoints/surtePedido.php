@@ -58,32 +58,55 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
       if (empty($producto['id'])) {
         return $rs->errorMessage($request->getParsedBody(),$response, 'Datos_Faltantes', 'Hace falta información para crear producto(s)', 400);
       }
-      $idProductos = $idProductos . ",'".$producto['idProducto']."'";
+      $idProductos = $idProductos . ",'".$producto['id']."'";
       $productRow ++;
     }
   }
   
   //Ejecuta lógica para surtimiento
   try {
-    //Inserta Surtido
-    $idSurtido = gen_uuid();
-    $sqlInsert = "INSERT INTO `ec_surtimiento` 
-        (`id`, `no_pedido`, `tipo`, `estado`, `id_vendedor`, `prioridad`, `fecha_creacion`, `creado_por`, `fecha_modificacion`, `modificado_por`) 
-        VALUES ('{$idSurtido}', '{$pedido}', '2', '1', '{$vendedor}', '3', now(), '{$vendedor}', now(), '{$vendedor}');";
-    $db->exec($sqlInsert);
-    
-    //Itera lista de productos para insertar detalle
-    $idSurtidor = '';
-    foreach($productos as $producto) {
-      $idDetalle = gen_uuid();
-      $sqlInsert = "INSERT INTO `ec_surtimiento_detalle` 
-        (`id`, `id_surtimiento`, `id_producto`, `cantidad_solicitada`, `estado`, `id_asignado`, `fecha_creacion`, `creado_por`, `fecha_modificacion`, `modificado_por`) 
-        SELECT  '{$idDetalle}', '{$idSurtido}', p.id_productos, '{$producto['cantidad']}', '1', '{$idSurtidor}', now(), '{$vendedor}', now(), '{$vendedor}'  from ec_productos p where p.orden_lista='{$producto['id']}';";
-      $db->exec($sqlInsert);
+    //Consulta productos disponibles para surtimiento
+    $productosSurtir=[];
+    $sqlConsultaProds="SELECT sp.id_producto, sp.surtir, p.orden_lista, sp.id_sucursal FROM sys_sucursales_producto sp
+        inner join ec_productos p on p.id_productos = sp.id_producto
+        left join sys_users u on u.id_sucursal = sp.id_sucursal
+        where p.orden_lista in (".$idProductos.")
+        and u.id_usuario='{$vendedor}'
+        and surtir=1";
+    //error_log('query:'.$sqlConsultaProds);
+    foreach ($db->query($sqlConsultaProds) as $row) {
+      $productosSurtir[]=$row['orden_lista'];
     }
-    
-    $insertsProd['resultado']='Solicitado';
-    $insertsProd['descripcion']='Se ha solicitado el pedido de '. $productRow . ' producto(s)';
+    //error_log('count:'.count($productosSurtir));
+    //Inserta Surtido
+    if(count($productosSurtir)>0){
+      $idSurtido = gen_uuid();
+      $sqlInsert = "INSERT INTO `ec_surtimiento` 
+          (`id`, `no_pedido`, `tipo`, `estado`, `id_vendedor`, `prioridad`, `fecha_creacion`, `creado_por`, `fecha_modificacion`, `modificado_por`) 
+          VALUES ('{$idSurtido}', '{$pedido}', '2', '1', '{$vendedor}', '3', now(), '{$vendedor}', now(), '{$vendedor}');";
+      $db->exec($sqlInsert);
+      
+      //Itera lista de productos para insertar detalle
+      $idSurtidor = '';
+      foreach($productos as $producto) {
+        if(in_array($producto['id'], $productosSurtir)){
+          //error_log('proceso prod.'.$producto['id']);
+          $idDetalle = gen_uuid();
+          $sqlInsert = "INSERT INTO `ec_surtimiento_detalle` 
+            (`id`, `id_surtimiento`, `id_producto`, `cantidad_solicitada`, `estado`, `id_asignado`, `fecha_creacion`, `creado_por`, `fecha_modificacion`, `modificado_por`) 
+            SELECT  '{$idDetalle}', '{$idSurtido}', p.id_productos, '{$producto['cantidad']}', '1', '{$idSurtidor}', now(), '{$vendedor}', now(), '{$vendedor}'  from ec_productos p where p.orden_lista='{$producto['id']}';";
+          $db->exec($sqlInsert);
+        }
+      }
+      
+      //Regrsa resultado
+      $insertsProd['resultado']='Solicitado';
+      $insertsProd['descripcion']='Se ha solicitado el pedido de '. count($productosSurtir) . ' producto(s)';
+    }else{
+      //Regrsa resultado no hay productos por surtir
+      $insertsProd['resultado']='Sin productos por surtir';
+      $insertsProd['descripcion']='No hay productos habilitados para surtir';
+    }
   }catch (PDOException $e) {
     $insertsProd['resultado']='Error';
     $insertsProd['descripcion']= $e->getMessage();
