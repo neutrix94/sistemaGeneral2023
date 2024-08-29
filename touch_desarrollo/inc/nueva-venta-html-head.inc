@@ -72,7 +72,14 @@
             /*if(products_array[i][13] == "undefined" ){
                 products_array[i][13] = null;
             }*/
-            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price );//aux_arr[2]
+            
+            var component_chk = products_array[i][14];
+            var contiene_checked = component_chk.includes("checked");
+            var select_checkbox = ( contiene_checked ) ? 1: 0;
+            
+            //agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price );//aux_arr[2]
+            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price, select_checkbox );//aux_arr[2]
+            //agregaFila(null, products_array[i][3], -1, products_array[i][1], products_array[i][14], tmp_price, select_checkbox );//aux_arr[2]
             //f,cant,temp,id_producto_pedido,lista_normal
         }
     }
@@ -928,7 +935,7 @@ var new_sale_window = null;
 
 var hay_paquete=0;
 //agregar fila a tabla del pedido
-    function agregaFila(f,cant,temp,id_producto_pedido,lista_normal, product_price = null){//se implementan las variables cant,temp por Oscar 13.08.2018
+    function agregaFila( f, cant, temp, id_producto_pedido, lista_normal, product_price = null, val_check_muestra = 0 ){//se implementan las variables cant,temp por Oscar 13.08.2018
         //alert(product_price );
     //alert( f + ','+ cant + ',' + temp + ',' + id_producto_pedido + ',' + lista_normal );
        // alert('add_fila');
@@ -1264,7 +1271,16 @@ var hay_paquete=0;
             aux[5]=0;
             aux[7]=0;
         }
-        //Orden de lista
+
+        //Checkbox muestra
+        /*
+        var newCell=newRow.insertCell(0);
+        var strCheck = (val_check_muestra == 1) ? '<input type="checkbox" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" onclick="checkMuestra(this)"/>';
+        newCell.innerHTML=strCheck;
+        newCell.align="center";
+        */
+
+        //Producto / Orden de Lista
         var newCell=newRow.insertCell(0);
         newCell.innerHTML=aux[2];
         newCell.align="center";
@@ -1375,6 +1391,19 @@ var hay_paquete=0;
 /*Fin de cambio Oscar 18.03.2019*/
         sig=0;
         lista_precios_actual=aux[15];
+
+        //Checkbox muestra
+        var newCell=newRow.insertCell(15);
+        var strCheck = (val_check_muestra == 1) ? '<input type="checkbox" class="cbMuestra" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+        //var strCheck = '<input type="checkbox" onclick="checkMuestra(this)"/>';
+        newCell.innerHTML=strCheck;
+        newCell.align="center";
+        //Una vez establecida la celda con el check, se procede a iluminar la fila
+        if( val_check_muestra ){
+            $(newRow).css('background-color','#D8FAFF');
+        }else{
+            $(newRow).css('background-color','#FFFF');
+        }
 
     /*implementacion de Oscar 03.05.2018 para insertar en tabla temporal de movimientos*/      
         var urlTmp="ajax/insertaTemporal.php?id_mov_temp="+id_mov_tmp+"&id_prod="+aux[1]+"&cant="+can2;
@@ -1605,8 +1634,7 @@ var hay_paquete=0;
 		trs=tabla.getElementsByTagName('tr');
 		
        	var can2=0;
-		for(i=1;i<trs.length;i++)
-		{
+        for(i=1;i<trs.length;i++){
 			tds=trs[i].getElementsByTagName('td');
 			//alert(tds[8].valor+" - "+sig);
 			
@@ -1642,7 +1670,6 @@ var hay_paquete=0;
 			var res=ajaxR(url);			
 			//alert(res);           
 			var aux=res.split('|');
-
 			if(aux[0] == 'exito')
 			{
 				for(i=0;i<parseInt(aux[1]);i++)
@@ -1667,7 +1694,40 @@ var hay_paquete=0;
        }
         calculaTotalVenta();
         setLocalStorageProducts();//implementacion Oscar 2023 para eliminar el producto de LocalStorage
-      }
+    }
+
+    function checkMuestra(item){
+        var valor_chk = $(item).is(":checked");
+
+        var str_checkbox = ( valor_chk ) ? '<input type="checkbox" class="cbMuestra" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+
+        if( valor_chk ){
+            $(item).parent().parent().css('background-color','#D8FAFF');
+        }else{
+            $(item).parent().parent().css('background-color','#FFFF');
+        }
+        var fila_tabla = $(item).parent().parent();
+        var indice = fila_tabla.index();
+
+        //Una vez obtenido el indice, procedemos a actualizar el objeto que se guarda en sessionStorage
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+
+        if( products_array.length > 0 ){ 
+            //Actualiza contenido de la primer columna
+            //Se resta al indice una unidad ya que el indice cero corresponde al header y ese no se toma en cuenta
+            products_array[indice-1][14] = str_checkbox;
+
+            sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+        }
+    }
+
+    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
+      function bloqueaPantalla () {
+          if ($("#es_regalo").prop('checked'))
+                $("#divEspera").css ("display", "block");
+      }*/
+
 	function guardarVenta ( quotation = null ){
 //alert('entra enn venta');
 		var retval = false; 
@@ -1754,6 +1814,8 @@ var hay_paquete=0;
             $("#detalle_nota_tmp").val(aux[3]);
         /*fin de cambio Oscar 13.11.2018*/
 			retval = true;
+            //mandamos a consumir servicio para surtir pedido
+            surtePedido();
 		}
 		else{
 			retval = false;
@@ -1777,6 +1839,86 @@ var hay_paquete=0;
 		return retval;
 	}
 
+    function surtePedido( ){
+
+        var baseUrl = window.location.origin;
+        var apiUrl = baseUrl + '/sistemaGeneral2023/rest/v1/surte/Pedido';
+
+        var productosPedido = getProductosPedido();
+
+        var dataSurtePedido = {
+                "productos": productosPedido,
+                "vendedor": <?php echo $user_id; ?>,
+                "pedido": genIdPedido( <?php echo $user_id; ?> ),
+            };
+
+        if( productosPedido.length > 0 ){
+            $.ajax({
+            type: 'POST',
+            url: apiUrl,
+            headers: {
+                'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
+            },
+            data: dataSurtePedido,
+            datatype: 'json',
+            success: function (data) {
+                console.log("RESPUESTA PEDIDO");
+                console.log(data);
+                if( data.result.resultado == "Solicitado" ){
+                    alert(data.result.descripcion);
+                }else{
+                    alert("Ha ocurrido un error: "+data.result.descripcion);
+                }
+
+                sessionStorage.setItem('ID_PEDIDO_TEMP', '');
+                
+                clearAllCheckBox();
+
+            },
+            error:function(error){
+                console.log("ERROR".error);
+            }
+            });
+            
+            
+        }else{
+        alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
+        }
+    }
+
+    function getProductosPedido(){
+    
+        var seleccionados = [];
+        var filas = $('#listaProductos tr.move');
+        if( filas.length > 0 ){
+            // Mostrar las filas en la consola
+            filas.each(function(index, fila) {
+                var $row = $(this);
+                var ordenDeLista = $row.find('td:eq(0)').text().trim();
+                var cantidad = $row.find('td:eq(2)').text().trim();
+                seleccionados.push({
+                    id: ordenDeLista,
+                    cantidad: cantidad
+                });
+                
+            });
+        }
+        return seleccionados;
+    }
+
+    function genIdPedido( id_user ) {
+        var id = "";
+        
+        if( sessionStorage.getItem('ID_PEDIDO_TEMP') != null && sessionStorage.getItem('ID_PEDIDO_TEMP') != '' ){
+            id = sessionStorage.getItem('ID_PEDIDO_TEMP');
+        }else{
+            id = new Date().getMilliseconds() + id_user ;
+            sessionStorage.setItem('ID_PEDIDO_TEMP', id);
+        }
+
+        return id;  
+    }
+    
     function change_to_upercase( obj ){
         obj.value = obj.value.toUpperCase();
     }

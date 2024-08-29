@@ -828,7 +828,7 @@
 				ON pp.id_proveedor_producto = tp.id_proveedor_producto
 				LEFT JOIN ec_productos p 
 				ON p.id_productos  = tp.id_producto_or
-				WHERE tp.id_transferencia IN( ${transfers} )
+				WHERE tp.id_transferencia IN( {$transfers} )
 				AND tsd.id_status_surtimiento IN( 1, 2 )
 				GROUP BY t.id_transferencia";
 		$stm = $link->query( $sql ) or die( "error|Error al validar que no haya registros pendientes de surtir : {$link->error}" );
@@ -847,12 +847,12 @@
 		if( $stm->num_rows <= 0 && $stm_2->num_rows <= 0 ){
 			return "ok|ok";
 		}else{
-			$resp .= "<h4  class=\"text-center\">Las siguientes transferencias tienen registros pendientes de surtir :</h4>";
+			$resp .= "<h4  class=\"text-center\">Las siguientes transferencias tienen registros pendientes de surtir : {$sql}</h4>";
 			$resp .= "<div class=\"row\"><table class=\"table table-bordered table-striped\">
 						<thead>
 							<tr>
 								<th>Transferencia</th>
-								<th>Productos Pendientes</th>
+								<th>Status</th>
 							</tr>
 						</thead>
 						<tbody>";
