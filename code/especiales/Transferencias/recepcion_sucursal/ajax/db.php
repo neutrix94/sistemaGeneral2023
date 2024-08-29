@@ -907,10 +907,13 @@
 			$sql = "SELECT
 						id_producto_resolucion
 					FROM ec_productos_resoluciones_tmp
-					WHERE id_bloque_transferencia_recepcion = {$reception_block_id}";
+					WHERE id_bloque_transferencia_recepcion = {$reception_block_id}";echo $sql;
 			$stm_sel = $link->query( $sql ) or die( "error|Error al consultar si hay produtos en resolucion : {$link->error}" );
+			echo "numero de productos : {$stm_sel->num_rows}";
 			if( $stm_sel->num_rows > 0 ){
+				die( "entra en 1" );
 			}else{	
+				die( "entra en 2" );
 				$sql = "UPDATE ec_bloques_transferencias_recepcion 
 							SET recibido = '1'
 						WHERE id_bloque_transferencia_recepcion = {$reception_block_id}";
