@@ -433,6 +433,7 @@ console.log( response );
 	function setResolutionBlock( resolution_block_id, finish_transfers = false, show_transfer = false ){
 		var url = "ajax/db.php?fl=getDataByBlock&reception_block_id=" + resolution_block_id;
 		var response = ajaxR( url ).split( '|' );
+		alert( "1" + response );
 		if( response[0] != 'ok' ){
 			alert( "Error : " + response );
 			return false;
@@ -444,6 +445,7 @@ console.log( response );
 
 	//finalizar la transferencia
 		if( finish_transfers == true && show_transfer == false ){
+			alert( "finish_transfers" );return false;
 			finish_transfers_();
 			getResolutionBlocks();
 		}
@@ -453,7 +455,7 @@ console.log( response );
 		}else{
 			show_view( '', '.finish_transfers');
 		}
-		
+		alert('pasa');
 		receptionResumen( 1 );
 		receptionResumen( 2 );
 		receptionResumen( 3 );
