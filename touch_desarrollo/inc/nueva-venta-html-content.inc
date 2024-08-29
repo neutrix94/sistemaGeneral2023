@@ -374,10 +374,10 @@ var packsCatalogue = new Array();
         var isChecked = $row.find('input[type="checkbox"]').is(':checked');
         if (isChecked) {
           var ordenDeLista = $row.find('td:eq(0)').text().trim();
-          var cantidad = $row.find('td:eq(2)').text().trim();
+          //var cantidad = $row.find('td:eq(2)').text().trim();
           seleccionados.push({
             id: ordenDeLista,
-            cantidad: cantidad
+            cantidad: 1 //Para muestra siempre se envía 1 unidad
           });
         }
       });
@@ -456,8 +456,45 @@ var packsCatalogue = new Array();
           const listOrder = findListOrderByBarcode(valCodigo, arrProductosTabla);
 
           if( listOrder != null ){
+            //Si el producto existe en la tabla, validamos si ya tiene muestra o ya ha sido solicitado como pedido
+            //Buscamos fila del orden de lista para validar si ya ha sido solicitado como pedido o muestra
+            var responseIndexDisponible = validateProductoEsPedidoMuestra(listOrder);
+            var disponibleCambioFisico = responseIndexDisponible[1];
 
-            descontarCantidad(listOrder);
+            if( disponibleCambioFisico ){
+
+              //Con base al indice, se actualiza la bandera para saber si es cambio
+              var indiceArreglo = responseIndexDisponible[0];
+
+              var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+              products_array = JSON.parse( products_array );
+              var cantidadSolicitado = products_array[indiceArreglo][2];
+
+              var cambio = Number(products_array[indiceArreglo][15]) + 1;
+
+              if( cambio > cantidadSolicitado ){
+                alert("El número de piezas para cambio, supera a la cantidad solicitada del producto.");
+                $('#inputDevolucion').val("");
+
+              }else{
+
+                products_array[indiceArreglo][15] = cambio;
+
+                sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+
+                alert("Recuerda que debes de Enviar pedido para poder surtir el cambio.");
+                $('#inputDevolucion').val("");
+                closeModal();
+              }
+
+            }else{
+
+              alert("El código ingresado corresponde a un producto que no se ha solicitado muestra y/o pedido.\nFavor de verificar");
+              $('#inputDevolucion').val("");
+
+            }
+
+            //descontarCantidad(listOrder);
           }else{
             alert("El código ingresado no existe en el pedido.\nFavor de revisar");
             $('#inputDevolucion').val("");
@@ -481,7 +518,47 @@ var packsCatalogue = new Array();
         }
     }
     return null; // Devuelve null si no se encuentra el código de barras
-}
+  }
+
+  function validateProductoEsPedidoMuestra(ordenLista){
+
+    var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+    products_array = JSON.parse( products_array );
+    var disponibleParaCambio = false;
+    if( products_array.length > 0 ){ 
+
+      //Obtenemos el indice del array para validar si ya se solicitó muestra o envió a pedido
+      var indexProducto = searchIndexByListOrder(ordenLista, products_array);
+
+      disponibleParaCambio = validaDisponibleParaCambio( indexProducto, products_array ); 
+
+    } 
+
+    return [ indexProducto, disponibleParaCambio ];
+  }
+
+  function searchIndexByListOrder( ordenLista, products_array ){
+    var indexFound =null;
+    
+    for (let index = 0; index < products_array.length; index++) {
+      if( products_array[index][0] == ordenLista){
+        indexFound = index;
+        index = products_array.length;
+      }
+    }
+    return indexFound;
+  }
+
+  function validaDisponibleParaCambio( index, products_array ) {
+    //Indice 14 contiene texto para saber si ya se solicitó muestra
+    //Indice 16 contiene bandera para saber si ya se solicitó pedido
+    var disponibleCambio = false;
+    if( products_array[index][14].includes("number-muestra") || products_array[index][16] == '1' ){
+      disponibleCambio = true;
+    }
+
+    return disponibleCambio;
+  }
 
 
   function buildObjetoOrdenListaCodigoBarras(){
@@ -1173,7 +1250,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
   <br>
   <div class="row"><!--class="ui-block-bwidth:48%;float:left;"-->
     <div class="col-2"></div>
-    <div class="col-4">
+    <!-- <div class="col-4">
       <button 
         type="button"
         onclick="openDevolucionProductos();"
@@ -1181,8 +1258,8 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
       >
         <b>Productos para devolver</b>
       </button>
-    </div>
-    <div class="col-4">
+    </div> -->
+    <div class="col-8">
       <button data-theme="a" 
         name="cerrar" 
         id="cerrar" 
@@ -1207,6 +1284,15 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
     <!--Descuentos-->
     
         <div class="row" style="align-items: center;justify-content: center;">
+            <div class="col-2 text-center">
+              <button 
+                type="button"
+                onclick="openDevolucionProductos();"
+                class="btn btn-success form-control"
+              >
+                <b>Cambio Físico</b>
+              </button> 
+            </div>
             <div class="col-2 text-center"><!-- width="20%" align="center" style="border: inset 0pt;" -->
              <fieldset  data-role="controlgroup" data-type="horizontal" style="display :none;">
                <label data-mini="true" style="width:100px;padding:10px;text-align:center;">
