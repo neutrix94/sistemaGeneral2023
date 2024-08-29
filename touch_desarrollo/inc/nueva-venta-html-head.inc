@@ -78,9 +78,12 @@
             var contiene_texto_muestra = component_chk.includes("number-muestra");
             var select_checkbox = ( contiene_checked ) ? 1: 0;
             var es_muestra = ( contiene_texto_muestra ) ? 1: 0;
+            //Posición 16 corresponde a la bandera para saber si el producto ya se ha enviado a pedido
+            var pedidoSolicitado = products_array[i][16];
+            var numeroPiezasCambio = products_array[i][15];
             
             //agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price );//aux_arr[2]
-            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price, select_checkbox, es_muestra );
+            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price, select_checkbox, es_muestra, pedidoSolicitado, numeroPiezasCambio );
             //agregaFila(null, products_array[i][3], -1, products_array[i][1], products_array[i][14], tmp_price, select_checkbox );//aux_arr[2]
             //f,cant,temp,id_producto_pedido,lista_normal
         }
@@ -937,7 +940,7 @@ var new_sale_window = null;
 
 var hay_paquete=0;
 //agregar fila a tabla del pedido
-    function agregaFila( f, cant, temp, id_producto_pedido, lista_normal, product_price = null, val_check_muestra = 0, es_muestra = 0 ){//se implementan las variables cant,temp por Oscar 13.08.2018
+    function agregaFila( f, cant, temp, id_producto_pedido, lista_normal, product_price = null, val_check_muestra = 0, es_muestra = 0, solicitado = 0, cambio = 0 ){//se implementan las variables cant,temp por Oscar 13.08.2018
         //alert(product_price );
     //alert( f + ','+ cant + ',' + temp + ',' + id_producto_pedido + ',' + lista_normal );
        // alert('add_fila');
@@ -1411,6 +1414,18 @@ var hay_paquete=0;
             $(newRow).css('background-color','#FFFF');
         }
 
+        //Bandera para saber si es cambio
+        var newCell=newRow.insertCell(16);
+        newCell.innerHTML=cambio;
+        newCell.align="right";
+        newCell.style.display="none";
+
+        //Bandera para saber si ya se envió a Pedido
+        var newCell=newRow.insertCell(17);
+        newCell.innerHTML=solicitado;
+        newCell.align="right";
+        newCell.style.display="none";
+
     /*implementacion de Oscar 03.05.2018 para insertar en tabla temporal de movimientos*/      
         var urlTmp="ajax/insertaTemporal.php?id_mov_temp="+id_mov_tmp+"&id_prod="+aux[1]+"&cant="+can2;
         //alert(aux[0]+"\n"+aux[1]+"\n"+aux[2]);
@@ -1878,11 +1893,14 @@ var hay_paquete=0;
                 console.log(data);
                 if( data.result.resultado == "Solicitado" ){
                     alert(data.result.descripcion);
+                    //Establecer el localStorage como 1 la fila 16, corresponde a la bandera para saber si ya fue solicitado
+                    setBanderaProductoSolicitado();
+
                 }else{
                     alert("Ha ocurrido un error: "+data.result.descripcion);
                 }
 
-                sessionStorage.setItem('ID_PEDIDO_TEMP', '');
+                //sessionStorage.setItem('ID_PEDIDO_TEMP', '');
                 
                 clearAllCheckBox();
 
@@ -1909,7 +1927,21 @@ var hay_paquete=0;
                 var ordenDeLista = $row.find('td:eq(0)').text().trim();
                 var cantidad = $row.find('td:eq(2)').text().trim();
                 var numberMuestra = $row.find('td:eq(15)').children().eq(0).attr('number-muestra');
-                if(numberMuestra=="1") cantidad = cantidad -1;
+                var cantidadPiezasCambio = $row.find('td:eq(16)').text().trim();
+                var solicitado = $row.find('td:eq(17)').text().trim();
+
+                //Cuando el producto ya se ha solciitado a envío, únicamente se hace la petición para surtir de las piezas para "cambio"
+                if(solicitado == '1'){
+                    if( cantidadPiezasCambio > 0 ){
+                        cantidad = cantidadPiezasCambio;
+                    }
+                }else{ 
+                    // En caso de que ya se haya solicitado muestra, a la cantidad solicitada, se resta la unidad de muestra, en otro caso, si no ha sido solicitado, se envía la cantidad solicitada originalmente
+                    if(numberMuestra=="1"){
+                        cantidad = cantidad -1; 
+                    }
+                }
+
                 seleccionados.push({
                     id: ordenDeLista,
                     cantidad: cantidad
@@ -1931,6 +1963,21 @@ var hay_paquete=0;
         }
 
         return id;  
+    }
+
+    function setBanderaProductoSolicitado(){
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+
+        if( products_array.length > 0 ){ 
+
+            for (let index = 0; index < products_array.length; index++) {
+                //La posición 16 corresponde a la bandera para identificar si ya ha sido solicitado
+                products_array[index][16] = '1';   
+            }
+
+          sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+        }
     }
     
     function change_to_upercase( obj ){
@@ -2221,6 +2268,8 @@ var hay_paquete=0;
   <!-- <script type="text/javascript" src="../scannerBC/quaggajs/quagga.min.js"></script>
   <script type="text/javascript" src="../scannerBC/quaggajs/scriptLeer.js"></script> -->
   <script type="text/javascript" src="../scannerBC/zxing/library/zxing.min.js"></script>
+  <!-- <script src="../../code/especiales/tesoreria/cobrosSmartAccounts/websocket_client/websocket_client_surtimiento.js" type="module"></script> -->
+  <script src="../../code/especiales/tesoreria/cobrosSmartAccounts/websocket_client/websocket_client_surtimiento.js" type="module"></script>
   <script type="text/javascript">
     window.addEventListener('load', function () {
       var listaCodigos = [];
