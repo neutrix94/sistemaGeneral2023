@@ -309,6 +309,8 @@ $indiceSurtir = 0;
            //Surtimiento completado
            document.getElementById('nombreVendedor').innerText = listaSurtir[0].nombre_vendedor;
            $('#surtidoModal').modal('show');
+
+           imprimeTicket();
         }
         
         function showAlertModal(title, content, showCancel, titleCancel, showAccept, titleAccept) {
@@ -332,6 +334,25 @@ $indiceSurtir = 0;
             }
             $('#alertModal').modal('show');
         }
+
+        function imprimeTicket(){
+          // Define la ruta donde quieres guardar el PDF
+          const savePath = "../pdf/tickets";
+
+          // Realiza la solicitud a ticket.php
+          fetch(`../surtimiento/pdf/ticket.php?savePath=${encodeURIComponent(savePath)}`)
+          .then(response => response.text())
+          .then(data => {
+              console.log("PDF generado y guardado en la ruta especificada");
+              // Puedes mostrar una alerta o actualizar la interfaz de usuario aquí
+              alert("PDF generado exitosamente");
+          })
+          .catch(error => {
+              console.error("Error al generar el PDF:", error);
+              alert("Error al generar el PDF");
+          });
+        }
+
     </script>
 </body>
 </html>
