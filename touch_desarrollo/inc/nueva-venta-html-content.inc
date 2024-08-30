@@ -479,8 +479,21 @@ var packsCatalogue = new Array();
               }else{
 
                 products_array[indiceArreglo][15] = cambio;
-
                 sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+
+                var filas = $('#listaProductos tr.move');
+                filas.each(function(index, fila) {
+                    var celdas = $(fila).find('td');
+
+                    // Solo verifica el índice 0 y aplica el cambio si coincide el código de barras
+                    var ordenLista = $(celdas.eq(0)).text();
+                    var codigoBarras = $('#inputDevolucion').val();
+                    if(ordenLista == codigoBarras) {
+                        // Cambia el contenido del <td> en la posición 16 que corresponde al conteo de piezas para cambio
+                        $(celdas.eq(16)).text(cambio);
+                        console.log("Aplicar cambio");
+                    }
+                });
 
                 alert("Recuerda que debes de Enviar pedido para poder surtir el cambio.");
                 $('#inputDevolucion').val("");
