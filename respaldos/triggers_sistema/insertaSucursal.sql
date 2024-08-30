@@ -149,6 +149,6 @@ BEGIN
 		WHERE spe.id_sucursal = 1
 	)ax;
 /*Inserta el resumen de la sincronizacion para la sucursal Oscar ( 2024-08-29 )*/
-	INSERT INTO sys_resumen_sincronizacion_sucursales_detalle ( id_resumen_sincronizacion_sucursal, id_sucursal, fecha_hora_ultima_actualizacion, contenido_ultima_respuesta, permite_sincronizar_manualmente, permite_sincronizacion_automaticamente )
+	INSERT INTO sys_resumen_sincronizacion_sucursales ( id_resumen_sincronizacion_sucursal, id_sucursal, fecha_hora_ultima_actualizacion, contenido_ultima_respuesta, permite_sincronizar_manualmente, permite_sincronizacion_automaticamente )
 		VALUES ( NULL, new.id_sucursal, NOW(), '', 1, 2 ); 
 END $$
