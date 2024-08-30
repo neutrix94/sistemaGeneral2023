@@ -82,8 +82,8 @@ BEGIN
 				'"agregado_en_surtimiento" : "', new.agregado_en_surtimiento, '",',
 				'"agregado_en_validacion" : "', new.agregado_en_validacion, '",',
 				'"id_caso_surtimiento" : "', new.id_caso_surtimiento, '",',
-				/*'"numero_consecutivo" : "', new.numero_consecutivo, '",',
-				'"consecutivo_orden_ubicacion" : "', new.consecutivo_orden_ubicacion, '",',*/
+				'"numero_consecutivo" : "', new.numero_consecutivo, '",',
+				/*'"consecutivo_orden_ubicacion" : "', new.consecutivo_orden_ubicacion, '",',*/
 				'"omite_movimiento_origen" : "', new.omite_movimiento_origen, '",',
 				'"omite_movimiento_destino" : "', new.omite_movimiento_destino, '",',
 				'"resuelto" : "', new.resuelto, '",',
