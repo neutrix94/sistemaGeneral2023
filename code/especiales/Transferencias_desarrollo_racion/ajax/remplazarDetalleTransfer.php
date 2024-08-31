@@ -25,11 +25,11 @@
 	$details = explode( '|~|', $_POST['detail'] );
 	$counter = 0;
 	foreach ( $details as $key => $detail ) {
+		$counter ++;//modificado por Oscar 2023/09/30 ( por producto )
 		$det = explode( '~', $detail );
 		$product_id = $det[0];
 		$product_providers_detail = explode( '||', $det[1] );
 		foreach ( $product_providers_detail as $key2 => $pp ) {
-			$counter ++;//modificado por Oscar 2023/09/30 ( por producto )
 			$pp_detail = explode( '', $pp );
 			if( $pp_detail[7] > 0 || $pp_detail[8] > 0 || $pp_detail[9] > 0){
 				$sql = "INSERT INTO ec_transferencia_productos( id_transferencia, id_producto_or, 
