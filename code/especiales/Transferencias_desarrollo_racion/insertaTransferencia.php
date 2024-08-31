@@ -73,12 +73,12 @@
 	$details = explode( '|~|', $_POST['detail'] );
 	$counter = 0;
 	foreach ( $details as $key => $detail ) {
+		$counter ++;//modificado por Oscar 2023/09/30 ( por producto )
 		$det = explode( '~', $detail );
 		$product_id = $det[0];
 		$es_racionado = ( isset( $det[2] ) && $det[2] == 'es_racionado' ? 1 : 0 );//indicador de racion
 		$product_providers_detail = explode( '||', $det[1] );
 		foreach ( $product_providers_detail as $key2 => $pp ) {
-			$counter ++;//modificado por Oscar 2023/09/30 ( por producto )
 			$pp_detail = explode( '', $pp );
 			if( $pp_detail[7] > 0 || $pp_detail[8] > 0 || $pp_detail[9] > 0){
 				//$counter ++; deshabilitado por Oscar 2023/09/30
