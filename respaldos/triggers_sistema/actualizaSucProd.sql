@@ -8,7 +8,8 @@ BEGIN
 
     IF(new.id_sucursal!=old.id_sucursal OR new.id_producto!=old.id_producto
         OR new.minimo_surtir!=old.minimo_surtir OR new.estado_suc!=old.estado_suc
-        OR new.ubicacion_almacen_sucursal!=old.ubicacion_almacen_sucursal OR new.es_externo!=old.es_externo)
+        OR new.ubicacion_almacen_sucursal!=old.ubicacion_almacen_sucursal 
+        OR new.es_externo != old.es_externo OR new.surtir != old.surtir )
     THEN
         SELECT id_sucursal INTO store_id FROM sys_sucursales WHERE acceso=1;
 	   IF( new.sincronizar != 0 )
@@ -38,6 +39,7 @@ BEGIN
                     '"racion_1" : "', new.racion_1, '",',
                     '"racion_2" : "', new.racion_2, '",',
                     '"racion_3" : "', new.racion_3, '",',
+                    '"surtir" : "', new.surtir, '",',
                     '"sincronizar" : "0"',
                     '}'
                 ),
