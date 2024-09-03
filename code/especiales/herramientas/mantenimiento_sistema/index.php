@@ -730,6 +730,11 @@
 								</button>
 			    			</div>
 			    			<div class="col-4">
+								<button 
+									type="button"
+									class="btn btn-warning form-control" onclick="getStoresLocationsExcluded();">
+									Exclusión de surtimiento de Productos en ventas
+								</button>
 			    			</div>
 			    			<div class="col-4">
 			    			</div>

@@ -109,7 +109,11 @@
 						p.ubicacion_almacen,
 						pp.id_proveedor_producto,
 						p.orden_lista,
-						s.tiene_ubicacion_prinicipal
+						s.tiene_ubicacion_prinicipal,
+						( SELECT
+							IF( epsv.id_producto IS NULL, 0, 1 )	
+						FROM ec_exclusion_productos_surtimiento_venta epsv
+						WHERE id_producto = p.id_productos) AS omitir_surtimiento
 					FROM ec_proveedor_producto pp
 					LEFT JOIN ec_productos p ON p.id_productos = pp.id_producto
 					LEFT JOIN ec_almacen_producto ap ON ap.id_producto = p.id_productos
@@ -143,7 +147,7 @@
 				$r[1] = str_replace( 'class_tam', ' style=\\\'font-size : 150%;\\\'', $r[1] );
 				$r[1] = str_replace( 'class_black', ' style=\\\'color : black;\\\'', $r[1] );
 				$resp .= "<div class=\"group_card\" id=\"location_response_{$counter}\" 
-							onclick=\"setProductLocation('{$r['0']}~<b style=\'color:black;\'>( {$r['7']} ) </b> {$r['1']}~{$r['2']}~{$r['3']}~{$r['4']}~{$r['5']}~{$r['6']}~{$r['8']}');\"
+							onclick=\"setProductLocation('{$r['0']}~<b style=\'color:black;\'>( {$r['7']} ) </b> {$r['1']}~{$r['2']}~{$r['3']}~{$r['4']}~{$r['5']}~{$r['6']}~{$r['8']}~{$r['9']}');\"
 						>{$r[1]}</div>";
 				$counter ++;
 			}
