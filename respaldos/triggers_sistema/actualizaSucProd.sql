@@ -38,6 +38,7 @@ BEGIN
                     '"racion_1" : "', new.racion_1, '",',
                     '"racion_2" : "', new.racion_2, '",',
                     '"racion_3" : "', new.racion_3, '",',
+                    '"surtir" : "', new.surtir, '",',
                     '"sincronizar" : "0"',
                     '}'
                 ),
