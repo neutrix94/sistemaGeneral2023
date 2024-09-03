@@ -172,11 +172,16 @@
 					onclick="detect_location_change();">
 				</div>
 
-				<div class="col-12 text-center">
+				<div class="col-6 text-center">
 					<br>
 					<label>Es Ubicacion Principal</label><br>
 					<input type="checkbox" id="is_principal" style="transform : scale( 2 );"
 					onclick="detect_location_change();">
+				</div>
+				<div class="col-6 text-center">
+					<br>
+					<label>Se surte en Ventas</label><br>
+					<input type="checkbox" id="is_supplied" style="transform : scale( 2 );" disabled>
 				</div>
 			</div>
 

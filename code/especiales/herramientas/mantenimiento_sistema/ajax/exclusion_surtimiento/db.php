@@ -85,7 +85,7 @@
                 VALUES ( $product_id, NOW(), 1 )";
             $stm = $this->link->query( $sql ) or die( "Error al insertar la exclusion de surtimiento de producto : {$sql} : {$this->link->error}" );
         //actualiza a surtir en 1 los productos en tabla de sucursal producto
-            $sql = "UPDATE sys_sucursales_producto SET surtir = 1 WHERE id_producto = {$product_id} AND id_sucursal > 1";
+            $sql = "UPDATE sys_sucursales_producto SET surtir = 0 WHERE id_producto = {$product_id} AND id_sucursal > 1";
             $stm = $this->link->query( $sql ) or die( "Error al actualizar surtimiento en tabla de sucursal producto : {$sql} : {$this->link->error}" );
             $this->link->commit();
             return "ok|El producto fue puesto en exclusión de surtimiento exitosamente.";
