@@ -61,7 +61,7 @@
         //inicio de transaccion
             $this->link->autocommit( false );
         //resetea tabla de ubicaciones por sucursal
-            $sql = "UPDATE ec_sucursal_producto_ubicacion_almacen SET 
+            /*$sql = "UPDATE ec_sucursal_producto_ubicacion_almacen SET 
                         numero_ubicacion_desde = '0',
                         numero_ubicacion_hasta = '0',
                         pasillo_desde = '',
@@ -70,7 +70,8 @@
                         altura_hasta = '',
                         habilitado = '0',
                         es_principal = '0'
-                    WHERE id_sucursal IN( $stores )";
+                    WHERE id_sucursal IN( $stores )";*/
+            $sql = "DELETE FROM ec_sucursal_producto_ubicacion_almacen WHERE id_sucursal IN( $stores )";
             $stm = $this->link->query( $sql ) or die( "Error al resetear tabla ec_sucursal_producto_ubicacion_almacen : {$sql} : {$this->link->error}" );
         //resetea ubicaciones en tabla de sucursal por producto
             $sql = "UPDATE sys_sucursales_producto SET ubicacion_almacen_sucursal = '' WHERE id_sucursal IN( $stores )";
