@@ -333,6 +333,19 @@
 		$( '.modal-body' ).html( resp );
 	}
 	
+	function getStoresLocationsExcluded( modal = true ){
+		var url = 'ajax/exclusion_surtimiento/exclusion.php';
+		var resp = ajaxR( url );
+		$( '#accept_modal_btn' ).css( 'display', 'block' );
+		$( '#accept_modal_btn' ).html( 'Aceptar y cerrar' );
+		$( '#exit_modal_btn' ).css( 'display', 'none' );
+		$( '.modal-title' ).html( `Exclusión de productos en surtimiento de ventas` );
+		$( '.modal-body' ).html( resp );
+		if( modal ){
+			$('#lanza_modal').click();
+		}
+	}
+	
 	//lamadas asincronas
 	function ajaxR( url ){
 		if(window.ActiveXObject)
