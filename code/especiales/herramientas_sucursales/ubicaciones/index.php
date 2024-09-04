@@ -1,4 +1,7 @@
 <?php
+/*
+	*Version 1.1 2024-09-03 Modificaciones para no dejar acceder en local a la pantalla de ubicaciones en sucursal
+*/
 	include( '../../../../conect.php' );
 	include( '../../../../conexionMysqli.php' );
 //implementacion Oscar 2024-09-03 para no dejar usar la pantalla en local
