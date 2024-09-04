@@ -185,9 +185,9 @@
 			$sql = "SELECT id_producto FROM ec_exclusion_productos_surtimiento_venta WHERE id_producto = {$product_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar si el producto esta excluido de surtimiento de ventas : {$sql} : {$this->link->error}" );
 			if( $stm->num_rows <= 0 ){
-				$sql = "UPDATE sys_sucursales_producto SET surtir = 1 WHERE id_producto = '{$product_id}'";
+				$sql = "UPDATE sys_sucursales_producto SET surtir = 1 WHERE id_producto = '{$product_id}' AND id_sucursal = {$sucursal_id}";
 			}else{
-				$sql = "UPDATE sys_sucursales_producto SET surtir = 0 WHERE id_producto = '{$product_id}'";
+				$sql = "UPDATE sys_sucursales_producto SET surtir = 0 WHERE id_producto = '{$product_id}' AND id_sucursal = {$sucursal_id}";
 			}
 			$stm = $this->link->query( $sql ) or die( "Error al actualizar campo de surtir tabla de sucursal producto : {$sql} : {$this->link->error}" );
 			$this->link->autocommit( true );
