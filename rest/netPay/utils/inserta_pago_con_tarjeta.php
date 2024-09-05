@@ -158,13 +158,14 @@
             id_nota_credito, id_cxc, es_externo )
             VALUES( {$row['sale_id']}, 7, NOW(), NOW(), {$amount}, '', 1, 1, -1, -1, 0 )";
             $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$link->error}" );*/
-      
+      //
+          $id_forma_pago = ( $cardType == 'C' ? 11 : ( $cardType == 'D' ? 14 : -1 ) );
       //inserta el cobro del cajero si el cobro fue exitoso
           $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, id_sucursal, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_terminal, 
-          /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar, /*11*/id_sesion_caja, /*12*/id_tipo_pago ) 
+          /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar, /*11*/id_sesion_caja, /*12*/id_tipo_pago, /*13*/id_forma_pago ) 
           VALUES ( /*1*/NULL, '{$traceability['id_sucursal']}', /*2*/'{$row['sale_id']}', /*3*/'{$traceability['id_cajero']}', /*4*/'{$row['affiliation_id']}', 
           /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1, 
-          /*11*/{$traceability['id_sesion_cajero']}, /*12*/7 )";
+          /*11*/{$traceability['id_sesion_cajero']}, /*12*/7, /*13*/{$id_forma_pago} )";
       //    error_log( $sql );
           $stm = $link->query( $sql );
         /*<Logger>*/
