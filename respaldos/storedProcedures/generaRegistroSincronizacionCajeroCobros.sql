@@ -42,6 +42,7 @@ BEGIN
 				'"cobro_cancelado" : "', cc.cobro_cancelado, '",',
 				'"observaciones" : "', cc.observaciones, '",',
 				'"folio_unico" : "', cc.folio_unico, '",',
+				'"id_forma_pago" : "', cc.id_forma_pago, '",',
 				'"sincronizar" : "0"',
 			'}'
 		),

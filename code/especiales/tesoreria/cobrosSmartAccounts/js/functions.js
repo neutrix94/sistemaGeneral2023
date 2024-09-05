@@ -510,6 +510,9 @@ var venta_actual_impresa = false;
 					return false;
 				}
 			}
+		//consume servicio para subir venta a daministracion de facturacion 
+			var resp = ajaxR( "ajax/db.php?fl=uploadSale&sale_folio=" + $( '#buscador' ).val() );
+			alert( resp );
 			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null
 			&& parseInt( $( '#monto_total' ).val().trim() ) == 0 ){//alert('here');
 				
@@ -1103,6 +1106,13 @@ var cont_cheques_transferencia=0;
 		//alert( url );
 		alert( ajaxR( url ) );
 		return false;
+	}
+
+	function send_sale_by_api(){
+		var url = 'ajax/db.php?fl=sendBill&sale_folio=24MAT80';
+		var resp = ajaxR( url );
+		alert( resp );
+		console.log( resp );
 	}
 
 //lamadas asincronas
