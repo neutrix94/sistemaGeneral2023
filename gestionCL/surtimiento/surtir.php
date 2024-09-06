@@ -1,9 +1,12 @@
 <?php
+include('../../conect.php');
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $perfil = isset($_GET['perfil']) ? $_GET['perfil'] : '';
+//error_log('id:'.$id);
+//error_log('$sucursal_id:'.$sucursal_id);
 require_once '../classes/surtimiento.php';
 $surtimientoCRUD = new SurtimientoCRUD();
-$listaSurtir = $surtimientoCRUD->listaDetalleSurtimiento($id);
+$listaSurtir = $surtimientoCRUD->listaDetalleSurtimiento($id,$sucursal_id);
 $pendientes = (count($listaSurtir)>0) ? 1: 0 ;
 $indiceSurtir = 0;
 
