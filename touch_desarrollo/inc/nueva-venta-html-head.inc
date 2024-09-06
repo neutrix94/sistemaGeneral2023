@@ -2269,7 +2269,6 @@ var hay_paquete=0;
   <script type="text/javascript" src="../scannerBC/quaggajs/scriptLeer.js"></script> -->
   <script type="text/javascript" src="../scannerBC/zxing/library/zxing.min.js"></script>
   <!-- <script src="../../code/especiales/tesoreria/cobrosSmartAccounts/websocket_client/websocket_client_surtimiento.js" type="module"></script> -->
-  <script src="../../code/especiales/tesoreria/cobrosSmartAccounts/websocket_client/websocket_client_surtimiento.js" type="module"></script>
   <script type="text/javascript">
     window.addEventListener('load', function () {
       var listaCodigos = [];
