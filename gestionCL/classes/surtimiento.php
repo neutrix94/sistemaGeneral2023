@@ -88,7 +88,7 @@ class SurtimientoCRUD {
         LEFT JOIN sys_users u ON u.id_usuario = s.id_vendedor
         WHERE u.id_sucursal = '{$sucursal}'
         AND s.estado in ({$estados})
-        ORDER BY s.estado, s.prioridad asc;");
+        ORDER BY s.estado, s.prioridad, s.fecha_creacion asc;");
         
         return $result->fetch_all(MYSQLI_ASSOC);
     }
@@ -251,7 +251,7 @@ class SurtimientoCRUD {
         //return true;
     }
     
-    public function listaDetalleSurtimiento($id=null) {
+    public function listaDetalleSurtimiento($id=null,$sucursal=null) {
         $result = $this->conn->query("SELECT 
                 sd.id,
                 sd.id_producto,
@@ -275,12 +275,12 @@ class SurtimientoCRUD {
                 pp_data.clave_prioridad_maxima
             FROM ec_surtimiento_detalle sd
             LEFT JOIN ec_productos p ON p.id_productos = sd.id_producto
-            LEFT JOIN ec_sucursal_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto AND ub.id_sucursal = '4'
+            LEFT JOIN ec_sucursal_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto AND ub.id_sucursal = '{$sucursal}'
             INNER JOIN ec_surtimiento s ON s.id = sd.id_surtimiento
             LEFT JOIN sys_users u ON u.id_usuario = s.id_vendedor
             LEFT JOIN 
                 (
-                    SELECT 
+                    SELECT distinct
                         pp.id_producto,
                         group_concat(pp.clave_proveedor ORDER BY pp.prioridad_surtimiento DESC) AS claves_proveedor,
                         replace(group_concat(concat_ws(',',pp.codigo_barras_pieza_1, pp.codigo_barras_pieza_2, pp.codigo_barras_pieza_3) SEPARATOR ','),' ','') AS codigos_barras,
@@ -300,8 +300,8 @@ class SurtimientoCRUD {
                 ) AS pp_data ON pp_data.id_producto = sd.id_producto
             WHERE  
                 sd.id_surtimiento = '{$id}'
-                and ub.habilitado = 1
-                and ub.es_principal = 1
+                -- and ub.habilitado = 1
+                -- and ub.es_principal = 1
                 -- and sd.id_asignado='104'
                 AND sd.estado IN (1,2);");
         
