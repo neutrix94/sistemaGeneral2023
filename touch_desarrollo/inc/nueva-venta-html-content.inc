@@ -300,7 +300,7 @@ var packsCatalogue = new Array();
 
     // Construye la URL base y la URL del API
     var baseUrl = window.location.origin;
-    var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Pedido';
+    var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Muestra';
 
     var productosSeleccionados = getProductosMuestras();
 
