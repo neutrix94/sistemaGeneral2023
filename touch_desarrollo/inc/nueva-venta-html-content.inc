@@ -315,6 +315,7 @@ var packsCatalogue = new Array();
           data: {
               "productos": productosSeleccionados,
               "vendedor": <?php echo $user_id; ?>,
+              "sucursal": <?php echo $sucursal_id;?>,
               "pedido": genIdPedido( <?php echo $user_id; ?> ),
           },
           datatype: 'json',
