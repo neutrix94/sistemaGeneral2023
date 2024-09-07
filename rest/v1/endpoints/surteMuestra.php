@@ -38,6 +38,7 @@ $app->post('/surte/Muestra', function (Request $request, Response $response){
   $productos = $request->getParam('productos');
   $vendedor = $request->getParam('vendedor');
   $pedido = $request->getParam('pedido');
+  $sucursal = $request->getParam('sucursal');
   
   //Validar elementos requeridos para crear surtimiento
   if (empty($vendedor)) {
@@ -48,6 +49,9 @@ $app->post('/surte/Muestra', function (Request $request, Response $response){
   }
   if (empty($productos)) {
     return $rs->errorMessage($request->getParsedBody(),$response, 'Datos_Faltantes', 'Hace falta información de productos para solicitar muestras', 400);
+  }
+  if (empty($sucursal)) {
+    return $rs->errorMessage($request->getParsedBody(),$response, 'Datos_Faltantes', 'Hace falta información de sucursal para solicitar muestras', 400);
   }
   //Validar elementos requerido para nodo productos
   if (count($productos)>0) {
