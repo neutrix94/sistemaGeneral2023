@@ -340,10 +340,11 @@ $indiceSurtir = 0;
 
         function imprimeTicket(){
           // Define la ruta donde quieres guardar el PDF
-          const savePath = "../pdf/tickets";
+          //const savePath = "../pdf/tickets";
 
           // Realiza la solicitud a ticket.php
-          fetch(`../surtimiento/pdf/ticket.php?savePath=${encodeURIComponent(savePath)}`)
+          //fetch(`../surtimiento/pdf/ticket.php?savePath=${encodeURIComponent(savePath)}`)
+          fetch(`../surtimiento/pdf/ticket.php`)
           .then(response => response.text())
           .then(data => {
               console.log("PDF generado y guardado en la ruta especificada");

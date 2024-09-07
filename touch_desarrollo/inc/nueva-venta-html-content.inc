@@ -291,12 +291,20 @@ var packsCatalogue = new Array();
 
   function solicitarMuestras( ){
 
+    // Obtiene la URL completa actual
+    var currentUrl = window.location.href;
+    // Extrae el nombre del ambiente (la parte entre el dominio y el siguiente '/')
+    var regex = /\/\/[^\/]+\/([^\/]+)/;
+    var match = currentUrl.match(regex);
+    var nombreAmbiente = match ? match[1] : '';
+
+    // Construye la URL base y la URL del API
     var baseUrl = window.location.origin;
-    var apiUrl = baseUrl + '/sistemaGeneral2023/rest/v1/surte/Muestra';
+    var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Muestra';
 
     var productosSeleccionados = getProductosMuestras();
 
-    if( productosSeleccionados.length > 0 ){
+    if( productosSeleccionados.length > 0  ){
       if (confirm("Se enviarán a solicitar " + productosSeleccionados.length + " muestras. ¿Confirmas la operación?") == true) {
           $.ajax({
           type: 'POST',
@@ -315,6 +323,7 @@ var packsCatalogue = new Array();
               console.log(data);
               if( data.result.resultado == "Solicitado" ){
                 alert(data.result.descripcion);
+
               }else{
                 alert("Ha ocurrido un error: "+data.result.descripcion);
               }
