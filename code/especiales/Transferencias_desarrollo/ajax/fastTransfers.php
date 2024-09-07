@@ -134,32 +134,32 @@
 				$transfer_id = ( isset( $_GET['transfer_id'] ) ? $_GET['transfer_id'] : $_POST['transfer_id'] );
 				$observations = ( isset( $_GET['observations'] ) ? $_GET['observations'] : $_POST['observations'] );
 				$transfer = $fT->getTransferInfo( $transfer_id );
-				if( $transfer['status'] == 9 ){
+				if( $transfer['transfer_status'] == 9 ){
 						$resp = $fT->buildMessage( "Esta transferencia ya fue finalizada Anteriormente y no se puede volver a finalizar", 'reload' );
 				}else if( $transfer['type'] == 10 ){
-					$fT->updateTransferStatus( $transfer_id, 2 );//pasa a pendiente de surtir para hacer movimientos de almacen de salida
+					$fT->updateTransferStatus( $user_id, $transfer_id, 2 );//pasa a pendiente de surtir para hacer movimientos de almacen de salidaupdateTransferStatus( $user_id, $transfer_id, $status_id, $observations = "" ){
 					$fT->updateTransferDetail( $transfer_id );//actualiza las cantidades recibidas en el detalle de transferencias
-					$fT->updateTransferStatus( $transfer_id, 9 );//pasa a transferencia recibida para hacer movimientos de almacen de entrada
+					$fT->updateTransferStatus( $user_id, $transfer_id, 9 );//pasa a transferencia recibida para hacer movimientos de almacen de entrada
 					$resp = $fT->buildMessage( "Transferencia Finalizada exitosamente!", 'reload' );
 				}else{
-					if( $transfer['type'] != 11 && $transfer['type'] != 6 ){
-						$resp = $fT->buildMessage( "Este tipo de transferencia no puede ser finalizada desde esta pantalla", 'reload' );
-					}else if( $transfer['status'] == 1 ){
-						$fT->updateTransferStatus( $transfer_id, 2 );//pasa a pendiente de surtir para hacer movimientos de almacen de salida
+					if( $transfer['transfer_type'] != 11 && $transfer['transfer_type'] != 6 ){
+						$resp = $fT->buildMessage( "Este tipo de transferencia no puede ser finalizada desde esta pantalla ({$transfer_id})", 'reload' );
+					}else if( $transfer['transfer_status'] == 1 ){
+						$fT->updateTransferStatus( $user_id, $transfer_id, 2 );//pasa a pendiente de surtir para hacer movimientos de almacen de salida
 						$fT->insertValidationBlock( $transfer_id, $user_id );
 						$fT->updateTransferDetail( $transfer_id );//actualiza las cantidades recibidas en el detalle de transferencias
-						$fT->updateTransferStatus( $transfer_id, 9, $observations );//pasa a transferencia recibida para hacer movimientos de almacen de entrada
+						$fT->updateTransferStatus( $user_id, $transfer_id, 9, $observations );//pasa a transferencia recibida para hacer movimientos de almacen de entrada
 						$resp = $fT->buildMessage( "Transferencia Finalizada exitosamente!", 'close_emergent' );
-					}else if( $transfer['status'] == 2 ){
+					}else if( $transfer['transfer_status'] == 2 ){
 						$fT->insertValidationBlock( $transfer_id, $user_id );
 						$fT->updateTransferDetail( $transfer_id );//actualiza las cantidades recibidas en el detalle de transferencias
-						$fT->updateTransferStatus( $transfer_id, 9, $observations );//pasa a transferencia recibida para hacer movimientos de almacen de entrada
-					}else if( $transfer['status'] == 7 || $transfer['status'] == 8 ){
+						$fT->updateTransferStatus( $user_id, $transfer_id, 9, $observations );//pasa a transferencia recibida para hacer movimientos de almacen de entrada
+					}else if( $transfer['transfer_status'] == 7 || $transfer['transfer_status'] == 8 ){
 						$fT->updateTransferDetail( $transfer_id );//actualiza las cantidades recibidas en el detalle de transferencias
-						$fT->updateTransferStatus( $transfer_id, 9, $observations );//pasa a transferencia recibida para hacer movimientos de almacen de entrada					
+						$fT->updateTransferStatus( $user_id, $transfer_id, 9, $observations );//pasa a transferencia recibida para hacer movimientos de almacen de entrada					
 						$resp = $fT->buildMessage( "Transferencia Finalizada exitosamente!", 'reload' );
 					}else{
-						$resp = $fT->buildMessage( "La transferencia esta en status {$transfer['status']} y este status no esta contemplado 
+						$resp = $fT->buildMessage( "La transferencia esta en status {$transfer['transfer_status']} y este status no esta contemplado 
 							para esta pantalla, avisa al encargado y / o contacta a SISTEMAS", 'close_emergent' );
 					}
 				}
