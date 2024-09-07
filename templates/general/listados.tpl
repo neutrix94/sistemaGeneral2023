@@ -1402,7 +1402,7 @@ $("#imp_csv_prd").change(function(){
 
 		function update_fast_transfer_status( pos, flag, status = null, observations = null ){
 			var url = "../../code/especiales/Transferencias_desarrollo/ajax/fastTransfers.php?freeTransferFl=" + flag;
-			url += "&transfer_id=" + celdaValorXY('listado', 0, pos);alert( "URL : " + url );return false;
+			url += "&transfer_id=" + celdaValorXY('listado', 0, pos);//alert( "URL : " + url );return false;
 			if( status != null ){
 				url += "&transfer_status=" + status;
 			}	
