@@ -512,7 +512,7 @@ var venta_actual_impresa = false;
 			}
 		//consume servicio para subir venta a daministracion de facturacion 
 			var resp = ajaxR( "ajax/db.php?fl=uploadSale&sale_folio=" + $( '#buscador' ).val() );
-			alert( resp );
+			//alert( resp );
 			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null
 			&& parseInt( $( '#monto_total' ).val().trim() ) == 0 ){//alert('here');
 				
