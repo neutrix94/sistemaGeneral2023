@@ -429,7 +429,7 @@
                                                 <br />
                                             {/if}
 											{if $campos[indice][12] > 60}
-												<textarea name="{$campos[indice][2]}" id="{$campos[indice][2]}" class="{$campos[indice][11]}" {if ($tipo eq 2 or $tipo eq 3) or $campos[indice][8] eq 0} readonly="" {/if}>{if $tipo eq 0}{$campos[indice][9]}{else}{$campos[indice][10]}{/if}</textarea>
+												<textarea name="{$campos[indice][2]}" id="{$campos[indice][2]}" class="{$campos[indice][11]}" {if ($tipo eq 2 or $tipo eq 3) or $campos[indice][8] eq 0} readonly="" {/if} onkeyup="{$campos2[indice][20]}" >{if $tipo eq 0}{$campos[indice][9]}{else}{$campos[indice][10]}{/if}</textarea>
 											{else}
 												<input type="text" name="{$campos[indice][2]}" id="{$campos[indice][2]}" size="{$campos[indice][12]}" maxlength="{$campos[indice][21]}" class="{$campos[indice][11]}" {if $tipo eq 0} value="{$campos[indice][9]}" {else} value="{$campos[indice][10]}" {/if} {if ($tipo eq 2 or $tipo eq 3) or $campos[indice][8] eq 0} readonly="" {/if}/>
 											{/if}
@@ -550,7 +550,7 @@
                                                 <br />
                                             {/if}
 											{if $campos[indice][12] > 60}
-												<textarea name="{$campos[indice][2]}" id="{$campos[indice][2]}" class="{$campos[indice][11]}" {if ($tipo eq 2 or $tipo eq 3) or $campos[indice][8] eq 0} readonly="" {/if}>{if $tipo eq 0}{$campos[indice][9]}{else}{$campos[indice][10]}{/if}</textarea>
+												<textarea name="{$campos[indice][2]}" id="{$campos[indice][2]}" class="{$campos[indice][11]}" {if ($tipo eq 2 or $tipo eq 3) or $campos[indice][8] eq 0} readonly="" {/if} onkeyup="{$campos2[indice][20]}">{if $tipo eq 0}{$campos[indice][9]}{else}{$campos[indice][10]}{/if}</textarea>
 											{else}
 												<input type="text" name="{$campos[indice][2]}" id="{$campos[indice][2]}" size="{$campos[indice][12]}" maxlength="{$campos[indice][21]}" class="{$campos[indice][11]}" {if $tipo eq 0} value="{$campos[indice][9]}" {else} value="{$campos[indice][10]}" {/if} {if ($tipo eq 2 or $tipo eq 3) or $campos[indice][8] eq 0} readonly="" {/if}/>
 											{/if}
@@ -671,7 +671,7 @@
                                                     <br />
                                                 {/if}
 											 	{if $campos2[indice][12] > 60}
-													<textarea name="{$campos2[indice][2]}" id="{$campos2[indice][2]}" class="{$campos2[indice][11]}" {if ($tipo eq 2 or $tipo eq 3) or $campos2[indice][8] eq 0} readonly="" {/if}>{if $tipo eq 0}{$campos2[indice][9]}{else}{$campos2[indice][10]}{/if}</textarea>
+													<textarea name="{$campos2[indice][2]}" id="{$campos2[indice][2]}" class="{$campos2[indice][11]}" {if ($tipo eq 2 or $tipo eq 3) or $campos2[indice][8] eq 0} readonly="" {/if} onkeyup="{$campos2[indice][20]}">{if $tipo eq 0}{$campos2[indice][9]}{else}{$campos2[indice][10]}{/if}</textarea>
 												{else}
 													<input type="text" name="{$campos2[indice][2]}" id="{$campos2[indice][2]}" size="{$campos2[indice][12]}" maxlength="{$campos2[indice][21]}" class="{$campos2[indice][11]}" {if $tipo eq 0} value="{$campos2[indice][9]}" {else} value="{$campos2[indice][10]}" {/if} {if ($tipo eq 2 or $tipo eq 3) or $campos2[indice][8] eq 0} readonly="" {/if}/>
 												{/if}
@@ -794,7 +794,7 @@
                                                 <br />
                                             {/if}
 											{if $campos[indice][12] > 60}
-												<textarea name="{$campos[indice][2]}" id="{$campos[indice][2]}" class="{$campos[indice][11]}" {if ($tipo eq 2 or $tipo eq 3) or $campos[indice][8] eq 0} readonly="" {/if} tabindex="{$campos[indice][4]}">{if $tipo eq 0}{$campos[indice][9]}{else}{$campos[indice][10]}{/if}</textarea>
+												<textarea name="{$campos[indice][2]}" id="{$campos[indice][2]}" class="{$campos[indice][11]}" {if ($tipo eq 2 or $tipo eq 3) or $campos[indice][8] eq 0} readonly="" {/if} tabindex="{$campos[indice][4]}" onkeyup="{$campos2[indice][20]}">{if $tipo eq 0}{$campos[indice][9]}{else}{$campos[indice][10]}{/if}</textarea>
 											{else}
 										<!--implementacion de {if $campos[indice][0] eq '467'}onkeyup="validaNoLista('this');"{/if} Oscar 21.02.2018 para agregar buscador en campos de tipo char-->
 												<input type="text" {if $campos[indice][0] eq '467' && $tipo neq '2'}onkeyup="validaNoLista(this,event);" onchange="show_list_order_msg();"{/if}
@@ -935,7 +935,7 @@
                                                     <br />
                                                 {/if}
 											 	{if $campos2[indice][12] > 60}
-													<textarea name="{$campos2[indice][2]}" id="{$campos2[indice][2]}" class="{$campos2[indice][11]}" {if ($tipo eq 2 or $tipo eq 3) or $campos2[indice][8] eq 0} readonly="" {/if} tabindex="{$campos2[indice][4]}">{if $tipo eq 0}{$campos2[indice][9]}{else}{$campos2[indice][10]}{/if}</textarea>
+													<textarea name="{$campos2[indice][2]}" id="{$campos2[indice][2]}" class="{$campos2[indice][11]}" {if ($tipo eq 2 or $tipo eq 3) or $campos2[indice][8] eq 0} readonly="" {/if} tabindex="{$campos2[indice][4]}" onkeyup="{$campos2[indice][20]}">{if $tipo eq 0}{$campos2[indice][9]}{else}{$campos2[indice][10]}{/if}</textarea>
 												{else}
 													<input type="text" name="{$campos2[indice][2]}" id="{$campos2[indice][2]}" size="{$campos2[indice][12]}" maxlength="{$campos2[indice][21]}" class="{$campos2[indice][11]}" {if $tipo eq 0} value="{$campos2[indice][9]}" {else} value="{$campos2[indice][10]}" {/if} {if ($tipo eq 2 or $tipo eq 3) or $campos2[indice][8] eq 0} readonly="" {/if} tabindex="{$campos2[indice][4]}" {if $campos2[indice][0] eq '466'}onkeyup="crea_previo_etiqueta();"{/if}/>
 					<!-- Implementacion Oscar 2023 para agregar botón de cambio de prefijo-->
