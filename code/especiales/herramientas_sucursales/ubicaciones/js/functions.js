@@ -80,6 +80,11 @@
 					$( '#is_principal' ).removeAttr( 'checked' );
 					$( '#is_principal' ).attr( 'disabled', true );
 				}
+				if( location_data[8] == 1 ){
+					$( '#is_supplied' ).prop( 'checked', true );
+				}else{
+					$( '#is_supplied' ).removeAttr( 'checked' );
+				}
 			}, 100);
 //setTimeout( function (){ getLocationDetail( $( "#location_status_seeker").val(), '_seeker' ); }, 300 );
 	}
