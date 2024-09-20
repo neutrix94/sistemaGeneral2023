@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../../../../css/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../css/icons/css/fontello.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/functions.js"></script>
+    <script src="js/builder.js"></script>
+    <script src="../../../../js/jquery-1.10.2.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="row global"> 
+        <div class="header bg-primary">
+            <h2 class="text-light">Generador de etiquetas de Precios</h2>
+        </div>
+        <br>
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Buscar / Escanear Producto" onkeyup="seek_product(this, event)">
+            <button
+                type="button"
+                class="btn btn-warning"
+            >
+                <i class="icon-barcode"></i>
+            </button>
+            <button
+                type="button"
+                class="btn btn-danger"
+            >
+                <i class="icon-trash"></i>
+            </button>
+        </div>
+        <div id="resBus">
+
+        </div>
+        <div>
+            <br>
+            <h4 id="current_product_name">
+            </h4>
+            <div id="previous_container" class="text-center"></div>
+        </div>
+        <div class="row bg-primary footer">
+            <button
+                type="button"
+                class="btn btn-light"
+            >
+                <i class="icon-home">Regresar al panel</i>
+            </button>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    getProductsCatalogue();
+   // create_template( 1, 1 );
+</script>
+
+<style>
+   
+    /*button{
+        border:1px solid;
+    }*/
+
+</style>
