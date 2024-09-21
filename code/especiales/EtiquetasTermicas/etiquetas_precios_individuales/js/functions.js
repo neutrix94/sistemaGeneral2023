@@ -249,6 +249,7 @@ var packsCatalogue = new Array();
     $( '#resBus' ).css( 'display', 'none' );
     $( '#current_product_name' ).html(product_name);
     create_template( product_id, product_name, 1);
+    $( '#seeker_input' ).val( "" );
   }
 //buscador
     function hidde_seeker_response( hidde = false ){

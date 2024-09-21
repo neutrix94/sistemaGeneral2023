@@ -42,6 +42,12 @@
                     $letter_to = ( isset( $_GET['letter_to'] ) ? $_GET['letter_to'] : $_POST['letter_to'] );
                     echo $TagsGenerator->createLocationTags( $sucursal_id, $user_id, $number_from, $number_to, $letter_from, $letter_to );
                 break;
+
+                case 'PrintTagWithoutPrice' :
+                    $product = ( isset( $_GET['product'] ) ? $_GET['product'] : $_POST['product'] );//recibe json
+                    $product = json_decode( $product, true );//convierte JSON en Array
+                    echo $TagsGenerator->PrintTagWithoutPrice( $sucursal_id, $user_id, $product );
+                break;
                 
                 default :
                     die( "Access denied on '{$action}'" );
@@ -146,40 +152,41 @@
             }
             function buildOnePriceHtml( $product ){
             //etiqueta mediana
-                $resp = "<div style=\"width:30%;border:2px solid;\" >
-                        <h5>Da click en la etiqueta para imprimir Precio ( etiqueta mediana )</h5>
+                $resp = "<div style=\"width:300px;border:2px solid;\" class=\"tag_global_container tag_1\">
+                        <p>Da click en la etiqueta para imprimir Precio ( etiqueta mediana )</p>
                         <button class=\"btn btn-light\" onclick=\"printTag( 'MediumTagPriceEPL' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
                                     <h1 class=\"text-center\">$</h1>
                                 </div>
-                                <div class=\"col-9\" style=\"font-size : 700%;margin : 0; padding: 0;font-weight:bold;line-height: 100%;transform: scale(.9, 1.5);\">
+                                <div class=\"col-9 text-start\" style=\"font-size : 500%;margin : 0; padding: 0;font-weight:bold;line-height: 150%;transform: scale(.9, 1.5);\">
                                     {$product['price']}
                                 </div>
-                                <div style=\"font-size : 200%;margin : 0; padding: 0;\">
+                                <div style=\"font-size : 150%;margin : 0; padding: 0;\">
                                     {$product['name_part_one']}
                                 </div>
-                                <div style=\"font-size : 200%;margin : 0; padding: 0;\">
+                                <div style=\"font-size : 150%;margin : 0; padding: 0;\">
                                     {$product['name_part_two']}
                                 </div>
                             </div>
                         </button>
                     </div>
-                    <div style=\"width:50%;border:1px solid;\" >
-                        <h5>Da click en la etiqueta para imprimir Precio ( etiqueta grande )</h5>
+                    <div style=\"width:380px;border:1px solid;\" class=\"tag_global_container tag_2\">
+                        <p>Da click en la etiqueta para imprimir Precio ( etiqueta grande )</p>
                         <button class=\"btn btn-light\" onclick=\"printTag( 'BigTagPriceEPL' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
+                                    <h1 class=\"text-center\">$</h1>
                                 </div>
-                                <div class=\"col-9\" style=\"font-size : 1500%;font-weight:bold;\">
+                                <div class=\"col-9\" style=\"font-size : 800%;font-weight:bold;\">
                                     {$product['price']}
                                 </div>
-                                <div style=\"font-size : 400%;\">
+                                <div style=\"font-size : 200%;\">
                                     {$product['name_part_one']}
                                 </div>
-                                <div style=\"font-size : 400%;\">
+                                <div style=\"font-size : 200%;\">
                                     {$product['name_part_two']}
                                 </div>
                             </div>
@@ -189,86 +196,87 @@
             }
             function buildTwoPriceHtml( $product ){
             //etiqueta mediana
-                $resp = "<div style=\"width:35%;border:2px solid;\" >
+                $resp = "<div style=\"width:300px;border:2px solid;\" class=\"tag_global_container tag_3\">
                         <h5 class=\"text-center\">Da click en la etiqueta para imprimir Precio ( etiqueta mediana )</h5>
                         <button class=\"btn btn-light\" onclick=\"printTag( 'MediumTagTwoPricesEPL' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
                                 </div>
-                                <div class=\"col-9\" style=\"font-size : 320%;margin : 0; padding: 0;font-weight:bold;line-height: 140%;\">
+                                <div class=\"col-9\" style=\"font-size : 220%;margin : 0; padding: 0;font-weight:bold;line-height: 140%;\">
                                     $ {$product['price_1']}
                                 </div>
                                 <div class=\"col-3\" style=\"font-size : 200%;margin : 0; padding: 0;\">
-                                    <span style=\"font-size : 300%;margin : 0; padding: 0;font-weight:bold;\">{$product['number_since']}</span>
+                                    <span style=\"font-size : 200%;margin : 0; padding: 0;font-weight:bold;\">{$product['number_since']}</span>
                                 </div>
-                                <div class=\"col-3\" style=\"font-size : 200%;margin : 0; padding: 0; vertical-align:middle;\">
+                                <div class=\"col-3\" style=\"font-size : 150%;margin : 0; padding: 0; vertical-align:middle;\">
                                     <br>X $ 
                                 </div>
-                                <div class=\"col-3\" style=\"font-size : 200%;margin : 0; padding: 0; vertical-align:middle;\">
+                                <div class=\"col-3\" style=\"font-size : 150%;margin : 0; padding: 0; vertical-align:middle;\">
                                     <span style=\"font-size : 300%;margin : 0; padding: 0;font-weight:bold;\">{$product['price_2']}</span>
                                 </div>
                                 <div class=\"bg-dark text-light text-center pd2\">
                                     Ahorra: \${$product['discount']}
                                 </div>
-                                <div style=\"font-size : 200%;margin : 0; padding: 0;\">
+                                <div style=\"font-size : 120%;margin : 0; padding: 0;\">
                                     {$product['name_part_one']}
                                 </div>
-                                <div style=\"font-size : 200%;margin : 0; padding: 0;\">
+                                <div style=\"font-size : 120%;margin : 0; padding: 0;\">
                                     {$product['name_part_two']}
                                 </div>
                             </div>
                         </button>
                     </div>
-                    <div style=\"width:55%;border:2px solid;\" >
+                    <div style=\"width:380px;border:2px solid;\" class=\"tag_global_container tag_4\">
                         <h5 class=\"text-center\">Da click en la etiqueta para imprimir Precio ( etiqueta grande )</h5>
                         <button class=\"btn btn-light\" onclick=\"printTag( 'BigTagTwoPricesEPL' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
                                 </div>
-                                <div class=\"col-9\" style=\"font-size :500%;margin : 0; padding: 0;font-weight:bold;line-height: 140%;\">
+                                <div class=\"col-9\" style=\"font-size :300%;margin : 0; padding: 0;font-weight:bold;line-height: 140%;\">
                                     $ <b>{$product['price_1']}</b>
                                 </div>
                                 <div class=\"col-3\" style=\"font-size : 200%;margin : 0; padding: 0;\">
-                                    <span style=\"font-size : 500%;margin : 0; padding: 0;font-weight:bold;\">{$product['number_since']}</span>
+                                    <span style=\"font-size : 300%;margin : 0; padding: 0;font-weight:bold;\">{$product['number_since']}</span>
                                 </div>
                                 <div class=\"col-3\" style=\"font-size : 300%;margin : 0; padding: 0; vertical-align:middle;\">
-                                <br> <b style=\"font-size : 200%;\">X $</b>
+                                <br><b style=\"font-size : 90%; top : -40px;position:relative;\">X $</b>
                                 </div>
                                 <div class=\"col-3\" style=\"font-size : 200%;margin : 0; padding: 0; vertical-align:middle;\">
-                                    <span style=\"font-size : 500%;margin : 0; padding: 0;font-weight:bold;\">{$product['price_2']}</span>
+                                    <span style=\"font-size : 300%;margin : 0; padding: 0;font-weight:bold;\">{$product['price_2']}</span>
                                 </div>
                                 <div class=\"bg-dark text-light text-center pd2\" style=\"font-size:300%;\">
                                     Ahorra: \${$product['discount']}
                                 </div>
-                                <div style=\"font-size : 400%;margin : 0; padding: 0;\">
+                                <div style=\"font-size : 200%;margin : 0; padding: 0;\">
                                     {$product['name_part_one']}
                                 </div>
-                                <div style=\"font-size : 400%;margin : 0; padding: 0;\">
+                                <div style=\"font-size : 200%;margin : 0; padding: 0;\">
                                     {$product['name_part_two']}
                                 </div>
                             </div>
                         </button>
                     </div>
-                    <div style=\"width:35%;border:2px solid;\" >
+                    <div style=\"width:300px;border:2px solid;\" class=\"tag_global_container tag_5\">
                         <h5 class=\"text-center\">Da click en la etiqueta para imprimir Precio anterior ( etiqueta mediana )</h5>
                         <button class=\"btn btn-light\" onclick=\"printTag( 'MediumTagPriceEPL' );>
                             <div class=\"row\">
-                                <div class=\"text-center\" style=\"font-size:200%;\"><!--transform: scale(.9, 1.5);-->
+                                <div class=\"text-center\" style=\"font-size:120%;\"><!--transform: scale(.9, 1.5);-->
                                     Precio Anterior :
                                 </div>
                                 <div class=\"col-3\" style=\"font-size : 200%;margin : 0; padding: 0;\">
-                                    <span style=\"font-size : 400%;margin : 0; padding: 0;font-weight:bold;\">$<del>{$product['price']}</del></span>
+                                    <span style=\"font-size : 150%;margin : 0; padding: 0;font-weight:bold;\">$<del>{$product['price_before']}</del></span>
                                 </div>
-                                <div style=\"font-size : 200%;margin : 0; padding: 0;\">
+                                <div style=\"font-size : 100%;margin : 0; padding: 0;\">
                                     {$product['name_part_one']}
                                 </div>
-                                <div style=\"font-size : 200%;margin : 0; padding: 0;\">
+                                <div style=\"font-size : 100%;margin : 0; padding: 0;\">
                                     {$product['name_part_two']}
                                 </div>
                             </div>
                         </button>
+                        <br><br><br>
                     </div>";
                 return $resp;
             }
@@ -429,6 +437,35 @@
                 fclose($file);
                 die( "ok" );
             }
+
+            function PrintTagWithoutPrice( $store_id, $user_id, $product ){
+                $epl_code = "\nI8,A,001\n\n";
+                $epl_code .= "Q408,024\n";
+                $epl_code .= "q448\n";
+                $epl_code .= "rN\n";
+                $epl_code .= "S1\n";
+                $epl_code .= "D5\n";
+                $epl_code .= "ZT\n";
+                $epl_code .= "JF\n";
+                $epl_code .= "O\n";
+                $epl_code .= "R112,0\n";
+                $epl_code .= "f100\n";
+                $epl_code .= "N\n";
+                $epl_code .= "b450,20,Q,m2,s6,\"{$product['list_order']}\"\n";//QR
+                $epl_code .= "A350,120,2,3,3,6,N,\"({$product['list_order']})\"\n";
+                $epl_code .= "A612,400,2,3,2,6,N,\"{$product['name_part_one']}\"\n";
+                $epl_code .= "A612,270,2,3,2,6,N,\"{$product['name_part_two']}\"\n";
+                $epl_code .= "P1\n";
+                $module_id = 15;
+                $file_route = $this->getFileRoute( $store_id, $user_id, $module_id );
+                $file_name = date("Y_m_d_H_i_s");
+            //creacion de archivo
+                $file = fopen("{$file_route}/tag_{$file_name}.txt", "a");
+                fwrite($file, $epl_code );
+                fclose($file);
+                die( "ok" );
+            }
+
             function part_word( $txt ){
                 $size = strlen( $txt );
                 $half = round( $size / 2 );
