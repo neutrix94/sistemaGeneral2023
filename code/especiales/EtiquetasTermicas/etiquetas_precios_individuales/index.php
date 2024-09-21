@@ -12,10 +12,24 @@
     <title>Document</title>
 </head>
 <body>
+    <div id="emergent">
+        <div id="emergent_content"></div>
+    </div>
     <div class="row global"> 
         <div class="header bg-primary">
             <h2 class="text-light">Generador de etiquetas de Precios</h2>
         </div>
+        <br>
+        <div class="text-center">
+            <button
+                type="button"
+                class="btn btn-success"
+                onclick="buildLocationForm();"
+            >
+                <i class="icon-location">Imprimir etiquetas de ubicaciones</i>
+            </button>
+        </div>
+        <br>
         <br>
         <div class="input-group">
             <input type="text" class="form-control" placeholder="Buscar / Escanear Producto" onkeyup="seek_product(this, event)">
@@ -55,6 +69,7 @@
 
 <script>
     getProductsCatalogue();
+    $( '#resBus' ).css( "display", 'none' );
    // create_template( 1, 1 );
 </script>
 

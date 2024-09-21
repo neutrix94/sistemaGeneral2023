@@ -35,11 +35,13 @@
                     echo $TagsGenerator->BigTagTwoPricesEPL( $sucursal_id, $user_id, $product );
                 break;
 
-                /*case 'MediumTagPriceEPL' :
-                    $product = ( isset( $_GET['product'] ) ? $_GET['product'] : $_POST['product'] );//recibe json
-                    $product = json_decode( $product, true );//convierte JSON en Array
-                    echo $TagsGenerator->MediumTagPriceEPL( $product );
-                break;*/
+                case 'createLocationTags' :
+                    $number_from = ( isset( $_GET['number_from'] ) ? $_GET['number_from'] : $_POST['number_from'] );
+                    $number_to = ( isset( $_GET['number_to'] ) ? $_GET['number_to'] : $_POST['number_to'] );
+                    $letter_from = ( isset( $_GET['letter_from'] ) ? $_GET['letter_from'] : $_POST['letter_from'] );
+                    $letter_to = ( isset( $_GET['letter_to'] ) ? $_GET['letter_to'] : $_POST['letter_to'] );
+                    echo $TagsGenerator->createLocationTags( $sucursal_id, $user_id, $number_from, $number_to, $letter_from, $letter_to );
+                break;
                 
                 default :
                     die( "Access denied on '{$action}'" );
@@ -51,7 +53,49 @@
             public function __construct( $connection ) {
                 $this->link = $connection;
             }
+            function createLocationTags( $store_id, $user_id, $number_from, $number_to, $letter_from, $letter_to ){
+                $letra_inicio = $letter_from;
+                $letra_fin = $letter_to;
+                $epl_code = "";
+                // Usar la función range para generar el rango de letras
+                for ($i = $number_from; $i <= $number_to ; $i++ ) {
+                    foreach (range($letra_inicio, $letra_fin) as $letra) {
+                        $prefix = strtoupper( $letra );
+                        $location = "{$i}-{$prefix}";
+                        if( sizeof($location) == 3 ){
+                            $location = " {$location}";
+                        }
+                        $epl_code .= $this->LocationTag( $location );
+                    }
+                }
+            //crea el archivo
+                $module_id = 15;
+                $file_route = $this->getFileRoute( $store_id, $user_id, $module_id );
+                $file_name = date("Y_m_d_H_i_s");
+            //creacion de archivo
+                $file = fopen("{$file_route}/locationTag_{$file_name}.txt", "a");
+                fwrite($file, $epl_code );
+                fclose($file);
+                die( "ok" );
+            }
 
+            function LocationTag( $location ){
+                $epl_code = "\nI8,A,001\n";
+                $epl_code .= "Q408,024\n";
+                $epl_code .= "q448\n";
+                $epl_code .= "rN\n";
+                $epl_code .= "S3\n";
+                $epl_code .= "D7\n";
+                $epl_code .= "ZT\n";
+                $epl_code .= "JF\n";
+                $epl_code .= "O\n";
+                $epl_code .= "R112,0\n";
+                $epl_code .= "f100\n";
+                $epl_code .= "N\n";
+                $epl_code .= "A595,370,2,5,4,7,N,\"{$location}\"\n";
+                $epl_code .= "P1\n";
+                return $epl_code;
+            }
             function getProductCounterPrices( $product_id, $store_id ){
                 $sql = "SELECT
                             pd.id_precio_detalle AS price_id,
@@ -92,9 +136,9 @@
                     $product['price_1'] = $row['price'];
                     $row = $stm->fetch_assoc();
                     $product['number_since'] = $row['number_since'];
-                    $product['price_2'] = $row['price'];
+                    $product['price_2'] = ( $row['price'] * $row['number_since'] );
                 //calcula descuento
-                    $discount = ( $product['number_since'] * $product['price_1'] ) - ( $product['number_since'] * $product['price_2'] );
+                    $discount = ( $product['number_since'] * $product['price_1'] ) - ( $product['number_since'] * $row['price'] );
                     $product['discount'] = $discount;
                     $price = $this->buildTwoPriceHtml( $product );
                     return json_encode( array( "status"=> 200, "templates"=>$price, "product"=>$product) );
@@ -230,28 +274,30 @@
             }
             function MediumTagPriceEPL( $store_id, $user_id, $product ){
                 $price_size = 4;
-                $epl_code = "\nI8,A,001\n\n
-                    Q408,024\n
-                    q448\n
-                    rN\n
-                    S1\n
-                    D5\n
-                    ZT\n
-                    JF\n
-                    O\n
-                    R112,0\n
-                    f100\n
-                    N\n";
-                $epl_code .= "A590,280,2,4,4,4,N,\"$\"\n";
+                $space_1 = ( $product['price'] <= 99 ? ' ' : '' );
+                $space_2 = ( $product['price'] <= 99 ? '  ' : '' );
+                $epl_code = "\nI8,A,001\n";
+                $epl_code .= "Q408,024\n";
+                $epl_code .= "q448\n";
+                $epl_code .= "rN\n";
+                $epl_code .= "S1\n";
+                $epl_code .= "D5\n";
+                $epl_code .= "ZT\n";
+                $epl_code .= "JF\n";
+                $epl_code .= "O\n";
+                $epl_code .= "R112,0\n";
+                $epl_code .= "f100\n";
+                $epl_code .= "N\n";
                 if( $product['price'] > 999 ){
                     $price_size = 3;
-                    $epl_code .= "A400,255,2,5,2,2,N,\",\"\n";
+                    //$epl_code .= "A400,255,2,5,2,2,N,\",\"\n";
                 }
-                $epl_code .= "b500,290,Q,m2,s5,\"{$product['list_order']}\"\n
-                    A486,380,2,5,{$price_size},4,N,\"{$product['price']}\"\n
-                    A612,150,2,3,2,3,N,\"{$product['name_part_one']}\"\n
-                    A612,80,2,3,2,3,N,\"{$product['name_part_two']}\"\n
-                    P1\n";
+                $epl_code .= "b500,290,Q,m2,s5,\"{$product['list_order']}\"\n";
+                $epl_code .= "A486,380,2,5,{$price_size},4,N,\"{$space_1}{$product['price']}\"\n";
+                $epl_code .= "A590,280,2,4,4,4,N,\"{$space_2}$\"\n";
+                $epl_code .= "A612,150,2,3,2,3,N,\"{$product['name_part_one']}\"\n";
+                $epl_code .= "A612,80,2,3,2,3,N,\"{$product['name_part_two']}\"\n";
+                $epl_code .= "P1\n";
                 $module_id = ( $product['is_special_price'] == 0 ? 15 : 18 );
                 $file_route = $this->getFileRoute( $store_id, $user_id, $module_id );
                 $file_name = date("Y_m_d_H_i_s");
@@ -264,29 +310,31 @@
             }
             function MediumTagTwoPricesEPL( $store_id, $user_id, $product ){
                 $price_size = ( $product['price_1'] <= 999 ? 3 : 2 );
-                $epl_code = "\nI8,A,001\n
-                    Q408,024\n
-                    q448\n
-                    rN\n
-                    S1\n
-                    D5\n
-                    ZT\n
-                    JF\n
-                    O\n
-                    R112,0\n
-                    f100\n
-                    N\n
-                    b40,60,Q,m2,s5,\"{$product['list_order']}\"\n
-                    A190,60,0,3,3,3,N,\"$\"\n
-                    A240,60,0,4,5,{$price_size},N,\"{$product['price_1']}\"\n
-                    A40,180,0,4,3,5,N,\"{$product['number_since']}\"\n
-                    A160,215,0,3,3,3,N,\"X\"\n
-                    A220,210,0,3,3,3,N,\"$\"\n
-                    A290,140,0,5,2,{$price_size},N,\"{$product['price_2']}\"\n
-                    A40,290,0,2,3,2,R,\"  Ahorra: \${$product['discount']}  \"\n
-                    A40,330,0,3,2,2,N,\"{$product['name_part_one']}\"\n
-                    A40,370,0,3,2,2,N,\"{$product['name_part_two']}\"\n
-                    P1\n";
+                $space_1 = ( $product['price'] <= 99 ? ' ' : '' );
+                $space_2 = ( $product['number_since'] <= 9 ? ' ' : '' );
+                $epl_code = "\nI8,A,001\n";
+                $epl_code .= "Q408,024\n";
+                $epl_code .= "q448\n";
+                $epl_code .= "rN\n";
+                $epl_code .= "S1\n";
+                $epl_code .= "D5\n";
+                $epl_code .= "ZT\n";
+                $epl_code .= "JF\n";
+                $epl_code .= "O\n";
+                $epl_code .= "R112,0\n";
+                $epl_code .= "f100\n";
+                $epl_code .= "N\n";
+                $epl_code .= "b40,60,Q,m2,s5,\"{$product['list_order']}\"\n";
+                $epl_code .= "A240,60,0,4,5,{$price_size},N,\"{$space_1}{$product['price_1']}\"\n";
+                $epl_code .= "A190,60,0,3,3,3,N,\"{$space_1}$\"\n";
+                $epl_code .= "A40,180,0,4,3,5,N,\"{$space_2}{$product['number_since']}\"\n";
+                $epl_code .= "A160,215,0,3,3,3,N,\"X\"\n";
+                $epl_code .= "A220,210,0,3,3,3,N,\"$\"\n";
+                $epl_code .= "A290,140,0,5,2,{$price_size},N,\"{$product['price_2']}\"\n";
+                $epl_code .= "A40,290,0,2,3,2,R,\"  Ahorra: \${$product['discount']}  \"\n";
+                $epl_code .= "A40,330,0,3,2,2,N,\"{$product['name_part_one']}\"\n";
+                $epl_code .= "A40,370,0,3,2,2,N,\"{$product['name_part_two']}\"\n";
+                $epl_code .= "P1\n";
                 $module_id = ( $product['is_special_price'] == 0 ? 15 : 18 );
                 $file_route = $this->getFileRoute( $store_id, $user_id, $module_id );
                 $file_name = date("Y_m_d_H_i_s");
@@ -297,31 +345,34 @@
                 die( "ok" );
             }
             function BigTagPriceEPL( $store_id, $user_id, $product ){
-                $price_size = ( $product['price'] <= 999 ? 7 : 6 );
-                $epl_code = "\nI8,A,001\n
-                    Q1215,024\n
-                    q863\n
-                    rN\n
-                    S6\n
-                    D5\n
-                    ZT\n
-                    JF\n
-                    O\n
-                    R24,0\n
-                    f100\n
-                    N\n
-                    b630,450,Q,m2,s8,\"{$product['list_order']}\"\n
-                    A740,430,2,4,5,6,N,\"$\"\n
-                    A600,590,2,5,5,{$price_size},N,\"{$product['price']}\"\n
-                    A795,230,2,4,2,4,N,\"{$product['name_part_one']}\"\n
-                    A795,140,2,4,2,4,N,\"{$product['name_part_two']}\"\n
+                $price_width = ( $product['price'] <= 999 ? 5 : 4 );
+                $price_height = ( $product['price'] <= 999 ? 7 : 7 );
+                $space_1 = ( $product['price'] <= 99 ? ' ' : '' );
+                $space_2 = ( $product['price'] <= 99 ? '  ' : '' );
+                $epl_code = "\nI8,A,001\n";
+                $epl_code .= "Q1215,024\n";
+                $epl_code .= "q863\n";
+                $epl_code .= "rN\n";
+                $epl_code .= "S6\n";
+                $epl_code .= "D5\n";
+                $epl_code .= "ZT\n";
+                $epl_code .= "JF\n";
+                $epl_code .= "O\n";
+                $epl_code .= "R24,0\n";
+                $epl_code .= "f100\n";
+                $epl_code .= "N\n";
+                $epl_code .= "b630,450,Q,m2,s8,\"{$product['list_order']}\"\n";
+                $epl_code .= "A600,590,2,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
+                $epl_code .= "A740,430,2,4,5,6,N,\"{$space_2}$\"\n";
+                $epl_code .= "A795,230,2,4,2,4,N,\"{$product['name_part_one']}\"\n";
+                $epl_code .= "A795,140,2,4,2,4,N,\"{$product['name_part_two']}\"\n";
 
-                    b10,680,Q,m2,s8,\"{$product['list_order']}\"\n
-                    A50,870,0,4,5,6,N,\"$\"\n
-                    A210,690,0,5,5,{$price_size},N,\"{$product['price']}\"\n
-                    A10,1050,0,4,2,4,N,\"{$product['name_part_one']}\"\n
-                    A10,1150,0,4,2,4,N,\"{$product['name_part_two']}\"\n
-                    P1\n";
+                $epl_code .= "b10,680,Q,m2,s8,\"{$product['list_order']}\"\n";
+                $epl_code .= "A210,690,0,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
+                $epl_code .= "A50,870,0,4,5,6,N,\"{$space_2}$\"\n";
+                $epl_code .= "A10,1050,0,4,2,4,N,\"{$product['name_part_one']}\"\n";
+                $epl_code .= "A10,1150,0,4,2,4,N,\"{$product['name_part_two']}\"\n";
+                $epl_code .= "P1\n";
                 $module_id = ( $product['is_special_price'] == 0 ? 16 : 19 );
                 $file_route = $this->getFileRoute( $store_id, $user_id, $module_id );
                 $file_name = date("Y_m_d_H_i_s");
@@ -332,41 +383,43 @@
                 die( "ok" );
             }
             function BigTagTwoPricesEPL( $store_id, $user_id, $product ){
+                $space_1 = ( $product['price'] <= 99 ? ' ' : '' );
+                $space_2 = ( $product['number_since'] <= 9 ? ' ' : '' );
                 $price_size = ( $product['price'] <= 999 ? 4 : 3 );
-                $epl_code = "\nI8,A,001\n
-                    Q1215,024\n
-                    q863\n
-                    rN\n
-                    S6\n
-                    D5\n
-                    ZT\n
-                    JF\n
-                    O\n
-                    R24,0\n
-                    f100\n
-                    N\n
-                    b680,480,Q,m2,s5,\"{$product['list_order']}\"\n
-                    A620,560,2,4,5,3,N,\"$\"\n
-                    A500,570,2,5,3,2,N,\"{$product['price_1']}\"\n
-                    A800,440,2,5,3,4,N,\"{$product['number_since']}\"\n
-                    A570,370,2,4,4,3,N,\"X\"\n
-                    A490,370,2,4,4,3,N,\"$\"\n
-                    A440,440,2,5,3,{$price_size},N,\"{$product['price_2']}\"\n
-                    A800,220,2,2,4,4,R,\"  Ahorra: \${$product['discount']}   \"\n
-                    A800,140,2,3,3,3,N,\"{$product['name_part_one']}\"\n
-                    A800,80,2,3,3,3,N,\"{$product['name_part_two']}\"\n
+                $epl_code = "\nI8,A,001\n";
+                $epl_code .= "Q1215,024\n";
+                $epl_code .= "q863\n";
+                $epl_code .= "rN\n";
+                $epl_code .= "S6\n";
+                $epl_code .= "D5\n";
+                $epl_code .= "ZT\n";
+                $epl_code .= "JF\n";
+                $epl_code .= "O\n";
+                $epl_code .= "R24,0\n";
+                $epl_code .= "f100\n";
+                $epl_code .= "N\n";
+                $epl_code .= "b680,480,Q,m2,s5,\"{$product['list_order']}\"\n";
+                $epl_code .= "A500,570,2,5,3,2,N,\"{$space_1}{$product['price_1']}\"\n";
+                $epl_code .= "A620,560,2,4,5,3,N,\"{$space_1}$\"\n";
+                $epl_code .= "A800,440,2,5,3,4,N,\"{$space_2}{$product['number_since']}\"\n";
+                $epl_code .= "A570,370,2,4,4,3,N,\"X\"\n";
+                $epl_code .= "A490,370,2,4,4,3,N,\"$\"\n";
+                $epl_code .= "A440,440,2,5,3,{$price_size},N,\"{$product['price_2']}\"\n";
+                $epl_code .= "A800,220,2,2,4,4,R,\"  Ahorra: \${$product['discount']}   \"\n";
+                $epl_code .= "A800,140,2,3,3,3,N,\"{$product['name_part_one']}\"\n";
+                $epl_code .= "A800,80,2,3,3,3,N,\"{$product['name_part_two']}\"\n";
 
-                    b10,670,Q,m2,s5,\"{$product['list_order']}\"\n
-                    A160,690,0,4,5,3,N,\"$\"\n
-                    A280,670,0,5,3,2,N,\"{$product['price_1']}\"\n
-                    A10,800,0,5,3,4,N,\"{$product['number_since']}\"\n
-                    A235,890,0,4,4,3,N,\"X\"\n
-                    A365,930,2,4,4,3,N,\"$\"\n
-                    A375,800,0,5,3,{$price_size},N,\"{$product['price_2']}\"\n
-                    A10,1020,0,2,4,4,R,\"  Ahorra: \${$product['discount']}   \"\n
-                    A10,1100,0,3,3,3,N,\"{$product['name_part_one']}\"\n
-                    A10,1160,0,3,3,3,N,\"{$product['name_part_two']}\"\n
-                    P1\n";
+                $epl_code .= "b10,670,Q,m2,s5,\"{$product['list_order']}\"\n";
+                $epl_code .= "A280,670,0,5,3,2,N,\"{$space_1}{$product['price_1']}\"\n";
+                $epl_code .= "A160,690,0,4,5,3,N,\"{$space_1}$\"\n";
+                $epl_code .= "A10,800,0,5,3,4,N,\"{$space_2}{$product['number_since']}\"\n";
+                $epl_code .= "A235,890,0,4,4,3,N,\"X\"\n";
+                $epl_code .= "A365,950,2,4,4,3,N,\"$\"\n";
+                $epl_code .= "A375,800,0,5,3,{$price_size},N,\"{$product['price_2']}\"\n";
+                $epl_code .= "A10,1020,0,2,4,4,R,\"  Ahorra: \${$product['discount']}   \"\n";
+                $epl_code .= "A10,1100,0,3,3,3,N,\"{$product['name_part_one']}\"\n";
+                $epl_code .= "A10,1160,0,3,3,3,N,\"{$product['name_part_two']}\"\n";
+                $epl_code .= "P1\n";
                 $module_id = ( $product['is_special_price'] == 0 ? 16 : 19 );
                 $file_route = $this->getFileRoute( $store_id, $user_id, $module_id );
                 $file_name = date("Y_m_d_H_i_s");
