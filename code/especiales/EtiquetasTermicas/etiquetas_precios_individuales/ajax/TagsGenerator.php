@@ -151,10 +151,11 @@
                 }
             }
             function buildOnePriceHtml( $product ){
+                $special_class = ( $product['is_special_price'] == 1 ? " green" : "" );
             //etiqueta mediana
                 $resp = "<div style=\"width:300px;border:2px solid;\" class=\"tag_global_container tag_1\">
                         <p>Da click en la etiqueta para imprimir Precio ( etiqueta mediana )</p>
-                        <button class=\"btn btn-light\" onclick=\"printTag( 'MediumTagPriceEPL' );\">
+                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'MediumTagPriceEPL' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
@@ -174,13 +175,13 @@
                     </div>
                     <div style=\"width:380px;border:1px solid;\" class=\"tag_global_container tag_2\">
                         <p>Da click en la etiqueta para imprimir Precio ( etiqueta grande )</p>
-                        <button class=\"btn btn-light\" onclick=\"printTag( 'BigTagPriceEPL' );\">
+                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'BigTagPriceEPL' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
                                     <h1 class=\"text-center\">$</h1>
                                 </div>
-                                <div class=\"col-9\" style=\"font-size : 800%;font-weight:bold;\">
+                                <div class=\"col-9\" style=\"font-size : 700%;font-weight:bold;\">
                                     {$product['price']}
                                 </div>
                                 <div style=\"font-size : 200%;\">
@@ -191,14 +192,17 @@
                                 </div>
                             </div>
                         </button>
-                    </div>";
+                    </div>
+                    <br><br><br><br>
+                    <br><br><br><br>";
                 return $resp;
             }
             function buildTwoPriceHtml( $product ){
+                $special_class = ( $product['is_special_price'] == 1 ? " green" : "" );
             //etiqueta mediana
                 $resp = "<div style=\"width:300px;border:2px solid;\" class=\"tag_global_container tag_3\">
                         <h5 class=\"text-center\">Da click en la etiqueta para imprimir Precio ( etiqueta mediana )</h5>
-                        <button class=\"btn btn-light\" onclick=\"printTag( 'MediumTagTwoPricesEPL' );\">
+                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'MediumTagTwoPricesEPL' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
@@ -229,7 +233,7 @@
                     </div>
                     <div style=\"width:380px;border:2px solid;\" class=\"tag_global_container tag_4\">
                         <h5 class=\"text-center\">Da click en la etiqueta para imprimir Precio ( etiqueta grande )</h5>
-                        <button class=\"btn btn-light\" onclick=\"printTag( 'BigTagTwoPricesEPL' );\">
+                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'BigTagTwoPricesEPL' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
@@ -244,7 +248,7 @@
                                 <br><b style=\"font-size : 90%; top : -40px;position:relative;\">X $</b>
                                 </div>
                                 <div class=\"col-3\" style=\"font-size : 200%;margin : 0; padding: 0; vertical-align:middle;\">
-                                    <span style=\"font-size : 300%;margin : 0; padding: 0;font-weight:bold;\">{$product['price_2']}</span>
+                                    <span style=\"font-size : 250%;margin : 0; padding: 0;font-weight:bold;\">{$product['price_2']}</span>
                                 </div>
                                 <div class=\"bg-dark text-light text-center pd2\" style=\"font-size:300%;\">
                                     Ahorra: \${$product['discount']}
@@ -276,8 +280,9 @@
                                 </div>
                             </div>
                         </button>
-                        <br><br><br>
-                    </div>";
+                    </div>
+                    <br><br><br><br>
+                    <br><br><br><br>";
                 return $resp;
             }
             function MediumTagPriceEPL( $store_id, $user_id, $product ){
@@ -451,8 +456,8 @@
                 $epl_code .= "R112,0\n";
                 $epl_code .= "f100\n";
                 $epl_code .= "N\n";
-                $epl_code .= "b450,20,Q,m2,s6,\"{$product['list_order']}\"\n";//QR
-                $epl_code .= "A350,120,2,3,3,6,N,\"({$product['list_order']})\"\n";
+                $epl_code .= "b250,20,Q,m2,s6,\"{$product['list_order']}\"\n";//QR
+                //$epl_code .= "A350,120,2,3,3,6,N,\"({$product['list_order']})\"\n";
                 $epl_code .= "A612,400,2,3,2,6,N,\"{$product['name_part_one']}\"\n";
                 $epl_code .= "A612,270,2,3,2,6,N,\"{$product['name_part_two']}\"\n";
                 $epl_code .= "P1\n";
