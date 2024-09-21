@@ -15,7 +15,7 @@
     <div id="emergent">
         <div id="emergent_content"></div>
     </div>
-    <div class="row global"> 
+    <div class="row global">
         <div class="header bg-primary">
             <h2 class="text-light">Generador de etiquetas de Precios</h2>
         </div>
@@ -31,25 +31,38 @@
         </div>
         <br>
         <br>
-        <div class="input-group">
-            <input type="text" class="form-control" placeholder="Buscar / Escanear Producto" onkeyup="seek_product(this, event)">
-            <button
-                type="button"
-                class="btn btn-warning"
-            >
-                <i class="icon-barcode"></i>
-            </button>
-            <button
-                type="button"
-                class="btn btn-danger"
-            >
-                <i class="icon-trash"></i>
-            </button>
+        <div class="row">
+            <div class="col-8">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Buscar / Escanear Producto" 
+                    onkeyup="seek_product(this, event)" id="seeker_input">
+                    <button
+                        type="button"
+                        class="btn btn-warning"
+                    >
+                        <i class="icon-barcode"></i>
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        onclick="location.reload();"
+                    >
+                        <i class="icon-trash"></i>
+                    </button>
+                </div>
+                <div id="resBus"></div>
+            </div>
+            <div class="col-4">
+                <button
+                    type="button"
+                    class="btn btn-success"
+                    onclick="print_tag_without_price();"
+                >
+                    <i class="icon-print">Sin precio</i>
+                </button>
+            </div>
         </div>
-        <div id="resBus">
-
-        </div>
-        <div>
+        <div class="row text-center" style="text-align : center !important; width : 100% !important;">
             <br>
             <h4 id="current_product_name">
             </h4>

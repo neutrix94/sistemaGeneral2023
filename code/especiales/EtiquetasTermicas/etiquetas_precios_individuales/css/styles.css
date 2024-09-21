@@ -56,3 +56,25 @@
         background: white;
         overflow: auto;
     }
+    
+    .tag_2, .tag_4, .tag_5{
+        margin-top: 20px;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .tag_global_container{
+            transform: scale( 1, .7 );
+        }
+        .tag_2, .tag_4{
+            margin-top: -50px;
+        }
+        .tag_4{
+            margin-top: -100px;
+        }
+        .tag_5{
+            margin-top: -70px;
+        }
+        .icon-print{
+            font-size: 60%;
+        }
+    }

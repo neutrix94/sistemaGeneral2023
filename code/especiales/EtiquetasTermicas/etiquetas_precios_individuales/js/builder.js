@@ -6,7 +6,9 @@
         if( json.templates ){
             $( '#previous_container' ).html( json.templates );
             global_json = json.product;
-            console.log( global_json );
+            $( '#current_product_name' ).html( `${json.product.name_part_one} ${json.product.name_part_two}` );
+          //  console.log( global_json );
+            $( '#seeker_input' ).val();
         }else if( json.error ){
             alert( json.error );
         }
@@ -25,6 +27,23 @@
             alert( "Etiqueta generada exitosamente." );
         }
        // alert( resp );
+    }
+
+    function print_tag_without_price(){
+        if( global_json == null ){
+            alert( "No hay ningun producto cargado, selecciona/escanea un producto para continuar." );
+            return false;
+        }
+        const jsonString = JSON.stringify(global_json);
+    // Codificar el JSON string para que sea seguro incluirlo en una URL
+        const encodedJson = encodeURIComponent(jsonString);
+        var url = `ajax/TagsGenerator.php?TagsGeneratorFl=PrintTagWithoutPrice&product=${encodedJson}`;
+        var resp = ajaxR( url );
+        if( resp.trim() != 'ok' ){
+            alert( "Error" + resp );
+        }else{
+            alert( "Etiqueta generada exitosamente." );
+        }
     }
 
     function printLocationTags(){
