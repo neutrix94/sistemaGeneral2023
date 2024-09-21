@@ -64,10 +64,10 @@
         </div>
         <div class="row text-center" style="text-align : center !important; width : 100% !important;">
             <br>
-            <h4 id="current_product_name">
-            </h4>
+            <h4 id="_current_product_name_"></h4>
             <div id="previous_container" class="text-center"></div>
         </div>
+        <br><br><br><br><br><br>
         <div class="row bg-primary footer">
             <button
                 type="button"

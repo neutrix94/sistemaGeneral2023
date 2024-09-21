@@ -263,6 +263,83 @@ var packsCatalogue = new Array();
             $( '.icon-eye-off' ).removeClass( 'icon-eye-off' );
         }
     }
+
+    function printTag( flag ){
+        const jsonString = JSON.stringify(global_json);
+    // Codificar el JSON string para que sea seguro incluirlo en una URL
+        const encodedJson = encodeURIComponent(jsonString);
+        var url = `ajax/TagsGenerator.php?TagsGeneratorFl=${flag}&product=${encodedJson}`;
+        //alert( url );return false;
+        var resp = ajaxR( url );
+        if( resp.trim() != 'ok' ){
+            alert( "Error" + resp );
+        }else{
+            alert( "Etiqueta generada exitosamente." );
+        }
+       // alert( resp );
+    }
+
+    function print_tag_without_price(){
+        if( global_json == null ){
+            alert( "No hay ningun producto cargado, selecciona/escanea un producto para continuar." );
+            return false;
+        }
+        const jsonString = JSON.stringify(global_json);
+    // Codificar el JSON string para que sea seguro incluirlo en una URL
+        const encodedJson = encodeURIComponent(jsonString);
+        var url = `ajax/TagsGenerator.php?TagsGeneratorFl=PrintTagWithoutPrice&product=${encodedJson}`;
+        var resp = ajaxR( url );
+        if( resp.trim() != 'ok' ){
+            alert( "Error" + resp );
+        }else{
+            alert( "Etiqueta generada exitosamente." );
+        }
+    }
+
+    function printLocationTags(){
+        var letter_from, letter_to, number_from, number_to;
+        number_from = $( '#number_from' ).val();
+        if( number_from == '' ){
+            alert( "El numero DESDE la ubicación no puede ir vacio." );
+            $( '#number_from' ).focus();
+            return false;
+        }
+        number_to = $( '#number_to' ).val();
+        if( number_to == '' ){
+            alert( "El numero HASTA la ubicación no puede ir vacio." );
+            $( '#number_to' ).focus();
+            return false;
+        }
+        letter_from = $( '#letter_from' ).val();
+        if( letter_from == '' ){
+            alert( "La letra DESDE de altura no puede ir vacio." );
+            $( '#letter_from' ).focus();
+            return false;
+        }
+        letter_to = $( '#letter_to' ).val();
+        if( letter_to == '' ){
+            alert( "La letra HASTA de altura no puede ir vacio." );
+            $( '#letter_to' ).focus();
+            return false;
+        }
+    //envia peticion para enviar etiquetas de ubicacion
+        var url = `ajax/TagsGenerator.php?TagsGeneratorFl=createLocationTags&number_from=${number_from}&number_to=${number_to}&letter_from=${letter_from}&letter_to=${letter_to}`;
+       // alert(url);
+        var resp = ajaxR( url );
+        if( resp.trim() != 'ok' ){
+            alert( "Error" + resp );
+        }else{
+            alert( "Etiqueta(s) generada(s) exitosamente." );
+        }
+    }
+
+    function letterValidation( obj ){
+		$( obj ).val( $( obj ).val().replace(/[^a-zA-Z]/g, '') );
+    }
+    function numberValidation(input){
+		input.value = input.value.replace(/[^0-9]/g, '');
+    }
+
 //funcion ajaxR
     function ajaxR(url){
         if(window.ActiveXObject){       

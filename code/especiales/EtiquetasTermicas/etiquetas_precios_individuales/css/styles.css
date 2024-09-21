@@ -61,6 +61,10 @@
         margin-top: 20px;
     }
 
+    .green{
+        background-color: rgb(18, 225, 70);
+    }
+
     @media only screen and (max-width: 600px) {
         .tag_global_container{
             transform: scale( 1, .7 );
