@@ -1,0 +1,84 @@
+    .global{
+        position: relative;
+        top : 0;
+        height: 100%;
+        margin-left : 1px;
+        width: 100%;
+    }
+
+    .header{
+        margin-bottom: 10px;
+    }
+
+    .footer{
+        position: fixed;
+        bottom: 0;
+        padding : 10px;
+        margin-left : 1px;
+    }
+    .card_container{
+        box-shadow: 1px 1px 10px rgba( 0,0,0,.5 ) !important;
+        padding : 10px !important;
+        background-color: rgb(82, 227, 82) !important;
+        font-size : 200%;
+        margin : 10px;
+    }
+
+    .product_name{
+        font-size: 180%;
+    }
+    .product_price{
+        font-size: 700%;
+    }
+
+    #resBus{
+        max-height: 300px;
+        overflow: auto;
+        box-shadow: 1px 1px 10px rgba( 0,0,0,.5 ) !important;
+        display: none;
+    }
+
+    #emergent{
+        position : fixed;
+        width: 100%;
+        height: 100%;
+        background-color: rgba( 0,0,0,.5 );
+        z-index : 10;
+        display : none;
+    }
+    #emergent_content{
+        position: relative;
+        min-height: 30%;
+        max-height: 80%;
+        top : 10%;
+        width: 90%;
+        left: 5%;
+        background: white;
+        overflow: auto;
+    }
+    
+    .tag_2, .tag_4, .tag_5{
+        margin-top: 20px;
+    }
+
+    .green{
+        background-color: rgb(18, 225, 70);
+    }
+
+    @media only screen and (max-width: 600px) {
+        .tag_global_container{
+            transform: scale( 1, .7 );
+        }
+        .tag_2, .tag_4{
+            margin-top: -50px;
+        }
+        .tag_4{
+            margin-top: -100px;
+        }
+        .tag_5{
+            margin-top: -70px;
+        }
+        .icon-print{
+            font-size: 60%;
+        }
+    }
