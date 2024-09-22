@@ -42,12 +42,12 @@
                     <div class="col-sm-6">
                         <label>Desde</label>
                         <input type="text" id="letter_from" class="form-control"
-                        maxlength="1" onkeyup="letterValidation(this);" placeholder="letra desde">
+                        maxlength="1" onkeyup="letterValidation(this, 'upper');" placeholder="letra desde">
                     </div>
                     <div class="col-sm-6">
                         <label>Hasta</label>
                         <input type="text" id="letter_to" class="form-control"
-                        maxlength="1" onkeyup="letterValidation(this);" placeholder="letra hasta">
+                        maxlength="1" onkeyup="letterValidation(this, 'upper');" placeholder="letra hasta">
                     </div>
                 </div>
             </div>

@@ -333,8 +333,13 @@ var packsCatalogue = new Array();
         }
     }
 
-    function letterValidation( obj ){
+    function letterValidation( obj, convert = false ){
 		$( obj ).val( $( obj ).val().replace(/[^a-zA-Z]/g, '') );
+        if( convert ){
+            if( convert == 'upper' ){
+                $( obj ).val( $( obj ).val( ).toUpperCase());
+            }
+        }
     }
     function numberValidation(input){
 		input.value = input.value.replace(/[^0-9]/g, '');
