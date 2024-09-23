@@ -374,17 +374,18 @@
                 $epl_code .= "R24,0\n";
                 $epl_code .= "f100\n";
                 $epl_code .= "N\n";
-                $epl_code .= "b630,450,Q,m2,s8,\"{$product['list_order']}\"\n";
-                $epl_code .= "A600,590,2,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
-                $epl_code .= "A740,430,2,4,5,6,N,\"{$space_2}$\"\n";
-                $epl_code .= "A795,230,2,4,2,4,N,\"{$product['name_part_one']}\"\n";
-                $epl_code .= "A795,140,2,4,2,4,N,\"{$product['name_part_two']}\"\n";
+                $epl_code .= "b630,420,Q,m2,s8,\"{$product['list_order']}\"\n";
+                $epl_code .= "A600,560,2,5,5,7,N,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
+                $epl_code .= "A740,400,2,4,5,6,N,\"{$space_2}$\"\n";
+                $epl_code .= "A795,200,2,4,2,4,N,\"{$product['name_part_one']}\"\n";
+                $epl_code .= "A795,110,2,4,2,4,N,\"{$product['name_part_two']}\"\n";
 
-                $epl_code .= "b10,680,Q,m2,s8,\"{$product['list_order']}\"\n";
-                $epl_code .= "A210,690,0,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
-                $epl_code .= "A50,870,0,4,5,6,N,\"{$space_2}$\"\n";
-                $epl_code .= "A10,1050,0,4,2,4,N,\"{$product['name_part_one']}\"\n";
-                $epl_code .= "A10,1150,0,4,2,4,N,\"{$product['name_part_two']}\"\n";
+                $epl_code .= "b30,650,Q,m2,s8,\"{$product['list_order']}\"\n";
+                $epl_code .= "A220,660,0,5,5,7,N,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
+                $epl_code .= "A80,840,0,4,5,6,N,\"{$space_2}$\"\n";
+                $epl_code .= "A30,1020,0,4,2,4,N,,\"{$product['name_part_one']}\"\n";
+                $epl_code .= "A30,1120,0,4,2,4,N,\"{$product['name_part_two']}\"\n";
+                $epl_code .= "A392,571,0,4,3,3,N,\"o\"\n";
                 $epl_code .= "P1\n";
                 $module_id = ( $product['is_special_price'] == 0 ? 16 : 19 );
                 $file_route = $this->getFileRoute( $store_id, $user_id, $module_id );
