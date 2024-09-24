@@ -289,7 +289,7 @@
                 $price_size = 4;
                 $space_1 = ( $product['price'] <= 99 ? ' ' : '' );
                 $space_2 = ( $product['price'] <= 99 ? '  ' : '' );
-                $epl_code = "\nI8,A,16\n";
+                $epl_code = "\nI8,A,001\n";
                 $epl_code .= "Q408,024\n";
                 $epl_code .= "q448\n";
                 $epl_code .= "rN\n";
@@ -325,7 +325,7 @@
                 $price_size = ( $product['price_1'] <= 999 ? 3 : 2 );
                 $space_1 = ( $product['price'] <= 99 ? ' ' : '' );
                 $space_2 = ( $product['number_since'] <= 9 ? ' ' : '' );
-                $epl_code = "\nI8,A,16\n";
+                $epl_code = "\nI8,A,001\n";
                 $epl_code .= "Q408,024\n";
                 $epl_code .= "q448\n";
                 $epl_code .= "rN\n";
@@ -362,8 +362,7 @@
                 $price_height = ( $product['price'] <= 999 ? 7 : 7 );
                 $space_1 = ( $product['price'] <= 99 ? ' ' : '' );
                 $space_2 = ( $product['price'] <= 99 ? '  ' : '' );
-                //$epl_code = "\nI8,A,001\n";
-                $epl_code = "\nI8,A,16\n";
+                $epl_code = "\nI8,A,001\n";
                 $epl_code .= "Q1215,024\n";
                 $epl_code .= "q863\n";
                 $epl_code .= "rN\n";
@@ -401,7 +400,7 @@
                 $space_1 = ( $product['price'] <= 99 ? ' ' : '' );
                 $space_2 = ( $product['number_since'] <= 9 ? ' ' : '' );
                 $price_size = ( $product['price'] <= 999 ? 4 : 3 );
-                $epl_code = "\nI8,A,16\n";
+                $epl_code = "\nI8,A,001\n";
                 $epl_code .= "Q1215,024\n";
                 $epl_code .= "q863\n";
                 $epl_code .= "rN\n";
@@ -446,7 +445,7 @@
             }
 
             function PrintTagWithoutPrice( $store_id, $user_id, $product ){
-                $epl_code = "\nI8,A,16\n\n";
+                $epl_code = "\nI8,A,001\n\n";
                 $epl_code .= "Q408,024\n";
                 $epl_code .= "q448\n";
                 $epl_code .= "rN\n";
