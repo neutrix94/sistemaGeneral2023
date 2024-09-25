@@ -3,9 +3,9 @@
 
 	.encabezado{padding:5px;background:#83B141;width:99%;height:80px;top:0;color:white;font-size:25px; 
 		padding-left: 20px;}
-	.footer{position:fixed;bottom:0;width:100%; height : 80px;background:#83B141;}
+	.footer{position:fixed;bottom:0;width:100%; height : 50px;background:#83B141;}
 
-	.footer_ant{position:fixed;bottom:0;width:100%; height : 80px;background:rgba(225,0,0,.6);}
+	.footer_ant{position:fixed;bottom:0;width:100%; height : 50px;background:rgba(225,0,0,.6);}
 	.encabezado_ant{padding:5px;background:rgba(225,0,0,.6);width:99%;height:60px;top:0;color:white;font-size:25px;}
 	
 	.boton{
@@ -13,7 +13,7 @@
 		border-radius: 5px;
 	}
 	.filtro{padding:10px;border-radius: 5px;}
-	#reporte{border:2px;background: rgba(0,0,0,.2);width:69%;border-radius: 5px;right: 10px;position: absolute;top:120px;}
+	#reporte{border:2px;background: rgba(0,0,0,.2);width:69%;border-radius: 5px;right: 10px;position: absolute;top:90px;}
 	.fecha{
 		padding:6px;
 		width:30%;
