@@ -73,6 +73,7 @@
             <button
                 type="button"
                 class="btn btn-light"
+                onclick="location.href='../../../../index.php?';"
             >
                 <i class="icon-home">Regresar al panel</i>
             </button>
