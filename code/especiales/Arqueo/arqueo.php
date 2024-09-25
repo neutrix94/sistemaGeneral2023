@@ -76,7 +76,7 @@
 		<div id="reporte">
 
 		</div>
-		<div class="<?php echo $clase_2;?> text-center" style="padding : 20px;">
+		<div class="<?php echo $clase_2;?> text-center" style="padding : 5px;">
 			<button type="button" class="btn btn-light" onclick="salir();">
 				<i class="icon-home-1">Regresar al panel</i>
 			</button>	
