@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     }
     if ($action == 'sinInventario') {
         $surtimientoCRUD = new SurtimientoCRUD();
-        $surtimientoCRUD->sinInventario($id);
+        $surtimientoCRUD->sinInventario($item);
     }
     if ($action == 'productoSurtido') {
         $surtimientoCRUD = new SurtimientoCRUD();
@@ -155,14 +155,14 @@ class SurtimientoCRUD {
             left join sys_users u on u.id_usuario = sd.id_asignado
             left join ec_surtimiento s on s.id = sd.id_surtimiento
             where sd.id_surtimiento = '{$id}'
-            and sd.id_asignado != '' and sd.id_asignado is not null
+             and sd.id_asignado != '' and sd.id_asignado is not null
             group by sd.id_asignado
             ;");
 
         $items = array();
+        $cancelado =0;
+        $pausado = 0;
         if ($itemsResult->num_rows > 0) {
-            $cancelado =0;
-            $pausado = 0;
             while($row = $itemsResult->fetch_assoc()) {
                 $items[] = array(
                   'partidas' => $row['partidas'], 
@@ -252,6 +252,8 @@ class SurtimientoCRUD {
     }
     
     public function listaDetalleSurtimiento($id=null,$sucursal=null) {
+        $ubicacionSel = ($sucursal == 1) ? "ub.numero_ubicacion_desde,ub.altura_desde," : "ub.numero_ubicacion_desde,ub.altura_desde,";
+        $ubicacionJoin = ($sucursal == 1) ? " LEFT JOIN ec_proveedor_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto ":" LEFT JOIN ec_sucursal_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto AND ub.id_sucursal = '{$sucursal}' ";
         $result = $this->conn->query("SELECT 
                 sd.id,
                 sd.id_producto,
@@ -261,8 +263,7 @@ class SurtimientoCRUD {
                 p.clave,
                 p.codigo_barras_4,
                 p.orden_lista,
-                ub.numero_ubicacion_desde,
-                ub.altura_desde,
+                {$ubicacionSel}
                 sd.cantidad_solicitada,
                 sd.cantidad_surtida,
                 sd.estado,
@@ -275,7 +276,7 @@ class SurtimientoCRUD {
                 pp_data.clave_prioridad_maxima
             FROM ec_surtimiento_detalle sd
             LEFT JOIN ec_productos p ON p.id_productos = sd.id_producto
-            LEFT JOIN ec_sucursal_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto AND ub.id_sucursal = '{$sucursal}'
+            {$ubicacionJoin}
             INNER JOIN ec_surtimiento s ON s.id = sd.id_surtimiento
             LEFT JOIN sys_users u ON u.id_usuario = s.id_vendedor
             LEFT JOIN 
@@ -308,13 +309,30 @@ class SurtimientoCRUD {
         return $result->fetch_all(MYSQLI_ASSOC);
     }
     
-    public function sinInventario($idDetalle = null) {
-        $query = "UPDATE ec_surtimiento_detalle sd SET sd.fecha_modificacion = now(), sd.estado = '5', sd.sin_inventario = 1 WHERE sd.id = '{$idDetalle}';";
+    public function sinInventario($item = null) {
+        $query = "UPDATE ec_surtimiento_detalle sd SET sd.fecha_modificacion = now(), sd.estado = '5', sd.sin_inventario = 1 WHERE sd.id = '".$item['id']."';";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
+        
+        // Obtener surtimienti para valira estado
+        $pendiente = false;
+        $itemsResult = $this->conn->query("SELECT s.id, s.estado estadoS, sd.estado estadoD
+            from ec_surtimiento s
+            inner join ec_surtimiento_detalle sd on sd.id_surtimiento = s.id
+            where s.id= '" . $item['id_surtimiento'] . "'and sd.estado = '1';");
+
+        while($row = $itemsResult->fetch_assoc()) {
+            $pendiente = true;
+        }
+      
+        $estado = ($pendiente) ? '2' : '3';
+        //Actualiza cabecera 2
+        $queryS = "UPDATE ec_surtimiento s SET s.fecha_modificacion = now(), s.estado = '{$estado}' WHERE s.estado != '{$estado}' and s.id = '{$item['id_surtimiento']}' ;";
+        $stmt = $this->conn->prepare($queryS);
+        $stmt->execute();
+        
         $stmt->close();
         $this->conn->close();
-        //return true;
     }
     
     public function productoSurtido($item = null){
@@ -322,14 +340,21 @@ class SurtimientoCRUD {
         $query = "UPDATE ec_surtimiento_detalle sd SET sd.fecha_modificacion = now(), sd.estado = '3', sd.cantidad_surtida ='".$item['cantidad_surtida']."' WHERE sd.id = '".$item['id']."';";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-        //Actualiza cabecera
-        $queryS = "UPDATE ec_surtimiento s SET s.fecha_modificacion = now(), s.estado = '3' WHERE s.id IN
-          (SELECT sd.id_surtimiento
-            FROM ec_surtimiento_detalle sd
-            WHERE sd.id_surtimiento='".$item['id_surtimiento']."'
-            GROUP BY sd.id_surtimiento
-            HAVING SUM(CASE WHEN sd.estado NOT IN (1, 2) THEN 0 ELSE 1 END) = 0 );";
-        //error_log('queryS: '. $queryS);
+        
+        // Obtener surtimienti para valira estado
+        $pendiente = false;
+        $itemsResult = $this->conn->query("SELECT s.id, s.estado estadoS, sd.estado estadoD
+            from ec_surtimiento s
+            inner join ec_surtimiento_detalle sd on sd.id_surtimiento = s.id
+            where s.id= '" . $item['id_surtimiento'] . "'and sd.estado = '1';");
+
+        while($row = $itemsResult->fetch_assoc()) {
+            $pendiente = true;
+        }
+      
+        $estado = ($pendiente) ? '2' : '3';
+        //Actualiza cabecera 2
+        $queryS = "UPDATE ec_surtimiento s SET s.fecha_modificacion = now(), s.estado = '{$estado}' WHERE s.estado != '{$estado}' and s.id = '{$item['id_surtimiento']}' ;";
         $stmt = $this->conn->prepare($queryS);
         $stmt->execute();
         
