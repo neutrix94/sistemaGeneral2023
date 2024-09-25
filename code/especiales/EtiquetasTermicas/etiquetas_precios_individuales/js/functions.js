@@ -264,8 +264,8 @@ var packsCatalogue = new Array();
         }
     }
 
-    function printTag( flag ){
-        const jsonString = JSON.stringify(global_json);
+    function printTag( flag, $is_maquiled ){
+        const jsonString = JSON.stringify( ( $is_maquiled == 'no' ? global_json : global_json_secondary ) );
     // Codificar el JSON string para que sea seguro incluirlo en una URL
         const encodedJson = encodeURIComponent(jsonString);
         var url = `ajax/TagsGenerator.php?TagsGeneratorFl=${flag}&product=${encodedJson}`;
@@ -334,15 +334,15 @@ var packsCatalogue = new Array();
     }
 
     function letterValidation( obj, convert = false ){
-		$( obj ).val( $( obj ).val().replace(/[^a-zA-Z]/g, '') );
-        if( convert ){
-            if( convert == 'upper' ){
-                $( obj ).val( $( obj ).val( ).toUpperCase());
-            }
-        }
-    }
-    function numberValidation(input){
-		input.value = input.value.replace(/[^0-9]/g, '');
+      $( obj ).val( $( obj ).val().replace(/[^a-zA-Z]/g, '') );
+          if( convert ){
+              if( convert == 'upper' ){
+                  $( obj ).val( $( obj ).val( ).toUpperCase());
+              }
+          }
+      }
+      function numberValidation(input){
+      input.value = input.value.replace(/[^0-9]/g, '');
     }
 
 //funcion ajaxR

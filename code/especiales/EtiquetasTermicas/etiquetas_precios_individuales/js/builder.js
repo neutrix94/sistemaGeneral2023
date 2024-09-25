@@ -1,14 +1,24 @@
     var global_json = null;
+    var global_json_secondary = null;
     function create_template( product_id, product_name, template_type ){
         var url = `ajax/TagsGenerator.php?TagsGeneratorFl=getPreviousPrices&product_id=${product_id}`;
         var resp = ajaxR( url );
         var json = JSON.parse( resp );//alert( json.templates );
+        console.log( json );
         if( json.templates ){
             $( '#previous_container' ).html( json.templates );
             global_json = json.product;
             $( '#current_product_name' ).html( `${json.product.name_part_one} ${json.product.name_part_two}` );
-          //  console.log( global_json );
+            console.log( global_json );
             $( '#seeker_input' ).val();
+            if( json.secondary_product ){
+                if( json.secondary_product.product ){
+                    global_json_secondary = json.secondary_product.product;
+                    $( '#previous_container' ).append( json.secondary_product.templates );
+                }
+            }else{
+                global_json_secondary = null;
+            }
         }else if( json.error ){
             alert( json.error );
         }

@@ -102,7 +102,7 @@
                 $epl_code .= "P1\n";
                 return $epl_code;
             }
-            function getProductCounterPrices( $product_id, $store_id ){
+            function getProductCounterPrices( $product_id, $store_id, $is_maquiled = 'no' ){
                 $sql = "SELECT
                             pd.id_precio_detalle AS price_id,
                             pd.de_valor As number_since,
@@ -111,7 +111,13 @@
                             CONCAT( pr.nombre_etiqueta, ' (', pr.orden_lista, ')' ) AS product_tag_name,
                             pr.orden_lista AS list_order,
                             pr.nombre AS product_name,
-                            pd.precio_anterior AS before_price
+                            pd.precio_anterior AS before_price,
+                            (SELECT 
+                                IF( '{$is_maquiled}' != 'no', '0', IF( id_producto_ordigen = pr.id_productos, id_producto, IF( id_producto = pr.id_productos, id_producto_ordigen, '0' ) ) )
+                            FROM ec_productos_detalle 
+                            WHERE id_producto_ordigen = pr.id_productos 
+                            OR id_producto = pr.id_productos 
+                            ) AS is_maquiled
                         FROM ec_precios_detalle pd
                         LEFT JOIN ec_precios p
                         ON pd.id_precio = p.id_precio
@@ -130,8 +136,15 @@
                     $name_tmp = $this->part_word( $product['product_tag_name'] );
                     $product['name_part_one'] = $name_tmp[0];
                     $product['name_part_two'] = $name_tmp[1];
-                    $price = $this->buildOnePriceHtml( $product );
-                    return json_encode( array( "status"=> 200, "templates"=>$price, "product"=>$product) );
+                    $price = $this->buildOnePriceHtml( $product, $is_maquiled );
+                    $secondary_product = array();
+                    if( $product['is_maquiled'] != 0 ){
+                        $secondary_product = $this->getProductCounterPrices( $product['is_maquiled'], $store_id, 'yes' );
+                    }
+                    if( $is_maquiled == 'yes' ){
+                        return array( "templates"=>$price, "product"=>$product );
+                    }
+                    return json_encode( array( "status"=> 200, "templates"=>$price, "product"=>$product, "secondary_product"=>$secondary_product) );
                 }else{//mas de un precio
                     $product = array();
                     $row = $stm->fetch_assoc();
@@ -140,22 +153,32 @@
                     $product['name_part_two'] = $name_tmp[1];
                     $product['list_order'] = $row['list_order'];
                     $product['price_1'] = $row['price'];
+                    $product['before_price'] = $row['before_price'];
+                    $product['is_maquiled'] = $row['is_maquiled'];
                     $row = $stm->fetch_assoc();
                     $product['number_since'] = $row['number_since'];
                     $product['price_2'] = round( $row['price'] * $row['number_since'] );
                 //calcula descuento
                     $discount = ( $product['number_since'] * $product['price_1'] ) - ( $product['number_since'] * $row['price'] );
                     $product['discount'] = round($discount);
-                    $price = $this->buildTwoPriceHtml( $product );
-                    return json_encode( array( "status"=> 200, "templates"=>$price, "product"=>$product) );
+                    $price = $this->buildTwoPriceHtml( $product, $is_maquiled );
+                    $secondary_product = array();//die( "here : {$product['is_maquiled']}" );
+                    if( $product['is_maquiled'] != 0 && $product['is_maquiled'] != '0' && $product['is_maquiled'] != null && $product['is_maquiled'] != '' ){
+                        $secondary_product = $this->getProductCounterPrices( $product['is_maquiled'], $store_id, 'yes' );
+                    }
+                    if( $is_maquiled == 'yes' ){
+                        return array( "templates"=>$price, "product"=>$product );
+                    }
+                    return json_encode( array( "status"=> 200, "templates"=>$price, "product"=>$product, "secondary_product"=>$secondary_product) );
+                    //return json_encode( array( "status"=> 200, "templates"=>$price, "product"=>$product) );
                 }
             }
-            function buildOnePriceHtml( $product ){
+            function buildOnePriceHtml( $product, $is_maquiled ){
                 $special_class = ( $product['is_special_price'] == 1 ? " green" : "" );
             //etiqueta mediana
                 $resp = "<div style=\"width:300px;border:2px solid;\" class=\"tag_global_container tag_1\">
                         <p>Da click en la etiqueta para imprimir Precio ( etiqueta mediana )</p>
-                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'MediumTagPriceEPL' );\">
+                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'MediumTagPriceEPL', '{$is_maquiled}' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
@@ -175,7 +198,7 @@
                     </div>
                     <div style=\"width:380px;border:1px solid;\" class=\"tag_global_container tag_2\">
                         <p>Da click en la etiqueta para imprimir Precio ( etiqueta grande )</p>
-                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'BigTagPriceEPL' );\">
+                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'BigTagPriceEPL', '{$is_maquiled}' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
@@ -197,12 +220,12 @@
                     <br><br><br><br>";
                 return $resp;
             }
-            function buildTwoPriceHtml( $product ){
+            function buildTwoPriceHtml( $product, $is_maquiled ){
                 $special_class = ( $product['is_special_price'] == 1 ? " green" : "" );
             //etiqueta mediana
                 $resp = "<div style=\"width:300px;border:2px solid;\" class=\"tag_global_container tag_3\">
                         <h5 class=\"text-center\">Da click en la etiqueta para imprimir Precio ( etiqueta mediana )</h5>
-                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'MediumTagTwoPricesEPL' );\">
+                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'MediumTagTwoPricesEPL', '{$is_maquiled}' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
@@ -233,7 +256,7 @@
                     </div>
                     <div style=\"width:380px;border:2px solid;\" class=\"tag_global_container tag_4\">
                         <h5 class=\"text-center\">Da click en la etiqueta para imprimir Precio ( etiqueta grande )</h5>
-                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'BigTagTwoPricesEPL' );\">
+                        <button class=\"btn btn-light{$special_class}\" onclick=\"printTag( 'BigTagTwoPricesEPL', '{$is_maquiled}' );\">
                             <div class=\"row\">
                                 <div class=\"col-3\">
                                     <img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png\" width=\"90%\">
@@ -262,7 +285,9 @@
                             </div>
                         </button>
                     </div>
-                    <div style=\"width:300px;border:2px solid;\" class=\"tag_global_container tag_5\">
+                    <br><br><br><br>
+                    <br><br><br><br>";
+                    /* <div style=\"width:300px;border:2px solid;\" class=\"tag_global_container tag_5\">
                         <h5 class=\"text-center\">Da click en la etiqueta para imprimir Precio anterior ( etiqueta mediana )</h5>
                         <button class=\"btn btn-light\" onclick=\"printTag( 'MediumTagPriceEPL' );>
                             <div class=\"row\">
@@ -281,8 +306,7 @@
                             </div>
                         </button>
                     </div>
-                    <br><br><br><br>
-                    <br><br><br><br>";
+                     */
                 return $resp;
             }
             function MediumTagPriceEPL( $store_id, $user_id, $product ){
