@@ -14,7 +14,7 @@
             if( json.secondary_product ){
                 if( json.secondary_product.product ){
                     global_json_secondary = json.secondary_product.product;
-                    $( '#previous_container' ).append( json.secondary_product.templates );
+                    $( '#previous_container' ).append( "<br>" + json.secondary_product.templates );
                 }
             }else{
                 global_json_secondary = null;
@@ -22,6 +22,8 @@
         }else if( json.error ){
             alert( json.error );
         }
+        $( '#previous_container' ).append( `<br><br><br><br>
+                    <br><br><br><br>` );
     }
 
     function buildLocationForm(){

@@ -215,9 +215,7 @@
                                 </div>
                             </div>
                         </button>
-                    </div>
-                    <br><br><br><br>
-                    <br><br><br><br>";
+                    </div>";
                 return $resp;
             }
             function buildTwoPriceHtml( $product, $is_maquiled ){
@@ -284,9 +282,7 @@
                                 </div>
                             </div>
                         </button>
-                    </div>
-                    <br><br><br><br>
-                    <br><br><br><br>";
+                    </div>";
                     /* <div style=\"width:300px;border:2px solid;\" class=\"tag_global_container tag_5\">
                         <h5 class=\"text-center\">Da click en la etiqueta para imprimir Precio anterior ( etiqueta mediana )</h5>
                         <button class=\"btn btn-light\" onclick=\"printTag( 'MediumTagPriceEPL' );>

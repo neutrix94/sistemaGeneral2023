@@ -68,6 +68,7 @@
             <div id="previous_container" class="text-center"></div>
         </div>
         <br><br><br><br><br><br>
+                    
         <div class="row bg-primary footer">
             <button
                 type="button"
