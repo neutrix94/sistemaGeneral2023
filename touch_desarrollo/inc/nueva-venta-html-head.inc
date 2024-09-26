@@ -1890,8 +1890,8 @@ var hay_paquete=0;
     /*Fin de cambio Oscar 12.03.2019*/
 
         var res=ajaxR(url);
-//alert(res);
-/*return false;*/
+        //alert(res);
+    /*return false;*/
 		aux=res.split('|');
 		/**/
         if(aux[0]=='sin_sesion_caja'){

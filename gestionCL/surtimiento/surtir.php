@@ -23,6 +23,26 @@ $indiceSurtir = 0;
     <!-- Cargar Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
+    <style type="text/css">
+      .text-primary {
+        background-color: #eeeded; 
+      }
+
+      .p-2 {
+        color: #140db2!important
+      }
+
+      .txt-content {
+        font-weight: bold;
+        font-size: 20px;
+      }
+
+      .txt-val-modal {
+        font-weight: bold;
+      }
+
+    </style>
+
 </head>
 <body>
     <!-- header -->
@@ -63,13 +83,13 @@ $indiceSurtir = 0;
 
     <!-- Modal -->
     <div class="modal fade" id="surtidoModal" tabindex="-1" aria-labelledby="surtidoModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+         <!-- <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title text-danger" id="surtidoModalLabel">Surtido Finalizado</h5>
-                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
-                    </button> -->
+                    </button> 
                 </div>
                 <div class="modal-body">
                     <h6 class="text-dark">No hay más productos por surtir.</h6>
@@ -79,6 +99,28 @@ $indiceSurtir = 0;
                     <button type="button" class="btn btn-success" onclick="window.location.href='lista.php'">Aceptar</button>
                 </div>
             </div>
+        </div>  -->
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content text-center">
+            <div class="modal-header">
+              <h5 class="modal-title text-danger w-100" id="surtidoModalLabel">SURTIDO FINALIZADO</h5>
+            </div>
+            <div class="modal-body">
+              <p class="txt-content">No hay más productos por surtir.</p>
+              <p>Entrega la mercancía a:</p>
+              <p class="text-primary p-2 txt-val-modal"><span id="nombreVendedor">Nombre del vendedor</span></p>
+              <p>Folio de la nota:</p>
+              <p class="text-primary p-2 txt-val-modal">El folio de la nota</p>
+              <p>Productos surtidos parcialmente:</p>
+              <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>
+              <p>Productos no surtidos:</p>
+              <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>
+            </div>
+            <div class="modal-footer d-flex flex-column align-items-center w-100">
+              <button type="button" class="btn btn-success mb-2" style="width: 50%;" onclick="imprimeTicket()">IMPRIMIR</button>
+              <button type="button" class="btn btn-primary"  style="width: 50%;" onclick="window.location.href='lista.php'">LISTA DE PEDIDOS</button>
+            </div>
+          </div>
         </div>
     </div>
     <!-- Modal: Alertas -->
@@ -325,7 +367,7 @@ $indiceSurtir = 0;
            document.getElementById('nombreVendedor').innerText = listaSurtir[0].nombre_vendedor;
            $('#surtidoModal').modal('show');
 
-           imprimeTicket();
+           //imprimeTicket();
         }
         
         function showAlertModal(title, content, showCancel, titleCancel, showAccept, titleAccept) {
@@ -352,16 +394,17 @@ $indiceSurtir = 0;
 
         function imprimeTicket(){
           // Define la ruta donde quieres guardar el PDF
-          //const savePath = "../pdf/tickets";
+          const savePath = "../pdf/tickets";
 
           // Realiza la solicitud a ticket.php
-          //fetch(`../surtimiento/pdf/ticket.php?savePath=${encodeURIComponent(savePath)}`)
-          fetch(`../surtimiento/pdf/ticket.php`)
+          fetch(`../surtimiento/pdf/ticket.php?savePath=${encodeURIComponent(savePath)}`)
+          //fetch(`../surtimiento/pdf/ticket.php`)
           .then(response => response.text())
           .then(data => {
               console.log("PDF generado y guardado en la ruta especificada");
               // Puedes mostrar una alerta o actualizar la interfaz de usuario aquí
               alert("PDF generado exitosamente");
+              window.location.href='lista.php';
           })
           .catch(error => {
               console.error("Error al generar el PDF:", error);
