@@ -83,13 +83,13 @@ $indiceSurtir = 0;
 
     <!-- Modal -->
     <div class="modal fade" id="surtidoModal" tabindex="-1" aria-labelledby="surtidoModalLabel" aria-hidden="true">
-        <!-- <div class="modal-dialog">
+         <!-- <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title text-danger" id="surtidoModalLabel">Surtido Finalizado</h5>
-                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
-                    </button> -->
+                    </button> 
                 </div>
                 <div class="modal-body">
                     <h6 class="text-dark">No hay más productos por surtir.</h6>
@@ -99,7 +99,7 @@ $indiceSurtir = 0;
                     <button type="button" class="btn btn-success" onclick="window.location.href='lista.php'">Aceptar</button>
                 </div>
             </div>
-        </div> -->
+        </div>  -->
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content text-center">
             <div class="modal-header">
@@ -108,13 +108,13 @@ $indiceSurtir = 0;
             <div class="modal-body">
               <p class="txt-content">No hay más productos por surtir.</p>
               <p>Entrega la mercancía a:</p>
-              <p class="text-primary p-2 txt-val-modal">Nombre del vendedor</p>
+              <p class="text-primary p-2 txt-val-modal"><span id="nombreVendedor">Nombre del vendedor</span></p>
               <p>Folio de la nota:</p>
-              <p class="text-primary p-2 txt-val-modal">Nombre del vendedor</p>
+              <p class="text-primary p-2 txt-val-modal">El folio de la nota</p>
               <p>Productos surtidos parcialmente:</p>
-              <p class="text-primary p-2 txt-val-modal">Nombre del vendedor</p>
+              <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>
               <p>Productos no surtidos:</p>
-              <p class="text-primary p-2 txt-val-modal">Nombre del vendedor</p>
+              <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>
             </div>
             <div class="modal-footer d-flex flex-column align-items-center w-100">
               <button type="button" class="btn btn-success mb-2" style="width: 50%;" onclick="imprimeTicket()">IMPRIMIR</button>
@@ -367,7 +367,7 @@ $indiceSurtir = 0;
            document.getElementById('nombreVendedor').innerText = listaSurtir[0].nombre_vendedor;
            $('#surtidoModal').modal('show');
 
-           imprimeTicket();
+           //imprimeTicket();
         }
         
         function showAlertModal(title, content, showCancel, titleCancel, showAccept, titleAccept) {
