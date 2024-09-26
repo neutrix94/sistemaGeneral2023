@@ -57,6 +57,7 @@ $indiceSurtir = 0;
     </nav>
     <!-- Tabla principal -->
     <div class="container mt-5">
+        <a href="javascript: history.go(-1)">⬅️ Lista de pedidos</a><br>
         <center><p id="indexSurtimiento"><b>Partida: </b><span id="index">0 de 0</span></p></center>
         <center><h2 id="nombreProducto">Nombre del Producto</h2></center>
         <center>
@@ -86,9 +87,9 @@ $indiceSurtir = 0;
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title text-danger" id="surtidoModalLabel">Surtido Finalizado</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
-                    </button>
+                    </button> -->
                 </div>
                 <div class="modal-body">
                     <h6 class="text-dark">No hay más productos por surtir.</h6>
@@ -195,10 +196,10 @@ $indiceSurtir = 0;
                 showAlertModal(
                   'Producto incorrecto',
                   'El producto no coincide con el solicitado, favor de validar!',
-                  false,
-                  '',
                   true,
-                  'Aceptar'
+                  'Cerrar',
+                  false,
+                  ''
                 ); 
             }
 
@@ -221,7 +222,7 @@ $indiceSurtir = 0;
                   type: 'POST',
                   data: {
                       action: 'sinInventario',
-                      id: listaSurtir[indiceSurtir].id
+                      item: listaSurtir[indiceSurtir]
                   },
                   success: function(response) {
                       indiceSurtir++;
@@ -273,6 +274,17 @@ $indiceSurtir = 0;
         }
 
         function siguiente() {
+            if(document.getElementById('codigoProducto').value == ""){
+                showAlertModal(
+                  'Información faltante',
+                  'Por favor, ingrese el código del producto',
+                  true,
+                  'Cerrar',
+                  false,
+                  ''
+                ); 
+                return;
+            }
             if(Number($('#cantidadSurtida').val()) == 0){
                 showAlertModal(
                   'Información incorrecta',
