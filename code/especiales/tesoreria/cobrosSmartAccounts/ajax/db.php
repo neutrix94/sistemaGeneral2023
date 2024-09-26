@@ -20,6 +20,10 @@
 		$Payments = new Payments( $link, $user_sucursal, ( $Logger == null ? null : $Logger ) );
 		$action = ( isset( $_GET['fl'] ) ? $_GET['fl'] : $_POST['fl'] );
 		switch ( $action ) {
+			case 'uploadSale' ://
+				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
+				echo $Payments->sendBill( $sale_folio, $sucursal_id );
+			break;
 			case 'getSaleData':
 				$sale_id = ( isset( $_GET['sale_id'] ) ? $_GET['sale_id'] : $_POST['sale_id'] );
 				$sale_folio = ( isset( $_GET['folio'] ) ? $_GET['folio'] : $_POST['folio'] );
@@ -622,8 +626,8 @@
 			//}
 		//inserta el cobro del cajero en efectivo
 			$sql_cc = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, sincronizar) 
-			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, {$afiliation_id}, -1, 7, {$ammount}, NOW(), NOW(), '{$authorization_number}', 1)";
+				monto, fecha, hora, observaciones, id_forma_pago, sincronizar) 
+			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, {$afiliation_id}, -1, 7, {$ammount}, NOW(), NOW(), '{$authorization_number}', -1, 1)";
 			$stm_cc = $this->link->query( $sql_cc ) or die( "Error al insertar el cobro del cajero en setPaymentWhithouthIntegration: {$this->link->error}" );
 			$id_cajero_cobro = $this->link->insert_id;//die( 'here' );
 		//consulta entre interno y externo
@@ -864,22 +868,6 @@
 			return 'ok|';
 		}
 
-		/*public function insertSpecialPayment( $ammount, $sale_id, $user_id, $session_id ){
-		//inserta cajero cobro	
-			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-			monto, fecha, hora, observaciones, sincronizar) 
-			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, -1, 2, {$ammount}, NOW(), NOW(), 'Pago por saldo a Favor', 1)";
-			$stm = $this->link->query( $sql ) or die( "Error al insertar el pago por saldo a favor : {$this->link->error}" );
-		//inserta el poedido pago
-			
-		$sql = "INSERT INTO ec_pedido_pagos ( id_pedido, id_cajero_cobro, id_tipo_pago, fecha, hora, monto, referencia, id_moneda, tipo_cambio, 
-		id_nota_credito, id_cxc, es_externo, id_cajero, id_sesion_caja )
-		VALUES( {$sale_id}, {$id_cajero_cobro}, {$type}, NOW(), NOW(), ( {$ammount}*{$row['internal_porcent']} ), '', 1, 1, -1, -1, 0, {$user_id}, {$session_id} )";
-		$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$sql} {$this->link->error}" );
-			return 'ok';
-			//$sql = "INSERT INTO ec_cajero_cobros";
-		}*/
-
 		public function insertPaymentsDepending( $ammount, $sale_id, $user_id, $session_id, $saldo_especial = 0, $id_caja_cuenta = -1, $log_id = null ){
 			$steep_log_id = 0;
 //echo "<br>INSERTPAYMENTDEPENDING<br>{$log_id}";
@@ -987,13 +975,12 @@
 			//inserta el cobro del cajero en efectivo por devolucion
 				if( $saldo_especial == 0 ){
 					$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-						monto, fecha, hora, observaciones, sincronizar) 
-					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$total_devolver_cajero}, NOW(), NOW(), '', 1)";
+						monto, fecha, hora, observaciones, id_forma_pago, sincronizar) 
+					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$total_devolver_cajero}, NOW(), NOW(), '', 1, 1 )";
 				}else{
 					$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-						monto, fecha, hora, observaciones, sincronizar) 
-					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$saldo_especial}, NOW(), NOW(), '', 1)";
-					
+						monto, fecha, hora, observaciones, id_forma_pago, sincronizar) 
+					VALUES ( NULL, {$this->store_id}, {$row['id_pedido_original']}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, 1, {$saldo_especial}, NOW(), NOW(), '', 1, 1 )";
 				}
 
 				if( $row['monto_devolucion_tomado_a_favor'] > 0 ){
@@ -1056,14 +1043,14 @@
 			}
 		}
 
-		public function insertPayment( $ammount, $sale_id, $user_id, $session_id, $type = 1, $id_caja_cuenta = -1 ){//$type = 1 ( efectivo )
+		public function insertPayment( $ammount, $sale_id, $user_id, $session_id, $type = 1, $id_caja_cuenta = -1, $subtype_payment = '' ){//$type = 1 ( efectivo )
 			//die( 'insertPayment' );
 //echo "<br>INSERTPAYMENT<br>";
 //echo $sql . "<br><br>";
 		//inserta el cobro del cajero en efectivo
 			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, sincronizar ) 
-			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, {$type}, {$ammount}, NOW(), NOW(), '', 1 )";
+				monto, fecha, hora, observaciones, id_forma_pago, sincronizar ) 
+			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, {$id_caja_cuenta}, {$type}, {$ammount}, NOW(), NOW(), '', IF( '{$type}' = '1', 1, IF( '{$subtype_payment}' = '', -1, '{$subtype_payment}' ) ), 1 )";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero en insertPayment : {$this->link->error}" );
 			$id_cajero_cobro = $this->link->insert_id;
 
@@ -1528,8 +1515,8 @@
 			}
 		//inserta el cobro del cajero en efectivo por devolucion
 			$sql = "INSERT INTO ec_cajero_cobros( id_cajero_cobro, id_sucursal, id_pedido, id_cajero, id_sesion_caja, id_afiliacion, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, sincronizar) 
-			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', 1)";
+				monto, fecha, hora, observaciones, id_forma_pago, sincronizar) 
+			VALUES ( NULL, {$this->store_id}, {$sale_id}, {$user_id}, {$session_id}, -1, -1, 1, {$ammount}, NOW(), NOW(), '', 1, 1)";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar el cobro del cajero en insertReturnPayment: {$this->link->error}" );
 			$id_cajero_cobro = $this->link->insert_id;
 			$sql = "UPDATE ec_devolucion_pagos 
@@ -1842,7 +1829,7 @@
 			$sql = "UPDATE ec_cajero_cobros SET cobro_cancelado = 1 WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al anular el cobro del cajero : {$this->link->error}" );
 			$sql = "INSERT INTO ec_cajero_cobros ( id_sucursal, id_pedido, id_devolucion, id_cajero, id_sesion_caja, id_afiliacion, id_terminal, id_banco, id_tipo_pago, 
-				monto, fecha, hora, observaciones, cobro_cancelado, sincronizar ) 
+				monto, fecha, hora, observaciones, cobro_cancelado, id_forma_pago, sincronizar ) 
 				SELECT 
 					id_sucursal, 
 					id_pedido, 
@@ -1857,7 +1844,8 @@
 					NOW(), 
 					NOW(), 
 					CONCAT( 'Cobro para anular el cobro ', id_cajero_cobro, ' -{$payment_type}-' ), 
-					1, 
+					1,
+					-1, 
 					1
 				FROM ec_cajero_cobros WHERE id_cajero_cobro = {$payment_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al re-insertar el cobro {$this->link->error}" );
@@ -2369,6 +2357,215 @@
 					)
 				);
 			die( "ok|{$resp}" );
+		}
+
+		public function sendBill( $sale_folio, $store_id ){
+			$sale_header = array();
+			$sale_detail = array();
+			$sale_payments = array();
+			$sale_payments_detail = array();
+		//actualiza el id de razon social de la nota de venta de acuerdo a la configuracion de la sucursal y los cobros
+		//consulta cabecera de venta
+			$sql = "SELECT 
+						id_pedido, 
+						folio_pedido, 
+						folio_nv, 
+						folio_factura, 
+						folio_cotizacion, 
+						id_cliente, 
+						id_estatus, 
+						id_moneda, 
+						fecha_alta, 
+						fecha_factura, 
+						id_razon_social, 
+						subtotal, 
+						iva, 
+						ieps, 
+						total, 
+						dias_proximo, 
+						pagado, 
+						surtido, 
+						enviado, 
+						id_sucursal, 
+						id_usuario, 
+						fue_cot, 
+						facturado, 
+						id_tipo_envio, 
+						descuento, 
+						id_razon_factura, 
+						folio_abono, 
+						correo, 
+						facebook, 
+						modificado, 
+						ultima_sincronizacion, 
+						ultima_modificacion, 
+						tipo_pedido, 
+						id_status_agrupacion, 
+						id_cajero, 
+						id_devoluciones, 
+						venta_validada, 
+						folio_unico, 
+						id_sesion_caja, 
+						tipo_sistema, 
+						monto_pago_inicial, 
+						cobro_finalizado,
+						id_status_facturacion 
+					FROM ec_pedidos 
+					WHERE folio_nv = '{$sale_folio}'
+					LIMIT 1";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar la cabecera de la nota de venta : {$sql} : {$this->link->error}");
+			$sale_header = $stm->fetch_assoc();
+			if( $sale_header['id_status_facturacion'] == 0 ){
+				$sql = "UPDATE ec_pedidos SET id_status_facturacion = 3 WHERE id_pedido = {$sale_header['id_pedido']}";
+				$stm = $this->link->query( $sql ) or die( "Error al actualizar status de facturacion de la venta : {$sql} : {$this->link->error}" );
+			}else if( $sale_header['id_status_facturacion'] > 0){
+				return json_encode( array( "message"=>"La venta ya habia sido enviada." ) );
+			}
+		//consigue la razon social de la nota de venta
+			$sale_header['id_razon_social'] = $this->getSaleSocialReason( $sale_header['id_pedido'], $store_id );
+		//consulta detalle de la venta
+			$sql = "SELECT 
+						id_pedido_detalle, 
+						id_pedido, 
+						id_producto, 
+						cantidad, 
+						precio, 
+						monto, 
+						iva, 
+						ieps, 
+						cantidad_surtida, 
+						descuento, 
+						modificado, 
+						es_externo, 
+						id_precio, 
+						folio_unico 
+					FROM ec_pedidos_detalle 
+					WHERE id_pedido = {$sale_header['id_pedido']}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar el detalle de la nota de venta : {$sql} : {$this->link->error}");
+			while( $detail_row = $stm->fetch_assoc() ){
+				$sale_detail[] = $detail_row;
+			}
+		//consulta los cobros
+			$sql = "SELECT 
+						id_cajero_cobro, 
+						id_sucursal, 
+						id_pedido, 
+						id_devolucion, 
+						id_cajero, 
+						id_sesion_caja, 
+						id_afiliacion, 
+						id_terminal, 
+						id_banco, 
+						id_tipo_pago, 
+						monto, 
+						fecha, 
+						hora, 
+						observaciones, 
+						cobro_cancelado,
+						folio_unico, 
+						sincronizar,
+						id_tipo_pago,
+						id_forma_pago 
+					FROM ec_cajero_cobros 
+					WHERE id_pedido = {$sale_header['id_pedido']}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar cobros de la nota de venta : {$sql} : {$this->link->error}");
+			while( $payments = $stm->fetch_assoc() ){
+				$sale_payments[] = $payments;
+			}
+		//consulta los pagos
+			$sql = "SELECT 
+						id_pedido_pago, 
+						id_pedido, 
+						id_cajero_cobro, 
+						id_tipo_pago, 
+						fecha, 
+						hora, 
+						monto, 
+						referencia, 
+						id_moneda, 
+						tipo_cambio, 
+						id_nota_credito, 
+						id_cxc, 
+						exportado, 
+						es_externo, 
+						id_cajero, 
+						folio_unico, 
+						sincronizar, 
+						id_sesion_caja, 
+						pago_cancelado 
+					FROM ec_pedido_pagos
+					WHERE id_pedido = {$sale_header['id_pedido']}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar pagos de la nota de venta : {$sql} : {$this->link->error}");
+			while( $payments_detail = $stm->fetch_assoc() ){
+				$sale_payments_detail[] = $payments_detail;
+			}
+			$post_data = json_encode( array( "venta"=>$sale_header, "venta_detalle"=>$sale_detail, "cobros"=>$sale_payments, "pagos"=>$sale_payments_detail  ) );
+		//
+			$sql = "UPDATE ec_pedidos SET id_status_facturacion = 2, id_razon_social = {$sale_header['id_razon_social']} WHERE id_pedido = {$sale_header['id_pedido']}";
+			$stm = $this->link->query( $sql ) or die( "Error al actualizar status de facturacion de la venta : {$sql} : {$this->link->error}" );
+		//consulta el path de API Facturacion 
+			$sql = "SELECT `value` AS api_path FROM api_config WHERE `name` = 'path_facturacion'";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar el path del API de Facturación : {$sql} : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			$url = "{$row['api_path']}/rest/inserta_venta_facturacion";
+		//envia peticion
+			$petition = $this->sendPetition( $url, $post_data, '' );
+			die( $petition );
+			$response = json_decode( $petition );
+			if( $response->status == 200 ){
+				$sql = "UPDATE ec_pedidos SET id_status_facturacion = 3 WHERE id_pedido = {$sale_header['id_pedido']}";
+				$stm = $this->link->query( $sql ) or die( "Error al actualizar status de facturacion de la venta : {$sql} : {$this->link->error}" );
+			}
+			//var_dump( $petition );
+		}
+
+		public function getSaleSocialReason( $sale_id, $store_id ){
+		//consulta si los pagos fueron en efectivo
+			$sql = "SELECT DISTINCT( id_tipo_pago ) AS payment_type FROM ec_cajero_cobros WHERE id_pedido = {$sale_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar los tipo de pagos : {$sql} : {$this->link->error}" );
+			if( $stm->num_rows == 1 ){//una sola forma de pago
+				$row = $stm->fetch_assoc();
+				if( $row['payment_type'] == 1 ){//si solo fue pagada en efectivo
+				//consulta el id de la razon social configurada en la sucursal
+					$sql = "SELECT id_razon_social FROM sys_sucursales WHERE id_sucursal = {$store_id}";
+					$stm = $this->link->query( $sql ) or die ( "Error al consultar la razon social configurada en la sucursal : {$sql} : {$this->link->error}" );
+					$row = $stm->fetch_assoc();
+					return $row['id_razon_social'];
+				}
+			}
+		//consulta el pago mas alto y su razon social
+			$sql = "SELECT 
+						cc.id_afiliacion,
+						cc.id_terminal
+					FROM ec_cajero_cobros cc
+					WHERE cc.id_pedido = {$sale_id}
+					AND ( cc.id_afiliacion > 0 OR cc.id_terminal > 0 )
+					ORDER BY cc.monto DESC
+					LIMIT 1";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar pagos con tarjeta : {$sql} : {$this->link->error}" );
+			$row = $stm->fetch_assoc();
+			$sql = "";
+			if( $row['id_afiliacion'] > 0 && $row['id_afiliacion'] != '' ){
+				$sql = "SELECT 
+							cc.id_razon_social
+						FROM ec_afiliaciones a
+						LEFT JOIN ec_caja_o_cuenta cc
+						ON a.id_banco = cc.id_caja_cuenta
+						WHERE a.id_afiliacion = {$row['id_afiliacion']}";
+				$stm = $this->link->query( $sql ) or die( "Error al consultar la razon social de la afiliación : {$sql} : {$this->link->error}" );
+				$row = $stm->fetch_assoc();
+				return $row['id_razon_social'];
+			}else if( $row['id_terminal'] > 0 && $row['id_terminal'] != '' ){
+				$sql = "SELECT 
+							cc.id_razon_social
+						FROM ec_terminales_integracion_smartaccounts t
+						LEFT JOIN ec_caja_o_cuenta cc
+						ON t.id_caja_cuenta = cc.id_caja_cuenta
+						WHERE t.id_terminal_integracion = {$row['id_terminal']}";
+				$stm = $this->link->query( $sql ) or die( "Error al consultar la razon social de la afiliación : {$sql} : {$this->link->error}" );
+				$row = $stm->fetch_assoc();
+				return $row['id_razon_social'];
+			}
 		}
 	}
 

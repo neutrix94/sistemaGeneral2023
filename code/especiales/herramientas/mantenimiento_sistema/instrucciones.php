@@ -138,8 +138,9 @@
 			<!-- fin de cambio Oscar 2023 -->
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-success modal_btn" data-bs-dismiss="modal">Aceptar</button>
+				<button type="button" id="accept_modal_btn" class="btn btn-success modal_btn" data-bs-dismiss="modal">Aceptar</button>
 				<button 
+					id="exit_modal_btn"
 					type="button" 
 					class="btn btn-danger modal_btn" 
 					onclick="location.href='../../../../index.php?';"

@@ -56,8 +56,8 @@
 		//busca la lista de precios de la sucursal
 			$sale_union = "";
 			$sale_condition = "";
-			$sale_field = "";
-			$name_field = "CONCAT( '<><span style=\'color : gray ;\'>', GROUP_CONCAT(pp.clave_proveedor SEPARATOR ' ' ), '</span><>', p.nombre )";
+			$sale_field = "";//<><span style=\'color : gray ;\'>', GROUP_CONCAT(pp.clave_proveedor SEPARATOR ' ' ), '</span><>
+			$name_field = "CONCAT( '', p.nombre )";
 			if( $sale_id != null ){
 				$sale_union = "LEFT JOIN ec_pedidos_detalle pedd 
 				ON p.id_productos = pedd.id_producto";

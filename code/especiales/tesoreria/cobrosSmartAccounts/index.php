@@ -172,6 +172,13 @@
 	<?php
 		}
 	?>
+		<button
+			type="button"
+			class="btn btn-success"
+			onclick="send_sale_by_api();"
+		>
+			<i class="icon-ok-circled"></i>
+		</button>
 
 		<button
 			type="button"

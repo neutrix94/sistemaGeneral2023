@@ -3,12 +3,13 @@
 /*Version 2024-06-20 (Protocolos https)*/
 	header('Content-Type: text/html; charset=utf-8');
 
-	$main_path = getenv('PATH_STORAGE') ?: '../..';
+	$is_server = getenv('PATH_STORAGE') ?: null;
 
 //1. Elimina el archivo /conexion_inicial.txt si existe
-	/*if($main_path && file_exists("{$main_path}/conexion_inicial.txt")){
-			unlink("{$main_path}/conexion_inicial.txt");
-	}*/
+	if($is_server && file_exists("{$is_server}/conexion_inicial.txt")){
+		unlink("{$is_server}/conexion_inicial.txt");
+	}
+
 	if(file_exists("../../conexion_inicial.txt")){
 		unlink("../../conexion_inicial.txt");
 	}
@@ -48,23 +49,25 @@
 	$cadena_datos.= '<>'.$_POST['antiguedad_depuracion'];
 				
 //3. Crea archivo /conexion_inicial.txt
-	/*if( $main_path ){
-		$fp = fopen("{$main_path}/conexion_inicial.txt", "w");
+	if( $is_server ){
+		$fp = fopen("{$is_server}/conexion_inicial.txt", "w");
 		fputs($fp,$cadena_datos);
 		fclose($fp);
-		chmod("{$main_path}/conexion_inicial.txt", 0777);
-	}*/
+		chmod("{$is_server}/conexion_inicial.txt", 0777);
+	}
+
 	$fp2 = fopen("../../conexion_inicial.txt", "w");
 	fputs($fp2,$cadena_datos);
 	fclose($fp2);
 	chmod("../../conexion_inicial.txt", 0777);
 
-
 //4. Elimina archivo /config.inc.php
 	/*if($main_path && file_exists("{$main_path}/config.inc.php")){
 		unlink("{$main_path}/config.inc.php");
 	}*/
-	unlink("../../config.inc.php");
+	if(!$is_server && file_exists("../../config.inc.php")){
+		unlink("../../config.inc.php");
+	}
 
 //5. Crea archivo /config.inc.php
 	/*if( $main_path ){
@@ -128,16 +131,22 @@
 		fclose($fp);
 		chmod("{$main_path}/config.inc.php", 0777);
 	}*/
-	$fp2 = fopen("../../config.inc.php", "w");
-	fputs($fp2,$datos);
-	fclose($fp2);
-	chmod("../../config.inc.php", 0777);
-	
+	if( !$is_server ){
+		$fp2 = fopen("../../config.inc.php", "w");
+		fputs($fp2,$datos);
+		fclose($fp2);
+		chmod("../../config.inc.php", 0777);
+	}
+
 //6. Elimina archivo /conexionDoble.php
 	/*if($main_path && file_exists("{$main_path}/conexionDoble.php")){
 		unlink("{$main_path}/conexionDoble.php");
 	}*/
-	unlink("../../conexionDoble.php");
+
+	if(!$is_server && file_exists("../../conexionDoble.php")){
+		unlink("../../conexionDoble.php");
+	}
+
 //7. Crea archivo /conexionDoble.php
 	/*if( $main_path ){
 		$ini=fopen("{$main_path}/conexionDoble.php", "w");
@@ -231,13 +240,14 @@
 		fclose($fp);
 		chmod("{$main_path}/conexionDoble.php", 0777);
 	}*/
-	$fp2 = fopen("../../conexionDoble.php", "w");
-	fputs($fp2,$datos);
-	fclose($fp2);
-	chmod("../../conexionDoble.php", 0777);
+	if( !$is_server ){
+		$fp2 = fopen("../../conexionDoble.php", "w");
+		fputs($fp2,$datos);
+		fclose($fp2);
+		chmod("../../conexionDoble.php", 0777);
+	}
 	
-	
-	if( getenv('PATH_STORAGE') ){
+	if( $is_server ){
 		require_once( '../../GCP/enviroment_vars.php' );
 	}else{
 		echo 'ok';

@@ -257,26 +257,26 @@ filtro de subtipo
 	$TermalPrinter = new TermalPrinter( $link );
 	switch( $template ){
 		case '1': 
-			$TermalPrinter->makeNormalTags($datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+			$TermalPrinter->makeNormalTags($datos, $canProds, $arr2[1], $store_id, $user_id, $arr2[0] );
 		break;
 		case '2':
-			$TermalPrinter->makeBigTags( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+			$TermalPrinter->makeBigTags( $datos, $canProds, $arr2[1], $store_id, $user_id, $arr2[0] );
 		break;
 		case '3': 
-			$TermalPrinter->makeSeveralTags( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+			$TermalPrinter->makeSeveralTags( $datos, $canProds, $arr2[1], $store_id, $user_id, $arr2[0] );
 		break;
 		case '4': 
-			$TermalPrinter->makeMoreThanOnePriceTags( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+			$TermalPrinter->makeMoreThanOnePriceTags( $datos, $canProds, $arr2[1], $store_id, $user_id, $arr2[0] );
 		break;
 		case '5':
-			$TermalPrinter->makeSeveralBigTags( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+			$TermalPrinter->makeSeveralBigTags( $datos, $canProds, $arr2[1], $store_id, $user_id, $arr2[0] );
 		break;
 		case '6':
 		//die('here');
-			$TermalPrinter->makeTagsWithouthPrice( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+			$TermalPrinter->makeTagsWithouthPrice( $datos, $canProds, $arr2[1], $store_id, $user_id, $arr2[0] );
 		break;
 		case '7':
-			$TermalPrinter->makeSeveralTagsMixed( $datos, $canProds, $arr2[1], $store_id, $arr2[0] );
+			$TermalPrinter->makeSeveralTagsMixed( $datos, $canProds, $arr2[1], $store_id, $user_id, $arr2[0] );
 		break;
 	}
 	//secho $query;
@@ -290,7 +290,33 @@ filtro de subtipo
  			$this->link = $connection;
  		}
 
-	 	function makeTagsWithouthPrice( $datos, $prods, $plantilla, $store_id, $number = 1 ) {
+		function getFileRoute( $store_id, $user_id, $module_id ){
+			if( ! include( '../../../especiales/controladores/SysModulosImpresionUsuarios.php' ) ){
+				die( "No se pudo incluir la libreria de descargar de archivos : 'SysModulosImpresionUsuarios'" );
+			}
+			$SysModulosImpresionUsuarios = new SysModulosImpresionUsuarios( $this->link );
+			if( ! include( '../../../especiales/controladores/SysModulosImpresion.php' ) ){
+				die( "No se pudo incluir la libreria de descargar de archivos : 'SysModulosImpresion'" );
+			}
+			$SysModulosImpresion = new SysModulosImpresion( $this->link );
+			$ruta_salida = '';
+			$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, $module_id );//etiqueta empaquetado pieza
+			if( $ruta_salida == 'no' ){
+				$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $store_id, $module_id );//etiqueta empaquetado pieza
+			}
+			//die( "../../../../{$ruta_salida}"  );
+			return "../../../../{$ruta_salida}";
+			//$this->routes["{$ruta_salida}"] = "";
+			//$ruta_salida = $SysModulosImpresionUsuarios->obtener_ruta_modulo_usuario( $user_id, 13 );//etiqueta empaquetado paquete
+			//if( $ruta_salida == 'no' ){
+			//	$ruta_salida = "cache/" . $SysModulosImpresion->obtener_ruta_modulo( $store_id, 13 );//etiqueta empaquetado paquete
+			//}
+			//$this->routes["{$ruta_salida}"] = "";
+			//return true;
+		}
+
+	 	function makeTagsWithouthPrice( $datos, $prods, $plantilla, $store_id, $user_id, $number = 1 ) {
+			$file_route = $this->getFileRoute( $store_id, $user_id, 15 );
 	 		//die( 'here : ' . $number );
 	 		//var_dump( $datos['result']);
 	 		$epl_code = "";
@@ -341,15 +367,15 @@ filtro de subtipo
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
 	 	//creacion de archivo
-	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+		 //$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+		 	$file = fopen("{$file_route}/tag_{$file_name}.txt", "a");
 			fwrite($file, $epl_code );
 			fclose($file);
 			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
 	 	}
 
-	 	function makeNormalTags( $datos, $prods, $plantilla, $store_id, $number = 1 ) {
-	 		//die( 'here : ' . $number );
-	 		//var_dump( $datos['result']);
+	 	function makeNormalTags( $datos, $prods, $plantilla, $store_id, $user_id, $number = 1 ) {
+	 		$file_route = $this->getFileRoute( $store_id, $user_id, 15 );
 	 		$epl_code = "";
 	 		$products_counter = 0;
 	 		$tags_counter = 0;
@@ -398,14 +424,15 @@ filtro de subtipo
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
 	 	//creacion de archivo
-	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+		 	//$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+		 	$file = fopen("{$file_route}/tag_{$file_name}.txt", "a");
 			fwrite($file, $epl_code );
 			fclose($file);
 			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
 	 	}
 
-	 	function makeSeveralTags( $datos, $prods, $plantilla, $store_id, $number = 1  ) {
-	 		//var_dump( $datos['result']);
+	 	function makeSeveralTags( $datos, $prods, $plantilla, $store_id, $user_id, $number = 1 ) {
+			$file_route = $this->getFileRoute( $store_id, $user_id, 15 );
 	 		$epl_code = "";
 	 		$products_counter = 0;
 	 		$tags_counter = 0;
@@ -469,15 +496,15 @@ filtro de subtipo
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
 	 	//creacion de archivo
-	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+			//$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+			$file = fopen("{$file_route}/tag_{$file_name}.txt", "a");
 			fwrite($file, $epl_code );
 			fclose($file);
 			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
 	 	}
 
-	 	function makeMoreThanOnePriceTags( $datos, $prods, $plantilla, $store_id, $number = 1 ) {
-	 		//die( 'here' );
-	 		//var_dump( $datos['result']);
+	 	function makeMoreThanOnePriceTags( $datos, $prods, $plantilla, $store_id, $user_id, $number = 1 ) {
+			$file_route = $this->getFileRoute( $store_id, $user_id, 15 );
 	 		$epl_code = "";
 	 		$products_counter = 0;
 	 		$tags_counter = 0;
@@ -516,14 +543,16 @@ filtro de subtipo
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
 	 	//creacion de archivo
-	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+	 		//$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+	 		$file = fopen("{$file_route}/tag_{$file_name}.txt", "a");
 			fwrite($file, $epl_code );
 			fclose($file);
 			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
 	 	}
 
-	 	function makeBigTags( $datos, $prods, $plantilla, $store_id, $number = 1 ){
-	 		$epl_code = "";
+	 	function makeBigTags( $datos, $prods, $plantilla, $store_id, $user_id, $number = 1 ){
+			$file_route = $this->getFileRoute( $store_id, $user_id, 16 );
+			$epl_code = "";
 	 		$products_counter = 0;
 	 		$tags_counter = 0;
 	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
@@ -564,15 +593,17 @@ filtro de subtipo
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
 	 	//creacion de archivo
-	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+		 	//$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+		 	$file = fopen("{$file_route}/tag_{$file_name}.txt", "a");
 			fwrite($file, $epl_code );
 			fclose($file);
 			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
 
 	 	}
 
-	 	function makeSeveralBigTags( $datos, $prods, $plantilla, $store_id, $number = 1 ){
-	 		$epl_code = "";
+	 	function makeSeveralBigTags( $datos, $prods, $plantilla, $store_id, $user_id, $number = 1 ){
+			$file_route = $this->getFileRoute( $store_id, $user_id, 16 );
+			$epl_code = "";
 	 		$products_counter = 0;
 	 		$tags_counter = 0;
 	 		while ( $row = mysql_fetch_assoc( $datos['result'] ) ) {
@@ -612,15 +643,16 @@ filtro de subtipo
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
 	 	//creacion de archivo
-	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+		 	//$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+		 	$file = fopen("{$file_route}/tag_{$file_name}.txt", "a");
 			fwrite($file, $epl_code );
 			fclose($file);
 			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );
 	 	}
 
 
-	 	function makeSeveralTagsMixed( $datos, $prods, $plantilla, $store_id, $number = 1  ) {
-	 		//var_dump( $datos['result']);
+	 	function makeSeveralTagsMixed( $datos, $prods, $plantilla, $store_id, $user_id, $number = 1  ) {
+			$file_route = $this->getFileRoute( $store_id, $user_id, 16 );
 	 		$epl_code = "";
 	 		$products_counter = 0;
 	 		$tags_counter = 0;
@@ -721,7 +753,8 @@ filtro de subtipo
 	 		}
 	 		$file_name = date("Y_m_d_H_i_s");
 	 	//creacion de archivo
-	 		$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+		 	//$file = fopen("../../../../cache/ticket/tag_{$file_name}.txt", "a");
+		 	$file = fopen("{$file_route}/tag_{$file_name}.txt", "a");
 			fwrite($file, $epl_code );
 			fclose($file);
 			die( "ok|Total Productos : {$tags_counter}|Etiquetas : {$products_counter}" );

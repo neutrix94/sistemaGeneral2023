@@ -6,7 +6,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_movimientos_proveedor_producto
 * Método: POST
 * Descripción: Insercion de movimientos proveedor producto
-* Version 2.1 Comprobacion y LOG
+* Version 2.1 Se corrige error de movimientos proveedor producto sin folio unico ( 2024-08-28 )
 */
 $app->post('/inserta_movimientos_proveedor_producto', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -148,7 +148,8 @@ $app->post('/inserta_movimientos_proveedor_producto', function (Request $request
 //die( "detenido par prueba mov proveedor producto" );
 //consulta registros pendientes de sincronizar
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', 'sys_sincronizacion_movimientos_proveedor_producto', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
-  $resp["rows_download"] = $productProviderMovementsSynchronization->getSynchronizationProductProviderMovements( $log['origin_store'], $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
+  $resp["rows_download"] = $productProviderMovementsSynchronization->getSynchronizationProductProviderMovements( $log['origin_store'], $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ), $resp["log_download"]["unique_folio"], 
+  ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
   /*if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );
   }*/

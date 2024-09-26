@@ -48,48 +48,150 @@ BEGIN
 				'"primary_key" : "folio_unico",',
 				'"primary_key_value" : "', new.folio_unico, '",',
 				'"id_transferencia" : "( SELECT id_transferencia FROM ec_transferencias WHERE folio_unico = \'', transfer_unique_folio, '\' LIMIT 1 )",',
-				'"id_producto_or" : "', new.id_producto_or, '",',
-				'"id_producto_de" : "', new.id_producto_de, '",',
-				'"cantidad" : "', new.cantidad, '",',
-				'"id_presentacion" : "', new.id_presentacion, '",',
-				'"cantidad_cajas" : "', new.cantidad_cajas, '",',
-				'"cantidad_paquetes" : "', new.cantidad_paquetes, '",',
-				'"cantidad_piezas" : "', new.cantidad_piezas, '",',
-				'"cantidad_cajas_surtidas" : "', new.cantidad_cajas_surtidas, '",',
-				'"cantidad_paquetes_surtidos" : "', new.cantidad_paquetes_surtidos, '",',
-				'"cantidad_piezas_surtidas" : "', new.cantidad_piezas_surtidas, '",',
-				'"total_piezas_surtimiento" : "', new.total_piezas_surtimiento, '",',
-				'"cantidad_cajas_validacion" : "', new.cantidad_cajas_validacion, '",',
-				'"cantidad_paquetes_validacion" : "', new.cantidad_paquetes_validacion, '",',
-				'"cantidad_piezas_validacion" : "', new.cantidad_piezas_validacion, '",',
-				'"total_piezas_validacion" : "', new.total_piezas_validacion, '",',
-				'"cantidad_cajas_recibidas" : "', new.cantidad_cajas_recibidas, '",',
-				'"cantidad_paquetes_recibidos" : "', new.cantidad_paquetes_recibidos, '",',
-				'"cantidad_piezas_recibidas" : "', new.cantidad_piezas_recibidas, '",',
-				'"total_piezas_recibidas" : "', new.total_piezas_recibidas, '",',
-				'"cantidad_presentacion" : "', new.cantidad_presentacion, '",',
-				'"cantidad_salida" : "', new.cantidad_salida, '",',
-				'"cantidad_salida_pres" : "', new.cantidad_salida_pres, '",',
-				'"cantidad_entrada" : "', new.cantidad_entrada, '",',
-				'"cantidad_entrada_pres" : "', new.cantidad_entrada_pres, '",',
-				'"resolucion" : "', new.resolucion, '",',
-				/*'"referencia_resolucion" : "', new.referencia_resolucion, '",',
-				'"se_queda" : "', new.se_queda, '",',
-				'"faltante" : "', new.faltante, '",',
-				'"se_regresa" : "', new.se_regresa, '",',
-				'"calculo_resolucion" : "', new.calculo_resolucion, '",',*/
-				'"id_proveedor_producto" : "', new.id_proveedor_producto, '",',
-				'"agregado_en_surtimiento" : "', new.agregado_en_surtimiento, '",',
-				'"agregado_en_validacion" : "', new.agregado_en_validacion, '",',
-				'"id_caso_surtimiento" : "', new.id_caso_surtimiento, '",',
-				/*'"numero_consecutivo" : "', new.numero_consecutivo, '",',
-				'"consecutivo_orden_ubicacion" : "', new.consecutivo_orden_ubicacion, '",',*/
-				'"omite_movimiento_origen" : "', new.omite_movimiento_origen, '",',
-				'"omite_movimiento_destino" : "', new.omite_movimiento_destino, '",',
-				'"resuelto" : "', new.resuelto, '",',
-				'"id_producto_resolucion" : "', new.id_producto_resolucion, '",',
-				'"fecha_actualizacion" : "', new.fecha_actualizacion, '",',
-				'"folio_unico" : "', new.folio_unico, '",',
+				IF( new.id_producto_or IS NULL,
+					'',
+					CONCAT( '"id_producto_or" : "', new.id_producto_or, '",' )
+				),
+				IF( new.id_producto_de IS NULL,
+					'',
+					CONCAT( '"id_producto_de" : "', new.id_producto_de, '",' )
+				),
+				IF( new.cantidad IS NULL,
+					'',
+					CONCAT( '"cantidad" : "', new.cantidad, '",' )
+				),
+				IF( new.id_presentacion IS NULL,
+					'',
+					CONCAT( '"id_presentacion" : "', new.id_presentacion, '",' )
+				),
+				IF( new.cantidad_cajas IS NULL,
+					'',
+					CONCAT( '"cantidad_cajas" : "', new.cantidad_cajas, '",' )
+				),
+				IF( new.cantidad_paquetes IS NULL,
+					'',
+					CONCAT( '"cantidad_paquetes" : "', new.cantidad_paquetes, '",' )
+				),
+				IF( new.cantidad_piezas IS NULL,
+					'',
+					CONCAT( '"cantidad_piezas" : "', new.cantidad_piezas, '",' )
+				),
+				IF( new.cantidad_cajas_surtidas IS NULL,
+					'',
+					CONCAT( '"cantidad_cajas_surtidas" : "', new.cantidad_cajas_surtidas, '",' )
+				),
+				IF( new.cantidad_paquetes_surtidos IS NULL,
+					'',
+					CONCAT( '"cantidad_paquetes_surtidos" : "', new.cantidad_paquetes_surtidos, '",' )
+				),
+				IF( new.cantidad_piezas_surtidas IS NULL,
+					'',
+					CONCAT( '"cantidad_piezas_surtidas" : "', new.cantidad_piezas_surtidas, '",' )
+				),
+				IF( new.total_piezas_surtimiento IS NULL,
+					'',
+					CONCAT( '"total_piezas_surtimiento" : "', new.total_piezas_surtimiento, '",' )
+				),
+				IF( new.cantidad_cajas_validacion IS NULL,
+					'',
+					CONCAT( '"cantidad_cajas_validacion" : "', new.cantidad_cajas_validacion, '",' ) 
+				),
+				IF( new.cantidad_paquetes_validacion IS NULL,
+					'',
+					CONCAT( '"cantidad_paquetes_validacion" : "', new.cantidad_paquetes_validacion, '",' )
+				),
+				IF( new.cantidad_piezas_validacion IS NULL,
+					'',
+					CONCAT( '"cantidad_piezas_validacion" : "', new.cantidad_piezas_validacion, '",' )
+				),
+				IF( new.total_piezas_validacion IS NULL,
+					'',
+					CONCAT( '"total_piezas_validacion" : "', new.total_piezas_validacion, '",' )
+				),
+				IF( new.cantidad_cajas_recibidas IS NULL,
+					'',
+					CONCAT( '"cantidad_cajas_recibidas" : "', new.cantidad_cajas_recibidas, '",' )
+				),
+				IF( new.cantidad_paquetes_recibidos IS NULL,
+					'',
+					CONCAT( '"cantidad_paquetes_recibidos" : "', new.cantidad_paquetes_recibidos, '",' )
+				),
+				IF( new.cantidad_piezas_recibidas IS NULL,
+					'',
+					CONCAT( '"cantidad_piezas_recibidas" : "', new.cantidad_piezas_recibidas, '",' )
+				),
+				IF( new.total_piezas_recibidas IS NULL,
+					'',
+					CONCAT( '"total_piezas_recibidas" : "', new.total_piezas_recibidas, '",' )
+				),
+				IF( new.cantidad_presentacion IS NULL,
+					'',
+					CONCAT( '"cantidad_presentacion" : "', new.cantidad_presentacion, '",' ) 
+				),
+				IF( new.cantidad_salida IS NULL,
+					'',
+					CONCAT( '"cantidad_salida" : "', new.cantidad_salida, '",' )
+				),
+				IF( new.cantidad_salida_pres IS NULL,
+					'',
+					CONCAT( '"cantidad_salida_pres" : "', new.cantidad_salida_pres, '",' )
+				),
+				IF( new.cantidad_entrada IS NULL,
+					'',
+					CONCAT( '"cantidad_entrada" : "', new.cantidad_entrada, '",' )
+				),
+				IF( new.cantidad_entrada_pres IS NULL,
+					'',
+					CONCAT( '"cantidad_entrada_pres" : "', new.cantidad_entrada_pres, '",' )
+				),
+				IF( new.resolucion IS NULL,
+					'',
+					CONCAT( '"resolucion" : "', new.resolucion, '",' )
+				),
+				IF( new.id_proveedor_producto IS NULL,
+					'',
+					CONCAT( '"id_proveedor_producto" : "', new.id_proveedor_producto, '",' )
+				),
+				IF( new.agregado_en_surtimiento IS NULL,
+					'',
+					CONCAT( '"agregado_en_surtimiento" : "', new.agregado_en_surtimiento, '",' )
+				),
+				IF( new.agregado_en_validacion IS NULL,
+					'',
+					CONCAT( '"agregado_en_validacion" : "', new.agregado_en_validacion, '",' )
+				),
+				IF( new.id_caso_surtimiento IS NULL,
+					'',
+					CONCAT( '"id_caso_surtimiento" : "', new.id_caso_surtimiento, '",' )
+				),
+				IF( new.numero_consecutivo IS NULL,
+					'',
+					CONCAT( '"numero_consecutivo" : "', new.numero_consecutivo, '",' )
+				),
+				IF( new.omite_movimiento_origen IS NULL,
+					'',
+					CONCAT( '"omite_movimiento_origen" : "', new.omite_movimiento_origen, '",' )
+				),
+				IF( new.omite_movimiento_destino IS NULL,
+					'',
+					CONCAT( '"omite_movimiento_destino" : "', new.omite_movimiento_destino, '",' )
+				),
+				IF( new.resuelto IS NULL,
+					'',
+					CONCAT( '"resuelto" : "', new.resuelto, '",' )
+				),
+				IF( new.id_producto_resolucion IS NULL,
+					'',
+					CONCAT( '"id_producto_resolucion" : "', new.id_producto_resolucion, '",' )
+				),
+				IF( new.fecha_actualizacion IS NULL,
+					'',
+					CONCAT( '"fecha_actualizacion" : "', new.fecha_actualizacion, '",' )
+				),
+				IF( new.folio_unico IS NULL,
+					'',
+					CONCAT( '"folio_unico" : "', new.folio_unico, '",' )
+				),
 				'"sincronizar" : "0"',
 				'}'
 			),

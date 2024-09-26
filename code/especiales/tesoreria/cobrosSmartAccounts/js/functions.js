@@ -4,16 +4,29 @@ var respuesta = null;
 var debug_json = "";
 
 	function validateNumberInput(input) {
-		input.value = input.value.replace(/[^0-9]/g, '');
+		input.value = input.value.replace(/[^0-9.]/g, '');
+		let value = input.value;
 		if( isNaN( input.value ) ){
 			alert( "En este campo solo puedes capturar números." );
 			input.value = '';
+			input.select();
 			var id = input.id + `_alerta`;
 			$( `#${id}` ).removeClass( "hidden" );
 			setTimeout( function(){
 				$( `#${id}` ).addClass( "hidden" );
 			}, 5000 );
 		}
+		value = value.replace(/[^0-9.]/g, '');
+		let parts = value.split('.');
+		if (parts.length >= 2) {
+			value = parts[0] + '.' + parts[1];
+		}
+		// Limita a dos decimales
+		if (parts[1]) {
+			parts[1] = parts[1].substring(0, 2);
+			value = parts.join('.');
+		}
+		input.value = value;
 	}
 
 	function decimal_format_twice( number ){
@@ -328,9 +341,9 @@ hljs.highlightAll();
 		var tope_tarjetas=$("#payments_list tr").length;
 		for( var i=0;i <tope_tarjetas; i++ ){
 			if($("#t"+i).val()!=''){
-				total_tarjetas+=parseFloat($("#t"+i).val().replaceAll( ',', '' ));
+				total_tarjetas+=parseFloat($("#t"+i).val().replace( ',', '' ));//All
 			}else{
-				$("#t"+i).val(0);
+				$("#t"+i).val('');
 			}
 		}
 		total_cobros+=parseFloat(total_tarjetas);
@@ -382,7 +395,7 @@ hljs.highlightAll();
 		var monto_pago = parseFloat( $( '#monto_cobro_emergente' ).val() );
 		if( monto_pago > 0 ){
 			var total_tarjetas=0,total_cheques=0,total_cobros=0;
-			var recibido=$("#efectivo_recibido").val().replaceAll( ',', '' );
+			var recibido=$("#efectivo_recibido").val().replace( ',', '' );//All
 			var devolver=$("#efectivo_devolver").val();
 			if(recibido<=0){
 				return true;
@@ -438,7 +451,11 @@ hljs.highlightAll();
 			$( '#monto_cheque_transferencia' ).val( '' );
 			$( '#monto_cheque_transferencia' ).focus();
 		}else{
-			alert( "Error : " + resp );
+			$( ".emergent_content_2" ).html( resp );
+			$( ".emergent_2" ).css( 'display', 'block' );
+			$( "#monto_cheque_transferencia" ).val( '' );
+			return false;
+			//alert( "Error : " + resp );
 		}
 			
 		setTimeout( function(){
@@ -493,6 +510,9 @@ var venta_actual_impresa = false;
 					return false;
 				}
 			}
+		//consume servicio para subir venta a daministracion de facturacion 
+			var resp = ajaxR( "ajax/db.php?fl=uploadSale&sale_folio=" + $( '#buscador' ).val() );
+			//alert( resp );
 			if( $( "#id_venta_origen" ).val() != '' && $( "#id_venta_origen" ).val() != 0 && $( "#id_venta_origen" ).val() != '0' && $( "#id_venta_origen" ).val() != null
 			&& parseInt( $( '#monto_total' ).val().trim() ) == 0 ){//alert('here');
 				
@@ -719,7 +739,8 @@ var cont_cheques_transferencia=0;
 				stop = index;
 				return false;
 			}
-			amount_sum += parseFloat( $( '#t' + index ).val().replaceAll( ',', '' ) );
+			//amount_sum += parseFloat( $( '#t' + index ).val().replaceAll( ',', '' ) );
+			amount_sum += parseFloat( $( '#t' + index ).val().replace( ',', '' ) );
 		});
 		if( stop != false ){
 			alert( "Hay cobros con tarjeta sin monto, verfica y vuelve a intentar." );
@@ -730,7 +751,7 @@ var cont_cheques_transferencia=0;
 			amount_sum += parseFloat( $( '#efectivo' ).val() );
 		}
 		if( amount_sum != amount_total ){
-			alert( "La suma de los montos es diferente del total." );
+			alert( "La suma de los montos es diferente del total." + `${amount_sum} != ${amount_total}` );
 			return false;
 		}
 	//muestra los botones para enviar la peticion
@@ -741,7 +762,6 @@ var cont_cheques_transferencia=0;
 		});
 		$( '#start_payments_btn' ).addClass( 'no_visible' );
 		$( '#add_card_btn' ).addClass( 'no_visible' );
-
 	}
 //buscador de la terminal por QR
 	function seekTerminalByQr( e ){
@@ -766,7 +786,12 @@ var cont_cheques_transferencia=0;
 		url += "&session_id=" + $( '#session_id' ).val();
 		var resp = ajaxR( url ).split( '|' );
 		if( resp[0] != 'ok' ){
-			alert( "Error : \n" + resp );
+			resp += `<div class="text-center">
+					<button type="button" onclick="close_emergent();" class="btn btn-danger">Aceptar y cerrar</button>
+				</div>`;
+			$( '.emergent_content' ).html( resp );
+			$( '.emergent' ).css( 'display', 'block' );
+			//alert( "Error : \n" + resp );
 		}else{
 			$( '#terminal_qr_input' ).val( '' );
 			var terminal = JSON.parse( resp[1] );
@@ -985,6 +1010,11 @@ var cont_cheques_transferencia=0;
 
 		$( '#afiliations_table_body' ).append( new_row );
 		$( '#afiliations_changes_container' ).removeClass( 'no_visible' );
+		$( '#afiliacion_combo_tmp' ).val( '0' );
+		$( '#afiliation_validation_btn_icon' ).removeClass( 'text-success' );
+		$( '#afiliation_validation_btn_icon' ).addClass( 'text-secondary' );
+		$( '#afiliation_validation_input' ).val( '' );
+		$( '#mannager_password' ).focus();
 	}
 
 	function saveAfiliationsChanges(){
@@ -1039,6 +1069,10 @@ var cont_cheques_transferencia=0;
 	}
 //agregar afiliacion 
 	function agregarTerminalSesion(){
+		if( ! $( '#terminal_validation_btn_icon' ).hasClass( 'text-success' ) ){
+			alert( "Es necesario que escanees la terminal para continuar." );
+			return false;
+		}
 		var session_id = $( '#session_id' ).val();
 		var password = $( '#mannager_password' ).val();
 		var terminal_id = $( '#terminal_combo_tmp' ).val();
@@ -1072,6 +1106,13 @@ var cont_cheques_transferencia=0;
 		//alert( url );
 		alert( ajaxR( url ) );
 		return false;
+	}
+
+	function send_sale_by_api(){
+		var url = 'ajax/db.php?fl=sendBill&sale_folio=24MAT80';
+		var resp = ajaxR( url );
+		alert( resp );
+		console.log( resp );
 	}
 
 //lamadas asincronas

@@ -25,7 +25,7 @@ BEGIN
 		SELECT 
 	        auto_increment into row_id
 	    FROM information_schema.tables
-	    WHERE table_name = 'ec_bloques_transferencias_recepcion_detalle'
+	    WHERE table_name = 'ec_transferencias_recepcion_usuarios'
 	    AND table_schema = database();
 	/*actualiza folio unico*/
         SET new.folio_unico = CONCAT( prefix, '_BTRU_', row_id );

@@ -33,24 +33,72 @@ BEGIN
 				'"action_type" : "update",',
 				'"primary_key" : "folio_unico",',
 				'"primary_key_value" : "', new.folio_unico, '",',
-				'"id_bloque_transferencia_recepcion" : "', 
-				'( SELECT id_bloque_transferencia_recepcion FROM ec_bloques_transferencias_recepcion WHERE folio_unico = \'',
-					reception_block_unique_folio, '\' LIMIT 1 )",',
-				'"id_usuario" : "', new.id_usuario, '",',
-				'"id_producto" : "', new.id_producto, '",',
-				'"id_proveedor_producto" : "', new.id_proveedor_producto, '",',
-				'"piezas_faltantes" : "', new.piezas_faltantes, '",',
-				'"piezas_sobrantes" : "', new.piezas_sobrantes, '",',
-				'"piezas_no_corresponden" : "', new.piezas_no_corresponden, '",',
-				'"piezas_se_quedan" : "', new.piezas_se_quedan, '",',
-				'"piezas_se_regresan" : "', new.piezas_se_regresan, '",',
-				'"piezas_faltaron" : "', new.piezas_faltaron, '",',
-				'"conteo" : "', new.conteo, '",',
-				'"conteo_excedente" : "', new.conteo_excedente, '",',
-				'"diferencia" : "', new.diferencia, '",',
-				'"id_producto_resolucion" : "', new.id_producto_resolucion, '",',
-				'"resuelto" : "', new.resuelto, '",',
-				'"folio_unico" : "', IF( new.folio_unico IS NULL, '', new.folio_unico ), '",',
+				IF( reception_block_unique_folio IS NULL,
+					'',
+					CONCAT( '"id_bloque_transferencia_recepcion" : "', 
+					'( SELECT id_bloque_transferencia_recepcion FROM ec_bloques_transferencias_recepcion WHERE folio_unico = \'',
+					reception_block_unique_folio, '\' LIMIT 1 )",' )
+				),
+				IF( new.id_usuario IS NULL,
+					'',	
+					CONCAT( '"id_usuario" : "', new.id_usuario, '",' ) 
+				),
+				IF( new.id_producto IS NULL,
+					'',
+					CONCAT( '"id_producto" : "', new.id_producto, '",' )
+				),
+				IF( new.id_proveedor_producto IS NULL,
+					'',
+					CONCAT( '"id_proveedor_producto" : "', new.id_proveedor_producto, '",' )
+				),
+				IF( new.piezas_faltantes IS NULL,
+					'',
+					CONCAT( '"piezas_faltantes" : "', new.piezas_faltantes, '",' )
+				),
+				IF( new.piezas_sobrantes IS NULL,
+					'',
+					CONCAT( '"piezas_sobrantes" : "', new.piezas_sobrantes, '",' )
+				),
+				IF( new.piezas_no_corresponden IS NULL,
+					'',
+					CONCAT( '"piezas_no_corresponden" : "', new.piezas_no_corresponden, '",' )
+				),
+				IF( new.piezas_se_quedan IS NULL,
+					'',
+					CONCAT( '"piezas_se_quedan" : "', new.piezas_se_quedan, '",' )
+				),
+				IF( new.piezas_se_regresan IS NULL,
+					'',
+					CONCAT( '"piezas_se_regresan" : "', new.piezas_se_regresan, '",' )
+				),
+				IF( new.piezas_faltaron IS NULL,
+					'',
+					CONCAT( '"piezas_faltaron" : "', new.piezas_faltaron, '",' )
+				),
+				IF( new.conteo IS NULL,
+					'',
+					CONCAT( '"conteo" : "', new.conteo, '",' )
+				),
+				IF( new.conteo_excedente IS NULL,
+					'',
+					CONCAT( '"conteo_excedente" : "', new.conteo_excedente, '",' )
+				),
+				IF( new.diferencia IS NULL,
+					'',
+					CONCAT( '"diferencia" : "', new.diferencia, '",' )
+				),
+				IF( new.id_producto_resolucion IS NULL,
+					'',
+					CONCAT( '"id_producto_resolucion" : "', new.id_producto_resolucion, '",' )
+				),
+				IF( new.resuelto IS NULL,
+					'',
+					CONCAT( '"resuelto" : "', new.resuelto, '",' )
+				),
+				IF( new.folio_unico IS NULL,
+					'',
+					CONCAT( '"folio_unico" : "', new.folio_unico, '",' )
+				),
 				'"sincronizar" : "0"',
 				'}'
 			),

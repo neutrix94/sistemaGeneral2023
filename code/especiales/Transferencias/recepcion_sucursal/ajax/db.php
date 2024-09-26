@@ -1,5 +1,6 @@
 <?php
 /*Version con insercion de movimientos por Procedure (2024-08-05)*/
+/*Version con comprobacionde llegaron de Menos Oscar (2024-08-29)*/
 	if( isset( $_GET['fl'] ) ){
 		include( '../../../../../config.inc.php' );
 		include( '../../../../../conect.php' );
@@ -871,7 +872,7 @@
 		}
 	}
 /*fin de cambio Oscar 2024-08-05*/
-	//verifica si hay registros en resolución
+	//verifica si hay registros en resolución ( Se recibe de mas )
 		$sql = "SELECT
 					btr.id_producto AS product_id,
 					btr.id_proveedor_producto AS product_provider_id,
@@ -884,8 +885,21 @@
 				WHERE btr.id_bloque_transferencia_recepcion IN( {$reception_block_id} )
 				ORDER BY p.orden_lista ASC";
 		$stm = $link->query( $sql ) or die( "Error al consultar detalles por resolver : {$link->error}" );
-		
-		if( $stm->num_rows > 0 ){
+	
+	//verifica si hay registros en resolución ( Se recibe de menos ) 2024-08-29
+		$sql = "SELECT
+					tp.id_transferencia_producto
+				FROM ec_transferencia_productos tp
+				LEFT JOIN ec_transferencias t
+				ON tp.id_transferencia = t.id_transferencia
+				LEFT JOIN ec_bloques_transferencias_validacion_detalle btvd
+				ON btvd.id_transferencia = t.id_transferencia
+				LEFT JOIN ec_bloques_transferencias_recepcion_detalle btrd
+				ON btrd.id_bloque_transferencia_validacion = btvd.id_bloque_transferencia_validacion
+				WHERE tp.total_piezas_validacion > tp.total_piezas_recibidas
+				AND btrd.id_bloque_transferencia_recepcion = {$reception_block_id}";
+		$stm2 = $link->query( $sql ) or die( "Error al consultar detalles recibidos con piezas de menos : {$link->error}" );
+		if( $stm->num_rows > 0 || $stm2 > 0 ){
 			$resp = "show_view( this, '.validate_transfers');close_emergent();";
 		/*	$sql = "SELECT 
 						t.id_sucursal_origen AS store_destinity,
@@ -904,6 +918,9 @@
 			$resp = $TransferResolution->insertResolutionHeader( $recepcion_block_id, $user, $sucursal, $header_data, $stm );*/
 		}else{
 			$resp = "close_emergent();";
+		/** 
+		 * Esta consulta es inecesaria pero se mantiene para no mover esta funcionalidad
+		*/
 			$sql = "SELECT
 						id_producto_resolucion
 					FROM ec_productos_resoluciones_tmp

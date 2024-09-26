@@ -1,6 +1,15 @@
 
 {literal}
 	<script type="text/javascript">
+	function evitaCaracteresEspeciales(event) {
+		const input = event.target;
+		const valor = input.value;
+		const valorFiltrado = valor.replace(/[^a-zA-Z0-9 *./=-]/g, ''); // Filtra caracteres que no sean letras o números
+		if (valor !== valorFiltrado) {
+			input.value = valorFiltrado;
+			alert( "No se permiten caracteres especiales en este campo." );
+		}
+	}
 	var global_is_repeat = 0;
 /*implementacion Oscar 2024-01-26*/
 	function UsersPrintsModulesValidation(){

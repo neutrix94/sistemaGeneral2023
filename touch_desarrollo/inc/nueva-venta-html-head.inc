@@ -1891,7 +1891,7 @@ var hay_paquete=0;
 
         var res=ajaxR(url);
         //alert(res);
-/*return false;*/
+    /*return false;*/
 		aux=res.split('|');
 		/**/
         if(aux[0]=='sin_sesion_caja'){
