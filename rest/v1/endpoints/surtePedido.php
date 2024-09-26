@@ -3,8 +3,8 @@ use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 
 /*
-* Endpoint: surteMuestra
-* Path: /surte/Muestra
+* Endpoint: surtePedido
+* Path: /surte/Pedido
 * Método: POST
 * Descripción: Servicio para solicitar pedido
 */
@@ -63,8 +63,10 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
       if (empty($producto['id'])) {
         return $rs->errorMessage($request->getParsedBody(),$response, 'Datos_Faltantes', 'Hace falta información para crear producto(s)', 400);
       }
-      $idProductos = $idProductos . ",'".$producto['id']."'";
-      $productRow ++;
+      if ($producto['cantidad'] > 0) {
+        $idProductos = $idProductos . ",'".$producto['id']."'";
+        $productRow ++;
+      }
     }
   }
   
