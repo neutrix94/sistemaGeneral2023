@@ -35,12 +35,12 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
     <table class="table table-bordered">
         <tbody>
             <tr>
-                <td colspan="2">Productos pendiente de surtir</td>
+                <td colspan="2">Productos pendientes de surtir</td>
                 <td id="pendientesSurtir"></td>
                 <td></td>
             </tr>
             <tr>
-                <td colspan="2">Productos pendiente de asignar</td>
+                <td colspan="2">Productos pendientes de asignar</td>
                 <td id="pendientesAsignar"></td>
                 <td></td>
             </tr>
@@ -51,7 +51,7 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
                 <td># de partidas
                     <input type="number" class="form-control" id="partidasInput">
                 </td>
-                <td>
+                <td style="vertical-align: middle; text-align: center;">
                     <button class="btn btn-primary" onclick="asignarPartidas()">
                         <i class="fa fa-plus"></i> Agregar
                     </button>
@@ -206,7 +206,7 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
             var cellEliminar = row.insertCell(2);
 
             if (!item.nombre_surtidor) {
-              surtidorNombre = listaAsignacion.Surtidores.find(s => s.id == item.id_surtidor).nombre;
+              surtidorNombre = (item.id_surtidor) ? listaAsignacion.Surtidores.find(s => s.id == item.id_surtidor).nombre : '';
             }else{
               surtidorNombre = item.nombre_surtidor;
             }
