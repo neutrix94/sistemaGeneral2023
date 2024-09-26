@@ -291,59 +291,87 @@ var packsCatalogue = new Array();
 
   function solicitarMuestras( ){
 
-    // Obtiene la URL completa actual
-    var currentUrl = window.location.href;
-    // Extrae el nombre del ambiente (la parte entre el dominio y el siguiente '/')
-    var regex = /\/\/[^\/]+\/([^\/]+)/;
-    var match = currentUrl.match(regex);
-    var nombreAmbiente = match ? match[1] : '';
+    var url="ajax/checkSesionCajaParaMuestra.php";
 
-    // Construye la URL base y la URL del API
-    var baseUrl = window.location.origin;
-    var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Muestra';
+    var res=ajaxRequest(url);
 
-    var productosSeleccionados = getProductosMuestras();
+    var aux=res.split('|');
 
-    if( productosSeleccionados.length > 0  ){
-      if (confirm("Se enviarán a solicitar " + productosSeleccionados.length + " muestras. ¿Confirmas la operación?") == true) {
-          $.ajax({
-          type: 'POST',
-          url: apiUrl,
-          headers: {
-            'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
-          },
-          data: {
-              "productos": productosSeleccionados,
-              "vendedor": <?php echo $user_id; ?>,
-              "sucursal": <?php echo $sucursal_id;?>,
-              "pedido": genIdPedido( <?php echo $user_id; ?> ),
-          },
-          datatype: 'json',
-          success: function (data) {
-              console.log("RESPUESTA MUESTRA");
-              console.log(data);
-              if( data.result.resultado == "Solicitado" ){
-                alert(data.result.descripcion);
-
-              }else{
-                alert("Ha ocurrido un error: "+data.result.descripcion);
-              }
-              
-              clearAllCheckBox();
-
-          },
-          error:function(error){
-            console.log("ERROR".error);
-          }
-        });
-        } else {
-          alert("Cancelaste la operación");
-        }
-        
+    if(aux[0]=='sin_sesion_caja'){
+        alert("No se pueden hacer ventas porque el cajero no ha iniciado sesión de caja\nPida al cajero que inicie su sesión de caja!!!");
+        return false;
     }else{
-      alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
+
+      // Obtiene la URL completa actual
+      var currentUrl = window.location.href;
+      // Extrae el nombre del ambiente (la parte entre el dominio y el siguiente '/')
+      var regex = /\/\/[^\/]+\/([^\/]+)/;
+      var match = currentUrl.match(regex);
+      var nombreAmbiente = match ? match[1] : '';
+  
+      // Construye la URL base y la URL del API
+      var baseUrl = window.location.origin;
+      var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Muestra';
+  
+      var productosSeleccionados = getProductosMuestras();
+  
+      if( productosSeleccionados.length > 0  ){
+        if (confirm("Se enviarán a solicitar " + productosSeleccionados.length + " muestras. ¿Confirmas la operación?") == true) {
+            $.ajax({
+            type: 'POST',
+            url: apiUrl,
+            headers: {
+              'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
+            },
+            data: {
+                "productos": productosSeleccionados,
+                "vendedor": <?php echo $user_id; ?>,
+                "sucursal": <?php echo $sucursal_id;?>,
+                "pedido": genIdPedido( <?php echo $user_id; ?> ),
+            },
+            datatype: 'json',
+            success: function (data) {
+                console.log("RESPUESTA MUESTRA");
+                console.log(data);
+                if( data.result.resultado == "Solicitado" ){
+                  alert(data.result.descripcion);
+  
+                }else{
+                  alert("Ha ocurrido un error: "+data.result.descripcion);
+                }
+                
+                clearAllCheckBox();
+  
+            },
+            error:function(error){
+              console.log("ERROR".error);
+            }
+          });
+          } else {
+            alert("Cancelaste la operación");
+          }
+          
+      }else{
+        alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
+      }
     }
+
   }
+
+  function ajaxRequest(url){
+    
+    if(window.ActiveXObject){       
+        var httpObj = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    else if (window.XMLHttpRequest){       
+        var httpObj = new XMLHttpRequest(); 
+    }
+
+    httpObj.open("POST", url , false, "", "");
+    httpObj.send(null);
+    
+    return httpObj.responseText;
+  }        
 
   function genIdPedido( id_user ) {
     var id = "";
