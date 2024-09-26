@@ -6,7 +6,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Endpoint: surteMuestra
 * Path: /surte/Muestra
 * Método: POST
-* Descripción: Servicio para solicitar muestra
+* Descripción: Servicio para solicitar pedido
 */
 $app->post('/surte/Pedido', function (Request $request, Response $response){
   //Init
@@ -105,6 +105,7 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
             WHERE  
                 s.id_vendedor = '{$vendedor}'
                 AND s.no_pedido ='{$pedido}'
+                AND s.tipo ='2'
                 AND sd.estado IN (1,2)
                 AND s.estado IN (1,2);";
                 
