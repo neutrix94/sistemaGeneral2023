@@ -425,10 +425,10 @@
 <?php 
 //12. Contador de registros validos
 	echo "<div class=\"row\" style=\"font-size : 80% !important; position : relative; width : 99% !important; left : .5%;\">
-			<div class=\"col-2 text-center\">
+			<div class=\"col-1 text-center\">
 				<font color=\"black\">Total: <b id=\"cont_visual_1\">{$c}</b></font>
 			</div>
-			<div class=\"col-2 text-center\">
+			<div class=\"col-1 text-center\">
 				validos: <b id=\"cont_visual_2\">{$validos}</b>
 				<input type=\"hidden\" value=\"0\" id=\"modificaciones\" disabled>
 			</div>";
@@ -450,7 +450,9 @@
 		<div class="col-2">
 			<button 
 				onclick="exportaTransferencia('formato_limpio');" 
-				class="btn btn-light">
+				class="btn btn-light"
+				style="text-decoration:none;color:white;margin-top:-20px;"
+			>
 				<img src="../../../img/especiales/exportaCSV1.png" width="30px">
 				<b style="color:black;">Exportar Formato en Limpio</b>
 			</button>
@@ -459,6 +461,7 @@
 			<button 
 				onclick="exportaTransferencia();" 
 				class="btn btn-light"
+				style="text-decoration:none;color:white;margin-top:-20px;"
 			>
 				<img src="../../../img/especiales/exportaCSV1.png" 
 				width="30px"><b style="color:black;">Exportar en Orden de Caja</b>
@@ -468,7 +471,7 @@
 			<button 
 				onclick="exportaTransferencia('orden_almacen');"  
 				class="btn btn-light"
-				style="text-decoration:none;color:white;"
+				style="text-decoration:none;color:white;margin-top:-20px;"
 			>
 				<img src="../../../img/especiales/exportaCSV1.png" width="30px">
 				<b style="color:black;">Exportar en Orden de Lista</b>
@@ -481,6 +484,16 @@
 			>
 				<img src="../../../img/especiales/importaCSV1.png" width="40px"><b style="color:black;">Importar</b>
 			</button>
+		</div>
+		<div class="col-2" style="<?php if(!isset($idTransfer)){echo 'display:none;';}?>">
+			<button 
+				onclick="exportaTransferencia('orden_lista_2024');"  
+				class="btn btn-light"
+				style="text-decoration:none;color:white;margin-top:-20px;"
+			>
+				<img src="../../../img/especiales/exportaCSV1.png" width="30px">
+				<b style="color:black;">Exportacion con Proyeccion</b>
+			</button>					
 		</div>
 		<div class="col-2">
 			<form class="form-inline">
@@ -507,6 +520,11 @@
 <!-- 14. Implementacion Oscar 29.05.2018 para exportacion en Excel -->
 	<form id="TheForm" method="post" action="ajax/modificaTransferencia.php" target="TheWindow">
 			<input type="hidden" id="fl" name="fl" value="1" />
+			<input type="hidden" id="datos" name="datos" value=""/>
+	</form>
+<!-- 14.1 Implementacion Oscar 2024 para exportacion en Excel con proyeccion-->
+	<form id="proyectionForm" method="post" action="ajax/exportacion_orden_lista.php" target="TheWindow">
+			<input type="hidden" id="idTransfer" name="idTransfer" value="<?php echo $idTransfer ;?>" />
 			<input type="hidden" id="datos" name="datos" value=""/>
 	</form>
 <!-- 15. Incluye archivo %pieDePagina.php%% -->
