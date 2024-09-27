@@ -159,6 +159,7 @@
 					</thead>
 					<tbody id="transfer_products"></tbody>
 				</table>
+				<br><br><br><br>
 		</div>
 	</div>
 	<input type="hidden" id="current_store" value="<?php echo $sucursal_id; ?>">
