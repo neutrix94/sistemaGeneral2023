@@ -61,6 +61,9 @@ Version 1.1 con resolucion de Transferencias seccionada por procesos 2024-08-16*
 	<audio id="unic_code_is_repeat" controls style="display:none;">
 		<source type="audio/wav" src="../../../../files/sounds/transfers/unic_code_is_repeat.mp3">
 	</audio>
+	<audio id="scanner_yes" controls style="display:none;">
+		<source type="audio/wav" src="../../../../files/sounds/transfers/yes.mp3">
+	</audio>
 
 
 
