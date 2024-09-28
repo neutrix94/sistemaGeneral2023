@@ -11,7 +11,7 @@
 /*Implementación Oscar 17.06.2019 para el buscador de folios*/
 	if(isset($_POST['flag']) && $_POST['flag']=='buscador'){//die('here');
 		$clave=$_POST['valor'];
-		$sql="SELECT id_sesion_caja,folio,verificado FROM ec_sesion_caja WHERE folio like '%$clave%' AND IF($user_sucursal=-1,id_sucursal>0,id_sucursal=$user_sucursal)";
+		$sql="SELECT id_sesion_caja,folio,verificado FROM ec_sesion_caja WHERE folio like '%$clave%' AND IF($user_sucursal=-1,id_sucursal>0,id_sucursal=$user_sucursal) AND hora_fin != '00:00:00'";/*AND hora fin != '00:00:00' agregado por Oscar 2024-09-27 */
 		$eje=mysql_query($sql)or die("Error al consultar coincidencias de folio");
 		echo 'ok|';
 		if(mysql_num_rows($eje)<=0){
