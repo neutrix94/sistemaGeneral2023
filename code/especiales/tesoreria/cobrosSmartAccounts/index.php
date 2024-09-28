@@ -237,7 +237,8 @@
 	<!-- historico dfe pagos -->
 		<div class="row" id="historic_payments"></div>
 	<!-- -->
-		<div class="row" id="card_qr_container">
+		<div class="row" id="card_qr_container" style="margin-top : -20px;">
+			<h3>Terminales Inbursa</h3>
 			<div class="input-group">
 				<input type="text" id="terminal_qr_input" class="form-control" 
 					placeholder="Escanear /codigo QR de la terminal"
@@ -269,7 +270,7 @@
 						onclick="getTerminalesForm();"
 					></i>
 				<!--/button-->
-				Tarjetas 
+				Terminales NetPay 
 				<button
 					type="button"
 					id="add_card_btn"
