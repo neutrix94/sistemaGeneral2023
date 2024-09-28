@@ -1946,13 +1946,16 @@ var hay_paquete=0;
         var currentUrl = window.location.href;
 
         // Extrae el nombre del ambiente (la parte entre el dominio y el siguiente '/')
-        var regex = /\/\/[^\/]+\/([^\/]+)/;
-        var match = currentUrl.match(regex);
-        var nombreAmbiente = match ? match[1] : '';
+        // var regex = /\/\/[^\/]+\/([^\/]+)/;
+        // var match = currentUrl.match(regex);
+        // var nombreAmbiente = match ? match[1] : '';
 
-        // Construye la URL base y la URL del API
-        var baseUrl = window.location.origin;
-        var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Pedido';
+        // // Construye la URL base y la URL del API
+        // var baseUrl = window.location.origin;
+
+        var parts_url = currentUrl.split('/touch_desarrollo');
+        //var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Pedido';
+        var apiUrl = parts_url[0] + '/rest/v1/surte/Pedido';
 
         var productosPedido = getProductosPedido();
         var productosEliminados = getProductosEliminados();
