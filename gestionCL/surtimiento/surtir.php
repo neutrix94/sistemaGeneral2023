@@ -143,6 +143,27 @@ $indiceSurtir = 0;
             </div>
         </div>
     </div>
+    <!-- Modal: Confirmación Passowrd -->
+    <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="passwordModalLabel">Título de la Alerta</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="passwordModalContent">Contenido de la alerta...</p>
+                    <input type="password" id="passwordModalInput" class="form-control">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="passwordModalCancelButton" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="passwordModalAcceptButton">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -247,30 +268,58 @@ $indiceSurtir = 0;
 
         function abandonarSurtimiento() {
             // Lógica para abandonar surtimiento
-            if(perfil != 2){
-                showAlertModal(
-                  'Sin permisos',
-                  'No puedes realizar esta acción, pide al encargado que lo realice',
-                  false,
-                  '',
-                  true,
-                  'Aceptar'
-                ); 
-                return;
-            }
-            
-            showAlertModal(
+            showPasswordModal(
               'Abandonar surtimiento',
-              '¿Estás seguro de abandonar el surtimiento?',
+              'Ingresa la contraseña del encargado de sucursal',
               true,
               'Cancelar',
               true,
               'Aceptar'
             ); 
-            $('#alertModalAcceptButton').off('click').on('click', function() {
-                $('#alertModal').modal('hide');
-                window.location.href = 'asignar.php?id=' +'<?php echo $id ?>';
+    
+            // Establecer la función de callback para el botón de aceptar
+            $('#passwordModalAcceptButton').off('click').on('click', function() {
+                if( $('#passwordModalInput').val().trim() == ''){
+                   alert('Ingrese contraseña de encargado');
+                   return;
+                }
+                var valid = false;
+                $.ajax({
+                    url: '../classes/surtimiento.php',
+                    type: 'POST',
+                    data: {
+                        action: 'validaPwd',
+                        pwd: $('#passwordModalInput').val(),
+                        sucursal: '<?php echo $sucursal_id; ?>'
+                    },
+                    success: function(response) {
+                        if(response){
+                            $.ajax({
+                                url: '../classes/surtimiento.php',
+                                type: 'POST',
+                                data: {
+                                    action: 'cancelarSurtimiento',
+                                    id: '<?php echo $id; ?>'
+                                },
+                                success: function(response) {
+                                    window.location.href = 'lista.php';
+                                },
+                                error: function(xhr, status, error) {
+                                    alert('Hubo un error al cancelar la asignación: ' + error);
+                                }
+                            });
+                        }else{
+                          alert('Contraseña incorrecta');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Hubo un error al cancelar la asignación: ' + error);
+                    }
+                });
+                $('#passwordModalInput').val("");
+                $('#passwordModal').modal('hide');
             });
+            
         }
 
         function siguiente() {
@@ -410,6 +459,28 @@ $indiceSurtir = 0;
               console.error("Error al generar el PDF:", error);
               alert("Error al generar el PDF");
           });
+        }
+        
+        function showPasswordModal(title, content, showCancel, titleCancel, showAccept, titleAccept) {
+            //Establece título y contenido
+            document.getElementById('passwordModalLabel').innerText = title;
+            document.getElementById('passwordModalContent').innerText = content;
+            //Habilita botón cancelar
+            if(showCancel){
+              $('#passwordModalCancelButton').show();
+              $('#passwordModalCancelButton').text(titleCancel);
+
+            }else{
+              $('#passwordModalCancelButton').hide();
+            }
+            //Habilita botón aceptar
+            if(showAccept){
+              $('#passwordModalAcceptButton').show();
+              $('#passwordModalAcceptButton').text(titleAccept);
+            }else{
+              $('#passwordModalAcceptButton').hide();
+            }
+            $('#passwordModal').modal('show');
         }
 
     </script>
