@@ -6,6 +6,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     $id = isset($_POST['id']) ? $_POST['id'] : '';
     $item = isset($_POST['item']) ? $_POST['item'] : [];
     $prioridad = isset($_POST['prioridad']) ? $_POST['prioridad'] : '';
+    $pwd = isset($_POST['pwd']) ? $_POST['pwd'] : '';
+    $sucursal = isset($_POST['sucursal']) ? $_POST['sucursal'] : '';
     $listaAsignacion = isset($_POST['listaAsignacion']) ? $_POST['listaAsignacion'] : '';
 
     if ($action == 'cancelarSurtimiento') {
@@ -31,6 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     if ($action == 'priorizarSurtimiento') {
         $surtimientoCRUD = new SurtimientoCRUD();
         $surtimientoCRUD->priorizarSurtimiento($id, $prioridad);
+    }
+    if ($action == 'validaPwd') {
+        $surtimientoCRUD = new SurtimientoCRUD();
+        $surtimientoCRUD->validaPwd($pwd,$sucursal);
     }
     
 }
@@ -252,8 +258,8 @@ class SurtimientoCRUD {
     }
     
     public function listaDetalleSurtimiento($id=null,$sucursal=null) {
-        $ubicacionSel = ($sucursal == 1) ? "ub.numero_ubicacion_desde,ub.altura_desde," : "ub.numero_ubicacion_desde,ub.altura_desde,";
-        $ubicacionJoin = ($sucursal == 1) ? " LEFT JOIN ec_proveedor_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto ":" LEFT JOIN ec_sucursal_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto AND ub.id_sucursal = '{$sucursal}' ";
+        $ubicacionSel = ($sucursal == 1) ? " ifnull(ub.numero_ubicacion_desde, 'ND') numero_ubicacion_desde, ifnull(ub.altura_desde,'ND') altura_desde," : " ifnull(ub.numero_ubicacion_desde, 'ND') numero_ubicacion_desde, ifnull(ub.altura_desde,'ND') altura_desde,";
+        $ubicacionJoin = ($sucursal == 1) ? " LEFT JOIN ec_proveedor_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto and ub.habilitado = 1  and ub.es_principal = 1 ":" LEFT JOIN ec_sucursal_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto AND ub.id_sucursal = '{$sucursal}' and ub.habilitado = 1  and ub.es_principal = 1 ";
         $result = $this->conn->query("SELECT 
                 sd.id,
                 sd.id_producto,
@@ -301,8 +307,6 @@ class SurtimientoCRUD {
                 ) AS pp_data ON pp_data.id_producto = sd.id_producto
             WHERE  
                 sd.id_surtimiento = '{$id}'
-                -- and ub.habilitado = 1
-                -- and ub.es_principal = 1
                 -- and sd.id_asignado='104'
                 AND sd.estado IN (1,2);");
         
@@ -361,6 +365,23 @@ class SurtimientoCRUD {
         $stmt->close();
         $this->conn->close();
     }
+    
+    public function validaPwd($pwd = null, $sucursal= null){
+        $valid = false;
+        $query = "SELECT id_usuario from sys_users
+          where tipo_perfil in ('4','8')
+          and id_sucursal = '{$sucursal}'
+          and contrasena = md5('".$pwd."');";
+          
+        $itemsResult = $this->conn->query($query);
+
+        while($row = $itemsResult->fetch_assoc()) {
+            $valid = true;
+        }
+        $this->conn->close();
+        echo $valid;
+    }
+    
     
 }
 ?>
