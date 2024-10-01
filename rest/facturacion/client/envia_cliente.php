@@ -36,10 +36,14 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	$store_prefix = $config['store_prefix'];
 	$initial_time = $config['process_initial_date_time'];
 	$costumers_limit = $config['rows_limit'];
-	
+//consulta la url del api de sistema de facturacion en la base de datos
+	$sql = "SELECT `value` FROM `api_config` WHERE name = 'path_facturacion'";
+	$stm = $link->query( $sql ) or die( "Error al consultar el PATH de facturación : {$sql} : {$link->error}" );			
+	$row = $stm->fetch_assoc();
 	if( ! include( 'utils/facturacion.php' ) ){
 		die( "No se incluyó : facturacion.php" );
 	}
+	$fact_path = trim ( $row['value'] );
 	//die( 'here' );
 	$Bill = new Bill( $link, $system_store, $store_prefix );
 //generacion de registros de sincronizacion
@@ -52,8 +56,10 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	//var_dump( $rows );
 	$post_data = json_encode($req, JSON_UNESCAPED_UNICODE);//forma peticion//
 //return $post_data;
-	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
+	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$fact_path}/rest/inserta_cliente", $post_data );
     $result = json_decode( $result_1 );//decodifica respuesta
+	//return $result_1;
+	//var_dump($result_1);
    	if( $result == null || $result == "" ){
    		echo "error : ";
    		var_dump($result_1);

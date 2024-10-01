@@ -119,7 +119,6 @@
 				//$row[27] = str_replace( "{$rep['codigo_reemplazo']}", "{$rep['caracter']}", $row[27] );//del_municipio
 			}
 			//die( "nombre : " . $name );
-
 			$data = array( "rfc"=>$rfc, "nombre"=>$name, "usoCFDI"=>"G03", "domicilioFiscal"=>$postal_code, 
 				"regimenFiscal"=>$fiscal_regime );//var_dump( $data );die('');
 			$sql = "select token from api_token where id_user=0 and expired_in > now() limit 1;";
@@ -135,7 +134,7 @@
 			curl_setopt($crl, CURLOPT_POST, true);
 			curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
 			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-		    curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+		    curl_setopt($crl, CURLOPT_TIMEOUT, 60000);
 			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
 			  'Content-Type: application/json',
 			  'token: ' . $token)
@@ -259,7 +258,7 @@
 			curl_setopt($crl, CURLOPT_POST, true);
 			//curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
 			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-		    curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+		    curl_setopt($crl, CURLOPT_TIMEOUT, 60000);
 			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
 			  'Content-Type: application/json',
 			  'token: ' . $token)
