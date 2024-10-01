@@ -313,8 +313,7 @@ var packsCatalogue = new Array();
       // var baseUrl = window.location.origin;
       // var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Muestra';
       var parts_url = currentUrl.split('/touch_desarrollo');
-        //var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Pedido';
-      var apiUrl = parts_url[0] + '/rest/v1/surte/Pedido';
+      var apiUrl = parts_url[0] + '/rest/v1/surte/Muestra';
   
       var productosSeleccionados = getProductosMuestras();
   
@@ -338,6 +337,29 @@ var packsCatalogue = new Array();
                 console.log(data);
                 if( data.result.resultado == "Solicitado" ){
                   alert(data.result.descripcion);
+                  //Actualizar el producto del que se solicitó muestra, tanto localStorage como en front para controlar el número de muestras que se ha solicitado
+                  if( data.result.solicitado.length > 0 ){
+
+                    for (let index = 0; index < data.result.solicitado.length; index++) {
+                      const element = data.result.solicitado[index];
+                      var strCbMuestra = setProductoSolicitadoComoMuestra( element );
+                      
+                      if( strCbMuestra != "" ){
+                        /* Actualizar en session storage */
+                        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+                        products_array = JSON.parse( products_array );
+                        
+                        var indexProducto = searchIndexByListOrder(element, products_array);
+
+                        //La posición 14 corresponde a la posición donde es establece string de muestra
+                        products_array[indexProducto][14] = strCbMuestra;
+                        
+                        sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+
+                      }
+
+                    }
+                  }
   
                 }else{
                   alert("Ha ocurrido un error: "+data.result.descripcion);
@@ -426,7 +448,43 @@ var packsCatalogue = new Array();
     return seleccionados;
   }
 
+  function setProductoSolicitadoComoMuestra( ordenListaParam ){
+
+    var filas = $('#listaProductos tr.move');
+    var stringCbMuestra = "";
+    if( filas.length > 0 ){
+      // Mostrar las filas en la consola
+      filas.each(function(fila) {
+        var $row = $(this);
+        var ordenDeLista = $row.find('td:eq(0)').text().trim();
+
+        if( ordenDeLista == ordenListaParam ){
+          //Obtenemos el npúmero de muestra actual
+          var numeroMuestra = $row.find('td:eq(15)').find('input').attr("number-muestra");
+
+          if( numeroMuestra != undefined ){
+            numeroMuestra = Number(numeroMuestra) + 1;
+          }else{
+            numeroMuestra = 1;
+          }
+          
+          $row.find('td:eq(15)').find('input').attr('number-muestra', numeroMuestra.toString());
+
+          stringCbMuestra = $row.find('td:eq(15)')[0].innerHTML;
+
+        }
+
+      });
+    }
+
+    //Regresa el string correspondiente al campo checkbox para establecerlo en sessionStorage
+    return stringCbMuestra;
+
+  }
+
   function clearAllCheckBox(){
+
+    /*
     $('.cbMuestra:checked').each(function() {
         //Antes de limpiar el check, se procede a habilitar bandera pra saber a qué producto se le descuenta 1 unidad
         $(this).attr('number-muestra', 1);
@@ -451,6 +509,7 @@ var packsCatalogue = new Array();
         }
        
     });
+    */
 
     $(".cbSelectAllMuestras").prop('checked', false); 
     $('.cbMuestra:checked').each(function() {
