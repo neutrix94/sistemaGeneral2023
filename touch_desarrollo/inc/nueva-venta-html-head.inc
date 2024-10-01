@@ -2040,11 +2040,13 @@ var hay_paquete=0;
                         cantidad = cantidadAdicionalDespuesDeSurtido;
                     }
 
+                    if( numberMuestra > 0 ) cantidad = numberMuestra;
+
 
                 }else{
                     // En caso de que ya se haya solicitado muestra, a la cantidad solicitada, se resta la unidad de muestra, en otro caso, si no ha sido solicitado, se envía la cantidad solicitada originalmente
-                    if(numberMuestra=="1"){
-                        cantidad = cantidad -1; 
+                    if( numberMuestra != undefined ){
+                        cantidad = cantidad - numberMuestra; 
                     }
                 }
 
@@ -2092,6 +2094,8 @@ var hay_paquete=0;
         if( products_array.length > 0 ){ 
 
             for (let index = 0; index < products_array.length; index++) {
+                //Se actualiza bandera de muestra que indica reseteo de surtimiento en muestras
+                products_array[index][14] = '<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
                 //La posición 16 corresponde a la bandera para identificar si ya ha sido solicitado
                 products_array[index][16] = '1';
                 products_array[index][17] = '-1';
