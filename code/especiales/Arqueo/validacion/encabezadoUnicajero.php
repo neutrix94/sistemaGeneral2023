@@ -1,19 +1,20 @@
 <?php
-/*version 2.0 2024-06-21*/
+/*version 2.0 2024-10-01 para que salgan terminales de netPay loguedo como linea*/
 	$id_sesion_caja = $_GET['id_corte'];
 //selecciona el id de usuario del corte
-	$sql = "SELECT id_cajero AS user_id FROM ec_sesion_caja WHERE id_sesion_caja = '{$id_sesion_caja}'";
+	$sql = "SELECT id_cajero AS user_id, id_sucursal AS store_id FROM ec_sesion_caja WHERE id_sesion_caja = '{$id_sesion_caja}'";
 	$stm = $link->query($sql) or die( "Error al consultar el id de cajero : {$sql} : {$link->error}" );
 	$user_row = $stm->fetch_assoc();
-	$user_id = $user_row['user_id'];
+	$user_id = ( $user_row['user_id'] == '' ? -1 : $user_row['user_id'] );
+	$store_id = ( $user_row['store_id'] == '' ? -1 : $user_row['store_id'] );
 //corte anterior
 	//$id_corte_anterior;//$Arqueo->getSessionBefore( $user_id );
 //afiliaciones
 	$tarjetas_cajero = $Arqueo->getAfiliaciones( $user_id, $fecha_sesion, $hora_inicio_sesion, $hora_cierre_sesion, $id_sesion_caja );
 //terminales SmartAccounts
-	$terminales_cajero_smartAccounts = $Arqueo->getSmartAccountsTerminals( $user_sucursal, $user_id, $fecha_sesion, $hora_inicio_sesion, $hora_cierre_sesion, $id_sesion_caja );
+	$terminales_cajero_smartAccounts = $Arqueo->getSmartAccountsTerminals( $store_id, $user_id, $fecha_sesion, $hora_inicio_sesion, $hora_cierre_sesion, $id_sesion_caja );
 //afiliaciones para cheque o transferencia 
-	$cajas = $Arqueo->getAccounts( $user_sucursal );
+	$cajas = $Arqueo->getAccounts( $store_id );
 //cheques/transferencias del corte de caja
 	$pagos_chqs = $Arqueo->getAdittionalPayments( $user_id, $fecha_sesion, $hora_inicio_sesion, $id_sesion_caja );
 	
