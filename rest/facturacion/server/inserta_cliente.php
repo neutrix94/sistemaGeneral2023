@@ -79,7 +79,7 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
   $resp["download"] = $rowsSynchronization->getSynchronizationRows( -1, $log['origin_store'], $costumers_limit, 'sys_sincronizacion_registros_facturacion' );
 
 //consume el webservice para insertar cliente en los sistemas de factureacion
-  $sql = "SELECT value FROM api_config WHERE name = 'path' LIMIT 1";
+  /*$sql = "SELECT value FROM api_config WHERE name = 'path' LIMIT 1";
   $stm = $link->query( $sql ) or die( "Error al consultar el path del api : {$link->error}" );
   $row = $stm->fetch_assoc();
   $api_path = $row['value'];
@@ -88,9 +88,10 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$api_path}/rest/facturacion/clientes/nuevoCliente", $post_data );
   if( trim( $result_1 ) != 'ok' ){
     die( "Error al insertar registros en facuracion : $result_1" );
-  }
+  }*/
   //die( 'here' );
-  return json_encode($resp, JSON_UNESCAPED_UNICODE);
+  return 'ok';
+  //return json_encode($resp, JSON_UNESCAPED_UNICODE);
   //die( "api_path : {$api_path}" );
 });
 
