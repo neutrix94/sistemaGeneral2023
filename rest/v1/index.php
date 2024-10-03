@@ -39,6 +39,7 @@ require 'endpoints/notiPedido.php';   //Surtimeinto: Notifica surtimiento
 require 'endpoints/notificacionesPendientes.php';   //Surtimeinto: Obtiene notificaciones pendientes
 require 'endpoints/getPerfilUsuario.php';   //Surtimiento: Obtiene perfil de usuario
 require 'endpoints/getDetallePedido.php';   //Surtimiento: Obtiene detalle del pedido
+require 'endpoints/faltantePedido.php';   //Surtimiento: Obtiene detalle del pedido
 
 
   //Servicios de Servidor
