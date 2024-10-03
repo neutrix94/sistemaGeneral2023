@@ -1,5 +1,5 @@
 <?php
-//ok 2023/11/25
+/* Version sin envio de cliente a sistemas de facturacion desde sistema general 2024-10-03*/
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 
