@@ -1,4 +1,5 @@
 <?php
+/*Version 2024-10-03 correccion de proyeccion y resultados de transferencia en la exportacion de transferencia por orden de lista con proyeccion*/
     include( '../../../../conexionMysqli.php' );//libreria de conexion
     $idTransfer = ( isset( $_POST['idTransfer'] ) ? $_POST['idTransfer'] : $_GET['idTransfer'] );
 //consulta datos de transferencia
@@ -39,7 +40,8 @@
                 ax4.id_producto,
                 ax4.orden_lista,
                 ax4.nombre_producto,
-                ( ax4.inventario_inicial + ax4.pedido + ax4.recibidoRecepcion + ax4.cantidad_validada ) AS proyeccion_piezas,
+                /*( ax4.inventario_inicial + ax4.pedido + ax4.recibidoRecepcion + ax4.cantidad_validada ) AS proyeccion_piezas,*/
+                ( ax4.inventarioTotal + ax4.pedido ) AS proyeccion_piezas,
                 ax4.inventarioTotal,
                 ax4.piezas_recibidas,
                 ax4.piezas_solicitadas,
@@ -99,10 +101,10 @@
                     ax3.observaciones,
                     ax3.nombre_familia,
                     ax3.estacionalidad,
-                    ax3.recibidoRecepcion,
+                    /*ax3.recibidoRecepcion,*/
                     ax3.cantidad_validada,
-                    ax3.inventario_inicial,
-                    ax3.inventario_inicial_otros_movs,
+                    /*ax3.inventario_inicial,
+                    ax3.inventario_inicial_otros_movs,*/
                     ax3.inventarioTotal,     
                     SUM( IF( ocd.id_oc_detalle IS NOT NULL, ( ocd.cantidad - ocd.cantidad_surtido ), 0 ) ) AS pedido
                 FROM(
@@ -116,10 +118,10 @@
                         ax2.observaciones,
                         ax2.nombre_familia,
                         ax2.estacionalidad,
-                        ax2.recibidoRecepcion,
+                        /*ax2.recibidoRecepcion,*/
                         ax2.cantidad_validada,
-                        SUM( IF( md.id_movimiento_almacen_detalle IS NOT NULL AND ma.fecha <= '$_FECHA_INICIAL', ( tm.afecta * md.cantidad ), 0 ) ) AS inventario_inicial,
-                        SUM( IF( md.id_movimiento_almacen_detalle IS NOT NULL AND ( ma.fecha BETWEEN '$_FECHA_1' AND '$_FECHA_2') AND ma.id_tipo_movimiento NOT IN(1), ( tm.afecta * md.cantidad ), 0 ) ) AS inventario_inicial_otros_movs,
+                        /*SUM( IF( md.id_movimiento_almacen_detalle IS NOT NULL AND ma.fecha <= '$_FECHA_INICIAL', ( tm.afecta * md.cantidad ), 0 ) ) AS inventario_inicial,
+                        SUM( IF( md.id_movimiento_almacen_detalle IS NOT NULL AND ( ma.fecha BETWEEN '$_FECHA_1' AND '$_FECHA_2') AND ma.id_tipo_movimiento NOT IN(1), ( tm.afecta * md.cantidad ), 0 ) ) AS inventario_inicial_otros_movs,*/
                         SUM( IF( md.id_movimiento_almacen_detalle IS NULL OR ma.id_movimiento_almacen IS NULL, 0, ( md.cantidad * tm.afecta ) ) ) AS inventarioTotal                
                     FROM(
                         SELECT
@@ -132,45 +134,48 @@
                             ax1.observaciones,
                             ax1.nombre_familia,
                             ax1.estacionalidad,
-                            ax1.recibidoRecepcion,
+                            /*ax1.recibidoRecepcion,*/
                             SUM( IF( ord.id_oc_recepcion_detalle IS NOT NULL AND ( ocr.fecha_recepcion BETWEEN '$_FECHA_1 00:00:01' AND '$_FECHA_2 23:59:59' ), ord.piezas_recibidas, 0 ) ) AS cantidad_validada            
                         FROM(
                             SELECT
                                 ax.id_producto,
                                 ax.orden_lista,
                                 ax.nombre_producto,
-                                ax.piezas_recibidas,
+                                /*ax.piezas_recibidas,
                                 ax.piezas_solicitadas,
-                                ax.numero_consecutivo,
+                                ax.numero_consecutivo,*/
                                 ax.observaciones,
                                 ax.nombre_familia,
                                 ax.estacionalidad,
-                                IF( rbd.id_recepcion_bodega_detalle IS NULL, 
+                                IF( tp.id_transferencia_producto IS NULL, 'n/a',tp.total_piezas_recibidas ) AS piezas_recibidas,
+                                IF( tp.id_transferencia_producto IS NULL, 'n/a',tp.cantidad ) AS piezas_solicitadas,
+                                IF( tp.id_transferencia_producto IS NULL, 'n/a', tp.numero_consecutivo ) AS numero_consecutivo
+                                /*IF( rbd.id_recepcion_bodega_detalle IS NULL, 
                                     0,
                                     SUM( ax.presentacion_caja * rbd.cajas_recibidas ) + SUM( rbd.piezas_sueltas_recibidas )
-                                ) AS recibidoRecepcion
+                                ) AS recibidoRecepcion*/
                             FROM(
                                 SELECT
                                     p.id_productos AS id_producto,
                                     p.orden_lista,
                                     p.nombre AS nombre_producto,
                                     pp.presentacion_caja,
-                                    IF( tp.id_transferencia_producto IS NULL, 'n/a',tp.total_piezas_recibidas ) AS piezas_recibidas,
+                                    /*IF( tp.id_transferencia_producto IS NULL, 'n/a',tp.total_piezas_recibidas ) AS piezas_recibidas,
                                     IF( tp.id_transferencia_producto IS NULL, 'n/a',tp.cantidad ) AS piezas_solicitadas,
-                                    IF( tp.id_transferencia_producto IS NULL, 'n/a', tp.numero_consecutivo ) AS numero_consecutivo,
+                                    IF( tp.id_transferencia_producto IS NULL, 'n/a', tp.numero_consecutivo ) AS numero_consecutivo,*/
                                     REPLACE( REPLACE( p.observaciones, '\n', '' ), ',', '' ) AS observaciones,
                                     c.nombre AS nombre_familia,
                                     ep.maximo AS estacionalidad
                                 FROM ec_productos p
+                                LEFT JOIN ec_categoria c
+                                ON c.id_categoria = p.id_categoria
                                 LEFT JOIN ec_proveedor_producto pp
                                 ON p.id_productos = pp.id_producto
-                                LEFT JOIN ec_transferencia_productos tp
+                                /*LEFT JOIN ec_transferencia_productos tp
                                 ON tp.id_producto_or = p.id_productos
                                 LEFT JOIN ec_transferencias t
                                 ON tp.id_transferencia = t.id_transferencia
-                                AND t.folio = '{$folio_transferencia}'
-                                LEFT JOIN ec_categoria c
-                                ON c.id_categoria = p.id_categoria
+                                AND t.folio = '{$folio_transferencia}'*/
                                 LEFT JOIN ec_estacionalidad_producto ep
                                 ON ep.id_producto = p.id_productos
                                 AND ep.id_estacionalidad IN( SELECT id_estacionalidad FROM sys_sucursales WHERE id_sucursal = {$destino} )
@@ -180,16 +185,23 @@
                                 AND p.id_productos > 0
                                 AND p.muestra_paleta = 0
                                 AND p.es_maquilado = 0
+                                AND ep.maximo > 0
                                 GROUP BY p.id_productos
                             )ax
-                            LEFT JOIN ec_recepcion_bodega_detalle rbd
+                            /*LEFT JOIN ec_recepcion_bodega_detalle rbd
                             ON rbd.id_producto = ax.id_producto
                             AND rbd.validado IN( 0  )
                             LEFT JOIN ec_recepcion_bodega rb 
                             ON rb.id_recepcion_bodega = rbd.id_recepcion_bodega
                             AND rb.fecha_alta LIKE '%{$ano_actual}%'
                             AND rb.id_status_validacion IN( 1, 2  )
-                            AND rb.id_recepcion_bodega_status IN(  2, 3  )
+                            AND rb.id_recepcion_bodega_status IN(  2, 3  )*/
+                            JOIN ec_transferencias t
+                           /* ON tp.id_transferencia = t.id_transferencia*/
+                            ON t.folio = '{$folio_transferencia}'
+                            LEFT JOIN ec_transferencia_productos tp
+                            ON tp.id_transferencia = t.id_transferencia
+                            AND tp.id_producto_or = ax.id_producto
                             GROUP BY ax.id_producto
                         )ax1
                         LEFT JOIN ec_oc_recepcion_detalle ord
