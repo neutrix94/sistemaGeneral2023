@@ -1,5 +1,5 @@
 <?php
-    //php_track_vars;
+/*Version 2024-10-04 Correccion de consulta de exportacion de precio de mayoreo*/
     
     extract($_GET);
     extract($_POST);
@@ -212,7 +212,7 @@
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*' ) SEPARATOR '<br>') )
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*' ) ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -226,7 +226,7 @@
               (SELECT
                   IF( pr_n.id_producto_nota IS NULL, 
                       '',
-                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( prn.nota, '\n', '*' ) ) SEPARATOR '<br>')
+                      GROUP_CONCAT( CONCAT( REPLACE( pvn.nombre_valor_nota, '\n', '*' ), ' : ', REPLACE( pr_n.nota, '\n', '*' ) ) SEPARATOR '<br>')
                   )
               FROM ec_productos_notas pr_n
               LEFT JOIN ec_productos_categorias_notas pcn
@@ -310,7 +310,7 @@
       //die($sql);
       }
 
-      $res=mysql_query($sql) or die(mysql_error());
+      $res=mysql_query($sql) or die( "{$sql}" . mysql_error() );
        
       $num=mysql_num_rows($res);        
     
