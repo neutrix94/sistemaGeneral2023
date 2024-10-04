@@ -326,8 +326,10 @@
                     //$epl_code .= "A400,255,2,5,2,2,N,\",\"\n";
                 }
                 $epl_code .= "b500,290,Q,m2,s5,\"{$product['list_order']}\"\n";
-                $epl_code .= "A486,380,2,5,{$price_size},4,N,\"{$space_1}{$product['price']}\"\n";
+                $epl_code .= "A495,380,2,5,{$price_size},4,N,\"{$space_1}{$product['price']}\"\n";
                 $epl_code .= "A590,280,2,4,4,4,N,\"{$space_2}$\"\n";
+                $epl_code .= "A65,340,2,4,3,3,N,\"p\"\n";
+                $epl_code .= "A65,270,2,4,3,3,N,\"z\"\n";
                 $epl_code .= "A612,150,2,3,2,3,N,\"{$product['name_part_one']}\"\n";
                 $epl_code .= "A612,80,2,3,2,3,N,\"{$product['name_part_two']}\"\n";
                 $epl_code .= "P1\n";
@@ -422,14 +424,18 @@
                 $epl_code .= "f100\n";
                 $epl_code .= "N\n";
                 $epl_code .= "b630,420,Q,m2,s8,\"{$product['list_order']}\"\n";
-                $epl_code .= "A600,560,2,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
+                $epl_code .= "A623,560,2,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
                 $epl_code .= "A740,400,2,4,5,6,N,\"{$space_2}$\"\n";
+                $epl_code .= "A55,440,2,4,3,3,N,\"p\"\n";
+                $epl_code .= "A55,360,2,4,3,3,N,\"z\"\n";
                 $epl_code .= "A795,200,2,4,2,4,N,\"{$product['name_part_one']}\"\n";
                 $epl_code .= "A795,110,2,4,2,4,N,\"{$product['name_part_two']}\"\n";
 
                 $epl_code .= "b30,650,Q,m2,s8,\"{$product['list_order']}\"\n";
-                $epl_code .= "A220,660,0,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
+                $epl_code .= "A200,660,0,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
                 $epl_code .= "A80,840,0,4,5,6,N,\"{$space_2}$\"\n";
+                $epl_code .= "A765,780,0,4,3,3,N,\"p\"\n";
+                $epl_code .= "A765,860,0,4,3,3,N,\"z\"\n";
                 $epl_code .= "A30,1020,0,4,2,4,N,\"{$product['name_part_one']}\"\n";
                 $epl_code .= "A30,1120,0,4,2,4,N,\"{$product['name_part_two']}\"\n";
                 $epl_code .= "A392,571,0,4,3,3,N,\"o\"\n";
