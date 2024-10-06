@@ -336,7 +336,36 @@ var packsCatalogue = new Array();
                 console.log("RESPUESTA MUESTRA");
                 console.log(data);
                 if( data.result.resultado == "Solicitado" ){
-                  alert(data.result.descripcion);
+                  
+                  var solicitado = data.result.solicitado;
+                  var noHabilitado = data.result.noHabilitado;
+                  var noSoliciado = data.result.noSolicitado;
+
+                  var msjAlert = "";
+
+                  if( solicitado.length > 0 ){
+                    msjAlert += "Se ha solicitado la muestra de los siguientes productos:";
+
+                    for (let index = 0; index < solicitado.length; index++) {
+                      msjAlert += "\n"+solicitado[index];
+                      
+                    }
+                  }
+
+                  if( noSoliciado.length > 0 ){
+                    msjAlert += "\n\nLos siguientes productos no se han solictado debido a que no se encuentran habilitados para surtimiento y/o se encuentran en proceso de surtimiento:";
+
+                    for (let index = 0; index < noSoliciado.length; index++) {
+                      msjAlert += "\n"+noSoliciado[index];
+                      
+                    }
+                  }
+
+                  if( msjAlert != "" ){
+                    alert(msjAlert);
+                  }
+
+                  //alert(data.result.descripcion);
                   //Actualizar el producto del que se solicitó muestra, tanto localStorage como en front para controlar el número de muestras que se ha solicitado
                   if( data.result.solicitado.length > 0 ){
 
@@ -595,7 +624,7 @@ var packsCatalogue = new Array();
                     }
                 });
 
-                alert("Recuerda que debes de Enviar pedido para poder surtir el cambio.");
+                alert("Solicitud de cambio físico generada exitosamente.\nPara concluir dicha operación favor de dar click en 'Enviar pedido'");
                 $('#inputDevolucion').val("");
                 closeModal();
               }
