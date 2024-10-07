@@ -170,11 +170,12 @@ $indiceSurtir = 0;
     <script>
         var listaSurtir = {};
         var indiceSurtir = 0;
+        var id = 0;
         var perfil = '<?php echo $perfil ?>';
         document.addEventListener('DOMContentLoaded', function() {
             indiceSurtir = 0;
             listaSurtir = []
-            const id = '<?php echo $id ?>';
+            id = '<?php echo $id ?>';
             if( <?php echo $pendientes?>){
               listaSurtir = <?php echo json_encode($listaSurtir) ?>;
               refreshView();

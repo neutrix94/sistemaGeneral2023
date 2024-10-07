@@ -1984,7 +1984,7 @@ var hay_paquete=0;
                 if( data.result.resultado == "Solicitado" ){
                     alert(data.result.descripcion);
                     //Establecer el localStorage como 1 la fila 16, corresponde a la bandera para saber si ya fue solicitado
-                    setBanderaProductoSolicitado();
+                    setBanderaProductoSolicitado(data.result.noSolicitados);
                     clearArrayEliminados();
 
                 }else{
@@ -2087,18 +2087,25 @@ var hay_paquete=0;
         return id;  
     }
 
-    function setBanderaProductoSolicitado(){
+    function setBanderaProductoSolicitado( noSolicitados ){
         var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
         products_array = JSON.parse( products_array );
 
         if( products_array.length > 0 ){ 
 
             for (let index = 0; index < products_array.length; index++) {
-                //Se actualiza bandera de muestra que indica reseteo de surtimiento en muestras
-                products_array[index][14] = '<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
-                //La posición 16 corresponde a la bandera para identificar si ya ha sido solicitado
-                products_array[index][16] = '1';
-                products_array[index][17] = '-1';
+                var odenListaProd = products_array[index][0];
+
+                //Solo se establecen como "solicitado" los productos que no vengan en el arreglo de noSolicitados
+                if( !noSolicitados.includes( odenListaProd ) ){
+                    //Se actualiza bandera de muestra que indica reseteo de surtimiento en muestras
+                    products_array[index][14] = '<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+                    //La posición 16 corresponde a la bandera para identificar si ya ha sido solicitado
+                    products_array[index][16] = '1';
+                    products_array[index][17] = '-1';
+
+                }
+
             }
 
           sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
