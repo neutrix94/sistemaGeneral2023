@@ -59,7 +59,11 @@ class SurtimientoCRUD {
         return $stmt->execute();
     }
 
-    public function listaSurtir($perfil=null,$idUsuario=null,$sucursal=null) {
+    public function listaSurtir($perfil=null,$idUsuario=null,$sucursal=null,$fecha=null,$tipo=null,$estado=null) {
+        $filters = ' ';
+        $filters = empty($tipo) ? $filters : $filters . " AND s.tipo = '{$tipo}' ";
+        $filters = empty($estado) ? $filters : $filters . " AND s.estado = '{$estado}' ";
+        $filters = empty($fecha) ? $filters : $filters . " AND date(s.fecha_creacion) >= '{$fecha}' ";
         $estados = $perfil=='2' ? "'1','2','3','4','5'" : "'1','2','4'" ;
         $result = $this->conn->query("SELECT 
             s.id,
@@ -98,6 +102,7 @@ class SurtimientoCRUD {
         LEFT JOIN sys_users u ON u.id_usuario = s.id_vendedor
         WHERE u.id_sucursal = '{$sucursal}'
         AND s.estado in ({$estados})
+        {$filters}
         ORDER BY s.estado, s.prioridad, s.fecha_creacion asc;");
         
         return $result->fetch_all(MYSQLI_ASSOC);
