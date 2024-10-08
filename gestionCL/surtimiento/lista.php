@@ -3,11 +3,14 @@ require_once '../classes/surtimiento.php';
 include('../../conect.php');
 
 // Obtiene datos de usuario logueado & lista de pedidos
+$fecha = isset($_GET['fecha']) ? $_GET['fecha'] : null;
+$tipo = isset($_GET['tipo']) ? $_GET['tipo'] : null;
+$estado = isset($_GET['estado']) ? $_GET['estado'] : null;
 $surtimientoCRUD = new SurtimientoCRUD();
 $idUsuario = isset($user_id) ? $user_id : null;
 $usuario =  $surtimientoCRUD->getUserProfile($idUsuario);
 $perfil = (isset($usuario[0]) && ($usuario[0]['tipo_perfil'] == '4' || $usuario[0]['tipo_perfil'] == '8') &&  $usuario[0]['id_encargado'] == $idUsuario ) ? '2': '1';
-$surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id);
+$surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$fecha,$tipo,$estado);
 
 ?>
 
@@ -42,6 +45,44 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id);
 </nav>
 <div class="container mt-5">
     <h1 class="text-center">Lista de Pedidos (<?php echo count($surtimientos) ?>)</h1><br>
+    <form id="filterForm" method="GET" action="lista.php" class="mb-4">
+        <div class="row">
+            <!-- Filtro por Fecha -->
+            <div class="col-md-3">
+                <label for="fecha">Fecha</label>
+                <input type="date" name="fecha" id="fecha" class="form-control" value="<?php echo $fecha ?>"/>
+            </div>
+            
+            <!-- Filtro por Estado -->
+            <div class="col-md-3">
+                <label for="estado">Estado</label>
+                <select name="estado" id="estado" class="form-control" value="<?php echo $estado ?>">
+                    <option value="">Todos</option>
+                    <option value="1" <?php echo $estado == "1" ? "selected" : "" ?> >Pendiente</option>
+                    <option value="2" <?php echo $estado == "2" ? "selected" : "" ?> >Proceso</option>
+                    <option value="3" <?php echo $estado == "3" ? "selected" : "" ?> >Completado</option>
+                    <option value="4" <?php echo $estado == "4" ? "selected" : "" ?> >Pausado</option>
+                    <option value="5" <?php echo $estado == "5" ? "selected" : "" ?> >Cancelado</option>
+                </select>
+            </div>
+
+            <!-- Filtro por Tipo -->
+            <div class="col-md-3">
+                <label for="tipo">Tipo</label>
+                <select name="tipo" id="tipo" class="form-control" value="<?php echo $tipo ?>">
+                    <option value="">Todos</option>
+                    <option value="1" <?php echo $tipo == "1" ? "selected" : "" ?> >Muestra</option>
+                    <option value="2" <?php echo $tipo == "2" ? "selected" : "" ?> >Pedido</option>
+                </select>
+            </div>
+
+            <!-- Botón de aplicar filtros -->
+            <div class="col-md-3 align-self-end">
+                <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+            </div>
+        </div>
+    </form>
+
     <table class="table table-striped table-bordered">
         <thead>
             <tr>
