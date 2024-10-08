@@ -74,10 +74,13 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
         </tbody>
     </table>
     <br>
-    <button id="btnPrioriza" class="btn btn-primary" onclick="priorizarSurtimiento()">⭐️ Priorizar surtimiento</button>
-    <button id="btnAsigna" class="btn btn-success" onclick="guardarAsignacion()">✔️ Guardar asignación</button>
-    <button id="btnPausa" class="btn btn-warning" onclick="pausarSurtimiento()">⏸️ Pausar surtimiento</button>
-    <button id="btnCancela" class="btn btn-danger" onclick="cancelarSurtimiento()">✖️ Cancelar surtimiento</button>
+    <div class="btn-group mr-2" role="group">
+      <button id="btnPrioriza" class="btn btn-primary" onclick="priorizarSurtimiento()">⭐️ Priorizar surtimiento</button>
+      <button id="btnAsigna" class="btn btn-success" onclick="guardarAsignacion()">✔️ Guardar asignación</button>
+      <button id="btnPausa" class="btn btn-warning" onclick="pausarSurtimiento()">⏸️ Pausar surtimiento</button>
+      <button id="btnCancela" class="btn btn-danger" onclick="cancelarSurtimiento()">✖️ Cancelar surtimiento</button>
+      <button id="btnReanudar" class="btn btn-success" onclick="reanudarSurtimiento()">▶️ Reanudar surtimiento</button>
+  </div>
 </div>
 
 <!-- Modal: Alertas -->
@@ -129,6 +132,9 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
         }
         if(listaAsignacion.pausado){
           document.getElementById('btnPausa').style.display = 'none';
+          document.getElementById('btnReanudar').style.display = 'block';
+        }else{
+          document.getElementById('btnReanudar').style.display = 'none';
         }
         poblarSurtidorSelect();
         actualizarTablaAsignaciones();
@@ -283,8 +289,48 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
         //     });
         // }
     }
+    function reanudarSurtimiento(){
+        showAlertModal(
+          'Confirmar reanudar',
+          '¿Estás seguro de reanudar el surtimiento?',
+          true,
+          'Cancelar',
+          true,
+          'Aceptar'
+        );
+        // Establecer la función de callback para el botón de aceptar
+        $('#alertModalAcceptButton').off('click').on('click', function() {
+            $.ajax({
+                url: '../classes/surtimiento.php',
+                type: 'POST',
+                data: {
+                    action: 'reanudarSurtimiento',
+                    id: '<?php echo $id; ?>'
+                },
+                success: function(response) {
+                    window.location.href = 'lista.php';
+                },
+                error: function(xhr, status, error) {
+                    alert('Hubo un error al cancelar la asignación: ' + error);
+                }
+            });
+            $('#alertModal').modal('hide');  
+        });
+    }
 
     function pausarSurtimiento() {
+        if (listaAsignacion.pendienteSurtir <= 0) {
+            showAlertModal(
+              'Proceso no viable',
+              'No puedes pausar una solicitud que no tiene partidar pendientes de surtir',
+              true,
+              'Cerrar',
+              false,
+              ''
+            );
+            return;
+        }
+      
         showAlertModal(
           'Confirmar pausa',
           '¿Estás seguro de pausar el surtimiento?',
@@ -331,6 +377,18 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
     }
 
     function cancelarSurtimiento() {
+        if (listaAsignacion.pendienteSurtir <= 0) {
+            showAlertModal(
+              'Proceso no viable',
+              'No puedes cancelar una solicitud que no tiene partidar pendientes de surtir',
+              true,
+              'Cerrar',
+              false,
+              ''
+            );
+            return;
+        }
+        
         showAlertModal(
           'Confirmar cancelación',
           '¿Estás seguro de cancelar el surtimiento?',

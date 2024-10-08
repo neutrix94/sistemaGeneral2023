@@ -38,6 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
         $surtimientoCRUD = new SurtimientoCRUD();
         $surtimientoCRUD->validaPwd($pwd,$sucursal);
     }
+    if ($action == 'reanudarSurtimiento') {
+        $surtimientoCRUD = new SurtimientoCRUD();
+        $surtimientoCRUD->reanudarSurtimiento($id,1);
+    }
     
 }
 
@@ -56,7 +60,7 @@ class SurtimientoCRUD {
     }
 
     public function listaSurtir($perfil=null,$idUsuario=null,$sucursal=null) {
-        $estados = $perfil=='2' ? "'1','2','3','4','5'" : "'1','2'" ;
+        $estados = $perfil=='2' ? "'1','2','3','4','5'" : "'1','2','4'" ;
         $result = $this->conn->query("SELECT 
             s.id,
             s.no_pedido,
@@ -161,7 +165,8 @@ class SurtimientoCRUD {
             left join sys_users u on u.id_usuario = sd.id_asignado
             left join ec_surtimiento s on s.id = sd.id_surtimiento
             where sd.id_surtimiento = '{$id}'
-             and sd.id_asignado != '' and sd.id_asignado is not null
+             -- and sd.id_asignado != '' 
+             -- and sd.id_asignado is not null
             group by sd.id_asignado
             ;");
 
@@ -170,13 +175,15 @@ class SurtimientoCRUD {
         $pausado = 0;
         if ($itemsResult->num_rows > 0) {
             while($row = $itemsResult->fetch_assoc()) {
-                $items[] = array(
-                  'partidas' => $row['partidas'], 
-                  'id_surtidor' => $row['id_surtidor'],
-                  'nombre_surtidor' => $row['nombre_surtidor'],
-                  'id_pedido' => $row['id_pedido'],
-                  'asignado' => 1
-                );
+                if(!empty($row['id_surtidor'])){
+                  $items[] = array(
+                    'partidas' => $row['partidas'], 
+                    'id_surtidor' => $row['id_surtidor'],
+                    'nombre_surtidor' => $row['nombre_surtidor'],
+                    'id_pedido' => $row['id_pedido'],
+                    'asignado' => 1
+                  );
+                }
                 $cancelado = ($row['estado'] == '5') ? 1 : $cancelado;
                 $pausado = ($row['estado'] == '4') ? 1 : $pausado;
             }
@@ -220,6 +227,16 @@ class SurtimientoCRUD {
     public function pausaSurtimiento($id = null, $idUsuario=null) {
         $idUsuario = empty($idUsuario) ? 1 : $idUsuario;
         $query = "UPDATE ec_surtimiento SET fecha_modificacion = now(), estado = '4' WHERE id = '{$id}';";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $stmt->close();
+        $this->conn->close();
+        //return true;
+    }
+    
+    public function reanudarSurtimiento($id = null, $idUsuario=null) {
+        $idUsuario = empty($idUsuario) ? 1 : $idUsuario;
+        $query = "UPDATE ec_surtimiento SET fecha_modificacion = now(), estado = '1', prioridad = '2' WHERE id = '{$id}';";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $stmt->close();
