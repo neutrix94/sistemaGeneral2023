@@ -1,4 +1,5 @@
 <?php
+/*version 2024-10-12 ( Se corrige bloqueo de apis de sincronizacion de acuerdo a configuracion en transferencias rapidas )*/
 	if( isset( $_GET['freeTransferFl'] ) || isset( $_POST['freeTransferFl'] ) ){
 		include( '../../../../conect.php' );
 		include( '../../../../conexionMysqli.php' );
@@ -30,7 +31,7 @@
 							case '1' :
 								$time = array();
 								$time['inicio'] =  $fT->getCurrentTime();
-								if( $lock_synchronization = 1 ){
+								if( $lock_synchronization == 1 ){
 									$fT->lock_and_unlock_synchronization_apis( 1 );
 								}
 								$time['fin'] =  $fT->getCurrentTime();
@@ -47,7 +48,7 @@
 							case '7' :
 								$time = array();
 								$time['inicio'] =  $fT->getCurrentTime();
-								if( $lock_synchronization = 1 ){
+								if( $lock_synchronization == 1 ){
 									$fT->lock_and_unlock_synchronization_apis( 0 );
 								}
 								$time['fin'] =  $fT->getCurrentTime();
@@ -58,7 +59,7 @@
 					case '11' ://Transferencia a otra sucursal
 						switch( $id_estado ){
 							case '1' :
-								if( $lock_synchronization = 1 ){
+								if( $lock_synchronization == 1 ){
 									$fT->lock_and_unlock_synchronization_apis( 1 );
 								}
 								echo json_encode( $fT->updateTransferStatus( $user_id, $transfer_id, 2, "SALIDA TRANSFERENCIA" ) );//pasa a pendiente de surtir para hacer movimientos de almacen de salida
@@ -70,7 +71,7 @@
 							break;
 							case '6' :
 								echo json_encode( $fT->updateTransferStatus( $user_id, $transfer_id, 7, $observations ) );//pasa a Revision Finalizada para que se reciba desde el listado
-								if( $lock_synchronization = 1 ){
+								if( $lock_synchronization == 1 ){
 									$fT->lock_and_unlock_synchronization_apis( 0 );
 								}
 							break;
