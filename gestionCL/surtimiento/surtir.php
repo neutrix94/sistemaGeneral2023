@@ -110,11 +110,15 @@ $indiceSurtir = 0;
               <p>Entrega la mercancía a:</p>
               <p class="text-primary p-2 txt-val-modal"><span id="nombreVendedor">Nombre del vendedor</span></p>
               <p>Folio de la nota:</p>
-              <p class="text-primary p-2 txt-val-modal">El folio de la nota</p>
+              <p class="text-primary p-2 txt-val-modal" id="folioNotaModal"></p>
               <p>Productos surtidos parcialmente:</p>
-              <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>
+              <div id="listaProductosSurtidosParcialmente"></div>
+              <!-- 
+                <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>
+              -->
               <p>Productos no surtidos:</p>
-              <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>
+              <div id="listaProductosNoSurtidos"></div>
+              <!-- <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>  -->
             </div>
             <div class="modal-footer d-flex flex-column align-items-center w-100">
               <button type="button" class="btn btn-success mb-2" style="width: 50%;" onclick="imprimeTicket()">IMPRIMIR</button>
@@ -415,7 +419,87 @@ $indiceSurtir = 0;
         function surtidoCompletado(){
            //Surtimiento completado
            document.getElementById('nombreVendedor').innerText = listaSurtir[0].nombre_vendedor;
-           $('#surtidoModal').modal('show');
+           //Mandamos a llamar para llenar modal
+           var currentUrl = window.location.href;
+      
+          var parts_url = currentUrl.split('/gestionCL');
+          var apiUrl = parts_url[0] + '/rest/v1/surte/Faltante';
+
+          var queryString = window.location.search;
+          // Crea un objeto URLSearchParams con la cadena de consulta
+          var urlParams = new URLSearchParams(queryString);
+          // Obtén el valor del parámetro 'id'
+          var idValue = urlParams.get('id');
+          var id = idValue;
+
+          $.ajax({
+            type: 'POST',
+            url: apiUrl,
+            headers: {
+              'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
+            },
+            data: {
+                "pedido": id
+            },
+            datatype: 'json',
+            success: function (data) {
+              console.log("algo");
+              window.dataSurtmiento = data;
+              
+              if( data.result.resultado == "Faltante" ){
+                $('#surtidoModal').modal('show');
+
+                var folio = data.result.detalle.folioPedido;
+                var productosParciales = data.result.detalle.surtidoParcial;
+                var stringProductosParciales = "";
+  
+                var productosNoSurtidos = data.result.detalle.noSurtido;
+                var stringProductosNoSurtidos = "";
+  
+                if( productosParciales.length > 0 ){
+                  
+                  for (let index = 0; index < productosParciales.length; index++) {
+                    
+                    stringProductosParciales += "<br>" + productosParciales[index].nombre;
+                  }
+                }
+  
+                if( productosNoSurtidos.length > 0 ){
+                  for (let index = 0; index < productosNoSurtidos.length; index++) {
+                    
+                    stringProductosNoSurtidos += "<br>" + productosNoSurtidos[index].nombre;
+                  }
+                }
+  
+                $('#folioNotaModal').text(folio);
+  
+                if( stringProductosParciales !="" ){
+                  $('#listaProductosSurtidosParcialmente').append('<p class="text-primary p-2 txt-val-modal">' + stringProductosParciales + '</p>');
+                }else{
+                  $('#listaProductosSurtidosParcialmente').append('<p class="text-primary p-2 txt-val-modal">&nbsp;</p>')
+                }
+  
+                if( stringProductosNoSurtidos != "" ){
+                  $('#listaProductosNoSurtidos').append('<p class="text-primary p-2 txt-val-modal">' + stringProductosNoSurtidos + '</p>');
+                }else{
+                  $('#listaProductosNoSurtidos').append('<p class="text-primary p-2 txt-val-modal">&nbsp;</p>');
+                }
+              }else{
+
+                //No se muestra detalle para imprimir ya que todo el Pedido se surtió completo
+
+                alert( data.result.resultado );
+                window.location.href='lista.php';
+
+              }
+
+
+            },
+            error:function(error){
+              console.log("ERROR".error);
+            }
+          });
+           
 
            //imprimeTicket();
         }
@@ -443,18 +527,24 @@ $indiceSurtir = 0;
         }
 
         function imprimeTicket(){
-          // Define la ruta donde quieres guardar el PDF
-          const savePath = "../pdf/tickets";
+          
+          const dataToSend = window.dataSurtmiento;
 
           // Realiza la solicitud a ticket.php
-          fetch(`../surtimiento/pdf/ticket.php?savePath=${encodeURIComponent(savePath)}`)
-          //fetch(`../surtimiento/pdf/ticket.php`)
+          fetch(`../surtimiento/pdf/ticket.php`, {
+              method: 'POST', // Método POST para enviar datos
+              headers: {
+                  'Content-Type': 'application/json' // Especifica que se envía JSON
+              },
+              body: JSON.stringify(dataToSend) // Convierte el objeto a JSON y lo envía
+          })
           .then(response => response.text())
           .then(data => {
               console.log("PDF generado y guardado en la ruta especificada");
-              // Puedes mostrar una alerta o actualizar la interfaz de usuario aquí
+              // Muestra una alerta o actualiza la interfaz de usuario
               alert("PDF generado exitosamente");
-              window.location.href='lista.php';
+
+              window.location.href = 'lista.php'; // Redirige a la página lista.php
           })
           .catch(error => {
               console.error("Error al generar el PDF:", error);
