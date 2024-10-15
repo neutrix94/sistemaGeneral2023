@@ -38,7 +38,7 @@
 						$resp = array();
 						$tiempo = array();
 						$tiempo['inicio'] = $ProductResolution->getCurrentTime();
-						if( $lock_synchronization = 1 ){
+						if( $lock_synchronization == 1 ){
 							$ProductResolution->lock_and_unlock_synchronization_apis( 1 );
 						}
 						$proccess = $ProductResolution->update_transfers_status( $user_id, $reception_block_id, $transfers_ids, 2 );
@@ -59,7 +59,7 @@
 					case '9' :
 						$tiempo = array();
 						$tiempo['inicio'] = $ProductResolution->getCurrentTime();
-						if( $lock_synchronization = 1 ){
+						if( $lock_synchronization == 1 ){
 							$ProductResolution->lock_and_unlock_synchronization_apis( 0 );
 						}
 						$sql = "UPDATE ec_bloques_transferencias_recepcion SET recibido = '1' WHERE id_bloque_transferencia_recepcion = {$reception_block_id}";
