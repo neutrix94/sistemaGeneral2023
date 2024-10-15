@@ -74,20 +74,21 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
   try {
     //Consulta productos disponibles para surtimiento
     $productosSurtir=[];
+    $productosSurtirResponse=[];
     $productosNoSurtir=[];
     if($idProductos){
-      $sqlConsultaProds="SELECT sp.id_producto, sp.surtir, p.orden_lista, sp.id_sucursal FROM sys_sucursales_producto sp
+      $sqlConsultaProds="SELECT sp.id_producto, sp.surtir, p.orden_lista, p.nombre nombre_producto, sp.id_sucursal FROM sys_sucursales_producto sp
           inner join ec_productos p on p.id_productos = sp.id_producto
           where p.orden_lista in (".$idProductos.")
           and sp.id_sucursal='{$sucursal}'
           and surtir=1";
-      //error_log('query:'.$sqlConsultaProds);
       foreach ($db->query($sqlConsultaProds) as $row) {
         $productosSurtir[]=$row['orden_lista'];
+        $productosSurtirResponse[]= array( "orden_lista" => $row['orden_lista'], "nombre_producto" => $row['nombre_producto'] );
       }
 
       //Agrega Query para obtener productos que no están habilitados para surtir
-      $sqlConsultaProdsNoSurtir="SELECT sp.id_producto, sp.surtir, p.orden_lista, sp.id_sucursal FROM sys_sucursales_producto sp
+      $sqlConsultaProdsNoSurtir="SELECT sp.id_producto, sp.surtir, p.orden_lista, p.nombre nombre_producto, sp.id_sucursal FROM sys_sucursales_producto sp
           inner join ec_productos p on p.id_productos = sp.id_producto
           where p.orden_lista in (".$idProductos.")
           and sp.id_sucursal='{$sucursal}'
@@ -96,7 +97,7 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
 
       foreach ($db->query($sqlConsultaProdsNoSurtir) as $row) {
         
-        $productosNoSurtir[]=$row['orden_lista'];
+        $productosNoSurtir[] =  array( "orden_lista" => $row['orden_lista'], "nombre_producto" => $row['nombre_producto'] );
       }
 
     }
@@ -169,18 +170,20 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
       }
 
       $strResponse = "Se ha solicitado el pedido de los siguientes productos:";
-      for ($i=0; $i < count($productosSurtir); $i++) { 
-        $strResponse .= "\n".$productosSurtir[$i];
+
+      for ($i=0; $i < count($productosSurtirResponse); $i++) { 
+        $strResponse .= "\n". "(" . $productosSurtirResponse[$i]['orden_lista']. ") ". $productosSurtirResponse[$i]['nombre_producto'];
       }
       
       if( count($productosNoSurtir) > 0 ){
-        $strResponse .= "\n\nLos siguientes productos no se han solictado debido a que no se encuentran habilitados para surtimiento:";
+        $strResponse .= "\n\nLos siguientes productos no se han solicitado debido a que no se encuentran habilitados para surtimiento:";
 
         for ($i=0; $i < count($productosNoSurtir); $i++) { 
 
           if( !empty($productosNoSurtir[$i]) && $productosNoSurtir[$i] != '0'  ){
 
-            $strResponse .= "\n".$productosNoSurtir[$i];
+            //$strResponse .= "\n".$productosNoSurtir[$i];
+            $strResponse .= "\n". "(" . $productosNoSurtir[$i]['orden_lista']. ") ". $productosNoSurtir[$i]['nombre_producto'];
           }
         }
       }

@@ -347,16 +347,18 @@ var packsCatalogue = new Array();
                     msjAlert += "Se ha solicitado la muestra de los siguientes productos:";
 
                     for (let index = 0; index < solicitado.length; index++) {
-                      msjAlert += "\n"+solicitado[index];
+                      var nombreProducto = getNombreProductoByOrdenLista( solicitado[index] );
+                      msjAlert += "\n"+ "(" + solicitado[index] + ") "+ nombreProducto;
                       
                     }
                   }
 
                   if( noSoliciado.length > 0 ){
-                    msjAlert += "\n\nLos siguientes productos no se han solictado debido a que no se encuentran habilitados para surtimiento y/o se encuentran en proceso de surtimiento:";
+                    msjAlert += "\n\nLos siguientes productos no se han solicitado debido a que no se encuentran habilitados para surtimiento y/o se encuentran en proceso de surtimiento:";
 
                     for (let index = 0; index < noSoliciado.length; index++) {
-                      msjAlert += "\n"+noSoliciado[index];
+                      var nombreProducto = getNombreProductoByOrdenLista( noSoliciado[index] );
+                      msjAlert += "\n" + "(" + noSoliciado[index] + ") "+ nombreProducto;
                       
                     }
                   }
@@ -475,6 +477,31 @@ var packsCatalogue = new Array();
       });
     }
     return seleccionados;
+  }
+
+  function getNombreProductoByOrdenLista( ordenListaParam ){
+
+    var filas = $('#listaProductos tr.move');
+    var nombreProducto = "";
+    if( filas.length > 0 ){
+      // Mostrar las filas en la consola
+      filas.each(function(fila) {
+        var $row = $(this);
+        var ordenDeLista = $row.find('td:eq(0)').text().trim();
+
+        if( ordenDeLista == ordenListaParam ){
+          //Obtenemos el npúmero de muestra actual
+          var nombreFull = $row.find('td:eq(1)').text();
+          var nombreClean = nombreFull.split("Ubicación:");
+          nombreProducto = nombreClean[0];
+
+        }
+
+      });
+    }
+
+    return nombreProducto;
+
   }
 
   function setProductoSolicitadoComoMuestra( ordenListaParam ){
