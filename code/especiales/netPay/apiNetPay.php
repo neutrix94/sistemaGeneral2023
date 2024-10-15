@@ -1,4 +1,5 @@
 <?php
+/*Version 2024-10-15 Correcciones de error de reimpresion manual desde la pantalla de cobros*/
 	include( '../../../conexionMysqli.php' );
 
 	class apiNetPay{
@@ -458,6 +459,18 @@ fclose($file);
 			if( sizeof($token) == 0 || $token == null ){
 				$token = $this->requireToken( $terminal, 'password', 'smartPos', 'netpay' );
 			}
+	/*Implementacion Oscar 2024-10-15 para correcciones de error de reimpresion manual desde la pantalla de cobros*/
+			if( $sale_folio == null || $sale_folio == '' ){
+		//consulta el folio de la nota en las transacciones de netPay
+				$sql = "SELECT
+							folio_venta
+						FROM vf_transacciones_netpay
+						WHERE orderId = '{$orderId}'";
+				$stm = $this->link->query( $sql ) or die( "Error al consultar el folio de transaccion porque no llegó a apiNetPay.saleReprint() : {$sql} : {$this->link->error}" );
+				$row = $stm->fetch_assoc();
+				$sale_folio = $row['folio_venta'];
+			}
+	/*Fin de cambio Oscar 2024-10-15*/
 			$terminal_data = $this->getTerminal( $terminal, $store_id );//var_dump( $terminal_data['store_id'] );die('');
 			$folio_unico_transaccion = $this->insertNetPetitionRow( $user_id, $store_id, $terminal_data['terminal_serie'], $terminal_data['store_id'], $sale_folio );
 		//arreglo de prueba
