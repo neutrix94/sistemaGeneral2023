@@ -68,7 +68,7 @@
         url += "&session_id=" + $( '#session_id' ).val();
         url += "&orderId=" + orderId;
         var resp = ajaxR( url );
-        if( resp.trim() != 'Transaccion exitosa' && resp.trim() != 'Transacción exitosa' ){
+       /* if( resp.trim() != 'Transaccion exitosa' && resp.trim() != 'Transacción exitosa' ){
             resp = `<h2 class="text-danger text-center">El dato ingresado es incorrecto, verifica y vuelve a intentar.</h2>
             <div class="row text-center">
                 <button
@@ -79,7 +79,7 @@
                     <i class="icon-ok-circled">Aceptar y volver a intentar</i>
                 </button>
             </div>`;
-        }
+        }*/
         $( '.emergent_content' ).html( resp );
         $( '.emergent' ).css( 'display', 'block' );
         $( '.emergent' ).focus();
