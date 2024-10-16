@@ -6,6 +6,7 @@ $perfil = isset($_GET['perfil']) ? $_GET['perfil'] : '';
 //error_log('$sucursal_id:'.$sucursal_id);
 require_once '../classes/surtimiento.php';
 $surtimientoCRUD = new SurtimientoCRUD();
+$asignar = $surtimientoCRUD->tomarSurtimiento($id, $sucursal_id, $user_id);
 $listaSurtir = $surtimientoCRUD->listaDetalleSurtimiento($id,$sucursal_id);
 $pendientes = (count($listaSurtir)>0) ? 1: 0 ;
 $indiceSurtir = 0;
@@ -58,6 +59,7 @@ $indiceSurtir = 0;
     <!-- Tabla principal -->
     <div class="container mt-5">
         <a href="javascript: history.go(-1)">⬅️ Lista de pedidos</a><br>
+        <center><h2>Pedido: #<span id="noPedido">0</span></h2></center>
         <center><p id="indexSurtimiento"><b>Partida: </b><span id="index">0 de 0</span></p></center>
         <center><h2 id="nombreProducto">Nombre del Producto</h2></center>
         <center>
@@ -122,7 +124,7 @@ $indiceSurtir = 0;
             </div>
             <div class="modal-footer d-flex flex-column align-items-center w-100">
               <button type="button" class="btn btn-success mb-2" style="width: 50%;" onclick="imprimeTicket()">IMPRIMIR</button>
-              <button type="button" class="btn btn-primary"  style="width: 50%;" onclick="window.location.href='lista.php'">LISTA DE PEDIDOS</button>
+              <button type="button" class="btn btn-primary"  style="width: 50%;" onclick="window.location.href='javascript: history.go(-1)'">LISTA DE PEDIDOS</button>
             </div>
           </div>
         </div>
@@ -195,7 +197,7 @@ $indiceSurtir = 0;
               ); 
               $('#alertModalAcceptButton').off('click').on('click', function() {
                   $('#alertModal').modal('hide');  
-                  window.location.href = 'lista.php';
+                  window.location.href = "javascript: history.go(-1)";
               });
               
             }
@@ -396,6 +398,7 @@ $indiceSurtir = 0;
         
         function refreshView(){
             //Actualiza datos de la vista
+            document.getElementById('noPedido').textContent = listaSurtir[indiceSurtir].no_pedido;
             document.getElementById('nombreProducto').textContent = listaSurtir[indiceSurtir].nombre;
             document.getElementById('ubicacionProducto').textContent = 'Ubicación: '+ listaSurtir[indiceSurtir].numero_ubicacion_desde + '-' +listaSurtir[indiceSurtir].altura_desde;
             document.getElementById('cantidad').textContent = listaSurtir[indiceSurtir].cantidad_solicitada;
@@ -489,7 +492,7 @@ $indiceSurtir = 0;
                 //No se muestra detalle para imprimir ya que todo el Pedido se surtió completo
 
                 alert( data.result.resultado );
-                window.location.href='lista.php';
+                window.location.href='javascript: history.go(-1)';
 
               }
 
