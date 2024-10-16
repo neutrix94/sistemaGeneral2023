@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     $prioridad = isset($_POST['prioridad']) ? $_POST['prioridad'] : '';
     $pwd = isset($_POST['pwd']) ? $_POST['pwd'] : '';
     $sucursal = isset($_POST['sucursal']) ? $_POST['sucursal'] : '';
+    $usuario = isset($_POST['usuario']) ? $_POST['usuario'] : '';
     $listaAsignacion = isset($_POST['listaAsignacion']) ? $_POST['listaAsignacion'] : '';
 
     if ($action == 'cancelarSurtimiento') {
@@ -42,6 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
         $surtimientoCRUD = new SurtimientoCRUD();
         $surtimientoCRUD->reanudarSurtimiento($id,1);
     }
+    if ($action == 'siguienteSurtimiento') {
+        $surtimientoCRUD = new SurtimientoCRUD();
+        $surtimientoCRUD->siguienteSurtimiento($id,$sucursal,$usuario);
+    }
     
 }
 
@@ -60,9 +65,12 @@ class SurtimientoCRUD {
     }
 
     public function listaSurtir($perfil=null,$idUsuario=null,$sucursal=null,$fecha=null,$tipo=null,$estado=null) {
+        $estado = ($estado == '') ? "'1','2','4'" : $estado;
+        $estado = ($estado == 'Todos') ? "'1','2','3','4','5'" : $estado;
+        $estado = ($estado == 'Cerrados') ? "'3','5'" : $estado;
         $filters = ' ';
         $filters = empty($tipo) ? $filters : $filters . " AND s.tipo = '{$tipo}' ";
-        $filters = empty($estado) ? $filters : $filters . " AND s.estado = '{$estado}' ";
+        $filters = empty($estado) ? $filters : $filters . " AND s.estado in ({$estado}) ";
         $filters = empty($fecha) ? $filters : $filters . " AND date(s.fecha_creacion) >= '{$fecha}' ";
         $estados = $perfil=='2' ? "'1','2','3','4','5'" : "'1','2','4'" ;
         $result = $this->conn->query("SELECT 
@@ -83,6 +91,8 @@ class SurtimientoCRUD {
             END AS estado,
             s.estado estado_id,
             concat(u.nombre, ' ', u.apellido_paterno) AS nombre_vendedor,
+            ifnull(group_concat(distinct concat(us.nombre, ' ', us.apellido_paterno)),'') nombre_surtidores,
+            ifnull(group_concat(distinct us.id_usuario),'') id_surtidores,
             CASE 
                 WHEN s.prioridad = 1 THEN 'Alto'
                 WHEN s.prioridad = 2 THEN 'Medio'
@@ -100,9 +110,12 @@ class SurtimientoCRUD {
             s.rango_ubicaciones
         FROM ec_surtimiento s
         LEFT JOIN sys_users u ON u.id_usuario = s.id_vendedor
+        LEFT JOIN ec_surtimiento_detalle sd on sd.id_surtimiento=s.id
+        LEFT JOIN sys_users us ON us.id_usuario = sd.id_asignado
         WHERE u.id_sucursal = '{$sucursal}'
         AND s.estado in ({$estados})
         {$filters}
+        group by s.id
         ORDER BY s.estado, s.prioridad, s.fecha_creacion asc;");
         
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -130,10 +143,13 @@ class SurtimientoCRUD {
         
         // Obtener lista de surtidores
         $surtidoresResult = $this->conn->query("SELECT u.id_usuario, 
-                   CONCAT(u.nombre, ' ', u.apellido_paterno) AS nombre
+               CONCAT(u.nombre, ' ', u.apellido_paterno) AS nombre
             FROM sys_users u
-            WHERE id_sucursal = '{$id_sucursal}'
-              AND tipo_perfil IN ('3');");
+            INNER JOIN ec_registro_nomina rn on rn.id_empleado = u.id_usuario
+            WHERE u.id_sucursal = '{$id_sucursal}'
+            AND u.tipo_perfil IN ('3')
+            AND rn.fecha = CURRENT_DATE()
+            ;");
 
         $surtidores = array();
         if ($surtidoresResult->num_rows > 0) {
@@ -262,7 +278,7 @@ class SurtimientoCRUD {
         //error_log(print_r($data,true));
         //Limpia asignaciones
         $idUsuario = empty($idUsuario) ? 1 : $idUsuario;
-        $query = "UPDATE ec_surtimiento_detalle SET id_asignado = null WHERE id_surtimiento = '".$data['id']."';";
+        $query = "UPDATE ec_surtimiento_detalle SET id_asignado = null WHERE estado = 1 AND id_surtimiento = '".$data['id']."';";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         if (isset($data['items']) && is_array($data['items'])) {
@@ -296,6 +312,8 @@ class SurtimientoCRUD {
                 sd.cantidad_surtida,
                 sd.estado,
                 sd.sin_inventario,
+                s.no_pedido,
+                s.estado estado_gral,
                 s.id_vendedor,
                 concat(u.nombre, ' ', u.apellido_paterno) AS nombre_vendedor,
                 pp_data.claves_proveedor,
@@ -330,7 +348,8 @@ class SurtimientoCRUD {
             WHERE  
                 sd.id_surtimiento = '{$id}'
                 -- and sd.id_asignado='104'
-                AND sd.estado IN (1,2);");
+                AND sd.estado IN (1,2)
+                AND s.estado NOT IN (3,5);");
         
         return $result->fetch_all(MYSQLI_ASSOC);
     }
@@ -402,6 +421,62 @@ class SurtimientoCRUD {
         }
         $this->conn->close();
         echo $valid;
+    }
+    
+    public function siguienteSurtimiento($id = null, $sucursal_id= null, $idUsuario){
+        $surtimientoCRUD = $this;
+        //Variables de control
+        $procesoSurtidor = false;
+        $pendienteSurtidor = false;
+        $pendienteLibre = false;
+        $siguienteOrden = false;
+        $estadoSurtimiento = '';
+        $asignadoSurtidor = false;
+        $asignadoLibre = false;
+
+        //Recupera detalle de línea a surtir
+        $surtimientoSeleccionado = $surtimientoCRUD->listaDetalleSurtimiento($id,$sucursal_id);
+
+        //Recupera información de orden de atención de surtimiento
+        $usuario =  $surtimientoCRUD->getUserProfile($idUsuario);
+        $perfil = (isset($usuario[0]) && ($usuario[0]['tipo_perfil'] == '4' || $usuario[0]['tipo_perfil'] == '8') &&  $usuario[0]['id_encargado'] == $idUsuario ) ? '2': '1';
+        $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,'2024-01-01','','1');
+
+        //Valida si está en proceso y asignado al usuario deja continuar
+        foreach ($surtimientoSeleccionado as $item => $value) {
+          $estadoSurtimiento = ($value['estado_gral'] == 2) ? 'Proceso' : 'Pendiente';
+          if($value['id_asignado'] == $idUsuario){
+              $asignadoSurtidor = true;
+          }
+          if($value['id_asignado'] == ''){
+              $asignadoLibre = true;
+          }
+        }
+
+        if($estadoSurtimiento == 'Proceso' && $asignadoSurtidor){
+          //devuelve id original
+          echo $id;
+          return;
+        }else{
+          //Valida orden de surtimiento
+          //error_log(print_r($surtimientos,true));
+          foreach ($surtimientos as $item => $value) {
+            if($value['id_surtidores'] == '' || in_array($idUsuario,explode(",",$value['id_surtidores'])) ){
+                echo $value['id'];
+                return;
+            }
+          }
+        }
+        echo 'noID';
+    }
+    
+    public function tomarSurtimiento($id = null, $sucursal_id= null, $idUsuario){
+        $query = "UPDATE ec_surtimiento_detalle SET fecha_modificacion = now(), modificado_por = '{$idUsuario}', id_asignado = '{$idUsuario}' WHERE (id_asignado is null OR id_asignado ='') AND estado = '1'  AND id_surtimiento = '{$id}';";
+        //error_log($query);
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $stmt->close();
+        return 'OK';
     }
     
     
