@@ -336,7 +336,7 @@
 				cheques+=$("#monto_"+i).html()+'~';//monto
 				cheques+=$("#nombre_referencia_"+i).html()+'°';//monto
 		}
-		alert(cheques);
+		//alert(cheques);
 	//generamos el reporte
 		$.ajax({
 			type:'post',
