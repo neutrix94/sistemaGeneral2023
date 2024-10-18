@@ -2097,13 +2097,16 @@ var hay_paquete=0;
                 var odenListaProd = products_array[index][0];
 
                 //Solo se establecen como "solicitado" los productos que no vengan en el arreglo de noSolicitados
-                if( !noSolicitados.includes( odenListaProd ) ){
-                    //Se actualiza bandera de muestra que indica reseteo de surtimiento en muestras
-                    products_array[index][14] = '<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
-                    //La posición 16 corresponde a la bandera para identificar si ya ha sido solicitado
-                    products_array[index][16] = '1';
-                    products_array[index][17] = '-1';
+                if( noSolicitados != undefined ){
 
+                    if( !noSolicitados.includes( odenListaProd ) ){
+                        //Se actualiza bandera de muestra que indica reseteo de surtimiento en muestras
+                        products_array[index][14] = '<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+                        //La posición 16 corresponde a la bandera para identificar si ya ha sido solicitado
+                        products_array[index][16] = '1';
+                        products_array[index][17] = '-1';
+    
+                    }
                 }
 
             }
