@@ -4,6 +4,7 @@ include('../../conect.php');
 
 // Obtiene datos de usuario logueado & lista de pedidos
 $fecha = isset($_GET['fecha']) ? $_GET['fecha'] : null;
+$fecha = empty($fecha) ? date("Y-m-d") : $fecha;
 $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : null;
 $estado = isset($_GET['estado']) ? $_GET['estado'] : null;
 $surtimientoCRUD = new SurtimientoCRUD();
@@ -57,12 +58,14 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
             <div class="col-md-3">
                 <label for="estado">Estado</label>
                 <select name="estado" id="estado" class="form-control" value="<?php echo $estado ?>">
-                    <option value="">Todos</option>
+                    <option value="">Default</option>
                     <option value="1" <?php echo $estado == "1" ? "selected" : "" ?> >Pendiente</option>
                     <option value="2" <?php echo $estado == "2" ? "selected" : "" ?> >Proceso</option>
                     <option value="3" <?php echo $estado == "3" ? "selected" : "" ?> >Completado</option>
                     <option value="4" <?php echo $estado == "4" ? "selected" : "" ?> >Pausado</option>
                     <option value="5" <?php echo $estado == "5" ? "selected" : "" ?> >Cancelado</option>
+                    <option value="Todos" <?php echo $estado == "Todos" ? "selected" : "" ?> >Todos</option>
+                    <option value="Cerrados" <?php echo $estado == "Cerrados" ? "selected" : "" ?> >Cerrados</option>
                 </select>
             </div>
 
@@ -91,6 +94,7 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
                 <th>Tipo</th>
                 <th>Estado</th>
                 <th>Vendedor</th>
+                <th>Surtidor(es)</th>
                 <?php if ($perfil == 2): ?>
                     <th>Asignar</th>
                 <?php endif; ?>
@@ -143,13 +147,15 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
                       <span class="<?php echo $estadoClass; ?>"><?php echo $estado; ?></span>
                     </td>
                     <td><?php echo $surtimiento['nombre_vendedor']; ?></td>
+                    <td><?php echo $surtimiento['nombre_surtidores']; ?></td>
                     <?php if ($perfil == 2): ?>
                         <td>
                             <a href="asignar.php?id=<?php echo $surtimiento['id']; ?>" class="btn btn-primary">Asignar</a>
                         </td>
                     <?php endif; ?>
                     <td>
-                        <a href="surtir.php?id=<?php echo $surtimiento['id']; ?>" class="btn btn-success">Surtir</a>
+                        <!-- <a href="surtir.php?id=<?php echo $surtimiento['id']; ?>" class="btn btn-success">Surtir</a> -->
+                        <a href="#" data-id="<?php echo $surtimiento['id']; ?>" class="btn btn-success surtir-row">Surtir</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -159,7 +165,34 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $('.surtir-row').click(function (event) {
+      event.preventDefault();
+      var id = $(this).data('id');
+      $.ajax({
+          url: '../classes/surtimiento.php',
+          type: 'POST',
+          data: {
+              action: 'siguienteSurtimiento',
+              id: id,
+              usuario: '<?php echo $user_id; ?>',
+              sucursal: '<?php echo $sucursal_id; ?>'
+          },
+          success: function(response) {
+              $('.alert').alert();
+              window.location.href = "surtir.php?id="+response;
+          },
+          error: function(xhr, status, error) {
+              alert('Hubo un error al guardar la asignación: ' + error);
+          }
+      });
+      
+      
+    });
+</script>
+
 </body>
 </html>
