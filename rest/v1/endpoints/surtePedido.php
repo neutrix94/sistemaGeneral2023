@@ -3,10 +3,10 @@ use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 
 /*
-* Endpoint: surteMuestra
-* Path: /surte/Muestra
+* Endpoint: surtePedido
+* Path: /surte/Pedido
 * Método: POST
-* Descripción: Servicio para solicitar muestra
+* Descripción: Servicio para solicitar pedido
 */
 $app->post('/surte/Pedido', function (Request $request, Response $response){
   //Init
@@ -63,8 +63,10 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
       if (empty($producto['id'])) {
         return $rs->errorMessage($request->getParsedBody(),$response, 'Datos_Faltantes', 'Hace falta información para crear producto(s)', 400);
       }
-      $idProductos = $idProductos . ",'".$producto['id']."'";
-      $productRow ++;
+      if ($producto['cantidad'] > 0) {
+        $idProductos = $idProductos . ",'".$producto['id']."'";
+        $productRow ++;
+      }
     }
   }
   
@@ -72,16 +74,32 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
   try {
     //Consulta productos disponibles para surtimiento
     $productosSurtir=[];
+    $productosSurtirResponse=[];
+    $productosNoSurtir=[];
     if($idProductos){
-      $sqlConsultaProds="SELECT sp.id_producto, sp.surtir, p.orden_lista, sp.id_sucursal FROM sys_sucursales_producto sp
+      $sqlConsultaProds="SELECT sp.id_producto, sp.surtir, p.orden_lista, p.nombre nombre_producto, sp.id_sucursal FROM sys_sucursales_producto sp
           inner join ec_productos p on p.id_productos = sp.id_producto
           where p.orden_lista in (".$idProductos.")
           and sp.id_sucursal='{$sucursal}'
           and surtir=1";
-      //error_log('query:'.$sqlConsultaProds);
       foreach ($db->query($sqlConsultaProds) as $row) {
         $productosSurtir[]=$row['orden_lista'];
+        $productosSurtirResponse[]= array( "orden_lista" => $row['orden_lista'], "nombre_producto" => $row['nombre_producto'] );
       }
+
+      //Agrega Query para obtener productos que no están habilitados para surtir
+      $sqlConsultaProdsNoSurtir="SELECT sp.id_producto, sp.surtir, p.orden_lista, p.nombre nombre_producto, sp.id_sucursal FROM sys_sucursales_producto sp
+          inner join ec_productos p on p.id_productos = sp.id_producto
+          where p.orden_lista in (".$idProductos.")
+          and sp.id_sucursal='{$sucursal}'
+          and orden_lista != 0
+          and surtir=0";
+
+      foreach ($db->query($sqlConsultaProdsNoSurtir) as $row) {
+        
+        $productosNoSurtir[] =  array( "orden_lista" => $row['orden_lista'], "nombre_producto" => $row['nombre_producto'] );
+      }
+
     }
     //error_log('count:'.count($productosSurtir));
     //Inserta Surtido
@@ -105,6 +123,7 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
             WHERE  
                 s.id_vendedor = '{$vendedor}'
                 AND s.no_pedido ='{$pedido}'
+                AND s.tipo ='2'
                 AND sd.estado IN (1,2)
                 AND s.estado IN (1,2);";
                 
@@ -149,10 +168,31 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
           }
         }
       }
+
+      $strResponse = "Se ha solicitado el pedido de los siguientes productos:";
+
+      for ($i=0; $i < count($productosSurtirResponse); $i++) { 
+        $strResponse .= "\n". "(" . $productosSurtirResponse[$i]['orden_lista']. ") ". $productosSurtirResponse[$i]['nombre_producto'];
+      }
       
-      //Regrsa resultado
+      if( count($productosNoSurtir) > 0 ){
+        $strResponse .= "\n\nLos siguientes productos no se han solicitado debido a que no se encuentran habilitados para surtimiento:";
+
+        for ($i=0; $i < count($productosNoSurtir); $i++) { 
+
+          if( !empty($productosNoSurtir[$i]) && $productosNoSurtir[$i] != '0'  ){
+
+            //$strResponse .= "\n".$productosNoSurtir[$i];
+            $strResponse .= "\n". "(" . $productosNoSurtir[$i]['orden_lista']. ") ". $productosNoSurtir[$i]['nombre_producto'];
+          }
+        }
+      }
+      
+      //Regresa resultado
       $insertsProd['resultado']='Solicitado';
-      $insertsProd['descripcion']='Se ha solicitado el pedido de '. count($productosSurtir) . ' producto(s)';
+     // $insertsProd['descripcion']='Se ha solicitado el pedido de '. count($productosSurtir) . ' producto(s)';
+      $insertsProd['descripcion']=$strResponse;
+      $insertsProd['noSolicitados']=$productosNoSurtir;
     }else{
       //Regrsa resultado no hay productos por surtir
       $insertsProd['resultado']='Solicitado';

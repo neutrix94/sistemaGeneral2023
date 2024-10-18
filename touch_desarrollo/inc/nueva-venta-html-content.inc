@@ -291,59 +291,143 @@ var packsCatalogue = new Array();
 
   function solicitarMuestras( ){
 
-    // Obtiene la URL completa actual
-    var currentUrl = window.location.href;
-    // Extrae el nombre del ambiente (la parte entre el dominio y el siguiente '/')
-    var regex = /\/\/[^\/]+\/([^\/]+)/;
-    var match = currentUrl.match(regex);
-    var nombreAmbiente = match ? match[1] : '';
+    var url="ajax/checkSesionCajaParaMuestra.php";
 
-    // Construye la URL base y la URL del API
-    var baseUrl = window.location.origin;
-    var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Muestra';
+    var res=ajaxRequest(url);
 
-    var productosSeleccionados = getProductosMuestras();
+    var aux=res.split('|');
 
-    if( productosSeleccionados.length > 0  ){
-      if (confirm("Se enviarán a solicitar " + productosSeleccionados.length + " muestras. ¿Confirmas la operación?") == true) {
-          $.ajax({
-          type: 'POST',
-          url: apiUrl,
-          headers: {
-            'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
-          },
-          data: {
-              "productos": productosSeleccionados,
-              "vendedor": <?php echo $user_id; ?>,
-              "sucursal": <?php echo $sucursal_id;?>,
-              "pedido": genIdPedido( <?php echo $user_id; ?> ),
-          },
-          datatype: 'json',
-          success: function (data) {
-              console.log("RESPUESTA MUESTRA");
-              console.log(data);
-              if( data.result.resultado == "Solicitado" ){
-                alert(data.result.descripcion);
-
-              }else{
-                alert("Ha ocurrido un error: "+data.result.descripcion);
-              }
-              
-              clearAllCheckBox();
-
-          },
-          error:function(error){
-            console.log("ERROR".error);
-          }
-        });
-        } else {
-          alert("Cancelaste la operación");
-        }
-        
+    if(aux[0]=='sin_sesion_caja'){
+        alert("No se pueden hacer ventas porque el cajero no ha iniciado sesión de caja\nPida al cajero que inicie su sesión de caja!!!");
+        return false;
     }else{
-      alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
+
+      // Obtiene la URL completa actual
+      var currentUrl = window.location.href;
+      // Extrae el nombre del ambiente (la parte entre el dominio y el siguiente '/')
+      // var regex = /\/\/[^\/]+\/([^\/]+)/;
+      // var match = currentUrl.match(regex);
+      // var nombreAmbiente = match ? match[1] : '';
+  
+      // // Construye la URL base y la URL del API
+      // var baseUrl = window.location.origin;
+      // var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Muestra';
+      var parts_url = currentUrl.split('/touch_desarrollo');
+      var apiUrl = parts_url[0] + '/rest/v1/surte/Muestra';
+  
+      var productosSeleccionados = getProductosMuestras();
+  
+      if( productosSeleccionados.length > 0  ){
+        if (confirm("Se enviarán a solicitar " + productosSeleccionados.length + " muestras. ¿Confirmas la operación?") == true) {
+            $.ajax({
+            type: 'POST',
+            url: apiUrl,
+            headers: {
+              'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
+            },
+            data: {
+                "productos": productosSeleccionados,
+                "vendedor": <?php echo $user_id; ?>,
+                "sucursal": <?php echo $sucursal_id;?>,
+                "pedido": genIdPedido( <?php echo $user_id; ?> ),
+            },
+            datatype: 'json',
+            success: function (data) {
+                console.log("RESPUESTA MUESTRA");
+                console.log(data);
+                if( data.result.resultado == "Solicitado" ){
+                  
+                  var solicitado = data.result.solicitado;
+                  var noHabilitado = data.result.noHabilitado;
+                  var noSoliciado = data.result.noSolicitado;
+
+                  var msjAlert = "";
+
+                  if( solicitado.length > 0 ){
+                    msjAlert += "Se ha solicitado la muestra de los siguientes productos:";
+
+                    for (let index = 0; index < solicitado.length; index++) {
+                      var nombreProducto = getNombreProductoByOrdenLista( solicitado[index] );
+                      msjAlert += "\n"+ "(" + solicitado[index] + ") "+ nombreProducto;
+                      
+                    }
+                  }
+
+                  if( noSoliciado.length > 0 ){
+                    msjAlert += "\n\nLos siguientes productos no se han solicitado debido a que no se encuentran habilitados para surtimiento y/o se encuentran en proceso de surtimiento:";
+
+                    for (let index = 0; index < noSoliciado.length; index++) {
+                      var nombreProducto = getNombreProductoByOrdenLista( noSoliciado[index] );
+                      msjAlert += "\n" + "(" + noSoliciado[index] + ") "+ nombreProducto;
+                      
+                    }
+                  }
+
+                  if( msjAlert != "" ){
+                    alert(msjAlert);
+                  }
+
+                  //alert(data.result.descripcion);
+                  //Actualizar el producto del que se solicitó muestra, tanto localStorage como en front para controlar el número de muestras que se ha solicitado
+                  if( data.result.solicitado.length > 0 ){
+
+                    for (let index = 0; index < data.result.solicitado.length; index++) {
+                      const element = data.result.solicitado[index];
+                      var strCbMuestra = setProductoSolicitadoComoMuestra( element );
+                      
+                      if( strCbMuestra != "" ){
+                        /* Actualizar en session storage */
+                        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+                        products_array = JSON.parse( products_array );
+                        
+                        var indexProducto = searchIndexByListOrder(element, products_array);
+
+                        //La posición 14 corresponde a la posición donde es establece string de muestra
+                        products_array[indexProducto][14] = strCbMuestra;
+                        
+                        sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+
+                      }
+
+                    }
+                  }
+  
+                }else{
+                  alert("Ha ocurrido un error: "+data.result.descripcion);
+                }
+                
+                clearAllCheckBox();
+  
+            },
+            error:function(error){
+              console.log("ERROR".error);
+            }
+          });
+          } else {
+            alert("Cancelaste la operación");
+          }
+          
+      }else{
+        alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
+      }
     }
+
   }
+
+  function ajaxRequest(url){
+    
+    if(window.ActiveXObject){       
+        var httpObj = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    else if (window.XMLHttpRequest){       
+        var httpObj = new XMLHttpRequest(); 
+    }
+
+    httpObj.open("POST", url , false, "", "");
+    httpObj.send(null);
+    
+    return httpObj.responseText;
+  }        
 
   function genIdPedido( id_user ) {
     var id = "";
@@ -395,7 +479,68 @@ var packsCatalogue = new Array();
     return seleccionados;
   }
 
+  function getNombreProductoByOrdenLista( ordenListaParam ){
+
+    var filas = $('#listaProductos tr.move');
+    var nombreProducto = "";
+    if( filas.length > 0 ){
+      // Mostrar las filas en la consola
+      filas.each(function(fila) {
+        var $row = $(this);
+        var ordenDeLista = $row.find('td:eq(0)').text().trim();
+
+        if( ordenDeLista == ordenListaParam ){
+          //Obtenemos el npúmero de muestra actual
+          var nombreFull = $row.find('td:eq(1)').text();
+          var nombreClean = nombreFull.split("Ubicación:");
+          nombreProducto = nombreClean[0];
+
+        }
+
+      });
+    }
+
+    return nombreProducto;
+
+  }
+
+  function setProductoSolicitadoComoMuestra( ordenListaParam ){
+
+    var filas = $('#listaProductos tr.move');
+    var stringCbMuestra = "";
+    if( filas.length > 0 ){
+      // Mostrar las filas en la consola
+      filas.each(function(fila) {
+        var $row = $(this);
+        var ordenDeLista = $row.find('td:eq(0)').text().trim();
+
+        if( ordenDeLista == ordenListaParam ){
+          //Obtenemos el npúmero de muestra actual
+          var numeroMuestra = $row.find('td:eq(15)').find('input').attr("number-muestra");
+
+          if( numeroMuestra != undefined ){
+            numeroMuestra = Number(numeroMuestra) + 1;
+          }else{
+            numeroMuestra = 1;
+          }
+          
+          $row.find('td:eq(15)').find('input').attr('number-muestra', numeroMuestra.toString());
+
+          stringCbMuestra = $row.find('td:eq(15)')[0].innerHTML;
+
+        }
+
+      });
+    }
+
+    //Regresa el string correspondiente al campo checkbox para establecerlo en sessionStorage
+    return stringCbMuestra;
+
+  }
+
   function clearAllCheckBox(){
+
+    /*
     $('.cbMuestra:checked').each(function() {
         //Antes de limpiar el check, se procede a habilitar bandera pra saber a qué producto se le descuenta 1 unidad
         $(this).attr('number-muestra', 1);
@@ -420,6 +565,7 @@ var packsCatalogue = new Array();
         }
        
     });
+    */
 
     $(".cbSelectAllMuestras").prop('checked', false); 
     $('.cbMuestra:checked').each(function() {
@@ -505,7 +651,7 @@ var packsCatalogue = new Array();
                     }
                 });
 
-                alert("Recuerda que debes de Enviar pedido para poder surtir el cambio.");
+                alert("Solicitud de cambio físico generada exitosamente.\nPara concluir dicha operación favor de dar click en 'Enviar pedido'");
                 $('#inputDevolucion').val("");
                 closeModal();
               }

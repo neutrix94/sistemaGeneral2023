@@ -1890,8 +1890,8 @@ var hay_paquete=0;
     /*Fin de cambio Oscar 12.03.2019*/
 
         var res=ajaxR(url);
-//alert(res);
-/*return false;*/
+        //alert(res);
+    /*return false;*/
 		aux=res.split('|');
 		/**/
         if(aux[0]=='sin_sesion_caja'){
@@ -1946,13 +1946,16 @@ var hay_paquete=0;
         var currentUrl = window.location.href;
 
         // Extrae el nombre del ambiente (la parte entre el dominio y el siguiente '/')
-        var regex = /\/\/[^\/]+\/([^\/]+)/;
-        var match = currentUrl.match(regex);
-        var nombreAmbiente = match ? match[1] : '';
+        // var regex = /\/\/[^\/]+\/([^\/]+)/;
+        // var match = currentUrl.match(regex);
+        // var nombreAmbiente = match ? match[1] : '';
 
-        // Construye la URL base y la URL del API
-        var baseUrl = window.location.origin;
-        var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Pedido';
+        // // Construye la URL base y la URL del API
+        // var baseUrl = window.location.origin;
+
+        var parts_url = currentUrl.split('/touch_desarrollo');
+        //var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Pedido';
+        var apiUrl = parts_url[0] + '/rest/v1/surte/Pedido';
 
         var productosPedido = getProductosPedido();
         var productosEliminados = getProductosEliminados();
@@ -1981,7 +1984,7 @@ var hay_paquete=0;
                 if( data.result.resultado == "Solicitado" ){
                     alert(data.result.descripcion);
                     //Establecer el localStorage como 1 la fila 16, corresponde a la bandera para saber si ya fue solicitado
-                    setBanderaProductoSolicitado();
+                    setBanderaProductoSolicitado(data.result.noSolicitados);
                     clearArrayEliminados();
 
                 }else{
@@ -2037,11 +2040,13 @@ var hay_paquete=0;
                         cantidad = cantidadAdicionalDespuesDeSurtido;
                     }
 
+                    if( numberMuestra > 0 ) cantidad = numberMuestra;
+
 
                 }else{
                     // En caso de que ya se haya solicitado muestra, a la cantidad solicitada, se resta la unidad de muestra, en otro caso, si no ha sido solicitado, se envía la cantidad solicitada originalmente
-                    if(numberMuestra=="1"){
-                        cantidad = cantidad -1; 
+                    if( numberMuestra != undefined ){
+                        cantidad = cantidad - numberMuestra; 
                     }
                 }
 
@@ -2082,16 +2087,28 @@ var hay_paquete=0;
         return id;  
     }
 
-    function setBanderaProductoSolicitado(){
+    function setBanderaProductoSolicitado( noSolicitados ){
         var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
         products_array = JSON.parse( products_array );
 
         if( products_array.length > 0 ){ 
 
             for (let index = 0; index < products_array.length; index++) {
-                //La posición 16 corresponde a la bandera para identificar si ya ha sido solicitado
-                products_array[index][16] = '1';
-                products_array[index][17] = '-1';
+                var odenListaProd = products_array[index][0];
+
+                //Solo se establecen como "solicitado" los productos que no vengan en el arreglo de noSolicitados
+                if( noSolicitados != undefined ){
+
+                    if( !noSolicitados.includes( odenListaProd ) ){
+                        //Se actualiza bandera de muestra que indica reseteo de surtimiento en muestras
+                        products_array[index][14] = '<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+                        //La posición 16 corresponde a la bandera para identificar si ya ha sido solicitado
+                        products_array[index][16] = '1';
+                        products_array[index][17] = '-1';
+    
+                    }
+                }
+
             }
 
           sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
