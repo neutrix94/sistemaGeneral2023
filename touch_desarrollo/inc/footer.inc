@@ -51,7 +51,23 @@
 
 function activaMayoreo( is_quotation = false ){
   //elimina el session Storage Oscar 2023
+  //sessionStorage.clear();
+  //Antes de eliminar todo el sessionStorage, guardamos temporalmente las claves que se utilizan para el surtimiento
+  const idPedidoTemp = sessionStorage.getItem('ID_PEDIDO_TEMP');
+  const saleProductsList = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+
+  // Limpiar sessionStorage
   sessionStorage.clear();
+
+  // Restaurar los valores de los elementos que no quieres eliminar
+  if (idPedidoTemp !== null) {
+      sessionStorage.setItem('ID_PEDIDO_TEMP', idPedidoTemp);
+  }
+
+  if (saleProductsList !== null) {
+      sessionStorage.setItem('SALE_PRODUCTS_LIST', saleProductsList);
+  }
+
   var em=document.getElementById('emergePermisos');
   em.style.display='block';
 //ocultamos menu y botones
