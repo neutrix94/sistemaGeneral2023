@@ -1,5 +1,6 @@
 <?php
-/*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket*/
+/*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket 1.1*/
+/*Version 2024-10-19 Para reimprimir ticket de netPay manualmente cuando la venta no llego al servidor*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
@@ -145,6 +146,51 @@
 				//$apiNetPay = new apiNetPay( $link );
 				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
 				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
+				$terminal_id = $data['terminalId'];
+				$store_id_netpay = $data['store_id_netpay'];
+				if( isset( $_GET['terminal_serie_id'] ) || isset( $_POST['terminal_serie_id'] ) ){
+                    $tmp = explode( "-", $orderId );
+					$data['terminalId'] = $tmp[1];//( isset( $_GET['terminal_serie_id'] ) ? $_GET['terminal_serie_id'] : $_POST['terminal_serie_id'] );
+					$data['orderId'] = ( isset( $_GET['orderId'] ) ? $_GET['orderId'] : $_POST['orderId'] );
+				    $sql = "SELECT store_id FROM ec_terminales_integracion_smartaccounts WHERE numero_serie_terminal = '{$tmp[1]}'";
+                    $stm = $link->query($sql) or die( "Error al consultar id de la terminal : {$sql} : {$link->error}" );
+                    $row = $stm->fetch_assoc();
+                    $store_id_netpay = $row['store_id'];
+$terminal_id = $_GET['terminal_serie_id'];
+				}
+//die("{$apiUrl}, {$data['orderId']}, {$data['terminalId']}, {$user_id}, {$sucursal_id}, {$sale_folio}, {$session_id}, {$store_id_netpay}");
+				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_reimpresion' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/reprint";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/reprint";
+//die("{$apiUrl}, {$data['orderId']}, {$data['terminalId']}, {$user_id}, {$sucursal_id}, {$sale_folio}, {$session_id}, {$store_id_netpay}");
+				$print = $apiNetPay->saleReprint( $apiUrl, $data['orderId'], $data['terminalId'],
+										$user_id, $sucursal_id, $sale_folio, $session_id, $store_id_netpay );
+				//saleReprint( $apiUrl, $orderId, $terminal, $user_id, $store_id, $sale_folio, session_id )
+				$resp = json_decode( $print );
+				if( $resp->code == '00' && $resp->message == "Mensaje enviado exitosamente" ){
+					$counter = 'null';
+					include( '../vistas/formularioNetPay.php' );
+				}else{
+					die( "<div class=\"row text-center\">
+							<h2 class=\"text-center\">Ocurrio un error :</h2>
+							<h4>Codigo : {$resp->code}</h4>
+							<h4>Mensaje : {$resp->message}</h4>
+							<button
+								type=\"button\"
+								class=\"btn btn-danger\"
+								onclick=\"close_emergent();\"
+							>
+								<i class=\"icon-cancel-circle\">Aceptar y cerrar</i>
+							</button>
+						</div>" );
+				}
+				return '';
+				//return $print;
+			break;
+			/*case 'rePrintByOrderIdManual' :
+				$orderId = ( isset( $_GET['orderId'] ) ? $_GET['orderId'] : $_POST['orderId'] );
+				$data = $Payments->getOrderResponse( $orderId, true );
+				//$apiNetPay = new apiNetPay( $link );
+				$sale_folio = ( isset( $_GET['sale_folio'] ) ? $_GET['sale_folio'] : $_POST['sale_folio'] );
+				$session_id = ( isset( $_GET['session_id'] ) ? $_GET['session_id'] : $_POST['session_id'] );
 				
 				$terminal_id = $data['terminalId'];
 				$store_id_netpay = $data['store_id_netpay'];
@@ -176,7 +222,7 @@
 				}
 				return '';
 				//return $print;
-			break;
+			break;*/
 			case 'cancelByOrderId' :
 				$transaction_id = ( isset( $_GET['transaction_id'] ) ? $_GET['transaction_id'] : $_POST['transaction_id'] );
 				$data = $Payments->getOrderResponse( $transaction_id );
