@@ -148,7 +148,10 @@
 				
 				$terminal_id = $data['terminalId'];
 				$store_id_netpay = $data['store_id_netpay'];
-
+				if( isset( $_GET['terminal_serie_id'] ) || isset( $_POST['terminal_serie_id'] ) ){
+					$data['terminalId'] = ( isset( $_GET['terminal_serie_id'] ) ? $_GET['terminal_serie_id'] : $_POST['terminal_serie_id'] );
+					$data['orderId'] = ( isset( $_GET['orderId'] ) ? $_GET['orderId'] : $_POST['orderId'] );
+				}
 				$apiUrl = $apiNetPay->getEndpoint( $terminal_id, 'endpoint_reimpresion' );//"https://suite.netpay.com.mx/gateway/integration-service/transactions/reprint";//http://nubeqa.netpay.com.mx:3334/integration-service/transactions/reprint";
 				$print = $apiNetPay->saleReprint( $apiUrl, $data['orderId'], $data['terminalId'],
 										$user_id, $sucursal_id, $sale_folio, $session_id, $store_id_netpay );

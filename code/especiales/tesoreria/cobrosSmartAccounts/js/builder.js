@@ -91,6 +91,7 @@
 	}
 
 	function get_reverse_form(){
+		var options = $( '#tarjeta_0' ).html();
 		var content = `<div class="row" style="padding:10px !important;">
 		<div class="row">
 			<div class="col-6">
@@ -114,8 +115,16 @@
 				<br><br>
 			</div>
 		</div>
-			<input type="text" class="form-control" id="reverse_input" placeholder="RNN-Terminal">
 			<p> </p>
+			<input type="text" class="form-control" id="reverse_input" placeholder="RNN-Terminal">
+			<p>Terminal : </p>
+			<select class="form-select" id="reverse_terminal">
+			${options}
+			</select>
+			<p> </p>
+			<div>
+				<input type="text" class="form-control" id="reverse_input_sale_folio" placeholder="Folio venta">
+			</div>
 			<p> </p>
 			<button
 				type="button"
