@@ -1,4 +1,4 @@
-
+/*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket 1.1*/
 	function buildPayment(){
 		var content = `<tr>
 			<td><td>

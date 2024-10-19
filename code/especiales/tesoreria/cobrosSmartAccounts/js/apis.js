@@ -1,4 +1,4 @@
-/*Version 2024-10-19 Para reimprimir ticket de netPay manualmente cuando la venta no llego al servidor*/
+/*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket 1.1*/
 	function sendTerminalPetition( counter, terminal_id ){
         var log_status = $( "#log_status" ).val();		
 		var sale_id = $( '#id_venta' ).val();

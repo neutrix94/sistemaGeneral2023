@@ -1,5 +1,6 @@
 <?php
 /*version 1.1 2024-06-21*/
+/*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket 1.1*/
 	include('../../../../conectMin.php');
 	include('../../../../conexionMysqli.php');
 	//consultamos si esta habiliado el logger
