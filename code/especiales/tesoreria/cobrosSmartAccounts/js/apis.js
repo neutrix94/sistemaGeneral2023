@@ -1,4 +1,4 @@
-
+/*Version 2024-10-19 Para reimprimir ticket de netPay manualmente cuando la venta no llego al servidor*/
 	function sendTerminalPetition( counter, terminal_id ){
         var log_status = $( "#log_status" ).val();		
 		var sale_id = $( '#id_venta' ).val();
@@ -63,10 +63,23 @@
             $( '#reverse_input' ).focus();
             return false;
         }
-        var sale_folio = $( `#buscador` ).val().trim();
+        var terminal_serie_id = $( '#reverse_terminal' ).val();
+        if( terminal_serie_id == 0 ){
+            alert( "Debes seleccionar una terminal valida para continuar" );
+            $( '#reverse_terminal' ).focus();
+            return false;
+        }
+        var sale_folio = $( `#reverse_input_sale_folio` ).val().trim();
+        if( sale_folio.trim() == '' ){
+            alert( "Debes ingresar un folio de venta válido para continuar." );
+            $( '#reverse_input_sale_folio' ).focus();
+            return false;
+        }
         var url = "ajax/db.php?fl=rePrintByOrderIdManual&sale_folio=" + sale_folio;
         url += "&session_id=" + $( '#session_id' ).val();
         url += "&orderId=" + orderId;
+        url += "&terminal_serie_id=" + terminal_serie_id;
+        //alert(url);
         var resp = ajaxR( url );
        /* if( resp.trim() != 'Transaccion exitosa' && resp.trim() != 'Transacción exitosa' ){
             resp = `<h2 class="text-danger text-center">El dato ingresado es incorrecto, verifica y vuelve a intentar.</h2>
