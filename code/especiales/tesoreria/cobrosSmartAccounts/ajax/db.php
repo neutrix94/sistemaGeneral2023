@@ -1,5 +1,6 @@
 <?php
 /*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket 1.1*/
+/*Version 2024-10-19 Para reimprimir ticket de netPay manualmente cuando la venta no llego al servidor*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
