@@ -103,7 +103,7 @@
                 return $epl_code;
             }
             function getProductCounterPrices( $product_id, $store_id, $is_maquiled = 'no' ){
-                $sql = "SELECT
+                /*$sql = "SELECT
                             pd.id_precio_detalle AS price_id,
                             pd.de_valor As number_since,
                             pd.precio_venta AS price,
@@ -126,6 +126,34 @@
                         LEFT JOIN ec_productos pr
                         ON pr.id_productos = pd.id_producto
                     WHERE pd.id_producto = {$product_id}
+                    AND s.id_sucursal = {$store_id}
+                    ORDER BY pd.de_valor";*/
+                $sql = "SELECT
+                            pd.id_precio_detalle AS price_id,
+                            pd.de_valor As number_since,
+                            pd.precio_venta AS price,
+                            pd.es_oferta AS is_special_price,
+                            CONCAT( pr.nombre_etiqueta, ' (', pr.orden_lista, ')' ) AS product_tag_name,
+                            pr.orden_lista AS list_order,
+                            pr.nombre AS product_name,
+                            pd.precio_anterior AS before_price,
+                            (SELECT 
+                                IF( '{$is_maquiled}' != 'no', '0', IF( id_producto_ordigen = pr.id_productos, id_producto, IF( id_producto = pr.id_productos, id_producto_ordigen, '0' ) ) )
+                            FROM ec_productos_detalle 
+                            WHERE id_producto_ordigen = pr.id_productos 
+                            OR id_producto = pr.id_productos 
+                            ) AS is_maquiled
+                        FROM ec_productos pr
+                        LEFT JOIN sys_sucursales_producto sp
+                        ON sp.id_producto = pr.id_productos
+                        LEFT JOIN sys_sucursales s
+                        ON sp.id_sucursal = s.id_sucursal
+                        LEFT JOIN ec_precios p
+                        ON p.id_precio = IF( sp.es_externo = 0, s.id_precio, s.lista_precios_externa )
+                        LEFT JOIN ec_precios_detalle pd
+                        ON pd.id_precio = p.id_precio
+                        AND pd.id_producto = pr.id_productos
+                    WHERE pr.id_productos = {$product_id}
                     AND s.id_sucursal = {$store_id}
                     ORDER BY pd.de_valor";
                 $stm = $this->link->query( $sql ) or die( "Error al buscar los precios del producto : {$sql} : {$this->link->error}" );

@@ -4,6 +4,7 @@
       private $dbHost = 'www.sistemageneralcasa.com';
       private $dbUser = 'wwsist_produccionFacturacion';
       private $dbPass = 'T+u7Uw_qYzt#';
+    
       private $dbName = 'wwsist_produccion_casa_luces_bazar';
 
       //Conexión
