@@ -1,6 +1,5 @@
 	<script type="text/javascript">
-	// El arreglo:
-
+//Version 2024-10-19 para correccion de error de pantalla negra en pantalla de ceerar venta
 
 
 	/* <![CDATA[ */
@@ -400,7 +399,7 @@ var emrge_aviso='';
 				type: 'GET',
 				url: "ajax/cerrarVenta.php?idp="+id_pedido+"&ap="+es_apartado+"&faceb="+face+"&cor="+correoC+"&"+datos+""+saldo_favor+ids_dvs
 			}).done (function (data) {
-
+//alert(data);
 //alert(data);//con este alert mostramos error
 				ax = data.split('|');
 		/*implementación Oscar 2019 para código de barras*/
@@ -414,6 +413,9 @@ var emrge_aviso='';
 		/*Fin de cambio Oscar 30.11.2018*/
 	//alert(data);
 				retval = ax[0].match (/^ok$/i);
+				if(retval == null){
+					retval = data;
+				}
 				pedidor=ax[1];
 		/**/
 				emrge_aviso=ax[2];
@@ -638,7 +640,9 @@ function bloquea_pantalla(){
 		//verificamos que tipo de venta es (normal o mayoreo)
 			var tipoVenta=document.getElementById('tipo_venta').value;
 	//implementacion de Oscar 29-12-2017
-			if (cerrarVenta ()){
+			var resp_vta = cerrarVenta ();
+			//alert( resp_vta );
+			if ( resp_vta == true || resp_vta == 'ok' ){
 			//implementacion Oscar 2023 para eliminar el sessionStorage
   				sessionStorage.clear();
 				//alert('pausa antes del ticket');
@@ -709,9 +713,15 @@ function bloquea_pantalla(){
 					}
 				}      
 		/*03.11.2018*/		
-			}else{
-				alert("Error al intentar el almacenado de los datos.\nVerifique conectividad e intente nuevamente.");
-				$("#cerrar").prop ("disabled", false);
+			}else{//alert(resp_vta);
+				resp_vta_json = JSON.parse( resp_vta );
+				if( resp_vta_json.status ){
+					$("#cont_emergente").html(`<div style="color : white;">${resp_vta_json.message}</div>`);//cargamos respuesta 
+					$("#emergente_cerrar").css("display","block");//hacemos visible la emergente
+				}else{
+					alert("Error al intentar el almacenado de los datos.\nVerifique conectividad e intente nuevamente.");
+					$("#cerrar").prop ("disabled", false);
+				}
 			}
 		}//fin de if monto==0
 
