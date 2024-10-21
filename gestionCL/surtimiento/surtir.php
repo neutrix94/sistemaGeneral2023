@@ -111,19 +111,19 @@ $indiceSurtir = 0;
               <p class="txt-content">No hay más productos por surtir.</p>
               <p>Entrega la mercancía a:</p>
               <p class="text-primary p-2 txt-val-modal"><span id="nombreVendedor">Nombre del vendedor</span></p>
-              <p>Folio de la nota:</p>
+              <p id="titleFolio">Folio de la nota:</p>
               <p class="text-primary p-2 txt-val-modal" id="folioNotaModal"></p>
-              <p>Productos surtidos parcialmente:</p>
+              <p id="titleProductosSurtdios">Productos surtidos parcialmente:</p>
               <div id="listaProductosSurtidosParcialmente"></div>
               <!-- 
                 <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>
               -->
-              <p>Productos no surtidos:</p>
+              <p id="titleProductosNoSurtdios">Productos no surtidos:</p>
               <div id="listaProductosNoSurtidos"></div>
               <!-- <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>  -->
             </div>
             <div class="modal-footer d-flex flex-column align-items-center w-100">
-              <button type="button" class="btn btn-success mb-2" style="width: 50%;" onclick="imprimeTicket()">IMPRIMIR</button>
+              <button type="button" id="btnImprimir" class="btn btn-success mb-2" style="width: 50%;" onclick="imprimeTicket()">IMPRIMIR</button>
               <button type="button" class="btn btn-primary"  style="width: 50%;" onclick="window.location.href='javascript: history.go(-1)'">LISTA DE PEDIDOS</button>
             </div>
           </div>
@@ -490,9 +490,17 @@ $indiceSurtir = 0;
               }else{
 
                 //No se muestra detalle para imprimir ya que todo el Pedido se surtió completo
+                $('#surtidoModal').modal('show');
+                $("#titleProductosSurtdios").hide();
+                $("#listaProductosSurtidosParcialmente").hide();
+                $("#titleProductosNoSurtdios").hide();
+                $("#listaProductosNoSurtidos").hide();
+                $("#titleFolio").hide();
+                $("#folioNotaModal").hide();
+                $("#btnImprimir").hide();
 
-                alert( data.result.resultado );
-                window.location.href='javascript: history.go(-1)';
+                //alert( data.result.resultado );
+                //window.location.href='javascript: history.go(-1)';
 
               }
 
