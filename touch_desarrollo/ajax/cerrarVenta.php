@@ -13,8 +13,17 @@
 	$stm = mysql_query( $sql ) or die( "Error al consultar si la venta temporal existe : {$sql} : " . mysql_error() );
 	if( mysql_num_rows($stm) <= 0 ){
 		die( json_encode( array( "status"=>201, 
-		"message"=>"<br><br><h2 class=\"text-light\">Esta venta ya habia sido cerrada, Reimprime el ticket de cobro desde el punto de venta </h2>
-		<div class=\"text-center\"><button class=\"btn btn-warning\" onclick=\"location.href='index.php?'\">Aceptar</button></div>" ) ) );
+		"message"=>"<br><br><h3 class=\"text-light\" style=\"font-size:150% !important;text-align:justify; padding:10px;\">Esta venta ya habia sido cerrada, Verifica si tu ticket ya fue impreso, 
+		de lo contrario, Reimprime el ticket de cobro desde el punto de venta</h3>
+		<h3 class=\"text-center text-warning\">Envia una captura de esta pantalla a Sistemas</h3>
+		<div class=\"row\">
+			<div class=\"col-3\"></div>
+			<div class=\"col-6 text-center\">
+				<br>
+				<button class=\"btn btn-warning form-control\" style=\"font-size:150% !important;\" onclick=\"location.href='index.php?'\">Aceptar</button>
+			</div>
+			<div class=\"col-3\"></div>
+		</div>" ) ) );
 	}
 	
 	$nitems = $_GET["nitems"];
