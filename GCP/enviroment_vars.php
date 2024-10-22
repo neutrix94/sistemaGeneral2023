@@ -6,7 +6,7 @@
         echo "ok";
     }*/
 
-    putenv('GOOGLE_APPLICATION_CREDENTIALS=/storage/casa-de-las-luces-f106cdae4177.json');
+    putenv('GOOGLE_APPLICATION_CREDENTIALS=/storage/projects/sistema-general-2023/casa-de-las-luces-f106cdae4177.json');
     //putenv('GOOGLE_APPLICATION_CREDENTIALS=../../api_credenciales.json');
 
     use Google\Service\CloudRun;
@@ -20,7 +20,7 @@
     $service = new Google_Service_CloudRun($client);
 
     $serviceName = 'sistemageneral2023';
-    $projectID = 'casa-de-las-luces';
+    $projectID = getenv('PROJECT_ID');
     $regionName = 'us-central1';
 
     $serviceDetails = $service->projects_locations_services->get("projects/$projectID/locations/$regionName/services/$serviceName");
@@ -35,10 +35,10 @@
             $envVar->setValue( $_POST['usuario_local'] );
         }
         if ($envVar->getName() === 'DB_NAME') {
-            $envVar->setValue( $_POST['pass_local'] );
+            $envVar->setValue( $_POST['nombre_local'] );
         }
         if ($envVar->getName() === 'DB_PASS') {
-            $envVar->setValue( $_POST['nombre_local'] );
+            $envVar->setValue( $_POST['pass_local'] );
         }
     }
 

@@ -291,49 +291,143 @@ var packsCatalogue = new Array();
 
   function solicitarMuestras( ){
 
-    var baseUrl = window.location.origin;
-    var apiUrl = baseUrl + '/sistemaGeneral2023/rest/v1/surte/Muestra';
+    var url="ajax/checkSesionCajaParaMuestra.php";
 
-    var productosSeleccionados = getProductosMuestras();
+    var res=ajaxRequest(url);
 
-    if( productosSeleccionados.length > 0 ){
-      if (confirm("Se enviarán a solicitar " + productosSeleccionados.length + " muestras. ¿Confirmas la operación?") == true) {
-          $.ajax({
-          type: 'POST',
-          url: apiUrl,
-          headers: {
-            'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
-          },
-          data: {
-              "productos": productosSeleccionados,
-              "vendedor": <?php echo $user_id; ?>,
-              "pedido": genIdPedido( <?php echo $user_id; ?> ),
-          },
-          datatype: 'json',
-          success: function (data) {
-              console.log("RESPUESTA MUESTRA");
-              console.log(data);
-              if( data.result.resultado == "Solicitado" ){
-                alert(data.result.descripcion);
-              }else{
-                alert("Ha ocurrido un error: "+data.result.descripcion);
-              }
-              
-              clearAllCheckBox();
+    var aux=res.split('|');
 
-          },
-          error:function(error){
-            console.log("ERROR".error);
-          }
-        });
-        } else {
-          alert("Cancelaste la operación");
-        }
-        
+    if(aux[0]=='sin_sesion_caja'){
+        alert("No se pueden hacer ventas porque el cajero no ha iniciado sesión de caja\nPida al cajero que inicie su sesión de caja!!!");
+        return false;
     }else{
-      alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
+
+      // Obtiene la URL completa actual
+      var currentUrl = window.location.href;
+      // Extrae el nombre del ambiente (la parte entre el dominio y el siguiente '/')
+      // var regex = /\/\/[^\/]+\/([^\/]+)/;
+      // var match = currentUrl.match(regex);
+      // var nombreAmbiente = match ? match[1] : '';
+  
+      // // Construye la URL base y la URL del API
+      // var baseUrl = window.location.origin;
+      // var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Muestra';
+      var parts_url = currentUrl.split('/touch_desarrollo');
+      var apiUrl = parts_url[0] + '/rest/v1/surte/Muestra';
+  
+      var productosSeleccionados = getProductosMuestras();
+  
+      if( productosSeleccionados.length > 0  ){
+        if (confirm("Se enviarán a solicitar " + productosSeleccionados.length + " muestras. ¿Confirmas la operación?") == true) {
+            $.ajax({
+            type: 'POST',
+            url: apiUrl,
+            headers: {
+              'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
+            },
+            data: {
+                "productos": productosSeleccionados,
+                "vendedor": <?php echo $user_id; ?>,
+                "sucursal": <?php echo $sucursal_id;?>,
+                "pedido": genIdPedido( <?php echo $user_id; ?> ),
+            },
+            datatype: 'json',
+            success: function (data) {
+                console.log("RESPUESTA MUESTRA");
+                console.log(data);
+                if( data.result.resultado == "Solicitado" ){
+                  
+                  var solicitado = data.result.solicitado;
+                  var noHabilitado = data.result.noHabilitado;
+                  var noSoliciado = data.result.noSolicitado;
+
+                  var msjAlert = "";
+
+                  if( solicitado.length > 0 ){
+                    msjAlert += "Se ha solicitado la muestra de los siguientes productos:";
+
+                    for (let index = 0; index < solicitado.length; index++) {
+                      var nombreProducto = getNombreProductoByOrdenLista( solicitado[index] );
+                      msjAlert += "\n"+ "(" + solicitado[index] + ") "+ nombreProducto;
+                      
+                    }
+                  }
+
+                  if( noSoliciado.length > 0 ){
+                    msjAlert += "\n\nLos siguientes productos no se han solicitado debido a que no se encuentran habilitados para surtimiento y/o se encuentran en proceso de surtimiento:";
+
+                    for (let index = 0; index < noSoliciado.length; index++) {
+                      var nombreProducto = getNombreProductoByOrdenLista( noSoliciado[index] );
+                      msjAlert += "\n" + "(" + noSoliciado[index] + ") "+ nombreProducto;
+                      
+                    }
+                  }
+
+                  if( msjAlert != "" ){
+                    alert(msjAlert);
+                  }
+
+                  //alert(data.result.descripcion);
+                  //Actualizar el producto del que se solicitó muestra, tanto localStorage como en front para controlar el número de muestras que se ha solicitado
+                  if( data.result.solicitado.length > 0 ){
+
+                    for (let index = 0; index < data.result.solicitado.length; index++) {
+                      const element = data.result.solicitado[index];
+                      var strCbMuestra = setProductoSolicitadoComoMuestra( element );
+                      
+                      if( strCbMuestra != "" ){
+                        /* Actualizar en session storage */
+                        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+                        products_array = JSON.parse( products_array );
+                        
+                        var indexProducto = searchIndexByListOrder(element, products_array);
+
+                        //La posición 14 corresponde a la posición donde es establece string de muestra
+                        products_array[indexProducto][14] = strCbMuestra;
+                        
+                        sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+
+                      }
+
+                    }
+                  }
+  
+                }else{
+                  alert("Ha ocurrido un error: "+data.result.descripcion);
+                }
+                
+                clearAllCheckBox();
+  
+            },
+            error:function(error){
+              console.log("ERROR".error);
+            }
+          });
+          } else {
+            alert("Cancelaste la operación");
+          }
+          
+      }else{
+        alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
+      }
     }
+
   }
+
+  function ajaxRequest(url){
+    
+    if(window.ActiveXObject){       
+        var httpObj = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    else if (window.XMLHttpRequest){       
+        var httpObj = new XMLHttpRequest(); 
+    }
+
+    httpObj.open("POST", url , false, "", "");
+    httpObj.send(null);
+    
+    return httpObj.responseText;
+  }        
 
   function genIdPedido( id_user ) {
     var id = "";
@@ -374,10 +468,10 @@ var packsCatalogue = new Array();
         var isChecked = $row.find('input[type="checkbox"]').is(':checked');
         if (isChecked) {
           var ordenDeLista = $row.find('td:eq(0)').text().trim();
-          var cantidad = $row.find('td:eq(2)').text().trim();
+          //var cantidad = $row.find('td:eq(2)').text().trim();
           seleccionados.push({
             id: ordenDeLista,
-            cantidad: cantidad
+            cantidad: 1 //Para muestra siempre se envía 1 unidad
           });
         }
       });
@@ -385,7 +479,94 @@ var packsCatalogue = new Array();
     return seleccionados;
   }
 
+  function getNombreProductoByOrdenLista( ordenListaParam ){
+
+    var filas = $('#listaProductos tr.move');
+    var nombreProducto = "";
+    if( filas.length > 0 ){
+      // Mostrar las filas en la consola
+      filas.each(function(fila) {
+        var $row = $(this);
+        var ordenDeLista = $row.find('td:eq(0)').text().trim();
+
+        if( ordenDeLista == ordenListaParam ){
+          //Obtenemos el npúmero de muestra actual
+          var nombreFull = $row.find('td:eq(1)').text();
+          var nombreClean = nombreFull.split("Ubicación:");
+          nombreProducto = nombreClean[0];
+
+        }
+
+      });
+    }
+
+    return nombreProducto;
+
+  }
+
+  function setProductoSolicitadoComoMuestra( ordenListaParam ){
+
+    var filas = $('#listaProductos tr.move');
+    var stringCbMuestra = "";
+    if( filas.length > 0 ){
+      // Mostrar las filas en la consola
+      filas.each(function(fila) {
+        var $row = $(this);
+        var ordenDeLista = $row.find('td:eq(0)').text().trim();
+
+        if( ordenDeLista == ordenListaParam ){
+          //Obtenemos el npúmero de muestra actual
+          var numeroMuestra = $row.find('td:eq(15)').find('input').attr("number-muestra");
+
+          if( numeroMuestra != undefined ){
+            numeroMuestra = Number(numeroMuestra) + 1;
+          }else{
+            numeroMuestra = 1;
+          }
+          
+          $row.find('td:eq(15)').find('input').attr('number-muestra', numeroMuestra.toString());
+
+          stringCbMuestra = $row.find('td:eq(15)')[0].innerHTML;
+
+        }
+
+      });
+    }
+
+    //Regresa el string correspondiente al campo checkbox para establecerlo en sessionStorage
+    return stringCbMuestra;
+
+  }
+
   function clearAllCheckBox(){
+
+    /*
+    $('.cbMuestra:checked').each(function() {
+        //Antes de limpiar el check, se procede a habilitar bandera pra saber a qué producto se le descuenta 1 unidad
+        $(this).attr('number-muestra', 1);
+        
+        //Se establece en sessionStorage el atributo 'number-muestra' del producto para saber si ya se solicitó muestra
+        var fila_tabla = $(this).parent().parent();
+        var indice = fila_tabla.index();
+
+        //Una vez obtenido el indice, procedemos a actualizar el objeto que se guarda en sessionStorage
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+
+        if( products_array.length > 0 ){ 
+
+          var string_actual = products_array[indice-1][14];
+
+          var modifiedString = string_actual.replace('checked', 'number-muestra="1"');
+          //Se resta al indice una unidad ya que el indice cero corresponde al header y ese no se toma en cuenta
+          products_array[indice-1][14] = modifiedString;
+
+          sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+        }
+       
+    });
+    */
+
     $(".cbSelectAllMuestras").prop('checked', false); 
     $('.cbMuestra:checked').each(function() {
         //$(this).prop('checked', false);  // Desmarcar el checkbox
@@ -431,8 +612,58 @@ var packsCatalogue = new Array();
           const listOrder = findListOrderByBarcode(valCodigo, arrProductosTabla);
 
           if( listOrder != null ){
+            //Si el producto existe en la tabla, validamos si ya tiene muestra o ya ha sido solicitado como pedido
+            //Buscamos fila del orden de lista para validar si ya ha sido solicitado como pedido o muestra
+            var responseIndexDisponible = validateProductoEsPedidoMuestra(listOrder);
+            var disponibleCambioFisico = responseIndexDisponible[1];
 
-            descontarCantidad(listOrder);
+            if( disponibleCambioFisico ){
+
+              //Con base al indice, se actualiza la bandera para saber si es cambio
+              var indiceArreglo = responseIndexDisponible[0];
+
+              var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+              products_array = JSON.parse( products_array );
+              var cantidadSolicitado = products_array[indiceArreglo][2];
+
+              var cambio = Number(products_array[indiceArreglo][15]) + 1;
+
+              if( cambio > cantidadSolicitado ){
+                alert("El número de piezas para cambio, supera a la cantidad solicitada del producto.");
+                $('#inputDevolucion').val("");
+
+              }else{
+
+                products_array[indiceArreglo][15] = cambio;
+                sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+
+                var filas = $('#listaProductos tr.move');
+                filas.each(function(index, fila) {
+                    var celdas = $(fila).find('td');
+
+                    // Solo verifica el índice 0 y aplica el cambio si coincide el código de barras
+                    var ordenLista = $(celdas.eq(0)).text();
+                    var codigoBarras = $('#inputDevolucion').val();
+                    if(ordenLista == codigoBarras) {
+                        // Cambia el contenido del <td> en la posición 16 que corresponde al conteo de piezas para cambio
+                        $(celdas.eq(16)).text(cambio);
+                        console.log("Aplicar cambio");
+                    }
+                });
+
+                alert("Solicitud de cambio físico generada exitosamente.\nPara concluir dicha operación favor de dar click en 'Enviar pedido'");
+                $('#inputDevolucion').val("");
+                closeModal();
+              }
+
+            }else{
+
+              alert("El código ingresado corresponde a un producto que no se ha solicitado muestra y/o pedido.\nFavor de verificar");
+              $('#inputDevolucion').val("");
+
+            }
+
+            //descontarCantidad(listOrder);
           }else{
             alert("El código ingresado no existe en el pedido.\nFavor de revisar");
             $('#inputDevolucion').val("");
@@ -456,7 +687,47 @@ var packsCatalogue = new Array();
         }
     }
     return null; // Devuelve null si no se encuentra el código de barras
-}
+  }
+
+  function validateProductoEsPedidoMuestra(ordenLista){
+
+    var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+    products_array = JSON.parse( products_array );
+    var disponibleParaCambio = false;
+    if( products_array.length > 0 ){ 
+
+      //Obtenemos el indice del array para validar si ya se solicitó muestra o envió a pedido
+      var indexProducto = searchIndexByListOrder(ordenLista, products_array);
+
+      disponibleParaCambio = validaDisponibleParaCambio( indexProducto, products_array ); 
+
+    } 
+
+    return [ indexProducto, disponibleParaCambio ];
+  }
+
+  function searchIndexByListOrder( ordenLista, products_array ){
+    var indexFound =null;
+    
+    for (let index = 0; index < products_array.length; index++) {
+      if( products_array[index][0] == ordenLista){
+        indexFound = index;
+        index = products_array.length;
+      }
+    }
+    return indexFound;
+  }
+
+  function validaDisponibleParaCambio( index, products_array ) {
+    //Indice 14 contiene texto para saber si ya se solicitó muestra
+    //Indice 16 contiene bandera para saber si ya se solicitó pedido
+    var disponibleCambio = false;
+    if( products_array[index][14].includes("number-muestra") || products_array[index][16] == '1' ){
+      disponibleCambio = true;
+    }
+
+    return disponibleCambio;
+  }
 
 
   function buildObjetoOrdenListaCodigoBarras(){
@@ -1148,7 +1419,7 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
   <br>
   <div class="row"><!--class="ui-block-bwidth:48%;float:left;"-->
     <div class="col-2"></div>
-    <div class="col-4">
+    <!-- <div class="col-4">
       <button 
         type="button"
         onclick="openDevolucionProductos();"
@@ -1156,8 +1427,8 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
       >
         <b>Productos para devolver</b>
       </button>
-    </div>
-    <div class="col-4">
+    </div> -->
+    <div class="col-8">
       <button data-theme="a" 
         name="cerrar" 
         id="cerrar" 
@@ -1182,6 +1453,15 @@ DESHABILITADO POR OSCAR 2023 ( ESCANER DE BARCODES CON CAMARA )
     <!--Descuentos-->
     
         <div class="row" style="align-items: center;justify-content: center;">
+            <div class="col-2 text-center">
+              <button 
+                type="button"
+                onclick="openDevolucionProductos();"
+                class="btn btn-success form-control"
+              >
+                <b>Cambio Físico</b>
+              </button> 
+            </div>
             <div class="col-2 text-center"><!-- width="20%" align="center" style="border: inset 0pt;" -->
              <fieldset  data-role="controlgroup" data-type="horizontal" style="display :none;">
                <label data-mini="true" style="width:100px;padding:10px;text-align:center;">

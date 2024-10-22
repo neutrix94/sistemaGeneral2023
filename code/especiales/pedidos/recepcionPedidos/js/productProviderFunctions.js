@@ -175,6 +175,15 @@ var global_meassures_path_camera_plugin = '';*/
 						//alert( 'here : ' + $(this).html().trim() );
 						product_providers += '~' + $(this).html().trim();
 					}//fin de cambio Oscar 2023
+			/*Implementacion Oscar 2024-08-26 para insertar /actualizar presentacion pieza, repetido*/
+					else if( index2 == 24 ){
+						product_providers += '~' + $(this).html().trim();
+					}else if( index2 == 25 ){
+						$( this ).children( 'input' ).each( function( index3 ){
+							product_providers += '~' + ( $(this).prop( 'checked' ) == true ? '1' : '0' );
+						});
+					}
+			/*Fin de cambio Oscar 2024-08-26 para insertar /actualizar presentacion pieza, repetido*/
 				}
 			});
 			count_tmp ++;

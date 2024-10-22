@@ -75,10 +75,17 @@
             
             var component_chk = products_array[i][14];
             var contiene_checked = component_chk.includes("checked");
+            var contiene_texto_muestra = component_chk.includes("number-muestra");
             var select_checkbox = ( contiene_checked ) ? 1: 0;
+            var es_muestra = ( contiene_texto_muestra ) ? 1: 0;
+            //Posición 16 corresponde a la bandera para saber si el producto ya se ha enviado a pedido
+            var pedidoSolicitado = products_array[i][16];
+            var numeroPiezasCambio = products_array[i][15];
+            //Posición 17 corresponde al número que se solicitó de un producto existente que previamente ya se solicitó para surtimiento
+            var piezasSurtirAgregadas = products_array[i][17];
             
             //agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price );//aux_arr[2]
-            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price, select_checkbox );//aux_arr[2]
+            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price, select_checkbox, es_muestra, pedidoSolicitado, numeroPiezasCambio, piezasSurtirAgregadas );
             //agregaFila(null, products_array[i][3], -1, products_array[i][1], products_array[i][14], tmp_price, select_checkbox );//aux_arr[2]
             //f,cant,temp,id_producto_pedido,lista_normal
         }
@@ -935,7 +942,7 @@ var new_sale_window = null;
 
 var hay_paquete=0;
 //agregar fila a tabla del pedido
-    function agregaFila( f, cant, temp, id_producto_pedido, lista_normal, product_price = null, val_check_muestra = 0 ){//se implementan las variables cant,temp por Oscar 13.08.2018
+    function agregaFila( f, cant, temp, id_producto_pedido, lista_normal, product_price = null, val_check_muestra = 0, es_muestra = 0, solicitado = 0, cambio = 0, piezasSurtirAgregadas = 0 ){//se implementan las variables cant,temp por Oscar 13.08.2018
         //alert(product_price );
     //alert( f + ','+ cant + ',' + temp + ',' + id_producto_pedido + ',' + lista_normal );
        // alert('add_fila');
@@ -1067,12 +1074,25 @@ var hay_paquete=0;
 
     //Buscamos si existe un producto igual
         var can2=-1;
+        var cantidadNuevaSurtir = piezasSurtirAgregadas;
         for(i=1;i<trs.length;i++){
             tds=trs[i].getElementsByTagName('td');
            // alert('|'+aux[2]+'|\n|'+tds[0].innerHTML+'|');
             //alert('|'+sig+'|'+tds[9]+'|');
             if(tds[0].innerHTML == aux[2] && global_last_orders_array.indexOf( aux[2] ) == -1/*&& (cant==null||cant=='')*/){ //&& sig == tds[9].valor se quita de la condición Oscar 03.09.2018 aux[2] != '18000'
                 //alert('Repetido');
+                //Solo se agrega la cantidad surtir en caso de que ya se haya solicitado
+                if( tds[17].innerHTML == '1' ){
+                    solicitado = '1';
+                    var currentSurtido = 0;
+                    if( tds[18].innerHTML != "-1" ){
+                        currentSurtido = parseInt(tds[18].innerHTML);
+                    }
+                    cantidadNuevaSurtir = currentSurtido + parseInt(can.value);
+                    //Se agrega a sessionStorage el valor para que en caso de Actualizar la página, se mantenga la cantidad adicional ingresada
+                    var oderList = tds[0].innerHTML;
+                    //setCantidadNuevaSurtirEnListaProductosStorage( oderList, cantidadNuevaSurtir );
+                }
                 can2=parseInt(tds[2].innerHTML)+parseInt(can.value);
                 //alert('hasta ');
                 eliminarItem(tds[0]);
@@ -1395,6 +1415,10 @@ var hay_paquete=0;
         //Checkbox muestra
         var newCell=newRow.insertCell(15);
         var strCheck = (val_check_muestra == 1) ? '<input type="checkbox" class="cbMuestra" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+
+        if( es_muestra == 1 ){
+            strCheck = strCheck.replace('onclick="checkMuestra(this)"', 'onclick="checkMuestra(this)" number-muestra="1"');
+        }
         //var strCheck = '<input type="checkbox" onclick="checkMuestra(this)"/>';
         newCell.innerHTML=strCheck;
         newCell.align="center";
@@ -1404,6 +1428,25 @@ var hay_paquete=0;
         }else{
             $(newRow).css('background-color','#FFFF');
         }
+
+        //Bandera para saber si es cambio
+        var newCell=newRow.insertCell(16);
+        newCell.innerHTML=cambio;
+        newCell.align="right";
+        newCell.style.display="none";
+
+        //Bandera para saber si ya se envió a Pedido
+        var newCell=newRow.insertCell(17);
+        newCell.innerHTML=solicitado;
+        newCell.align="right";
+        newCell.style.display="none";
+
+        //Bandera para saber si se solicitaron más piezas del mismo producto después de haber solicitado pedido
+        piezasSurtirAgregadas = cantidadNuevaSurtir;
+        var newCell=newRow.insertCell(18);
+        newCell.innerHTML=piezasSurtirAgregadas;
+        newCell.align="right";
+        newCell.style.display="none";
 
     /*implementacion de Oscar 03.05.2018 para insertar en tabla temporal de movimientos*/      
         var urlTmp="ajax/insertaTemporal.php?id_mov_temp="+id_mov_tmp+"&id_prod="+aux[1]+"&cant="+can2;
@@ -1516,6 +1559,32 @@ var hay_paquete=0;
         setLocalStorageProducts();
     }
 
+    function setCantidadNuevaSurtirEnListaProductosStorage( orden_lista, val_cantidad ){
+
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+        var indiceLista = -1;
+        if( products_array.length > 0 ){ 
+
+            for (let index = 0; index < products_array.length; index++) {
+                
+                if( products_array[index][0] == orden_lista ){
+                    indiceLista = index;
+                    //Salimos del ciclo
+                    index = products_array.length;
+                }
+                
+            }
+
+            if(indiceLista != -1){
+                //En la posición 17 se encuentra el valor de la cantidad ingresada
+                products_array[indiceLista][17] = val_cantidad;
+
+                sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+            }   
+        }
+
+    }
 
 
 	function enterNext(obj, eve)
@@ -1621,6 +1690,8 @@ var hay_paquete=0;
 		//alert(id_prod);
 		//return false;
 		$(item).parents ("tr.move").first ().remove ();
+        //El elemento eliminado se agrega al arreglo para mandar petición de surtimiento
+        setArregloElimnarSurtimiento(tds);
 		//calculaTotal ();
 		$("#producto, #cantidad").val ("");
 		
@@ -1696,10 +1767,39 @@ var hay_paquete=0;
         setLocalStorageProducts();//implementacion Oscar 2023 para eliminar el producto de LocalStorage
     }
 
+    function setArregloElimnarSurtimiento( tds ){
+
+        var orderList = tds[0].innerHTML;
+        var esSolicitado = tds[17].innerHTML;
+        
+        if( sessionStorage.getItem('ARRAY_ELIMINADOS') != null && sessionStorage.getItem('ARRAY_ELIMINADOS') != '' ){
+            var array_eliminados = JSON.parse(sessionStorage.getItem('ARRAY_ELIMINADOS'));
+            array_eliminados.push(orderList);
+
+            sessionStorage.setItem('ARRAY_ELIMINADOS', JSON.stringify(array_eliminados));
+        }else{
+            var array_eliminados = [];
+            //Solo se agrega al arreglo en caso de que 
+            if( esSolicitado == '1' ){
+                array_eliminados.push(orderList);
+                sessionStorage.setItem('ARRAY_ELIMINADOS', JSON.stringify(array_eliminados));
+            }else{
+                console.log("NO SE AGREGA A LA ELIMINACIÓN PARA SURTIMIENTO");
+            }
+            
+        }
+    }
+
     function checkMuestra(item){
         var valor_chk = $(item).is(":checked");
+        var es_muestra = $(item).attr('number-muestra');
 
         var str_checkbox = ( valor_chk ) ? '<input type="checkbox" class="cbMuestra" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+
+        if( es_muestra == '1' ){
+
+            str_checkbox = str_checkbox.replace('onclick="checkMuestra(this)"', 'onclick="checkMuestra(this)" number-muestra="1"');
+        }
 
         if( valor_chk ){
             $(item).parent().parent().css('background-color','#D8FAFF');
@@ -1790,8 +1890,8 @@ var hay_paquete=0;
     /*Fin de cambio Oscar 12.03.2019*/
 
         var res=ajaxR(url);
-//alert(res);
-/*return false;*/
+        //alert(res);
+    /*return false;*/
 		aux=res.split('|');
 		/**/
         if(aux[0]=='sin_sesion_caja'){
@@ -1815,7 +1915,7 @@ var hay_paquete=0;
         /*fin de cambio Oscar 13.11.2018*/
 			retval = true;
             //mandamos a consumir servicio para surtir pedido
-            surtePedido();
+            //surtePedido();
 		}
 		else{
 			retval = false;
@@ -1838,21 +1938,38 @@ var hay_paquete=0;
 //alert('fin de generaVe');	
 		return retval;
 	}
+    
+    //El parámetro callback se manda para poder ejecutar función hasta que la petición de surtimiento termine
+    function surtePedido( callback ){
 
-    function surtePedido( ){
+        // Obtiene la URL completa actual
+        var currentUrl = window.location.href;
 
-        var baseUrl = window.location.origin;
-        var apiUrl = baseUrl + '/sistemaGeneral2023/rest/v1/surte/Pedido';
+        // Extrae el nombre del ambiente (la parte entre el dominio y el siguiente '/')
+        // var regex = /\/\/[^\/]+\/([^\/]+)/;
+        // var match = currentUrl.match(regex);
+        // var nombreAmbiente = match ? match[1] : '';
+
+        // // Construye la URL base y la URL del API
+        // var baseUrl = window.location.origin;
+
+        var parts_url = currentUrl.split('/touch_desarrollo');
+        //var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Pedido';
+        var apiUrl = parts_url[0] + '/rest/v1/surte/Pedido';
 
         var productosPedido = getProductosPedido();
+        var productosEliminados = getProductosEliminados();
+        //var productosEliminados = [];
 
         var dataSurtePedido = {
+                "productosEliminados": productosEliminados,
                 "productos": productosPedido,
                 "vendedor": <?php echo $user_id; ?>,
+                "sucursal": <?php echo $sucursal_id;?>,
                 "pedido": genIdPedido( <?php echo $user_id; ?> ),
             };
 
-        if( productosPedido.length > 0 ){
+        if( productosPedido.length > 0 || productosEliminados.length > 0 ){
             $.ajax({
             type: 'POST',
             url: apiUrl,
@@ -1866,23 +1983,31 @@ var hay_paquete=0;
                 console.log(data);
                 if( data.result.resultado == "Solicitado" ){
                     alert(data.result.descripcion);
+                    //Establecer el localStorage como 1 la fila 16, corresponde a la bandera para saber si ya fue solicitado
+                    setBanderaProductoSolicitado(data.result.noSolicitados);
+                    clearArrayEliminados();
+
                 }else{
                     alert("Ha ocurrido un error: "+data.result.descripcion);
                 }
 
-                sessionStorage.setItem('ID_PEDIDO_TEMP', '');
+                //sessionStorage.setItem('ID_PEDIDO_TEMP', '');
                 
                 clearAllCheckBox();
+                callback();
 
             },
             error:function(error){
                 console.log("ERROR".error);
+                callback();
             }
             });
             
             
         }else{
-        alert("Favor de seleccionar al menos una casilla de muestra correspondiente a un producto dentro de la tabla");
+            console.log("No sufrió cambio, no se envpia ningún producto a surtimiento");
+            //location.href = $("#menu_cerrar").attr ("href");
+             callback();
         }
     }
 
@@ -1896,14 +2021,57 @@ var hay_paquete=0;
                 var $row = $(this);
                 var ordenDeLista = $row.find('td:eq(0)').text().trim();
                 var cantidad = $row.find('td:eq(2)').text().trim();
-                seleccionados.push({
-                    id: ordenDeLista,
-                    cantidad: cantidad
-                });
+                var numberMuestra = $row.find('td:eq(15)').children().eq(0).attr('number-muestra');
+                var cantidadPiezasCambio = $row.find('td:eq(16)').text().trim();
+                var solicitado = $row.find('td:eq(17)').text().trim();
+                var cantidadAdicionalDespuesDeSurtido = $row.find('td:eq(18)').text().trim();
+
+                if( solicitado == '1' ){
+                    
+                    if( cantidadPiezasCambio == '0' && cantidadAdicionalDespuesDeSurtido <= '0' ){
+                        cantidad = 0;
+                    }
+                    //Cuando el producto ya se ha solciitado a envío, únicamente se hace la petición para surtir de las piezas para "cambio"
+                    if( cantidadPiezasCambio != '0' &&  cantidadAdicionalDespuesDeSurtido <= '0' ){
+                        cantidad = cantidadPiezasCambio;
+                    }
+
+                    if( cantidadPiezasCambio == '0' &&  cantidadAdicionalDespuesDeSurtido >= '0' ){
+                        cantidad = cantidadAdicionalDespuesDeSurtido;
+                    }
+
+                    if( numberMuestra > 0 ) cantidad = numberMuestra;
+
+
+                }else{
+                    // En caso de que ya se haya solicitado muestra, a la cantidad solicitada, se resta la unidad de muestra, en otro caso, si no ha sido solicitado, se envía la cantidad solicitada originalmente
+                    if( numberMuestra != undefined ){
+                        cantidad = cantidad - numberMuestra; 
+                    }
+                }
+
+                if( cantidad > 0 ){
+                    //únicamente si la cantidad es mayor a 0, el producto se agrega a la petición
+                    seleccionados.push({
+                        id: ordenDeLista,
+                        cantidad: cantidad
+                    });
+                }
                 
             });
         }
         return seleccionados;
+    }
+
+    function getProductosEliminados(){
+        var array_eliminados = [];
+        if( sessionStorage.getItem('ARRAY_ELIMINADOS') != null && sessionStorage.getItem('ARRAY_ELIMINADOS') != '' ){
+
+            array_eliminados = JSON.parse(sessionStorage.getItem('ARRAY_ELIMINADOS'));
+        }
+
+        return array_eliminados;
+
     }
 
     function genIdPedido( id_user ) {
@@ -1917,6 +2085,38 @@ var hay_paquete=0;
         }
 
         return id;  
+    }
+
+    function setBanderaProductoSolicitado( noSolicitados ){
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+
+        if( products_array.length > 0 ){ 
+
+            for (let index = 0; index < products_array.length; index++) {
+                var odenListaProd = products_array[index][0];
+
+                //Solo se establecen como "solicitado" los productos que no vengan en el arreglo de noSolicitados
+                if( noSolicitados != undefined ){
+
+                    if( !noSolicitados.includes( odenListaProd ) ){
+                        //Se actualiza bandera de muestra que indica reseteo de surtimiento en muestras
+                        products_array[index][14] = '<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+                        //La posición 16 corresponde a la bandera para identificar si ya ha sido solicitado
+                        products_array[index][16] = '1';
+                        products_array[index][17] = '-1';
+    
+                    }
+                }
+
+            }
+
+          sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+        }
+    }
+
+    function clearArrayEliminados(){
+        sessionStorage.removeItem('ARRAY_ELIMINADOS');
     }
     
     function change_to_upercase( obj ){
@@ -2142,8 +2342,10 @@ var hay_paquete=0;
                      }
                      else
                      {
-                        
-                             if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
+                        selfElement = this;
+                        surtePedido(function(){
+
+                            if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
                                  $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href").replace (/&idp=\d+/i, "&idp=" + $("#id_pedido").val ()));
                              }
                              else {
@@ -2186,12 +2388,15 @@ var hay_paquete=0;
                              
     /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores}*/
 
-                             if ($(this).attr ("id").match (/^cerrar$/i))
+                             if ($(selfElement).attr ("id").match (/^cerrar$/i))
                                  location.href = $("#menu_cerrar").attr ("href");
                              
                              return true;
                             
                          }
+
+                        });
+                        
                      }
                  }
              });
@@ -2207,6 +2412,7 @@ var hay_paquete=0;
   <!-- <script type="text/javascript" src="../scannerBC/quaggajs/quagga.min.js"></script>
   <script type="text/javascript" src="../scannerBC/quaggajs/scriptLeer.js"></script> -->
   <script type="text/javascript" src="../scannerBC/zxing/library/zxing.min.js"></script>
+  <!-- <script src="../../code/especiales/tesoreria/cobrosSmartAccounts/websocket_client/websocket_client_surtimiento.js" type="module"></script> -->
   <script type="text/javascript">
     window.addEventListener('load', function () {
       var listaCodigos = [];
