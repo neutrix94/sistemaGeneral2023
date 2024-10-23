@@ -8,6 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     $prioridad = isset($_POST['prioridad']) ? $_POST['prioridad'] : '';
     $pwd = isset($_POST['pwd']) ? $_POST['pwd'] : '';
     $sucursal = isset($_POST['sucursal']) ? $_POST['sucursal'] : '';
+    $fechaInicio = isset($_POST['fechaInicio']) ? $_POST['fechaInicio'] : '';
+    $fechaFin = isset($_POST['fechaFin']) ? $_POST['fechaFin'] : '';
     $usuario = isset($_POST['usuario']) ? $_POST['usuario'] : '';
     $listaAsignacion = isset($_POST['listaAsignacion']) ? $_POST['listaAsignacion'] : '';
 
@@ -47,6 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
         $surtimientoCRUD = new SurtimientoCRUD();
         $surtimientoCRUD->siguienteSurtimiento($id,$sucursal,$usuario);
     }
+    if ($action == 'cancelarSurtimientos') {
+        $surtimientoCRUD = new SurtimientoCRUD();
+        $surtimientoCRUD->cancelarSurtimientos($fechaInicio,$fechaFin,$sucursal,$usuario);
+    }
+    
     
 }
 
@@ -441,11 +448,13 @@ class SurtimientoCRUD {
         $usuario =  $surtimientoCRUD->getUserProfile($idUsuario);
         $perfil = (isset($usuario[0]) && ($usuario[0]['tipo_perfil'] == '4' || $usuario[0]['tipo_perfil'] == '8') &&  $usuario[0]['id_encargado'] == $idUsuario ) ? '2': '1';
         $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,'2024-01-01','','1');
-
+        //error_log(print_r($surtimientoSeleccionado,true));
+        //error_log(print_r($surtimientos,true));
+        
         //Valida si está en proceso y asignado al usuario deja continuar
         foreach ($surtimientoSeleccionado as $item => $value) {
           $estadoSurtimiento = ($value['estado_gral'] == 2) ? 'Proceso' : 'Pendiente';
-          if($value['id_asignado'] == $idUsuario){
+          if($value['id_asignado'] == $idUsuario || empty($value['id_asignado']) ){
               $asignadoSurtidor = true;
           }
           if($value['id_asignado'] == ''){
@@ -461,7 +470,7 @@ class SurtimientoCRUD {
           //Valida orden de surtimiento
           //error_log(print_r($surtimientos,true));
           foreach ($surtimientos as $item => $value) {
-            if($value['id_surtidores'] == '' || in_array($idUsuario,explode(",",$value['id_surtidores'])) ){
+            if( ($value['id_surtidores'] == '' || in_array($idUsuario,explode(",",$value['id_surtidores'])) ) && $value['estado_gral'] <= 3 ){
                 echo $value['id'];
                 return;
             }
@@ -479,6 +488,23 @@ class SurtimientoCRUD {
         return 'OK';
     }
     
+    public function cancelarSurtimientos($fechaInicio = null, $fechaFin = null, $sucursal= null, $usuario=null){
+        try {
+          $query = "UPDATE ec_surtimiento s 
+            LEFT JOIN sys_users u ON u.id_usuario = s.id_vendedor 
+            SET s.fecha_modificacion = now(), s.modificado_por = '{$usuario}', s.estado = '5'
+            WHERE s.fecha_creacion >= '{$fechaInicio}' and s.fecha_creacion <= '{$fechaFin}' and s.estado in ('1','2')
+            and u.id_sucursal = '{$sucursal}' ;";
+          $stmt = $this->conn->prepare($query);
+          $stmt->execute();
+          $stmt->close();
+          //error_log($query);
+          echo 'OK';
+        } catch (\Exception $e) {
+          echo $e;
+        }
+        return;
+    }
     
 }
 ?>

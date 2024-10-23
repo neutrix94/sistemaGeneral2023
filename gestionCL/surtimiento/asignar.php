@@ -234,10 +234,16 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
 
     function eliminarAsignacion(index) {
         var partidas = Number(listaAsignacion.items[index].partidas);
-        listaAsignacion.pendienteAsignar += partidas;
-        document.getElementById('pendientesAsignar').textContent = listaAsignacion.pendienteAsignar;
+        if(partidas <= listaAsignacion.pendienteSurtir ){
+          listaAsignacion.pendienteAsignar += partidas;
+          document.getElementById('pendientesAsignar').textContent = listaAsignacion.pendienteAsignar;
+          listaAsignacion.items.splice(index, 1);
+        }else{
+          listaAsignacion.items[index].partidas = partidas - listaAsignacion.pendienteSurtir;
+          listaAsignacion.pendienteAsignar += partidas - listaAsignacion.items[index].partidas;
+          document.getElementById('pendientesAsignar').textContent = listaAsignacion.pendienteAsignar;
+        }
         
-        listaAsignacion.items.splice(index, 1);
         actualizarTablaAsignaciones();
     }
 
