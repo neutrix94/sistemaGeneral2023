@@ -59,13 +59,15 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
                 <label for="estado">Estado</label>
                 <select name="estado" id="estado" class="form-control" value="<?php echo $estado ?>">
                     <option value="">Default</option>
+                    <option value="Todos" <?php echo $estado == "Todos" ? "selected" : "" ?> >Todos</option>
                     <option value="1" <?php echo $estado == "1" ? "selected" : "" ?> >Pendiente</option>
                     <option value="2" <?php echo $estado == "2" ? "selected" : "" ?> >Proceso</option>
-                    <option value="3" <?php echo $estado == "3" ? "selected" : "" ?> >Completado</option>
-                    <option value="4" <?php echo $estado == "4" ? "selected" : "" ?> >Pausado</option>
-                    <option value="5" <?php echo $estado == "5" ? "selected" : "" ?> >Cancelado</option>
-                    <option value="Todos" <?php echo $estado == "Todos" ? "selected" : "" ?> >Todos</option>
-                    <option value="Cerrados" <?php echo $estado == "Cerrados" ? "selected" : "" ?> >Cerrados</option>
+                    <?php if ($perfil == 2): ?>
+                      <option value="3" <?php echo $estado == "3" ? "selected" : "" ?> >Completado</option>
+                      <option value="4" <?php echo $estado == "4" ? "selected" : "" ?> >Pausado</option>
+                      <option value="5" <?php echo $estado == "5" ? "selected" : "" ?> >Cancelado</option>
+                      <option value="Cerrados" <?php echo $estado == "Cerrados" ? "selected" : "" ?> >Cerrados</option>
+                    <?php endif; ?>
                 </select>
             </div>
 
@@ -85,6 +87,14 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
             </div>
         </div>
     </form>
+    <?php if ($perfil == 2): ?>
+      <div class="row">
+        <!-- Botón de aplicar filtros -->
+        <div class="col-md-3 align-self-end">
+            <button class="btn btn-warning" onclick="openCancelModal()">Cerrar solicitudes</button>
+        </div>
+      </div>
+    <?php endif; ?>
 
     <table class="table table-striped table-bordered">
         <thead>
@@ -155,13 +165,42 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
                     <?php endif; ?>
                     <td>
                         <!-- <a href="surtir.php?id=<?php echo $surtimiento['id']; ?>" class="btn btn-success">Surtir</a> -->
-                        <a href="#" data-id="<?php echo $surtimiento['id']; ?>" class="btn btn-success surtir-row">Surtir</a>
+                        <a href="#" data-id="<?php echo $surtimiento['id']; ?>" class="btn btn-success surtir-row <?php echo ($surtimiento['estado_id'] == '5' || $surtimiento['estado_id'] == '3') ? 'disabled':''; ?>">Surtir</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
         <?php endif; ?>
     </tbody>
     </table>
+</div>
+<!-- Modal para Cierre de Solicitudes Pendientes -->
+<div class="modal fade" id="cierreSolicitudesModal" tabindex="-1" role="dialog" aria-labelledby="cierreSolicitudesModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cierreSolicitudesModalLabel">Cierre de Solicitudes Pendientes</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="filtroCierreForm">
+          <div class="form-group">
+            <label for="fechaInicio">Fecha de inicio</label>
+            <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+          </div>
+          <div class="form-group">
+            <label for="fechaFin">Fecha de fin</label>
+            <input type="date" class="form-control" id="fechaFin" name="fechaFin" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="cerrarSolicitudes()">Cerrar solicitudes</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -183,6 +222,10 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
           },
           success: function(response) {
               $('.alert').alert();
+              let reasigna = (id != response) ? 1 : 0;
+              if(reasigna){
+                alert("La solicitud de surtimiento que intentas tomar ya está en proceso, te asignamos otra que puedes tomar");
+              }
               window.location.href = "surtir.php?id="+response;
           },
           error: function(xhr, status, error) {
@@ -192,6 +235,60 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
       
       
     });
+    function cerrarSolicitudes() {
+      // Obtener los valores del formulario de filtro
+      const fechaInicio = document.getElementById('fechaInicio').value;
+      const fechaFin = document.getElementById('fechaFin').value;
+
+      // Obtener la fecha actual
+      const hoy = new Date().toISOString().split('T')[0];  // Formato YYYY-MM-DD
+
+      // Validar que las fechas estén completas
+      if (!fechaInicio || !fechaFin) {
+          alert('Por favor, seleccione un rango de fechas completo.');
+          return;
+      }
+
+      // Validar que la fecha fin no sea mayor al día actual
+      if (fechaFin >= hoy) {
+          alert('La fecha de fin debe ser anterior a la fecha actual.');
+          return;
+      }
+      
+      // Validar que la fecha inicio sea menor a la fecha fin
+      if (fechaInicio > fechaFin) {
+          alert('La fecha de Inicio debe ser anterior a la fecha Fin.');
+          return;
+      }
+
+      // Puedes agregar aquí una llamada AJAX para enviar las fechas al servidor y cerrar las solicitudes
+      $.ajax({
+          url: '../classes/surtimiento.php',
+          type: 'POST',
+          data: {
+              action: 'cancelarSurtimientos',
+              fechaInicio: fechaInicio,
+              fechaFin: fechaFin,
+              userId: '<?php echo $user_id; ?>',
+              sucursal: '<?php echo $sucursal_id; ?>'
+          },
+          success: function(response) {
+            if (response == 'OK') {
+              alert("Se han cancelado las solicitudes de surtimiento de forma correcta");
+              window.location.reload();
+            }else{
+              alert("Se ha detectado un problema "+ response);
+            }
+              
+          },
+          error: function(xhr, status, error) {
+              alert('Hubo un problema al guardar los cambios: ' + error);
+          }
+      });
+  }
+  function openCancelModal() {
+      $('#cierreSolicitudesModal').modal('show');
+  }
 </script>
 
 </body>
