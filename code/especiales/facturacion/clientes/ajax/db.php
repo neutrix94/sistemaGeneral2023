@@ -308,7 +308,7 @@ $resp = curl_exec($crl);//envia peticion
 				fclose($file);
 				$config=explode("<>",$line);
 				$tmp=explode("~",$config[0]);
-				$local_path = "localhost/" . base64_decode( $tmp[1] ) . "/rest/facturacion/envia_cliente";
+				$local_path = "localhost/" . base64_decode( $tmp[1] ) . "/rest/facturacion/busca_y_descarga_clientes";
 			}else{
 				die("No hay archivo de configuración!!!");
 			}
