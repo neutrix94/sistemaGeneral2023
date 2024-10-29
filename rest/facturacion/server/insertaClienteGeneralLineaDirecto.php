@@ -10,7 +10,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Descripción: Insercion de clientes de facturacion
 */
 
-$app->post('/inserta_cliente', function (Request $request, Response $response){
+$app->post('/inserta_cliente_directo_general_linea', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
     die( 'No se incluyó conexion' );
   }
@@ -37,18 +37,18 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
   $tmp_ok = "";
   $tmp_no = "";
 
-  $log = $request->getParam( "log" );
+  //$log = $request->getParam( "log" );
   $costumers = $request->getParam( "rows" );
   //inserta request
-  $request_initial_time = $SynchronizationManagmentLog->getCurrentTime();
-  $resp["log"] = $SynchronizationManagmentLog->insertResponse( $log, $request_initial_time );
+  //$request_initial_time = $SynchronizationManagmentLog->getCurrentTime();
+  //$resp["log"] = $SynchronizationManagmentLog->insertResponse( $log, $request_initial_time );
   if( sizeof( $costumers ) > 0 ){
     $insert_returns = $Bill->insertCostumers( $costumers );
       $resp["ok_rows"] = $insert_returns;//$insert_returns["ok_rows"];
 //return json_encode( $insert_returns );
     if( $insert_returns["error"] != '' && $insert_returns["error"] != null  ){
     //inserta error si es el caso
-      $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_returns["error"], $resp["log"]["unique_folio"] );
+     // $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_returns["error"], $resp["log"]["unique_folio"] );
     }else{
       $resp["ok_rows"] = $insert_returns;//$insert_returns["ok_rows"];
    // die( "ok_rows : {$insert_returns}" );
@@ -57,12 +57,12 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
       //$tmp_ok = $insert_returns->tmp_ok;
       //$tmp_no = $insert_returns->tmp_no;
     //inserta respuesta exitosa
-      $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$resp["ok_rows"]} | {$insert_returns["error_rows"]}", $resp["log"]["unique_folio"] );
+      //$resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$resp["ok_rows"]} | {$insert_returns["error_rows"]}", $resp["log"]["unique_folio"] );
     }
   }else{
   //inserta excepcion controlada
     $response_string = "No llegaron clientes, posiblemente tengas que bajar el limite de registros de sincronizacion de facturacion!";
-    $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $response_string, $resp["log"]["unique_folio"] );
+    //$resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $response_string, $resp["log"]["unique_folio"] );
   }
 /*deshabilitado por Oscar 2024-10-13 porque esto ya no aplica
 //consulta las cliemtes que se tiene que descargar 

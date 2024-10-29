@@ -81,7 +81,7 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 	}
 	if( $result->ok_rows != "" ){
 		$sql = "UPDATE sys_sincronizacion_registros_facturacion SET status_sincronizacion = 3 WHERE id_sincronizacion_registro IN( {$result->ok_rows} )";
-		$stm = $link->query( $sql ) or die( "Erorr al actualizar registros de sincronizacion en local : {$link->error}" );
+		$stm = $link->query( $sql ) or die( "Error al actualizar registros de sincronizacion en local : {$link->error}" );
 	}
    	//var_dump( $example[0]['razon_social'] );
    	//die( "debug end" );	

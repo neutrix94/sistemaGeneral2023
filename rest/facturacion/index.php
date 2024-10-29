@@ -20,6 +20,7 @@ require 'client/descarga_clientes.php';
 
 //server
 require 'server/inserta_cliente.php';
+require 'server/insertaClienteGeneralLineaDirecto.php';
 //die( 'here' );
 
 $app->run();
