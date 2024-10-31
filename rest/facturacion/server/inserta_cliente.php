@@ -10,7 +10,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Descripción: Insercion de devoluciones
 */
 
-$app->post('/inserta_cliente_general_linea', function (Request $request, Response $response){
+$app->post('/inserta_cliente', function (Request $request, Response $response){
    // die( 'here' );
   if ( ! include( '../../conexionMysqli.php' ) ){
     die( 'No se incluyó conexion' );
