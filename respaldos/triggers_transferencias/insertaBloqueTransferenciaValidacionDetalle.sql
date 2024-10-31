@@ -56,9 +56,18 @@ BEGIN
 				'"id_transferencia" : "',  
 				'( SELECT id_transferencia FROM ec_transferencias WHERE folio_unico = \'',
 					transfer_unique_folio, '\' LIMIT 1 )",',
-				'"fecha_alta" : "', new.fecha_alta, '",',
-				'"invalidado" : "', new.invalidado, '",',
-				'"folio_unico" : "', new.folio_unico , '",',
+				IF( new.fecha_alta IS NULL, 
+					'',
+					CONCAT( '"fecha_alta" : "', new.fecha_alta, '",' )
+				),
+				IF( new.invalidado IS NULL, 
+					'',
+					CONCAT( '"invalidado" : "', new.invalidado, '",' )
+				),
+				IF( new.folio_unico IS NULL, 
+					'',
+					CONCAT( '"folio_unico" : "', new.folio_unico , '",' )
+				),
 				'"sincronizar" : "0"',
 				'}'
 			),
