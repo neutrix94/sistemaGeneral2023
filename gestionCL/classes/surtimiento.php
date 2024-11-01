@@ -440,6 +440,10 @@ class SurtimientoCRUD {
         $estadoSurtimiento = '';
         $asignadoSurtidor = false;
         $asignadoLibre = false;
+        $siguientePedido = [];
+        $siguientePedido['redirect'] = '';
+        $siguientePedido['id'] = '';
+        
 
         //Recupera detalle de línea a surtir
         $surtimientoSeleccionado = $surtimientoCRUD->listaDetalleSurtimiento($id,$sucursal_id);
@@ -447,7 +451,7 @@ class SurtimientoCRUD {
         //Recupera información de orden de atención de surtimiento
         $usuario =  $surtimientoCRUD->getUserProfile($idUsuario);
         $perfil = (isset($usuario[0]) && ($usuario[0]['tipo_perfil'] == '4' || $usuario[0]['tipo_perfil'] == '8') &&  $usuario[0]['id_encargado'] == $idUsuario ) ? '2': '1';
-        $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,'2024-01-01','','1');
+        $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,'2024-01-01','','');
         //error_log(print_r($surtimientoSeleccionado,true));
         //error_log(print_r($surtimientos,true));
         
@@ -464,14 +468,28 @@ class SurtimientoCRUD {
 
         if($estadoSurtimiento == 'Proceso' && $asignadoSurtidor){
           //devuelve id original
-          echo $id;
+          $siguientePedido['redirect'] = '';
+          $siguientePedido['id'] = $id;
+          echo json_encode($siguientePedido);
           return;
         }else{
-          //Valida orden de surtimiento
+          //Valida orden de surtimiento: Proceso
+          //error_log(print_r($surtimientos,true));
+          foreach ($surtimientos as $item => $value) {
+            if( in_array($idUsuario,explode(",",$value['id_surtidores'])) && $value['estado_gral'] = 2 ){
+                $siguientePedido['redirect'] = 'proceso';
+                $siguientePedido['id'] = $value['id'];
+                echo json_encode($siguientePedido);
+                return;
+            }
+          }
+          //Valida orden de surtimiento: Pendiente
           //error_log(print_r($surtimientos,true));
           foreach ($surtimientos as $item => $value) {
             if( ($value['id_surtidores'] == '' || in_array($idUsuario,explode(",",$value['id_surtidores'])) ) && $value['estado_gral'] <= 3 ){
-                echo $value['id'];
+                $siguientePedido['redirect'] = ($id == $value['id']) ? '': 'pendiente';
+                $siguientePedido['id'] = $value['id'];
+                echo json_encode($siguientePedido);
                 return;
             }
           }
@@ -484,6 +502,10 @@ class SurtimientoCRUD {
         //error_log($query);
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
+        //Update status general a proceso
+        $queryS = "UPDATE ec_surtimiento s SET s.fecha_modificacion = now(), s.estado = '2' WHERE s.id = '{$id}' ;";
+        $stmt = $this->conn->prepare($queryS);
+        $stmt->execute();
         $stmt->close();
         return 'OK';
     }
@@ -493,7 +515,7 @@ class SurtimientoCRUD {
           $query = "UPDATE ec_surtimiento s 
             LEFT JOIN sys_users u ON u.id_usuario = s.id_vendedor 
             SET s.fecha_modificacion = now(), s.modificado_por = '{$usuario}', s.estado = '5'
-            WHERE s.fecha_creacion >= '{$fechaInicio}' and s.fecha_creacion <= '{$fechaFin}' and s.estado in ('1','2')
+            WHERE cast(s.fecha_creacion as date) >= '{$fechaInicio}' and cast(s.fecha_creacion as date) <= '{$fechaFin}' and s.estado in ('1','2')
             and u.id_sucursal = '{$sucursal}' ;";
           $stmt = $this->conn->prepare($query);
           $stmt->execute();
