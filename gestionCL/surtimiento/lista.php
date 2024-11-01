@@ -221,12 +221,16 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
               sucursal: '<?php echo $sucursal_id; ?>'
           },
           success: function(response) {
-              $('.alert').alert();
-              let reasigna = (id != response) ? 1 : 0;
-              if(reasigna){
-                alert("La solicitud de surtimiento que intentas tomar ya está en proceso, te asignamos otra que puedes tomar");
+              let jsonResponse = JSON.parse(response);
+              let reasigna = (id != jsonResponse.id) ? 1 : 0;
+              let accionReasigna = jsonResponse.redirect;
+              if(accionReasigna == 'proceso'){
+                alert("Tienes un pedido en proceso, debes terminarlo o abandonarlo");
               }
-              window.location.href = "surtir.php?id="+response;
+              if(accionReasigna == 'pendiente'){
+                alert("Te asignaremos el siguiente pedido pendiente en la lista");
+              }
+              window.location.href = "surtir.php?id="+jsonResponse.id;
           },
           error: function(xhr, status, error) {
               alert('Hubo un error al guardar la asignación: ' + error);
