@@ -1,6 +1,7 @@
 <?php
 /*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket 1.1*/
 /*Version 2024-10-19 Para reimprimir ticket de netPay manualmente cuando la venta no llego al servidor*/
+/*Version 2024-10-31 Para dar margen de 50 centavos en cobros*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
@@ -639,10 +640,10 @@ $terminal_id = $_GET['terminal_serie_id'];
 					ON pp.id_pedido = p.id_pedido
 					WHERE p.id_pedido = {$sale_id}";
 			//die( $sql );
-			$difference = round( $row['sale_total'], 2 ) - round( $row['payments_total'], 2 );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los totales para validar : {$sql} : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			if( $row['was_payed'] == 1 && ( $difference == 1 || $difference == -1) ){
+			$difference = round( $row['sale_total'], 2 ) - round( $row['payments_total'], 2 );
+			if( $row['was_payed'] == 1 && ( abs( $difference ) > 0.5 ) ){//Modificado por Oscar 2024-10-31 para dar margen de 50 centavos en cobros//== 1 || $difference == -1)
 				die( "<div class=\"row\">
 					<h3 class=\"text-center text-danger fs-2\">La venta no esta liquidada, registra todos los pagos y vuelve a intentar</h3>
 					<div class=\"\">
