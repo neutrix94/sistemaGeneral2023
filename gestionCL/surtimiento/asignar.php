@@ -201,7 +201,6 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
             );
             return;
         }
-
         if (id_surtidor && partidas) {
             listaAsignacion.items.push({ id_surtidor: id_surtidor, nombre_surtidor: '', partidas: partidas });
             listaAsignacion.pendienteAsignar -= partidas;
@@ -275,7 +274,8 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
                 type: 'POST',
                 data: {
                     action: 'actualizarAsignacion',
-                    listaAsignacion: listaAsignacion
+                    listaAsignacion: listaAsignacion,
+                    sucursal: '2' // '<?php echo $sucursal_id; ?>'
                 },
                 success: function(response) {
                     $('.alert').alert();
