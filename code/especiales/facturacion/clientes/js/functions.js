@@ -1,8 +1,9 @@
-audio_is_playing = null;
+/*Version 2024-10-23 Permitir espacios en nombre de contacto al dar de alta cliente de facturacion*/
+	audio_is_playing = null;
 	
 	function validate_is_just_text( event ){
         var inputValue = event.target.value;
-        var sanitizedValue = inputValue.replace(/[^a-zA-Z0-9]/g, '');
+        var sanitizedValue = inputValue.replace(/[^a-zA-Z0-9 ]/g, '');
         event.target.value = sanitizedValue;
 	}
 	//document.getElementById('inputSinEspeciales').addEventListener('input', function(event) {

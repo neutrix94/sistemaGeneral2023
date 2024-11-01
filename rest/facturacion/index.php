@@ -16,6 +16,7 @@ $app = new \Slim\App;
 //client
 require 'client/envia_cliente.php';
 require 'client/envia_cliente_facturacion.php';
+require 'client/descarga_clientes.php';
 
 //server
 require 'server/inserta_cliente.php';

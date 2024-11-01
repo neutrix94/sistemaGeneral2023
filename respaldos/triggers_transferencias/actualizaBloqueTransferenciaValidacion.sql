@@ -4,7 +4,7 @@ CREATE TRIGGER actualizaBloqueTransferenciaValidacion
 BEFORE UPDATE ON ec_bloques_transferencias_validacion
 FOR EACH ROW
 BEGIN
-/*verificado 13-07-2023*/
+/*verificado 2024-10-22*/
 	DECLARE store_id INTEGER;
 	DECLARE validation_session_unique_folio VARCHAR( 30 );
 	IF( new.sincronizar = 1 )
@@ -30,19 +30,31 @@ BEGIN
 			id_sucursal,
 			CONCAT('{',
 				'"table_name" : "ec_bloques_transferencias_validacion",',
-				'"action_type" : "update",',
-				'"primary_key" : "folio_unico",',
-				'"primary_key_value" : "', new.folio_unico, '",',
-				'"fecha_alta" : "', new.fecha_alta, '",',
-				'"validado" : "', new.validado, '",',
-				'"bloqueado" : "', new.bloqueado, '",',
+					'"action_type" : "update",',
+					'"primary_key" : "folio_unico",',
+					'"primary_key_value" : "', new.folio_unico, '",',
+				IF(  new.fecha_alta IS NULL,
+					'',
+					CONCAT( '"fecha_alta" : "', new.fecha_alta, '",' ) 
+				),
+				IF(  new.validado IS NULL,
+					'',
+					CONCAT( '"validado" : "', new.validado, '",' )
+				),
+				IF(  new.bloqueado IS NULL,
+					'',
+					CONCAT( '"bloqueado" : "', new.bloqueado, '",' )
+				),
 				IF( new.id_sesion_principal != 0, 
 					CONCAT( '"id_sesion_principal" : "', 
 					'( SELECT id_sesion_dispositivo_validacion FROM ec_sesiones_dispositivos_validacion_transferencias WHERE folio_unico = \'', 
 						validation_session_unique_folio ,'\' LIMIT 1 )",'),
 					''
 				),
-				'"folio_unico" : "', new.folio_unico , '",',
+				IF(  new.folio_unico IS NULL,
+					'',
+					CONCAT( '"folio_unico" : "', new.folio_unico , '",' )
+				),
 				'"sincronizar" : "0"',
 				'}'
 			),

@@ -4,7 +4,7 @@ CREATE TRIGGER actualizaTransferencia
 BEFORE UPDATE ON ec_transferencias
 FOR EACH ROW
 BEGIN
-/*verificado 13-07-2023*/
+/*verificado 2024-10-22*/
 	DECLARE store_id INTEGER;
 	DECLARE idTransfer INT(11);
 	DECLARE estado INT(11);
@@ -43,63 +43,12 @@ BEGIN
 	THEN
 		UPDATE ec_transferencia_productos SET cantidad_salida=cantidad,
 		cantidad_salida_pres=cantidad_presentacion WHERE id_transferencia=idTransfer;
-	/*
-		SELECT COUNT( * ) INTO row_counter FROM ec_transferencia_productos WHERE id_transferencia=idTransfer
-		AND omite_movimiento_origen = 0;
-		IF( row_counter > 0 )
-		THEN
-			SELECT 
-				6,
-				t.id_usuario, 
-				t.id_sucursal_origen, 
-				NOW(), 
-				NOW(),
-				t.id_transferencia, 
-				t.id_almacen_origen
-			INTO
-				var_id_tipo_movimiento,
-				var_id_usuario,
-				var_id_sucursal,
-				var_fecha,
-				var_hora,
-				var_id_transferencia,
-				var_id_almacen
-			FROM ec_transferencias t WHERE t.id_transferencia = idTransfer;
-
-			CALL spMovimientoAlmacen_inserta ( var_id_usuario, 'SALIDA POR TRANSFERENCIA', var_id_sucursal, var_id_almacen, 
-				var_id_tipo_movimiento, -1, -1, -1, var_id_transferencia, 4, NULL );
-
-			SELECT LAST_INSERT_ID() INTO movAlmacen;
-
-			UPDATE ec_transferencia_productos SET cantidad_salida=cantidad,
-			cantidad_salida_pres=cantidad_presentacion WHERE id_transferencia=idTransfer;
-
-			CALL insertaDetalleMovimientoTransferencia( idTransfer, movAlmacen );
-		END IF;*/
 	END IF;
 
 	IF( new.id_estado=9 AND new.id_estado!=old.id_estado AND (sucActual=-1 OR permiso_transfer=1) )
 	THEN
 		SELECT COUNT( * ) INTO row_counter FROM ec_transferencia_productos WHERE id_transferencia=idTransfer
 		AND omite_movimiento_destino = 0;
-		/*IF( row_counter > 0 )
-		THEN
-			INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora,
-			observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen)
-			SELECT 5,t.id_usuario, t.id_sucursal_destino, NOW(), NOW(), 'ENTRADA DE TRANSFERENCIA',
-			-1, -1, '', -1,t.id_transferencia, t.id_almacen_destino
-			FROM ec_transferencias t where t.id_transferencia=idTransfer;
-
-			SELECT MAX(id_movimiento_almacen) INTO movAlmacen FROM ec_movimiento_almacen;
-
-			INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida,
-			id_pedido_detalle, id_oc_detalle, id_proveedor_producto, id_equivalente )
-			SELECT movAlmacen,tP.id_producto_or,tP.total_piezas_recibidas,tP.total_piezas_recibidas,-1,-1,tP.id_proveedor_producto,0
-			FROM ec_transferencia_productos tP
-			WHERE tP.id_transferencia=idTransfer
-			AND tP.total_piezas_recibidas != 0
-			AND tP.omite_movimiento_destino = 0;
-		END IF;*/
 	END IF;
 
 	IF( new.sincronizar = 1 )
@@ -115,29 +64,98 @@ BEGIN
 				'"action_type" : "update",',
 				'"primary_key" : "folio_unico",',
 				'"primary_key_value" : "', new.folio_unico, '",',
-				'"id_usuario" : "', new.id_usuario, '",',
-				'"folio" : "', new.folio, '",',
-				'"fecha" : "', new.fecha, '",',
-				'"hora" : "', new.hora, '",',
-				'"id_sucursal_origen" : "', new.id_sucursal_origen, '",',
-				'"id_sucursal_destino" : "', new.id_sucursal_destino, '",',
-				'"observaciones" : "', new.observaciones, '",',
-				'"id_razon_social_venta" : "', new.id_razon_social_venta, '",',
-				'"id_razon_social_compra" : "', new.id_razon_social_compra, '",',
-				'"facturable" : "', new.facturable, '",',
-				'"porc_ganancia" : "', new.porc_ganancia, '",',
-				'"id_almacen_origen" : "', new.id_almacen_origen, '",',
-				'"id_almacen_destino" : "', new.id_almacen_destino, '",',
-				'"id_tipo" : "', new.id_tipo, '",',
-				'"id_estado" : "', new.id_estado, '",',
-				'"id_sucursal" : "', new.id_sucursal, '",',
-				'"es_resolucion" : "', IF( new.es_resolucion IS NULL, '', new.es_resolucion ), '",',
-				'"impresa" : "', new.impresa, '",',
-				'"titulo_transferencia" : "', new.titulo_transferencia, '",',
-				'"recibiendo_transferencia" : "', new.recibiendo_transferencia, '",',
-				'"ultima_sincronizacion" : "', new.ultima_sincronizacion, '",',
-				'"ultima_actualizacion" : "', new.ultima_actualizacion, '",',
-				'"folio_unico" : "', new.folio_unico, '",',
+				IF( new.id_usuario IS NULL, 
+					'',
+					CONCAT( '"id_usuario" : "', new.id_usuario, '",' )
+				),
+				IF( new.folio IS NULL, 
+					'',
+					CONCAT( '"folio" : "', new.folio, '",' )
+				),
+				IF( new.fecha IS NULL,
+					'', 
+					CONCAT( '"fecha" : "', new.fecha, '",' )
+				),
+				IF( new.hora IS NULL,
+					'', 
+					CONCAT( '"hora" : "', new.hora, '",' )
+				),
+				IF( new.id_sucursal_origen IS NULL,
+					'', 
+					CONCAT( '"id_sucursal_origen" : "', new.id_sucursal_origen, '",' )
+				),
+				IF( new.id_sucursal_destino IS NULL,
+					'', 
+					CONCAT( '"id_sucursal_destino" : "', new.id_sucursal_destino, '",' )
+				),
+				IF( new.observaciones IS NULL,
+					'', 
+					CONCAT( '"observaciones" : "', new.observaciones, '",' )
+				),
+				IF( new.id_razon_social_venta IS NULL,
+					'', 
+					CONCAT( '"id_razon_social_venta" : "', new.id_razon_social_venta, '",' )
+				),
+				IF( new.id_razon_social_compra IS NULL,
+					'', 
+					CONCAT( '"id_razon_social_compra" : "', new.id_razon_social_compra, '",' )
+				),
+				IF( new.facturable IS NULL,
+					'', 
+					CONCAT( '"facturable" : "', new.facturable, '",' )
+				),
+				IF( new.porc_ganancia IS NULL,
+					'', 
+					CONCAT( '"porc_ganancia" : "', new.porc_ganancia, '",' )
+				),
+				IF( new.id_almacen_origen IS NULL,
+					'', 
+					CONCAT( '"id_almacen_origen" : "', new.id_almacen_origen, '",' )
+				),
+				IF( new.id_almacen_destino IS NULL,
+					'', 
+					CONCAT( '"id_almacen_destino" : "', new.id_almacen_destino, '",' )
+				),
+				IF( new.id_tipo IS NULL,
+					'', 
+					CONCAT( '"id_tipo" : "', new.id_tipo, '",' )
+				),
+				IF( new.id_estado IS NULL,
+					'', 
+					CONCAT( '"id_estado" : "', new.id_estado, '",' )
+				),
+				IF( new.id_sucursal IS NULL,
+					'', 
+					CONCAT( '"id_sucursal" : "', new.id_sucursal, '",' )
+				),
+				IF( new.es_resolucion IS NULL,
+					'', 
+					CONCAT( '"es_resolucion" : "', new.es_resolucion, '",' )
+				),
+				IF( new.impresa IS NULL,
+					'', 
+					CONCAT( '"impresa" : "', new.impresa, '",' )
+				),
+				IF( new.titulo_transferencia IS NULL,
+					'', 
+					CONCAT( '"titulo_transferencia" : "', new.titulo_transferencia, '",' )
+				),
+				IF( new.recibiendo_transferencia IS NULL,
+					'', 
+					CONCAT( '"recibiendo_transferencia" : "', new.recibiendo_transferencia, '",' )
+				),
+				IF( new.ultima_sincronizacion IS NULL,
+					'', 
+					CONCAT( '"ultima_sincronizacion" : "', new.ultima_sincronizacion, '",' )
+				),
+				IF( new.ultima_actualizacion IS NULL,
+					'', 
+					CONCAT( '"ultima_actualizacion" : "', new.ultima_actualizacion, '",' )
+				),
+				IF( new.folio_unico IS NULL,
+					'', 
+					CONCAT( '"folio_unico" : "', new.folio_unico, '",' )
+				),
 				'"sincronizar" : "0"',
 				'}'
 			),

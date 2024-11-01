@@ -4,7 +4,7 @@ CREATE TRIGGER insertaSesionDispositivoValidacionTransferencia
 BEFORE INSERT ON ec_sesiones_dispositivos_validacion_transferencias
 FOR EACH ROW
 BEGIN
-/*verificado 13-07-2023*/
+/*verificado 2024-10-22*/
 	DECLARE store_id INTEGER;
 	DECLARE row_id BIGINT;
 	DECLARE prefix VARCHAR( 30 );
