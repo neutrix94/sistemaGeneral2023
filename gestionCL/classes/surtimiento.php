@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     }
     if ($action == 'actualizarAsignacion') {
         $surtimientoCRUD = new SurtimientoCRUD();
-        $surtimientoCRUD->actualizaAsignacion($listaAsignacion);
+        $surtimientoCRUD->actualizaAsignacion($listaAsignacion,$sucursal);
     }
     if ($action == 'sinInventario') {
         $surtimientoCRUD = new SurtimientoCRUD();
@@ -169,7 +169,7 @@ class SurtimientoCRUD {
         $pendienteAsignarResult = $this->conn->query("SELECT COUNT(*) AS total
             FROM ec_surtimiento_detalle
             WHERE id_surtimiento = '{$id}'
-              AND id_asignado = '' or id_asignado is null");
+              AND (id_asignado = '' or id_asignado is null)");
         $pendienteAsignar = 0;
         if ($pendienteAsignarResult->num_rows > 0) {
             $row = $pendienteAsignarResult->fetch_assoc();
@@ -281,18 +281,46 @@ class SurtimientoCRUD {
         //return true;
     }
     
-    public function actualizaAsignacion($data=null) {
+    public function actualizaAsignacion($data=null, $sucursal) {
         //error_log(print_r($data,true));
+        //error_log('sucursal:' +$sucursal);
         //Limpia asignaciones
         $idUsuario = empty($idUsuario) ? 1 : $idUsuario;
         $query = "UPDATE ec_surtimiento_detalle SET id_asignado = null WHERE estado = 1 AND id_surtimiento = '".$data['id']."';";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         if (isset($data['items']) && is_array($data['items'])) {
-            foreach ($data['items'] as $item) {
-                $query = "UPDATE ec_surtimiento_detalle SET fecha_modificacion = now(), id_asignado = '".$item['id_surtidor']."' WHERE (id_asignado='' or id_asignado is null) and id_surtimiento = '".$data['id']."' limit {$item['partidas']};";
-                $stmt = $this->conn->prepare($query);
-                $stmt->execute();
+            if($sucursal == '1'){
+              foreach ($data['items'] as $item) {
+                  $query = "UPDATE ec_surtimiento_detalle sd
+                  SET sd.fecha_modificacion = now(), sd.id_asignado = '{$item['id_surtidor']}' 
+                  WHERE (sd.id_asignado='' or sd.id_asignado is null) and sd.id_surtimiento = '".$data['id']."' limit {$item['partidas']};";
+                  $stmt = $this->conn->prepare($query);
+                  $stmt->execute();
+              }
+            }else{
+              foreach ($data['items'] as $item) {
+                  $query = "UPDATE ec_surtimiento_detalle sd
+                    JOIN (
+                        SELECT sd.id
+                        FROM ec_surtimiento_detalle sd
+                        LEFT JOIN ec_productos p ON p.id_productos = sd.id_producto
+                        LEFT JOIN ec_sucursal_producto_ubicacion_almacen ub 
+                            ON ub.id_producto = sd.id_producto 
+                            AND ub.id_sucursal = '{$sucursal}' 
+                            AND ub.habilitado = 1  
+                            AND ub.es_principal = 1 
+                        WHERE (sd.id_asignado = '' OR sd.id_asignado IS NULL) 
+                          AND sd.id_surtimiento = '{$data['id']}'
+                        ORDER BY ub.numero_ubicacion_desde, p.orden_lista ASC
+                        LIMIT {$item['partidas']}
+                    ) AS subquery ON sd.id = subquery.id
+                    SET sd.fecha_modificacion = NOW(), 
+                        sd.id_asignado = '{$item['id_surtidor']}';";
+                  //error_log($query);
+                  $stmt = $this->conn->prepare($query);
+                  $stmt->execute();
+              }
             }
         } else {
             echo "No hay items para iterar.\n";
@@ -356,7 +384,8 @@ class SurtimientoCRUD {
                 sd.id_surtimiento = '{$id}'
                 -- and sd.id_asignado='104'
                 AND sd.estado IN (1,2)
-                AND s.estado NOT IN (3,5);");
+                AND s.estado NOT IN (3,5)
+            ORDER BY ub.numero_ubicacion_desde, p.orden_lista desc ;");
         
         return $result->fetch_all(MYSQLI_ASSOC);
     }
