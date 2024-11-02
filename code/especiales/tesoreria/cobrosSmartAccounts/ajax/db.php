@@ -1,7 +1,7 @@
 <?php
 /*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket 1.1*/
 /*Version 2024-10-19 Para reimprimir ticket de netPay manualmente cuando la venta no llego al servidor*/
-/*Version 2024-10-31 Para dar margen de 50 centavos en cobros 1.1*/
+/*Version 2024-10-31 Para dar margen de 50 centavos en cobros 1.2 (se agrega que se cierre emergente 1 y 2)*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
@@ -610,7 +610,7 @@ $terminal_id = $_GET['terminal_serie_id'];
 							<button
 								type=\"button\"
 								class=\"btn btn-danger form-control\"
-								onclick=\"close_emergent_2();\"	
+								onclick=\"close_emergent();close_emergent_2();\"	
 							>
 								<i class=\"icon-ok-circled\">Aceptar</i>
 							</button>
