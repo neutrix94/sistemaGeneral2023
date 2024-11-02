@@ -1,7 +1,7 @@
 <?php
 /*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket 1.1*/
 /*Version 2024-10-19 Para reimprimir ticket de netPay manualmente cuando la venta no llego al servidor*/
-/*Version 2024-10-31 Para dar margen de 50 centavos en cobros*/
+/*Version 2024-10-31 Para dar margen de 50 centavos en cobros 1.1*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
@@ -318,6 +318,10 @@ $terminal_id = $_GET['terminal_serie_id'];
 				$is_per_error = ( isset( $_GET['is_per_error'] ) ? $_GET['is_per_error'] : $_POST['is_per_error'] );
 				
 				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
+				if( $validation != 'ok' ){
+					die( $validation );
+				}
+				//die( "validation : {$validation}" );
 				$id_devolucion_relacionada = 0;
 				if( isset( $_GET['id_devolucion_relacionada'] ) || isset( $_POST['id_devolucion_relacionada'] ) ){
 					$id_devolucion_relacionada = ( isset( $_GET['id_devolucion_relacionada'] ) ? $_GET['id_devolucion_relacionada'] : $_POST['id_devolucion_relacionada'] );
@@ -589,16 +593,17 @@ $terminal_id = $_GET['terminal_serie_id'];
 			$pagos_dev = $devolucion_row['pagos_devolucion'];
 			$tmp_total =  $payments_total + $ammount - $pagos_dev;//round()
 			$rest = ($sale_total - $tmp_total);
+			//die( "Rest : {$rest}" );
 			//if( $sale_total < $tmp_total ){
-			if( $rest >= -1 && $rest <=1 ){
+			/*if( $rest >= -1 && $rest <=1 ){
 
-			}else{
-				if( $tmp_total > $sale_total ){
+			}else{*/
+				if( $tmp_total > $sale_total && abs($rest) > 0.5 ){
 					if( $log_id != null ){
 						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', "El pago no puede ser mayor al total de la venta : {$sale_total} - {$tmp_total} = {$rest}", 'N/A' );
 					}	
 					die( "<div class=\"row\" style=\"padding:15px;\">
-						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta.</h2>
+						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta. </h2>
 						<div class=\"col-3\"></div>
 						<div class=\"col-6\">
 							<br>
@@ -612,7 +617,7 @@ $terminal_id = $_GET['terminal_serie_id'];
 						</div>
 					</div>" );//error|
 				}
-			}
+			//}
 			return 'ok';
 		}
 
