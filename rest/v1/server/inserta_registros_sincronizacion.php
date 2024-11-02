@@ -7,6 +7,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Método: GET
 * Descripción: Insercion de registros de sincronizacion
 * Version 2.1 Comprobacion y LOG
+* Version Oscar 2024-11-02 para no enviar registros nuevos si tiene registros por comprobar.
 */
 $app->post('/inserta_registros_sincronizacion', function (Request $request, Response $response){
 //incluye librerias
@@ -105,6 +106,9 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
   }else{
   //inserta excepcion controlada
     $response_string = "No llegaron registros de sincronizacion, posiblemente tengas que bajar el limite de registros de sincronizacion!";
+    /*if(  ){
+      $response_string = "No llegaron registros de sincronizacion, posiblemente tengas que bajar el limite de registros de sincronizacion!";
+    }*/
     $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $response_string, $resp["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   }
 
@@ -116,8 +120,10 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
   $initial_time = $config['process_initial_date_time'];
   $rows_limit = $config['rows_limit'];
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
-  $rows_limit, 'sys_sincronizacion_registros', $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene registros para descargar
+  if( $resp["rows_validation"]["rows_download"]["verification"] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+    $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
+    $rows_limit, 'sys_sincronizacion_registros', $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene registros para descargar
+  }
   /*if( sizeof( $resp["rows_download"] ) > 0 ){
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   }*/
