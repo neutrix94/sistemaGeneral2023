@@ -330,7 +330,7 @@ class SurtimientoCRUD {
         //return true;
     }
     
-    public function listaDetalleSurtimiento($id=null,$sucursal=null) {
+    public function listaDetalleSurtimiento($id=null,$sucursal=null, $idUsuario=null) {
         $ubicacionSel = ($sucursal == 1) ? " ifnull(ub.numero_ubicacion_desde, 'ND') numero_ubicacion_desde, ifnull(ub.altura_desde,'ND') altura_desde," : " ifnull(ub.numero_ubicacion_desde, 'ND') numero_ubicacion_desde, ifnull(ub.altura_desde,'ND') altura_desde,";
         $ubicacionJoin = ($sucursal == 1) ? " LEFT JOIN ec_proveedor_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto and ub.habilitado = 1  and ub.es_principal = 1 ":" LEFT JOIN ec_sucursal_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto AND ub.id_sucursal = '{$sucursal}' and ub.habilitado = 1  and ub.es_principal = 1 ";
         $result = $this->conn->query("SELECT 
@@ -385,6 +385,7 @@ class SurtimientoCRUD {
                 -- and sd.id_asignado='104'
                 AND sd.estado IN (1,2)
                 AND s.estado NOT IN (3,5)
+                AND sd.id_asignado = '{$idUsuario}'
             ORDER BY ub.numero_ubicacion_desde, p.orden_lista desc ;");
         
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -475,7 +476,7 @@ class SurtimientoCRUD {
         
 
         //Recupera detalle de línea a surtir
-        $surtimientoSeleccionado = $surtimientoCRUD->listaDetalleSurtimiento($id,$sucursal_id);
+        $surtimientoSeleccionado = $surtimientoCRUD->listaDetalleSurtimiento($id,$sucursal_id, $idUsuario);
 
         //Recupera información de orden de atención de surtimiento
         $usuario =  $surtimientoCRUD->getUserProfile($idUsuario);
