@@ -6,10 +6,11 @@ $reasigna = isset($_GET['reasigna']) ? $_GET['reasigna'] : '';
 
 //error_log('id:'.$id);
 //error_log('$sucursal_id:'.$sucursal_id);
+//error_log('$user_id:'.$user_id);
 require_once '../classes/surtimiento.php';
 $surtimientoCRUD = new SurtimientoCRUD();
 $asignar = $surtimientoCRUD->tomarSurtimiento($id, $sucursal_id, $user_id);
-$listaSurtir = $surtimientoCRUD->listaDetalleSurtimiento($id,$sucursal_id);
+$listaSurtir = $surtimientoCRUD->listaDetalleSurtimiento($id,$sucursal_id,$user_id);
 $pendientes = (count($listaSurtir)>0) ? 1: 0 ;
 $indiceSurtir = 0;
 
