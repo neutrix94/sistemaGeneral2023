@@ -1,4 +1,5 @@
 <?php
+/*Version 2024-10-31 Para dar margen de 50 centavos en cobro*/
 	/*
 		Version Oscar 2024-11-04 Para seccionar tickets en tamaño carta
 	*/
@@ -394,8 +395,9 @@ Fin de cambio Oscar 25.06.2019*/
     }
 /*fin de cambio Oscar 2023/10/12*/
 /*Implementacion Oscar 2023/10/12*/
-    $comprobacion_cobro = round( $total - $payments_total );
-    if( ( $comprobacion_cobro == 1 || $comprobacion_cobro == 0 || $comprobacion_cobro == -1 ) || $pagado == 0 ){
+
+    $comprobacion_cobro = round( $total - $payments_total, 2 );//modificado Oscar 2024-10-31 para dar margen de 50 centavos en cobro
+    if( abs($comprobacion_cobro) <= 0.5 || $pagado == 0 ){//modificado Oscar 2024-10-31 para dar margen de 50 centavos en cobro//( $comprobacion_cobro == 1 || $comprobacion_cobro == 0 || $comprobacion_cobro == -1 )
 	//if( $payments_total == $total ){
         $ticket->Image("../../img/especiales/pagado.jpeg", 5, 2, 70);
 		$ticket->SetXY(5, $ticket->GetY()+12);

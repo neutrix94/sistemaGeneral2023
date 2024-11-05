@@ -1,4 +1,5 @@
 <?php
+/*Version 2024-10-31 Para dar margen de 50 centavos en cobros*/
 	if( isset( $_GET['fl'] ) ){
 		include( '../../../config.inc.php' );
 		include( '../../../conect.php' );
@@ -604,8 +605,8 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 				$devolucion_row = $stm->fetch_assoc();
 				$pagos_dev = $devolucion_row['pagos_devolucion'];
 
-				$difference = round( $row_aux['payments_total'] - $pagos_dev ) - round( $row['total'] );
-				if( ( $difference != -1 && $difference != 0 && $difference != -1 ) && $row['pagado'] == 1 ){//venta no liquidada $row_aux['payments_total'] < $row['total']
+				$difference = round( $row_aux['payments_total'] - $pagos_dev ) - round( $row['total'], 2 );//Modificacion Oscar 2024-10-31 para dar margen de 50 centavos en cobros//
+				if( abs( $difference ) > 0.5 && $row['pagado'] == 1 ){//venta no liquidada $row_aux['payments_total'] < $row['total']( $difference != -1 && $difference != 0 && $difference != -1 )
 					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no ha sido liquidada<br>Verifica y vuelve a intentar.</p>";
 					$resp .= "<h5>{$row_aux['payments_total']} VS {$row['total']} = {$difference}, {$row['pagado']}</h5>";
 					$resp .= "<div class=\"row\">";
