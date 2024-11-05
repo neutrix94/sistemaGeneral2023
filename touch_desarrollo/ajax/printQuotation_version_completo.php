@@ -1,7 +1,6 @@
 <?php
-	/*
-		Version Oscar 2024-11-04 Para seccionar tickets en tamaño carta
-	*/
+	#header("Content-Type: text/plain;charset=utf-8");
+	//die('here');
 	include( '../../conect.php' );
 	define('FPDF_FONTPATH','../../include/fpdf153/font/');
 	
@@ -288,8 +287,8 @@ Fin de cambio Oscar 25.06.2019*/
 		}
 	}
 	
-	//$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40 deshabilitado por Oscar 202-11-04 para seccionar en carta los tickets
-	$ticket = new TicketPDF("P", "mm", array(80,282), "{$sucursal}", "{$folio}", 10);
+	//+40+130
+	$ticket = new TicketPDF("P", "mm", array(80,$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
 	
