@@ -1,6 +1,7 @@
 <?php
-	#header("Content-Type: text/plain;charset=utf-8");
-	//die('here');
+	/*
+		Version Oscar 2024-11-04 Para seccionar tickets en tamaño carta
+	*/
 	define('FPDF_FONTPATH','../include/fpdf153/font/');
 	
 	include("../include/fpdf153/fpdf.php");
@@ -356,8 +357,8 @@ Fin de cambio Oscar 25.06.2019*/
 		}
 	}
 	
-	//+40+130
-	$ticket = new TicketPDF("P", "mm", array(80,50+$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40), "{$sucursal}", "{$folio}", 10);
+	//50+$lineas_dev+50+$lineas_productos*6+($total!=$subtotal?12:0)+($pagado>0?14:30)+(count($pagos)>0?($lineas_pagos+1)*6:0)+40+40
+	$ticket = new TicketPDF("P", "mm", array(80,277), "{$sucursal}", "{$folio}", 10);
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
 	
@@ -393,7 +394,17 @@ Fin de cambio Oscar 25.06.2019*/
     if( ( $comprobacion_cobro == 1 || $comprobacion_cobro == 0 || $comprobacion_cobro == -1 ) || $pagado == 0 ){
 	//if( $payments_total == $total ){
         $ticket->Image("../img/especiales/pagado.jpeg", 5, 2, 70);
-		$ticket->SetXY(5, $ticket->GetY()+20);
+		$ticket->SetXY(5, $ticket->GetY()+12);
+		$comprobacion_cobro = round( $total - $payments_total );
+    //generacion de codigo de barras
+        include('../include/barcode/barcode.php');
+        $barcode_name = str_replace(' ', '', $folio );
+        $barcodePath = "../img/codigos_barra/{$barcode_name}.png";
+        barcode( $barcodePath, base64_encode( $folio ), '60', 'horizontal', 'code128', false, 1);
+    //se incrustra el codigo de barras en el ticket
+        $ticket->Image( $barcodePath, 6, $ticket->GetY()+10, 70);
+		$ticket->SetXY(5, $ticket->GetY()+30);
+   // die( $folio );
 	}
 /*Fin de cambio Oscar 2023/10/12*/
 	if($tv==1){
@@ -779,21 +790,7 @@ $ticket->SetXY(5, $ticket->GetY()+4);
     }*/
 /*Implementado por Oscar 2023/10/12*/
 //echo "{$payments_total} == {$total} || {$pagado} == 0";
-    $comprobacion_cobro = round( $total - $payments_total );
-    if( ( $comprobacion_cobro == 1 || $comprobacion_cobro == 0 || $comprobacion_cobro == -1 ) || $pagado == 0 ){//$ticket_was_payed == 1 &&
-    	//die( 'ere' );
-       // $ticket->Image("../../../../img/especiales/pagado.jpeg", 5, 2, 70);
-    //generacion de codigo de barras
-        include('../include/barcode/barcode.php');
-        $barcode_name = str_replace(' ', '', $folio );
-        $barcodePath = "../img/codigos_barra/{$barcode_name}.png";
-        barcode( $barcodePath, base64_encode( $folio ), '60', 'horizontal', 'code128', false, 1);
-    //se incrustra el codigo de barras en el ticket
-        $ticket->Image( $barcodePath, 6, $ticket->GetY()+10, 70);
-   // die( $folio );
-    }else if ( $pagado == 1 ){//implementacion Oscar 2024-04-26 para no imprimir 
-		//deshabilitado por Oscar 2024-05-01 die('La nota no ah sido liquidada y no saldra el ticket de productos.');
-	}
+    
 /*fin de cambio Oscar 2023/10/12*/
     if($printPan == 1) {
     	ob_end_clean();
