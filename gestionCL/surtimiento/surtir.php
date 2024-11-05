@@ -445,7 +445,8 @@ $indiceSurtir = 0;
               'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
             },
             data: {
-                "pedido": id
+                "pedido": id,
+                "user_id":'<?php echo $user_id ?>'
             },
             datatype: 'json',
             success: function (data) {

@@ -36,6 +36,7 @@ $app->post('/surte/Faltante', function (Request $request, Response $response){
 
   //Recuperar parámetros de entrada
   $pedido = $request->getParam('pedido');
+  $user_id = $request->getParam('user_id');
   
   //Validar elementos requeridos para crear surtimiento
   if (empty($pedido)) {
@@ -57,6 +58,7 @@ $app->post('/surte/Faltante', function (Request $request, Response $response){
             where 
             s.id='{$pedido}'
             and (ifnull(sd.cantidad_solicitada,0) - ifnull(sd.cantidad_surtida,0)) > 0
+            and sd.id_asignado = '{$user_id}'
             ;";
                 
       foreach ($db->query($sqlConsultaSol) as $row) {
