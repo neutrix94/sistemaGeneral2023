@@ -1,7 +1,7 @@
 <?php
 /*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket 1.1*/
 /*Version 2024-10-19 Para reimprimir ticket de netPay manualmente cuando la venta no llego al servidor*/
-/*Version 2024-10-31 Para dar margen de 50 centavos en cobros 1.2 (se agrega que se cierre emergente 1 y 2)*/
+/*Version 2024-11-07 Para regresar la version de 50 centavos por error de devolucion (no actualizaba pedidos referencia devolucion porque no entraba en impresion de ticket)*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
@@ -318,10 +318,6 @@ $terminal_id = $_GET['terminal_serie_id'];
 				$is_per_error = ( isset( $_GET['is_per_error'] ) ? $_GET['is_per_error'] : $_POST['is_per_error'] );
 				
 				$validation = $Payments->validate_payment_is_not_bigger( $sale_id, $ammount );
-				if( $validation != 'ok' ){
-					die( $validation );
-				}
-				//die( "validation : {$validation}" );
 				$id_devolucion_relacionada = 0;
 				if( isset( $_GET['id_devolucion_relacionada'] ) || isset( $_POST['id_devolucion_relacionada'] ) ){
 					$id_devolucion_relacionada = ( isset( $_GET['id_devolucion_relacionada'] ) ? $_GET['id_devolucion_relacionada'] : $_POST['id_devolucion_relacionada'] );
@@ -593,31 +589,30 @@ $terminal_id = $_GET['terminal_serie_id'];
 			$pagos_dev = $devolucion_row['pagos_devolucion'];
 			$tmp_total =  $payments_total + $ammount - $pagos_dev;//round()
 			$rest = ($sale_total - $tmp_total);
-			//die( "Rest : {$rest}" );
 			//if( $sale_total < $tmp_total ){
-			/*if( $rest >= -1 && $rest <=1 ){
+			if( $rest >= -1 && $rest <=1 ){
 
-			}else{*/
-				if( $tmp_total > $sale_total && abs($rest) > 0.5 ){
+			}else{
+				if( $tmp_total > $sale_total ){
 					if( $log_id != null ){
 						$steep_log_error = $this->Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos / ec_pedido_pagos', 'N/A', "El pago no puede ser mayor al total de la venta : {$sale_total} - {$tmp_total} = {$rest}", 'N/A' );
 					}	
 					die( "<div class=\"row\" style=\"padding:15px;\">
-						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta. </h2>
+						<h2 class=\"text-center text-danger\">El pago no puede ser mayor al total de la venta.</h2>
 						<div class=\"col-3\"></div>
 						<div class=\"col-6\">
 							<br>
 							<button
 								type=\"button\"
 								class=\"btn btn-danger form-control\"
-								onclick=\"close_emergent();close_emergent_2();\"	
+								onclick=\"close_emergent_2();\"	
 							>
 								<i class=\"icon-ok-circled\">Aceptar</i>
 							</button>
 						</div>
 					</div>" );//error|
 				}
-			//}
+			}
 			return 'ok';
 		}
 
@@ -645,10 +640,10 @@ $terminal_id = $_GET['terminal_serie_id'];
 					ON pp.id_pedido = p.id_pedido
 					WHERE p.id_pedido = {$sale_id}";
 			//die( $sql );
+			$difference = round( $row['sale_total'], 2 ) - round( $row['payments_total'], 2 );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar los totales para validar : {$sql} : {$this->link->error}" );
 			$row = $stm->fetch_assoc();
-			$difference = round( $row['sale_total'], 2 ) - round( $row['payments_total'], 2 );
-			if( $row['was_payed'] == 1 && ( abs( $difference ) > 0.5 ) ){//Modificado por Oscar 2024-10-31 para dar margen de 50 centavos en cobros//== 1 || $difference == -1)
+			if( $row['was_payed'] == 1 && ( $difference == 1 || $difference == -1) ){
 				die( "<div class=\"row\">
 					<h3 class=\"text-center text-danger fs-2\">La venta no esta liquidada, registra todos los pagos y vuelve a intentar</h3>
 					<div class=\"\">

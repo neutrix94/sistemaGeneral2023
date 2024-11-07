@@ -1,9 +1,24 @@
 <?php
+/*
+	*Version Oscar 2024-11-06 para implememntar contrasena en busqueda por nombre en validacion de ventas
+*/
 //conexiones a la base de datos
 	include( '../../config.inc.php' );
 	include( '../../conect.php' );//sesión
 	include( '../../conexionMysqli.php' );
 	//die( $user_id );
+  $sql = "SELECT 
+            u.contrasena AS password
+          FROM sys_sucursales s
+          LEFT JOIN sys_users u
+          ON s.id_encargado = u.id_usuario
+          WHERE s.id_sucursal = {$sucursal_id}";
+  $stm = $link->query( $sql ) or die( "Error al consultar passwor de encargado : {$link->error}" );
+  if( $stm->num_rows <= 0 ){
+    die( "Esta pnatlla no se puede usar porque no hay un encargado asignado a la sucursal." );
+  }
+  $row = $stm->fetch_assoc();
+  $mannager_pass = $row['password'];
 ?>
 <!DOCTYPE html>
 <head>
@@ -15,6 +30,8 @@
 	<link href="../../css/icons/css/fontello.css" rel="stylesheet" type="text/css"  media="all" />
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
 	<script type="text/javascript" src="../../js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="../../js/md5.js"></script>
+  
 	<script type="text/javascript" src="js/functions.js"></script>
 	<script type="text/javascript" src="../../code/especiales/plugins/js/barcodeValidationStructure.js"></script>
 
@@ -39,6 +56,7 @@
   <audio id="validation_ok" controls style="display : none;">
     <source type="audio/wav" src="../../files/sounds/validation_finished.mp3">
   </audio>
+  <input type="hidden" id="primary_password" value="<?php echo $mannager_pass;?>">
 
 	<div class="emergent" tabindex="1">
 		<div style="position: relative; top : 120px; left: 90%; z-index:1; display : none;">
