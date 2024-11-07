@@ -4,10 +4,11 @@ use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 
 /*
-* Endpoint: inserta_cliente
-* Path: /inserta_cliente
-* Método: GET
-* Descripción: Insercion de clientes de facturacion
+  * Endpoint: inserta_cliente_directo_general_linea
+  * Path: /inserta_cliente_directo_general_linea
+  * Método: POST
+  * Descripción: Serviciond de Insercion de clientes (viene desde administracion de facturacion).
+  * Version Oscar 2024-11-07 Para mandar ids de clientes procesados exitosamente en la respuesta del servicio hacia administracion de facturacion
 */
 
 $app->post('/inserta_cliente_directo_general_linea', function (Request $request, Response $response){
@@ -29,47 +30,30 @@ $app->post('/inserta_cliente_directo_general_linea', function (Request $request,
   $rowsSynchronization = new rowsSynchronization( $link );
 
   $resp = array();
-  $resp["ok_rows"] = '';
-  $resp["error_rows"] = '';
-  $resp["rows_download"] = array();
-  $resp["log_download"] = array();
+  $resp["ok_rows"] = array();
 
   $tmp_ok = "";
   $tmp_no = "";
-
-  //$log = $request->getParam( "log" );
   $costumers = $request->getParam( "rows" );
-  //inserta request
-  //$request_initial_time = $SynchronizationManagmentLog->getCurrentTime();
-  //$resp["log"] = $SynchronizationManagmentLog->insertResponse( $log, $request_initial_time );
   if( sizeof( $costumers ) > 0 ){
-    $insert_returns = $Bill->insertCostumers( $costumers );
-      $resp["ok_rows"] = $insert_returns;//$insert_returns["ok_rows"];
-//return json_encode( $insert_returns );
-    if( $insert_returns["error"] != '' && $insert_returns["error"] != null  ){
-    //inserta error si es el caso
-     // $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $insert_returns["error"], $resp["log"]["unique_folio"] );
+    $insert_costumers = $Bill->insertCostumers( $costumers );
+      $resp["ok_rows"] = $insert_costumers;
+    if( $insert_costumers["error"] != '' && $insert_costumers["error"] != null  ){
+      return json_encode( array( "status"=>400, "message"=>$insert_costumers["error"] ) );
     }else{
-      $resp["ok_rows"] = $insert_returns;//$insert_returns["ok_rows"];
-   // die( "ok_rows : {$insert_returns}" );
-      
-      //$resp["error_rows"] = $insert_returns["error_rows"];
-      //$tmp_ok = $insert_returns->tmp_ok;
-      //$tmp_no = $insert_returns->tmp_no;
-    //inserta respuesta exitosa
-      //$resp["log"] = $SynchronizationManagmentLog->updateResponseLog( "{$resp["ok_rows"]} | {$insert_returns["error_rows"]}", $resp["log"]["unique_folio"] );
+      $resp["ok_rows"] = $insert_costumers;
     }
   }else{
-  //inserta excepcion controlada
     $response_string = "No llegaron clientes, posiblemente tengas que bajar el limite de registros de sincronizacion de facturacion!";
-    //$resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $response_string, $resp["log"]["unique_folio"] );
+    return json_encode( array( "status"=>200, "message"=>$response_string ) );
   }
-/*deshabilitado por Oscar 2024-10-13 porque esto ya no aplica
-//consulta las cliemtes que se tiene que descargar 
-  //$costumers_limit = 1000;
-  //$resp["download"] = $rowsSynchronization->getSynchronizationRows( -1, $log['origin_store'], $costumers_limit, 'sys_sincronizacion_registros_facturacion' );
-*/
-  return 'ok';
+  return json_encode( 
+    array( 
+                  "status"=>200, 
+                  "ok_rows"=>$resp["ok_rows"], 
+                  "message"=>"Registros procesados en General Linea exitosamente." 
+                ) 
+              );
 });
 
 ?>
