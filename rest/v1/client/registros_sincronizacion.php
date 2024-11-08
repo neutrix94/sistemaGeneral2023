@@ -8,6 +8,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Método: POST
 * Descripción: Recupera y envia los registros de sincronizacion que no se han sincronizado ( local a linea )
 * Version 2.1 ( Log y comprobacion )
+* Version Oscar 2024-11-02 para no enviar registros nuevos si tiene registros por comprobar.
 */
 $app->get('/obtener_registros_sincronizacion', function (Request $request, Response $response){
  //die( 'here' );
@@ -70,10 +71,11 @@ $app->get('/obtener_registros_sincronizacion', function (Request $request, Respo
   $req['verification'] = $generalRowsVerification->getPendingRows( $system_store, -1, 'sys_sincronizacion_registros', 
   ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene los registros de comprobacion de registros de sincronizacion
 /*Fin de comprobacion de registros de sincronizacion*/
-  
+  //var_dump( $req['verification']['verification'] ); return '';
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta request
-  $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros', $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
-
+  if( $req['verification']['verification'] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+    $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros', $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  }
    
     $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion//
 //echo $post_data;

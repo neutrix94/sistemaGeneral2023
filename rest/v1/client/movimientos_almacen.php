@@ -73,16 +73,18 @@ $app->get('/obtener_movimientos_almacen', function (Request $request, Response $
 /*Inserta Log de peticion*/
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN', 
     'sys_sincronizacion_movimientos_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta log de request
-/*Crea JSONS de movimientos de almacen*/
-  $setMovements = $movementsSynchronization->setNewSynchronizationMovements( $system_store, $system_store, $store_prefix, 
-  $movements_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos de almacen
-  if( $setMovements != 'ok' ){
-    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
-    return json_encode( array( "response" => $setMovements ) );
+  if( $req['verification']['verification'] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+  /*Crea JSONS de movimientos de almacen*/
+    $setMovements = $movementsSynchronization->setNewSynchronizationMovements( $system_store, $system_store, $store_prefix, 
+    $movements_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos de almacen
+    if( $setMovements != 'ok' ){
+      $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
+      return json_encode( array( "response" => $setMovements ) );
+    }
+  /*Consulta JSONS de movimientos de almacen*/
+    $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 1, $req['log']['unique_folio'], 
+    ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
   }
-/*Consulta JSONS de movimientos de almacen*/
-  $req["movements"] = $movementsSynchronization->getSynchronizationMovements( -1, $movements_limit, 1, $req['log']['unique_folio'], 
-  ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
 /*Codifica peticion en JSON*/
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
 /*Envia Peticion a Linea*/

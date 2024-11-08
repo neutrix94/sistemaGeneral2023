@@ -1,9 +1,7 @@
 <?php
-//ok 2023/11/25
-//die( "here" );
-	/*include( '../../../conexionMysqli.php' );
-	$bill = new Bill( $link );
-	echo $bill->insertBillSystemCostumerSynchronization();*/
+/*
+	* Version Oscar 2024-11-07 Para mandar ids de clientes procesados exitosamente en la respuesta del servicio hacia administracion de facturacion
+*/
 	class Bill
 	{
 		private $link;	
@@ -103,21 +101,16 @@
 
 /*Insercion de clientes en linea*/
 		public function insertCostumers( $costumers ){
-			$rows = "";
+			$rows = array();
 			$this->link->autocommit( false );
 			foreach ( $costumers as $key => $costumer ) {
-				//var_dump( $costumer['id_cliente_facturacion_tmp'] );
 				$insert = $this->insertLineCostumer( $costumer );
 				if( $insert != "ok" ){
 					die( "Error en objeto insertCostumers : {$insert}" );
 				}
-			//inserta los registros de sincronizacion de clientes en los sistemas de facturacion
-				
-				$rows .= ( $rows == "" ? "" : "," );
-				$rows .= $costumer['detail'][0]['synchronization_row_id'];
+				array_push( $rows, $costumer['detail'][0]['synchronization_row_id'] );
 			}
-		//autoriza transaccion
-			$this->link->autocommit( true );
+			$this->link->autocommit( true );//autoriza transaccion
 			//die( "Rows : {$rows}" );
 			return $rows;
 		}
@@ -131,8 +124,6 @@
 				if( $insert != "ok" ){
 					die( "Error en objeto insertCostumers : {$insert}" );
 				}
-			//inserta los registros de sincronizacion de clientes en los sistemas de facturacion
-				
 				$rows .= ( $rows == "" ? "" : "," );
 				$rows .= $costumer['detail'][0]['synchronization_row_id'];
 			}
@@ -183,9 +174,7 @@
 							/*15*/'{$costumer->regimen_fiscal}', /*16*/'{$costumer->productos_especificos}', /*17*/NOW(), /*18*/1, '{$costumer->folio_unico}' )";
 					$stm = $this->link->query( $sql ) or die( "Error al insertar cliente de facturacion en local : {$sql} {$this->link->error}" );
 				}
-			//die( 'here2 : ' . $sql );
-			//obtiene el id insertado
-				$costumer_id = $this->link->insert_id;
+				$costumer_id = $this->link->insert_id;//obtiene el id insertado
 				$this->link->autocommit( true );
 			return 'ok';
 		}
@@ -377,21 +366,6 @@
 					$stm = $this->link->query( $sql ) or die( "Error al actualizar el contacto : {$this->link->error}" );
 				}
 			}
-		//inserta el registro de sincronizacion para sucursales locales
-			$costumer_json = json_encode( $costumer, JSON_UNESCAPED_UNICODE );
-			$sql = "INSERT INTO sys_sincronizacion_registros_facturacion ( id_sincronizacion_registro, sucursal_de_cambio,
-					id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )
-					SELECT
-						NULL,
-						-1,
-						id_sucursal,
-						'{$costumer_json}',
-						NOW(),
-						'facturacion_insertLineCostumer.php',
-						1
-					FROM sys_sucursales 
-					WHERE id_sucursal > 0";
-			$stm = $this->link->query( $sql ) or die( "Error al insertar registros de sincronizacion de cliente poara equipos locales: {$this->link->error}" );
 			return 'ok';
 		}
 
