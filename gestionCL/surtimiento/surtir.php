@@ -2,12 +2,15 @@
 include('../../conect.php');
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $perfil = isset($_GET['perfil']) ? $_GET['perfil'] : '';
+$reasigna = isset($_GET['reasigna']) ? $_GET['reasigna'] : '';
+
 //error_log('id:'.$id);
 //error_log('$sucursal_id:'.$sucursal_id);
+//error_log('$user_id:'.$user_id);
 require_once '../classes/surtimiento.php';
 $surtimientoCRUD = new SurtimientoCRUD();
 $asignar = $surtimientoCRUD->tomarSurtimiento($id, $sucursal_id, $user_id);
-$listaSurtir = $surtimientoCRUD->listaDetalleSurtimiento($id,$sucursal_id);
+$listaSurtir = $surtimientoCRUD->listaDetalleSurtimiento($id,$sucursal_id,$user_id);
 $pendientes = (count($listaSurtir)>0) ? 1: 0 ;
 $indiceSurtir = 0;
 
@@ -111,19 +114,19 @@ $indiceSurtir = 0;
               <p class="txt-content">No hay más productos por surtir.</p>
               <p>Entrega la mercancía a:</p>
               <p class="text-primary p-2 txt-val-modal"><span id="nombreVendedor">Nombre del vendedor</span></p>
-              <p>Folio de la nota:</p>
+              <p id="titleFolio">Folio de la nota:</p>
               <p class="text-primary p-2 txt-val-modal" id="folioNotaModal"></p>
-              <p>Productos surtidos parcialmente:</p>
+              <p id="titleProductosSurtdios">Productos surtidos parcialmente:</p>
               <div id="listaProductosSurtidosParcialmente"></div>
               <!-- 
                 <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>
               -->
-              <p>Productos no surtidos:</p>
+              <p id="titleProductosNoSurtdios">Productos no surtidos:</p>
               <div id="listaProductosNoSurtidos"></div>
               <!-- <p class="text-primary p-2 txt-val-modal">Producto 1<br>Producto 2</p>  -->
             </div>
             <div class="modal-footer d-flex flex-column align-items-center w-100">
-              <button type="button" class="btn btn-success mb-2" style="width: 50%;" onclick="imprimeTicket()">IMPRIMIR</button>
+              <button type="button" id="btnImprimir" class="btn btn-success mb-2" style="width: 50%;" onclick="imprimeTicket()">IMPRIMIR</button>
               <button type="button" class="btn btn-primary"  style="width: 50%;" onclick="window.location.href='javascript: history.go(-1)'">LISTA DE PEDIDOS</button>
             </div>
           </div>
@@ -442,7 +445,8 @@ $indiceSurtir = 0;
               'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
             },
             data: {
-                "pedido": id
+                "pedido": id,
+                "user_id":'<?php echo $user_id ?>'
             },
             datatype: 'json',
             success: function (data) {
@@ -490,9 +494,17 @@ $indiceSurtir = 0;
               }else{
 
                 //No se muestra detalle para imprimir ya que todo el Pedido se surtió completo
+                $('#surtidoModal').modal('show');
+                $("#titleProductosSurtdios").hide();
+                $("#listaProductosSurtidosParcialmente").hide();
+                $("#titleProductosNoSurtdios").hide();
+                $("#listaProductosNoSurtidos").hide();
+                $("#titleFolio").hide();
+                $("#folioNotaModal").hide();
+                $("#btnImprimir").hide();
 
-                alert( data.result.resultado );
-                window.location.href='javascript: history.go(-1)';
+                //alert( data.result.resultado );
+                //window.location.href='javascript: history.go(-1)';
 
               }
 

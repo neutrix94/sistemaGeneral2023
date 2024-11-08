@@ -1,3 +1,6 @@
+/*
+	*Version Oscar 2024-11-06 para implememntar contrasena en busqueda por nombre en validacion de ventas
+*/
 var global_current_ticket;
 var global_ticket_has_return = 0;
 var global_view = '';
@@ -9,6 +12,7 @@ var global_view = '';
 			&& document.activeElement.id != 'return_seeker' 
 			&& document.activeElement.id != 'product_barcode_seeker'
 			&& document.activeElement.id != 'product_barcode_seeker_pieces'
+			&& document.activeElement.id != 'mannager_password'
 		){//!= element_focus_locked && element_focus_locked !
 			var resp = "<h5 class=\"orange\">No estas posicionado en el campo del código de barras.</h5>";
 			//alert( '' ) ;
@@ -595,6 +599,26 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 		$( '#mannager_password' ).focus();
 	}
 /**/
+
+	function enable_model_with_password( e ){
+		if( e.keyCode != 13 && e != 'intro' ){
+			return false;
+		}
+	//recupera contrasena
+		var pass_txt = $( '#mannager_password' ).val();
+		if( pass_txt.length <= 0 ){
+			alert( "La contraseña del encargado no puede ir vacia." );
+			$( '#mannager_password' ).focus();
+			return false;
+		}
+	//valida la contrasena
+		if( md5( pass_txt ) == $( '#primary_password' ).val().trim() ){
+			$( '#select_p_p_by_name_btn' ).removeAttr( 'disabled' ); 
+			$( '#select_model_password' ).css( "display", "none" );
+		}else{
+			alert( "la contraseña del encargado es incorrecta.\nVerifica y vuelve a intentar." );
+		}
+	}
 
 //llamadas asincronas
 	function ajaxR(url){
