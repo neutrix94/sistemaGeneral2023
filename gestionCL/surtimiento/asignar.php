@@ -201,7 +201,6 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
             );
             return;
         }
-
         if (id_surtidor && partidas) {
             listaAsignacion.items.push({ id_surtidor: id_surtidor, nombre_surtidor: '', partidas: partidas });
             listaAsignacion.pendienteAsignar -= partidas;
@@ -234,10 +233,16 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
 
     function eliminarAsignacion(index) {
         var partidas = Number(listaAsignacion.items[index].partidas);
-        listaAsignacion.pendienteAsignar += partidas;
-        document.getElementById('pendientesAsignar').textContent = listaAsignacion.pendienteAsignar;
+        if(partidas <= listaAsignacion.pendienteSurtir ){
+          listaAsignacion.pendienteAsignar += partidas;
+          document.getElementById('pendientesAsignar').textContent = listaAsignacion.pendienteAsignar;
+          listaAsignacion.items.splice(index, 1);
+        }else{
+          listaAsignacion.items[index].partidas = partidas - listaAsignacion.pendienteSurtir;
+          listaAsignacion.pendienteAsignar += partidas - listaAsignacion.items[index].partidas;
+          document.getElementById('pendientesAsignar').textContent = listaAsignacion.pendienteAsignar;
+        }
         
-        listaAsignacion.items.splice(index, 1);
         actualizarTablaAsignaciones();
     }
 
@@ -269,7 +274,8 @@ $listaAsignacion = $surtimientoCRUD->listaAsignacion($id,$sucursal_id);
                 type: 'POST',
                 data: {
                     action: 'actualizarAsignacion',
-                    listaAsignacion: listaAsignacion
+                    listaAsignacion: listaAsignacion,
+                    sucursal: '2' // '<?php echo $sucursal_id; ?>'
                 },
                 success: function(response) {
                     $('.alert').alert();

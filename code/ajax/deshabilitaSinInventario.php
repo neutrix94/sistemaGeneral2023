@@ -1,5 +1,6 @@
 <?php
 /*Version Oscar 2024-11-01 Para habilitar productos maquilados con el boton habilitar productos con inventario*/
+/*Version Oscar 2024-11-05 para habilitar los productos que tienen estacionalidad en la sucursal*/
 	include('../../conectMin.php');
 
 	$flag=$_POST['fl'];//recibimos la variable flag para cer de que caso se trata
@@ -40,17 +41,18 @@
 		
 		die("El contador de folios de venta fue reseteado exitosamente!!!");
 	}
-/*Implementación Oscar 04.04.2019 para habilitar los productos que tienen estacionalidad en la sucursal/ deshabilitar los productos que no tienen estacionalidad en la sucursal*/
+/*Implementación Oscar 04.04.2019 para habilitar los productos que tienen estacionalidad en la sucursal*/
 	if($flag==7){
 		mysql_query("BEGIN");//marcamos inicio transacción
+//deshabiliado por Oscar 2024-11-05 porque choca con funcionalidad de habilitar productos maquilados
 	//deshabilitamos todos los productos de la tabla de sys_sucursales_producto
-		$sql="UPDATE sys_sucursales_producto SET estado_suc=0 WHERE id_sucursal=$suc_sel";
+/*		$sql="UPDATE sys_sucursales_producto SET estado_suc=0 WHERE id_sucursal=$suc_sel";
 		$eje=mysql_query($sql);
 		if(!$eje){
 			$error=mysql_error();
 			mysql_query("ROLLBACK");//cancelamos la transacción
 			die("Error al deshabilitar todos los productos en la sucursal patra después habilitarlos!!!\n\n".$error."\n\n".$sql);
-		}
+		}*/
 
 		$sql="UPDATE sys_sucursales_producto SET estado_suc=1
 			WHERE id_sucursal=$suc_sel
