@@ -6,7 +6,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /depurar_logs
 * Método: POST
 * Descripción: Depura registros de logs ( tablas de Logs )
-* Version 1.1 Para depurar logs ( 2024-08-03 )
+  * Version 1.1 Para depurar logs ( 2024-08-03 )
+  * Version Oscar 2024-11-08 para deshabilitar el consumo de depuracion de registros logs sincronizacion al servidor en linea 
 */
 $app->post('/depurar_logs', function (Request $request, Response $response){
     if ( ! include( '../../conexionMysqli.php' ) ){
@@ -75,6 +76,8 @@ $app->post('/depurar_logs', function (Request $request, Response $response){
 
 //cierra conexion Mysql
   $link->close();
+
+/*Deshabilitado por Oscar 2024-11-08 para deshabilit ar el consumo de depuracion de registros logs sincronizacion al servidor en linea  
   if( $system_store != -1 ){//envia peticion a linea
     $resp = "";
     $post_data = json_encode( array( "is_complete"=>$is_complete ) );
@@ -96,7 +99,7 @@ $app->post('/depurar_logs', function (Request $request, Response $response){
     }
     //var_dump( $resp );
     //return $resp;
-  }
+  }*/
 //regresa respuesta
   die('ok');
   //return json_encode( array( "response" => "Ventas ok!" ) );

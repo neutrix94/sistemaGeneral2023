@@ -7,7 +7,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /depurar_sincronizacion
 * Método: POST
 * Descripción: Depura registros de sincronizacion ( tablas de sincronizacion )
-* Version 1.2 Se corrige depuracion de regitros Proveedor Producto ( 2024-08-27 )
+  * Version 1.2 Se corrige depuracion de regitros Proveedor Producto ( 2024-08-27 )
+  * Version Oscar 2024-11-08para deshabilit ar el consumo de depuracion de registros de sincronizacion al servidor en linea
 */
 $app->post('/depurar_sincronizacion', function (Request $request, Response $response){//die("here");
 
@@ -229,6 +230,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
   $link->autocommit( true );//autoriza transaccion
 //cierra conexion Mysql
   $link->close();
+/*Deshabilitado por Oscar 2024-11-08 para deshabilitar el consumo de depuracion de registros de sincronizacion al servidor en linea
   if( $system_store != -1 ){//envia peticion a linea
     $resp = "";
     $post_data = json_encode( array( "is_complete"=>$is_complete ) );
@@ -251,7 +253,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
     }
     //var_dump( $resp );
     //return $resp;
-  }
+  }*/
 //regresa respuesta
   die('ok');
   //return json_encode( array( "response" => "Ventas ok!" ) );
