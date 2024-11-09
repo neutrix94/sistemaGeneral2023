@@ -6,7 +6,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_registros_sincronizacion
 * Método: POST
 * Descripción: Insercion de registros de sincronizacion
-* Version 2.1 Comprobacion y LOG
+  * Version 2.1 Comprobacion y LOG
+  * Version Oscar 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->post('/inserta_registros_sincronizacion_ventas', function (Request $request, Response $response){
 //incluye librerias
@@ -120,8 +121,11 @@ $app->post('/inserta_registros_sincronizacion_ventas', function (Request $reques
     return json_encode( array( "response" => $setPayments ) );
   }
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros_ventas' );
-  $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
+  
+  if( $resp["rows_validation"]["verification"] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+    $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
     $rows_limit, 'sys_sincronizacion_registros_ventas', $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene registros para descargar
+  }
   
 //desbloquea indicador de sincronizacion en tabla
   $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );

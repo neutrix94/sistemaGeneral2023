@@ -6,6 +6,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_registros_sincronizacion
 * Método: GET
 * Descripción: Insercion de registros de sincronizacion
+  * Versión 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->post('/inserta_registros_sincronizacion_movs_p_p', function (Request $request, Response $response){
 //incluye librerias
@@ -112,8 +113,11 @@ $app->post('/inserta_registros_sincronizacion_movs_p_p', function (Request $requ
   $initial_time = $config['process_initial_date_time'];
   $rows_limit = $config['rows_limit'];
 
-  $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
-  $rows_limit, 'sys_sincronizacion_registros_movimientos_proveedor_producto' );//obtiene registros para descargar
+  if( $resp["rows_validation"]["verification"] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+    $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
+    $rows_limit, 'sys_sincronizacion_registros_movimientos_proveedor_producto' );//obtiene registros para descargar
+  }
+  
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 
     'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros_movimientos_proveedor_producto', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_detalle_proveedor_producto', 'subida', $resp["status"], $log["origin_store"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza el resumen de modulo/sucursal ( subida )

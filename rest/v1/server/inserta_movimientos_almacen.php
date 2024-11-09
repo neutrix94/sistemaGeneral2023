@@ -6,8 +6,9 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Endpoint: inserta_movimientos_almacen
 * Path: /inserta_movimientos_almacen
 * Método: GET
-* Descripción: Insercion de movimeintos de almacen a nivel producto
-* Version 2.1 Comprobacion y LOG
+* Descripción: Insercion de movimientos de almacen a nivel producto
+  * Version 2.1 Comprobacion y LOG
+  * Versión 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->post('/inserta_movimientos_almacen', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -151,19 +152,20 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   }
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'],  $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', 
   'sys_sincronizacion_movimientos_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  if( $resp["verification_movements"]["verification"] == false ){
+
+  if( $resp["verification_movements"]["verification"] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
   //ejecuta el procedure para generar los movimientos de almacen
     $setMovements = $movementsSynchronization->setNewSynchronizationMovements( $log['origin_store'], $system_store, $store_prefix, $rows_limit, 
       ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     if( $setMovements != 'ok' ){
       return json_encode( array( "response" => $setMovements ) );
     }
-  //die( "detenido par prueba mov producto" );
   //consulta registros pendientes de sincronizar
     $resp["rows_download"] = $movementsSynchronization->getSynchronizationMovements( $log['origin_store'], $rows_limit, 1, $resp["log_download"]["unique_folio"], 
       ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-    $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_almacen', 'subida', $resp["status"], $log["origin_store"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza el resumen de modulo/sucursal ( subida )
   }
+
+  $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_almacen', 'subida', $resp["status"], $log["origin_store"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza el resumen de modulo/sucursal ( subida )
 //desbloquea indicador de sincronizacion en tabla
   $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   if( $LOGGER ){

@@ -6,8 +6,9 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_registros_sincronizacion
 * Método: GET
 * Descripción: Insercion de registros de sincronizacion
-* Version 2.1 Comprobacion y LOG
-* Version Oscar 2024-11-02 para no enviar registros nuevos si tiene registros por comprobar.
+  * Version 2.1 Comprobacion y LOG
+  * Version Oscar 2024-11-02 para no enviar registros nuevos si tiene registros por comprobar.
+  * Version Oscar 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->post('/inserta_registros_sincronizacion', function (Request $request, Response $response){
 //incluye librerias
