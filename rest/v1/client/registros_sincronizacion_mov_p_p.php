@@ -6,6 +6,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /obtener_registros_sincronizacion_mov_p_p
 * Método: POST
 * Descripción: Recupera y envia los registros de sincronizacion de movimientos proveedor producto que no se han sincronizado
+  * Versión 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->get('/obtener_registros_sincronizacion_mov_p_p', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -68,7 +69,10 @@ $app->get('/obtener_registros_sincronizacion_mov_p_p', function (Request $reques
 
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 
     'REGISTROS DE SINCRONIZACION PROVEEDOR PRODUCTO', 'sys_sincronizacion_registros_movimientos_proveedor_producto', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta request
-  $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros_movimientos_proveedor_producto', $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  
+  if( $req['verification']['verification'] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+    $req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $rows_limit, 'sys_sincronizacion_registros_movimientos_proveedor_producto', $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  }
   
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_registros_sincronizacion_movs_p_p", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición

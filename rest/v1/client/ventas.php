@@ -6,7 +6,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /obtener_ventas
 * Método: POST
 * Descripción: Recupera y envia las ventas que no se han sincronizado ( local a linea )
-* Versión : 2.1 ( Log y comprobacion )
+  * Versión : 2.1 ( Log y comprobacion )
+  * Version Oscar 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->get('/obtener_ventas', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -63,11 +64,7 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
     return json_encode( array( "response"=>"La sucursal es linea y no puede ser cliente." ) );
   }
 
-  $setSales = $salesSynchronization->setNewSynchronizationSales( $system_store, $system_store, $store_prefix, $sales_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos de almacen
-  if( $setSales != 'ok' ){
-    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
-    return json_encode( array( "response" => $setSales ) );
-  }
+  
   
 /*Comprobacion de movimientos de almacen ( peticiones anteriores ) 2024*/
   $req['verification'] = $SalesRowsVerification->getPendingSales( $system_store, -1, 
@@ -75,7 +72,14 @@ $app->get('/obtener_ventas', function (Request $request, Response $response){
 /*Fin de comprobacion de movimientos de almacen*/
 
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'VENTAS', 'sys_sincronizacion_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta request
-  $req["sales"] = $salesSynchronization->getSynchronizationSales( -1, $sales_limit, $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  if( $req['verification']['verification'] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+    $setSales = $salesSynchronization->setNewSynchronizationSales( $system_store, $system_store, $store_prefix, $sales_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos de almacen
+    if( $setSales != 'ok' ){
+      $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
+      return json_encode( array( "response" => $setSales ) );
+    }
+    $req["sales"] = $salesSynchronization->getSynchronizationSales( -1, $sales_limit, $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  }
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
 //return $post_data;
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_ventas", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición

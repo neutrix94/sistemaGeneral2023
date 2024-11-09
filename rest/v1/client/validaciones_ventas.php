@@ -6,7 +6,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /obtener_validaciones_ventas
 * Método: POST
 * Descripción: Recupera y envia las validaciones de ventas que no se han sincronizado ( local a linea )
-* Versión : 2.1 ( Log y comprobacion )
+  * Versión : 2.1 ( Log y comprobacion )
+  * Versión 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->get('/obtener_validaciones_ventas', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -71,13 +72,16 @@ $app->get('/obtener_validaciones_ventas', function (Request $request, Response $
 
 //ejecuta el procedure para generar las validaciones de ventas
   $setValidations = $salesValidationSynchronization->setNewSynchronizationSalesValidation( $system_store, $system_store, $store_prefix, $validation_limits, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  if( $setValidations != 'ok' ){
-    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos_validacion_usuarios', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
-    return json_encode( array( "response" => $setValidations ) );
+  
+  if( $req['verification']['verification'] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+    if( $setValidations != 'ok' ){
+      $SynchronizationManagmentLog->release_sinchronization_module( 'ec_pedidos_validacion_usuarios', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
+      return json_encode( array( "response" => $setValidations ) );
+    }
+    $req["validations"] = $salesValidationSynchronization->getSynchronizationSalesValidation( -1, $validation_limits, $req['log']['unique_folio'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );//consulta registros pendientes de sincronizar
   }
   //var_dump($req['log']);return'';
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'VALIDACION VENTAS', 'sys_sincronizacion_validaciones_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//inserta request
-  $req["validations"] = $salesValidationSynchronization->getSynchronizationSalesValidation( -1, $validation_limits, $req['log']['unique_folio'], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );//consulta registros pendientes de sincronizar
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
 //echo $post_data;//return $post_data;
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_validaciones_ventas", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false )  );//envia petición
