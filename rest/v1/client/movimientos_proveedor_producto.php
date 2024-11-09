@@ -6,7 +6,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /obtener_movimientos_proveedor_producto
 * Método: POST
 * Descripción: Recupera y envia los movimientos proveedor producto que no se han sincronizado ( local a linea )
-* Versión : 2.1 ( Log y comprobacion )
+  * Versión : 2.1 ( Log y comprobacion )
+  * Versión 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->get('/obtener_movimientos_proveedor_producto', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -79,9 +80,12 @@ $app->get('/obtener_movimientos_proveedor_producto', function (Request $request,
     $SynchronizationManagmentLog->release_sinchronization_module( 'ec_movimiento_detalle_proveedor_producto', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
     return json_encode( array( "response" => $setProductProviderMovements ) );
   }
-/*Recupera JSONS de movimientos proveedor producto*/
-  $req["product_provider_movements"] = $productProviderMovementsSynchronization->getSynchronizationProductProviderMovements( -1, $product_provider_movements_limit, 1, $req['log']['unique_folio'], 
-  ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+
+  if( $req['verification']['verification'] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+  /*Recupera JSONS de movimientos proveedor producto*/
+    $req["product_provider_movements"] = $productProviderMovementsSynchronization->getSynchronizationProductProviderMovements( -1, $product_provider_movements_limit, 1, $req['log']['unique_folio'], 
+    ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  }
 /*codifica peticion en JSON*/
   $post_data = json_encode($req, JSON_PRETTY_PRINT);//forma peticion
   //return $post_data;

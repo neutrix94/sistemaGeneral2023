@@ -7,8 +7,9 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /obtener_registros_sincronizacion
 * Método: POST
 * Descripción: Recupera y envia los registros de sincronizacion que no se han sincronizado ( local a linea )
-* Version 2.1 ( Log y comprobacion )
-* Version Oscar 2024-11-02 para no enviar registros nuevos si tiene registros por comprobar.
+  * Version 2.1 ( Log y comprobacion )
+  * Version Oscar 2024-11-02 para no enviar registros nuevos si tiene registros por comprobar.
+  * Version Oscar 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->get('/obtener_registros_sincronizacion', function (Request $request, Response $response){
  //die( 'here' );

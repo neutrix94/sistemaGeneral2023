@@ -6,7 +6,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /obtener_devoluciones
 * Método: POST
 * Descripción: Recupera y envia las devoluciones que no se han sincronizado ( local a linea )
-* Versión : 2.1 ( Log y comprobacion )
+  * Versión : 2.1 ( Log y comprobacion )
+  * Version Oscar 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->get('/obtener_devoluciones', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -66,14 +67,17 @@ $app->get('/obtener_devoluciones', function (Request $request, Response $respons
     ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene los registros de comprobacion de movientos de almacen
 /*Fin de comprobacion de movimientos de almacen*/
 
-  $setReturns= $returnsSynchronization->setNewSynchronizationReturns( $system_store, $system_store, $store_prefix, $returns_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos de almacen
-  if( $setReturns != 'ok' ){
-    $SynchronizationManagmentLog->release_sinchronization_module( 'ec_devolucion', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
-    return json_encode( array( "response" => $setReturns ) );
-  }
-
   $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'DEVOLUCIONES', 'sys_sincronizacion_devoluciones', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//forma peticion
-  $req["returns"] = $returnsSynchronization->getSynchronizationReturns( -1, $returns_limit, $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  
+  if( $req['verification']['verification'] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+    $setReturns= $returnsSynchronization->setNewSynchronizationReturns( $system_store, $system_store, $store_prefix, $returns_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos de almacen
+    if( $setReturns != 'ok' ){
+      $SynchronizationManagmentLog->release_sinchronization_module( 'ec_devolucion', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//liberar el modulo de sincronizacion
+      return json_encode( array( "response" => $setReturns ) );
+    }
+    $req["returns"] = $returnsSynchronization->getSynchronizationReturns( -1, $returns_limit, $req["log"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  }
+  
   $post_data = json_encode($req, JSON_PRETTY_PRINT);
  //return $post_data;
   $result_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/inserta_devoluciones", $post_data, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//envia petición

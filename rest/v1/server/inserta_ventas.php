@@ -7,7 +7,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_ventas
 * Método: POST
 * Descripción: Insercion de ventas
-* Version 2.1 Comprobacion y LOG
+  * Version 2.1 Comprobacion y LOG
+  * Version Oscar 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->post('/inserta_ventas', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -136,15 +137,18 @@ $app->post('/inserta_ventas', function (Request $request, Response $response){
   if( $system_store != -1 ){
     return json_encode( array( "response"=>"La sucursal es local y no puede ser servidor." ) );
   }
-//ejecuta el procedure para generar los movimientos de almacen
-  $setSales = $salesSynchronization->setNewSynchronizationSales( $log['origin_store'], $system_store, $store_prefix, $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  if( $setSales != 'ok' ){
-    return json_encode( array( "response" => $setSales ) );
-  }
 
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'VENTAS DESDE LINEA', 'sys_sincronizacion_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-//consulta registros pendientes de sincronizar
-  $resp["rows_download"] = $salesSynchronization->getSynchronizationSales( $log['origin_store'], $rows_limit, $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+
+  if( $resp["verification_sales"]["verification"] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+  //ejecuta el procedure para generar los movimientos de almacen
+    $setSales = $salesSynchronization->setNewSynchronizationSales( $log['origin_store'], $system_store, $store_prefix, $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+    if( $setSales != 'ok' ){
+      return json_encode( array( "response" => $setSales ) );
+    }
+  //consulta registros pendientes de sincronizar
+    $resp["rows_download"] = $salesSynchronization->getSynchronizationSales( $log['origin_store'], $rows_limit, $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  }
 //var_dump($req["movements"]);
 //die( 'here' );
 //return json_encode( $req["sales"] );

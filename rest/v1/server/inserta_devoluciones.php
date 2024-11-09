@@ -7,7 +7,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_devoluciones
 * Método: GET
 * Descripción: Insercion de devoluciones
-* Version 2.1 Comprobacion y LOG
+  * Version 2.1 Comprobacion y LOG
+  * Version Oscar 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->post('/inserta_devoluciones', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -131,8 +132,6 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
   if( $system_store != -1 ){
     return json_encode( array( "response"=>"La sucursal es local y no puede ser servidor." ) );
   }
-//ejecuta el procedure para generar los movimientos de almacen
-  $setMovements = $returnsSynchronization->setNewSynchronizationReturns( $log['origin_store'], $system_store, $store_prefix, $rows_limit );
   //die( "detenido por prueba sincronizacion" );
   if( $setMovements != 'ok' ){
     return json_encode( array( "response" => $setMovements ) );
@@ -142,8 +141,12 @@ $app->post('/inserta_devoluciones', function (Request $request, Response $respon
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'DEVOLUCIONES DESDE LINEA', 'sys_sincronizacion_devoluciones', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   }*/
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'DEVOLUCIONES DESDE LINEA', 'sys_sincronizacion_devoluciones', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  $resp["rows_download"] = $returnsSynchronization->getSynchronizationReturns( $log['origin_store'], $rows_limit, $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   
+  if( $resp["returns_validation"]["verification"] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+  //ejecuta el procedure para generar los movimientos de almacen
+    $setMovements = $returnsSynchronization->setNewSynchronizationReturns( $log['origin_store'], $system_store, $store_prefix, $rows_limit );
+    $resp["rows_download"] = $returnsSynchronization->getSynchronizationReturns( $log['origin_store'], $rows_limit, $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
+  }
   $SynchronizationManagmentLog->updateModuleResume( 'ec_devolucion', 'subida', $resp["status"], $log["origin_store"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza el resumen de modulo/sucursal ( subida )
   
 //desbloquea indicador de sincronizacion en tabla

@@ -6,7 +6,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /obtener_movimientos_almacen
 * Método: POST
 * Descripción: Recupera y envia los movimientos de almacen que no se han sincronizado ( local a linea )
-* Versión : 2.1 ( Log y comprobacion )
+  * Versión : 2.1 ( Log y comprobacion )
+  * Versión 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->get('/obtener_movimientos_almacen', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){

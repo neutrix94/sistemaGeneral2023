@@ -6,7 +6,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Path: /inserta_validaciones_ventas
 * Método: POST
 * Descripción: Insercion de validaciones de ventas
-* Version 2.1 Comprobacion y LOG
+  * Version 2.1 Comprobacion y LOG
+  * Versión 2024-11-08 para no seguir creando registros de comprobacion si ya hay una comprobacion pendiente.
 */
 $app->post('/inserta_validaciones_ventas', function (Request $request, Response $response){
   if ( ! include( '../../conexionMysqli.php' ) ){
@@ -115,12 +116,15 @@ $app->post('/inserta_validaciones_ventas', function (Request $request, Response 
     return json_encode( array( "response"=>"La sucursal es local y no puede ser servidor." ) );
   }
 
-  $setMovements = $salesValidationSynchronization->setNewSynchronizationsalesValidation( $log['origin_store'], -1,  $store_prefix, $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos proveedor producto
-  if( $setMovements != 'ok' ){
-    return json_encode( array( "response" => $setMovements ) );
-  }
+  
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'VALIDACION VENTAS DESDE LINEA', 'sys_sincronizacion_validaciones_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  $resp["rows_download"] = $salesValidationSynchronization->getSynchronizationsalesValidation( $log['origin_store'], $rows_limit, $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  if( $resp["sales_validation"]["verification"] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+    $setMovements = $salesValidationSynchronization->setNewSynchronizationsalesValidation( $log['origin_store'], -1,  $store_prefix, $rows_limit, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//ejecuta el procedure para generar los movimientos proveedor producto
+    if( $setMovements != 'ok' ){
+      return json_encode( array( "response" => $setMovements ) );
+    }
+    $resp["rows_download"] = $salesValidationSynchronization->getSynchronizationsalesValidation( $log['origin_store'], $rows_limit, $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//consulta registros pendientes de sincronizar
+  }
   /*if ( sizeof( $resp["rows_download"] ) > 0 ) {//inserta request
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'], $store_prefix, $initial_time, 'VALIDACION VENTAS DESDE LINEA', 'sys_sincronizacion_validaciones_ventas', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   }*/
