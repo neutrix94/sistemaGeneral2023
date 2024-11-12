@@ -2465,10 +2465,14 @@ $terminal_id = $_GET['terminal_serie_id'];
 					LIMIT 1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar la cabecera de la nota de venta : {$sql} : {$this->link->error}");
 			$sale_header = $stm->fetch_assoc();
-			if( $sale_header['id_status_facturacion'] == 0 ){
-				$sql = "UPDATE ec_pedidos SET id_status_facturacion = 3 WHERE id_pedido = {$sale_header['id_pedido']}";
+			if( $sale_header['id_status_facturacion'] <= 2 ){
+				$sql = "UPDATE ec_pedidos SET id_status_facturacion = 2 WHERE id_pedido = {$sale_header['id_pedido']}";
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar status de facturacion de la venta : {$sql} : {$this->link->error}" );
-			}else if( $sale_header['id_status_facturacion'] > 0){
+	/*NOTA : 
+			* Hacer otra API en administracion de facturacion para que barra registros de ventas que en estan en status 2 delproceso de facuracion por que puede ser que deba de insertarlo o solo actualizar status en local
+			* Configurar un corn que mande llamar a API de comprobacion de ventas status sincronizacion
+	*/
+			}else if( $sale_header['id_status_facturacion'] >= 3 ){
 				return json_encode( array( "message"=>"La venta ya habia sido enviada." ) );
 			}
 		//consigue la razon social de la nota de venta
@@ -2522,6 +2526,54 @@ $terminal_id = $_GET['terminal_serie_id'];
 			while( $payments = $stm->fetch_assoc() ){
 				$sale_payments[] = $payments;
 			}
+/*DEshabilitado por OScar 2024-11-08
+			$sql = "SELECT 
+						cc.id_cajero_cobro, 
+						cc.id_sucursal, 
+						cc.id_pedido, 
+						cc.id_devolucion, 
+						cc.id_cajero, 
+						cc.id_sesion_caja, 
+						cc.id_afiliacion, 
+						cc.id_terminal, 
+						cc.id_banco, 
+						cc.id_tipo_pago, 
+						cc.monto, 
+						cc.fecha, 
+						cc.hora, 
+						cc.observaciones, 
+						cc.cobro_cancelado,
+						cc.folio_unico, 
+						cc.sincronizar,
+						cc.id_tipo_pago,
+						cc.id_forma_pago,
+						rse_1.rfc AS rfc_terminal,
+						rse_1.id_razon_social AS id_razon_social_terminal,
+						rse_2.rfc AS rfc_afiliacion,
+						rse_2.id_razon_social AS id_razon_social_afiliacion,
+						IF( ( cc.id_terminal = -1 OR cc.id_terminal = 0 ) AND ( cc.id_afiliacion = -1 OR cc.id_afiliacion = 0 ), 
+							{$sale_header['id_razon_social']}, 
+							0 
+						) AS id_razon_social_efectivo
+					FROM ec_cajero_cobros cc
+					LEFT JOIN ec_terminales_integracion_smartaccounts tis
+					ON cc.id_terminal = tis.id_terminal_integracion
+					LEFT JOIN ec_caja_o_cuenta coc_1
+					ON tis.id_caja_cuenta = coc_1.id_caja_cuenta
+					LEFT JOIN vf_razones_sociales_emisores rse_1
+					ON rse_1.id_razon_social = coc_1.id_razon_social
+					LEFT JOIN ec_afiliaciones af
+					ON cc.id_terminal = af.id_afiliacion
+					LEFT JOIN ec_caja_o_cuenta coc_2
+					ON af.id_banco = coc_2.id_caja_cuenta
+					LEFT JOIN vf_razones_sociales_emisores rse_2
+					ON rse_2.id_razon_social = coc_2.id_razon_social
+					WHERE cc.id_pedido = {$sale_header['id_pedido']}";
+
+			$stm = $this->link->query( $sql ) or die( "Error al consultar cobros de la nota de venta : {$sql} : {$this->link->error}");
+			while( $payments = $stm->fetch_assoc() ){
+				$sale_payments[] = $payments;
+			}*/
 		//consulta los pagos
 			$sql = "SELECT 
 						id_pedido_pago, 
@@ -2560,7 +2612,7 @@ $terminal_id = $_GET['terminal_serie_id'];
 			$url = "{$row['api_path']}/rest/inserta_venta_facturacion";
 		//envia peticion
 			$petition = $this->sendPetition( $url, $post_data, '' );
-			die( $petition );
+//die( $petition );
 			$response = json_decode( $petition );
 			if( $response->status == 200 ){
 				$sql = "UPDATE ec_pedidos SET id_status_facturacion = 3 WHERE id_pedido = {$sale_header['id_pedido']}";
