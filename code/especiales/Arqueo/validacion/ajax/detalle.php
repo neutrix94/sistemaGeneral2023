@@ -1,5 +1,8 @@
 <?php
-/*version 2.0 2024-06-21*/
+/*
+	* Version 2.0 2024-06-21
+	* Version Oscar 2024-11-12 para tomar los cobros de la tabla de cajeros cobros en validacion de arqueo de caja
+*/
 	require('../../../../../conect.php');
 //consultamos las tarjetas
 	$sql="SELECT SUM(IF(cc.id_cajero_cobro IS NULL,0,cc.monto)) 
@@ -75,7 +78,8 @@
 	$condicion1=" WHERE pp.fecha='$fcha_corte' AND (pp.hora BETWEEN '$h1' AND '$h2')";/*AND p.id_sucursal='".$user_sucursal."'*/
 	$condicion2=" WHERE dp.fecha='$fcha_corte' AND (dp.hora BETWEEN '$h1' AND '$h2')";/*AND d.id_sucursal='".$user_sucursal."'*/
 	
-
+/*
+Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devoluciones
 //sacamos total de pagos
 	$sql="SELECT 
 			SUM(IF(pp.es_externo=0,pp.monto,0)) as pagosPedro,
@@ -108,6 +112,17 @@
 	$entrada-=round($rw[0],2);
 	$entrada_externa-=round($rw[1],2);//implementado por Oscar 15.08.2018 para guardar monto de productos externos
 //echo 'devoluciones $ '.$sql."<br><br>";
+	*/
+	$sql = "SELECT
+				SUM( monto ) AS ingreso_interno,
+				0 AS ingreso_externo
+			FROM ec_cajero_cobros
+			WHERE id_cajero = {$user_id}
+			AND id_sesion_caja = {$teller_session_id}";
+	$eje = mysql_query($sql ) or die( "Error al consultar ingresos cobrados : {$sql} " . mysql_error() );
+	$cajero_cobros = mysql_fetch_assoc($eje );
+	$entrada = $cajero_cobros['ingreso_interno'];
+	$entrada_externa = $cajero_cobros['ingreso_externo'];
 
 //sacamos Gastos
 	$sql="SELECT g.id_usuario,g.fecha,g.hora,cg.nombre,g.observaciones,g.monto
