@@ -117,7 +117,7 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 				SUM( monto ) AS ingreso_interno,
 				0 AS ingreso_externo
 			FROM ec_cajero_cobros
-			WHERE id_cajero = {$user_id}
+			WHERE id_cajero = {$cajero[0]}
 			AND id_sesion_caja = {$teller_session_id}";
 	$eje = mysql_query($sql ) or die( "Error al consultar ingresos cobrados : {$sql} " . mysql_error() );
 	$cajero_cobros = mysql_fetch_assoc($eje );
