@@ -1,5 +1,9 @@
 <?php
-/*version casa 1.0*/
+/*
+	* Version casa 1.0
+	* Version Oscar 2024-11-12 para tomar los cobros de la tabla de cajeros cobros en el arqueo de caja
+*/
+
 	require('../../../../conect.php');
 
 //consultamos las tarjetas
@@ -155,7 +159,9 @@
 	if(mysql_num_rows($eje)>0){
 		die("Hay devoluciones pendientes de terminar<br>Terminalas y vuelve a intentar!!!");
 	}
-//sacamos total de pagos
+/*
+Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devoluciones
+sacamos total de pagos
 	$sql="SELECT 
 			SUM(IF(pp.es_externo=0,pp.monto,0)) as pagosPedro,
 			SUM(IF(pp.es_externo=1,pp.monto,0)) as pagosExternos
@@ -187,7 +193,17 @@
 	$entrada-=round($rw[0],2);
 	$entrada_externa-=round($rw[1],2);//implementado por Oscar 15.08.2018 para guardar monto de productos externos
 //echo 'devoluciones $ '.$sql."<br><br>";
-
+*/
+	$sql = "SELECT
+				SUM( monto ) AS ingreso_interno,
+				0 AS ingreso_externo
+			FROM ec_cajero_cobros
+			WHERE id_cajero = {$user_id}
+			AND id_sesion_caja = {$teller_session_id}";
+	$eje = mysql_query($sql ) or die( "Error al consultar ingresos cobrados : {$sql} " . mysql_error() );
+	$cajero_cobros = mysql_fetch_assoc($eje );
+	$entrada = $cajero_cobros['ingreso_interno'];
+	$entrada_externa = $cajero_cobros['ingreso_externo'];
 //sacamos Gastos
 	$sql="SELECT g.id_usuario,g.fecha,g.hora,cg.nombre,g.observaciones,g.monto
 			FROM ec_gastos g 
