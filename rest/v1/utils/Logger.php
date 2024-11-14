@@ -1,4 +1,7 @@
-<?
+<?php
+/*
+    * Version Oscar 2024-11-14 para agregar etiqueta de php (<?php Por esta razon no interpretaba el codigo de las APIS el servidor )
+*/
     final class Logger
     {
         private $link;
