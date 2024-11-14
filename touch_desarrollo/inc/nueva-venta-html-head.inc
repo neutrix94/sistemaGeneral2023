@@ -1095,7 +1095,7 @@ var hay_paquete=0;
                 }
                 can2=parseInt(tds[2].innerHTML)+parseInt(can.value);
                 //alert('hasta ');
-                eliminarItem(tds[0]);
+                eliminarItem(tds[0, true]);
                 //break;
                 //alert('pasa');
             }    
@@ -1679,7 +1679,7 @@ var hay_paquete=0;
           });
       }
 
-	function eliminarItem (item){
+	function eliminarItem (item, llamadoFueraDeBoton){
 		
 		//tds=$(item).getElementsByTagName('td');
 		
@@ -1691,7 +1691,9 @@ var hay_paquete=0;
 		//return false;
 		$(item).parents ("tr.move").first ().remove ();
         //El elemento eliminado se agrega al arreglo para mandar petición de surtimiento
-        setArregloElimnarSurtimiento(tds);
+        if( !llamadoFueraDeBoton ){
+            setArregloElimnarSurtimiento(tds);
+        }
 		//calculaTotal ();
 		$("#producto, #cantidad").val ("");
 		
