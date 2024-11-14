@@ -50,20 +50,59 @@ $app->post('/surte/Faltante', function (Request $request, Response $response){
       $solicitudActual['noSurtido'] = [];
       $solicitudProducto = [];
       $sqlConsultaSol="SELECT s.id, s.no_pedido, s.id_vendedor, concat(u.nombre , ' ' , u.apellido_paterno, ' ', u.apellido_materno) as vendedor, 
-            sd.id_producto, p.nombre as producto, ifnull(sd.cantidad_solicitada,0) as solicitado, ifnull(sd.cantidad_surtida,0) as surtido, (ifnull(sd.cantidad_solicitada,0) - ifnull(sd.cantidad_surtida,0)) as faltante
-            FROM ec_surtimiento s
-            inner join ec_surtimiento_detalle sd on sd.id_surtimiento = s.id
-            inner join sys_users u on u.id_usuario = s.id_vendedor
-            inner join ec_productos p on p.id_productos = sd.id_producto
-            where 
-            s.id='{$pedido}'
-            and (ifnull(sd.cantidad_solicitada,0) - ifnull(sd.cantidad_surtida,0)) > 0
-            and sd.id_asignado = '{$user_id}'
-            ;";
-                
-      foreach ($db->query($sqlConsultaSol) as $row) {
-          $solicitudActual['folioPedido'] = $row['no_pedido'];
+      sd.id_producto, p.nombre as producto, ifnull(sd.cantidad_solicitada,0) as solicitado, ifnull(sd.cantidad_surtida,0) as surtido, (ifnull(sd.cantidad_solicitada,0) - ifnull(sd.cantidad_surtida,0)) as faltante,
+      concat( u_asignado.nombre , ' ' , u_asignado.apellido_paterno, ' ', u_asignado.apellido_materno ) as surtidor
+      FROM ec_surtimiento s
+      inner join ec_surtimiento_detalle sd on sd.id_surtimiento = s.id
+      inner join sys_users u on u.id_usuario = s.id_vendedor
+      inner join ec_productos p on p.id_productos = sd.id_producto
+      LEFT JOIN sys_users u_asignado ON u_asignado.id_usuario = sd.id_asignado
+      where 
+      s.id='{$pedido}'
+      and (ifnull(sd.cantidad_solicitada,0) - ifnull(sd.cantidad_surtida,0)) > 0
+      and sd.id_asignado = '{$user_id}';";
+
+      $resultQuery = $db->query($sqlConsultaSol);
+      $num_filas = $resultQuery->rowCount();
+      error_log( "FALTANTE, SE ENCONTRARON : " .$num_filas );
+      $folioPedido = "";
+      if( $num_filas > 0 ){
+        foreach ($resultQuery as $row) {
+            $solicitudActual['folioPedido'] = $row['no_pedido'];
+            $solicitudActual['vendedor'] = $row['vendedor'];
+            $solicitudActual['surtidor'] = $row['surtidor'];
+            $solicitudProducto['nombre'] = $row['producto'];
+            $solicitudProducto['solicitado'] = $row['solicitado'];
+            $solicitudProducto['surtido'] = $row['surtido'];
+            $solicitudProducto['faltante'] = $row['faltante'];
+            
+            if( $solicitudProducto['surtido'] == 0){
+                $solicitudActual['noSurtido'][] = $solicitudProducto;
+            } else {
+                $solicitudActual['surtidoParcial'][] = $solicitudProducto;
+            }
+        }
+      }else{
+        //QUERY PARA PEDIDOS COMPLETOS, SE GENERA PARA OBTENER DATOS DE VENDEDOR Y SURTIDOR
+        $sqlConsultaSolCompleto="SELECT s.id, s.no_pedido, s.id_vendedor, concat(u.nombre , ' ' , u.apellido_paterno, ' ', u.apellido_materno) as vendedor, 
+        sd.id_producto, p.nombre as producto, ifnull(sd.cantidad_solicitada,0) as solicitado, ifnull(sd.cantidad_surtida,0) as surtido, (ifnull(sd.cantidad_solicitada,0) - ifnull(sd.cantidad_surtida,0)) as faltante,
+        concat( u_asignado.nombre , ' ' , u_asignado.apellido_paterno, ' ', u_asignado.apellido_materno ) as surtidor
+        FROM ec_surtimiento s
+        inner join ec_surtimiento_detalle sd on sd.id_surtimiento = s.id
+        inner join sys_users u on u.id_usuario = s.id_vendedor
+        inner join ec_productos p on p.id_productos = sd.id_producto
+        LEFT JOIN sys_users u_asignado ON u_asignado.id_usuario = sd.id_asignado
+        where 
+        s.id='{$pedido}'
+        and sd.id_asignado = '{$user_id}';";
+  
+        $resultQueryCompleto = $db->query($sqlConsultaSolCompleto);
+
+        foreach ($resultQueryCompleto as $row) {
+          //$solicitudActual['folioPedido'] = $row['no_pedido'];
+          $folioPedido = $row['no_pedido'];
           $solicitudActual['vendedor'] = $row['vendedor'];
+          $solicitudActual['surtidor'] = $row['surtidor'];
           $solicitudProducto['nombre'] = $row['producto'];
           $solicitudProducto['solicitado'] = $row['solicitado'];
           $solicitudProducto['surtido'] = $row['surtido'];
@@ -75,6 +114,7 @@ $app->post('/surte/Faltante', function (Request $request, Response $response){
               $solicitudActual['surtidoParcial'][] = $solicitudProducto;
           }
       }
+    }       
       
       //Valida respuesta
       if( isset($solicitudActual['folioPedido'])) {
@@ -83,9 +123,13 @@ $app->post('/surte/Faltante', function (Request $request, Response $response){
           $insertsProd['descripcion']='Se han identificado los siguientes productos faltantes de surtir';
           $insertsProd['detalle'] = $solicitudActual;
       }else{
-          //Regrsa resultado
+          //Regresa resultado
+          if( $folioPedido !== "" ){
+            $solicitudActual['folioPedido'] = $folioPedido;
+          }
           $insertsProd['resultado']='Completo';
           $insertsProd['descripcion']='No hay productos faltantes por surtir para este pedido';
+          $insertsProd['detalle'] = $solicitudActual;
       }
       
   }catch (PDOException $e) {
