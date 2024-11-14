@@ -1095,7 +1095,7 @@ var hay_paquete=0;
                 }
                 can2=parseInt(tds[2].innerHTML)+parseInt(can.value);
                 //alert('hasta ');
-                eliminarItem(tds[0, true]);
+                eliminarItem(tds[0], true);
                 //break;
                 //alert('pasa');
             }    
