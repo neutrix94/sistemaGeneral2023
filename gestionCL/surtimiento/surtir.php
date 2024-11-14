@@ -501,7 +501,7 @@ $indiceSurtir = 0;
                 $("#listaProductosNoSurtidos").hide();
                 $("#titleFolio").hide();
                 $("#folioNotaModal").hide();
-                $("#btnImprimir").hide();
+                //$("#btnImprimir").hide();
 
                 //alert( data.result.resultado );
                 //window.location.href='javascript: history.go(-1)';
