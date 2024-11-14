@@ -354,16 +354,16 @@ var regresar_efectivo_devolucion = 0;
 		});
 	}
 
-var emrge_aviso='';
+		var emrge_aviso='';
 		function cerrarVenta() {
-		//implementacion de Oscar 29-12-2017
+			//implementacion de Oscar 29-12-2017
 			//obtenemos saldo a favor del cliente
 			if(document.getElementById("saldoAFavor")){
 				s_f=document.getElementById("saldoAFavor").value;
 				//alert(s_f);
 			}
 
-		//fin de cambio
+			//fin de cambio
 			var retval = false; 
 			var es_apartado = $("#es_apartado").prop ("checked") ? "1" : "0";
 			var id_pedido = "<?php echo $id_pedido; ?>";
@@ -373,7 +373,7 @@ var emrge_aviso='';
 				datos += "&idt" + index + "=" + $(this).find ("input.id_tipo").val () + "&mon" + index + "=" + $(this).find ("input.montoVal").val ();
 			});
 			//alert(datos);
-		//cambio de correo y facebook Oscar(01/11/2017)
+			//cambio de correo y facebook Oscar(01/11/2017)
 			var correoC=document.getElementById('co').value;
 			if(correoC==""){
 				correoC="-";
@@ -382,42 +382,58 @@ var emrge_aviso='';
 			if(face==""){
 				face="-";
 			}
-		//return false;
+			//return false;
 			var saldo_favor='';
 			if($("#saldoFavorOriginal").val()>0){
 				saldo_favor="&a_favor="+$("#saldoFavorOriginal").val();
 			}
-		/*implementacion Oscar 25.06.2019 para mandar los ids de las devoluciones*/
+			/*implementacion Oscar 25.06.2019 para mandar los ids de las devoluciones*/
 			var ids_dvs="";
 			if(document.getElementById('ids_de_devoluciones')){
 				ids_dvs+="&id_devoluciones="+$('#ids_de_devoluciones').val();
 			}
-		//alert( datos );return false;
-		/*Fin de cambio Oscar 25.06.2019*/
-		//alert( "ajax/cerrarVenta.php?idp="+id_pedido+"&ap="+es_apartado+"&faceb="+face+"&cor="+correoC+"&"+datos+""+saldo_favor+ids_dvs );return false;
+			//alert( datos );return false;
+			/*Fin de cambio Oscar 25.06.2019*/
+			//alert( "ajax/cerrarVenta.php?idp="+id_pedido+"&ap="+es_apartado+"&faceb="+face+"&cor="+correoC+"&"+datos+""+saldo_favor+ids_dvs );return false;
 			$.ajax({
 				async: false,
 				type: 'GET',
 				url: "ajax/cerrarVenta.php?idp="+id_pedido+"&ap="+es_apartado+"&faceb="+face+"&cor="+correoC+"&"+datos+""+saldo_favor+ids_dvs
 			}).done (function (data) {
 
-//alert(data);//con este alert mostramos error
+				//alert(data);//con este alert mostramos error
 				ax = data.split('|');
-		/*implementación Oscar 2019 para código de barras*/
-			$.post( "inc/img_codigo.php", {text:ax[3]});
-		/*fin de cambio Oscar 2019*/
-//alert('para');
 
-		/**/
-		/*Implementación Oscar 30.11.2018 para no dejar hacer más de una venta por dar click doble*/
-				hay_proceso=1;//ocupamos el proceso
-		/*Fin de cambio Oscar 30.11.2018*/
-	//alert(data);
-				retval = ax[0].match (/^ok$/i);
-				pedidor=ax[1];
-		/**/
-				emrge_aviso=ax[2];
-		/**/
+				if( ax[0] == "ERR" ){
+
+					retval = false;
+					var datosError = ax[2].split(',');
+					mensaje = "";
+					for (let index = 0; index < datosError.length; index++) {
+						//No añade salto de línea si es el último elemento
+						( index == datosError.length - 1 ) ? mensaje += datosError[index] : mensaje += datosError[index] + "\n";
+					}
+					//Pintamos en el log
+					writeLog('2', mensaje );
+
+				}else{
+
+					/*implementación Oscar 2019 para código de barras*/
+						$.post( "inc/img_codigo.php", {text:ax[3]});
+					/*fin de cambio Oscar 2019*/
+					//alert('para');
+	
+					/**/
+					/*Implementación Oscar 30.11.2018 para no dejar hacer más de una venta por dar click doble*/
+							hay_proceso=1;//ocupamos el proceso
+					/*Fin de cambio Oscar 30.11.2018*/
+					//alert(data);
+					retval = ax[0].match (/^ok$/i);
+					pedidor=ax[1];
+					/**/
+					emrge_aviso=ax[2];
+					/**/
+				}
 			}).fail (function () {
 				//alert(data);
 				retval = false;
@@ -425,6 +441,25 @@ var emrge_aviso='';
 
 			return retval;
 		}
+
+		function writeLog( tipo_operacion, mensaje ){
+			var currentUrl = window.location.href;
+			var msjTipo = (tipo_operacion == '1') ? "Acción al Enviar Pedido" : "Acción al Cerrar Venta" 
+			var parts_url = currentUrl.split('/touch_desarrollo');
+			const url = parts_url[0] + `/touch/ajax/writeLog.php?mssgLog=${encodeURIComponent( msjTipo + "\n" + mensaje)}`;
+			fetch(url).then(response => {
+				if (!response.ok) {
+					throw new Error("Error en la solicitud");
+				}
+				return response.text(); // Puedes cambiar a .json() si el PHP devuelve JSON
+			})
+			.then(data => {
+				console.log("Respuesta del servidor:", data);
+			})
+			.catch(error => {
+				console.error("Hubo un error:", error);
+			});
+    	}
 
 		function changeHashOnLoad() {
 			var base_href = location.href.match (/^([^\#]*)(?:\#.*)?$/i)[0];
