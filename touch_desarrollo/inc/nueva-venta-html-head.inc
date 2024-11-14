@@ -2233,6 +2233,26 @@ var hay_paquete=0;
 		return retval;
 	}
 
+    function writeLog( tipo_operacion,mensaje, callback ){
+        var currentUrl = window.location.href;
+        var msjTipo = (tipo_operacion == '1') ? "Acción al Enviar Pedido" : "Acción al Cerrar Venta" 
+        var parts_url = currentUrl.split('/touch_desarrollo');
+        const url = parts_url[0] + `/touch/ajax/writeLog.php?mssgLog=${encodeURIComponent( msjTipo + "\n" + mensaje)}`;
+        fetch(url).then(response => {
+            if (!response.ok) {
+                throw new Error("Error en la solicitud");
+            }
+            return response.text(); // Puedes cambiar a .json() si el PHP devuelve JSON
+        })
+        .then(data => {
+            console.log("Respuesta del servidor:", data);
+            callback();
+        })
+        .catch(error => {
+            console.error("Hubo un error:", error);
+        });
+    }
+
 /*implementacion Oscar 2023 para imprimir, visualizar cotizacion*/
     function quotationEmergent( sale_id ){
         var quotation_content = `<div class="row text-center" id="quotation_container" style="background-color : white;">
@@ -2815,9 +2835,9 @@ var hay_paquete=0;
                     cierraEmer();
             //si no es mayoreo el proceso sigue norma
                 }
-    /*
-        FINALIZAN CAMBIOS
-    */
+            /*
+                FINALIZAN CAMBIOS
+            */
             //valida que haya productos capturados
                  if (!$("#listaProductos tr.move").length)
                  {
@@ -2884,19 +2904,21 @@ var hay_paquete=0;
                              return false;
                          }*\/
                          else{*/
-                             if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
-                                 $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href").replace (/&idp=\d+/i, "&idp=" + $("#id_pedido").val ()));
-                             }
-                             else {
-                            // modificacion de Oscar(05-11-2017)
+
+                        writeLog('1', mensaje , function(){
+                            if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
+                                $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href").replace (/&idp=\d+/i, "&idp=" + $("#id_pedido").val ()));
+                            }
+                            else {
+                                // modificacion de Oscar(05-11-2017)
                                 var ventaTipo=document.getElementById('tipo_venta').value;//sacamos el tipo de venta
-                            //implementacion de Oscar 24-12-2017
+                                //implementacion de Oscar 24-12-2017
                                 var sFa='';
                                 if(document.getElementById('saldoAFavor')){
                                     sFa="&sald_fav="+document.getElementById('saldoAFavor').value;
                                 }
                             
-                            /*implementación de Oscar 04.09.2018 para cambio de apartados*/
+                                /*implementación de Oscar 04.09.2018 para cambio de apartados*/
                                 var es_apartado=$("#id_de_apartado").val();
                                 var aprt='';
                                 if(es_apartado!=''&& es_apartado!=null){
@@ -2906,40 +2928,41 @@ var hay_paquete=0;
                                 if($("#monto_abonado").val()){
                                     abono="&abonado="+$("#monto_abonado").val();
                                 }
-                            /*fin de cambio 04.09.2018*/
+                                /*fin de cambio 04.09.2018*/
 
-                        /*Cambio Oscar 13.11.2018 para enviar el temporal de la venta antes de que fuera modificada*
-                            	var prods_antes="";
-                                if($("#detalle_nota_tmp").val()){
-                                    prods_antes="&prods_ant="+$("#detalle_nota_tmp").val();
-                                }
-                        /*Fin de cambio Oscar 13.11.2018*/
+                                /*Cambio Oscar 13.11.2018 para enviar el temporal de la venta antes de que fuera modificada*
+                                        var prods_antes="";
+                                        if($("#detalle_nota_tmp").val()){
+                                            prods_antes="&prods_ant="+$("#detalle_nota_tmp").val();
+                                        }
+                                /*Fin de cambio Oscar 13.11.2018*/
 
-                        /*implementacion Oscar 25.06.2019 para arrastrar los ids de devolucion a la pantalla de cerrar venta*/
-                            var ids_dvs="";
-                            if(document.getElementById('id_de_devoluciones')){
-                                ids_dvs+="&ids_devoluciones="+$("#id_de_devoluciones").val();
-                            } 
-                        /*Fin de cambio Oscar 25.06.2019*/
+                                /*implementacion Oscar 25.06.2019 para arrastrar los ids de devolucion a la pantalla de cerrar venta*/
+                                var ids_dvs="";
+                                if(document.getElementById('id_de_devoluciones')){
+                                    ids_dvs+="&ids_devoluciones="+$("#id_de_devoluciones").val();
+                                } 
+                                /*Fin de cambio Oscar 25.06.2019*/
 
-                        /**/
-							$("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href") + "&idp=" + $("#id_pedido").val ()+'&tv='+ventaTipo+sFa+aprt+abono+"&id_pedido_original="+$("#id_de_pedido_original").val()+ids_dvs);//
-                             
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores}*/
-
-                             if ($(this).attr ("id").match (/^cerrar$/i))
-                                 location.href = $("#menu_cerrar").attr ("href");
-                             
-                             return true;
+                                /**/
+                                $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href") + "&idp=" + $("#id_pedido").val ()+'&tv='+ventaTipo+sFa+aprt+abono+"&id_pedido_original="+$("#id_de_pedido_original").val()+ids_dvs);//
                             
-                         }
+                                /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores}*/
+
+                                if ($(this).attr ("id").match (/^cerrar$/i))
+                                location.href = $("#menu_cerrar").attr ("href");
+                            
+                                return true;
+                            
+                            }
+                        });
+
                      }
                  }
-             });
+            });
 
             /*$("#es_regalo").prop ("checked", false);
             $("#producto").focus ();*/
-                
         });
 
       /* ]]> */
