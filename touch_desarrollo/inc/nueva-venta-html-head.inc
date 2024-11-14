@@ -557,16 +557,16 @@ function enlista_paquete(arreglo){
                 $("#total").val("$"+(tot));
             }else{
             }
-      	return false;
+        return false;
       }
     
     function redondea05( numero ){
         var numero_redondeado = numero;
 
         var $aux = Math.trunc( numero );
-    	var $dif = numero - $aux;
-    	
-    	if ($dif == 0){
+        var $dif = numero - $aux;
+        
+        if ($dif == 0){
             return numero;
         }else if ($dif < 0.25){
            return $aux; 
@@ -620,15 +620,15 @@ function enlista_paquete(arreglo){
     //alert(flag);
         var pass=document.getElementById('passWord').value; 
         $.ajax({
-        	type:'post',
-        	url:'ajax/verificaPassEncargado.php',
-        	cache:false,
-        	data:{clave:pass},
-        	success:function (datos){
-        		//alert(datos);
-        		if(datos=='ok'){
+            type:'post',
+            url:'ajax/verificaPassEncargado.php',
+            cache:false,
+            data:{clave:pass},
+            success:function (datos){
+                //alert(datos);
+                if(datos=='ok'){
         /*Cambio Oscar 08.11.2018*/
-        			if(flag=='recargar'){   
+                    if(flag=='recargar'){   
                         location.reload();//recargamos la página
                         return false;
                     }
@@ -639,18 +639,18 @@ function enlista_paquete(arreglo){
         /*Fin de cambuio Oscar 08.11.2018*/
 
                     var objC=document.getElementById("cerrar");
-					if(objC){
-						totalVenta=totalFinal;
-						autorizado=1;
-  				 		objC.click('1');
-					}
-        		}else{
-        			alert('La contraseña es incorrecta.');
-        			document.getElementById('passWord').select();
-        			
-        			return false;
-        		}
-        	}
+                    if(objC){
+                        totalVenta=totalFinal;
+                        autorizado=1;
+                        objC.click('1');
+                    }
+                }else{
+                    alert('La contraseña es incorrecta.');
+                    document.getElementById('passWord').select();
+                    
+                    return false;
+                }
+            }
         });
     }
 
@@ -859,12 +859,12 @@ function enlista_paquete(arreglo){
     
     function cancelaPaleta()
     {
-    	var obj=document.getElementById('paleta_Colores');
-        	
-       	obj.style.display="none";
-       	
-       	var busc=document.getElementById('buscadorLabel');
-        var can=document.getElementById('cantidad2');	
+        var obj=document.getElementById('paleta_Colores');
+            
+        obj.style.display="none";
+        
+        var busc=document.getElementById('buscadorLabel');
+        var can=document.getElementById('cantidad2');   
         
         busc.value="";
         can.value="";
@@ -874,59 +874,59 @@ function enlista_paquete(arreglo){
 var es_paleta_tmp=0;
     function cierraPaleta()
     {
-    	
-    	var can=document.getElementById('cantidad2');
-    	canFin=isNaN(parseInt(can.value))?0:parseInt(can.value);
-    	
-    	var can=document.getElementById('cantidadPaleta');
-    	
-    	can=isNaN(parseInt(can.value))?0:parseInt(can.value);
-    	
-    	var f=null;
-    	canCol=0;
+        
+        var can=document.getElementById('cantidad2');
+        canFin=isNaN(parseInt(can.value))?0:parseInt(can.value);
+        
+        var can=document.getElementById('cantidadPaleta');
+        
+        can=isNaN(parseInt(can.value))?0:parseInt(can.value);
+        
+        var f=null;
+        canCol=0;
     es_paleta_tmp=1;
-    	for(i=1;i<=can;i++)
-    	{
-    		//document.getElementById('buscadorLabel').value=document.getElementById('productoPaleta'+i).value;
-    		var cant=document.getElementById('cantidadPaleta'+i);
-    		cant=isNaN(parseInt(cant.value))?0:parseInt(cant.value);
-    		canCol+=cant;
-    	}
-    	
-    	
-    	if(canCol > canFin)
-    	{
-    		alert("La cantidad a vender es mayor a la pedida");
+        for(i=1;i<=can;i++)
+        {
+            //document.getElementById('buscadorLabel').value=document.getElementById('productoPaleta'+i).value;
+            var cant=document.getElementById('cantidadPaleta'+i);
+            cant=isNaN(parseInt(cant.value))?0:parseInt(cant.value);
+            canCol+=cant;
+        }
+        
+        
+        if(canCol > canFin)
+        {
+            alert("La cantidad a vender es mayor a la pedida");
     es_paleta_tmp=0;
-    		return false;
-    	}
+            return false;
+        }
 
-		if(canCol<canFin){
-    		alert("La cantidad a vender es menor a la pedida");
+        if(canCol<canFin){
+            alert("La cantidad a vender es menor a la pedida");
     es_paleta_tmp=0;
-    		return false;
-    	}
-    	//alert(can);
-    	for(cpi=1;cpi<=can;cpi++)
-    	{    	
+            return false;
+        }
+        //alert(can);
+        for(cpi=1;cpi<=can;cpi++)
+        {       
 
-			//alert('Iteracion '+cpi+' de '+can);
-	
-    		var cant=document.getElementById('cantidadPaleta'+cpi);
-    		cant=isNaN(parseInt(cant.value))?0:parseInt(cant.value);
-    		
-    		if(cant > 0)
-    		{
-    			document.getElementById('cantidad2').value=cant;
-    			document.getElementById('buscadorLabel').value=document.getElementById('productoPaleta'+cpi).value;
-    			//alert("valor: "+document.getElementById('productoPaleta'+cpi).value);
+            //alert('Iteracion '+cpi+' de '+can);
+    
+            var cant=document.getElementById('cantidadPaleta'+cpi);
+            cant=isNaN(parseInt(cant.value))?0:parseInt(cant.value);
+            
+            if(cant > 0)
+            {
+                document.getElementById('cantidad2').value=cant;
+                document.getElementById('buscadorLabel').value=document.getElementById('productoPaleta'+cpi).value;
+                //alert("valor: "+document.getElementById('productoPaleta'+cpi).value);
                 agregaFila(f);
-    		}	
-    	}
-    	
-    	var obj=document.getElementById('paleta_Colores');
+            }   
+        }
+        
+        var obj=document.getElementById('paleta_Colores');
         obj.style.display="none";
-    	
+        
         es_paleta_tmp=0;
     }
 var new_sale_window = null;
@@ -1095,7 +1095,7 @@ var hay_paquete=0;
                 }
                 can2=parseInt(tds[2].innerHTML)+parseInt(can.value);
                 //alert('hasta ');
-                eliminarItem(tds[0]);
+                eliminarItem(tds[0], true);
                 //break;
                 //alert('pasa');
             }    
@@ -1327,7 +1327,7 @@ var hay_paquete=0;
         //Oferta
         var newCell=newRow.insertCell(4);
         if(ventaTipo==1){
-        	newCell.style.display="none";
+            newCell.style.display="none";
         }
         newCell.innerHTML=aux[9];
         newCell.align="right";
@@ -1525,10 +1525,10 @@ var hay_paquete=0;
                         tds[7].valor=ax[2];
                         tds[8].valor=ax[3];
                     /*
-						-Cambio implementado por Oscar(02-11-2017)
-							(cambie el monto temporal cuando cambia la oferta)
+                        -Cambio implementado por Oscar(02-11-2017)
+                            (cambie el monto temporal cuando cambia la oferta)
                     */
-                    	//alert('ax en la 0: '+ax[0]);
+                        //alert('ax en la 0: '+ax[0]);
                         //var conv=ax[0].split("$");
                         ax[0]=pTemp[2]*tds[2].innerHTML;
                         //return false;
@@ -1540,7 +1540,7 @@ var hay_paquete=0;
            }
            else{
                 alert("Error_valida_promo_1:\n"+res); 
-           	}	
+            }   
            
        }
 
@@ -1587,24 +1587,24 @@ var hay_paquete=0;
     }
 
 
-	function enterNext(obj, eve)
+    function enterNext(obj, eve)
     {
-		key=(eve.which) ? eve.which : eve.keyCode;
+        key=(eve.which) ? eve.which : eve.keyCode;
         
-		if(key == 13)
-		{
-		
-			var aux=obj.id.replace("cantidadPaleta","");
-			aux=parseInt(aux);
-			
-			if(document.getElementById("cantidadPaleta"+(aux+1))){
-				document.getElementById("cantidadPaleta"+(aux+1)).focus();
+        if(key == 13)
+        {
+        
+            var aux=obj.id.replace("cantidadPaleta","");
+            aux=parseInt(aux);
+            
+            if(document.getElementById("cantidadPaleta"+(aux+1))){
+                document.getElementById("cantidadPaleta"+(aux+1)).focus();
             }
-			else{
-				document.getElementById("cantidadPaleta99").focus();
+            else{
+                document.getElementById("cantidadPaleta99").focus();
             }
-		}
-	}
+        }
+    }
     
 
     
@@ -1679,71 +1679,74 @@ var hay_paquete=0;
           });
       }
 
-	function eliminarItem (item){
-		
-		//tds=$(item).getElementsByTagName('td');
-		
-		var tds=$(item).parents("tr").children("td");
-		familiaAct=tds[10].valor;
-		lista_precios_actual=tds[14].valor;
-		var id_prod=tds[11].valor;
-		//alert(id_prod);
-		//return false;
-		$(item).parents ("tr.move").first ().remove ();
+    function eliminarItem (item, llamadoFueraDeBoton){
+        
+        //tds=$(item).getElementsByTagName('td');
+        
+        var tds=$(item).parents("tr").children("td");
+        familiaAct=tds[10].valor;
+        lista_precios_actual=tds[14].valor;
+        var id_prod=tds[11].valor;
+        //alert(id_prod);
+        //return false;
+        $(item).parents ("tr.move").first ().remove ();
         //El elemento eliminado se agrega al arreglo para mandar petición de surtimiento
-        setArregloElimnarSurtimiento(tds);
-		//calculaTotal ();
-		$("#producto, #cantidad").val ("");
-		
-		familias="";
-		cans="";
-		posiciones=Array();
-		nfams=0;
-		
+        if( !llamadoFueraDeBoton ){
 
-		var tabla=document.getElementById('listaProductos'); 
-		trs=tabla.getElementsByTagName('tr');
-		
-       	var can2=0;
+            setArregloElimnarSurtimiento(tds);
+        }
+        //calculaTotal ();
+        $("#producto, #cantidad").val ("");
+        
+        familias="";
+        cans="";
+        posiciones=Array();
+        nfams=0;
+        
+
+        var tabla=document.getElementById('listaProductos'); 
+        trs=tabla.getElementsByTagName('tr');
+        
+        var can2=0;
         for(i=1;i<trs.length;i++){
-			tds=trs[i].getElementsByTagName('td');
-			//alert(tds[8].valor+" - "+sig);
-			
-			//alert(tds[10].valor);
-			
-			if(tds[10].valor == familiaAct && tds[14].valor==lista_precios_actual)/*Oscar 19.03.2019*/
-			{
-				//Validamos si tiene la misma promocion
-				can2+=parseInt(tds[2].innerHTML);
+            tds=trs[i].getElementsByTagName('td');
+            //alert(tds[8].valor+" - "+sig);
+            
+            //alert(tds[10].valor);
+            
+            if(tds[10].valor == familiaAct && tds[14].valor==lista_precios_actual)/*Oscar 19.03.2019*/
+            {
+                //Validamos si tiene la misma promocion
+                can2+=parseInt(tds[2].innerHTML);
                
-				if(familias != '')
-					familias+=",";
+                if(familias != '')
+                    familias+=",";
                     
-				if(cans != '')
-					cans+=",";     
+                if(cans != '')
+                    cans+=",";     
                
-				familias+=tds[11].valor;
-				id_prod=tds[11].valor
-				cans+=tds[2].innerHTML;
-				posiciones[nfams]=i;     
+                familias+=tds[11].valor;
+                id_prod=tds[11].valor
+                cans+=tds[2].innerHTML;
+                posiciones[nfams]=i;     
                 
-				nfams++;
-			}     
-		}
-				
-		var ventaTipo=$("#tipo_venta").val();//esta variable se declara para saber si es venta por mayoreo
+                nfams++;
+            }     
+        }
+                
+        var ventaTipo=$("#tipo_venta").val();//esta variable se declara para saber si es venta por mayoreo
        
-		if(nfams > 0 && familias != '' && global_last_pieces_array.indexOf( id_prod ) == -1 /*&& ventaTipo!=1*/)/*se agregó condición para que no se aplique promo cuando la venta es por mayoreo !=1808*/
-		{
+        if(nfams > 0 && familias != '' && global_last_pieces_array.indexOf( id_prod ) == -1 /*&& ventaTipo!=1*/)/*se agregó condición para que no se aplique promo cuando la venta es por mayoreo !=1808*/
+        {
             //alert("Entra en validacion \nnfams: "+nfams+"\nfamilias: "+familias);
-			var url="ajax/validaPromo.php?prods="+familias+"&can="+can2+"&cans="+cans+"&prodAct="+id_prod+"&tipo=eliminar"+"&id_lista_prc="+lista_precios_actual;
-			//alert(url);           
-			var res=ajaxR(url);			
-			//alert(res);           
-			var aux=res.split('|');
-			if(aux[0] == 'exito')
-			{
-				for(i=0;i<parseInt(aux[1]);i++)
+            var url="ajax/validaPromo.php?prods="+familias+"&can="+can2+"&cans="+cans+"&prodAct="+id_prod+"&tipo=eliminar"+"&id_lista_prc="+lista_precios_actual;
+            //alert(url);           
+            var res=ajaxR(url);         
+            //alert(res);           
+            var aux=res.split('|');
+            if(aux[0] == 'exito')
+            {
+                for(i=0;i<parseInt(aux[1]);i++)
                 {
                     var ax=aux[i+2].split('~');
                     tds=trs[posiciones[i]].getElementsByTagName('td');
@@ -1828,33 +1831,33 @@ var hay_paquete=0;
                 $("#divEspera").css ("display", "block");
       }*/
 
-	function guardarVenta ( quotation = null ){
+    function guardarVenta ( quotation = null ){
 //alert('entra enn venta');
-		var retval = false; 
+        var retval = false; 
         //alert('vta');             
-		$("#menu_cerrar").prop ("disabled", true);		
-		var es_pedido = $("#es_pedido").prop ("checked") ? "1" : "0";
-		var es_paquete = $("#es_paquete").prop ("checked") ? "1" : "0";
-		var id_pedido = $("#id_pedido").val ();
-		var datos = "nitems=" + $("#listaProductos tr.move").length;
-	//Detalles
-		var tabla=document.getElementById('listaProductos');
-		trs=tabla.getElementsByTagName('tr');
-		for(i=0;i<trs.length-1;i++)
-		{
-			tds=trs[i+1].getElementsByTagName('td');
+        $("#menu_cerrar").prop ("disabled", true);      
+        var es_pedido = $("#es_pedido").prop ("checked") ? "1" : "0";
+        var es_paquete = $("#es_paquete").prop ("checked") ? "1" : "0";
+        var id_pedido = $("#id_pedido").val ();
+        var datos = "nitems=" + $("#listaProductos tr.move").length;
+    //Detalles
+        var tabla=document.getElementById('listaProductos');
+        trs=tabla.getElementsByTagName('tr');
+        for(i=0;i<trs.length-1;i++)
+        {
+            tds=trs[i+1].getElementsByTagName('td');
             
             //implementado por Oscar(28-10-2017)
             var objIn=tds[12].getElementsByTagName('input');
             datos += "&idp" + i + "=" + tds[11].valor + "&can" + i + "=" + tds[2].innerHTML + "&pre" + i +"=" + tds[7].valor
             + "&mon" + i +"=" + tds[8].valor+"&id_precio" + i +"=" + tds[14].valor;//se agrega variable desc para guardar
-		}
+        }
         //alert( url );
          
-		//var url= "ajax/guardaNuevaVenta.php?idp=" + id_pedido  + "&pe=" + es_pedido + "&pa=" + es_paquete + "&" + datos + "&totalPed="+totalVenta;
+        //var url= "ajax/guardaNuevaVenta.php?idp=" + id_pedido  + "&pe=" + es_pedido + "&pa=" + es_paquete + "&" + datos + "&totalPed="+totalVenta;
     //validamos password  
         totalVentAux=($("#total").val()).split("$");
-		//alert(totalVentAux[1]);
+        //alert(totalVentAux[1]);
         var url="ajax/guardaVentaTemp.php?idp="+id_pedido +"&pe="+es_pedido;
 /*implementacion Oscar 2023 para enviar los productos tomados de exhibicion*/
         url += "&exhibition_headers=" + sessionStorage.getItem( 'EXHIBITION_P_P' );
@@ -1892,8 +1895,8 @@ var hay_paquete=0;
         var res=ajaxR(url);
         //alert(res);
 /*return false;*/
-		aux=res.split('|');
-		/**/
+        aux=res.split('|');
+        /**/
         if(aux[0]=='sin_sesion_caja'){
             alert("No se pueden hacer ventas porque el cajero no ha iniciado sesión de caja.\nPide al cajero que inicie su sesión de caja.");
             return false;
@@ -1907,18 +1910,18 @@ var hay_paquete=0;
 /*fin de cambio Oscar 2023*/
         //alert(res);
         if(aux[0] == 'OK')
-		{
-			var ax=aux[1].split(':');
-			$("#id_pedido").val (ax[1]);
-		/*modificación Oscar 13.11.2018*
+        {
+            var ax=aux[1].split(':');
+            $("#id_pedido").val (ax[1]);
+        /*modificación Oscar 13.11.2018*
             $("#detalle_nota_tmp").val(aux[3]);
         /*fin de cambio Oscar 13.11.2018*/
-			retval = true;
+            retval = true;
             //mandamos a consumir servicio para surtir pedido
             //surtePedido();
-		}
-		else{
-			retval = false;
+        }
+        else{
+            retval = false;
         }
     //implementacion Oscar 2023 para eliminar el almacenamiento local al guardar la venta
      //   deleteLocalStorageProducts();
@@ -1935,9 +1938,9 @@ var hay_paquete=0;
         }
 /*fin de cambio 03.05.2018*/
 
-//alert('fin de generaVe');	
-		return retval;
-	}
+//alert('fin de generaVe'); 
+        return retval;
+    }
     
     //El parámetro callback se manda para poder ejecutar función hasta que la petición de surtimiento termine
     function surtePedido( callback ){
@@ -2117,6 +2120,29 @@ var hay_paquete=0;
 
     function clearArrayEliminados(){
         sessionStorage.removeItem('ARRAY_ELIMINADOS');
+    }
+
+    function writeLog( tipo_operacion,mensaje, callback ){
+        var currentUrl = window.location.href;
+        var msjTipo = (tipo_operacion == '1') ? "Acción al Enviar Pedido" : "Acción al Cerrar Venta" 
+        var parts_url = currentUrl.split('/touch_desarrollo');
+        const url = parts_url[0] + `/touch/ajax/writeLog.php?mssgLog=${encodeURIComponent( msjTipo + "\n" + mensaje)}`;
+
+        fetch(url).then(response => {
+            if (!response.ok) {
+                throw new Error("Error en la solicitud");
+            }
+            return response.text(); // Puedes cambiar a .json() si el PHP devuelve JSON
+        })
+        .then(data => {
+            console.log("Respuesta del servidor:", data);
+
+            callback();
+        })
+        .catch(error => {
+            console.error("Hubo un error:", error);
+        });
+
     }
     
     function change_to_upercase( obj ){
@@ -2343,61 +2369,69 @@ var hay_paquete=0;
                      else
                      {
                         selfElement = this;
-                        surtePedido(function(){
+                        surtePedido(function(){ 
 
-                            if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
-                                 $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href").replace (/&idp=\d+/i, "&idp=" + $("#id_pedido").val ()));
-                             }
-                             else {
-                            // modificacion de Oscar(05-11-2017)
-                                var ventaTipo=document.getElementById('tipo_venta').value;//sacamos el tipo de venta
-                            //implementacion de Oscar 24-12-2017
-                                var sFa='';
-                                if(document.getElementById('saldoAFavor')){
-                                    sFa="&sald_fav="+document.getElementById('saldoAFavor').value;
-                                }
+                            var folioVenta = $("#id_pedido").val();
+                            var subTotal = "0";
+                            var total = $("#total").val();
+
+                            var mensaje = "Folio Venta: " + folioVenta + "\nSubtotal: " + subTotal + "\nTotal: "+ total;
+
+
+                            writeLog('1', mensaje , function(){
+                                if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
+                                    $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href").replace (/&idp=\d+/i, "&idp=" + $("#id_pedido").val ()));
+                                }else {
+                                    // modificacion de Oscar(05-11-2017)
+                                    var ventaTipo=document.getElementById('tipo_venta').value;//sacamos el tipo de venta
+                                    //implementacion de Oscar 24-12-2017
+                                    var sFa='';
+                                    if(document.getElementById('saldoAFavor')){
+                                        sFa="&sald_fav="+document.getElementById('saldoAFavor').value;
+                                    }
                             
-                            /*implementación de Oscar 04.09.2018 para cambio de apartados*/
-                                var es_apartado=$("#id_de_apartado").val();
-                                var aprt='';
-                                if(es_apartado!=''&& es_apartado!=null){
-                                    aprt="&id_aprt="+es_apartado;
-                                }
-                                var abono='';
-                                if($("#monto_abonado").val()){
-                                    abono="&abonado="+$("#monto_abonado").val();
-                                }
-                            /*fin de cambio 04.09.2018*/
+                                    /*implementación de Oscar 04.09.2018 para cambio de apartados*/
+                                    var es_apartado=$("#id_de_apartado").val();
+                                    var aprt='';
+                                    if(es_apartado!=''&& es_apartado!=null){
+                                        aprt="&id_aprt="+es_apartado;
+                                    }
+                                    var abono='';
+                                    if($("#monto_abonado").val()){
+                                        abono="&abonado="+$("#monto_abonado").val();
+                                    }
+                                        
+                                    /*fin de cambio 04.09.2018*/
 
-                        /*Cambio Oscar 13.11.2018 para enviar el temporal de la venta antes de que fuera modificada*
-                            	var prods_antes="";
-                                if($("#detalle_nota_tmp").val()){
-                                    prods_antes="&prods_ant="+$("#detalle_nota_tmp").val();
-                                }
-                        /*Fin de cambio Oscar 13.11.2018*/
+                                    /*Cambio Oscar 13.11.2018 para enviar el temporal de la venta antes de que fuera modificada*
+                                            var prods_antes="";
+                                            if($("#detalle_nota_tmp").val()){
+                                                prods_antes="&prods_ant="+$("#detalle_nota_tmp").val();
+                                            }
+                                    /*Fin de cambio Oscar 13.11.2018*/
 
-                        /*implementacion Oscar 25.06.2019 para arrastrar los ids de devolucion a la pantalla de cerrar venta*/
-                            var ids_dvs="";
-                            if(document.getElementById('id_de_devoluciones')){
-                                ids_dvs+="&ids_devoluciones="+$("#id_de_devoluciones").val();
-                            } 
-                        /*Fin de cambio Oscar 25.06.2019*/
+                                    /*implementacion Oscar 25.06.2019 para arrastrar los ids de devolucion a la pantalla de cerrar venta*/
+                                    var ids_dvs="";
+                                    if(document.getElementById('id_de_devoluciones')){
+                                        ids_dvs+="&ids_devoluciones="+$("#id_de_devoluciones").val();
+                                    } 
+                                    /*Fin de cambio Oscar 25.06.2019*/
 
-                        /**/
-							$("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href") + "&idp=" + $("#id_pedido").val ()+'&tv='+ventaTipo+sFa+aprt+abono+"&id_pedido_original="+$("#id_de_pedido_original").val()+ids_dvs);//
+                                    /**/
+                                    $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href") + "&idp=" + $("#id_pedido").val ()+'&tv='+ventaTipo+sFa+aprt+abono+"&id_pedido_original="+$("#id_de_pedido_original").val()+ids_dvs);//
                              
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores}*/
+                                    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores}*/
 
-                             if ($(selfElement).attr ("id").match (/^cerrar$/i))
-                                 location.href = $("#menu_cerrar").attr ("href");
+                                    if ($(selfElement).attr ("id").match (/^cerrar$/i))
+                                        location.href = $("#menu_cerrar").attr ("href");
                              
-                             return true;
-                            
-                         }
-
+                                        return true;
+                                    }
+                            });
                         });
                         
                      }
+
                  }
              });
 

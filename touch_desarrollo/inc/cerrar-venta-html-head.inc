@@ -354,7 +354,7 @@ var regresar_efectivo_devolucion = 0;
 		});
 	}
 
-var emrge_aviso='';
+		var emrge_aviso='';
 		function cerrarVenta() {
 		//implementacion de Oscar 29-12-2017
 			//obtenemos saldo a favor del cliente
@@ -400,24 +400,38 @@ var emrge_aviso='';
 				type: 'GET',
 				url: "ajax/cerrarVenta.php?idp="+id_pedido+"&ap="+es_apartado+"&faceb="+face+"&cor="+correoC+"&"+datos+""+saldo_favor+ids_dvs
 			}).done (function (data) {
-
-//alert(data);//con este alert mostramos error
+				//alert(data);//con este alert mostramos error
 				ax = data.split('|');
-		/*implementación Oscar 2019 para código de barras*/
-			$.post( "inc/img_codigo.php", {text:ax[3]});
-		/*fin de cambio Oscar 2019*/
-//alert('para');
 
-		/**/
-		/*Implementación Oscar 30.11.2018 para no dejar hacer más de una venta por dar click doble*/
-				hay_proceso=1;//ocupamos el proceso
-		/*Fin de cambio Oscar 30.11.2018*/
-	//alert(data);
-				retval = ax[0].match (/^ok$/i);
-				pedidor=ax[1];
-		/**/
-				emrge_aviso=ax[2];
-		/**/
+				if( ax[0] == "ERR" ){
+					retval = false;
+					var datosError = ax[2].split(',');
+					mensaje = "";
+					for (let index = 0; index < datosError.length; index++) {
+						//No añade salto de línea si es el último elemento
+						( index == datosError.length - 1 ) ? mensaje += datosError[index] : mensaje += datosError[index] + "\n";
+					}
+
+					//Pintamos en el log
+					writeLog('2', mensaje );
+
+				}else{
+
+					$.post( "inc/img_codigo.php", {text:ax[3]});
+					/*fin de cambio Oscar 2019*/
+					//alert('para');
+						/**/
+						/*Implementación Oscar 30.11.2018 para no dejar hacer más de una venta por dar click doble*/
+					hay_proceso=1;//ocupamos el proceso
+					/*Fin de cambio Oscar 30.11.2018*/
+					//alert(data);
+					retval = ax[0].match (/^ok$/i);
+					pedidor=ax[1];
+						/**/
+					emrge_aviso=ax[2];
+				}
+				/*implementación Oscar 2019 para código de barras*/
+					/**/
 			}).fail (function () {
 				//alert(data);
 				retval = false;
@@ -425,6 +439,26 @@ var emrge_aviso='';
 
 			return retval;
 		}
+
+		function writeLog( tipo_operacion,mensaje ){
+			var currentUrl = window.location.href;
+			var msjTipo = (tipo_operacion == '1') ? "Acción al Enviar Pedido" : "Acción al Cerrar Venta" 
+			var parts_url = currentUrl.split('/touch_desarrollo');
+			const url = parts_url[0] + `/touch/ajax/writeLog.php?mssgLog=${encodeURIComponent( msjTipo + "\n" + mensaje)}`;
+
+			fetch(url).then(response => {
+				if (!response.ok) {
+					throw new Error("Error en la solicitud");
+				}
+				return response.text(); // Puedes cambiar a .json() si el PHP devuelve JSON
+			})
+			.then(data => {
+				console.log("Respuesta del servidor:", data);
+			})
+			.catch(error => {
+				console.error("Hubo un error:", error);
+			});
+    	}
 
 		function changeHashOnLoad() {
 			var base_href = location.href.match (/^([^\#]*)(?:\#.*)?$/i)[0];
@@ -637,8 +671,13 @@ function bloquea_pantalla(){
 	//return false;
 		//verificamos que tipo de venta es (normal o mayoreo)
 			var tipoVenta=document.getElementById('tipo_venta').value;
-	//implementacion de Oscar 29-12-2017
-			if (cerrarVenta ()){
+			//implementacion de Oscar 29-12-2017
+			console.log("CERRARVENTA");
+			var cerrarVentaResult = cerrarVenta();
+			if (true){
+				$("#cont_emergente").html("EMERGENTE DE PRUEBA");//cargamos respuesta 
+							$("#emergente_cerrar").css("display","block");
+							return false;
 			//implementacion Oscar 2023 para eliminar el sessionStorage
   				sessionStorage.clear();
 				//alert('pausa antes del ticket');
@@ -710,6 +749,7 @@ function bloquea_pantalla(){
 				}      
 		/*03.11.2018*/		
 			}else{
+
 				alert("Error al intentar el almacenado de los datos.\nVerifique conectividad e intente nuevamente.");
 				$("#cerrar").prop ("disabled", false);
 			}
