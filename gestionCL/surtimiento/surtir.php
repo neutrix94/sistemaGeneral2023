@@ -195,8 +195,8 @@ $indiceSurtir = 0;
                 'No hay partidas pendientes de surtir',
                 false,
                 '',
-                true,
-                'Aceptar'
+                false,
+                ''
               ); 
               $('#alertModalAcceptButton').off('click').on('click', function() {
                   $('#alertModal').modal('hide');  
