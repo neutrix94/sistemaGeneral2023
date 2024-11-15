@@ -2253,6 +2253,29 @@ var hay_paquete=0;
         });
     }
 
+    function setProductosEnVenta(){
+
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        //var products_array = localStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+        console.log( products_array );
+
+        var strProductos = "\nDetalle de productos:\n";
+        for( var i = 0; i < products_array.length; i ++ ){
+
+            var id = products_array[i][0];
+            var nombre = products_array[i][1];
+            var piezas = products_array[i][2];
+            var precio = products_array[i][3];
+            var monto = products_array[i][5];
+            
+            strProductos += id + " - " + nombre + " - # Piezas: " + piezas + " - Precio: " + precio + " - Monto : " + monto + "\n";
+        }
+
+        return strProductos;
+
+    }
+
 /*implementacion Oscar 2023 para imprimir, visualizar cotizacion*/
     function quotationEmergent( sale_id ){
         var quotation_content = `<div class="row text-center" id="quotation_container" style="background-color : white;">
@@ -2910,6 +2933,10 @@ var hay_paquete=0;
                             var total = $("#total").val();
                             var mensaje = "Folio Venta: " + folioVenta + "\nSubtotal: " + subTotal + "\nTotal: "+ total;
 
+                            var mensajeProductos = setProductosEnVenta();
+
+                            mensaje = ( mensajeProductos !== "\nDetalle de productos:\n" ) ? mensaje + mensajeProductos : mensaje;
+
                             selfBoton = this;
                         writeLog('1', mensaje , function(){
                             if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
@@ -2955,7 +2982,7 @@ var hay_paquete=0;
                             
                                 /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores}*/
 
-                                if ($(selfBoton).attr ("id").match (/^cerrar$/i))
+                                if ($(selfBoton).attr ("id").match(/^cerrar$/i))
                                
                                 location.href = $("#menu_cerrar").attr ("href");
                             

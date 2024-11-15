@@ -80,7 +80,7 @@
     $totalEsperado = null;
     $subtotal = null;
     //Debido al rango de error en números decimales de PHP, se debe utilizar ese margen de error
-    $epsilon = 0.00001;
+    $margen = 0.99;
 
 	while ($row = mysql_fetch_assoc($resultGetPedidoBack)) {
 		$descuento = $row["descuento"];
@@ -93,10 +93,10 @@
 	error_log("EL TOTAL ESPERADO ES: ".$totalEsperado);
     error_log("EL TOTAL DEL PEDIDO ES : ".$totalPedido);
 
-	$totalEsperado = 55.5;
-    $totalPedido = 54.5;
-	//if( $totalEsperado !== $totalPedido ){
-    if( abs($totalEsperado - $totalPedido) > $epsilon ){
+	//$totalEsperado = 600.5;
+    //$totalPedido = 559.5;
+	//Se muestra error en caso de que los valores no coincidan con un margen de 99 centavos
+    if( abs($totalPedido - $totalEsperado) > $margen ){
 
 		echo "ERROR_INCONSISTENCIA_DATOS|El total del pedido Es Incorrecto favor de verificar los montos|Folio {$id_pedido},Total del Pedido {$totalPedido},Subtotal {$subtotal},Total del pedido más Descuento {$totalEsperado}";
 
