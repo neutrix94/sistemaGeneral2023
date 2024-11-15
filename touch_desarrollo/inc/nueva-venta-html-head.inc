@@ -2905,6 +2905,12 @@ var hay_paquete=0;
                          }*\/
                          else{*/
 
+                            var folioVenta = $("#id_pedido").val();
+                            var subTotal = "0";
+                            var total = $("#total").val();
+                            var mensaje = "Folio Venta: " + folioVenta + "\nSubtotal: " + subTotal + "\nTotal: "+ total;
+
+                            selfBoton = this;
                         writeLog('1', mensaje , function(){
                             if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
                                 $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href").replace (/&idp=\d+/i, "&idp=" + $("#id_pedido").val ()));
@@ -2949,7 +2955,8 @@ var hay_paquete=0;
                             
                                 /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores}*/
 
-                                if ($(this).attr ("id").match (/^cerrar$/i))
+                                if ($(selfBoton).attr ("id").match (/^cerrar$/i))
+                               
                                 location.href = $("#menu_cerrar").attr ("href");
                             
                                 return true;

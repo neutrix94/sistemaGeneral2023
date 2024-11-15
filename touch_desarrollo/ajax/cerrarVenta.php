@@ -93,12 +93,12 @@
 	error_log("EL TOTAL ESPERADO ES: ".$totalEsperado);
     error_log("EL TOTAL DEL PEDIDO ES : ".$totalPedido);
 
-	//$totalEsperado = 55.5;
-    //$totalPedido = 54.5;
+	$totalEsperado = 55.5;
+    $totalPedido = 54.5;
 	//if( $totalEsperado !== $totalPedido ){
     if( abs($totalEsperado - $totalPedido) > $epsilon ){
 
-		echo "ERR|El total del pedido Es Incorrecto favor de verificar los montos|Folio {$id_pedido},Total del Pedido {$totalPedido},Subtotal {$subtotal},Total del pedido más Descuento {$totalEsperado}";
+		echo "ERROR_INCONSISTENCIA_DATOS|El total del pedido Es Incorrecto favor de verificar los montos|Folio {$id_pedido},Total del Pedido {$totalPedido},Subtotal {$subtotal},Total del pedido más Descuento {$totalEsperado}";
 
 	}else{
 /**/
@@ -191,7 +191,7 @@
 						/*30*/'{$corr}',
 						/*31*/'{$face}',
 						/*32*/0,
-						/*33*/'0000-00-00 00:00:00',
+						/*33*/null,
 						/*34*/NOW(),
 						/*35*/tipo_pedido,
 						/*36*/-1,
