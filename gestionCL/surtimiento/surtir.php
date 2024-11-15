@@ -195,8 +195,8 @@ $indiceSurtir = 0;
                 'No hay partidas pendientes de surtir',
                 false,
                 '',
-                true,
-                'Aceptar'
+                false,
+                ''
               ); 
               $('#alertModalAcceptButton').off('click').on('click', function() {
                   $('#alertModal').modal('hide');  
@@ -501,7 +501,7 @@ $indiceSurtir = 0;
                 $("#listaProductosNoSurtidos").hide();
                 $("#titleFolio").hide();
                 $("#folioNotaModal").hide();
-                $("#btnImprimir").hide();
+                //$("#btnImprimir").hide();
 
                 //alert( data.result.resultado );
                 //window.location.href='javascript: history.go(-1)';

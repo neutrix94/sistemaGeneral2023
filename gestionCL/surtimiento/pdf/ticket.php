@@ -13,9 +13,12 @@
     $inputData = json_decode( $inputJSON, true );
 
     if( $inputData ){
+        $estatusPedido = $inputData['result']["resultado"];
         $folioPedido = $inputData['result']["detalle"]["folioPedido"];
         $vendedor = $inputData['result']["detalle"]["vendedor"];
+        $surtidor = $inputData['result']["detalle"]["surtidor"];
         $productosParciales = $inputData['result']["detalle"]["surtidoParcial"];
+        $productosNoSurtidos = $inputData['result']["detalle"]["noSurtido"];
 
         $pdf->SetMargins(4,10,4);
         $pdf->AddPage();
@@ -50,7 +53,7 @@
         $pdf->Ln(5);
         //$pdf->MultiCell(0,5,iconv("UTF-8", "ISO-8859-1","Cajero: Carlos Alfaro"),0,'C',false);
         $pdf->SetFont('Arial','B',12);
-        $pdf->MultiCell(0,5,"Surtido por: Bodeguero 1",0,'C',false);
+        $pdf->MultiCell(0,5,"Surtido por: {$surtidor}",0,'C',false);
     
         $pdf->SetFont('Arial','',9);
         $pdf->Ln(2);
@@ -60,42 +63,82 @@
         $pdf->Ln(2);
         $pdf->Cell(0,5,"-------------------------------------------------------------------",0,0,'C');
         $pdf->Ln(5);
-    
-        $pdf->SetFont('Arial','B',14);
-        $pdf->MultiCell(0,5,"PRODUCTOS QUE NO SE",0,'C',false);
-        $pdf->MultiCell(0,5,"SURTIERON COMPLETOS",0,'C',false);
         
-    
-        $pdf->SetFont('Arial','',9);
-        
-        $pdf->Ln(5);
-    
-        /* INICIO PRODUCTO */
-        if( count($productosParciales) > 0 ){
-            for ($i=0; $i < count($productosParciales); $i++) { 
+        if( $estatusPedido !== "Completo" ){
 
-                $pdf->MultiCell(0,4, $productosParciales[$i]['nombre'] ,0,'C',false);
-                $pdf->SetFillColor(200, 200, 200);
-                $widths = [20, 20, 20];  // Anchos de las 3 columnas
-                $height = 8;  // Altura de las filas
+            /* INICIO PRODUCTO */
+            if( count($productosParciales) > 0 ){
+
+                $pdf->SetFont('Arial','B',14);
+                $pdf->MultiCell(0,5,"PRODUCTOS QUE NO SE",0,'C',false);
+                $pdf->MultiCell(0,5,"SURTIERON COMPLETOS",0,'C',false);
+                
             
-                $xPos = ($pdf->GetPageWidth() - array_sum($widths)) / 2;
-                // Encabezados de la tabla (sin fondo)
-                $pdf->SetFont('Arial', 'B', 9);
-                $pdf->SetX($xPos);
-                // Encabezados de la tabla
-                $pdf->Cell($widths[0], $height, 'Pedido', 0, 0, 'C');
-                $pdf->Cell($widths[1], $height, 'Surtido', 0, 0, 'C');
-                $pdf->Cell($widths[2], $height, 'Faltante', 0, 1, 'C');
-            
-                // Primera fila
-                $pdf->SetFont('Arial', '', 9);
-                $pdf->SetX($xPos);
-                $pdf->Cell($widths[0], $height, $productosParciales[$i]['solicitado'] , 0, 0, 'C', true);
-                $pdf->Cell($widths[1], $height, $productosParciales[$i]['surtido'] , 0, 0, 'C', true);
-                $pdf->Cell($widths[2], $height, $productosParciales[$i]['faltante'] , 0, 0, 'C', true);
-                $pdf->Ln(12);
+                $pdf->SetFont('Arial','',9);
+                
+                $pdf->Ln(5);
+
+                for ($i=0; $i < count($productosParciales); $i++) { 
+    
+                    $pdf->MultiCell(0,4, $productosParciales[$i]['nombre'] ,0,'C',false);
+                    $pdf->SetFillColor(200, 200, 200);
+                    $widths = [20, 20, 20];  // Anchos de las 3 columnas
+                    $height = 8;  // Altura de las filas
+                
+                    $xPos = ($pdf->GetPageWidth() - array_sum($widths)) / 2;
+                    // Encabezados de la tabla (sin fondo)
+                    $pdf->SetFont('Arial', 'B', 9);
+                    $pdf->SetX($xPos);
+                    // Encabezados de la tabla
+                    $pdf->Cell($widths[0], $height, 'Pedido', 0, 0, 'C');
+                    $pdf->Cell($widths[1], $height, 'Surtido', 0, 0, 'C');
+                    $pdf->Cell($widths[2], $height, 'Faltante', 0, 1, 'C');
+                
+                    // Primera fila
+                    $pdf->SetFont('Arial', '', 9);
+                    $pdf->SetX($xPos);
+                    $pdf->Cell($widths[0], $height, $productosParciales[$i]['solicitado'] , 0, 0, 'C', true);
+                    $pdf->Cell($widths[1], $height, $productosParciales[$i]['surtido'] , 0, 0, 'C', true);
+                    $pdf->Cell($widths[2], $height, $productosParciales[$i]['faltante'] , 0, 0, 'C', true);
+                    $pdf->Ln(12);
+                }
             }
+    
+            /* PRODUCTOS NO SURTIDOS */
+            if( count($productosNoSurtidos) > 0 ){
+                $pdf->SetFont('Arial','B',14);
+                $pdf->MultiCell(0,5,"PRODUCTOS NO SURTIDOS",0,'C',false);
+        
+                $pdf->SetFont('Arial','',9);
+    
+                for ($i=0; $i < count($productosNoSurtidos); $i++) { 
+    
+                    $pdf->MultiCell(0,4, $productosNoSurtidos[$i]['nombre'] ,0,'C',false);
+                    $pdf->SetFillColor(200, 200, 200);
+                    $widths = [20, 20, 20];  // Anchos de las 3 columnas
+                    $height = 8;  // Altura de las filas
+                
+                    $xPos = ($pdf->GetPageWidth() - array_sum($widths)) / 2;
+                    // Encabezados de la tabla (sin fondo)
+                    $pdf->SetFont('Arial', 'B', 9);
+                    $pdf->SetX($xPos);
+                    // Encabezados de la tabla
+                    $pdf->Cell($widths[0], $height, '', 0, 0, 'C');
+                    $pdf->Cell($widths[1], $height, 'Piezas no surtidas', 0, 0, 'C');
+                    $pdf->Cell($widths[2], $height, '', 0, 1, 'C');
+                
+                    // Primera fila
+                    $pdf->SetFont('Arial', '', 9);
+                    $pdf->SetX($xPos);
+                    $pdf->Cell($widths[0], $height, '' , 0, 0, 'C', true);
+                    $pdf->Cell($widths[1], $height, $productosNoSurtidos[$i]['solicitado'] , 0, 0, 'C', true);
+                    $pdf->Cell($widths[2], $height, '' , 0, 0, 'C', true);
+                    $pdf->Ln(12);
+                }
+            }
+        }else{
+            $pdf->SetFont('Arial','B',14);
+            $pdf->MultiCell(0,5,"PEDIDO SURTIDO COMPLETO",0,'C',false);
         }
     
         $pdf->Ln(5);
