@@ -23,7 +23,9 @@
 
 
 	$details = explode( '|~|', $_POST['detail'] );
+	$counter = 0;
 	foreach ( $details as $key => $detail ) {
+		$counter ++;//modificado por Oscar 2023/09/30 ( por producto )
 		$det = explode( '~', $detail );
 		$product_id = $det[0];
 		$product_providers_detail = explode( '||', $det[1] );
@@ -32,9 +34,9 @@
 			if( $pp_detail[7] > 0 || $pp_detail[8] > 0 || $pp_detail[9] > 0){
 				$sql = "INSERT INTO ec_transferencia_productos( id_transferencia, id_producto_or, 
 					id_presentacion, cantidad_presentacion,cantidad, id_producto_de, 
-					referencia_resolucion, cantidad_cajas, cantidad_paquetes, cantidad_piezas, id_proveedor_producto )
+					referencia_resolucion, cantidad_cajas, cantidad_paquetes, cantidad_piezas, id_proveedor_producto, numero_consecutivo )
 				VALUES('{$transfer_id}','{$product_id}','-1','{$pp_detail[10]}','{$pp_detail[10]}',
-					'{$product_id}','{$pp_detail[10]}', '{$pp_detail[7]}', '{$pp_detail[8]}', '{$pp_detail[9]}', '{$pp_detail[2]}')";
+					'{$product_id}','{$pp_detail[10]}', '{$pp_detail[7]}', '{$pp_detail[8]}', '{$pp_detail[9]}', '{$pp_detail[2]}', {$counter} )";
 				$eje=mysql_query($sql);//EJECUTA CONSULTA
 				if(!$eje){
 					$error=mysql_error();

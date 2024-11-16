@@ -21,7 +21,7 @@
 					id="product_barcode_seeker"
 					class="form-control"
 					placeholder="Escanea código de barras del Producto"
-					onkeyup="seek_product( this, event, '#product_barcode_seeker_response' );"
+					onkeyup="evitarCaracteresEspeciales(event);seek_product( this, event, '#product_barcode_seeker_response' );"
 				>
 				<!--	onkeyup="seekTicketBarcode( event, this, 'seekProductBarcode' );" -->
 				<button 
@@ -45,7 +45,7 @@
 					id="product_barcode_seeker_pieces"
 					class="form-control"
 					placeholder="Escanea código de barras del Producto"
-					onkeyup="seek_product( this, event, '#product_barcode_seeker_pieces_response' );"
+					onkeyup="evitarCaracteresEspeciales(event);seek_product( this, event, '#product_barcode_seeker_pieces_response' );"
 					disabled
 				><!-- seekTicketBarcode( event, this, 'seekProductBarcode' ); -->
 				<button class="input-group-text btn btn-warning no_visible"

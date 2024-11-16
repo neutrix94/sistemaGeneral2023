@@ -1,9 +1,21 @@
 <?php
+/*
+Version 1.1 con resolucion de Transferencias seccionada por procesos 2024-08-16*/
 //conexiones a la base de datos
 	include( '../../../../config.inc.php' );
 	include( '../../../../conectMin.php' );//sesión
 	include( '../../../../conexionMysqli.php' );
 	include( 'ajax/db.php' );
+//consulta si estan habilitadas las alertas
+	$sql = "SELECT
+			ald.alertas_habilitadas AS alert_log_enabled
+		FROM sys_alertas_log al
+		LEFT JOIN sys_alertas_log_detalle ald
+		ON ald.id_alerta_log = al.id_alerta_log
+		WHERE al.id_alerta_log = 2";
+	$stm = $link->query($sql) or die( "Error al consultar el log de alerta : {$sql} : {$link->error}" );
+	$row = $stm->fetch_assoc();
+	$alert_log_enabled = $row['alert_log_enabled'];
 ?>
 <!DOCTYPE html>
 <head>
@@ -17,6 +29,9 @@
 	<script type="text/javascript" src="js/functions.js"></script>
 	<script type="text/javascript" src="js/blocks.js"></script>
 	<script type="text/javascript" src="../../plugins/js/barcodeValidationStructure.js"></script>
+	<script src="../../../../js/highlight/highlight.min.js"></script>
+	<link rel="stylesheet" href="../../../../js/highlight/styles/default.min.css">
+    <script>hljs.highlightAll();</script>
 
 	<title>Recepción de transferencias</title>
 </head>
@@ -54,6 +69,8 @@
 	</audio-->
 <?php
 	echo '<input type="hidden" id="user_id" value="' . $user_id . '" >';
+	echo '<input type="hidden" id="alert_log_enabled" value="' . $alert_log_enabled . '" >';
+	
 	echo getSpecialPermissions( $user_id, $sucursal_id, $link );
 ?>
 	<div class="emergent" style="z-index : 20;">
@@ -74,6 +91,26 @@
 			>X</button>
 		</div>
 		<div class="emergent_content_2" tabindex="2"></div>
+	</div>
+	
+	<div class="emergent_3" style="z-index : 40;">
+		<div style="position: relative; top : 120px; left: 90%; z-index:3; display:none;">
+			<button 
+				class="btn btn-danger"
+				onclick="close_emergent();"
+			>X</button>
+		</div>
+		<div class="emergent_content_3" tabindex="3"></div>
+	</div>
+
+	<div class="emergent_4" style="z-index : 50;">
+		<div style="position: relative; top : 120px; left: 90%; z-index:4; display:none;">
+			<button 
+				class="btn btn-danger"
+				onclick="close_emergent();"
+			>X</button>
+		</div>
+		<div class="emergent_content_4" tabindex="4"></div>
 	</div>
 
 	<div class="global_container">

@@ -164,7 +164,7 @@ else if($multicajero==1){
 			LIMIT 1";
 		$eje = mysql_query( $sql ) or die( "Error al consultar el corte de caja Anterior! " . mysql_error() );
 		$r_c_a = mysql_fetch_row( $eje );
-
+	/*Deshabilitado por Oscar 2024-07-04 para no eviar el email
 		if( $r_c_a[0] != $_POST['cambio_caja'] ){
 			include('../../plugins/sendMail.php');
 			$mail = new sendMail( '../../../../' );
@@ -174,6 +174,7 @@ else if($multicajero==1){
 			$email_content .= "<p>Monto de caja inicial : $ <b>{$_POST['cambio_caja']}</b></p>";
 			$mail->sendMailTo( "Diferencia de cambio en caja durante el Incio de Caja en  {$r_c_a[1]} {$folio} ", $email_content, $mails, null );
 		}
+	*/
 /*Fin de cambio Oscar 2021*/
 
 		mysql_query("COMMIT");//autorizamos transacción

@@ -10,7 +10,7 @@ var global_view = '';
 			&& document.activeElement.id != 'product_barcode_seeker'
 			&& document.activeElement.id != 'product_barcode_seeker_pieces'
 		){//!= element_focus_locked && element_focus_locked !
-			var resp = "<h5 class=\"orange\">No estas posicionado en el campo del código de barras!</h5>";
+			var resp = "<h5 class=\"orange\">No estas posicionado en el campo del código de barras.</h5>";
 			//alert( '' ) ;
 			alert_scann( 'error' );
 			
@@ -33,6 +33,15 @@ var global_view = '';
 		}
 	}, false);
 
+	function evitarCaracteresEspeciales(event) {
+		const input = event.target;
+		const valor = input.value;
+		const valorFiltrado = valor.replace(/[^a-zA-Z0-9 /=-]/g, ''); // Filtra caracteres que no sean letras o números
+		if (valor !== valorFiltrado) {
+			input.value = valorFiltrado;
+		}
+	}
+
 //mostrar / ocultar vistas del menú
 	function show_view( obj, view ){
 		if( view == '.check_ticket_detail' ){
@@ -40,7 +49,7 @@ var global_view = '';
 			if( localStorage.getItem( 'current_ticket' ) == 'null'
 				|| localStorage.getItem( 'current_ticket' ) == null 
 				|| localStorage.getItem( 'current_ticket' ) == 0 ){
-				alert( "Primero selecciona un ticket de venta!" );
+				alert( "Primero selecciona un ticket de venta." );
 				return false;
 			}else{
 				load_ticketDetail();
@@ -92,14 +101,14 @@ var global_view = '';
 			txt = barcode.trim();
 		}
 		if( txt.length == 0 || txt == '' ){
-			alert( "El código de barras no puede ir vacío!" );
+			alert( "El código de barras no puede ir vacío." );
 			$( obj ).focus();
 			return false;
 		}
 	//omite codigo de barras si es el caso
 		txt = txt.replace( '  ', ' ' );//reemplaza el dobles espacio
 		if( ! validateBarcodeStructure( txt ) ){
-			alert( "El codigo de barras no tiene la estructura correcta, verifica y vuelve a intentar" );
+			alert( "El codigo de barras no tiene la estructura correcta, verifica y vuelve a intentar." );
 			return false;
 		}
 		var tmp_txt = txt.split( ' ' );
@@ -182,7 +191,7 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 					setProductByName( aux[1], aux[2], 1 );
 					$( '.emergent' ).focus();
 				}else{
-					alert( "el producto no corresponse a esta nota de venta, verifica y vuelve a intentar!" );
+					alert( "El producto no corresponse a esta nota de venta, verifica y vuelve a intentar." );
 				}
 			}else{
 				$( '.emergent_content' ).html( response );
@@ -196,7 +205,7 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 	function setPiecesQuanity( barcode, ticket_id, sale_detail_id, was_found_by_name ){
 		var pieces = $( '#pieces_quantity_tmp' ).val();
 		if( pieces <= 0 ){
-			alert( "El valor del número de piezas no pude ser menor a 1!" );
+			alert( "El valor del número de piezas no pude ser menor a 1." );
 			return false;
 		}else{
 			seekTicketBarcode( -1, '#product_barcode_seeker_pieces', 'seekProductBarcode', barcode, pieces, sale_detail_id, was_found_by_name );
@@ -255,7 +264,7 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 			var resp = `<div class="row">
 				<div class="col-1"></div>
 				<div class="col-10 text-center">
-						<h5>Aún hay productos pendientes de validar!</h5>
+						<h5>Aún hay productos pendientes de validar.</h5>
 						<button
 							type="button"
 							class="btn btn-info"
@@ -271,9 +280,9 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 		}else{
 			var url = "ajax/db.php?fl=finishValidation&p_k=" + localStorage.getItem( 'current_ticket' );
 			url += "&ticket_has_changed=" + global_ticket_has_return;
-			
 			//alert( url ); return  false;
 			var response = ajaxR( url ).trim().split( '|' );
+			console.log( response );
 		//recibe la respuesta en JSON
 			var json_data = JSON.parse( response );
 			//if( response[0] != 'ok' ){
@@ -389,7 +398,7 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 			}
 		});
 		if( detail_selected == -1 ){
-			alert( "Debes de seleccionar un producto para continuar!" );
+			alert( "Debes de seleccionar un producto para continuar." );
 			return false;
 		}else{
 			seekTicketBarcode( -1, '#product_barcode_seeker_pieces', 'seekProductBarcode', barcode_selected, 
@@ -410,7 +419,7 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 			}
 		});
 		if( model_selected == -1 ){
-			alert( "Debes de seleccionar un modelo para continuar!" );
+			alert( "Debes de seleccionar un modelo para continuar." );
 			return false;
 		}else{
 			if( is_sale_return == null ){
@@ -512,9 +521,13 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 		var tmp_val = $( obj ).val();
 		//alert( tmp_val.includes( '.' ) + ' ? ' + tmp_val );
 		if( tmp_val.includes( '.' ) ){
-			alert( "Los decimales no son permitidos, verifica y vuelve a intentar!" );
+			alert( "Los decimales no son permitidos, verifica y vuelve a intentar." );
 		}
-
+		if( tmp_val <= 0 ){
+			alert( "Solo se permiten cantidades mayores a cero." );
+			$( obj ).val( '' );
+			return false;
+		}
 		tmp_val = tmp_val.replaceAll( 'e', '' );
 		tmp_val = tmp_val.replaceAll( '.', '' );
 		$( obj ).focus().val( '' ).val( tmp_val );
@@ -529,7 +542,7 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 		//valida el password del encargado
 			var pass = $( '#mannager_password' ).val();
 			if( pass == '' ){
-				alert( "La contraseña del encargado no puede ir vacia!" );
+				alert( "La contraseña del encargado no puede ir vacia." );
 				$( '#mannager_password' ).focus();
 				return false;
 			}
@@ -544,7 +557,7 @@ deshabilitado por oscar 2023/10/17 ( habilitar para proceso de pagos/validacion 
 				url = "ajax/db.php?fl=reset_validation&sale_id=" + ticket_id;
 				resp = ajaxR( url );
 				if( resp == 'ok' ){
-					alert( "Esta validacion fue reseteada exitosamente!" );
+					alert( "Esta validacion fue reseteada exitosamente." );
 					location.reload();
 				}else{
 					alert( "Error al resetear validacion : \n" + resp );

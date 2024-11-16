@@ -39,8 +39,10 @@ BEGIN
 				'"monto" : "', cc.monto, '",',
 				'"fecha" : "', cc.fecha, '",',
 				'"hora" : "', cc.hora, '",',
+				'"cobro_cancelado" : "', cc.cobro_cancelado, '",',
 				'"observaciones" : "', cc.observaciones, '",',
 				'"folio_unico" : "', cc.folio_unico, '",',
+				'"id_forma_pago" : "', cc.id_forma_pago, '",',
 				'"sincronizar" : "0"',
 			'}'
 		),
@@ -54,7 +56,7 @@ BEGIN
 	ON d.id_devolucion = cc.id_devolucion
 	WHERE cc.id_cajero_cobro = payment_id
 	GROUP BY cc.id_cajero_cobro;
-/*Transaccion netPay*/
+/*Transaccion netPay
 	SELECT id_transaccion_netpay INTO netpay_transaction_id FROM vf_transacciones_netpay WHERE id_cajero_cobro = payment_id;
 	IF( netpay_transaction_id IS NOT NULL AND netpay_transaction_id > 0 AND netpay_transaction_id != '' )
 	THEN
@@ -124,6 +126,6 @@ BEGIN
 			1
 		FROM vf_transacciones_netpay t
 		WHERE t.id_cajero_cobro = payment_id;
-	END IF;
+	END IF;*/
 /**/
 END $$

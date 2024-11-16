@@ -1,4 +1,5 @@
 <?php
+/*Version con insercion de movimientos por Procedure (2024-08-05)*/
 	include( '../../../../../config.inc.php' );
 	include( '../../../../../conect.php' );
 	include( '../../../../../conexionMysqli.php' );
@@ -2045,22 +2046,33 @@
 		$stm = $link->query( $sql ) or die( "Error al consultar las transferencias con diferencias : {$link->error}" );
 
 		while( $row = $stm->fetch_assoc() ){
-			$sql = "INSERT INTO ec_movimiento_detalle ( /*1*/id_movimiento_almacen_detalle, /*2*/id_movimiento, /*3*/id_producto,
-						/*4*/cantidad, /*5*/cantidad_surtida, /*6*/id_pedido_detalle, /*7*/id_oc_detalle, /*8*/id_proveedor_producto )
-					SELECT
-						/*1*/NULL,
-						/*2*/{$row['warehouse_movement_id']},
-						/*3*/tp.id_producto_or,
-						/*4*/( tp.total_piezas_validacion - tp.cantidad ),
-						/*5*/( tp.total_piezas_validacion - tp.cantidad ),
-						/*6*/-1,
-						/*7*/-1,
-						/*8*/tp.id_proveedor_producto
+			//$sql = "INSERT INTO ec_movimiento_detalle ( /*1*/id_movimiento_almacen_detalle, /*2*/id_movimiento, /*3*/id_producto,
+			//			/*4*/cantidad, /*5*/cantidad_surtida, /*6*/id_pedido_detalle, /*7*/id_oc_detalle, /*8*/id_proveedor_producto )
+			//		SELECT
+			//			/*1*/NULL,
+			//			/*2*/{$row['warehouse_movement_id']},
+			//			/*3*/tp.id_producto_or,
+			//			/*4*/( tp.total_piezas_validacion - tp.cantidad ),
+			//			/*5*/( tp.total_piezas_validacion - tp.cantidad ),
+			//			/*6*/-1,
+			//			/*7*/-1,
+			//			/*8*/tp.id_proveedor_producto
+			//		FROM ec_transferencia_productos tp
+			//		WHERE tp.id_transferencia IN( '{$row['transfer_id']}' )
+			//		AND tp.cantidad <> tp.total_piezas_validacion";
+			$sql = "SELECT
+						tp.id_producto_or AS product_id,
+						( tp.total_piezas_validacion - tp.cantidad ) AS quantity,
+						tp.id_proveedor_producto AS product_provider_id
 					FROM ec_transferencia_productos tp
 					WHERE tp.id_transferencia IN( '{$row['transfer_id']}' )
 					AND tp.cantidad <> tp.total_piezas_validacion";
-		//	echo $sql;
-			$stm2 = $link->query( $sql ) or die( "Error al insertar los movimientos de la resolución : {$sql} {$link->error}" );
+			$stm2 = $link->query( $sql ) or die( "Error al consultar los movimientos de la resolución : {$sql} {$link->error}" );
+			while( $row_2 = $stm2->fetch_assoc() ){
+				$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$row['warehouse_movement_id']}, {$row_2['product_id']}, {$row_2['quantity']}, {$row_2['quantity']},
+							-1, -1, {$row_2['product_provider_id']}, 5, NULL )";
+				$stm_3 = $link->query( $sql ) or die( "Error al insertar los detalles de movimientos de la resolución : {$sql} {$link->error}" );
+			}
 		}
 		$link->autocommit( true );
 		return $resp;
@@ -2084,7 +2096,7 @@
 		$sql = "SELECT 
 					t.id_transferencia AS transfer_id,
 					/*ma.id_movimiento_almacen AS mov_id,*/
-					( SELECT id_movimiento_almacen FROM ec_movimiento_almacen WHERE id_transferencia IN ( t.id_transferencia ) ) AS mov_id,
+					( SELECT id_movimiento_almacen FROM ec_movimiento_almacen WHERE id_transferencia IN ( t.id_transferencia ) LIMIT 1 ) AS mov_id,
 					SUM( ( tp.cantidad - tp.total_piezas_validacion ) ) AS difference
 				FROM ec_transferencias t
 				LEFT JOIN ec_movimiento_almacen ma
@@ -2150,7 +2162,7 @@
 		$stm = $link->query( $sql ) or die( "Error al insertar el nuevo registro en la transferencia" . $link->error );
 		$new_detail_id  = $link->insert_id;
 	//inserta el detalle del movimiento de almacen
-		$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
+		/*$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
 				id_pedido_detalle, id_oc_detalle, id_proveedor_producto )
 				SELECT 
 					'{$mov_id}',
@@ -2161,8 +2173,20 @@
 					-1, 
 					tp.id_proveedor_producto
 				FROM ec_transferencia_productos tp
+				WHERE tp.id_transferencia_producto = '{$new_detail_id}'";*/
+		
+		$sql = "SELECT 
+					tp.id_producto_or As product_id,
+					tp.cantidad AS quantity,
+					tp.id_proveedor_producto AS product_provider_id
+				FROM ec_transferencia_productos tp
 				WHERE tp.id_transferencia_producto = '{$new_detail_id}'";
-		$stm = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen : {$sql}" . $link->error );
+		$stm2 = $link->query( $sql )or die( "Error al consultar el detalle del movimiento de almacen : {$sql}" . $link->error );
+		while( $row_2 = $stm2->fetch_assoc() ){
+			$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$mov_id}, {$row_2['product_id']}, {$row_2['quantity']}, {$row_2['quantity']},
+						-1, -1, {$row_2['product_provider_id']}, 5, NULL )";
+			$stm_3 = $link->query( $sql ) or die( "Error al insertar los detalles de movimientos de la resolución : {$sql} {$link->error}" );
+		}
 	//inserta el registro de validación
 		$sql_2 = "INSERT INTO ec_transferencias_validacion_usuarios ( id_transferencia_validacion, id_transferencia_producto,
 		id_usuario, id_producto, id_proveedor_producto, cantidad_cajas_validadas, cantidad_paquetes_validados, 
@@ -2327,24 +2351,32 @@
 		$link->autocommit( false );
 		if( $substraction != '' &&  $substraction != null  ){
 	//inserta la cabecera del movimiento de almacen ( resta )
-			$sql = "INSERT INTO ec_movimiento_almacen ( /*1*/id_movimiento_almacen, /*2*/id_tipo_movimiento, 
-				/*3*/id_usuario, /*4*/id_sucursal, /*5*/fecha, /*6*/hora, /*7*/observaciones, /*8*/id_pedido,
-				/*9*/id_orden_compra, /*10*/lote, /*11*/id_maquila, /*12*/id_transferencia, /*13*/id_almacen )
-					VALUES( /*1*/NULL, /*2*/8, /*3*/{$user}, /*4*/1, /*5*/NOW(), /*6*/NOW(), 
-						/*7*/'RESTA POR AJUSTE DE INVENTARIO DESDE VALIDACIÓN', /*8*/-1, /*9*/-1, /*10*/NULL,
-						/*11*/-1, /*12*/-1, /*13*/1 )";
-			
-			$stm = $link->query( $sql ) or die( "Error al insertar cabecera de movimiento de almacen ( ajuste ): {$link->error}" );
-			$mov_header_id = (int) $link->insert_id;
+			//$sql = "INSERT INTO ec_movimiento_almacen ( /*1*/id_movimiento_almacen, /*2*/id_tipo_movimiento, 
+			//	/*3*/id_usuario, /*4*/id_sucursal, /*5*/fecha, /*6*/hora, /*7*/observaciones, /*8*/id_pedido,
+			//	/*9*/id_orden_compra, /*10*/lote, /*11*/id_maquila, /*12*/id_transferencia, /*13*/id_almacen )
+			//		VALUES( /*1*/NULL, /*2*/8, /*3*/{$user}, /*4*/1, /*5*/NOW(), /*6*/NOW(), 
+			//			/*7*/'RESTA POR AJUSTE DE INVENTARIO DESDE VALIDACIÓN', /*8*/-1, /*9*/-1, /*10*/NULL,
+			//			/*11*/-1, /*12*/-1, /*13*/1 )";
+			$sql = "CALL spMovimientoAlmacen_inserta ( {$user}, 'RESTA POR AJUSTE DE INVENTARIO DESDE VALIDACIÓN', 1, 1, 8,
+						-1, -1, -1, -1, 5, NULL )";
+			$stm = $link->query( $sql ) or die( "Error al insertar cabecera de movimiento de almacen ( ajuste ): {$sql} : {$link->error}" );
+			//$mov_header_id = (int) $link->insert_id;
+		//recupera el id insertado
+			$sql = "SELECT MAX(id_movimiento_almacen) AS movement_header_id FROM ec_movimiento_almacen";
+			$stm = $link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado por ajuste ( resta ) : {$sql} : {$link->error}" );
+			$row = $stm->fetch_assoc();
+			$mov_header_id = $row['movement_header_id'];
 			$substraction_array = explode( '|', $substraction );
 			//die( $substraction );
 			foreach ( $substraction_array as $key => $sub ) {
 				$sub = explode( '~', $sub );
 				if( $sub[0] != '' && $sub[0] != null ){
-					$sql = "INSERT INTO ec_movimiento_detalle ( /*1*/id_movimiento_almacen_detalle, /*2*/id_movimiento,
-						/*3*/id_producto, /*4*/cantidad, /*5*/cantidad_surtida, /*6*/id_pedido_detalle,/*7*/id_oc_detalle,
-						/*8*/id_proveedor_producto ) VALUES ( /*1*/NULL, /*2*/{$mov_header_id},/*3*/{$sub[1]}, /*4*/{$sub[3]}, 
-						/*5*/{$sub[3]}, /*6*/-1, /*7*/-1, /*8*/{$sub[2]} )";
+				//	$sql = "INSERT INTO ec_movimiento_detalle ( /*1*/id_movimiento_almacen_detalle, /*2*/id_movimiento,
+				//		/*3*/id_producto, /*4*/cantidad, /*5*/cantidad_surtida, /*6*/id_pedido_detalle,/*7*/id_oc_detalle,
+				//		/*8*/id_proveedor_producto ) VALUES ( /*1*/NULL, /*2*/{$mov_header_id},/*3*/{$sub[1]}, /*4*/{$sub[3]}, 
+				//		/*5*/{$sub[3]}, /*6*/-1, /*7*/-1, /*8*/{$sub[2]} )";
+					$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$mov_header_id}, {$sub[1]}, {$sub[3]}, {$sub[3]}, 
+								-1, -1, {$sub[2]}, 5, NULL  )";
 					$exc = $link->query( $sql ) or die ( "Error al insertar el detalle del movimiento de almacen 1 : {$link->error}" );	
 					
 					$sql = "UPDATE ec_diferencias_inventario_proveedor_producto
@@ -2358,22 +2390,34 @@
 
 		if( $addition != '' &&  $addition != null  ){
 	//inserta la cabecera del movimiento de almacen ( suma )
-			$sql = "INSERT INTO ec_movimiento_almacen ( /*1*/id_movimiento_almacen, /*2*/id_tipo_movimiento, 
-				/*3*/id_usuario, /*4*/id_sucursal, /*5*/fecha, /*6*/hora, /*7*/observaciones, /*8*/id_pedido,
-				/*9*/id_orden_compra, /*10*/lote, /*11*/id_maquila, /*12*/id_transferencia, /*13*/id_almacen )
-					VALUES( /*1*/NULL, /*2*/9, /*3*/{$user}, /*4*/1, /*5*/NOW(), /*6*/NOW(), 
-						/*7*/'SUMA POR AJUSTE DE INVENTARIO DESDE VALIDACIÓN', /*8*/-1, /*9*/-1, /*10*/NULL,
-						/*11*/-1, /*12*/-1, /*13*/1 )";
+			//$sql = "INSERT INTO ec_movimiento_almacen ( /*1*/id_movimiento_almacen, /*2*/id_tipo_movimiento, 
+			//	/*3*/id_usuario, /*4*/id_sucursal, /*5*/fecha, /*6*/hora, /*7*/observaciones, /*8*/id_pedido,
+			//	/*9*/id_orden_compra, /*10*/lote, /*11*/id_maquila, /*12*/id_transferencia, /*13*/id_almacen )
+			//		VALUES( /*1*/NULL, /*2*/9, /*3*/{$user}, /*4*/1, /*5*/NOW(), /*6*/NOW(), 
+			//			/*7*/'SUMA POR AJUSTE DE INVENTARIO DESDE VALIDACIÓN', /*8*/-1, /*9*/-1, /*10*/NULL,
+			//			/*11*/-1, /*12*/-1, /*13*/1 )";
+			$sql = "CALL spMovimientoAlmacen_inserta ( {$user}, 'SUMA POR AJUSTE DE INVENTARIO DESDE VALIDACIÓN', 1, 1, 9,
+						-1, -1, -1, -1, 5, NULL )";
 			$stm = $link->query( $sql ) or die( "Error al insertar cabecera de movimiento de almacen ( ajuste ): {$link->error}" );
-			$mov_header_id = (int) $link->insert_id;
+			//$mov_header_id = (int) $link->insert_id;
+
+			//recupera el id insertado
+			$sql = "SELECT MAX(id_movimiento_almacen) AS movement_header_id FROM ec_movimiento_almacen";
+			$stm = $link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado por ajuste ( resta ) : {$sql} : {$link->error}" );
+			$row = $stm->fetch_assoc();
+			$mov_header_id = $row['movement_header_id'];
+
 			$addition_array = explode( '|', $addition );
 			foreach ( $addition_array as $key => $add ) {
 				$add = explode( '~', $add );
 				if( $add[0] != '' && $add[0] != null ){
-					$sql = "INSERT INTO ec_movimiento_detalle ( /*1*/id_movimiento_almacen_detalle, /*2*/id_movimiento,
-						/*3*/id_producto, /*4*/cantidad, /*5*/cantidad_surtida, /*6*/id_pedido_detalle,/*7*/id_oc_detalle,
-						/*8*/id_proveedor_producto ) VALUES ( /*1*/NULL, /*2*/{$mov_header_id},/*3*/{$add[1]}, /*4*/{$add[3]}, 
-						/*5*/{$add[3]}, /*6*/-1, /*7*/-1, /*8*/{$add[2]} )";
+			//		$sql = "INSERT INTO ec_movimiento_detalle ( /*1*/id_movimiento_almacen_detalle, /*2*/id_movimiento,
+			//			/*3*/id_producto, /*4*/cantidad, /*5*/cantidad_surtida, /*6*/id_pedido_detalle,/*7*/id_oc_detalle,
+			//			/*8*/id_proveedor_producto ) VALUES ( /*1*/NULL, /*2*/{$mov_header_id},/*3*/{$add[1]}, /*4*/{$add[3]}, 
+			//			/*5*/{$add[3]}, /*6*/-1, /*7*/-1, /*8*/{$add[2]} )";
+					
+					$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$mov_header_id}, {$add[1]}, {$add[3]}, {$add[3]}, 
+								-1, -1, {$add[2]}, 5, NULL )";
 					$exc = $link->query( $sql) or die( "Error al insertar el detalle del movimiento de almacen 2 : {$link->error}" );	
 					
 					$sql = "UPDATE ec_diferencias_inventario_proveedor_producto

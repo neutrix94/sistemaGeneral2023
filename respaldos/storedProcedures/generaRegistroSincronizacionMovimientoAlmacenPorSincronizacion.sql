@@ -36,6 +36,7 @@ BEGIN
 				'"id_equivalente" : "-1", ',
 				'"ultima_sincronizacion" : "', IF( ma.ultima_sincronizacion IS NULL, '', ma.ultima_sincronizacion ) ,'", ',
 				'"ultima_actualizacion" : "', IF( ma.ultima_actualizacion IS NULL, '', ma.ultima_actualizacion ) ,'", ',
+				'"id_pantalla" : "', ma.id_pantalla,'",',
 				'"folio_unico" : "', ma.folio_unico ,'" ',
 			IF( md.id_movimiento_almacen_detalle IS NOT NULL,
 				CONCAT( ', "movimiento_detail" : [',

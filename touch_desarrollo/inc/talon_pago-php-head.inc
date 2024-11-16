@@ -511,6 +511,8 @@
 	$ticket->SetFont('Arial','',$bF-2);
 	if($pagado == 1) {
 			if( $devolucion['pagos_realizados'] > 0 ){
+				$devolucion['pagos_realizados'] = number_format( $devolucion['pagos_realizados'], 2);
+				$devolucion['total_actual'] = number_format( $devolucion['total_actual'],2);
 				$ticket->SetFont('Arial','B',$bF+2);
 				$ticket->SetXY(5, $ticket->GetY()+6);
 				$ticket->Cell(66, 6, utf8_decode("TOTAL PAGADO : $ {$devolucion['pagos_realizados']}"), "" ,0, "L");

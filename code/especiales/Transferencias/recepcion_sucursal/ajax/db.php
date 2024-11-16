@@ -1,4 +1,6 @@
 <?php
+/*Version con insercion de movimientos por Procedure (2024-08-05)*/
+/*Version con comprobacionde llegaron de Menos Oscar (2024-08-29)*/
 	if( isset( $_GET['fl'] ) ){
 		include( '../../../../../config.inc.php' );
 		include( '../../../../../conect.php' );
@@ -829,7 +831,48 @@
 				WHERE id_transferencia IN( $transfers )";
 //die( $sql );
 		$stm = $link->query( $sql ) or die( "Error al actualizar la(s) Transferencia( s ) a recibidas : {$sql}  {$link->error}" );
-	//verifica si hay registros en resolución
+/*Implementación Oscar 2024-08-05 para hacer movimientos de transferencias por procedure*/
+	$transfers_array = explode( ",", $transfers );
+	foreach ( $transfers_array as $key => $transfer ) {
+	//consulta datos de cabecera de la transferencia
+		$sql = "SELECT 
+					t.id_usuario, 
+					t.id_sucursal_origen,
+					t.id_sucursal_destino,
+					t.id_transferencia, 
+					t.id_almacen_origen,
+					t.id_almacen_destino
+				FROM ec_transferencias t
+				WHERE t.id_transferencia = {$transfer}";
+		$stm_1 = $link->query( $sql ) or die( "Error al consultar datos de la transferencia : {$sql} : {$link->error}" );
+		$transfer_row = $stm_1->fetch_assoc();
+	//inserta cabecera de movimiento de almacen
+		$sql = "CALL spMovimientoAlmacen_inserta ( {$transfer_row['id_usuario']}, 'ENTRADA POR TRANSFERENCIA', {$transfer_row['id_sucursal_destino']}, {$transfer_row['id_almacen_destino']}, 5,
+				-1, -1, -1, {$transfer}, 4, NULL )";
+		$stm_2 = $link->query( $sql ) or die( "Error al insertar el movimiento de almacen por Procedure : {$sql} : {$link->error}" );
+	//recupera id insertado
+		$sql = "SELECT LAST_INSERT_ID() AS last_id";
+		$stm_3 = $link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado : {$sql} : {$link->error}" );
+		$movement_id = $stm_3->fetch_assoc();
+		$movement_id = $movement_id['last_id'];
+	//consulta datos del detalle de la transferencia
+		$sql = "SELECT 
+				tp.id_producto_or,
+				tp.total_piezas_recibidas,
+				tp.id_proveedor_producto
+				FROM ec_transferencia_productos tp
+				WHERE tp.id_transferencia = {$transfer}
+				AND tp.omite_movimiento_origen = 0";
+		$stm_4 = $link->query( $sql ) or die( "Error al consultar el detalle de productos de la transferencia : {$sql} : {$link->error}" );
+	//inserta detalle de movimientos de almacen
+		while( $detail_row = $stm_4->fetch_assoc() ){
+			$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_id}, {$detail_row['id_producto_or']}, {$detail_row['total_piezas_recibidas']}, 
+						{$detail_row['total_piezas_recibidas']}, -1, -1, {$detail_row['id_proveedor_producto']}, 8, NULL )";
+			$stm_5 = $link->query( $sql ) or die( "Error al insertar detalle de movimiento de almacen desde procedure : {$sql} : {$link->error}" );
+		}
+	}
+/*fin de cambio Oscar 2024-08-05*/
+	//verifica si hay registros en resolución ( Se recibe de mas )
 		$sql = "SELECT
 					btr.id_producto AS product_id,
 					btr.id_proveedor_producto AS product_provider_id,
@@ -842,8 +885,21 @@
 				WHERE btr.id_bloque_transferencia_recepcion IN( {$reception_block_id} )
 				ORDER BY p.orden_lista ASC";
 		$stm = $link->query( $sql ) or die( "Error al consultar detalles por resolver : {$link->error}" );
-		
-		if( $stm->num_rows > 0 ){
+	
+	//verifica si hay registros en resolución ( Se recibe de menos ) 2024-08-29
+		$sql = "SELECT
+					tp.id_transferencia_producto
+				FROM ec_transferencia_productos tp
+				LEFT JOIN ec_transferencias t
+				ON tp.id_transferencia = t.id_transferencia
+				LEFT JOIN ec_bloques_transferencias_validacion_detalle btvd
+				ON btvd.id_transferencia = t.id_transferencia
+				LEFT JOIN ec_bloques_transferencias_recepcion_detalle btrd
+				ON btrd.id_bloque_transferencia_validacion = btvd.id_bloque_transferencia_validacion
+				WHERE tp.total_piezas_validacion > tp.total_piezas_recibidas
+				AND btrd.id_bloque_transferencia_recepcion = {$reception_block_id}";
+		$stm2 = $link->query( $sql ) or die( "Error al consultar detalles recibidos con piezas de menos : {$link->error}" );
+		if( $stm->num_rows > 0 || $stm2 > 0 ){
 			$resp = "show_view( this, '.validate_transfers');close_emergent();";
 		/*	$sql = "SELECT 
 						t.id_sucursal_origen AS store_destinity,
@@ -862,6 +918,9 @@
 			$resp = $TransferResolution->insertResolutionHeader( $recepcion_block_id, $user, $sucursal, $header_data, $stm );*/
 		}else{
 			$resp = "close_emergent();";
+		/** 
+		 * Esta consulta es inecesaria pero se mantiene para no mover esta funcionalidad
+		*/
 			$sql = "SELECT
 						id_producto_resolucion
 					FROM ec_productos_resoluciones_tmp
@@ -2924,7 +2983,7 @@
 		$stm = $link->query( $sql ) or die( "Error al insertar el nuevo registro en la transferencia" . $link->error );
 		$new_detail_id  = $link->insert_id;
 	//inserta el detalle del movimiento de almacen
-		$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
+		/*$sql = "INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida, 
 				id_pedido_detalle, id_oc_detalle, id_proveedor_producto )
 				SELECT 
 					'{$mov_id}',
@@ -2935,8 +2994,18 @@
 					-1, 
 					tp.id_proveedor_producto
 				FROM ec_transferencia_productos tp
+				WHERE tp.id_transferencia_producto = '{$new_detail_id}'";*/
+		$sql = "SELECT 
+					tp.id_producto_or,
+					tp.cantidad,
+					tp.cantidad
+					tp.id_proveedor_producto
+				FROM ec_transferencia_productos tp
 				WHERE tp.id_transferencia_producto = '{$new_detail_id}'";
-		$stm = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen : " . $link->error );
+		$stm_detail = $link->query( $sql )or die( "Error al consultar el detalle para insertar detalle movimiento de almacen por procedure : " . $link->error );
+		$detail_row = $stm_detail->fetch_assoc();
+		$sql = "CALL spMovimientoAlmacenDetalle_inserta( {$mov_id}, {$detail_row['id_producto_or']}, {$detail_row['cantidad']}, {$detail_row['cantidad']}, -1, -1, {$detail_row['id_proveedor_producto']}, 8, NULL );";
+		$stm = $link->query( $sql )or die( "Error al insertar el detalle del movimiento de almacen por procedure : {$sql} : {$link->error}" );
 		return "El producto fue agregado y validado exitosamente!";
 	}
 

@@ -72,10 +72,10 @@
 		public function insert_triggers(){
 			include( '../../herramientas/mantenimiento_sistema/mysqlDDL.php' );
 			$mysqlDDL = new mysqlDDL( $this->link );
-			$enabled_triggers = $mysqlDDL->alterInventoryTriggersSinceFiles( '../../../../respaldos/triggersInventarios/' );
+			/*$enabled_triggers = $mysqlDDL->alterInventoryTriggersSinceFiles( '../../../../respaldos/triggersInventarios/' );
 			if( $enabled_triggers != 'ok' ){
 				die( "Ocurrio un problema al reinsertar los triggers de inventario en la base de datos : {$enabled_triggers}" );
-			}
+			}*/
 			$enabled_triggers = $mysqlDDL->alterInventoryTriggersSinceFiles( '../../../../respaldos/triggers_sistema/' );
 			if( $enabled_triggers != 'ok' ){
 				die( "Ocurrio un problema al reinsertar los triggers del sistema en la base de datos : {$enabled_triggers}" );
@@ -245,7 +245,7 @@
 			curl_setopt($crl, CURLOPT_POST, true);
 			curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
 			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-		    curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+		    curl_setopt($crl, CURLOPT_TIMEOUT, 60000);
 			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
 			  'Content-Type: application/json',
 			  'token: ' . $token)

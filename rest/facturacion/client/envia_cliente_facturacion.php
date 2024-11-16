@@ -12,10 +12,14 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 $app->post('/clientes/nuevoCliente', function (Request $request, Response $response){
 //die( 'here' );
   include('../../conexionMysqli.php');
-  $dbHost = "sistemageneralcasa.com";
-  $dbUser = "wwsist_oscar23";
-  $dbPassword = "wwsist_oscar23_23";
-  $dbName = "wwsist_casa_luces_bazar"; 
+/*Implementacion Oscar 2024-06-27*/
+  $sql = "SELECT host_bd, usuario_bd, pass_bd, nombre_bd FROM ec_bases_facturacion LIMIT 1";
+  $db_stm = $link->query( $sql ) or die( "Error al consultar los parametros de bases de datos de facturacion : {$sql} : {$link->error}" );
+  $db_row = $db_stm->fetch_assoc();
+  $dbHost = $db_row['host_bd'];//"sistemageneralcasa.com";
+  $dbUser = $db_row['usuario_bd'];//"wwsist_oscar23";
+  $dbPassword = $db_row['pass_bd'];//"wwsist_oscar23_23";
+  $dbName = $db_row['nombre_bd'];//"wwsist_casa_luces_bazar"; */
 
   $linkFact = mysqli_connect($dbHost, $dbUser, $dbPassword, $dbName);
   if( $linkFact->connect_error ){

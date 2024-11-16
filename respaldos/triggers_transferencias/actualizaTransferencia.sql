@@ -14,6 +14,14 @@ BEGIN
 	DECLARE permiso_transfer INT(11);
 	DECLARE row_counter INT(11);
 
+	/*DECLARE var_id_tipo_movimiento INTEGER;
+	DECLARE var_id_usuario INTEGER; 
+	DECLARE var_id_sucursal INTEGER; 
+	DECLARE var_fecha DATE; 
+	DECLARE var_hora TIME; 
+	DECLARE var_id_transferencia INTEGER; 
+	DECLARE var_id_almacen INTEGER;*/
+
 	SELECT id_sucursal INTO store_id FROM sys_sucursales WHERE acceso=1;
 	SELECT
 		id_sucursal,
@@ -33,35 +41,48 @@ BEGIN
 	SET estado=new.id_estado;
 	IF(new.id_estado=2 AND new.id_estado!=old.id_estado AND (sucActual=-1 OR permiso_transfer=1))
 	THEN
+		UPDATE ec_transferencia_productos SET cantidad_salida=cantidad,
+		cantidad_salida_pres=cantidad_presentacion WHERE id_transferencia=idTransfer;
+	/*
 		SELECT COUNT( * ) INTO row_counter FROM ec_transferencia_productos WHERE id_transferencia=idTransfer
 		AND omite_movimiento_origen = 0;
-	IF( row_counter > 0 )
-	THEN
-	INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora, observaciones, id_pedido, 
-		id_orden_compra, lote, id_maquila, id_transferencia, id_almacen)
-	SELECT 6,t.id_usuario, t.id_sucursal_origen, NOW(), NOW(), 'SALIDA DE TRANSFERENCIA', -1, 
-	-1, '', -1,t.id_transferencia, t.id_almacen_origen
-	FROM ec_transferencias t where t.id_transferencia=idTransfer;
+		IF( row_counter > 0 )
+		THEN
+			SELECT 
+				6,
+				t.id_usuario, 
+				t.id_sucursal_origen, 
+				NOW(), 
+				NOW(),
+				t.id_transferencia, 
+				t.id_almacen_origen
+			INTO
+				var_id_tipo_movimiento,
+				var_id_usuario,
+				var_id_sucursal,
+				var_fecha,
+				var_hora,
+				var_id_transferencia,
+				var_id_almacen
+			FROM ec_transferencias t WHERE t.id_transferencia = idTransfer;
 
-	SELECT MAX(id_movimiento_almacen) INTO movAlmacen FROM ec_movimiento_almacen;
+			CALL spMovimientoAlmacen_inserta ( var_id_usuario, 'SALIDA POR TRANSFERENCIA', var_id_sucursal, var_id_almacen, 
+				var_id_tipo_movimiento, -1, -1, -1, var_id_transferencia, 4, NULL );
 
-	UPDATE ec_transferencia_productos SET cantidad_salida=cantidad,
-	cantidad_salida_pres=cantidad_presentacion WHERE id_transferencia=idTransfer;
+			SELECT LAST_INSERT_ID() INTO movAlmacen;
 
-	INSERT INTO ec_movimiento_detalle(id_movimiento, id_producto,cantidad,cantidad_surtida,
-	id_pedido_detalle, id_oc_detalle, id_proveedor_producto)
-	SELECT movAlmacen,tP.id_producto_or,tP.cantidad,tP.cantidad,-1,-1, tP.id_proveedor_producto
-	FROM ec_transferencia_productos tP
-	WHERE tP.id_transferencia=idTransfer
-	AND tP.omite_movimiento_origen = 0;
-	END IF;
+			UPDATE ec_transferencia_productos SET cantidad_salida=cantidad,
+			cantidad_salida_pres=cantidad_presentacion WHERE id_transferencia=idTransfer;
+
+			CALL insertaDetalleMovimientoTransferencia( idTransfer, movAlmacen );
+		END IF;*/
 	END IF;
 
 	IF( new.id_estado=9 AND new.id_estado!=old.id_estado AND (sucActual=-1 OR permiso_transfer=1) )
 	THEN
 		SELECT COUNT( * ) INTO row_counter FROM ec_transferencia_productos WHERE id_transferencia=idTransfer
 		AND omite_movimiento_destino = 0;
-		IF( row_counter > 0 )
+		/*IF( row_counter > 0 )
 		THEN
 			INSERT INTO ec_movimiento_almacen(id_tipo_movimiento, id_usuario, id_sucursal, fecha, hora,
 			observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen)
@@ -78,7 +99,7 @@ BEGIN
 			WHERE tP.id_transferencia=idTransfer
 			AND tP.total_piezas_recibidas != 0
 			AND tP.omite_movimiento_destino = 0;
-		END IF;
+		END IF;*/
 	END IF;
 
 	IF( new.sincronizar = 1 )

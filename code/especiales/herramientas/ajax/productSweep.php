@@ -1,10 +1,10 @@
 	
 <?php
 	
-	include( '../../../../conexionMysqli.php' );
+/*	include( '../../../../conexionMysqli.php' );
 	die( "Habilitar el código del Web Service!" );
 	$productSweep = new productSweep( $link );
-	$productSweep->getProducts( null, null, null );
+	$productSweep->getProducts( null, null, null );*/
 	class productSweep
 	{
 		private $link;
@@ -38,7 +38,7 @@
 
 		public function getWebServiceConfiguration(){
 		//token
-			$sql = "select token from api_token where id_user=0 and expired_in > now() limit 1;";
+			$sql = "select token from api_token where expired_in > now() limit 1;";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar token : {$this->link->error}" );
 			if( $stm->num_rows <= 0 ){
 				die( "No hay token Vigente!" );
@@ -65,6 +65,7 @@
 					)
 			);
 			$post_data = json_encode($data);
+			//echo "{$this->end_point}/rest/v1/productos/nuevoFact";
 			$crl = curl_init( "{$this->end_point}/rest/v1/productos/nuevoFact");
 			curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($crl, CURLINFO_HEADER_OUT, true);

@@ -1,6 +1,20 @@
 <?php
+/*
+	*Version 1.1 2024-09-03 Modificaciones para no dejar acceder en local a la pantalla de ubicaciones en sucursal
+*/
 	include( '../../../../conect.php' );
 	include( '../../../../conexionMysqli.php' );
+//implementacion Oscar 2024-09-03 para no dejar usar la pantalla en local
+	$sql = "SELECT
+				id_sucursal AS store_id
+			FROM sys_sucursales
+			WHERE acceso = 1";
+	$stm = $link->query( $sql ) or die( "Error al consultar el tipo de sistema : {$link->error}" );
+	$row = $stm->fetch_assoc();
+	if( $row['store_id'] >=1 ){
+		die( "<script>alert( \"Esta pantalla solo puede ser usada en el sistema en linea.\" );location.href=\"../../../../index.php?\";</script>" );
+	}
+	
 //busca nombre de sucursal y almacen principal
 	$sql = "SELECT
 				s.nombre AS store_name,
@@ -172,11 +186,16 @@
 					onclick="detect_location_change();">
 				</div>
 
-				<div class="col-12 text-center">
+				<div class="col-6 text-center">
 					<br>
 					<label>Es Ubicacion Principal</label><br>
 					<input type="checkbox" id="is_principal" style="transform : scale( 2 );"
 					onclick="detect_location_change();">
+				</div>
+				<div class="col-6 text-center">
+					<br>
+					<label>Se surte en Ventas</label><br>
+					<input type="checkbox" id="is_supplied" style="transform : scale( 2 );" disabled>
 				</div>
 			</div>
 

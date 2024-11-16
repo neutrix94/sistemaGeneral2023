@@ -1,10 +1,18 @@
 DROP TRIGGER IF EXISTS insertaProveedorProducto|
 DELIMITER $$
 CREATE TRIGGER insertaProveedorProducto
-AFTER INSERT ON ec_proveedor_producto
+BEFORE INSERT ON ec_proveedor_producto
 FOR EACH ROW
 BEGIN
 	DECLARE store_id INTEGER;
+	DECLARE new_product_provider_id INT(11);/*estra va a ser el nuevo id proveedor producto*/
+	DECLARE current_prefix VARCHAR(2);
+/*consultamos el nuevo id de proveedor producto*/
+	SELECT ( MAX( id_proveedor_producto ) + 1 ) INTO new_product_provider_id FROM ec_proveedor_producto; 
+	SET new.id_proveedor_producto = new_product_provider_id;
+/*consulta el prefijo actual*/
+	SELECT prefijo_codigos_unicos INTO current_prefix FROM sys_configuracion_sistema LIMIT 1;
+	SET new.prefijo_codigos_unicos = current_prefix;
 	SELECT id_sucursal INTO store_id FROM sys_sucursales WHERE acceso=1;
 	IF( store_id = -1 AND new.sincronizar = 1 )
 	THEN

@@ -6,6 +6,7 @@ BEGIN
 	DECLARE user_validation_id BIGINT DEFAULT NULL;
 	DECLARE detail_unique_folio VARCHAR(30);
 	DECLARE fecha_base VARCHAR(10);
+	DECLARE validation_store INT;
 	DECLARE recorre CURSOR FOR
 		SELECT 
 			pvu.id_pedido_validacion,

@@ -351,8 +351,8 @@
 		margin-bottom: 10px;
 		width: 100% !important;
 		max-width: 100% !important;
-		height : 200px !important;
-		max-height : 200px !important;
+		height : 300px !important;
+		max-height : 300px !important;
 		overflow: auto;
 	}
 /*captura de productos en ventas*/

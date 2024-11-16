@@ -31,7 +31,7 @@ BEGIN
 				'}'
 			),
 			NOW(),
-			0,
+			'insertaAlmacen',
 			1
 		FROM sys_sucursales 
 		WHERE id_sucursal > 0;

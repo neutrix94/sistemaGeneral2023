@@ -15,6 +15,8 @@ BEGIN
 	DECLARE transfer_reception_unique_folio VARCHAR( 30 );
 	DECLARE transfer_resolution_unique_folio VARCHAR( 30 );
 	DECLARE transfer_resolution_detail_unique_folio VARCHAR( 30 );
+/*Consulta sucursal de la base de datos con acceso 1*/
+	SELECT id_sucursal INTO store_id FROM sys_sucursales WHERE acceso = 1 LIMIT 1;
 /*inserta registro de sincronizacion*/
 	INSERT INTO sys_sincronizacion_registros_transferencias ( id_sincronizacion_registro, sucursal_de_cambio,
 	id_sucursal_destino, datos_json, fecha, tipo, status_sincronizacion )

@@ -29,6 +29,7 @@ BEGIN
                 '"precio_etiqueta" : "', new.precio_etiqueta, '",',
                 '"id_producto" : "', new.id_producto, '",',
                 '"es_oferta" : "', new.es_oferta, '",',
+                '"precio_anterior" : "', new.precio_anterior, '",',
                 '"alta" : "', new.alta, '",',
                 '"ultima_actualizacion" : "', new.ultima_actualizacion, '",',
                 '"sincronizar" : "0"',

@@ -19,7 +19,7 @@
 	    $tmp_=explode("~",$config[0]);
 		$carpeta_path = base64_decode( $tmp_[1] );
 	}else{
-		die("No hay archivo de configuración!!!");
+		die("No hay archivo de configuración.");
 	}
 /*Fin de cambio Oscar 25.01.2018*/
     
@@ -234,7 +234,7 @@ Fin de cambio Oscar 25.06.2019*/
 			FROM ec_devolucion_pagos dp 
 			LEFT JOIN ec_devolucion dev ON dp.id_devolucion=dev.id_devolucion
 			WHERE dev.id_pedido=$id_pedido";
-	$eje=mysql_query($sql)or die("Error al calcular monto de devoluciones!!!\n\n".$sql."\n\n".mysql_error());
+	$eje=mysql_query($sql)or die("Error al calcular monto de devoluciones : \n\n".$sql."\n\n".mysql_error());
 	$res_dev=mysql_fetch_row($eje);
 	
 	$monto_devolucion=$res_dev[0];//aqui capturamos el monto de la devolucion
@@ -675,7 +675,7 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 
 /*implementación Oscar 17.09.2018 para impresión de tickets de acuerdo a la configuración de la sucursal*/
     	$sql="SELECT IF($pagado=1,ticket_venta,ticket_apartado) FROM sys_sucursales WHERE id_sucursal=$user_sucursal";
-    	$eje=mysql_query($sql)or die("Error al consultar número de impresiones!!!\n\n".$sql."\n\n".mysql_error());	
+    	$eje=mysql_query($sql)or die("Error al consultar número de impresiones : \n\n".$sql."\n\n".mysql_error());	
     	$numero=mysql_fetch_row($eje);
     	for($cont=1;$cont<=1;$cont++){//$numero[0]
     		$nombre_ticket="ticket_".$user_sucursal."_" . date("YmdHis") . "_" . strtolower($tipofolio) . "_" . $folio . "_".$cont.".pdf";
@@ -691,7 +691,7 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 					$registro_sincronizacion = $SysArchivosDescarga->crea_registros_sincronizacion_archivo( 'pdf', $nombre_ticket, $ruta_or, $ruta_salida, $user_sucursal, $user_id );
 				}else{//impresion por red local
 					$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 3, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, 
-					$carpeta_path, '../', 'alert("Impresion de cotizacion exitosa!");close_emergent();' );
+					$carpeta_path, '../', 'alert("Impresion de cotizacion exitosa.");close_emergent();' );
 				}
 			}
     /*fin de cambio Oscar 25.01.2019*/
@@ -707,7 +707,7 @@ $ticket->MultiCell(66, 4, utf8_decode($datos_fiscales), "", "C", false);
 		if( isset($_GET['show_pdf']) ){
 			die( "ok|../../{$ruta_salida}/{$nombre_ticket}" );
 		}
-       	die( "ok|Cotizacion Impresa exitosamente!" );
+       	die( "ok|Cotizacion Impresa exitosamente." );
        	//header ("location: index.php?scr=evaluation"); 
     }
 		

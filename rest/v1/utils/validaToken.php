@@ -28,7 +28,10 @@
       }
 
       public function refrescar_token( $token, $db ){
-        $sqlToken = "UPDATE api_token SET expired_in = ( select TIMESTAMPADD(SECOND,3600,NOW()) ) WHERE token = '{$token}'";
+        $sqlAPIConfig="SELECT value FROM api_config c WHERE c.key='token' and name='time_value' limit 1";//Genera sentencia recuperar tiem_value
+        $resultadoConfig = $db->query($sqlAPIConfig);
+        $time_value = $resultadoConfig->fetch();
+        $sqlToken = "UPDATE api_token SET expired_in = ( select TIMESTAMPADD( SECOND, {$time_value['value']}, NOW() ) ) WHERE token = '{$token}'";
         $stm = $db->query($sqlToken);
         if( !$stm ){
           return "Error al renovar token : {$db->errorInfo()}";

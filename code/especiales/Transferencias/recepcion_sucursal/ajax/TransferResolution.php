@@ -75,22 +75,80 @@
 						fecha_alta = NOW(),
 						invalidado = 0";
 			$stm = $this->link->query( $sql ) or die( "Error al insertar detalle de bloque de validación : {$this->link->error}" );
-			
 		//actualiza la transferencia a salida para hacer los movimientos de almacen(origen)
+/**** INSERTA MOVIMIENTOS DE SALIDA ****/
 			$sql = "UPDATE ec_transferencias 
 						SET id_estado = 2
 					WHERE id_transferencia = {$header_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al actualizar transferencias : {$sql} {$this->link->error}" );
-
+		//consulta datos de cabecera de la transferencia
+			$sql = "SELECT 
+					t.id_usuario, 
+					t.id_sucursal_origen,
+					t.id_sucursal_destino,
+					t.id_transferencia, 
+					t.id_almacen_origen,
+					t.id_almacen_destino
+				FROM ec_transferencias t
+				WHERE t.id_transferencia = {$header_id}";
+			$stm_1 = $this->link->query( $sql ) or die( "Error al consultar datos de la transferencia : {$sql} : {$this->link->error}" );
+			$transfer_row = $stm_1->fetch_assoc();
+		//inserta cabecera de movimiento de almacen
+			$sql = "CALL spMovimientoAlmacen_inserta ( {$transfer_row['id_usuario']}, 'SALIDA POR TRANSFERENCIA', {$transfer_row['id_sucursal_origen']}, {$transfer_row['id_almacen_origen']}, 6,
+				-1, -1, -1, {$header_id}, 9, NULL )";
+			$stm_2 = $this->link->query( $sql ) or die( "Error al insertar el movimiento de almacen entrada por Procedure : {$sql} : {$this->link->error}" );
+		//recupera id insertado
+			$sql = "SELECT LAST_INSERT_ID() AS last_id";
+			$stm_3 = $this->link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado : {$sql} : {$this->link->error}" );
+			$movement_id = $stm_3->fetch_assoc();
+			$movement_id = $movement_id['last_id'];
+		//consulta datos del detalle de la transferencia
+			$sql = "SELECT 
+				tp.id_producto_or,
+				tp.cantidad,
+				tp.id_proveedor_producto
+				FROM ec_transferencia_productos tp
+				WHERE tp.id_transferencia = {$header_id}
+				AND tp.omite_movimiento_origen = 0";
+			$stm_4 = $this->link->query( $sql ) or die( "Error al consultar el detalle de productos de la transferencia : {$sql} : {$this->link->error}" );
+			//inserta detalle de movimientos de almacen
+			while( $detail_row = $stm_4->fetch_assoc() ){
+				$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_id}, {$detail_row['id_producto_or']}, {$detail_row['cantidad']}, 
+							{$detail_row['cantidad']}, -1, -1, {$detail_row['id_proveedor_producto']}, 9, NULL )";
+				$stm_5 = $this->link->query( $sql ) or die( "Error al insertar detalle de movimiento de almacen entrada desde procedure : {$sql} : {$this->link->error}" );
+			}
 		//actualiza la transferencia a recibida para hacer los movimientos de almacen(destino)
 			$sql = "UPDATE ec_transferencias 
 						SET id_estado = 9
 					WHERE id_transferencia = {$header_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al actualizar transferencias : {$sql} {$this->link->error}" );
 
-
+/**** INSERTA MOVIMIENTOS DE ENTRADA ****/
+		//inserta cabecera de movimiento de almacen
+			$sql = "CALL spMovimientoAlmacen_inserta ( {$transfer_row['id_usuario']}, 'SALIDA POR TRANSFERENCIA', {$transfer_row['id_sucursal_destino']}, {$transfer_row['id_almacen_destino']}, 5,
+			-1, -1, -1, {$header_id}, 9, NULL )";
+			$stm_2 = $this->link->query( $sql ) or die( "Error al insertar el movimiento de almacen salida por Procedure : {$sql} : {$this->link->error}" );
+		//recupera id insertado
+			$sql = "SELECT LAST_INSERT_ID() AS last_id";
+			$stm_3 = $this->link->query( $sql ) or die( "Error al consultar el id de movimiento de almacen insertado : {$sql} : {$this->link->error}" );
+			$movement_id = $stm_3->fetch_assoc();
+			$movement_id = $movement_id['last_id'];
+		//consulta datos del detalle de la transferencia
+			$sql = "SELECT 
+						tp.id_producto_or,
+						tp.cantidad,
+						tp.id_proveedor_producto
+					FROM ec_transferencia_productos tp
+					WHERE tp.id_transferencia = {$header_id}
+					AND tp.omite_movimiento_origen = 0";
+			$stm_4 = $this->link->query( $sql ) or die( "Error al consultar el detalle de productos de la transferencia : {$sql} : {$this->link->error}" );
+		//inserta detalle de movimientos de almacen
+			while( $detail_row = $stm_4->fetch_assoc() ){
+				$sql = "CALL spMovimientoAlmacenDetalle_inserta ( {$movement_id}, {$detail_row['id_producto_or']}, {$detail_row['cantidad']}, 
+							{$detail_row['cantidad']}, -1, -1, {$detail_row['id_proveedor_producto']}, 9, NULL )";
+				$stm_5 = $this->link->query( $sql ) or die( "Error al insertar detalle de movimiento de almacen salida desde procedure : {$sql} : {$this->link->error}" );
+			}
 			return "La Transferencia por resolución fue generada exitosamente";
-		
 		}
 
 		public function insertResolutionDetail( $stm, $transfer_id ){

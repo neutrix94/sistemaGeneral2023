@@ -194,6 +194,14 @@
 			</div>
 		</div>
 	</div>
+	<div class="footer bg-primary text-center">
+		<button
+			class="btn btn-light"
+			onclick="if( confirm( 'Realmente deseas salir al Panel principal?' ) ){ location.href='../../../../index.php?'; }"
+		>
+			<i class="icon-home-1">Regresar al Panel</i>
+		</button>
+	</div>
 </body>
 </html>
 

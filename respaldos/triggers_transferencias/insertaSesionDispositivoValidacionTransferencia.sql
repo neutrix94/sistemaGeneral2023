@@ -60,13 +60,34 @@ BEGIN
 						'( SELECT id_bloque_transferencia_validacion FROM ec_bloques_transferencias_validacion WHERE folio_unico = \'',
 						validation_block_unique_folio, '\' LIMIT 1 )",' )
 				),
-				'"token_unico_dispositivo" : "', new.token_unico_dispositivo, '",',
-				'"id_usuario" : "', new.id_usuario, '",',
-				'"fecha_sesion" : "', new.fecha_sesion, '",',
-				'"fecha_modificacion" : "', new.fecha_modificacion, '",',
-				'"bloqueada" : "', new.bloqueada, '",',
-				'"finalizada" : "', new.finalizada, '",',
-				'"folio_unico" : "', new.folio_unico, '",',
+				IF( new.token_unico_dispositivo IS NULL,
+					'', 
+					CONCAT( '"token_unico_dispositivo" : "', new.token_unico_dispositivo, '",' )
+				),
+				IF( new.id_usuario IS NULL,
+					'', 
+					CONCAT( '"id_usuario" : "', new.id_usuario, '",' )
+				),
+				IF( new.fecha_sesion IS NULL,
+					'', 
+					CONCAT( '"fecha_sesion" : "', new.fecha_sesion, '",' )
+				),
+				IF( new.fecha_modificacion IS NULL,
+					'', 
+					CONCAT( '"fecha_modificacion" : "', new.fecha_modificacion, '",' )
+				),
+				IF( new.bloqueada IS NULL,
+					'', 
+					CONCAT( '"bloqueada" : "', new.bloqueada, '",' ) 
+				),
+				IF( new.finalizada IS NULL,
+					'', 
+					CONCAT( '"finalizada" : "', new.finalizada, '",' ) 
+				),
+				IF( new.folio_unico IS NULL,
+					'', 
+					CONCAT( '"folio_unico" : "', new.folio_unico, '",' ) 
+				),
 				'"sincronizar" : "0"',
 				'}'
 			),

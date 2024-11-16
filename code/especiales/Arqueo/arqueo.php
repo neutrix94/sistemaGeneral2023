@@ -1,5 +1,5 @@
 <?php
-/*version casa 1.1*/
+/*version 2.0 2024-06-21*/
 	include('../../../conectMin.php');
 	include('../../../conexionMysqli.php');
 	include( 'ajax/Arqueo.php' );
@@ -68,7 +68,7 @@
 		$multicajero=$r[0];
 	//	die($multicajero);
 		if($multicajer0==1){
-			include('encabezadoMulticajero.php');
+			include('encabezadoUnicajero.php');
 		}else{
 			include('encabezadoUnicajero.php');
 		}
@@ -76,7 +76,7 @@
 		<div id="reporte">
 
 		</div>
-		<div class="<?php echo $clase_2;?> text-center" style="padding : 20px;">
+		<div class="<?php echo $clase_2;?> text-center" style="padding : 5px;">
 			<button type="button" class="btn btn-light" onclick="salir();">
 				<i class="icon-home-1">Regresar al panel</i>
 			</button>	

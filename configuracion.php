@@ -26,9 +26,12 @@
 	    $retardo_sync = $config[7];
 	    $puerto_sync = $config[8];
 	    $puerto_imp = $config[9];
+	    $puerto_imp = $config[9];
 	    //$store_id = base64_decode( $conf_ext[5] );
 	    $store_id = $config[10];
 	    $system_type = $config[11];
+	    $path_api_local = $config[12];
+	    $antiguedad_depuracion = $config[13];
 	// die($store_id );
 	}
 //1.1. Implementacion Oscar 2020 para listar rutas de ticket e impresoras
@@ -297,7 +300,7 @@
 						onclick=""
 						id="herramienta_3_0">
 							<i class="icon-spin3" style="font-size : 120%;">
-								Configuracion de impresiones y Sincronización
+								Configuración de Sincronización
 							</i>
 					</button>
 				</h2>
@@ -320,6 +323,18 @@
 										<td>
 											<b class="descripcion">Retraso sincronizacion <br>(milesimas seg): </b>
 											<input type="number" id="retraso_sinc" value="<?php echo $retardo_sync;?>" class="form-control">
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<b class="descripcion">Path API Local : </b>
+											<input type="text" id="path_api_local" value="<?php echo $path_api_local;?>" class="form-control" placeholder="http://localhost/general">
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<b class="descripcion">Anigüedad de depuración (minutos): </b>
+											<input type="text" id="antiguedad_depuracion" value="<?php echo $antiguedad_depuracion;?>" class="form-control" placeholder="3600">
 										</td>
 									</tr>	
 								</table>
@@ -348,8 +363,8 @@
 									</tr>
 								</table>
 							</div>
-							<div class="col-12">
-								<table class="table table-bordered" id="impresoras"><!-- style="position:absolute;top:60%; width: 500px; left:5%;" -->
+							<!--div class="col-12">
+								<table class="table table-bordered" id="impresoras">
 									<tr>
 										<th style="background : red;">Ruta de Archivos</th>
 										<th style="background : red;">Nombre Impresora</th>
@@ -366,7 +381,7 @@
 										</td>
 									</tr>
 								</table>
-							</div>
+							</div-->
 						</div>
 					</div>
 				</div>
@@ -411,9 +426,10 @@
 		}
 		var r_l=$("#ruta_loc").val();
 		if( r_l.length<=0  && system_type == 'general' ){
+		/*Se deshabilita que sea obligatoria la ruta local
 			alert("El campo de Ruta Local no puede ir vacío!!!");
 			$("#ruta_loc").focus();
-			return false;
+			return false;*/
 		}
 		var n_bd_l=$("#nombre_bd_loc").val();
 		if( n_bd_l.length<=0  && system_type == 'general' ){
@@ -480,7 +496,7 @@
 		var int_imp = $("#intervalo_imp").val();
 
 
-		var imp = cadena_impresoras();
+		var imp = '';//cadena_impresoras();
 
 		var retraso_sincronizacion = $("#retraso_sinc").val(); 
 		if(retraso_sincronizacion.length<=0 && system_type == 'general'){
@@ -509,6 +525,21 @@
 			$("#store_id").focus();
 			return false;
 		}
+
+		var path_api_local = $( "#path_api_local" ).val();
+		if( path_api_local == '' ){
+			alert("El api local de la sincronización no puede ir vacío!!!");
+			$("#path_api_local").focus();
+			return false;
+		}
+
+		var antiguedad_depuracion = $( "#antiguedad_depuracion" ).val();
+		if( antiguedad_depuracion == '' ){
+			alert("La antigüedad de depuración no puede ir vacía!!!");
+			$("#antiguedad_depuracion").focus();
+			return false;
+		}
+		
 	//	alert( store_id );
 	//enviamos datos por ajax
 		$.ajax({
@@ -536,8 +567,9 @@
 				puerto_sis_sinc : puerto_sincronizacion,
 				puerto_sis_imp : puerto_impresion,
 				store_id : store_id,
+				path_api_local : path_api_local,
+				antiguedad_depuracion : antiguedad_depuracion,
 				system_type : $( '#system_type' ).val()
-
 			},
 			success:function(dat){
 				if(dat!='ok'){

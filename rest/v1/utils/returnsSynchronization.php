@@ -3,28 +3,44 @@
 	class returnsSynchronization
 	{
 		private $link;
-		function __construct( $connection ){
+		private $LOGGER;
+		function __construct( $connection, $Logger = false ){
 			$this->link = $connection;
+			$this->LOGGER = $Logger;
 		}
 //hacer jsons de movimientos de almacen
-		public function setNewSynchronizationReturns( $store_id, $system_store, $origin_store_prefix, $limit ){
+		public function setNewSynchronizationReturns( $store_id, $system_store, $origin_store_prefix, $limit, $logger_id = null ){
+			$log_steep_id = null;
 		//crea JSONS de devoluciones
 			$sql = "CALL buscaDevolucionesPendientesDeSincronizar( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
 			$stm = $this->link->query( $sql );
-			if( ! $stm ){
-				return "Error al generar registros de devoluciones pendientes de sincronizar : {$this->link->error} {$sql}";
-			}
+				if( $logger_id ){
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Genera registros de devoluciones por sincronizar", $sql );
+				}
+				if( $this->link->error ){
+					if( $logger_id ){
+						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al generar registros de devoluciones pendientes de sincronizar", 'sys_sincronizacion_comprobaciones_log', $sql, $this->link->error );
+					}
+					die( "Error al generar registros de devoluciones pendientes de sincronizar : {$this->link->error} {$sql}" );
+				}
 		//crea JSONS de pagos de devoluciones
 			$sql = "CALL buscaPagosDevolucionesPendientesDeSincronizar( {$store_id}, {$system_store}, '{$origin_store_prefix}', {$limit} )"; 
 			$stm = $this->link->query( $sql );
-			if( ! $stm ){
-				return "Error al generar registros de pagos de devolucion pendientes de sincronizar : {$this->link->error} {$sql}";
-			}
+				if( $logger_id ){
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Genera registros de pagos de devolucion pendientes de sincronizar", $sql );
+				}
+				if( $this->link->error ){
+					if( $logger_id ){
+						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al generar registros de pagos de devolucion pendientes de sincronizar", 'sys_sincronizacion_comprobaciones_log', $sql, $this->link->error );
+					}
+					die( "Error al generar registros de pagos de devolucion pendientes de sincronizar : {$this->link->error} {$sql}" );
+				}
 			return 'ok';
 		}
 
 //hacer / obtener jsons de movimientos de almacen
-		public function getSynchronizationReturns( $system_store, $limit ){
+		public function getSynchronizationReturns( $system_store, $limit, $petition_unique_folio, $logger_id = null ){
+			$log_steep_id = null;
 			$resp = array();
 			$sql = "SELECT 
 						id_sincronizacion_devolucion,
@@ -36,7 +52,18 @@
 					AND id_sucursal_destino = {$system_store}
 					LIMIT {$limit}";
 		//die( $sql );
-			$stm = $this->link->query( $sql ) or die( "Error al consultar los datos de jsons : {$this->link->error}" );
+			$stm = $this->link->query( $sql );
+				if( $logger_id ){
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Consulta los datos de jsons", $sql );
+				}
+				if( $this->link->error ){
+					if( $logger_id ){
+						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al consultar los datos de jsons", 'sys_sincronizacion_comprobaciones_log', $sql, $this->link->error );
+					}
+					die( "Error al consultar los datos de jsons : {$this->link->error} {$sql}" );
+				}
+			
+			// or die( "Error al consultar los datos de jsons : {$this->link->error}" );
 			$movements_counter = 0;
 			//forma arreglo
 			while ( $row = $stm->fetch_assoc() ) {
@@ -52,22 +79,45 @@
 					
 					array_push( $resp, json_decode($row['data']) );//decodifica el JSON
 					$movements_counter ++;
+				//actualiza al status 2 los registros que va a enviar
+					$sql = "UPDATE sys_sincronizacion_devoluciones SET id_status_sincronizacion = 2, folio_unico_peticion = '{$petition_unique_folio}' WHERE id_sincronizacion_devolucion = {$row['id_sincronizacion_devolucion']}";
+					$stm_2 = $this->link->query( $sql );
+						if( $logger_id ){
+							$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza registro de sincronizacion devolución a status 2", $sql );
+						}
+						if( $this->link->error ){
+							if( $logger_id ){
+								$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al poner registro de sincronizacion de devolución en status 2", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+							}
+							die( "Error al poner registro de sincronizacion de devolución en status 2 : {$this->link->error} {$sql}" );
+						}
 				}
 			}
 			//var_dump( $resp );
 			return $resp;
 		}
 //actualizacion de registros de sincronizacion
-		public function updateReturnSynchronization( $rows, $petition_unique_folio, $status = 3 ){
+		public function updateReturnSynchronization( $rows, $petition_unique_folio, $status = 3, $logger_id = null ){
+			$log_steep_id = null;
 			$sql = "";
 				$sql = "UPDATE sys_sincronizacion_devoluciones 
 	              SET id_status_sincronizacion = '{$status}',
 	              	folio_unico_peticion = '{$petition_unique_folio}' 
 	            WHERE registro_llave IN( {$rows} )";
-	   	 	$stm = $this->link->query( $sql ) or die( "Error al actualizar registros de sincronización exitosos : {$this->link->error} {$sql}" );	
+	   	 	$stm = $this->link->query( $sql );
+				if( $logger_id ){
+					$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Actualiza registro de sincronizacion devolución a status {$status}", $sql );
+				}
+				if( $this->link->error ){
+					if( $logger_id ){
+						$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al poner registro de sincronizacion de devolución en status {$status}", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+					}
+					die( "Error al poner registro de sincronizacion de devolución en status {$status}} : {$this->link->error} {$sql}" );
+				}
 		}
 //inserción de movimientos
-		public function insertReturns( $returns ){
+		public function insertReturns( $returns, $logger_id = null ){
+			$log_steep_id = null;
   			$resp = array();
 			$resp["ok_rows"] = '';
 			$resp["error_rows"] = '';
@@ -75,26 +125,41 @@
 			$resp["tmp_ok"] = "";
 			$resp["tmp_no"] = "";
 			$updates = array();
-			$this->link->autocommit( false );
 			foreach ($returns as $key => $return) {
+				$this->link->autocommit( false );
 				$ok = true;
 			//inserta cabecera
 				$sql = "INSERT INTO ec_devolucion ( id_usuario, id_sucursal, fecha, hora, id_pedido, 
-				folio, es_externo, status, observaciones, tipo_sistema, id_status_agrupacion, folio_unico )
+				folio, es_externo, status, observaciones, tipo_sistema, monto_devolucion, id_status_agrupacion, folio_unico )
 				VALUES ( '{$return['id_usuario']}', '{$return['id_sucursal']}', '{$return['fecha']}', 
 					'{$return['hora']}', {$return['id_pedido']}, '{$return['folio']}', '{$return['es_externo']}', 
-					'{$return['status']}', '{$return['observaciones']}', '{$return['tipo_sistema']}', 
+					'{$return['status']}', '{$return['observaciones']}', '{$return['tipo_sistema']}', '{$return['monto_devolucion']}',
 					'{$return['id_status_agrupacion']}', '{$return['folio_unico']}' )";
 				$sql = str_replace( "'(", "(", $sql );
 				$sql = str_replace( ")'", ")", $sql );
 
 				$stm_head = $this->link->query( $sql );//or die( "Error al insertar cabecera de movimiento de almacen : {$sql} {$this->link->error}" );
-				if( ! $stm_head ){
-					return array( "error"=>"Error al insertar cabecera de devolucion : {$sql} {$this->link->error} ");
-					$ok = false;
-				}
+					if( $logger_id ){
+						$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "inserta cabecera de devolucion", $sql );
+					}
+					if( $this->link->error ){
+						$ok = false;
+						if( $logger_id ){
+							$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar cabecera de devolucion", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+						}
+						//die( "Error al insertar cabecera de devolucion : {$this->link->error} {$sql}" );
+					}
 				$sql = "SELECT LAST_INSERT_ID() AS last_id";
-				$stm = $this->link->query( $sql ) or die( "Error al recuperar el id insertado : {$this->link->error}" );
+				$stm = $this->link->query( $sql );
+					if( $logger_id ){
+						$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Recupera el id de cabecera de devolución insertado", $sql );
+					}
+					if( $this->link->error ){
+						if( $logger_id ){
+							$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al recuperar el id de cabecera de devolución insertado", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+						}
+						//die( "Error al recuperar el id de cabecera de devolución insertado : {$this->link->error} {$sql}" );
+					}
 				$row = $stm->fetch_assoc();
 				$return_id = $row['last_id'];
 			//inserta detalle(s) 
@@ -110,11 +175,17 @@
 						$sql = str_replace( "'(", "(", $sql );
 						$sql = str_replace( ")'", ")", $sql );
 						
-						$stm = $this->link->query( $sql ) or die( "Error al insertar detalle de devolucion : {$sql} {$this->link->error}" );
-						if( ! $stm ){
-							return array( "error"=>"Error al insertar detalle de devolucion : {$this->link->error}" );
-						  $ok = false;
-						}
+						$stm = $this->link->query( $sql );
+							if( $logger_id ){
+								$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta detalle de devolución", $sql );
+							}
+							if( $this->link->error ){
+								$ok = false;
+								if( $logger_id ){
+									$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar detalle de devolucion", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+								}
+								//die( "Error al insertar detalle de devolucion : {$this->link->error} {$sql}" );
+							}
 					}
 				}
 			//iniserta pago(s) 
@@ -126,21 +197,27 @@
 						VALUES ( '{$return_id}', '{$payment['id_tipo_pago']}', '{$payment['monto']}', 
 							'{$payment['referencia']}', '{$payment['es_externo']}', '{$payment['fecha']}', '{$payment['hora']}', 
 							'{$payment['id_cajero']}', '{$payment['folio_unico']}', {$payment['id_sesion_caja']} )";
-						
 						$sql = str_replace( "'(", "(", $sql );
 						$sql = str_replace( ")'", ")", $sql );
-
-						$stm = $this->link->query( $sql ) or die( "Error al insertar pago de devolucion : {$sql} {$this->link->error}" );
-						if( ! $stm ){
-							return array( "error"=>"Error al insertar pago de devolucion : {$this->link->error}");
-						  $ok = false;
-						}
+						$stm = $this->link->query( $sql );
+							if( $logger_id ){
+								$log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Inserta pago de devolución", $sql );
+							}
+							if( $this->link->error ){
+								$ok = false;
+								if( $logger_id ){
+									$this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al insertar pago de devolucion", 'sys_sincronizacion_peticion', $sql, $this->link->error );
+								}
+								//die( "Error al insertar pago de devolucion : {$this->link->error} {$sql}" );
+							}
 					}
 				}
 				if( $ok == true ){
+					$this->link->commit();
 					$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$return['folio_unico']}'";
 					$resp["tmp_ok"] .= ( $resp["tmp_ok"] == '' ? '' : ',' ) . "'{$return['folio_unico']}'";
 				}else{
+					$this->link->rollback();
 					$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$return['folio_unico']}'";
 					$resp["tmp_no"] .= ( $resp["tmp_no"] == '' ? '' : ',' ) . "'{$return['folio_unico']}'";
 				}

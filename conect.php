@@ -21,7 +21,7 @@
 	$link=@mysql_connect($dbHost, $dbUser, $dbPassword);
 	
 	if(!$link){	
-		Muestraperror($smarty, "Error al conectar con el servidor de base de datos", 'No aplica', mysql_error(), "", 'conect.php');
+		Muestraperror($smarty, "Error al conectar con el servidor de base de datos : HOST->{$dbHost} : USER->{$dbUser} : PASSWORD->{$dbPassword} : NOMBRE->{$dbName}", 'No aplica', mysql_error(), "", 'conect.php');
 	}	
 	
 	$db=@mysql_select_db($dbName);
@@ -29,7 +29,7 @@
 	
 	if(!$link)
 	{	
-		Muestraperror($smarty, "Error al conectar con el servidor de base de datos", 'No aplica', mysql_error(), "", 'conect.php');
+		Muestraperror($smarty, "Error al conectar con el servidor de base de datos : HOST->{$dbHost} : USER->{$dbUser} : PASSWORD->{$dbPassword} : NOMBRE->{$dbName}", 'No aplica', mysql_error(), "", 'conect.php');
 	}
 	
 	mysql_set_charset("utf8");

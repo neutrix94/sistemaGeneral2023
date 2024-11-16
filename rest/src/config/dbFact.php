@@ -1,10 +1,10 @@
 <?php
   class dbFact{
       //Variables
-      private $dbHost = 'www.lacasadelasluces.com';
-      private $dbUser = 'wwlaca_production2022';
-      private $dbPass = 'ZI6&knjM1**#';
-      private $dbName = 'wwlaca_fact_casa_luces_bazar';
+      private $dbHost = 'www.sistemageneralcasa.com';
+      private $dbUser = 'wwsist_produccionFacturacion';
+      private $dbPass = 'T+u7Uw_qYzt#';
+      private $dbName = 'wwsist_produccion_casa_luces_bazar';
 
       //Conexión
       public function conectDB(){

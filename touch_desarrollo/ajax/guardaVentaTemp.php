@@ -623,6 +623,8 @@
 			}
 /*Fin de cambio Oscar 24.10.2019*/
 
+				$descuento = (!isset($_GET["desc{$ix}"])) ? 0 : $_GET["desc{$ix}"];
+
 			$cs = "	INSERT INTO ec_pedidos_detalle_back
 					SET
 					id_pedido = '{$id_pedido}',
@@ -633,7 +635,7 @@
 					monto = '{$_GET["mon{$ix}"]}',
 					iva = '0',
 					ieps = '0', 
-					descuento='{$_GET["desc{$ix}"]}',
+					descuento='{$descuento}',
 					es_externo=$row[0],
 					id_precio='{$_GET["id_precio{$ix}"]}'";/*Campo implementado por Oscar 07.08.2018*/
 			

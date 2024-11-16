@@ -109,7 +109,11 @@
 						p.ubicacion_almacen,
 						pp.id_proveedor_producto,
 						p.orden_lista,
-						s.tiene_ubicacion_prinicipal
+						s.tiene_ubicacion_prinicipal,
+						( SELECT
+							IF( epsv.id_producto IS NULL, 0, 1 )	
+						FROM ec_exclusion_productos_surtimiento_venta epsv
+						WHERE id_producto = p.id_productos) AS omitir_surtimiento
 					FROM ec_proveedor_producto pp
 					LEFT JOIN ec_productos p ON p.id_productos = pp.id_producto
 					LEFT JOIN ec_almacen_producto ap ON ap.id_producto = p.id_productos
@@ -143,7 +147,7 @@
 				$r[1] = str_replace( 'class_tam', ' style=\\\'font-size : 150%;\\\'', $r[1] );
 				$r[1] = str_replace( 'class_black', ' style=\\\'color : black;\\\'', $r[1] );
 				$resp .= "<div class=\"group_card\" id=\"location_response_{$counter}\" 
-							onclick=\"setProductLocation('{$r['0']}~<b style=\'color:black;\'>( {$r['7']} ) </b> {$r['1']}~{$r['2']}~{$r['3']}~{$r['4']}~{$r['5']}~{$r['6']}~{$r['8']}');\"
+							onclick=\"setProductLocation('{$r['0']}~<b style=\'color:black;\'>( {$r['7']} ) </b> {$r['1']}~{$r['2']}~{$r['3']}~{$r['4']}~{$r['5']}~{$r['6']}~{$r['8']}~{$r['9']}');\"
 						>{$r[1]}</div>";
 				$counter ++;
 			}
@@ -177,6 +181,15 @@
 				$stm = $this->link->query( $sql ) or die( "Error al actualizar ubicacion : {$this->link->error}" );
 				$sinchronization = $this->insertStoreLocationSinchronization( $store_location_id, 'update' );
 			}
+		//actualiza el campo de surtir en 1
+			$sql = "SELECT id_producto FROM ec_exclusion_productos_surtimiento_venta WHERE id_producto = {$product_id}";
+			$stm = $this->link->query( $sql ) or die( "Error al consultar si el producto esta excluido de surtimiento de ventas : {$sql} : {$this->link->error}" );
+			if( $stm->num_rows <= 0 ){
+				$sql = "UPDATE sys_sucursales_producto SET surtir = 1 WHERE id_producto = '{$product_id}' AND id_sucursal = {$sucursal_id}";
+			}else{
+				$sql = "UPDATE sys_sucursales_producto SET surtir = 0 WHERE id_producto = '{$product_id}' AND id_sucursal = {$sucursal_id}";
+			}
+			$stm = $this->link->query( $sql ) or die( "Error al actualizar campo de surtir tabla de sucursal producto : {$sql} : {$this->link->error}" );
 			$this->link->autocommit( true );
 			return 'ok';
 			
@@ -234,7 +247,7 @@
 //metodo para sincronizar
 		public function insertStoreLocationSinchronization( $store_location_id, $type ){
 		//consulta la sucursal del sistema
-			$system_store_id;
+			$system_store_id = null;
 			$sql = "SELECT id_sucursal AS system_store_id, prefijo AS store_prefix FROM sys_sucursales WHERE acceso=1";
 			$stm = $this->link->query( $sql ) or die( "Error al consultar datos de sucursal sucursal para sincronizacion: {$this->link->error}" );
 			$row = $stm->fetch_assoc();

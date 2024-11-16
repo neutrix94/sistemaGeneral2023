@@ -23,6 +23,7 @@ BEGIN
 				'"id_sucursal" : "', d.id_sucursal, '",\n',
 				'"fecha" : "', d.fecha, '",\n',
 				'"hora" : "', d.hora, '",\n',
+				'"monto_devolucion" : "', d.monto_devolucion, '",\n',
 				'"id_pedido" : "( SELECT IF( id_pedido IS NULL, 0, id_pedido) FROM ec_pedidos WHERE folio_unico = \'', ( SELECT IF( id_pedido IS NULL, '0', folio_unico ) FROM ec_pedidos WHERE id_pedido = d.id_pedido LIMIT 1 ), '\' LIMIT 1 )",\n',
 				'"folio" : "', d.folio, '",\n',
 				'"es_externo" : "', d.es_externo, '",\n',

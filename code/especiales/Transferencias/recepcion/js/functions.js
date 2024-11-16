@@ -112,6 +112,14 @@
 		$( '.emergent_content_2' ).html( '' );
 		$( '.emergent_2' ).css( 'display', 'none' );
 	}
+	function close_emergent_3( obj_clean = null, obj_focus = null ){
+		$( '.emergent_content_3' ).html( '' );
+		$( '.emergent_3' ).css( 'display', 'none' );
+	}
+	function close_emergent_4( obj_clean = null, obj_focus = null ){
+		$( '.emergent_content_4' ).html( '' );
+		$( '.emergent_4' ).css( 'display', 'none' );
+	}
 /*lanza emergente para confirmar transferencias por recibir
 	function setTransferToReceive( obj_list ){
 		transfers_to_receive_info = '<div class="transfer_to_receive_container"><div class="row header_transfer_to_receive">'
@@ -956,6 +964,12 @@ var global_tmp_unique_barcode = '';
 		if( response[0] == 'ok' ){
 			$( '#missing_and_excedent_counter_capture' ).empty();
 			$( '#missing_and_excedent_counter_capture' ).append( response[1] );
+		/*Implementacion Oscar 2024-08-16 para pasar directo a la finalización de la resolución si es el caso*/
+			if( $( '#missing_and_excedent_counter_capture tr' ).length <= 0 ){
+				$( '#insert_products_resolution_headers' ).css( 'display', 'none' );
+				$( '#btn_resolve_resolution' ).removeAttr( 'disabled' );
+			}
+		/*fin de cambio Oscar 2024-08-16*/
 		}else{
 			alert( "Error al recargar vista de pendientes de recibir : " + response );
 		}

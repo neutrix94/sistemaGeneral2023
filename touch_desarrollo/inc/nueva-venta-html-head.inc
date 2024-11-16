@@ -72,7 +72,21 @@
             /*if(products_array[i][13] == "undefined" ){
                 products_array[i][13] = null;
             }*/
-            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price );//aux_arr[2]
+            
+            var component_chk = products_array[i][14];
+            var contiene_checked = component_chk.includes("checked");
+            var contiene_texto_muestra = component_chk.includes("number-muestra");
+            var select_checkbox = ( contiene_checked ) ? 1: 0;
+            var es_muestra = ( contiene_texto_muestra ) ? 1: 0;
+            //Posición 16 corresponde a la bandera para saber si el producto ya se ha enviado a pedido
+            var pedidoSolicitado = products_array[i][16];
+            var numeroPiezasCambio = products_array[i][15];
+            //Posición 17 corresponde al número que se solicitó de un producto existente que previamente ya se solicitó para surtimiento
+            var piezasSurtirAgregadas = products_array[i][17];
+            
+            //agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price );//aux_arr[2]
+            agregaFila(null, products_array[i][2], -1, products_array[i][0], products_array[i][13], tmp_price, select_checkbox, es_muestra, pedidoSolicitado, numeroPiezasCambio, piezasSurtirAgregadas );
+            //agregaFila(null, products_array[i][3], -1, products_array[i][1], products_array[i][14], tmp_price, select_checkbox );//aux_arr[2]
             //f,cant,temp,id_producto_pedido,lista_normal
         }
     }
@@ -114,27 +128,16 @@
 var products_without_inventory = 0;
 function enlista_paquete(arreglo){
     paqte=0;
-    enlistando_paquete=1;//marcamos que se esta enlistando paquete
-/**
-    var url="ajax/valida_precios_paquete.php?&arreglo="+arreglo_paquete;
-    if(document.getElementById("id_lista_mayoreo")){
-        url+="&id_lista_precio="+$("#id_lista_mayoreo").val();
-    }
-    /*alert();
-    var aux_lista_pqte=ajaxR(url);
-    alert("aux: "aux_lista_pqte);return false;
-/**/
+    enlistando_paquete=1;//marca que se esta enlistando paquete
     if(pqt==0){// si no hay paquete activado
-        activa_paq();//activamos el paquete
+        activa_paq();//activa el paquete
     }
     /*var aux_dt=arreglo.split("*");//separamos por producto*/
     var aux_arr="";
     for(var i=0;i<=arreglo_paquete.length-1;i++){
         if(i<arreglo_paquete.length-1){
             aux_arr=arreglo_paquete[i].split("~");//separamos los datos del producto
-        //mandamos agregar la fila
-            //alert(null+'|'+aux_arr[1]+'|'+-1+'|'+aux_arr[0]);
-            //arreglo_paquete.shift();//quitamos la posición
+        //manda agregar la fila
             agregaFila(null,aux_arr[1],-1,aux_arr[0]);        
         }
     }//fin de for i
@@ -151,9 +154,9 @@ function enlista_paquete(arreglo){
     function show_products_without_inventory(){
         var resp = `<div class="row" style="background-color : white ; font-size : 150% !important; padding : 1%;margin : 1%; position : absolute !important; top : 10% !important;">
             <br><br><br>
-            <h2 class="text-center red" style="font-size : 200% !important;">IMPORTANTE!</h2>
+            <h2 class="text-center red" style="font-size : 200% !important;">IMPORTANTE :</h2>
             <h4 style="color : black; text-align : justify;">Hay productos que posiblemente no tienen inventario,
-            <b class="red">estos productos estan marcados en ROJO</b> Asegurate de que tengan todos los productos del paquete antes de cerrar la nota de venta!</h4>
+            <b class="red">estos productos estan marcados en ROJO</b> Asegurate de que tengan todos los productos del paquete antes de cerrar la nota de venta.</h4>
             <div class="col-2 text-center"></div>
             <div class="col-8 text-center">
                 <br><br>
@@ -210,7 +213,7 @@ function enlista_paquete(arreglo){
         var res=ajaxR("ajax/verificaInventario.php?flag=eliminar_tmp_exhib&id_reg="+id);
         var aux=res.split("|");
         if(aux[0]!='ok'){
-            alert("Error al eliminar el temporal de la exhibición!!!\n"+res);
+            alert("Error al eliminar el temporal de la exhibición : \n"+res);
             return false;
         }
     }
@@ -240,7 +243,7 @@ function enlista_paquete(arreglo){
         pass_enc=$("#pss_encargado").val();
         if(alm1!=0&&alm1!=''||alm2!=0&&alm2!=''){
             if(pass_enc==''){
-                alert("El encargado debe autorizar con su contraseña!!!");
+                alert("El encargado debe autorizar con su contraseña.");
                 $("#pss_encargado").focus();//enfocamos la caja de contraseña
                 return false;
             }
@@ -253,7 +256,7 @@ function enlista_paquete(arreglo){
 //alert("ajax/verificaInventario.php?clave="+pass_enc+"&id_pr="+id+"&cant="+alm2+"&alm_princ="+alm1+"&alm_exh="+alm2);
             var aux=res.split("|");            
             if(aux[0]!='ok'){
-                alert("Error!!!\n\n"+res);
+                alert("Error : \n\n"+res);
                 return false;
             }
         //
@@ -270,7 +273,7 @@ function enlista_paquete(arreglo){
                     $("#emergente_1").css("display","none");
                     return false;
                 }
-                alert("Error!!!\n"+aux[1]);
+                alert("Error : \n"+aux[1]);
                 inventario_validado=0;
                 return false;
             }
@@ -344,6 +347,8 @@ function enlista_paquete(arreglo){
                     <br>
                     <input type="password" id="passWord_1" class="form-control"/>
                     <br></br>
+                    <p calsss="text-center" id="password_response_error"></p>
+                    <br></br>
                     <button 
                         type="button" 
                         onclick="regresaEfectivo(1)" 
@@ -374,12 +379,17 @@ function enlista_paquete(arreglo){
             //var url = "index.php?scr=talon_pago&idp=" + $("#id_de_pedido_original").val();
             //"index.php?scr=talon_pago&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
             //u1+="&sald_fav_cl="+s_f+"&favOrig="+s_f_o;
-            $('#emergente_1').html( '<img src="../img/img_casadelasluces/load.gif">' );
+            //$('#emergente_1').html( '<img src="../img/img_casadelasluces/load.gif">' );
             var imp_dev = ajaxR( url );
             //alert( imp_dev );return false;
             if( imp_dev.trim() != 'ok' ){
-                $('#emergente_1').html( imp_dev );
-                $('#emergente_1').css('display','block');
+                $('#password_response_error').html( imp_dev );
+                $('#passWord_1').select();
+                alert_scann( "error" );
+                //$('#emergente_1').css('display','block');
+                setTimeout(() => {
+                    $('#password_response_error').html( "" );
+                }, 3000);
                 return false;
             }else{
                 location.href = "index.php?";
@@ -399,21 +409,6 @@ function enlista_paquete(arreglo){
         return false;
     }
 
-/*función encargada de quitar los descuentos por producto *************Deshabilitado por Oscar 09.11.2018
-    function resetearMontos(){
-        var tabla=document.getElementById('listaProductos');
-        trs=tabla.getElementsByTagName('tr');
-        for(i=0;i<trs.length-1;i++){
-            tds=trs[i+1].getElementsByTagName('td');
-        //regresamos monto original
-            var objIn=tds[13].getElementsByTagName('input');
-            tds[5].innerHTML=objIn[0].value;
-        //ponemos en cero el descuento
-            objIn1=tds[12].getElementsByTagName('input');
-            objIn1[0].value='';
-        }
-    }
-*/
 //implementado por Oscar 26-12-2017
     function activa_paq(){
         if(pqt==1){
@@ -432,7 +427,7 @@ function enlista_paquete(arreglo){
         var resp=ajaxR(ur);
         var axP=resp.split("|");
         if(axP[0]!='ok'){
-            alert('Ocurrió un error al activar el paquete\nActualice la pantalla y vuela a intentar!!!');
+            alert('Ocurrió un error al activar el paquete\nActualice la pantalla y vuela a intentar.');
             return false
         }
         $("#paq1").css("background","#91D617");
@@ -449,61 +444,12 @@ function enlista_paquete(arreglo){
     }
 //fin de cambio
 
-/* deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores*
-//implementado por Oscar(28-10-2017)
-    function cambiaMonto(pos){
-    //si es paquete no hacemos acción
-        if(pqt==1){
-            alert("El pedido tiene activo el paquete y no se pueden agregar descuentos extras...!!!");
-            var tds=$(pos).parents("tr").children("td");
-            var montOrig=tds[12].getElementsByTagName('input');
-            montOrig[0].value="";
-            return false;
-        }
-    //quitamos descuentos directos
-        document.getElementById("porcGeneral").value='';
-        document.getElementById("descGeneral").value='';
-        
-        var tablaT=$('#listaProductos').length;
-        var tds=$(pos).parents("tr").children("td");
-        if(!tds[13]){
-        }else{
-            var montOrig=tds[13].getElementsByTagName('input');
-            var montoAct=montOrig[0].value;
-            var aux=montoAct.split('$');
-            var aux2=aux[1].split(",");
-            montoAct="";
-            for(var i=0;i<aux2.length;i++){         
-                montoAct+=""+aux2[i];   
-            }
-            var montOrig=tds[13].getElementsByTagName('input');
-            var montoAct=montOrig[0].value;
-            var aux=montoAct.split('$');
-            var aux2=aux[1].split(",");
-            montoAct="";
-            for(var i=0;i<aux2.length;i++){         
-                montoAct+=""+aux2[i];   
-            }
-        }
-    //alert(montoAct);
-        if(tds[12]){
-            var objIn=tds[12].getElementsByTagName('input');   
-            var descuentoProducto=isNaN(parseFloat(objIn[0].value))?0:parseFloat(objIn[0].value); 
-            //alert('monto: '+montoAct+"|descuento: "+descuentoProducto);
-            var id_prod=tds[5].innerHTML="$"+parseFloat(montoAct-descuentoProducto);
-            calculaTotalVenta();
-     //alert('first');
-        }
-        return false;
-    }*/
-
-
     function habilitaDesc(flag,permiso){
         if(flag==1||flag==2){
             //resetearMontos();
             if((permiso==0||permiso==null) && verifica_cambio_desc==0 && /*$("#id_de_apartado").val()!='' 
                 && $("#id_de_apartado").val()!=null && */ $("#porcGeneral").val()!=''){
-                if(!confirm("realmente desea cambiar el descuento original del pedido????")){
+                if(!confirm("Realmente deseas cambiar el descuento original del pedido?")){
                     return false;
                 }else{
                     verifica_cambio_desc=1;
@@ -610,24 +556,6 @@ function enlista_paquete(arreglo){
  //               //deshabilitado por Oscar 2023-02-13 $("#total").val("$"+Math.ceil(tot));//moneyFormat
                 $("#total").val("$"+(tot));
             }else{
-                /*alert("Hay una diferencia en los montos!!! \nProceso_1:"+tot+"\nValidacion:"+verificar_montos);
-                var msg='<br><br><p align="center" align="center" style="font-size:30px;color:white;">Ah ocurrido un error en el monto de esta venta!!!</p>';
-                msg+='<p align="center" style="font-size:25px;color:white;">Monto correcto:  $ '+verificar_montos+'</p>';
-                msg+='<p align="center" style="font-size:25px;color:white;">Monto incorrecto:  $ '+Math.ceil(tot)+'</p>';
-                msg+='<p align="center" style="font-size:25px;color:white;">Tome una Fotografía y mandela al encargado de sistemas<br>Pida al encargado que ingrese su contraseña</p>';
-                msg+='<p align="center"><input type="text" id="passWord_1" onkeyDown="cambiar(this,event,\'passWord\');" style="padding:10px;" name="passWord"></p>';
-                msg+='<input type="hidden" id="passWord" value="">';
-                msg+='<p align="center"><button onclick="verificaAutorizacion(\'mantener\');" style="margin:20px;">Continuar<br>El monto corrrecto aparecerá <br>al imprimir el ticket</button>';
-                msg+='<button style="margin:20px;" onclick="verificaAutorizacion(\'recargar\');">Continuar<br>Volver a cargar <br></button></p>';
-                document.getElementById('passWord').setAttribute('autocomplete','off');
-                $("#cont_emerg").html(msg);//contEmerge
-                $("#emergente_1").css("display","block");//hacemos visible la ventana emergente
-                $("#total").val("$"+Math.ceil(tot));//moneyFormat*/
-               /*var err_log="Monto correcto: $ "+verificar_montos+"\n"+"Monto incorrecto:  $ "+Math.ceil(tot);
-                var insertaError=ajaxR('ajax/guardarErrores.php?msg='+err_log);
-                if(insertaError!='ok'){
-                    alert("No se pudo guardar el error!!!\n"+insertaError);
-                }*/
             }
       	return false;
       }
@@ -717,7 +645,7 @@ function enlista_paquete(arreglo){
   				 		objC.click('1');
 					}
         		}else{
-        			alert('La contraseña es incorrecta!!!');
+        			alert('La contraseña es incorrecta.');
         			document.getElementById('passWord').select();
         			
         			return false;
@@ -848,7 +776,7 @@ function enlista_paquete(arreglo){
            /* $( '#resBus' ).html( res );
             $( '#resBus' ).css( 'display', 'block' );
             return false;*/
-            if(res=='no se encontró el paquete!!!'){
+            if(res=='no se encontró el paquete.'){
                 $("#cantidad2").val('');
                 $("#buscadorLabel").select();
                 return false;
@@ -860,7 +788,7 @@ function enlista_paquete(arreglo){
             $("#resBus").css("display","none");
 
             if(ax[0] != 'exito'){
-                alert('Producto incorrecto, pruebe con uno diferente');
+                alert('Producto incorrecto, prueba con uno diferente');
                 obj.focus();
                 obj.setSelectionRange(0, obj.value.length);
                 return false;
@@ -887,162 +815,6 @@ function enlista_paquete(arreglo){
 /*Fin de Cambio Oscar 04.03.2019*/
   
     var filant=-1;  
-      
-/*Funcionalidad del buscador (por cada teclaque se oprime se manda la búsqueda)
-    function activaBuscador(obj, eve){
-        if( eve == 'intro' ){
-            obj = document.getElementById( obj );
-        }
-        if( eve != 'intro' && eve.keyCode != 13 ){
-            document.getElementById('resBus').style.display="none";
-            return false;
-        }
-//implementado por oscar...
-    var ventaTipo=document.getElementById('tipo_venta').value;//sacamos el tipo de venta
-        
-        key=(eve.which) ? eve.which : eve.keyCode;//sacamos el valor de la tecla
-        
-        //alert(obj.value.indexOf(' '));
-        
-        if(key == 40 && obj.value.length >= 3){
-            var cuadro=document.getElementById("resBus");
-            els=cuadro.getElementsByTagName("DIV");
-            
-            
-            if(els[filant])
-            {
-                els[filant].className="objetoLista";
-                els[filant].focus();
-            }    
-            
-            
-            
-            filant++;
-            
-            if(els[filant])
-            {
-                els[filant].className="lista_productos2";
-                els[filant].focus();
-            }    
-            
-            //els[0].innerHTML="l";
-            
-            return false;
-            
-        }
-        
-        if(key == 38 && obj.value.length >= 3){
-            var cuadro=document.getElementById("resBus");
-            els=cuadro.getElementsByTagName("DIV");
-            
-            
-            if(els[filant])
-            {
-                els[filant].className="objetoLista";
-                els[filant].focus();
-            }    
-            
-            
-            if(filant > 0)
-                filant--;
-            
-            if(els[filant])
-            {
-                els[filant].className="lista_productos2";
-                els[filant].focus();
-            }    
-            
-            //els[0].innerHTML="l";
-            
-            return false;
-            
-        }
-        
-        if(key == 13 && filant != -1)
-        {
-            //alert(filant);
-            ocultaBuscador(document.getElementById('lista_'+filant));   
-        } 
-        
-        
-        if(key == 13)
-        {
-            
-            //alert("intro");
-            muestraDesc(1);
-            can=document.getElementById('cantidad2');
-            
-            can.value="1";
-            can.focus();
-            can.setSelectionRange(0, 1);            
-            return false;
-        } 
-        /*Deshabilitado por Oscar 12.11.2018 parq eu también busque numeros
-        	if(!isNaN(obj.value))
-            	return false;   
-        *
-        
-        
-        if( obj.value.length >= 6 )
-        {
-            var url="ajax/buscaProductos.php?clave="+obj.value+"&t="+ventaTipo;
-        /*Implementación Oscar 03.03.2019 para tomar precio de lista de mayoreo*
-            url+="&id_lista_precio="+$("#id_lista_mayoreo").val();
-        /*Fin de Cambio Oscar 03.03.2019*
-            //alert(url);
-            
-            var res=ajaxR(url);
-            
-            var aux=res.split('←');
-            
-            if(aux[0] != 'exito')
-            {
-                alert("Error: "+res);
-                return false;
-            }
-            
-            if(aux.length <= 1)
-            {
-                document.getElementById('resBus').style.display="none";
-                return false;   
-            }
-            
-            var cuadro=document.getElementById('resBus');
-            
-            cuadro.innerHTML="";    
-            
-            //var sel=document.getElementById('respuestasBusc');
-            //sel.options.length=0;
-            
-            var op=new Array();
-            filant=-1;
-        //aqui se forman las opciones
-            for(var i=1;i<aux.length;i++)
-            {
-                var ax=aux[i].split('~');
-                
-                op[i]=document.createElement("DIV");
-                op[i].id="lista_"+(i-1);
-                op[i].innerHTML=ax[1]/*+"<span style='display:none'>"+ax[0]+"</span>"*;
-                op[i].className="objetoLista";
-                op[i].onclick=function(){
-                    ocultaBuscador(this);
-                }
-                
-                //op[i].onkeypress=function(){alert('hola');}
-                
-                cuadro.appendChild(op[i]);
-                
-                //option=null;   
-            }
-            
-            document.getElementById('resBus').style.display="block";
-        }
-        else
-        {
-            document.getElementById('resBus').style.display="none";
-        }
-    }*/
     
     function ocultaBuscador(obj, is_pack = 0 )
     {
@@ -1060,15 +832,7 @@ function enlista_paquete(arreglo){
         aux=aux_1[0];
         var tmp_ = aux.split( '&lt;&gt;' );
         aux=tmp_[0] + tmp_[2];
-/*fin de cambio para incluir busqueda por modelo de proveedor 2023*
-        if(ventaTipo==1){
-            //aux_1=aux.split("<p style");
-            alert( aux );
-            aux=aux_1[0];
-
-        }*/
-        /*var aux=aux.split(' - ');
-        aux=aux[0]+":"+aux[1];*/
+/*fin de cambio para incluir busqueda por modelo de proveedor 2023*/
         
         
         document.getElementById('buscadorLabel').value=aux;
@@ -1178,7 +942,7 @@ var new_sale_window = null;
 
 var hay_paquete=0;
 //agregar fila a tabla del pedido
-    function agregaFila(f,cant,temp,id_producto_pedido,lista_normal, product_price = null){//se implementan las variables cant,temp por Oscar 13.08.2018
+    function agregaFila( f, cant, temp, id_producto_pedido, lista_normal, product_price = null, val_check_muestra = 0, es_muestra = 0, solicitado = 0, cambio = 0, piezasSurtirAgregadas = 0 ){//se implementan las variables cant,temp por Oscar 13.08.2018
         //alert(product_price );
     //alert( f + ','+ cant + ',' + temp + ',' + id_producto_pedido + ',' + lista_normal );
        // alert('add_fila');
@@ -1230,21 +994,12 @@ var hay_paquete=0;
             can.setSelectionRange(0, can.value.length);
             return false;
         }
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-       //if(parseInt(can.value) > 1 && sig == 1){
-            alert('Sólo es permitido regalar un producto');
-            can.value="1";
-            can.focus();
-            can.setSelectionRange(0, can.value.length);
-            return false;
-        }
-    */
     //enviamos datos por ajax
         var res=ajaxR(url);
         var aux=res.split('|');
         //alert(res);
         if(aux[0] != 'exito'){
-            alert("Error!!!\n"+res);
+            alert("Error : \n"+res);
             busc.focus();
             busc.setSelectionRange(0, busc.value.length);
         //$("#contenedorGrid").html(res);
@@ -1260,7 +1015,7 @@ var hay_paquete=0;
 
     /*Implementación Oscar 30.03.2019 para  no dejar vender productos externos en venta de mayoreo*/
         if(ventaTipo==1 && aux[16]==1){
-            alert("Este producto no puede ser vendido en un ticket de mayoreo\nCapturelo en un ticket de venta normal!!!");
+            alert("Este producto no puede ser vendido en un ticket de mayoreo\nCapturelo en un ticket de venta normal.");
             $("#cantidad2").val("");
             $("#buscadorLabel").select();
             return false;
@@ -1319,15 +1074,28 @@ var hay_paquete=0;
 
     //Buscamos si existe un producto igual
         var can2=-1;
+        var cantidadNuevaSurtir = piezasSurtirAgregadas;
         for(i=1;i<trs.length;i++){
             tds=trs[i].getElementsByTagName('td');
            // alert('|'+aux[2]+'|\n|'+tds[0].innerHTML+'|');
             //alert('|'+sig+'|'+tds[9]+'|');
             if(tds[0].innerHTML == aux[2] && global_last_orders_array.indexOf( aux[2] ) == -1/*&& (cant==null||cant=='')*/){ //&& sig == tds[9].valor se quita de la condición Oscar 03.09.2018 aux[2] != '18000'
                 //alert('Repetido');
+                //Solo se agrega la cantidad surtir en caso de que ya se haya solicitado
+                if( tds[17].innerHTML == '1' ){
+                    solicitado = '1';
+                    var currentSurtido = 0;
+                    if( tds[18].innerHTML != "-1" ){
+                        currentSurtido = parseInt(tds[18].innerHTML);
+                    }
+                    cantidadNuevaSurtir = currentSurtido + parseInt(can.value);
+                    //Se agrega a sessionStorage el valor para que en caso de Actualizar la página, se mantenga la cantidad adicional ingresada
+                    var oderList = tds[0].innerHTML;
+                    //setCantidadNuevaSurtirEnListaProductosStorage( oderList, cantidadNuevaSurtir );
+                }
                 can2=parseInt(tds[2].innerHTML)+parseInt(can.value);
                 //alert('hasta ');
-                eliminarItem(tds[0]);
+                eliminarItem(tds[0], true);
                 //break;
                 //alert('pasa');
             }    
@@ -1410,19 +1178,8 @@ var hay_paquete=0;
             }
         }
     //aqui detenemos venta si no existe el precio
-   /* alert("aux[12]: "+aux[12]+" ventaTipo: "+ventaTipo+" cant: "+cant);
-        if(aux[5]==0){//&&
-            var mensaje="Este producto no se puede vender porque no tiene precio!!!!";
-            if(ventaTipo==1){
-                mensaje="Este producto no aplica en precio de mayoreo!!!";
-            }
-            alert(mensaje);
-            can.value="";
-            document.getElementById('buscadorLabel').select();
-            return false;
-        }*/
         if(aux[5]==0 && ventaTipo!=1){//&&
-            var mensaje="Este producto no se puede vender porque no tiene precio!!!!";
+            var mensaje="Este producto no se puede vender porque no tiene precio.";
             alert(mensaje);
             can.value="";
             document.getElementById('buscadorLabel').select();
@@ -1432,19 +1189,10 @@ var hay_paquete=0;
 //alert("aux[12]: "+aux[12]+" ventaTipo: "+ventaTipo+" cant: "+cant);
     /*implementación de emergente para productos que no entran en precio de mayoreo Oscar 09.05.2018*/
         if((aux[12]=='muestra_emergente'||aux[12]=='es_externo')&&ventaTipo==1&& ((cant==null||cant==''||aux[5]==0)/*||paqte==1*/) ){
-            /*var btn_1='<button class="btn btn-success form-control" onclick="agregaFila(null,';
-            if(can.value==''){btn_1+=cant;}else{btn_1+=can.value;}
-            btn_1+=',-1,'+aux[2]+',1);document.getElementById(\'emergePermisos\').style.display=\'none\';';
-            if(enlistando_paquete!=0){
-                    btn_1+='enlista_paquete();';
-            }*/
             var btn_1 = `<button class="btn btn-success form-control" onclick="open_new_sale();">
                     <i>Abrir otra venta en nueva pestaña</i>
                 </button>`;
-//alert( aux[13] + '/' + aux[14] );
-           // btn_1 += ( ( aux[14] != undefined && aux[14] != 'undefined' ) || (aux[13] == 1) ? '"' : '" disabled' );
-
-            //+='>Aceptar</button>';/*agregaFila(null,'+can.value+',0,'+id_prod_selec+');*/
+                
             var btn_2='<button class="btn btn-danger form-control" onclick="document.getElementById(\'cantidad2\').value=\'\';document.getElementById(\'buscadorLabel\').value=\'\';';
             btn_2+='document.getElementById(\'emergePermisos\').style.display=\'none\';document.getElementById(\'buscadorLabel\').focus();';
             if(enlistando_paquete!=0){
@@ -1479,10 +1227,10 @@ var hay_paquete=0;
 
     //verificamos existencias
         var cantidadTotal=parseInt($("#cantidad2").val());
-        if( inventario_validado==0 && $( '#is_just_quotation' ).val() != 1 ){/*implementacion Oscar 2023 para no mandar emergente de inventario cuando es cotizacion ($( '#is_just_quotation' ).val() != 1)*/
+        if( inventario_validado==0 && $( '#is_just_quotation' ).val() != 1 ){
             for(var j=1;j<trs.length;j++){
                 tds=trs[j].getElementsByTagName('td');
-                if(tds[0].innerHTML == aux[2] && sig == tds[9].valor && global_last_orders_array.indexOf( aux[2] ) == -1  ){//aux[2] != '18000'
+                if(tds[0].innerHTML == aux[2] && sig == tds[9].valor && global_last_orders_array.indexOf( aux[2] ) == -1  ){
                     cantidadTotal=parseInt(tds[2].innerHTML)+parseInt($("#cantidad2").val());
                 }    
             }//termina for
@@ -1520,11 +1268,7 @@ var hay_paquete=0;
         verif=ajaxR(url2);
 //alert( verif );//aqui me quede en el desarrollo Oscar Febrero 2023
 //alert('cantidad que llega a la función: '+cant);
-        if(verif!='ok' && global_last_pieces_array.indexOf( aux[1] ) == -1 && (cant=='' || cant==null) ){// deshabilitado por Oscar 2023 para excepciones de productos maquilados && aux[13]==0 && es_paleta_tmp==0 
-    /*Reparar que si sale la emergente de inventario no incluya productos de ultimas piezas ( cambiar la condicion del parametro fijo por el arreglo )
-    aux[1]!='1808' se cambia por global_last_pieces_array.indexOf( aux[1] ) == -1*/
-        
-            //se implementa la condición de si la respuesta en la 13 es igual a cero (quiere decir que no es maquilado ni muestra paleta Oscar 10.11.2018) 
+        if(verif!='ok' && global_last_pieces_array.indexOf( aux[1] ) == -1 && (cant=='' || cant==null) ){
         //implementacion de Oscar 02.11.2018 para ocultar los resultados de busqueda
             $("#resBus").css("display","none");//ocultamos resultados de busqueda
         //fin de cambio
@@ -1537,16 +1281,7 @@ var hay_paquete=0;
             without_inventory = true;
         }
     }
-
-    /*implementación de emergente para productos que no entran en precio de mayoreo Oscar 09.05.2018*
-        if(aux[12]=='es_externo'&&ventaTipo==1){
-            $("#contEmerge").html("<br><br><p align=\"center\" style=\"color:white;font-size:30px;\">El producto "+aux[3]+" no se puede vender como mayoreo <br>Si desea venderlo, captúrelo en un ticket que no sea de mayoreo!!!<b></p>");
-            $('#emergePermisos').css('display','block');
-            $('#emergePermisos').css('z-index','100');
-            return false;
-        }
-//alert('llega_2');
-    /*Fin de cambio 09.05.2018*/
+    
         var newRow=tabla.insertRow(1);
         newRow.className="move" + ( without_inventory == true ? ' red' : '' );
         
@@ -1556,7 +1291,16 @@ var hay_paquete=0;
             aux[5]=0;
             aux[7]=0;
         }
-        //Orden de lista
+
+        //Checkbox muestra
+        /*
+        var newCell=newRow.insertCell(0);
+        var strCheck = (val_check_muestra == 1) ? '<input type="checkbox" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" onclick="checkMuestra(this)"/>';
+        newCell.innerHTML=strCheck;
+        newCell.align="center";
+        */
+
+        //Producto / Orden de Lista
         var newCell=newRow.insertCell(0);
         newCell.innerHTML=aux[2];
         newCell.align="center";
@@ -1667,6 +1411,42 @@ var hay_paquete=0;
 /*Fin de cambio Oscar 18.03.2019*/
         sig=0;
         lista_precios_actual=aux[15];
+
+        //Checkbox muestra
+        var newCell=newRow.insertCell(15);
+        var strCheck = (val_check_muestra == 1) ? '<input type="checkbox" class="cbMuestra" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+
+        if( es_muestra == 1 ){
+            strCheck = strCheck.replace('onclick="checkMuestra(this)"', 'onclick="checkMuestra(this)" number-muestra="1"');
+        }
+        //var strCheck = '<input type="checkbox" onclick="checkMuestra(this)"/>';
+        newCell.innerHTML=strCheck;
+        newCell.align="center";
+        //Una vez establecida la celda con el check, se procede a iluminar la fila
+        if( val_check_muestra ){
+            $(newRow).css('background-color','#D8FAFF');
+        }else{
+            $(newRow).css('background-color','#FFFF');
+        }
+
+        //Bandera para saber si es cambio
+        var newCell=newRow.insertCell(16);
+        newCell.innerHTML=cambio;
+        newCell.align="right";
+        newCell.style.display="none";
+
+        //Bandera para saber si ya se envió a Pedido
+        var newCell=newRow.insertCell(17);
+        newCell.innerHTML=solicitado;
+        newCell.align="right";
+        newCell.style.display="none";
+
+        //Bandera para saber si se solicitaron más piezas del mismo producto después de haber solicitado pedido
+        piezasSurtirAgregadas = cantidadNuevaSurtir;
+        var newCell=newRow.insertCell(18);
+        newCell.innerHTML=piezasSurtirAgregadas;
+        newCell.align="right";
+        newCell.style.display="none";
 
     /*implementacion de Oscar 03.05.2018 para insertar en tabla temporal de movimientos*/      
         var urlTmp="ajax/insertaTemporal.php?id_mov_temp="+id_mov_tmp+"&id_prod="+aux[1]+"&cant="+can2;
@@ -1779,6 +1559,32 @@ var hay_paquete=0;
         setLocalStorageProducts();
     }
 
+    function setCantidadNuevaSurtirEnListaProductosStorage( orden_lista, val_cantidad ){
+
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+        var indiceLista = -1;
+        if( products_array.length > 0 ){ 
+
+            for (let index = 0; index < products_array.length; index++) {
+                
+                if( products_array[index][0] == orden_lista ){
+                    indiceLista = index;
+                    //Salimos del ciclo
+                    index = products_array.length;
+                }
+                
+            }
+
+            if(indiceLista != -1){
+                //En la posición 17 se encuentra el valor de la cantidad ingresada
+                products_array[indiceLista][17] = val_cantidad;
+
+                sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+            }   
+        }
+
+    }
 
 
 	function enterNext(obj, eve)
@@ -1801,47 +1607,6 @@ var hay_paquete=0;
 	}
     
 
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores    
-    function calculaTotalProd()
-    {
-        alert('entra en proceso anterior');
-        var total=0;
-        var es_paquete = $("#es_paquete").prop ("checked") ? "1" : "0";
-        
-        var tabla=document.getElementById('listaProductos');
-        trs=tabla.getElementsByTagName('tr');
-        for(i=1;i<trs.length;i++)
-        {
-            tds=trs[i].getElementsByTagName('td');
-            
-            total+=isNaN(parseFloat(tds[8].valor))?0:parseFloat(tds[8].valor);
-            
-        }
-        
-//(alert(total);
-        document.getElementById('total').value=Mascara("$#,##.##", total);
-        if(es_paquete == 1)
-        {
-            total=total*(1-descuento);
-        }
-        
-        //Descuento porcentaje
-        if(aplicaDescuento == 1)
-        {
-            total=total*(1-descuentoAplicado);
-        }
-        
-        //Descuento monto
-        if(aplicaDescuento == 2)
-        {
-            total=total-descuentoAplicado;
-        }
-        
-        //alert(totalVenta);
-        totalVenta=Math.floor(total);    
-        
-        document.getElementById('total').value=Mascara("$#,##.##", total);
-    }*/
     
     function redond(val, ndec){
         return(Math.round(eval(val)*Math.pow(10,ndec))/Math.pow(10,ndec));  
@@ -1884,66 +1649,7 @@ var hay_paquete=0;
     var id_ver=0;
     var sig=0; 
 
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-    var id_autorizacion=0; 
-    
-    function validaAut()
-    {
-        res=ajaxR('ajax/getValidacion.php?id='+id_autorizacion);
-
-        // Fines de prueba, autorizar aleatoriamente 
-        // aux = Math.random() * 100 > 60 ? "SI" : "NO";
-        
-        var aux=res.split('|'); 
-        
-        if(aux[0] == 'SI')
-        {
-            
-
-            $("#divEspera").css ("display", "none");
-            $("#es_regalo").prop ("checked", true);
-            
-            alert(aux[1]);
-            
-            if(aux[2] == 1)
-            {
-                sig=1;
-            }
-            if(aux[2] == 2)
-            {
-                //alert(aux[3]);
-                //alert(descuento);
-                aplicaDescuento=1;
-                descuentoAplicado=parseFloat(aux[3])/100;
-                calculaTotalProd();
-            }
-            if(aux[2] == 3)
-            {
-                aplicaDescuento=2;
-                descuentoAplicado=parseFloat(aux[3]);
-                calculaTotalProd();
-            }
-            
-            $("#producto").focus ();
-
-			existeRegalo++;
-                
-            clearInterval(id_ver);
-        }
-        if(aux[0] == 'NO')
-        {
-            alert("La peticion no ha sido autorizada");
-            $("#divEspera").css ("display", "none");
-            $("#es_regalo").prop ("checked", false);
-            $("#es_regalo").prop ("disabled", false);
-            $("#img_regalo").prop ("disabled", false);
-            clearInterval(id_ver);
-            
-            $("#producto").focus ();
-        }
-    }           
-*/
-     function ajaxR(url)
+    function ajaxR(url)
         {
             if(window.ActiveXObject){       
                 var httpObj = new ActiveXObject("Microsoft.XMLHTTP");
@@ -1973,43 +1679,7 @@ var hay_paquete=0;
           });
       }
 
-/*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-      function calculaTotal () {
-        // Sumar el total 
-            total = 0.0;
-            $("#listaProductos tr.move td.tabla_total p").each (function(index, value) {
-                total += parseFloat($(this).html ().replace (/[\$\s,]/g, ""));
-            });
-            $("#total").val ("$ " + moneyFormat(total));
-      }*/
-
-
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-      function calculaPrecios () {
-          $("#listaProductos tr.move td.tabla_id_producto").each (function(index, value) {
-                var id_producto = $(this).find("p").html();
-                var tr = $(this).parent ();
-
-                $.ajax({
-                     async: false,
-                     type: 'GET',
-                     url: "ajax/precioProducto.php?idp=" + id_producto
-                }).done (function (data){
-                    if (coincidencias = data.match (/^ok\|precio\:(\d+(?:.\d+)?)\|nombre\:(.*)$/i)) {
-                        precio = parseInt($(tr).find("td.tabla_detalles input.es_regalo").val ()) > 0 ? 0 : coincidencias[1];
-                        if ($("#es_paquete").prop ("checked")) precio = parseFloat(precio) - parseFloat(precio) * descuento;
-                        $(tr).find("td.tabla_precio p").html ("$ " + moneyFormat(precio));
-                        $(tr).find("td.tabla_total p").html ("$ " + moneyFormat(precio * parseFloat($(tr).find("td.tabla_cantidad p").html())));
-                        // Calcular total cada iteración 
-                        calculaTotal();
-                    }
-                }).fail (function () {
-                    alert ("Error al intentar obtener el precio del producto seleccionado.");
-                });
-            });
-      }*/
-
-	function eliminarItem (item){
+	function eliminarItem (item, llamadoFueraDeBoton){
 		
 		//tds=$(item).getElementsByTagName('td');
 		
@@ -2020,6 +1690,10 @@ var hay_paquete=0;
 		//alert(id_prod);
 		//return false;
 		$(item).parents ("tr.move").first ().remove ();
+        //El elemento eliminado se agrega al arreglo para mandar petición de surtimiento
+        if( !llamadoFueraDeBoton ){
+            setArregloElimnarSurtimiento(tds);
+        }
 		//calculaTotal ();
 		$("#producto, #cantidad").val ("");
 		
@@ -2033,8 +1707,7 @@ var hay_paquete=0;
 		trs=tabla.getElementsByTagName('tr');
 		
        	var can2=0;
-		for(i=1;i<trs.length;i++)
-		{
+        for(i=1;i<trs.length;i++){
 			tds=trs[i].getElementsByTagName('td');
 			//alert(tds[8].valor+" - "+sig);
 			
@@ -2070,7 +1743,6 @@ var hay_paquete=0;
 			var res=ajaxR(url);			
 			//alert(res);           
 			var aux=res.split('|');
-
 			if(aux[0] == 'exito')
 			{
 				for(i=0;i<parseInt(aux[1]);i++)
@@ -2095,7 +1767,62 @@ var hay_paquete=0;
        }
         calculaTotalVenta();
         setLocalStorageProducts();//implementacion Oscar 2023 para eliminar el producto de LocalStorage
-      }
+    }
+
+    function setArregloElimnarSurtimiento( tds ){
+
+        var orderList = tds[0].innerHTML;
+        var esSolicitado = tds[17].innerHTML;
+        
+        if( sessionStorage.getItem('ARRAY_ELIMINADOS') != null && sessionStorage.getItem('ARRAY_ELIMINADOS') != '' ){
+            var array_eliminados = JSON.parse(sessionStorage.getItem('ARRAY_ELIMINADOS'));
+            array_eliminados.push(orderList);
+
+            sessionStorage.setItem('ARRAY_ELIMINADOS', JSON.stringify(array_eliminados));
+        }else{
+            var array_eliminados = [];
+            //Solo se agrega al arreglo en caso de que 
+            if( esSolicitado == '1' ){
+                array_eliminados.push(orderList);
+                sessionStorage.setItem('ARRAY_ELIMINADOS', JSON.stringify(array_eliminados));
+            }else{
+                console.log("NO SE AGREGA A LA ELIMINACIÓN PARA SURTIMIENTO");
+            }
+            
+        }
+    }
+
+    function checkMuestra(item){
+        var valor_chk = $(item).is(":checked");
+        var es_muestra = $(item).attr('number-muestra');
+
+        var str_checkbox = ( valor_chk ) ? '<input type="checkbox" class="cbMuestra" checked onclick="checkMuestra(this)"/>':'<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+
+        if( es_muestra == '1' ){
+
+            str_checkbox = str_checkbox.replace('onclick="checkMuestra(this)"', 'onclick="checkMuestra(this)" number-muestra="1"');
+        }
+
+        if( valor_chk ){
+            $(item).parent().parent().css('background-color','#D8FAFF');
+        }else{
+            $(item).parent().parent().css('background-color','#FFFF');
+        }
+        var fila_tabla = $(item).parent().parent();
+        var indice = fila_tabla.index();
+
+        //Una vez obtenido el indice, procedemos a actualizar el objeto que se guarda en sessionStorage
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+
+        if( products_array.length > 0 ){ 
+            //Actualiza contenido de la primer columna
+            //Se resta al indice una unidad ya que el indice cero corresponde al header y ese no se toma en cuenta
+            products_array[indice-1][14] = str_checkbox;
+
+            sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+        }
+    }
 
     /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
       function bloqueaPantalla () {
@@ -2112,17 +1839,6 @@ var hay_paquete=0;
 		var es_paquete = $("#es_paquete").prop ("checked") ? "1" : "0";
 		var id_pedido = $("#id_pedido").val ();
 		var datos = "nitems=" + $("#listaProductos tr.move").length;
-//implementacion de correo y facebook Oscar(29-10-2017)
-    /*recolectamos información del cliente 
-        var corr=$("#co").val();
-        var fac=$("#fa").val();
-        if(corr==""){
-            corr='-';
-        }
-        if(fac==""){
-            corr='-';
-        }
-     */   
 	//Detalles
 		var tabla=document.getElementById('listaProductos');
 		trs=tabla.getElementsByTagName('tr');
@@ -2132,18 +1848,8 @@ var hay_paquete=0;
             
             //implementado por Oscar(28-10-2017)
             var objIn=tds[12].getElementsByTagName('input');
-        
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-            if(objIn.length > 0){
-                descProd=isNaN(parseFloat(objIn[0].value))?0:parseFloat(objIn[0].value);
-            }
-            //termina cambio*/
-            
-			//total+=isNaN(parseFloat(tds[8].valor))?0:parseFloat(tds[8].valor);tds[11].innerHTML
             datos += "&idp" + i + "=" + tds[11].valor + "&can" + i + "=" + tds[2].innerHTML + "&pre" + i +"=" + tds[7].valor
             + "&mon" + i +"=" + tds[8].valor+"&id_precio" + i +"=" + tds[14].valor;//se agrega variable desc para guardar
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-            +"&desc"+i+"="+descProd*/
 		}
         //alert( url );
          
@@ -2186,12 +1892,12 @@ var hay_paquete=0;
     /*Fin de cambio Oscar 12.03.2019*/
 
         var res=ajaxR(url);
-//alert(res);
-/*return false;*/
+        //alert(res);
+    /*return false;*/
 		aux=res.split('|');
 		/**/
         if(aux[0]=='sin_sesion_caja'){
-            alert("No se pueden hacer ventas porque el cajero no ha iniciado sesión de caja\nPida al cajero que inicie su sesión de caja!!!");
+            alert("No se pueden hacer ventas porque el cajero no ha iniciado sesión de caja.\nPide al cajero que inicie su sesión de caja.");
             return false;
         }
 
@@ -2210,6 +1916,8 @@ var hay_paquete=0;
             $("#detalle_nota_tmp").val(aux[3]);
         /*fin de cambio Oscar 13.11.2018*/
 			retval = true;
+            //mandamos a consumir servicio para surtir pedido
+            //surtePedido();
 		}
 		else{
 			retval = false;
@@ -2232,6 +1940,190 @@ var hay_paquete=0;
 //alert('fin de generaVe');	
 		return retval;
 	}
+    
+    //El parámetro callback se manda para poder ejecutar función hasta que la petición de surtimiento termine
+    function surtePedido( callback ){
+
+        // Obtiene la URL completa actual
+        var currentUrl = window.location.href;
+
+        // Extrae el nombre del ambiente (la parte entre el dominio y el siguiente '/')
+        // var regex = /\/\/[^\/]+\/([^\/]+)/;
+        // var match = currentUrl.match(regex);
+        // var nombreAmbiente = match ? match[1] : '';
+
+        // // Construye la URL base y la URL del API
+        // var baseUrl = window.location.origin;
+
+        var parts_url = currentUrl.split('/touch_desarrollo');
+        //var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Pedido';
+        var apiUrl = parts_url[0] + '/rest/v1/surte/Pedido';
+
+        var productosPedido = getProductosPedido();
+        var productosEliminados = getProductosEliminados();
+        //var productosEliminados = [];
+
+        var dataSurtePedido = {
+                "productosEliminados": productosEliminados,
+                "productos": productosPedido,
+                "vendedor": <?php echo $user_id; ?>,
+                "sucursal": <?php echo $sucursal_id;?>,
+                "pedido": genIdPedido( <?php echo $user_id; ?> ),
+            };
+
+        if( productosPedido.length > 0 || productosEliminados.length > 0 ){
+            $.ajax({
+            type: 'POST',
+            url: apiUrl,
+            headers: {
+                'Token':'9aca3d54-6eae-48f4-8597-6022be714915'
+            },
+            data: dataSurtePedido,
+            datatype: 'json',
+            success: function (data) {
+                console.log("RESPUESTA PEDIDO");
+                console.log(data);
+                if( data.result.resultado == "Solicitado" ){
+                    alert(data.result.descripcion);
+                    //Establecer el localStorage como 1 la fila 16, corresponde a la bandera para saber si ya fue solicitado
+                    setBanderaProductoSolicitado(data.result.noSolicitados);
+                    clearArrayEliminados();
+
+                }else{
+                    alert("Ha ocurrido un error: "+data.result.descripcion);
+                }
+
+                //sessionStorage.setItem('ID_PEDIDO_TEMP', '');
+                
+                clearAllCheckBox();
+                callback();
+
+            },
+            error:function(error){
+                console.log("ERROR".error);
+                callback();
+            }
+            });
+            
+            
+        }else{
+            console.log("No sufrió cambio, no se envpia ningún producto a surtimiento");
+            //location.href = $("#menu_cerrar").attr ("href");
+             callback();
+        }
+    }
+
+    function getProductosPedido(){
+    
+        var seleccionados = [];
+        var filas = $('#listaProductos tr.move');
+        if( filas.length > 0 ){
+            // Mostrar las filas en la consola
+            filas.each(function(index, fila) {
+                var $row = $(this);
+                var ordenDeLista = $row.find('td:eq(0)').text().trim();
+                var cantidad = $row.find('td:eq(2)').text().trim();
+                var numberMuestra = $row.find('td:eq(15)').children().eq(0).attr('number-muestra');
+                var cantidadPiezasCambio = $row.find('td:eq(16)').text().trim();
+                var solicitado = $row.find('td:eq(17)').text().trim();
+                var cantidadAdicionalDespuesDeSurtido = $row.find('td:eq(18)').text().trim();
+
+                if( solicitado == '1' ){
+                    
+                    if( cantidadPiezasCambio == '0' && cantidadAdicionalDespuesDeSurtido <= '0' ){
+                        cantidad = 0;
+                    }
+                    //Cuando el producto ya se ha solciitado a envío, únicamente se hace la petición para surtir de las piezas para "cambio"
+                    if( cantidadPiezasCambio != '0' &&  cantidadAdicionalDespuesDeSurtido <= '0' ){
+                        cantidad = cantidadPiezasCambio;
+                    }
+
+                    if( cantidadPiezasCambio == '0' &&  cantidadAdicionalDespuesDeSurtido >= '0' ){
+                        cantidad = cantidadAdicionalDespuesDeSurtido;
+                    }
+
+                    if( numberMuestra > 0 ) cantidad = numberMuestra;
+
+
+                }else{
+                    // En caso de que ya se haya solicitado muestra, a la cantidad solicitada, se resta la unidad de muestra, en otro caso, si no ha sido solicitado, se envía la cantidad solicitada originalmente
+                    if( numberMuestra != undefined ){
+                        cantidad = cantidad - numberMuestra; 
+                    }
+                }
+
+                if( cantidad > 0 ){
+                    //únicamente si la cantidad es mayor a 0, el producto se agrega a la petición
+                    seleccionados.push({
+                        id: ordenDeLista,
+                        cantidad: cantidad
+                    });
+                }
+                
+            });
+        }
+        return seleccionados;
+    }
+
+    function getProductosEliminados(){
+        var array_eliminados = [];
+        if( sessionStorage.getItem('ARRAY_ELIMINADOS') != null && sessionStorage.getItem('ARRAY_ELIMINADOS') != '' ){
+
+            array_eliminados = JSON.parse(sessionStorage.getItem('ARRAY_ELIMINADOS'));
+        }
+
+        return array_eliminados;
+
+    }
+
+    function genIdPedido( id_user ) {
+        var id = "";
+        
+        if( sessionStorage.getItem('ID_PEDIDO_TEMP') != null && sessionStorage.getItem('ID_PEDIDO_TEMP') != '' ){
+            id = sessionStorage.getItem('ID_PEDIDO_TEMP');
+        }else{
+            id = new Date().getMilliseconds() + id_user ;
+            sessionStorage.setItem('ID_PEDIDO_TEMP', id);
+        }
+
+        return id;  
+    }
+
+    function setBanderaProductoSolicitado( noSolicitados ){
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+
+        if( products_array.length > 0 ){ 
+
+            for (let index = 0; index < products_array.length; index++) {
+                var odenListaProd = products_array[index][0];
+
+                //Solo se establecen como "solicitado" los productos que no vengan en el arreglo de noSolicitados
+                if( noSolicitados != undefined ){
+
+                    if( !noSolicitados.includes( odenListaProd ) ){
+                        //Se actualiza bandera de muestra que indica reseteo de surtimiento en muestras
+                        products_array[index][14] = '<input type="checkbox" class="cbMuestra" onclick="checkMuestra(this)"/>';
+                        //La posición 16 corresponde a la bandera para identificar si ya ha sido solicitado
+                        products_array[index][16] = '1';
+                        products_array[index][17] = '-1';
+    
+                    }
+                }
+
+            }
+
+          sessionStorage.setItem('SALE_PRODUCTS_LIST', JSON.stringify( products_array ));
+        }
+    }
+
+    function clearArrayEliminados(){
+        sessionStorage.removeItem('ARRAY_ELIMINADOS');
+    }
+    
+    function change_to_upercase( obj ){
+        obj.value = obj.value.toUpperCase();
+    }
 
     function writeLog( tipo_operacion,mensaje, callback ){
         var currentUrl = window.location.href;
@@ -2276,14 +2168,15 @@ var hay_paquete=0;
 
     }
 
-/*implementacion Oscar 2023 para imprimir, visualizar cotizacion*/
+
+    /*implementacion Oscar 2023 para imprimir, visualizar cotizacion*/
     function quotationEmergent( sale_id ){
         var quotation_content = `<div class="row text-center" id="quotation_container" style="background-color : white;">
-                <h2>Escribe "Es cotizacion" para continuar</h2>
+                <h2>Escribe "ES COTIZACION" para continuar</h2>
                 <div class="col-2"></div>
                 <div class="col-8">
                 <br>
-                <input type="text" placeholder="Es cotizacion" class="form-control" id="quotation_words">
+                <input type="text" placeholder="ES COTIZACION" class="form-control" id="quotation_words" onkeyup="change_to_upercase( this );">
                     <br><br>
                     <button
                         class="btn btn-warning form-control"
@@ -2304,12 +2197,15 @@ var hay_paquete=0;
         </div>`;
         $( '#contEmerge' ).html( quotation_content );
         $( '#emergePermisos' ).css( 'display', 'block' );
+            setTimeout(() => {
+                $( '#quotation_words' ).focus();
+            }, 200 );    
     }
 
     function printQuotation( sale_id, pdf = false ){
     //valida frase
-        if( $( '#quotation_words' ).val().toLowerCase() != 'es cotizacion' ){
-            alert( 'Es necesario que escribas "Es cotizacion"' );
+        if( $( '#quotation_words' ).val().toLowerCase() != 'es cotizacion' && $( '#quotation_words' ).val().toLowerCase() != 'es cotización' ){
+            alert( 'Es necesario que escribas "ES COTIZACION"' );
             $( '#quotation_words' ).select();
             return false;
         }
@@ -2352,213 +2248,9 @@ var hay_paquete=0;
         activaMayoreo();
     }
 
-
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-    function actualizaOfertas (){
-        var retval = false; 
-        var es_regalo = $("#es_regalo").prop ("checked") ? "1" : "0";
-        var es_pedido = $("#es_pedido").prop ("checked") ? "1" : "0";
-        var es_paquete = $("#es_paquete").prop ("checked") ? "1" : "0";
-        var id_pedido = $("#id_pedido").val ();
-
-        var datos = "nitems=" + $("#listaProductos tr.move").length;
-        $("#listaProductos tr.move").each (function(index, value) {
-            datos += "&idp" + index + "=" + $(this).find ("td.tabla_id_producto p").html () + "&can" + index + "=" + $(this).find ("td.tabla_cantidad p").html ();
-        });
-
-        $.ajax({
-             async: false,
-             type: 'GET',
-             url: "ajax/calculaOfertas.php?idp=" + id_pedido + "&re=" + es_regalo + "&pe=" + es_pedido + "&pa=" + es_paquete + "&" + datos
-        }).done (function (data) {
-            //alert (data);
-       }).fail (function () {
-            alert("Error al buscar las ofertas.");
-            retval = false;
-       });
-
-     return retval;
-    }*/
-
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-    function agregarProducto () {
-        if ($("#id_producto").val ().match (/^\d+$/) && $("#cantidad").val ().match (/^-?\d+$/)) {
-            $.ajax({
-                 async: false,
-                 type: 'GET',
-                 url: "ajax/precioProducto.php?idp=" + $("#id_producto").val ()
-            }).done (function (data) {
-                if (coincidencias = data.match (/^ok\|precio\:(\d+(?:.\d+)?)\|nombre\:(.*)$/i)) {
-                    var precio = coincidencias[1];
-                    var nombre = coincidencias[2];
-                    var existe = false;
-                    
-                    if ($("#es_regalo").prop ("checked")) {
-                        precio = 0;
-                    } else if ($("#es_paquete").prop ("checked")) {
-                        precio = parseFloat(precio) - parseFloat(precio) * descuento;
-                    }
-                    
-                    // Si el producto ya existe, se actualiza la cantidad y el total 
-                    // Se desconoce el comportamiento si se trata de un regalo   
-                                            
-                    $("#listaProductos tr.move td.tabla_id_producto").each (function(index, value) {
-                        if ($(this).find("p").html() == $("#id_producto").val ()) {
-                            existe = true;
-                            if ($("#es_regalo").prop ("checked")) {
-                                alert ("Imposible registrar este regalo.\nEl producto marcado se encuentra previamente registrado.");
-                            } else {
-                                cantidad = parseInt($("#cantidad").val())+parseInt($(this).parent().find("td.tabla_cantidad p").html());
-                                $(this).parent().html ("<td class=\"tabla_id_producto\"><p>" + $("#id_producto").val() + "</p></td><td><p>" + $("#producto").val() + "</p></td><td class=\"tabla_cantidad\"><p>" + cantidad + "</p></td><td class=\"tabla_precio\"><p>$ " + moneyFormat(precio) + "</p></td><td class=\"tabla_total\"><p>$ " + moneyFormat(precio * cantidad) + "</p></td><td class=\"tabla_detalles\"><a href=\"javascript:void(0)\" onclick=\"eliminarItem(this)\" class=\"eliminar\"> <span>eliminar</span></a> <input type=\"hidden\" class=\"es_regalo\" value=\"0\" /> </td>");
-                            }
-                        }
-                    });
-                    
-                    if (!existe) {
-                        $("#listaProductos").append ("<tr class=\"move\"><td class=\"tabla_id_producto\"><p>" + $("#id_producto").val() + "</p></td><td><p>" + nombre + "</p></td><td class=\"tabla_cantidad\"><p>" + $("#cantidad").val() + "</p></td><td class=\"tabla_precio\"><p>$ " + moneyFormat(precio) + "</p></td><td class=\"tabla_total\"><p>$ " + moneyFormat(precio * parseFloat($("#cantidad").val())) + "</p></td><td class=\"tabla_detalles\"><a href=\"javascript:void(0)\" onclick=\"eliminarItem(this)\" class=\"eliminar\"> <span>eliminar</span></a> <input type=\"hidden\" class=\"es_regalo\" value=\"" + ($("#es_regalo").prop ("checked") ? "1" : "0") + "\" /> </td></tr>");
-                    }
-
-                    if ($("#es_regalo").prop ("checked")) {
-                        $("#es_regalo").prop ("checked", false);
-                    }
-
-                    calculaTotal();
-                }
-
-                // Buscar y recalcular precios por la cuestión de las ofertas 
-            
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-                actualizaOfertas ();
-                *
-            });
-        }else{
-            alert("El producto seleccionado no existe o la cantidad solicitada es incorrecta.");
-        }
-
-        $("#producto, #cantidad").val ("");
-        $("#producto").focus ();
-    }*/
-
-
-/*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores    
-    function buscarProducto (){
-        //alert('here');
-        if (coincidencias = $("#producto").val ().match (/^(\d+)~?/i)) {
-            es_ok = false;
-            $.ajax({
-                 async: false,
-                 type: 'GET',
-                 url: "ajax/buscarProductoCB.php?cb=" + coincidencias[1]
-            }).done (function (data) {
-                if (coincidencias = data.match (/^ok\|idp:(\d+)$/i)) {
-                    $("#id_producto").val (coincidencias[1]);
-                    $("#cantidad").val ("1");
-                    $("#cantidad").focus ().select();
-                    es_ok = true;
-                }
-           });
-
-           if (!es_ok) {
-               // Blanqueamos el id del producto 
-               $("#id_producto, #producto").val ("");
-               alert ("¡Alerta!\nNo existe el producto solicitado.");
-           }
-        }
-    }
-*/
-
-/*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-    function marcaRegalo () {
-         var es_regalo = $("#es_regalo").prop ("checked") ? "1" : "0";
-         var es_pedido = $("#es_pedido").prop ("checked") ? "1" : "0";
-         var es_paquete = $("#es_paquete").prop ("checked") ? "1" : "0";
-         var id_pedido = $("#id_pedido").val ();
-         
-         //$("#es_regalo").prop ("disabled", true);
-         //$("#img_regalo").prop ("disabled", true);
-         
-
-		if(existeRegalo > 0){
-			alert ("Imposible continuar.\nYa existe un regalo previamente seleccionado.");
-            return false;
-		}
-
-        var hay_regalo = false;
-
-         // Verificar que previamente no haya regalo seleccionado 
-         
-         $("#listaProductos tr.move td.tabla_detalles input.es_regalo").each (function(index, value) {
-             if (parseInt($(this).val ()) > 0)
-                 hay_regalo = true;
-         });
-
-         if (hay_regalo) {
-             alert ("Imposible continuar.\nYa existe un regalo previamente seleccionado.");
-            return false;
-         }
-
-         var datos = "nitems=" + $("#listaProductos tr.move").length;
-          /*$("#listaProductos tr.move").each (function(index, value) {
-              datos += "&idp" + index + "=" + $(this).find ("td.tabla_id_producto p").html () + "&can" + index + "=" + $(this).find ("td.tabla_cantidad p").html () + (parseInt($(this).find("td.tabla_detalles input.es_regalo").val ()) > 0 ? "&reg=" + index : "");
-          });//////////////*\
-         
-         //Detalles
-         
-         var tabla=document.getElementById('listaProductos');
-         trs=tabla.getElementsByTagName('tr');
-         for(i=0;i<trs.length-1;i++)
-         {
-            tds=trs[i+1].getElementsByTagName('td');
-            
-            //total+=isNaN(parseFloat(tds[8].valor))?0:parseFloat(tds[8].valor);tds[11].innerHTML
-            
-            datos += "&idp" + i + "=" + tds[11].valor + "&can" + i + "=" + tds[2].innerHTML + "&pre" + i +"=" + tds[7].valor+ "&mon" + i +"=" + tds[8].valor;
-            
-         }
-        
-    
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-        if ($("#listaProductos tr.move").length > 0) {
-            
-            $.ajax({
-                    async: false,
-                    type: 'GET',
-                    url: "ajax/guardaAutorizacion.php?idp=" + id_pedido + "&re=" + es_regalo + "&pe=" + es_pedido + "&pa=" + es_paquete + "&" + datos
-               }).done (function (data) {
-                   
-                   //alert(data);
-                   
-                   id_autorizacion=data;
-                   
-                   bloqueaPantalla (); 
-                   
-                   id_ver=setInterval('validaAut()', 5000);
-                   return true;
-               }).fail (function () {
-                   alert ("Error al registrar la autorización.");
-                   return false;
-               });
-        } else {
-            alert ("Imposible continuar.\nSeleccione cuando menos un producto.");
-            return false;
-        }*******\/
-    }*/
-
     function changeHashOnLoad() {
-        //alert('se ocupa');
         var base_href = location.href.match (/^([^\#]*)(?:\#.*)?$/i)[0];
         location.href = base_href + "#";
-    /*implementación Oscar 30.05.2018 para limpiar las cajas de texto* DEshabilitado por Oscar 09.11.2018 porque ya no se usa para limpiar cajas de texto
-        if($("#id_de_apartado").val()=='' || $("#id_de_apartado").val()==null){
-            //alert('limpiar');
-            $("#porcGeneral").val("");//limpiamos entrada de texto de descuento por porcentaje
-        }
-        if(!document.getElementById('desc_anterior')){
-            $("#descGeneral").val("");//limpiamos entrada de texto de descuento por monto
-        }else if(document.getElementById('desc_anterior').value>0){
-            $("#porcGeneral").val($("#desc_anterior").val());
-        }
-    /*fin de cambio 30.05.2018*/
         setTimeout("changeHashAgain()", "50");
     }
 
@@ -2587,157 +2279,16 @@ var hay_paquete=0;
        // $( '#buscadorLabel' ).val( 'prueba' );
         $( '#buscadorLabel' ).click();
 
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-            $("#es_pedido").on ("click", function () {
-                if ($("#es_pedido").prop('checked')) {
-                // cambiaRegalo ();  
-                    $("#es_regalo").prop ("checked", false);
-                    $("#es_paquete").prop ("checked", false);
-                    $("#es_paquete").prop ("disabled", true);
-                    $("#es_regalo").prop ("disabled", true);
-                    $("#menu_cerrar span").html ("Generar Nota");
-                    $("#menu_cerrar").removeClass ("nota").addClass ("pedido");
-                } else {
-                    
-                    //alert('OK1');
-                    $("#es_paquete").prop ("disabled", false);
-                    $("#es_regalo").prop ("disabled", false);
-                    $("#menu_cerrar span").html ("Cerrar Venta");
-                    $("#menu_cerrar").removeClass ("pedido").addClass("nota");
-                }
-            
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-                calculaPrecios ();*\/
-                cargaNuevoFolio ();
-                $("#producto").focus ();
-            });*/
-
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-            $("#es_regalo").on ("click", function () {
-                return marcaRegalo ();
-            });*/
-            
-            /*$("#img_regalo").on ("click", function () {
-                
-                return marcaRegalo ();
-                
-            });*/
-
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-            $("#cancelar").on ("click", function () {
-                
-                $("#es_regalo").prop ("disabled", false);
-                $("#img_regalo").prop ("disabled", false);
-                
-                $("#divEspera").css ("display", "none");
-                $("#es_regalo").prop ("checked", false);
-                $("#producto").focus ();
-                
-                clearInterval(id_ver);
-                ajaxR('ajax/cancelaAuto.php?id='+id_autorizacion);  
-                
-            });
-
-            $("#es_paquete, #es_regalo").on ("click", function () {
-                $("#producto").focus ();
-            });
-
-            $("#salirbtn").on ("click", function () {
-                if (confirm ("¿Realmente desea cerrar sin guardar?")) {
-                    top.location.href = "index.php";
-                }
-            });*/
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-            $("#img_regalo").on ("click", function () {
-                if (!$("#es_regalo").prop ("disabled")) {
-                    $("#es_regalo").prop('checked', true);
-                    $("#es_regalo").prop('checked', marcaRegalo ());
-                }
-                $("#producto").focus ();
-            });*/            
-
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-            $("#cantidad").on ("keydown", function (e) {
-                alert();
-                var key = e.charCode || e.keyCode || 0;
-                if (key == 13) {
-                    agregarProducto();
+        $("#menu_cerrar, #cerrar").on ("click", function (){
+    //alert('cierra, AUTORIZADO= '+autorizado);
+            if(autorizado==0){
+                if(!confirm("Esta operación cerrará la venta.\n¿Deseas continuar?")) {
+                //regresamos referencia a un valor vacío
+                    sa=0;
+                    autorizado=0;
                     return false;
                 }
-            });*/
-           
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores $("#cantidad").ForceNumericOnly();*/
-
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-            $("#producto").on ("keydown", function (e){
-                var key = e.charCode || e.keyCode || 0;
-                if (key == 13) {
-                    buscarProducto();
-                    return false;
-                }
-            });*/
-
-            
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-            // Botón agregar... 
-            $("#agregar").on ("click", function () {
-                agregarProducto ();
-             });*/
-
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores
-            $("#es_paquete").on ("click", function () {
-                alert('aqui');
-                //alert(res);
-            //implementado por oscar 4-11-2017
-                if(document.getElementById("es_paquete").checked==true){
-                //checamos el descuento
-                    var opc=confirm("El paquete no permitirá ningún tipo de descuento adicional!!!\nDesea continuar?");
-                    if(opc==false){
-                        document.getElementById("es_paquete").checked=false;
-                        return false;
-                    }
-                    var link="ajax/getDescuentoPaquete.php";
-                    var res=ajaxR(link);
-                    if(res=='no'||res==''||res==0){
-                        alert('No se encontró descuento para paquete!!!\nConsulte al encargado...');
-                    }
-                    document.getElementById("porcGeneral").value=res;
-                //deshabilitamos descuentos en grid
-                    //resetearMontos(); 
-                    referenciaPaquete=1;      
-                    $('#listaProductos').find('input').prop('disabled',true);
-                //deshabilitamos deescuentos directos
-                    $('#descGeneral').prop('disabled',true);
-                    $('#porcGeneral').prop('disabled',true);            
-                }else{
-                    alert('Paquete desactivado!!!');
-                    referenciaPaquete=0;  
-                    if(opc==false){
-                        return false;
-                    }
-                    document.getElementById("porcGeneral").value="";
-                //habilitamos descuentos en grid
-                    $('#listaProductos').find('input').prop('disabled',false);
-                //habilitamos deescuentos directos
-                    $('#descGeneral').prop('disabled',false);
-                    $('#porcGeneral').prop('disabled',false);
-                }
-                calculaTotalVenta();
-
-                //calculaPrecios ();
-            //calculaTotalProd();
-            });*/
-
-            $("#menu_cerrar, #cerrar").on ("click", function (){
-//alert('cierra, AUTORIZADO= '+autorizado);
-                if(autorizado==0){
-                    if(!confirm("Esta operación cerrará la venta, ¿desea continuar?")) {
-                    //regresamos referencia a un valor vacío
-                        sa=0;
-                        autorizado=0;
-                        return false;
-                    }
-                }
+            }
     /*
      CAMBIOS DE OSCAR
     */
@@ -2759,46 +2310,6 @@ var hay_paquete=0;
                     var txt2="Descuento directo aplicado sobre el ticket: ";
                     var detalleDescProd='<p class="autDesc">Descuentos por Producto:</p>'+
                     '<div class="tablaEmergente"><table><tr><td width="50%">Producto</td><td>Cant</td><td>Monto</td><td>Desc</td><td>Total</td></tr>';
-                    
-                    /*var tabla=document.getElementById('listaProductos');
-                    var trs=tabla.getElementsByTagName('tr');
-                    if(referenciaPaquete==1){
-                         for(i=0;i<trs.length-1;i++){
-                        tds=trs[i+1].getElementsByTagName('td');
-                        var objIn=tds[12].getElementsByTagName('input');
-                        var descProd=0;
-                            //1,13,2
-                            var descripcionPr=tds[1].innerHTML;
-                            var cantidadProductos=tds[2].innerHTML;
-                            var objAux=tds[13].getElementsByTagName('input');
-                            var subtotalReal=objAux[0].value;
-                            var montTemp=tds[5].innerHTML;
-                            detalleDescProd+='<tr><td>'+descripcionPr+'</td><td>'+cantidadProductos+'</td><td>'
-                            +subtotalReal+'</td><td>$'+'</td><td>'+montTemp+'</td></tr>';
-                        }
-                        var txt1="Este descuento es por paquete\n";
-                        var txt2="";
-                    }else{
-                    for(i=0;i<trs.length-1;i++){
-                        tds=trs[i+1].getElementsByTagName('td');
-                        var objIn=tds[12].getElementsByTagName('input');
-                        var descProd=0;
-                        if(objIn.length > 0){
-                            descProd=isNaN(parseFloat(objIn[0].value))?0:parseFloat(objIn[0].value);
-                        }
-                        if(descProd>0){
-                            //1,13,2
-                            var descripcionPr=tds[1].innerHTML;
-                            var cantidadProductos=tds[2].innerHTML;
-                            var objAux=tds[13].getElementsByTagName('input');
-                            var subtotalReal=objAux[0].value;
-                            var montTemp=tds[5].innerHTML;
-                            detalleDescProd+='<tr><td>'+descripcionPr+'</td><td>'+cantidadProductos+'</td><td>'
-                            +subtotalReal+'</td><td>$'+descProd+'</td><td>'+montTemp+'</td></tr>';
-                        }
-                    }//fin de for
-                }//fin de else
-                    detalleDescProd+="</table></div>";*/
                     
                     var descDirectos,porcDir,descDir;
                     porcDir=document.getElementById('porcGeneral').value;
@@ -2858,145 +2369,98 @@ var hay_paquete=0;
                     cierraEmer();
             //si no es mayoreo el proceso sigue norma
                 }
-            /*
-                FINALIZAN CAMBIOS
-            */
+    /*
+        FINALIZAN CAMBIOS
+    */
             //valida que haya productos capturados
                  if (!$("#listaProductos tr.move").length)
                  {
                      // Verificar la selección de productos en lista 
-                     alert("Imposible continuar.\nNo ha seleccionado productos para la venta.");
+                     alert("Imposible continuar.\nNo has seleccionado productos para la venta.");
                      $("#buscadorLabel").focus ();
                      return false; 
                  }
                  else{
                      if (!guardarVenta ()){
                          // No se pudo guardar la venta 
-                         alert("Error mientras se procesaba la venta.\nActualice la pantalla e intente nuevamente.");
+                         alert("Error mientras se procesaba la venta.\nActualiza la pantalla e intente nuevamente.");
                          return false;
                      }
                      else
                      {
-                         /*if ($("#menu_cerrar").hasClass ("pedido"))
-                         {
-                            // Si se trata de un pedido, imprimir ticket y bloquear la opción pedido 
-                            // Tambien habilita el botón para cerrar la venta 
-                             
-                             agregarProducto = function () { alert ("Función deshabilitada."); return false; };
-                             //Cambiar por ajax  
-                             //window.open ("index.php?scr=ticket&idp=" + $("#id_pedido").val (), "_blank"); 
-                             //alert('ok');
-                             $.ajax({
-				                    async: false,
-				                    type: 'GET',
-				                    url: "../index.php?scr=ticket&idp=" + $("#id_pedido").val () + "&noImp=1"
-				               }).done (function (data) {
-                                    //alert(data);
-				                   return true;
-				               });/*
-				             $.ajax({
-                                    async: false,
-                                    type: 'GET',
-                                    url: "../index.php?scr=ticket&idp=" + $("#id_pedido").val () + "&noImp=2"
-                               }).done (function (data) {
-                                    //alert(data);
-                                   return true;
-                               });  
-                             *\/
-                             $("#menu_cerrar span").html ("Cerrar Venta");
-                             $("#menu_cerrar").removeClass ("pedido").addClass ("nota");
-                             
-                             //alert('OK');
-                             $("#es_pedido").prop ("checked", false);
-                             $("#es_pedido").prop ("disabled", true);
-                             //cargaNuevoFolio();
-                             //$("#es_pedido").prop ("checked", true);
-                             
-                             var url="ajax/nuevoFolio.php?tipo=V"+ "&idp=" + $("#id_pedido").val ();
-                             
-                             var res=ajaxR(url);
-                             
-                             if (coincidencias = res.match (/^ok\|folio\:(\w+)$/i)) {
-                              
-                                  
-                                  $("#folio_venta").val (coincidencias[1]);
-                                  $("#folio_pedido").val ("");
-                          }
-                             
-                             
-                             return false;
-                         }*\/
-                         else{*/
+                        var folioVenta = $("#id_pedido").val();
+                        var subTotal = "0";
+                        var total = $("#total").val();
+                        var mensaje = "Folio Venta: " + folioVenta + "\nSubtotal: " + subTotal + "\nTotal: "+ total;
 
-                            var folioVenta = $("#id_pedido").val();
-                            var subTotal = "0";
-                            var total = $("#total").val();
-                            var mensaje = "Folio Venta: " + folioVenta + "\nSubtotal: " + subTotal + "\nTotal: "+ total;
+                        var mensajeProductos = setProductosEnVenta();
 
-                            var mensajeProductos = setProductosEnVenta();
+                        mensaje = ( mensajeProductos !== "\nDetalle de productos:\n" ) ? mensaje + mensajeProductos : mensaje;
+                        selfElement = this;
 
-                            mensaje = ( mensajeProductos !== "\nDetalle de productos:\n" ) ? mensaje + mensajeProductos : mensaje;
-
-                            selfBoton = this;
                         writeLog('1', mensaje , function(){
-                            if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
-                                $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href").replace (/&idp=\d+/i, "&idp=" + $("#id_pedido").val ()));
-                            }
-                            else {
-                                // modificacion de Oscar(05-11-2017)
-                                var ventaTipo=document.getElementById('tipo_venta').value;//sacamos el tipo de venta
-                                //implementacion de Oscar 24-12-2017
-                                var sFa='';
-                                if(document.getElementById('saldoAFavor')){
-                                    sFa="&sald_fav="+document.getElementById('saldoAFavor').value;
+                            surtePedido(function(){
+    
+                                if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
+                                     $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href").replace (/&idp=\d+/i, "&idp=" + $("#id_pedido").val ()));
+                                 }
+                                 else {
+                                    // modificacion de Oscar(05-11-2017)
+                                    var ventaTipo=document.getElementById('tipo_venta').value;//sacamos el tipo de venta
+                                    //implementacion de Oscar 24-12-2017
+                                    var sFa='';
+                                    if(document.getElementById('saldoAFavor')){
+                                        sFa="&sald_fav="+document.getElementById('saldoAFavor').value;
+                                    }
+                                
+                                    /*implementación de Oscar 04.09.2018 para cambio de apartados*/
+                                    var es_apartado=$("#id_de_apartado").val();
+                                    var aprt='';
+                                    if(es_apartado!=''&& es_apartado!=null){
+                                        aprt="&id_aprt="+es_apartado;
+                                    }
+                                    var abono='';
+                                    if($("#monto_abonado").val()){
+                                        abono="&abonado="+$("#monto_abonado").val();
+                                    }
+                                    /*fin de cambio 04.09.2018*/
+    
+                                    /*Cambio Oscar 13.11.2018 para enviar el temporal de la venta antes de que fuera modificada*
+                                    var prods_antes="";
+                                    if($("#detalle_nota_tmp").val()){
+                                        prods_antes="&prods_ant="+$("#detalle_nota_tmp").val();
+                                    }
+                                    /*Fin de cambio Oscar 13.11.2018*/
+    
+                                    /*implementacion Oscar 25.06.2019 para arrastrar los ids de devolucion a la pantalla de cerrar venta*/
+                                    var ids_dvs="";
+                                    if(document.getElementById('id_de_devoluciones')){
+                                        ids_dvs+="&ids_devoluciones="+$("#id_de_devoluciones").val();
+                                    } 
+                                    /*Fin de cambio Oscar 25.06.2019*/
+    
+                                    /**/
+                                    $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href") + "&idp=" + $("#id_pedido").val ()+'&tv='+ventaTipo+sFa+aprt+abono+"&id_pedido_original="+$("#id_de_pedido_original").val()+ids_dvs);//
+                                 
+                                    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores}*/
+    
+                                    if ($(selfElement).attr ("id").match (/^cerrar$/i))
+                                        location.href = $("#menu_cerrar").attr ("href");
+                                 
+                                 return true;
+                                
                                 }
-                            
-                                /*implementación de Oscar 04.09.2018 para cambio de apartados*/
-                                var es_apartado=$("#id_de_apartado").val();
-                                var aprt='';
-                                if(es_apartado!=''&& es_apartado!=null){
-                                    aprt="&id_aprt="+es_apartado;
-                                }
-                                var abono='';
-                                if($("#monto_abonado").val()){
-                                    abono="&abonado="+$("#monto_abonado").val();
-                                }
-                                /*fin de cambio 04.09.2018*/
-
-                                /*Cambio Oscar 13.11.2018 para enviar el temporal de la venta antes de que fuera modificada*
-                                        var prods_antes="";
-                                        if($("#detalle_nota_tmp").val()){
-                                            prods_antes="&prods_ant="+$("#detalle_nota_tmp").val();
-                                        }
-                                /*Fin de cambio Oscar 13.11.2018*/
-
-                                /*implementacion Oscar 25.06.2019 para arrastrar los ids de devolucion a la pantalla de cerrar venta*/
-                                var ids_dvs="";
-                                if(document.getElementById('id_de_devoluciones')){
-                                    ids_dvs+="&ids_devoluciones="+$("#id_de_devoluciones").val();
-                                } 
-                                /*Fin de cambio Oscar 25.06.2019*/
-
-                                /**/
-                                $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href") + "&idp=" + $("#id_pedido").val ()+'&tv='+ventaTipo+sFa+aprt+abono+"&id_pedido_original="+$("#id_de_pedido_original").val()+ids_dvs);//
-                            
-                                /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores}*/
-
-                                if ($(selfBoton).attr ("id").match(/^cerrar$/i))
-                               
-                                location.href = $("#menu_cerrar").attr ("href");
-                            
-                                return true;
-                            
-                            }
+    
+                            });
                         });
 
                      }
                  }
-            });
+             });
 
             /*$("#es_regalo").prop ("checked", false);
             $("#producto").focus ();*/
+                
         });
 
       /* ]]> */
@@ -3005,6 +2469,7 @@ var hay_paquete=0;
   <!-- <script type="text/javascript" src="../scannerBC/quaggajs/quagga.min.js"></script>
   <script type="text/javascript" src="../scannerBC/quaggajs/scriptLeer.js"></script> -->
   <script type="text/javascript" src="../scannerBC/zxing/library/zxing.min.js"></script>
+  <!-- <script src="../../code/especiales/tesoreria/cobrosSmartAccounts/websocket_client/websocket_client_surtimiento.js" type="module"></script> -->
   <script type="text/javascript">
     window.addEventListener('load', function () {
       var listaCodigos = [];
@@ -3119,14 +2584,14 @@ var is_exhibition = false;
         }
         var password = $( '#exhibition_mannager_password' ).val();
         if( password == '' ){
-            alert( "La contraseña no puede ir vacia!" );
+            alert( "La contraseña no puede ir vacia." );
             $( '#exhibition_mannager_password' ).focus();
             return false;
         }
         var url = "ajax/verificaPassEncargado.php?clave=" + password;
         var resp = ajaxR( url );//.split( '|' )
         if( resp != 'ok' ){
-            alert( "Contraseña de encargado incorrecta!" );
+            alert( "Contraseña de encargado incorrecta." );
             $( '#exhibition_mannager_password' ).focus();
             return false;
         }else{

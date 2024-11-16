@@ -203,7 +203,8 @@
 	//insertamos los nuevos detalles de precios
 		for($i=0;$i<sizeof($arr);$i++){
 			$arr1=explode("~",$arr[$i]);
-			$sql="INSERT INTO ec_precios_detalle VALUES(null,$arr1[0],$arr1[1],$arr1[2],$arr1[3],$arr1[3],$id,$arr1[4],NOW(),NOW(),1)";
+			$sql="INSERT INTO ec_precios_detalle ( id_precio_detalle, id_precio, de_valor, a_valor, precio_venta, precio_etiqueta, id_producto, es_oferta, alta, ultima_actualizacion, sincronizar )
+			VALUES(null,$arr1[0],$arr1[1],$arr1[2],$arr1[3],$arr1[3],$id,$arr1[4],NOW(),NOW(),1)";
 			$eje=mysql_query($sql);
 			if(!$eje){
 				mysql_query("ROLLBACK");//cancelamos transacción

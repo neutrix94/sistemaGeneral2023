@@ -161,22 +161,27 @@
 //insertamos cabecera del movimiento de almacen de la devolución
     for($i=0;$i<=1;$i++){
         if($i==0&&$num_internos>0||$i==1&&$num_externos>0){
-            $insMov="INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal,
-            fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, 
-            status_agrupacion, ultima_sincronizacion, ultima_actualizacion ) 
-            VALUES(null,'12','$user_id','$user_sucursal',now(),now(),'DEVOLUCION $fol_dev',-1,-1,'',-1,-1,";
+         //   $insMov="INSERT INTO ec_movimiento_almacen ( id_movimiento_almacen, id_tipo_movimiento, id_usuario, id_sucursal,
+          //  fecha, hora, observaciones, id_pedido, id_orden_compra, lote, id_maquila, id_transferencia, id_almacen, 
+         //   status_agrupacion, ultima_sincronizacion, ultima_actualizacion ) 
+         //   VALUES(null,'12','$user_id','$user_sucursal',now(),now(),'DEVOLUCION $fol_dev',-1,-1,'',-1,-1,";
+            $almacen_id = 0;
             if($i==0){
-                $insMov.=$id_almacen_principal;
+                $almacen_id = $id_almacen_principal;
             }else if($i==1){
-                $insMov.=$id_almacen_externo;
+                $almacen_id = $id_almacen_externo;
             }
-            $insMov.=",-1,null,now() )";
-            $eje=mysql_query($insMov)or die("Error al insertar el encabezado de movimiento de almacén con entrada por devolución2....".$insMov.mysql_error());
+            $sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, 'DEVOLUCION $fol_dev', {$user_sucursal}, {$almacen_id}, 12, -1, -1, -1, -1, 13, NULL )";
+            // $insMov.=",-1,null,now() )";
+            $eje=mysql_query($sql)or die("Error al insertar el encabezado de movimiento de almacén con entrada por devolución2....".$insMov.mysql_error());
+            $ma_stm = mysql_query( "SELECT max( id_movimiento_almacen ) AS id_movimiento_almacen FROM ec_movimiento_almacen" ) or die( "Error al recuperar id ma insertado : " . mysql_error() );
+            $id_mov = mysql_fetch_assoc( $ma_stm );
+            $id_mov = $id_mov['id_movimiento_almacen'];
             if($i==0){
-                $id_nvo_mov_int=mysql_insert_id();//capturamos el id asignado al movimiento de devolución
+                $id_nvo_mov_int=$id_mov;//capturamos el id asignado al movimiento de devolución
             }
             if($i==1){
-                $id_nvo_mov_ext=mysql_insert_id();//capturamos el id asignado al movimiento de devolución
+                $id_nvo_mov_ext=$id_mov;//capturamos el id asignado al movimiento de devolución
             }
         }
     }//fin de for $i
@@ -184,7 +189,7 @@
 //devolvemos todo si no esta pagado
         if($esta_pagado==0){
     /*implementacion Oscar 01.10.2019 para devolver al producto origen en caso de ser maquila*/
-             $ins_mov_det="INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, 
+            /* $ins_mov_det="INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, 
              id_producto, cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle, id_proveedor_producto,
              id_equivalente, sincronizar )
             SELECT 
@@ -207,6 +212,33 @@
                 $error=mysql_error();
                 mysql_query("ROLLBACK");//cancelamos transacción
                 die("Error al insertar el detalle de movimiento por devolución!!!\n\n".$error."\n\n".$ins_mov_det);
+            }*/
+            $detail = "SELECT 
+                        null,
+                        IF( pd.es_externo=1, {$id_nvo_mov_ext}, {$id_nvo_mov_int} ) AS id_movimiento,
+                        IF( p.id_producto_ordigen IS NULL,pd.id_producto,p.id_producto_ordigen ) AS id_producto,
+                        IF( p.id_producto_ordigen IS NULL,pd.cantidad,(pd.cantidad*p.cantidad) ) AS cantidad,
+                        IF( p.id_producto_ordigen IS NULL,pd.cantidad,(pd.cantidad*p.cantidad) ) As cantidad_surtida,
+                        -1 AS id_pedido_detalle,
+                        -1 AS id_oc_detalle,
+                        NULL AS id_proveedor_producto,
+                        '0' AS id_equivalente,
+                        '0' AS sincronizar
+                    FROM ec_pedidos_detalle pd
+                    LEFT JOIN ec_productos_detalle p 
+                    ON p.id_producto=pd.id_producto
+                    WHERE pd.id_pedido=$idp";
+            $stm_detail = mysql_query( $sql ) or die( "Error al consultar el detalle para llamar procedures : " . mysql_error() );
+            while( $detail_row = $stm_detail->fetch_assoc() ){
+            $ins_mov_det = "CALL spMovimientoAlmacenDetalle_inserta( {$detail_row['id_movimiento']}, 
+            {$detail_row['id_producto']}, {$detail_row['cantidad']}, {$detail_row['cantidad_surtida']}, 
+            {$detail_row['id_pedido_detalle']}, -1, {$detail_row['id_proveedor_producto']}, 13, NULL );";		
+            $eje=mysql_query($ins_mov_det);
+            if(!$eje){
+                $error=mysql_error();
+                mysql_query("ROLLBACK");//cancelamos transacción
+                die("Error al insertar el detalle de movimiento por devolución ( spMovimientoAlmacenDetalle_inserta ) !!!\n\n".$error."\n\n".$ins_mov_det);
+            }
             }
         }
 
@@ -285,7 +317,7 @@
     	}
     //si la nota esta pagada insertamos el detalle del movimiento por devolución de los productos devueltos
         if($esta_pagado==1){
-            $ins_mov_det="INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, 
+            /*$ins_mov_det="INSERT INTO ec_movimiento_detalle ( id_movimiento_almacen_detalle, id_movimiento, 
              id_producto, cantidad, cantidad_surtida, id_pedido_detalle, id_oc_detalle, id_proveedor_producto,
              id_equivalente, sincronizar ) 
             SELECT 
@@ -299,14 +331,24 @@
             NULL,
             '0',
             '0'";
-            /*echo $ins_mov_det;
+            echo $ins_mov_det;
             die("");*/
+            
+            $id_movimiento_almacen = ( $r[2] == 0 ? $id_nvo_mov_int : $id_nvo_mov_ext );
+            $ins_mov_det = "CALL spMovimientoAlmacenDetalle_inserta( {$id_movimiento_almacen}, 
+            {$get_product_id}, {$get_quantity}, {$get_quantity}, -1, -1, NULL, 13, NULL );";	
             $eje=mysql_query($ins_mov_det);
             if(!$eje){
                 $error=mysql_error();
                 mysql_query("ROLLBACK");//cancelamos transacción
-                die("Error al insertar el detalle de movimiento por devolución!!!\n\n".$ins_mov_det."\n\n".$error);
+                die("Error al insertar el detalle de movimiento por devolución spMovimientoAlmacenDetalle_inserta !!!\n\n".$ins_mov_det."\n\n".$error);
             }
+            /*$eje=mysql_query($ins_mov_det);
+            if(!$eje){
+                $error=mysql_error();
+                mysql_query("ROLLBACK");//cancelamos transacción
+                die("Error al insertar el detalle de movimiento por devolución!!!\n\n".$ins_mov_det."\n\n".$error);
+            }*/
         }//fin de si esta pagado
 
     //sumamos los pagos

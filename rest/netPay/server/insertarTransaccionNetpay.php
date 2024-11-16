@@ -49,6 +49,10 @@
 		if( $store_id_netpay == '' || $store_id_netpay == null ){
 			return json_encode( array( "status"=>400, "message"=>"El atributo 'store_id_netpay' es requerido" ) );
 		}
+		$sale_folio = $request->getParam( 'sale_folio' );
+		if( $sale_folio == '' || $sale_folio == null ){
+			return json_encode( array( "status"=>400, "message"=>"El atributo 'sale_folio' es requerido" ) );
+		}
 
 	//consulta folio unico de la sucursal
 		$sql = "SELECT 
@@ -66,8 +70,8 @@
 	
 		$link->autocommit(false);
 	//inserta la peticion de la transaccion
-		$sql = "INSERT INTO vf_transacciones_netpay ( id_cajero, id_sucursal, terminalId, store_id_netpay ) 
-				VALUES ( {$id_cajero}, {$id_sucursal}, '{$terminalId}', '{$store_id_netpay}' )";
+		$sql = "INSERT INTO vf_transacciones_netpay ( id_cajero, id_sucursal, terminalId, store_id_netpay, folio_venta ) 
+				VALUES ( {$id_cajero}, {$id_sucursal}, '{$terminalId}', '{$store_id_netpay}', '{$sale_folio}' )";
 		$stm = $link->query( $sql );
 		if( $link->error ){
 			return json_encode( array( "status"=>400, "message"=>"Error al insertar transaccion netPay : {$link->error}" ) );

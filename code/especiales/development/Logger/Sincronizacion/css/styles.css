@@ -1,0 +1,45 @@
+
+    .hidden{
+        display:none;
+    }
+    .mg_30{
+        padding : 30px;
+    }
+    .emergent{
+        position : fixed;
+        width : 100%;
+        top : 0;
+        height: 100%;
+        left : 0;
+        background : rgba( 0,0,0,.5 );
+        display : none;
+    }
+    .emergent_content{
+        position : absolute;
+        width : 90%;
+        top : 10%;
+        height: 80%;
+        left : 5%;
+        background : white;
+    }
+    .textarea_full{
+        position: relative;
+        width : calc( 100% - 40px );
+        height : calc( 100% - 100px );
+        margin : 20px;
+    }
+    .header{
+        position: sticky;
+        top:0;
+        left: 0;
+        width: 100%;
+        height: 70px;
+    }
+    .footer{
+        position: fixed;
+        bottom:0;
+        padding : 5px;
+        left: 0;
+        width: 100%;
+        height: 50px;
+    }

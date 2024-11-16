@@ -71,7 +71,7 @@
           AND s.id_sucursal=$user_sucursal";
     $eje=mysql_query($sql)or die("Error al consultar cabecera del paquete \n\n".mysql_error()."\n\n".$sql);
     if(mysql_num_rows($eje)<=0){
-      die("no se encontró el paquete!!!");
+      die("no se encontró el paquete.");
     }
     $datos='exito||paquete';
     $r=mysql_fetch_row($eje);
@@ -107,7 +107,7 @@
     //die( $sql );
     $eje=mysql_query($sql)or die("Error al consultar detalle del paquete \n\n".mysql_error()."\n\n".$sql);
     if(mysql_num_rows($eje)<=0){
-      die("no se encontró el paquete!!!");
+      die("no se encontró el paquete.");
     }
     $datos='exito|';
     while($r=mysql_fetch_row($eje)){

@@ -31,11 +31,26 @@
 	<script language="javascript" src="{$rooturl}js/presentacion.js"></script>
 	<script type="text/javascript" src="{$rooturl}js/papaparse.min.js"></script>
 	<link href="css/icons/css/fontello.css" rel="stylesheet" type="text/css"  media="all" />
-	<!--link rel="stylesheet" type="text/css" href="{$rooturl}/css/bootstrap/css/bootstrap.css"-->
+	<link rel="stylesheet" type="text/css" href="{$rooturl}/css/bootstrap/css/bootstrap.css">
+	<script src="{$rooturl}/js/highlight/highlight.min.js"></script>
+	<link rel="stylesheet" href="{$rooturl}/js/highlight/styles/default.min.css">
+    <script>hljs.highlightAll();</script>
 
 	<style>
 	
 	{literal}
+	#botones{
+		height : 40px !important;
+		top : 230px !important;
+	}
+	.datosusuario, .usuario1, .sucursal{
+		font-size : 90% !important;
+	}
+	.datosusuario{
+		width : 15%;
+		right : 5%;
+		position : relative;
+	}
 	@font-face {
  		 font-family: 'Gafata';
 	     font-style: normal;
@@ -363,7 +378,7 @@ jQuery(window).load(function() {
 
 	<div id="buscador_de_menus" style="padding: 0px;position: absolute;top:170px;margin-left:20px;z-index: 100;">
 		<p style="width: 80%;">
-			<input type="text" id="buscador_de_mnu" placeholder="buscar menu..." onkeyup="buscar_coincidencias_menu(event,this);" onclick="this.select();"></p>
+			<input type="text" id="buscador_de_mnu" class="form-control" placeholder="buscar menu..." onkeyup="buscar_coincidencias_menu(event,this);" onclick="this.select();"></p>
 		<div id="res_buc_menu" style="position: absolute;width: 150%;background: white;height: 300px;top:65px;overflow-y:auto;display: none;"></div>
 	</div>
 <!---->

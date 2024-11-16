@@ -36,7 +36,7 @@ BEGIN
 
 	SET new.monto=(new.precio_pieza*new.piezas_recibidas)-((new.precio_pieza*new.piezas_recibidas)*new.porcentaje_descuento);
 
-
+/*
 	IF(new.piezas_recibidas!=old.piezas_recibidas OR new.id_proveedor_producto!=old.id_proveedor_producto)
 	THEN
 		UPDATE ec_movimiento_detalle SET cantidad=new.piezas_recibidas,
@@ -45,7 +45,7 @@ BEGIN
 			sincronizar = 1
 		WHERE id_oc_detalle=new.id_oc_recepcion_detalle;
 	END IF;
-
+*/
 
 	SELECT SUM(piezas_recibidas),SUM(monto) INTO piezas_recibido,total_recibido
 	FROM ec_oc_recepcion_detalle WHERE id_oc_recepcion=new.id_oc_recepcion AND id_producto!=new.id_producto;

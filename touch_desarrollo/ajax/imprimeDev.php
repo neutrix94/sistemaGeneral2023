@@ -45,7 +45,9 @@
     $r=mysql_fetch_row($eje);
     if($r[0]==0){
     //si no se encuentran coincidencias
-      die('no');
+      die('<div class="row">
+        <h2 class="text-danger">La contraseña del encargado es incorrecta, verifica y vuelve a intentar!</h2>
+      </div>');
     }
   }
 /*Fin de cambio Oscar 2021*/
@@ -412,7 +414,9 @@
     $ticket->SetFont('Arial','',$bF+2);
     $ticket->SetXY(/*7+66*0.35*/0,$ticket->GetY()+5);
     $ticket->Cell(66*0.8, 6, utf8_decode($folio_pedido_original), "" ,0, "C");
-
+    
+    $devolucion['pagos_realizados'] = number_format($devolucion['pagos_realizados'], 2);
+    $devolucion['total_actual'] = number_format($devolucion['total_actual'], 2);
     $ticket->SetXY(5, $ticket->GetY()+5);
     $ticket->Cell(66, 6, utf8_decode("TOTAL PAGADO : {$devolucion['pagos_realizados']}"), "" ,0, "C");
     $ticket->SetFont('Arial','B',$bF+15);
@@ -505,7 +509,7 @@
       
       $total_de_devolucion+=$producto["monto"];
   }
-
+    $total_de_devolucion = number_format($total_de_devolucion,2);
     $ticket->SetY($ticket->GetY()-2);
     $ticket->SetXY(7+66*0.40, $ticket->GetY()+3);
     $ticket->Cell(66*0.32, 2, "", "T" ,0, "C");
@@ -520,6 +524,8 @@
     $ticket->Cell(66*0.3, 6, utf8_decode("Total :   $ {$total_de_devolucion}"), "" ,0, "L");
 //die("here : { $devolucion['pagos_realizados']}");
     if( $devolucion['pagos_realizados'] > 0 ){
+      $devolucion['pagos_realizados'] = number_format($devolucion['pagos_realizados'], 2);
+      $devolucion['total_actual'] = number_format($devolucion['total_actual'], 2);
       $ticket->SetFont('Arial','B',$bF+2);
       $ticket->SetXY(5, $ticket->GetY()+6);
       $ticket->Cell(66, 6, utf8_decode("TOTAL PAGADO : $ {$devolucion['pagos_realizados']}"), "" ,0, "L");

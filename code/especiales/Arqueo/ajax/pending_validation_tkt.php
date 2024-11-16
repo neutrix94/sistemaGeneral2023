@@ -58,7 +58,7 @@
 		$resp = "ok|";
 		if( $sales_without_payment > 0 ){//ventas pendientes de pago
 
-			$resp .= "<div class=\"row\" style=\"background-color : white; max-height : 60%; overflow : auto; position : relative; top : 100px;\">
+			$resp .= "<div class=\"row\" style=\"background-color : white; max-height : 60%; overflow : auto; position : relative; top : 100px; width:100% !important;\">
 						<div class=\"col-2\"></div>
 						<div class=\"col-8\">
 							<h5 class=\"text-danger\">Las siguientes ventas estan pendientes de pago : </h5>
@@ -91,7 +91,7 @@
 		
 		if( $sales_number > 0 ){
 
-			$resp .= "<div class=\"row\" style=\"background-color : white; max-height : 60%; overflow : auto; position : relative; top : 100px;\">
+			$resp .= "<div class=\"row\" style=\"background-color : white; max-height : 20%; overflow : auto; position : relative; top : 100px;\">
 						<div class=\"col-2\"></div>
 						<div class=\"col-8\">
 							<h5 class=\"text-warning\">Las siguientes ventas estan pendientes de validar : </h5>
@@ -115,20 +115,22 @@
 							<td class=\"text-center\">{$row['date']}</td>
 						</tr>";
 			}
-			$resp .= "</tbody></table></div>
+			$resp .= "</tbody></table><br><br></div>
 						<div class=\"col-2\">
 							<!--i class=\"icon-down-open btn btn-light\" 
 								style=\"position : fixed; top : 65% !important; border-radius : 50%; border : 1px solid green; \"></i-->
 						</div>
-						<div class=\"col-2\"></div>
-						<div class=\"col-8 text-center\">
-							<button 
-									type=\"button\" 
-									class=\"btn btn-success\"
-									onclick=\"print_pending_ticket();\"
-								><i class=\"icon-ok-circle\">Aceptar y Continuar</i></button>
-						</div>
-			</div>";
+						
+			</div>
+			<div class=\"row\" style=\"background-color : white; max-height : 60%; overflow : auto; position : fixed; top : 69%; width:100% !important;\">
+				<div class=\"col-2\"></div>
+				<div class=\"col-8 text-center\">
+					<button 
+							type=\"button\" 
+							class=\"btn btn-success\"
+							onclick=\"print_pending_ticket();\"
+						><i class=\"icon-ok-circle\">Aceptar y Continuar</i></button>
+				</div>";
 		}
 		die( $resp );
 	}else{
