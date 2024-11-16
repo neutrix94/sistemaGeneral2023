@@ -98,6 +98,7 @@
 	$esError = false;
 	$totalPedido = null;
 	$totalEsperado = null;
+	$descuento = null;
 	$subtotal = null;
 	//Debido al rango de error en números decimales de PHP, se debe utilizar ese margen de error
 	$margen = 0.99;
@@ -113,10 +114,11 @@
 	error_log("EL TOTAL ESPERADO ES: ".$totalEsperado);
 	error_log("EL TOTAL DEL PEDIDO ES : ".$totalPedido);
 
+	$totalDescuento = $totalPedido + $descuento;
 	//$totalEsperado = 600.5;
 	//$totalPedido = 559.5;
 	//Se muestra error en caso de que los valores no coincidan con un margen de 99 centavos
-	if( abs($totalPedido - $totalEsperado) > $margen ){
+	if( abs($totalDescuento - $totalEsperado) > $margen ){
 
 		echo "ERROR_INCONSISTENCIA_DATOS|El total del pedido Es Incorrecto favor de verificar los montos|Folio {$id_pedido},Total del Pedido {$totalPedido},Subtotal {$subtotal},Total del pedido más Descuento {$totalEsperado}";
 
