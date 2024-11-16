@@ -827,7 +827,13 @@
 						X
 					</td>";
 			$resp .= "<td class=\"no_visible\" id=\"pp_18_{$counter}\">{$r[17]}</td>";
-			$resp .= "<td class=\"no_visible\" id=\"pp_20_{$counter}\" value=\"{$r[18]}\">{$row[19]}</td>";
+			$resp .= "<td class=\"no_visible\" id=\"pp_20_{$counter}\" value=\"{$r[18]}\">{$r[19]}</td>";
+			
+			$check = ( $r[25] == 1 ? 'checked' : '' );
+		/*Implementacion Oscar 2024-08-26 para meter campos de unidad medida pieza / codigo repetido*/
+			$resp .= "<td id=\"pp_23_{$counter}\" onclick=\"editaCelda( 23, {$counter}, 'pp_' );\" class=\"text-start\">{$r[24]}</td>";
+			$resp .= "<td id=\"\" class=\"text-center\"><input type=\"checkbox\" id=\"pp_24_{$counter}\" {$check}></td>";
+		/*Fin de cambio Oscar 2024-08-26*/
 		$resp .= '</tr>';
 		return $resp;
 	}
@@ -903,7 +909,9 @@
 							FROM ec_recepcion_bodega_detalle rbd
 			                WHERE rbd.id_proveedor_producto = pp.id_proveedor_producto
 			                AND rbd.validado IN( 0 )
-						) AS receptionReceived
+						) AS receptionReceived,
+					/*24*/pp.unidad_medida_pieza,
+					/*25*/pp.es_modelo_codigo_repetido
 				FROM ec_productos p
 				LEFT JOIN ec_proveedor_producto pp ON pp.id_producto = p.id_productos
 				WHERE p.id_productos = '{$id}'
@@ -943,6 +951,8 @@
 		/*fin de cambio Oscar 2023*/
 				$resp .= '<th style="color:black;">Medidas</th>';
 				$resp .= '<th style="color:black;">Quitar</th>';
+				$resp .= '<th style="color:black;">Unidad Pieza</th>';
+				$resp .= '<th style="color:black;">Repetido</th>';
 			$resp .= '</tr>';
 		$resp .= '</thead>';
 		$resp .= '<tbody id="product_provider_list">';
@@ -1079,10 +1089,12 @@
 				$provider[16] = ( $provider[15] * $provider[4] );
 				
 				$sql_auxiliar .= "precio = '{$provider[16]}',";
-				$sql_auxiliar .= "prioridad_surtimiento = '{$provider[17]}'";//implementacion Oscar 2023
+				$sql_auxiliar .= "prioridad_surtimiento = '{$provider[17]}',";//implementacion Oscar 2023
+				$sql_auxiliar .= "unidad_medida_pieza = '{$provider[18]}',";//implementacion Oscar 2024-08-26
+				$sql_auxiliar .= "es_modelo_codigo_repetido = '{$provider[19]}'";//implementacion Oscar 2024-08-26
 				$sql_auxiliar .= ( $provider[0] != '' ? " WHERE id_proveedor_producto = '{$provider[0]}'" : ", id_producto = '{$product_id}'" );
 				//return $sql_aux;
-				//echo $sql_aux;
+				echo $sql_aux;
 				$stm = $link->query( $sql_auxiliar )or die( "{$key} : Error al guardar los proveedores del producto : " . $link->error );
 				
 			//se agrega el nuevo registro a la exclusion de porveedores producto por eliminar

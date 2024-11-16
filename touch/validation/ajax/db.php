@@ -1,5 +1,9 @@
 <?php
-	if( isset( $_GET['fl'] ) ){
+/*
+	*Version 2024-10-31 Para dar margen de 50 centavos en cobros
+	*Version Oscar 2024-11-06 para implememntar contrasena en busqueda por nombre en validacion de ventas
+*/
+if( isset( $_GET['fl'] ) ){
 		include( '../../../config.inc.php' );
 		include( '../../../conect.php' );
 		include( '../../../conexionMysqli.php' );
@@ -465,11 +469,14 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 							pp.piezas_presentacion_cluces AS pack_pieces,
 							pp.presentacion_caja AS box_pieces,
 							ipp.inventario AS inventory,
-							pp.codigo_barras_pieza_1 AS piece_barcode_1
+							pp.codigo_barras_pieza_1 AS piece_barcode_1,
+							p.nombre AS product_name
 						FROM ec_proveedor_producto pp
 						LEFT JOIN ec_inventario_proveedor_producto ipp
 						ON ipp.id_producto = pp.id_producto 
 						AND ipp.id_proveedor_producto = pp.id_proveedor_producto
+						LEFT JOIN ec_productos p
+						ON p.id_productos = pp.id_producto
 						WHERE pp.id_producto = {$product_id}
 						AND ipp.id_almacen IN ( SELECT id_almacen FROM ec_almacen WHERE es_almacen = 1 AND id_sucursal = {$store_id} )";
 			}else{
@@ -491,7 +498,8 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 							pp.piezas_presentacion_cluces AS pack_pieces,
 							pp.presentacion_caja AS box_pieces,
 							ipp.inventario AS inventory,
-							pp.codigo_barras_pieza_1 AS piece_barcode_1
+							pp.codigo_barras_pieza_1 AS piece_barcode_1,
+							p.nombre AS product_name
 						FROM ec_proveedor_producto pp
 						LEFT JOIN ec_pedidos_validacion_usuarios pvu
 						ON pvu.id_proveedor_producto = pp.id_proveedor_producto
@@ -499,15 +507,19 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 						LEFT JOIN ec_inventario_proveedor_producto ipp
 						ON ipp.id_producto = pp.id_producto 
 						AND ipp.id_proveedor_producto = pp.id_proveedor_producto
+						LEFT JOIN ec_productos p
+						ON p.id_productos = pp.id_producto
 						WHERE pp.id_producto = {$product_id}
 						AND pvu.id_proveedor_producto IS NULL
 						AND ipp.id_almacen IN ( SELECT id_almacen FROM ec_almacen WHERE es_almacen = 1 AND id_sucursal = {$store_id} )
 						ORDER BY ipp.inventario DESC";
 			}
+			$product_name = "";
 			$stm_name = $this->link->query( $sql ) or die( "error|Error al consutar el detalle del producto : {$link->error}" ); 
 			$resp = "<div class=\"row\">";
 			//$resp .= "<div class=\"col-2\"></div>";
 			$resp .= "<div class=\"col-12\">";
+				$resp .= "<h3>___PRODUCT_NAME___</h3>";
 				$resp .= "<h5>Selecciona el modelo del producto : </h5>";
 				$resp .= "<table class=\"table table-bordered table-striped table_70\">";
 				$resp .= "<thead>
@@ -530,13 +542,24 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 						$resp .= "<td id=\"p_m_6_{$counter}\" class=\"no_visible\">{$row_name['product_provider_id']}</td>";
 					$resp .= "</tr>";
 					$counter ++;
+					$product_name = $row_name['product_name'];
 				}
 				$resp .= "</tbody></table>";
 				$resp .= "</div>";
 				$resp .= "<div class=\"col-2\"></div>";
-				$resp .= "<div class=\"col-8\">";
+				$resp .= "<div class=\"col-8\">
+						<div class=\"input-group\" id=\"select_model_password\">
+							<input type=\"password\" id=\"mannager_password\" class=\"form-control\" onkeyup=\"enable_model_with_password(event);\">
+							<button
+								class=\"btn btn-success\"
+								onclick=\"enable_model_with_password('intro');\"
+							>
+								<i class=\"icon-barcode\"></i>
+							</button>
+						</div>
+						<br>";
 				if( $ticket_id == null ){	
-					$resp .= "<button id=\"select_p_p_by_name_btn\" class=\"btn btn-success form-control\" onclick=\"setProductModel( '{$sale_detail_id}', null, null, null, '{$is_by_name}' );\">
+					$resp .= "<button id=\"select_p_p_by_name_btn\" class=\"btn btn-success form-control\" onclick=\"setProductModel( '{$sale_detail_id}', null, null, null, '{$is_by_name}' );\" disabled>
 							<i class=\"icon-ok-circle\">Continuar</i>
 						</button><br><br>
 						<button class=\"btn btn-danger form-control\"
@@ -555,6 +578,7 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 
 				$resp .= "	</div>
 					</div>|{$is_maquiled}";
+				$resp = str_replace( "___PRODUCT_NAME___", $product_name, $resp );
 			return $resp;
 		}
 
@@ -604,8 +628,8 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 				$devolucion_row = $stm->fetch_assoc();
 				$pagos_dev = $devolucion_row['pagos_devolucion'];
 
-				$difference = round( $row_aux['payments_total'] - $pagos_dev ) - round( $row['total'] );
-				if( ( $difference != -1 && $difference != 0 && $difference != -1 ) && $row['pagado'] == 1 ){//venta no liquidada $row_aux['payments_total'] < $row['total']
+				$difference = round( $row_aux['payments_total'] - $pagos_dev ) - round( $row['total'], 2 );//Modificacion Oscar 2024-10-31 para dar margen de 50 centavos en cobros//
+				if( abs( $difference ) > 0.5 && $row['pagado'] == 1 ){//venta no liquidada $row_aux['payments_total'] < $row['total']( $difference != -1 && $difference != 0 && $difference != -1 )
 					$resp = "<p align=\"center\" style=\"color: red; font-size : 200%;\">La nota de ventas con el folio : <b>{$barcode}</b> no ha sido liquidada<br>Verifica y vuelve a intentar.</p>";
 					$resp .= "<h5>{$row_aux['payments_total']} VS {$row['total']} = {$difference}, {$row['pagado']}</h5>";
 					$resp .= "<div class=\"row\">";

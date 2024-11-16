@@ -319,10 +319,16 @@ window.onload=function(){
 		}
 	/**/
 
+		if( flag == 'orden_lista_2024' ){
+			ventana_abierta=window.open('', 'TheWindow');	
+			document.getElementById('proyectionForm').submit();
+			setTimeout(cierra_pestana,20000);	
+		}else{
 	//enviamos datos al archivo que genera el archivo en Excel
 		ventana_abierta=window.open('', 'TheWindow');	
 		document.getElementById('TheForm').submit();
-		setTimeout(cierra_pestana,15000);			
+		setTimeout(cierra_pestana,15000);		
+		}	
 	}
 
 	function cierra_pestana(){

@@ -63,9 +63,18 @@ BEGIN
 					""
 				),
 				/*'',*/ 
-				'"id_usuario_alta" : "', new.id_usuario_alta, '",',
-				'"fecha_alta" : "', new.fecha_alta, '",',
-				'"folio_unico" : "', new.folio_unico, '",',
+				IF( new.id_usuario_alta IS NULL,
+					'',
+					CONCAT( '"id_usuario_alta" : "', new.id_usuario_alta, '",' )
+				),
+				IF( new.fecha_alta IS NULL,
+					'',
+					CONCAT( '"fecha_alta" : "', new.fecha_alta, '",' )
+				),
+				IF( new.folio_unico IS NULL,
+					'',
+					CONCAT( '"folio_unico" : "', new.folio_unico, '",' )
+				),
 				'"sincronizar" : "0"',
 				'}'
 			),

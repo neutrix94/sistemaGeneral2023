@@ -54,7 +54,7 @@
 }
 </script>
 <!-- 2. Botones de pie de pagina -->
-<div style="bottom:0; position:fixed; width:100%; height:10%;" class="bg-primary bg-gradient">
+<div style="bottom:0; position:fixed; width:100%; height:8%;" class="bg-primary bg-gradient">
     		<div style="padding:10px;text-decoration:none; background:rgba(0,0,0,.2); width:98%; height:100%;">
             	<table border="0" width="100%;" height="100%">
             		<tr>

@@ -1,40 +1,31 @@
 <?php
-//ok 2023/11/25
+/* Version sin envio de cliente a sistemas de facturacion desde sistema general 2024-10-03*/
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 
 /*
-* Endpoint: inserta_devoluciones
-* Path: /inserta_devoluciones
+* Endpoint: inserta_cliente
+* Path: /inserta_cliente
 * Método: GET
-* Descripción: Insercion de devoluciones
+* Descripción: Insercion de clientes de facturacion
 */
 
 $app->post('/inserta_cliente', function (Request $request, Response $response){
-   // die( 'here' );
   if ( ! include( '../../conexionMysqli.php' ) ){
     die( 'No se incluyó conexion' );
   }
   $link->set_charset("utf8mb4");
-  /*if ( ! include( 'utils/returnsSynchronization.php' ) ){
-    die( 'No se incluyó libereria de Devoluciones' );
-  }*/
   if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
     die( "No se incluyó : SynchronizationManagmentLog.php" );
   }
-
   if( ! include( 'utils/facturacion.php' ) ){
     die( "No se incluyó : facturacion.php" );
-  }//die( 'here' );
+  }
   $Bill = new Bill( $link, $system_store, $store_prefix );
-  //return json_encode( $request->getParam( "rows" ) );
   $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
- // $returnsSynchronization = new returnsSynchronization( $link );//instancia clase de sincronizacion de movimientos
-  
-
   if( ! include( 'utils/rowsSynchronization.php' ) ){
     die( "No se incluyó : rowsSynchronization.php" );
-  }//die( 'here' );
+  }
   $rowsSynchronization = new rowsSynchronization( $link );
 
   $resp = array();
@@ -73,25 +64,12 @@ $app->post('/inserta_cliente', function (Request $request, Response $response){
     $response_string = "No llegaron clientes, posiblemente tengas que bajar el limite de registros de sincronizacion de facturacion!";
     $resp["log"] = $SynchronizationManagmentLog->updateResponseLog( $response_string, $resp["log"]["unique_folio"] );
   }
+/*deshabilitado por Oscar 2024-10-13 porque esto ya no aplica
 //consulta las cliemtes que se tiene que descargar 
-  $costumers_limit = 1000;
-
-  $resp["download"] = $rowsSynchronization->getSynchronizationRows( -1, $log['origin_store'], $costumers_limit, 'sys_sincronizacion_registros_facturacion' );
-
-//consume el webservice para insertar cliente en los sistemas de factureacion
-  $sql = "SELECT value FROM api_config WHERE name = 'path' LIMIT 1";
-  $stm = $link->query( $sql ) or die( "Error al consultar el path del api : {$link->error}" );
-  $row = $stm->fetch_assoc();
-  $api_path = $row['value'];
-
-  $post_data = json_encode( array( "costumers"=>$resp["download"] ), JSON_UNESCAPED_UNICODE );  
-  $result_1 = $SynchronizationManagmentLog->sendPetition( "{$api_path}/rest/facturacion/clientes/nuevoCliente", $post_data );
-  if( trim( $result_1 ) != 'ok' ){
-    die( "Error al insertar registros en facuracion : $result_1" );
-  }
-  //die( 'here' );
-  return json_encode($resp, JSON_UNESCAPED_UNICODE);
-  //die( "api_path : {$api_path}" );
+  //$costumers_limit = 1000;
+  //$resp["download"] = $rowsSynchronization->getSynchronizationRows( -1, $log['origin_store'], $costumers_limit, 'sys_sincronizacion_registros_facturacion' );
+*/
+  return 'ok';
 });
 
 ?>

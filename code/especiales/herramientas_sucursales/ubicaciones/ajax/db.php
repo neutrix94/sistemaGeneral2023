@@ -1,5 +1,5 @@
 <?php
-	
+/*Version 2024-11-01 Para quitar transacciones en las consultas*/
 	if( isset( $_GET['location_fl'] ) || isset( $_POST['location_fl'] ) ){
 	//	die( 'here' );
 		include( '../../../../../conect.php' );
@@ -157,7 +157,7 @@
 
 		public function saveLocation( $product_id, $location_number_from, $aisle_from, $level_from, $is_enabled, $is_principal, 
 			$warehouse_id, $sucursal_id, $store_location_id ){
-			$this->link->autocommit( false );
+//$this->link->autocommit( false );
 			if( $store_location_id == '' || $store_location_id == null ){
 				$sql = "INSERT INTO ec_sucursal_producto_ubicacion_almacen ( id_sucursal, id_almacen, id_producto, numero_ubicacion_desde, 
 					numero_ubicacion_hasta, pasillo_desde, pasillo_hasta, altura_desde, altura_hasta, habilitado, es_principal ) 
@@ -190,16 +190,16 @@
 				$sql = "UPDATE sys_sucursales_producto SET surtir = 0 WHERE id_producto = '{$product_id}' AND id_sucursal = {$sucursal_id}";
 			}
 			$stm = $this->link->query( $sql ) or die( "Error al actualizar campo de surtir tabla de sucursal producto : {$sql} : {$this->link->error}" );
-			$this->link->autocommit( true );
+//$this->link->autocommit( true );
 			return 'ok';
 			
 		}
 		public function deteleProductLocation( $store_location_id ){
-			$this->link->autocommit( false );
+//$this->link->autocommit( false );
 			$sinchronization = $this->insertStoreLocationSinchronization( $store_location_id, 'delete' );
 			$sql = "DELETE FROM ec_sucursal_producto_ubicacion_almacen WHERE id_ubicacion_sucursal = {$store_location_id}";
 			$stm = $this->link->query( $sql ) or die( "Error al eliminar ubicacion de producto : {$this->link->error}" );
-			$this->link->autocommit( true );
+//$this->link->autocommit( true );
 			return 'ok';
 
 		}

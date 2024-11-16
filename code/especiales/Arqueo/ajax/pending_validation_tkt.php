@@ -36,7 +36,8 @@
 					p.folio_nv AS folio, 
 					p.total AS amount,
 					CONCAT( u.nombre ) AS username,/*, ' ', u.apellido_paterno, ' ', u.apellido_materno*/
-					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) AS pagado
+					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) AS pagado,
+					ROUND( p.total ) - ROUND( SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) ) AS difference
 				FROM ec_pedidos p
 				LEFT JOIN ec_cajero_cobros cc
 				ON cc.id_pedido = p.id_pedido
@@ -47,7 +48,7 @@
 				AND p.id_sucursal = {$sucursal_id}
 				GROUP BY p.id_pedido
 			)ax
-			WHERE ROUND( ax.pagado ) < ROUND( ax.amount )";//
+			WHERE ax.difference > 1";//ROUND( ax.pagado ) < ROUND( ax.amount )
 			//die($sql_2);
 	$stm_2 = $link->query( $sql_2 ) or die( "Error al consultar las ventas pendientes de pago : {$link->error}" );
 	$sales_without_payment = $stm_2->num_rows;

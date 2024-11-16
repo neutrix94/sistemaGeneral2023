@@ -1,4 +1,5 @@
 <?php
+/*Version Oscar 2024-11-01 para consumir servicio de descarga de clientes de facturacion separado de el alta de clientes en pantalla de clientes de facturacion 2024*/
 	include( '../../../../../conect.php' );
 	include( '../../../../../conexionMysqli.php' );
 	if( isset( $_GET['costumer_fl'] ) || isset( $_POST['costumer_fl'] ) ){
@@ -119,7 +120,6 @@
 				//$row[27] = str_replace( "{$rep['codigo_reemplazo']}", "{$rep['caracter']}", $row[27] );//del_municipio
 			}
 			//die( "nombre : " . $name );
-
 			$data = array( "rfc"=>$rfc, "nombre"=>$name, "usoCFDI"=>"G03", "domicilioFiscal"=>$postal_code, 
 				"regimenFiscal"=>$fiscal_regime );//var_dump( $data );die('');
 			$sql = "select token from api_token where id_user=0 and expired_in > now() limit 1;";
@@ -135,7 +135,7 @@
 			curl_setopt($crl, CURLOPT_POST, true);
 			curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
 			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-		    curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+		    curl_setopt($crl, CURLOPT_TIMEOUT, 60000);
 			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
 			  'Content-Type: application/json',
 			  'token: ' . $token)
@@ -259,7 +259,7 @@
 			curl_setopt($crl, CURLOPT_POST, true);
 			//curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
 			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-		    curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+		    curl_setopt($crl, CURLOPT_TIMEOUT, 60000);
 			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
 			  'Content-Type: application/json',
 			  'token: ' . $token)
@@ -300,6 +300,7 @@ $resp = curl_exec($crl);//envia peticion
 		}
 
 		public function seek_by_rfc( $rfc ){
+			$token = "";
 		//consume el api para subir/descargar clientes a linea
 			$local_path = "";
 			$archivo_path = "../../../../../conexion_inicial.txt";
@@ -309,7 +310,7 @@ $resp = curl_exec($crl);//envia peticion
 				fclose($file);
 				$config=explode("<>",$line);
 				$tmp=explode("~",$config[0]);
-				$local_path = "localhost/" . base64_decode( $tmp[1] ) . "/rest/facturacion/envia_cliente";
+				$local_path = "localhost/" . base64_decode( $tmp[1] ) . "/rest/facturacion/busca_y_descarga_clientes";
 			}else{
 				die("No hay archivo de configuración!!!");
 			}
@@ -320,7 +321,7 @@ $resp = curl_exec($crl);//envia peticion
 			curl_setopt($crl, CURLOPT_POST, true);
 			//curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
 			//curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-		    curl_setopt($ch, CURLOPT_TIMEOUT, 60000);
+		    curl_setopt($crl, CURLOPT_TIMEOUT, 60000);
 			curl_setopt($crl, CURLOPT_HTTPHEADER, array(
 			  'Content-Type: application/json',
 			  'token: ' . $token)

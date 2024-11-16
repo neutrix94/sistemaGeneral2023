@@ -1,5 +1,5 @@
 <script type="text/javascript">
-	// El arreglo:
+//Version 2024-10-19 para correccion de error de pantalla negra en pantalla de ceerar venta
 
 
 
@@ -443,6 +443,7 @@ var regresar_efectivo_devolucion = 0;
 					emrge_aviso=ax[2];
 					/**/
 				}
+
 			}).fail (function () {
 				//alert(data);
 				retval = false;
@@ -594,7 +595,7 @@ function bloquea_pantalla(){
 						</div>
 					</div>
 				</div>`;
-				$("#cont_emergente").html( emergente_tmp );//cargamos respuesta 
+				$("#cont_emergente").html( `<div style="color : white;">${emergente_tmp}</div>` );//cargamos respuesta 
 				$("#emergente_cerrar").css("display","block");//hacemos visible la emergente
 				$("#fticket").css("display","block");
 				$( '#password_encargado' ).focus();
@@ -681,9 +682,11 @@ function bloquea_pantalla(){
 			//return false;
 			//verificamos que tipo de venta es (normal o mayoreo)
 			var tipoVenta=document.getElementById('tipo_venta').value;
-			//implementacion de Oscar 29-12-2017
-			if (cerrarVenta ()){
-				//implementacion Oscar 2023 para eliminar el sessionStorage
+	//implementacion de Oscar 29-12-2017
+			var resp_vta = cerrarVenta ();
+			//alert( resp_vta );
+			if ( resp_vta == true || resp_vta == 'ok' ){
+			  //implementacion Oscar 2023 para eliminar el sessionStorage
   				sessionStorage.clear();
 				//alert('pausa antes del ticket');
 				//deshabilitado por Oscar 2023/10/12 var u1="index.php?scr=ticket&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
@@ -714,8 +717,8 @@ function bloquea_pantalla(){
 					//alert('here:'+data);
 					setTimeout( function(){ 
 						if( data != 'ok' ){
-						//alert(1);
-							$("#cont_emergente").html(data);//cargamos respuesta 
+              //alert(1);
+							$("#cont_emergente").html(`<div style="color : white;">${data}</div>`);//cargamos respuesta 
 							$("#emergente_cerrar").css("display","block");
 							return false;
 						}else{
@@ -738,7 +741,7 @@ function bloquea_pantalla(){
 			*/		
 		/*cambio Oscar 03.11.2018*/    	 
 				if(emrge_aviso!=''){
-					$("#cont_emergente").html(emrge_aviso);//cargamos respuesta 
+					$("#cont_emergente").html(`<div style="color : white;">${emrge_aviso}</div>` );//cargamos respuesta 
 					$("#emergente_cerrar").css("display","block");//hacemos visible la emergente
 				}else{
 					if( servicio_ok == "ok" ){
@@ -747,15 +750,21 @@ function bloquea_pantalla(){
 						var TMP_WS = servicio_ok.split( '|' ); 
 						//build_ws_again( TMP_WS[1] );
 						//alert("here_here : " + TMP_WS[1] );
-						$("#cont_emergente").html(servicio_ok);//cargamos respuesta 
+						$("#cont_emergente").html(`<div style="color : white;">${servicio_ok}</div>`);//cargamos respuesta 
 						$("#emergente_cerrar").css("display","block");//hacemos visible la emergente
 						return false;
 					}
 				}      
 		/*03.11.2018*/		
-			}else{
-				alert("Error al intentar el almacenado de los datos.\nVerifique conectividad e intente nuevamente.");
-				$("#cerrar").prop ("disabled", false);
+			}else{//alert(resp_vta);
+				resp_vta_json = JSON.parse( resp_vta );
+				if( resp_vta_json.status ){
+					$("#cont_emergente").html(`<div style="color : white;">${resp_vta_json.message}</div>`);//cargamos respuesta 
+					$("#emergente_cerrar").css("display","block");//hacemos visible la emergente
+				}else{
+					alert("Error al intentar el almacenado de los datos.\nVerifique conectividad e intente nuevamente.");
+					$("#cerrar").prop ("disabled", false);
+				}
 			}
 		}//fin de if monto==0
 
@@ -795,7 +804,7 @@ url: "index.php?scr=ticket&idp="+pedidor+"&noImp=1"*/
 				});
 			*/		/*cambio Oscar 03.11.2018*/    	 
 				if(emrge_aviso!=''){
-					$("#cont_emergente").html(emrge_aviso);//cargamos respuesta 
+					$("#cont_emergente").html( `<div style="color : white;">${emrge_aviso}</div>` );//cargamos respuesta 
 					$("#emergente_cerrar").css("display","block");//hacemos visible la emergente
 				}else{
 					location.href = "index.php?";  //scr=evaluation

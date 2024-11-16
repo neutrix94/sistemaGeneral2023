@@ -1,4 +1,5 @@
 <?php
+/*Version 2024-10-10 ( Implementacion de ordenamiento pororden de lista en la consulta de transferencia cuando se consulta una transferencia ya guardada )*/
 //1. Hace extract de variables GET y POST
 	extract($_POST);
 	extract($_GET);
@@ -193,7 +194,8 @@ if( isset( $idTransfer ) ){
 										AND id_transferencia IN( {$idTransfer} ) 
 									)
 							) 
-						)AS productProviderDetail
+						)AS productProviderDetail,
+						tp.numero_consecutivo
 				FROM ec_transferencia_productos tp
 				LEFT JOIN ec_productos p 
 				ON p.id_productos=tp.id_producto_or
@@ -212,11 +214,13 @@ if( isset( $idTransfer ) ){
 				WHERE id_transferencia = '{$idTransfer}'
 				AND ep.id_estacionalidad = (SELECT id_estacionalidad FROM sys_sucursales WHERE id_sucursal= '{$destino}')
 				GROUP BY tp.id_producto_or
+				ORDER BY tp.numero_consecutivo ASC
 			)aux
 			LEFT JOIN ec_movimiento_detalle md ON aux.ID=md.id_producto
 			LEFT JOIN ec_movimiento_almacen m ON md.id_movimiento = m.id_movimiento_almacen AND m.id_sucursal IN( {$origen}, {$destino} )
 			LEFT JOIN ec_tipos_movimiento tm ON m.id_tipo_movimiento = tm.id_tipo_movimiento
-			GROUP BY aux.ID";
+			GROUP BY aux.ID
+			ORDER BY aux.numero_consecutivo ASC";
 								/*GROUP BY pp1.id_proveedor_producto*/
 	//die('<textarea>' . $sql . '</textarea>' );
 	$res=mysql_query($sql)or die($sql.mysql_error());

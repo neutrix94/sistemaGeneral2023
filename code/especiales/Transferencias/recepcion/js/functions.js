@@ -415,7 +415,7 @@ var global_tmp_unique_barcode = '';
 
 				$( '#scanner_products_response' ).html( ax[1] );
 				$( '#scanner_products_response' ).css( 'display', 'block' );
-				alert_scann( 'ok' );
+				alert_scann( 'scanner_yes' );
 				lock_and_unlock_focus( '#barcode_seeker_lock_btn', '#barcode_seeker', true );
 
 				$( '#barcode_seeker' ).val( '' );

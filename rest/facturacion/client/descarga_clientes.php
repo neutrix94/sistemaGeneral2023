@@ -10,7 +10,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Descripción: Insercion de devoluciones
 */
 
-$app->post('/envia_cliente', function (Request $request, Response $response){
+$app->post('/busca_y_descarga_clientes', function (Request $request, Response $response){
 //variables
 	$req = [];
 	$req["rows"] = array();
@@ -44,22 +44,19 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 		die( "No se incluyó : facturacion.php" );
 	}
 	$fact_path = trim ( $row['value'] );
-	//die( 'here' );
+    
 	$Bill = new Bill( $link, $system_store, $store_prefix );
-//generacion de registros de sincronizacion
-	$make_sinchronization_rows = $Bill->getTemporalCostumer();
-	//var_dump( $make_sinchronization_rows );
-	//die( 'here' );
-//recupera los registros de sincronizacion
-	$req["rows"] = $rowsSynchronization->getSynchronizationRows( $system_store, -1, $costumers_limit, 'sys_sincronizacion_registros_facturacion' );
-	$req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION' );//inserta request
-	//var_dump( $rows );
+//envia la peticion para buscar clientes en administracion de facturacion
+    $req["log"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, -1, $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACIÓN FACTURACIÓN' );//inserta request
 	$post_data = json_encode($req, JSON_UNESCAPED_UNICODE);//forma peticion//
 //return $post_data;
-	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$fact_path}/rest/inserta_cliente", $post_data );
+    //die("here");
+    $post_data = json_encode( array( "store_id"=>$system_store ) );
+	$result_1 = $SynchronizationManagmentLog->sendPetition( "{$fact_path}/rest/descarga_clientes", $post_data );
+    //echo "{$fact_path}/rest/descarga_clientes";
     $result = json_decode( $result_1 );//decodifica respuesta
-	//return $result_1;
-	//var_dump($result_1);
+	
+	//var_dump($result_1);return $result_1;
    	if( $result == null || $result == "" ){
    		echo "error : ";
    		var_dump($result_1);
@@ -74,14 +71,14 @@ $app->post('/envia_cliente', function (Request $request, Response $response){
 		//die( $sql );
 	//$update_sinc_rows = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/facturacion/inserta_cliente", $post_data );
 		$post_data = json_encode( array( "QUERY"=>$sql ), JSON_UNESCAPED_UNICODE );
-		$result_1_1 = $SynchronizationManagmentLog->sendPetition( "{$path}/rest/v1/", $post_data );
+		$result_1_1 = $SynchronizationManagmentLog->sendPetition( "{$fact_path}/rest/", $post_data );
 		if( $result_1_1 != '' && $result_1_1 != NULL ){
 			die( "Error al actualizar peticion : {$result_1_1}" );
 		}
 	}
 	if( $result->ok_rows != "" ){
 		$sql = "UPDATE sys_sincronizacion_registros_facturacion SET status_sincronizacion = 3 WHERE id_sincronizacion_registro IN( {$result->ok_rows} )";
-		$stm = $link->query( $sql ) or die( "Error al actualizar registros de sincronizacion en local : {$link->error}" );
+		$stm = $link->query( $sql ) or die( "Erorr al actualizar registros de sincronizacion en local : {$link->error}" );
 	}
    	//var_dump( $example[0]['razon_social'] );
    	//die( "debug end" );	

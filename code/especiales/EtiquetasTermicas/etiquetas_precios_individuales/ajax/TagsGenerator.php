@@ -103,7 +103,7 @@
                 return $epl_code;
             }
             function getProductCounterPrices( $product_id, $store_id, $is_maquiled = 'no' ){
-                $sql = "SELECT
+                /*$sql = "SELECT
                             pd.id_precio_detalle AS price_id,
                             pd.de_valor As number_since,
                             pd.precio_venta AS price,
@@ -126,6 +126,34 @@
                         LEFT JOIN ec_productos pr
                         ON pr.id_productos = pd.id_producto
                     WHERE pd.id_producto = {$product_id}
+                    AND s.id_sucursal = {$store_id}
+                    ORDER BY pd.de_valor";*/
+                $sql = "SELECT
+                            pd.id_precio_detalle AS price_id,
+                            pd.de_valor As number_since,
+                            pd.precio_venta AS price,
+                            pd.es_oferta AS is_special_price,
+                            CONCAT( pr.nombre_etiqueta, ' (', pr.orden_lista, ')' ) AS product_tag_name,
+                            pr.orden_lista AS list_order,
+                            pr.nombre AS product_name,
+                            pd.precio_anterior AS before_price,
+                            (SELECT 
+                                IF( '{$is_maquiled}' != 'no', '0', IF( id_producto_ordigen = pr.id_productos, id_producto, IF( id_producto = pr.id_productos, id_producto_ordigen, '0' ) ) )
+                            FROM ec_productos_detalle 
+                            WHERE id_producto_ordigen = pr.id_productos 
+                            OR id_producto = pr.id_productos 
+                            ) AS is_maquiled
+                        FROM ec_productos pr
+                        LEFT JOIN sys_sucursales_producto sp
+                        ON sp.id_producto = pr.id_productos
+                        LEFT JOIN sys_sucursales s
+                        ON sp.id_sucursal = s.id_sucursal
+                        LEFT JOIN ec_precios p
+                        ON p.id_precio = IF( sp.es_externo = 0, s.id_precio, s.lista_precios_externa )
+                        LEFT JOIN ec_precios_detalle pd
+                        ON pd.id_precio = p.id_precio
+                        AND pd.id_producto = pr.id_productos
+                    WHERE pr.id_productos = {$product_id}
                     AND s.id_sucursal = {$store_id}
                     ORDER BY pd.de_valor";
                 $stm = $this->link->query( $sql ) or die( "Error al buscar los precios del producto : {$sql} : {$this->link->error}" );
@@ -326,8 +354,11 @@
                     //$epl_code .= "A400,255,2,5,2,2,N,\",\"\n";
                 }
                 $epl_code .= "b500,290,Q,m2,s5,\"{$product['list_order']}\"\n";
-                $epl_code .= "A486,380,2,5,{$price_size},4,N,\"{$space_1}{$product['price']}\"\n";
+                $epl_code .= "A495,380,2,5,{$price_size},4,N,\"{$space_1}{$product['price']}\"\n";
                 $epl_code .= "A590,280,2,4,4,4,N,\"{$space_2}$\"\n";
+                $epl_code .= "A65,270,2,4,1,2,N,\"pz\"\n";
+                //$epl_code .= "A65,340,2,4,3,3,N,\"p\"\n";
+                //$epl_code .= "A65,270,2,4,3,3,N,\"z\"\n";
                 $epl_code .= "A612,150,2,3,2,3,N,\"{$product['name_part_one']}\"\n";
                 $epl_code .= "A612,80,2,3,2,3,N,\"{$product['name_part_two']}\"\n";
                 $epl_code .= "P1\n";
@@ -422,14 +453,20 @@
                 $epl_code .= "f100\n";
                 $epl_code .= "N\n";
                 $epl_code .= "b630,420,Q,m2,s8,\"{$product['list_order']}\"\n";
-                $epl_code .= "A600,560,2,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
+                $epl_code .= "A623,560,2,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
                 $epl_code .= "A740,400,2,4,5,6,N,\"{$space_2}$\"\n";
+                $epl_code .= "A55,360,2,4,1,3,N,\"pz\"\n";
+                //$epl_code .= "A55,440,2,4,3,3,N,\"p\"\n";
+                //$epl_code .= "A55,360,2,4,3,3,N,\"z\"\n";
                 $epl_code .= "A795,200,2,4,2,4,N,\"{$product['name_part_one']}\"\n";
                 $epl_code .= "A795,110,2,4,2,4,N,\"{$product['name_part_two']}\"\n";
 
                 $epl_code .= "b30,650,Q,m2,s8,\"{$product['list_order']}\"\n";
-                $epl_code .= "A220,660,0,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
+                $epl_code .= "A200,660,0,5,{$price_width},{$price_height},N,\"{$space_1}{$product['price']}\"\n";
                 $epl_code .= "A80,840,0,4,5,6,N,\"{$space_2}$\"\n";
+                $epl_code .= "A765,860,0,4,1,3,N,\"pz\"\n";
+                //$epl_code .= "A765,780,0,4,3,3,N,\"p\"\n";
+                //$epl_code .= "A765,860,0,4,3,3,N,\"z\"\n";
                 $epl_code .= "A30,1020,0,4,2,4,N,\"{$product['name_part_one']}\"\n";
                 $epl_code .= "A30,1120,0,4,2,4,N,\"{$product['name_part_two']}\"\n";
                 $epl_code .= "A392,571,0,4,3,3,N,\"o\"\n";
