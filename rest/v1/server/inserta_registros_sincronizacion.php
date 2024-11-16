@@ -120,10 +120,10 @@ $app->post('/inserta_registros_sincronizacion', function (Request $request, Resp
   $initial_time = $config['process_initial_date_time'];
   $rows_limit = $config['rows_limit'];
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  if( $resp["rows_validation"]["verification"] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
+  //if( $resp["rows_validation"]["verification"] == false ){//implementacion Oscar 2024-11-02 para no enviar registros si tiene registros por comprobar
     $resp["rows_download"] = $rowsSynchronization->getSynchronizationRows( $system_store, $log['origin_store'], 
     $rows_limit, 'sys_sincronizacion_registros', $resp["log_download"]["unique_folio"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//obtiene registros para descargar
-  }
+  //}
   /*if( sizeof( $resp["rows_download"] ) > 0 ){
     $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( $system_store, $log['origin_store'], $store_prefix, $initial_time, 'REGISTROS DE SINCRONIZACION', 'sys_sincronizacion_registros', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   }*/
