@@ -261,7 +261,7 @@
 				</button>
 			</div>		
 		</div>
-		<div class="row" id="cards_container">
+		<div class="row" id="cards_container" style="display:none;">
 			<h3>
 				<!--button
 					type="button"
