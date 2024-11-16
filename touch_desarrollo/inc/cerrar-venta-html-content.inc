@@ -364,7 +364,8 @@ if($id_aprt!=''&&$id_aprt!=null){
 		<input type="checkbox" name="es_apartado" id="es_apartado" style="display:none;">
 		<label for="es_apartado" id="label_apartado" style="display:none;">Es apartado</label>
    		<!-- <button type="submit" name="submit" class="cerrar"> <span>Cerrar</span></button> -->
-   		<button  
+   		<button
+			type="button"
    			name="cerrar" 
    			id="cerrar" 
    			class="btn1 btn btn-success form-control">
