@@ -1,5 +1,9 @@
 <?php
-/*version casa 1.0*/
+/*
+	* Version casa 1.0
+	* Version Oscar 2024-11-16 Se modifican las consultas del arqueo de caja para mostrar aquellas terminales en las que hubo cobros y se cambia vista previa del corte de caja
+
+*/
 	require('../../../../conect.php');
 
 //consultamos las tarjetas
@@ -187,7 +191,7 @@
 	$entrada-=round($rw[0],2);
 	$entrada_externa-=round($rw[1],2);//implementado por Oscar 15.08.2018 para guardar monto de productos externos
 //echo 'devoluciones $ '.$sql."<br><br>";
-$sql = "SELECT
+	$sql = "SELECT
 				SUM( monto ) AS ingreso_total,
 				SUM( IF( id_tipo_pago = 1, monto, 0 ) ) AS ingreso_efectivo,
 				SUM( IF( id_tipo_pago = 1, monto, 0 ) ) AS ingreso_tarjetas

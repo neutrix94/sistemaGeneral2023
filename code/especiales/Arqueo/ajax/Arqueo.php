@@ -1,5 +1,8 @@
 <?php
-/*version 2.0 2024-06-21*/
+/*
+	* Version 2.0 2024-06-21
+	* Version Oscar 2024-11-16 Se modifican las consultas del arqueo de caja para mostrar aquellas terminales en las que hubo cobros y se cambia vista previa del corte de caja
+*/
 	include( '../../../../conexionMysqli.php' );
 	/**
 	* 
