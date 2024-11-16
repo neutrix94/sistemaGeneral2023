@@ -187,7 +187,19 @@
 	$entrada-=round($rw[0],2);
 	$entrada_externa-=round($rw[1],2);//implementado por Oscar 15.08.2018 para guardar monto de productos externos
 //echo 'devoluciones $ '.$sql."<br><br>";
-
+$sql = "SELECT
+				SUM( monto ) AS ingreso_total,
+				SUM( IF( id_tipo_pago = 1, monto, 0 ) ) AS ingreso_efectivo,
+				SUM( IF( id_tipo_pago = 1, monto, 0 ) ) AS ingreso_tarjetas
+			FROM ec_cajero_cobros
+			WHERE id_cajero = {$user_id}
+			AND id_sesion_caja = {$teller_session_id}";
+	$eje = mysql_query($sql ) or die( "Error al consultar ingresos cobrados : {$sql} " . mysql_error() );
+	$cajero_cobros = mysql_fetch_assoc($eje );
+	$entrada = $cajero_cobros['ingreso_total'];
+	$entrada_efectivo = $cajero_cobros['ingreso_efectivo'];
+	$entrada_tarjeta = $cajero_cobros['ingreso_tarjetas'];
+	$entrada_externa = 0;
 //sacamos Gastos
 	$sql="SELECT g.id_usuario,g.fecha,g.hora,cg.nombre,g.observaciones,g.monto
 			FROM ec_gastos g 
@@ -258,7 +270,55 @@
 		<?php
 		/**/
 		//die($tar);
-			$suma_tarjetas=0;
+		//consulta pagos con tarjeta ( Inbursa )
+			$sql = "SELECT 
+					a.id_afiliacion,
+					a.no_afiliacion,
+					CONCAT( a.observaciones ),
+					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) AS ammount_sum
+				FROM ec_afiliaciones a
+				LEFT JOIN ec_cajero_cobros cc
+				ON cc.id_afiliacion = a.id_afiliacion
+				WHERE a.id_afiliacion>0
+				AND cc.id_sesion_caja = '{$teller_session_id}'
+				GROUP BY cc.id_afiliacion";
+			$stm = mysql_query( $sql ) or die( "Error al consultar los pagos con terminales de inbursa : {$sql} : " . mysql_error() );
+			$cont_tar=0;
+			echo '<tr>
+					<td></td>
+					<td class="text-secondary">Inbursa</td>
+			</tr>';
+			while( $row = mysql_fetch_assoc($stm) ){
+				$cont_tar++;
+				echo '<tr>';
+					echo '<td align="right" class="text-secondary">'.$row['no_afiliacion'].'</td>';//Tarjeta
+					echo '<td align="right" class="text-secondary" id="ta'.($cont_tar).'">'.$row['ammount_sum'].'</td>';
+				echo '</tr>';
+			}
+			$sql="SELECT 
+					tis.id_terminal_integracion,
+					CONCAT( tis.nombre_terminal, ' - ', tis.numero_serie_terminal, ' - ', tis.store_id ) AS nombre_terminal,
+					/*tis.nombre_terminal,*/
+					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) AS ammount_sum
+				FROM ec_terminales_integracion_smartaccounts tis
+				LEFT JOIN ec_cajero_cobros cc
+				ON tis.id_terminal_integracion = cc.id_terminal
+				WHERE tis.id_terminal_integracion > 0
+				AND cc.id_sesion_caja = '{$teller_session_id}'
+				GROUP BY cc.id_terminal";
+			$stm = mysql_query( $sql ) or die( "Error al consultar los pagos con terminales de NETPAY : {$sql} : " . mysql_error() );
+			echo '<tr>
+					<td></td>
+					<td class="text-primary">NetPay</td>
+			</tr>';
+			while( $row = mysql_fetch_assoc($stm) ){
+				$cont_tar++;
+				echo '<tr>';
+					echo '<td align="right" class="text-primary">'.$row['nombre_terminal'].'</td>';//Tarjeta
+					echo '<td align="right" class="text-primary" id="ta'.($cont_tar).'">'.$row['ammount_sum'].'</td>';
+				echo '</tr>';
+			}
+			/*$suma_tarjetas=0;
 			$tarjetas=explode("°",$tar);
 			$cont_tar=0;
 			for($i=0;$i<sizeof($tarjetas)-1;$i++){
@@ -269,7 +329,7 @@
 					echo '<td align="right">'.$aux[2].'</td>';//Tarjeta
 					echo '<td align="right" id="ta'.($cont_tar).'">'.$aux[1].'</td>';
 				echo '</tr>';
-			}
+			}*/
 		/**/
 			$cheques=explode("°",$cheq_trans);
 			$cont_cheq=0;
@@ -283,6 +343,7 @@
 					echo '<td align="right">'.$aux[1].'</td>';
 				echo '</tr>';
 			}
+		
 		?>
 
 				<tr><td><br></td></tr>
@@ -290,7 +351,7 @@
 					<td align="right"><b>Ingresos en Efectivo:</b></td>
 					<td align="right"><b id="subtotal_ing_efect"><?php
 											$subT=($entrada+$entrada_externa)-($suma_cheques+$suma_tarjetas);	
-											 echo $subT;?></b></td>
+											 echo $entrada_efectivo;?></b></td>
 				</tr>
 			</table>
 

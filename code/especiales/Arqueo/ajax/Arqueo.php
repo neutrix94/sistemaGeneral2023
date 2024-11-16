@@ -61,13 +61,14 @@
 			$sql="SELECT 
 					a.id_afiliacion,
 					a.no_afiliacion,
-					sca.insertada_por_error_en_cobro,
-					CONCAT( a.observaciones )
+					CONCAT( a.observaciones ),
+					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) AS ammount_sum
 				FROM ec_afiliaciones a
-				LEFT JOIN ec_sesion_caja_afiliaciones sca
-				ON sca.id_afiliacion = a.id_afiliacion 
+				LEFT JOIN ec_cajero_cobros cc
+				ON cc.id_afiliacion = a.id_afiliacion
 				WHERE a.id_afiliacion>0
-				AND sca.id_sesion_caja = '{$id_sesion_caja}'";
+				AND cc.id_sesion_caja = '{$id_sesion_caja}'
+				GROUP BY cc.id_afiliacion";
 			$eje = $this->link->query( $sql )or die("Error al consultar las afiliaciones para este cajero!!!<br>{$this->link->error}");
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
 			$tarjetas_cajero='';
@@ -78,14 +79,15 @@
 					$es_por_error = 'text-danger';
 				}	
 			//sumamos los pagos del cajero en caso de tener pagos
-				$sql="SELECT 
+				/*$sql="SELECT 
 						SUM( IF( id_cajero_cobro IS NULL,0,monto ) ) 
 						FROM ec_cajero_cobros 
 						WHERE id_sesion_caja = '{$id_sesion_caja}' 
 						AND id_afiliacion = '{$r[0]}'";
 				$eje_tar = $this->link->query($sql)or die("Error al consultar los pagos con tarjetas!!!<br> {$this->link->error}");
 				$r1 = $eje_tar->fetch_row();
-				$total = $r1[0];
+				$total = $r1[0];*/
+				$total = $r[3];
 				if( $total == '' ){
 					$total=0;
 				}
@@ -115,30 +117,29 @@
 			$sql="SELECT 
 					tis.id_terminal_integracion,
 					tis.nombre_terminal,
-					nombre_terminal
+					tis.nombre_terminal,
+					SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) AS ammount_sum
 				FROM ec_terminales_integracion_smartaccounts tis
-				LEFT JOIN ec_terminales_sucursales_smartaccounts tss
-				ON tss.id_terminal = tis.id_terminal_integracion
-				AND tss.id_sucursal = {$user_sucursal}
-				LEFT JOIN ec_sesion_caja_terminales sct
-				ON sct.id_terminal = tss.id_terminal
-				WHERE tss.estado_suc = 1
-				AND tis.id_terminal_integracion > 0
-				AND sct.id_sesion_caja = '{$id_sesion_caja}'";
+				LEFT JOIN ec_cajero_cobros cc
+				ON tis.id_terminal_integracion = cc.id_terminal
+				WHERE tis.id_terminal_integracion > 0
+				AND cc.id_sesion_caja = '{$id_sesion_caja}'
+				GROUP BY cc.id_terminal";
 			$eje = $this->link->query( $sql )or die("Error al consultar las afiliaciones para este cajero!!!<br>{$this->link->error}");
 			//$afiliacion_1='<select id="tarjeta_1" class="filtro"><option value="0">--SELECCIONAR--</option>';
 			$SmartAccountsTerminals='';
 			//$c=0;
 			while( $r = $eje->fetch_row() ){
 			//sumamos los pagos del cajero en caso de tener pagos
-				$sql="SELECT 
+				/*$sql="SELECT 
 						SUM( IF( id_cajero_cobro IS NULL,0,monto ) ) 
 						FROM ec_cajero_cobros 
 						WHERE id_sesion_caja = '{$id_sesion_caja}'
 						AND id_terminal = '{$r[0]}'";
 				$eje_tar = $this->link->query($sql)or die("Error al consultar los pagos con tarjetas!!!<br> {$this->link->error}");
-				$r1 = $eje_tar->fetch_row();
-				$total = $r1[0];
+				$r1 = $eje_tar->fetch_row();*/
+				//$total = $r1[0];
+				$total = $r[3];
 				if( $total == '' ){
 					$total=0;
 				}
