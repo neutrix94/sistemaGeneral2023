@@ -1,5 +1,6 @@
-	<script type="text/javascript">
+<script type="text/javascript">
 //Version 2024-10-19 para correccion de error de pantalla negra en pantalla de ceerar venta
+
 
 
 	/* <![CDATA[ */
@@ -353,16 +354,16 @@ var regresar_efectivo_devolucion = 0;
 		});
 	}
 
-var emrge_aviso='';
+		var emrge_aviso='';
 		function cerrarVenta() {
-		//implementacion de Oscar 29-12-2017
+			//implementacion de Oscar 29-12-2017
 			//obtenemos saldo a favor del cliente
 			if(document.getElementById("saldoAFavor")){
 				s_f=document.getElementById("saldoAFavor").value;
 				//alert(s_f);
 			}
 
-		//fin de cambio
+			//fin de cambio
 			var retval = false; 
 			var es_apartado = $("#es_apartado").prop ("checked") ? "1" : "0";
 			var id_pedido = "<?php echo $id_pedido; ?>";
@@ -372,7 +373,7 @@ var emrge_aviso='';
 				datos += "&idt" + index + "=" + $(this).find ("input.id_tipo").val () + "&mon" + index + "=" + $(this).find ("input.montoVal").val ();
 			});
 			//alert(datos);
-		//cambio de correo y facebook Oscar(01/11/2017)
+			//cambio de correo y facebook Oscar(01/11/2017)
 			var correoC=document.getElementById('co').value;
 			if(correoC==""){
 				correoC="-";
@@ -381,45 +382,68 @@ var emrge_aviso='';
 			if(face==""){
 				face="-";
 			}
-		//return false;
+			//return false;
 			var saldo_favor='';
 			if($("#saldoFavorOriginal").val()>0){
 				saldo_favor="&a_favor="+$("#saldoFavorOriginal").val();
 			}
-		/*implementacion Oscar 25.06.2019 para mandar los ids de las devoluciones*/
+			/*implementacion Oscar 25.06.2019 para mandar los ids de las devoluciones*/
 			var ids_dvs="";
 			if(document.getElementById('ids_de_devoluciones')){
 				ids_dvs+="&id_devoluciones="+$('#ids_de_devoluciones').val();
 			}
-		//alert( datos );return false;
-		/*Fin de cambio Oscar 25.06.2019*/
-		//alert( "ajax/cerrarVenta.php?idp="+id_pedido+"&ap="+es_apartado+"&faceb="+face+"&cor="+correoC+"&"+datos+""+saldo_favor+ids_dvs );return false;
+			//alert( datos );return false;
+			/*Fin de cambio Oscar 25.06.2019*/
+			//alert( "ajax/cerrarVenta.php?idp="+id_pedido+"&ap="+es_apartado+"&faceb="+face+"&cor="+correoC+"&"+datos+""+saldo_favor+ids_dvs );return false;
 			$.ajax({
 				async: false,
 				type: 'GET',
 				url: "ajax/cerrarVenta.php?idp="+id_pedido+"&ap="+es_apartado+"&faceb="+face+"&cor="+correoC+"&"+datos+""+saldo_favor+ids_dvs
 			}).done (function (data) {
-//alert(data);
-//alert(data);//con este alert mostramos error
-				ax = data.split('|');
-		/*implementación Oscar 2019 para código de barras*/
-			$.post( "inc/img_codigo.php", {text:ax[3]});
-		/*fin de cambio Oscar 2019*/
-//alert('para');
 
-		/**/
-		/*Implementación Oscar 30.11.2018 para no dejar hacer más de una venta por dar click doble*/
-				hay_proceso=1;//ocupamos el proceso
-		/*Fin de cambio Oscar 30.11.2018*/
-	//alert(data);
-				retval = ax[0].match (/^ok$/i);
-				if(retval == null){
-					retval = data;
+				//alert(data);//con este alert mostramos error
+				ax = data.split('|');
+
+				if( ax[0] == "ERROR_INCONSISTENCIA_DATOS" ){
+					window.dataError = 1;
+
+                    retval = false;
+                    var datosError = ax[2].split(',');
+                    mensaje = "";
+                    for (let index = 0; index < datosError.length; index++) {
+                        //No añade salto de línea si es el último elemento
+                        ( index == datosError.length - 1 ) ? mensaje += datosError[index] : mensaje += datosError[index] + "\n";
+                    }
+                    //Pintamos en el log
+                    writeLog('2', mensaje );
+
+					$("#cont_emergente").css({ "text-align":"center","display":"flex","align-items":"center","justify-content":"center"});
+                    $("#cont_emergente").html( "<div style='text-align:center'>EXISTEN INCONSISTENCIA EN LOS DATOS DE LA VENTA<br>Total y Subtotal no coinciden.<br>Favor de verificar y regresar a la venta actual</div>" );
+                    $("#emergente_cerrar").css("display","block");//hacemos visible la emergente
+					//Deshabilitamos los botones
+					$(".row.footer").children().eq(0).find('button').attr('disabled',"disabled");
+					$(".row.footer").children().eq(2).find('a').css({"pointer-events":"none","background-color":"#B3E9F6"});
+
+
+				}else{
+
+					/*implementación Oscar 2019 para código de barras*/
+					$.post( "inc/img_codigo.php", {text:ax[3]});
+					/*fin de cambio Oscar 2019*/
+					//alert('para');
+	
+					/**/
+					/*Implementación Oscar 30.11.2018 para no dejar hacer más de una venta por dar click doble*/
+					hay_proceso=1;//ocupamos el proceso
+					/*Fin de cambio Oscar 30.11.2018*/
+					//alert(data);
+					retval = ax[0].match (/^ok$/i);
+					pedidor=ax[1];
+					/**/
+					emrge_aviso=ax[2];
+					/**/
 				}
-				pedidor=ax[1];
-		/**/
-				emrge_aviso=ax[2];
-		/**/
+
 			}).fail (function () {
 				//alert(data);
 				retval = false;
@@ -427,6 +451,25 @@ var emrge_aviso='';
 
 			return retval;
 		}
+
+		function writeLog( tipo_operacion, mensaje ){
+            var currentUrl = window.location.href;
+            var msjTipo = (tipo_operacion == '1') ? "Acción al Enviar Pedido" : "Acción al Cerrar Venta" 
+            var parts_url = currentUrl.split('/touch_desarrollo');
+            const url = parts_url[0] + `/touch/ajax/writeLog.php?mssgLog=${encodeURIComponent( msjTipo + "\n" + mensaje)}`;
+            fetch(url).then(response => {
+                if (!response.ok) {
+                    throw new Error("Error en la solicitud");
+                }
+                return response.text(); // Puedes cambiar a .json() si el PHP devuelve JSON
+            })
+            .then(data => {
+                console.log("Respuesta del servidor:", data);
+            })
+            .catch(error => {
+                console.error("Hubo un error:", error);
+            });
+        }
 
 		function changeHashOnLoad() {
 			var base_href = location.href.match (/^([^\#]*)(?:\#.*)?$/i)[0];
@@ -635,34 +678,34 @@ function bloquea_pantalla(){
 	
 		if (parseFloat(document.getElementById('monto').value) == 0) {
 			// Venta 
-	//alert('aqui es venta');
-	//return false;
-		//verificamos que tipo de venta es (normal o mayoreo)
+			//alert('aqui es venta');
+			//return false;
+			//verificamos que tipo de venta es (normal o mayoreo)
 			var tipoVenta=document.getElementById('tipo_venta').value;
 	//implementacion de Oscar 29-12-2017
 			var resp_vta = cerrarVenta ();
 			//alert( resp_vta );
 			if ( resp_vta == true || resp_vta == 'ok' ){
-			//implementacion Oscar 2023 para eliminar el sessionStorage
+			  //implementacion Oscar 2023 para eliminar el sessionStorage
   				sessionStorage.clear();
 				//alert('pausa antes del ticket');
 				//deshabilitado por Oscar 2023/10/12 var u1="index.php?scr=ticket&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
 				var u1="index.php?scr=talon_pago&idp="+pedidor+"&noImp=1&tv="+tipoVenta;
 				//var u2="index.php?scr=ticket&idp="+pedidor+"&noImp=2&tv="+tipoVenta;
-			//agregamos saldos a favor
+				//agregamos saldos a favor
 				if(s_f!='no'){
 					//alert('El cliente tiene saldo a favor de $'+s_f+'!!!');
 					u1+="&sald_fav_cl="+s_f+"&favOrig="+s_f_o;
 					//u2+="&sald_fav_cl="+s_f+"&favOrig="+s_f_o;
 				}
-			/*Implementación Oscar 07.03.2019 para actualizar status de devoluciones*/
+				/*Implementación Oscar 07.03.2019 para actualizar status de devoluciones*/
 				if(document.getElementById('id_pedido_original')){
 					u1+="&id_pedido_original="+$("#id_pedido_original").val();
 				}
-			/*Fin de cambio Oscar 07.03.2019*/
+				/*Fin de cambio Oscar 07.03.2019*/
 				//alert(u1);
 				//console.log( u1 ); return false;
-	//fin de cambio
+				//fin de cambio
 				var servicio_ok = "";
 				$.ajax({
 					async: false,
@@ -670,11 +713,11 @@ function bloquea_pantalla(){
 					url: u1
 				}).done (function (data){
 					servicio_ok = data.trim();
-//console.log( data );
-//alert('here:'+data);
+					//console.log( data );
+					//alert('here:'+data);
 					setTimeout( function(){ 
 						if( data != 'ok' ){
-//alert(1);
+              //alert(1);
 							$("#cont_emergente").html(`<div style="color : white;">${data}</div>`);//cargamos respuesta 
 							$("#emergente_cerrar").css("display","block");
 							return false;
