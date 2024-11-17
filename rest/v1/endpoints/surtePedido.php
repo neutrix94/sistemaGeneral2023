@@ -105,7 +105,6 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
     //Inserta Surtido
     if(count($productosSurtir)>0){
       //Consulta solicitud existente; Pendiente o Proceso
-      //Se agrega "Completado", para generar nuevo pedido en caso de que se agreguen más piezas de un pedido ya surtido
       $solicitudActual=[];
       $solicitudActual['id_surtimiento'] = '';
       $solicitudActual['lineas'] = [];
@@ -117,7 +116,6 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
                 sd.id_surtimiento,
                 p.orden_lista,
                 sd.cantidad_solicitada,
-                sd.cantidad_surtida,
                 sd.estado
             FROM ec_surtimiento_detalle sd
             LEFT JOIN ec_productos p ON p.id_productos = sd.id_producto
@@ -126,67 +124,18 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
                 s.id_vendedor = '{$vendedor}'
                 AND s.no_pedido ='{$pedido}'
                 AND s.tipo ='2'
-                AND sd.estado IN (1,2,3)
-                AND s.estado IN (1,2,3);";
-
-        error_log("CONSULTA PRODUCTOS");
-        error_log( $sqlConsultaSol );
+                AND sd.estado IN (1,2)
+                AND s.estado IN (1,2);";
                 
       foreach ($db->query($sqlConsultaSol) as $row) {
-        //Si el pedido ya está "Completado", se procede a validar si es necesario crear nuevo Pedido o  actualizar con las piezas faltantes
-          if( $row['estado'] == 3 ){
-            //Validamos que el producto agregado exista en el pedido
-            $arrExiste = array();
-            $diferenciaSurtir = null;
-            error_log( "ARRAY PRODUCTOS" );
-            error_log( print_r($productos,true) );
-            foreach($productos as $key => $producto) {
-              error_log( "DENTRO DE FOREACH PRODUCTOS EN LAS CONSULTAS" );
-              error_log( print_r($row,true) );
-              if($producto['id'] == $row['orden_lista'] ){
-
-                error_log( "PRODUCTO EXISTE EN EL PEDIDO" );
-                error_log( print_r($row,true) );
-                $cantidadYaSurtida = $row['cantidad_surtida'];
-                $cantidadNueva = $producto['cantidad'];
-                error_log( "CANTIDAD YA SURTIDA: ".$cantidadYaSurtida );
-                error_log( "CANTIDAD NUEVA: ".$cantidadNueva );
-                
-                if( $cantidadYaSurtida >= $cantidadNueva ){
-                  error_log( "LA CANTIDAD SURTIDA ES MAYOR, NO SE GENERA PEDIDO" );
-                  //Si la cantidad surtida supera a la nueva cantidad solicitada, no se hace nada, es decir, no se crea nuevo pedido
-                  array_push($arrExiste, 1);
-                  
-                }else{
-                  error_log( "CANTIDAD SURTIDA ES MENOR, SE GENERA NUEVO PEDIDO " );
-                  $diferenciaSurtir = $cantidadNueva - $cantidadYaSurtida;
-                  //$productos[$key]['cantidad'] = $diferenciaSurtir;
-                  $producto['cantidad_despues_de_completado'] = $diferenciaSurtir;
-                }
-              }
-            }
-
-          }
-
-          error_log( "VALOR DIFERENCIA SURTIR: ".$diferenciaSurtir );
-          if( $diferenciaSurtir != null  ){
-            error_log( "DIFERENCIA SURTIR NO ES NULL " );
-            $solicitudActual['id_surtimiento'] = "";
-            //$solicitudActual['lineas'][$row['orden_lista']] = [];
-            $solicitudActual['lineas'] = [];
-          }else{
-
-            $solicitudActual['id_surtimiento'] = $row['id_surtimiento'];
-            $solicitudActual['lineas'][$row['orden_lista']] = [];
-            $solicitudActual['lineas'][$row['orden_lista']]['id_detalle'] = $row['id_detalle'];
-            $solicitudActual['lineas'][$row['orden_lista']]['cantidad_solicitada'] = $row['cantidad_solicitada'];
-          }
+          $solicitudActual['id_surtimiento'] = $row['id_surtimiento'];
+          $solicitudActual['lineas'][$row['orden_lista']] = [];
+          $solicitudActual['lineas'][$row['orden_lista']]['id_detalle'] = $row['id_detalle'];
+          $solicitudActual['lineas'][$row['orden_lista']]['cantidad_solicitada'] = $row['cantidad_solicitada'];
       }
       
       //Valida crear o actualizar
       if(empty($solicitudActual['id_surtimiento'])){
-        //Antes de insertar validamos 
-        error_log( "SE GENERA NUEVO PEDIDO" );
           $idSurtido = gen_uuid();
           $sqlInsert = "INSERT INTO `ec_surtimiento` 
               (`id`, `no_pedido`, `tipo`, `estado`, `id_vendedor`, `prioridad`, `fecha_creacion`, `creado_por`, `fecha_modificacion`, `modificado_por`) 
@@ -195,9 +144,6 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
       }else{
           $idSurtido = $solicitudActual['id_surtimiento'];
       }
-
-      error_log( "LA SOLICITUD ACTUAL:" );
-      error_log( print_r( $solicitudActual,true ) );
       
       //Itera lista de productos para insertar detalle
       $idSurtidor = '';
@@ -206,27 +152,13 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
           //error_log('proceso prod.'.$producto['id']);
           if(isset($solicitudActual['lineas'][$producto['id']])){
               $idDetalle = $solicitudActual['lineas'][$producto['id']]['id_detalle'];
-
-              $sqlUpdate = "";
-              
-              if( isset( $producto['cantidad_despues_de_completado']) ){
-                $sqlUpdate = "UPDATE `ec_surtimiento_detalle` 
-                SET fecha_modificacion = now(),
-                modificado_por = '{$vendedor}'
-                WHERE id = '{$idDetalle}';";
-              
-              }else{
-                $cantidad =  $solicitudActual['lineas'][$producto['id']]['cantidad_solicitada'] + $producto['cantidad'];
-
-                $sqlUpdate = "UPDATE `ec_surtimiento_detalle` 
+              $cantidad =  $solicitudActual['lineas'][$producto['id']]['cantidad_solicitada'] + $producto['cantidad'];
+              $sqlUpdate = "UPDATE `ec_surtimiento_detalle` 
                 SET cantidad_solicitada = '{$cantidad}',
                 fecha_modificacion = now(),
                 modificado_por = '{$vendedor}'
                 WHERE id = '{$idDetalle}';";
-              }
-              
-              $db->exec($sqlUpdate);  
-              
+              $db->exec($sqlUpdate);
           }else{
               $idDetalle = gen_uuid();
               $sqlInsert = "INSERT INTO `ec_surtimiento_detalle` 
