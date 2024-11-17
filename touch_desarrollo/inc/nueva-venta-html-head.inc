@@ -1773,17 +1773,20 @@ var hay_paquete=0;
 
         var orderList = tds[0].innerHTML;
         var esSolicitado = tds[17].innerHTML;
+        var cantidadEliminada = tds[2].innerHTML;
         
         if( sessionStorage.getItem('ARRAY_ELIMINADOS') != null && sessionStorage.getItem('ARRAY_ELIMINADOS') != '' ){
             var array_eliminados = JSON.parse(sessionStorage.getItem('ARRAY_ELIMINADOS'));
-            array_eliminados.push(orderList);
+            var itemElimado = {'id': orderList, "cantidadEliminada": cantidadEliminada };
+            array_eliminados.push(itemElimado);
 
             sessionStorage.setItem('ARRAY_ELIMINADOS', JSON.stringify(array_eliminados));
         }else{
             var array_eliminados = [];
             //Solo se agrega al arreglo en caso de que 
             if( esSolicitado == '1' ){
-                array_eliminados.push(orderList);
+                var itemElimado = {'id': orderList, "cantidadEliminada": cantidadEliminada };
+                array_eliminados.push(itemElimado);
                 sessionStorage.setItem('ARRAY_ELIMINADOS', JSON.stringify(array_eliminados));
             }else{
                 console.log("NO SE AGREGA A LA ELIMINACIÓN PARA SURTIMIENTO");
@@ -1959,13 +1962,18 @@ var hay_paquete=0;
         //var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Pedido';
         var apiUrl = parts_url[0] + '/rest/v1/surte/Pedido';
 
-        var productosPedido = getProductosPedido();
         var productosEliminados = getProductosEliminados();
+        var productosPedido = getProductosPedido( productosEliminados );
         //var productosEliminados = [];
 
+        //Limpieza de body para productos eliminados y prodcutos en el pedido
+        var newEliminados = setProductosPeticionSurtimiento( productosEliminados, productosPedido );
+
+        var newProductosPedido = setNewProductosParaPedido( productosEliminados, productosPedido );
+
         var dataSurtePedido = {
-                "productosEliminados": productosEliminados,
-                "productos": productosPedido,
+                "productosEliminados": newEliminados,
+                "productos": newProductosPedido,
                 "vendedor": <?php echo $user_id; ?>,
                 "sucursal": <?php echo $sucursal_id;?>,
                 "pedido": genIdPedido( <?php echo $user_id; ?> ),
@@ -2013,7 +2021,7 @@ var hay_paquete=0;
         }
     }
 
-    function getProductosPedido(){
+    function getProductosPedido(eliminados){
     
         var seleccionados = [];
         var filas = $('#listaProductos tr.move');
@@ -2062,6 +2070,9 @@ var hay_paquete=0;
                 
             });
         }
+
+        //Si el mismo producto existe en eliminados y en productos a enviar, quitamos del arreglo de eliminados
+
         return seleccionados;
     }
 
@@ -2074,6 +2085,47 @@ var hay_paquete=0;
 
         return array_eliminados;
 
+    }
+
+
+    function setProductosPeticionSurtimiento( eliminados, productosPedido ){
+
+        var newEliminados =eliminados.filter(eliminado => 
+            !productosPedido.some(producto => producto.id === eliminado.id)
+        );
+
+        return newEliminados;
+    }
+
+    function setNewProductosParaPedido( eliminados, productosPedido ){
+
+        //Obtener la diferencia en caso de que un producto se haya eliminado y se hayan agregado menos piezas
+        return productosPedido.reduce((nuevoArreglo, producto) => {
+            // Buscar si el producto está en el arreglo de eliminados
+            const eliminado = eliminados.find(e => e.id === producto.id);
+
+            if (eliminado) {
+                // Calcular la diferencia entre cantidad y cantidadEliminada
+                const diferencia = parseInt(producto.cantidad) - parseInt(eliminado.cantidadEliminada);
+
+                // Si la diferencia es mayor a 0, agregar al nuevo arreglo
+                if (diferencia > 0) {
+                    nuevoArreglo.push({
+                        id: producto.id,
+                        cantidad: diferencia.toString()
+                    });
+                }
+            } else {
+                // Si no está eliminado, agregar el producto con su cantidad original
+                nuevoArreglo.push({
+                    id: producto.id,
+                    cantidad: producto.cantidad
+                });
+            }
+
+            return nuevoArreglo;
+        }, []);
+    
     }
 
     function genIdPedido( id_user ) {
