@@ -2,8 +2,9 @@
 /*
 	* Version casa 1.0
 	* Version Oscar 2024-11-16 Se modifican las consultas del arqueo de caja para mostrar aquellas terminales en las que hubo cobros y se cambia vista previa del corte de caja
-
+	* Version Oscar 2024-11-12 para tomar los cobros de la tabla de cajeros cobros en el arqueo de caja
 */
+
 	require('../../../../conect.php');
 
 //consultamos las tarjetas
@@ -159,7 +160,9 @@
 	if(mysql_num_rows($eje)>0){
 		die("Hay devoluciones pendientes de terminar<br>Terminalas y vuelve a intentar!!!");
 	}
-//sacamos total de pagos
+/*
+Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devoluciones
+sacamos total de pagos
 	$sql="SELECT 
 			SUM(IF(pp.es_externo=0,pp.monto,0)) as pagosPedro,
 			SUM(IF(pp.es_externo=1,pp.monto,0)) as pagosExternos
