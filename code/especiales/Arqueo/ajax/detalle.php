@@ -390,7 +390,7 @@ $sql = "SELECT
 				</tr>
 				<tr>
 					<td align="right" colspan="4"><b>Efectivo en caja:</b></td>
-					<td align="right"><b id="ingreso_final_efectivo"><?php echo round($subT-$gastoTotal,2);?></b></td>
+					<td align="right"><b id="ingreso_final_efectivo"><?php echo round($cajero_cobros['ingreso_efectivo']-$gastoTotal,2);?></b></td>
 				</tr>
 			</table>
 
