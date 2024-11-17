@@ -2,6 +2,7 @@
 /*
 	* Version 2.0 2024-06-21
 	* Version Oscar 2024-11-12 para tomar los cobros de la tabla de cajeros cobros en validacion de arqueo de caja
+	* Version Oscar 2024-11-16 Se modifican las consultas de validacion de arqueo de caja para mostrar aquellas terminales en las que hubo cobros y se cambia vista previa de validacion de corte de caja
 */
 	require('../../../../../conect.php');
 //consultamos las tarjetas
@@ -114,15 +115,18 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 //echo 'devoluciones $ '.$sql."<br><br>";
 	*/
 	$sql = "SELECT
-				SUM( monto ) AS ingreso_interno,
-				0 AS ingreso_externo
+				SUM( monto ) AS ingreso_total,
+				SUM( IF( id_tipo_pago = 1, monto, 0 ) ) AS ingreso_efectivo,
+				SUM( IF( id_tipo_pago = 1, monto, 0 ) ) AS ingreso_tarjetas
 			FROM ec_cajero_cobros
-			WHERE id_cajero = {$cajero[0]}
+			WHERE id_cajero = {$user_id}
 			AND id_sesion_caja = {$teller_session_id}";
 	$eje = mysql_query($sql ) or die( "Error al consultar ingresos cobrados : {$sql} " . mysql_error() );
 	$cajero_cobros = mysql_fetch_assoc($eje );
-	$entrada = $cajero_cobros['ingreso_interno'];
-	$entrada_externa = $cajero_cobros['ingreso_externo'];
+	$entrada = $cajero_cobros['ingreso_total'];
+	$entrada_efectivo = $cajero_cobros['ingreso_efectivo'];
+	$entrada_tarjeta = $cajero_cobros['ingreso_tarjetas'];
+	$entrada_externa = 0;
 
 //sacamos Gastos
 	$sql="SELECT g.id_usuario,g.fecha,g.hora,cg.nombre,g.observaciones,g.monto
@@ -187,7 +191,7 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 				</tr>
 		<?php
 		/**/
-			$suma_tarjetas=0;
+			/*$suma_tarjetas=0;
 			$tarjetas=explode("°",$tar);
 			$cont_tar=0;
 			for($i=0;$i<sizeof($tarjetas)-1;$i++){
@@ -200,8 +204,60 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 				echo '</tr>';
 			//sumamos al total de ingresos
 				$total_montos_entregados+=$aux[1];
-			}
-		/**/
+			}*/
+
+		//consulta pagos con tarjeta ( Inbursa )
+		$sql = "SELECT 
+				a.id_afiliacion,
+				a.no_afiliacion,
+				CONCAT( a.observaciones ),
+				SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) AS ammount_sum
+			FROM ec_afiliaciones a
+			LEFT JOIN ec_cajero_cobros cc
+			ON cc.id_afiliacion = a.id_afiliacion
+			WHERE a.id_afiliacion>0
+			AND cc.id_sesion_caja = '{$teller_session_id}'
+			GROUP BY cc.id_afiliacion";
+		$stm = mysql_query( $sql ) or die( "Error al consultar los pagos con terminales de inbursa : {$sql} : " . mysql_error() );
+		$cont_tar=0;
+		echo '<tr>
+				<td></td>
+				<td class="text-secondary">Inbursa</td>
+		</tr>';
+		while( $row = mysql_fetch_assoc($stm) ){
+			$cont_tar++;
+			echo '<tr>';
+				echo '<td align="right" class="text-secondary">'.$row['no_afiliacion'].'</td>';//Tarjeta
+				echo '<td align="right" class="text-secondary" id="ta'.($cont_tar).'">'.$row['ammount_sum'].'</td>';
+			echo '</tr>';
+			$total_montos_entregados+=$row['ammount_sum'];
+		}
+
+		$sql="SELECT 
+				tis.id_terminal_integracion,
+				CONCAT( tis.nombre_terminal, ' - ', tis.numero_serie_terminal, ' - ', tis.store_id ) AS nombre_terminal,
+				/*tis.nombre_terminal,*/
+				SUM( IF( cc.id_cajero_cobro IS NULL, 0, cc.monto ) ) AS ammount_sum
+			FROM ec_terminales_integracion_smartaccounts tis
+			LEFT JOIN ec_cajero_cobros cc
+			ON tis.id_terminal_integracion = cc.id_terminal
+			WHERE tis.id_terminal_integracion > 0
+			AND cc.id_sesion_caja = '{$teller_session_id}'
+			GROUP BY cc.id_terminal";
+		$stm = mysql_query( $sql ) or die( "Error al consultar los pagos con terminales de NETPAY : {$sql} : " . mysql_error() );
+		echo '<tr>
+				<td></td>
+				<td class="text-primary">NetPay</td>
+		</tr>';
+		while( $row = mysql_fetch_assoc($stm) ){
+			$cont_tar++;
+			echo '<tr>';
+				echo '<td align="right" class="text-primary">'.$row['nombre_terminal'].'</td>';//Tarjeta
+				echo '<td align="right" class="text-primary" id="ta'.($cont_tar).'">'.$row['ammount_sum'].'</td>';
+			echo '</tr>';
+			$total_montos_entregados+=$row['ammount_sum'];
+		}
+		/*
 			$cheques=explode("°",$cheq_trans);
 			$cont_cheq=0;
 			$suma_cheques=0;
@@ -215,10 +271,11 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 				echo '</tr>';
 			//sumamos al total de ingresos
 				$total_montos_entregados+=$aux[1];
-			}
+			}*/
 			//die( "cheques : {$suma_cheques}" );
 		//sumamos el efectivo al total ingresos
-			$ingreso_efect = ( $ingreso_efect  );//- $suma_cheques
+			//$ingreso_efect = ( $ingreso_efect  );//- $suma_cheques
+			//$total_montos_entregados+=$ingreso_efect;
 			$total_montos_entregados+=$ingreso_efect;
 		?>
 
@@ -227,7 +284,7 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 					<td align="right"><b>Ingresos en Efectivo:</b></td>
 					<td align="right"><b id=""><?php
 											$subT=($entrada+$entrada_externa)-($suma_cheques+$suma_tarjetas);	
-											 echo $subT;/*echo $ingreso_efect;*/?></b></td>
+											 echo $entrada_efectivo;/*echo $ingreso_efect;*/?></b></td>
 				</tr>
 			</table>
 

@@ -1,6 +1,7 @@
 <?php
 /* 
-	* Version Oscar 2024-11-08 para implementar movimeintos de almacen por store Procedures 2024
+	* Version Oscar 2024-11-08 para implementar movimientos de almacen por store Procedures 2024
+	* Version Oscar 2024-11-08 para corregir error insertado con id de la sucursal de logueo, se cambia por la sucursal destino
 */
 	include( '../../../../conect.php' );
 	include( '../../../../conexionMysqli.php' );
@@ -17,7 +18,7 @@
 	$warehouse_id = $row['warehouse_id'];
 	$link->autocommit( false );
 //se implementa store procedure para insertar cabecera movimiento de almacen Oscar 2024-11-08
-	$sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, 'AJUSTE DE INVENTARIO CONSUMIBLES DESDE TRANSFERENCIA', {$sucursal_id}, {$warehouse_id}, 8, -1, -1, -1, -1, 22, NULL )";
+	$sql = "CALL spMovimientoAlmacen_inserta ( {$user_id}, 'AJUSTE DE INVENTARIO CONSUMIBLES DESDE TRANSFERENCIA', {$store_id}, {$warehouse_id}, 8, -1, -1, -1, -1, 22, NULL )";
 	$stm = $link->query( $sql ) or die( "Error al insertar la cabecera del movimiento almacen : {$link->error} {$sql}" );
 	$sql = "SELECT LAST_INSERT_ID()";
 	$stm_2 = $link->query( $sql ) or die( "Error al consultar id de cabecera de movimiento almacen : {$link->error} {$sql}" );

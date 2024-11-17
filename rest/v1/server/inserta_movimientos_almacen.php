@@ -151,7 +151,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
   }
   $resp["log_download"] = $SynchronizationManagmentLog->insertPetitionLog( -1, $log['origin_store'],  $store_prefix, $initial_time, 'MOVIMIENTOS DE ALMACEN DESDE LINEA', 
   'sys_sincronizacion_movimientos_almacen', ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
-  if( $resp["verification_movements"]["verification"] == false ){
+  //if( $resp["verification_movements"]["verification"] == false ){
   //ejecuta el procedure para generar los movimientos de almacen
     $setMovements = $movementsSynchronization->setNewSynchronizationMovements( $log['origin_store'], $system_store, $store_prefix, $rows_limit, 
       ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
@@ -163,7 +163,7 @@ $app->post('/inserta_movimientos_almacen', function (Request $request, Response 
     $resp["rows_download"] = $movementsSynchronization->getSynchronizationMovements( $log['origin_store'], $rows_limit, 1, $resp["log_download"]["unique_folio"], 
       ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
     $SynchronizationManagmentLog->updateModuleResume( 'ec_movimiento_almacen', 'subida', $resp["status"], $log["origin_store"], ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );//actualiza el resumen de modulo/sucursal ( subida )
-  }
+  //}
 //desbloquea indicador de sincronizacion en tabla
   $update_synchronization = $SynchronizationManagmentLog->updateSynchronizationStatus( $log['origin_store'], 2, ( $LOGGER['id_sincronizacion'] ? $LOGGER['id_sincronizacion'] : false ) );
   if( $LOGGER ){
