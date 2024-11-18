@@ -196,6 +196,7 @@
                     //verifica si existe el registro
                         $verification_sql = "SELECT {$row['primary_key']} FROM {$row['table_name']} {$condition}";//die( $verification_sql );
                         $verification_stm   = $this->link->query( $verification_sql );
+error_log( "Verificacion insercion  : {$verification_sql}" );
                             if( $logger_id ){
                                 $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "(INSERT); Verifica si existe el registro en tabla {$row['table_name']} : ", $verification_sql );
                             }
@@ -227,6 +228,7 @@
                                 $sql = "UPDATE {$row['table_name']} SET sincronizar = 0 {$condition}";
                                 array_push( $queries, array( "query"=>$sql, "row_id"=>"n/a") );
                             }
+error_log( "Registro no existe y lo inserta  : {$verification_sql}" );
                         }else{//si el registro ya existe en el destino
                             $resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row_['synchronization_row_id']}'";
                         }
