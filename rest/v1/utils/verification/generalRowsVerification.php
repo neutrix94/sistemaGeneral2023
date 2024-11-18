@@ -311,7 +311,7 @@ error_log( "Registro no existe y lo inserta  : {$verification_sql}" );
                             if( $logger_id ){
                                 $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al ejecutar consulta ", "$table_name", $query, $this->link->error );
                             }
-                            die( "Error : {$sql} : {$this->link->error}" );
+                            die( "Error : {$query} : {$this->link->error}" );
                         }
                     if( $ok == true && $query_['row_id'] != 'n/a' ){
 						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
