@@ -407,6 +407,7 @@ $indiceSurtir = 0;
             document.getElementById('cantidad').textContent = listaSurtir[indiceSurtir].cantidad_solicitada;
             document.getElementById('index').textContent = Number(indiceSurtir)+1 +' de '+ Number(listaSurtir.length);  
             document.getElementById('codigos_barras').textContent = '**(Sólo habilitado para pruebas) Códigos de barras permitidos: '+ listaSurtir[indiceSurtir].codigos_barras ;
+            $('#codigos_barras').hide();
             
             if(listaSurtir[indiceSurtir].claves_proveedor !== undefined && listaSurtir[indiceSurtir].claves_proveedor !== null){
               var htmlClaves = '';
