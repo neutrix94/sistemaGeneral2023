@@ -3,6 +3,7 @@
 	* Version 2.0 2024-06-21
 	* Version Oscar 2024-11-12 para tomar los cobros de la tabla de cajeros cobros en validacion de arqueo de caja
 	* Version Oscar 2024-11-16 Se modifican las consultas de validacion de arqueo de caja para mostrar aquellas terminales en las que hubo cobros y se cambia vista previa de validacion de corte de caja
+	* Version Oscar 2024-11-18 Se agrega que para pago en efectivo tome pagos tipo 1 y 2 en validacion de corte de caja
 */
 	require('../../../../../conect.php');
 //consultamos las tarjetas
@@ -116,8 +117,8 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 	*/
 	$sql = "SELECT
 				SUM( monto ) AS ingreso_total,
-				SUM( IF( id_tipo_pago = 1, monto, 0 ) ) AS ingreso_efectivo,
-				SUM( IF( id_tipo_pago = 1, monto, 0 ) ) AS ingreso_tarjetas
+				SUM( IF( id_tipo_pago = 1 OR id_tipo_pago = 2, monto, 0 ) ) AS ingreso_efectivo,
+				SUM( IF( id_tipo_pago = 7, monto, 0 ) ) AS ingreso_tarjetas
 			FROM ec_cajero_cobros
 			WHERE id_cajero = {$user_id}
 			AND id_sesion_caja = {$teller_session_id}";
