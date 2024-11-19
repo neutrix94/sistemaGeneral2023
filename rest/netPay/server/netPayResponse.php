@@ -253,15 +253,15 @@ $app->post('/', function (Request $request, Response $response){
     }
   }
 
-  error_log("RESPUESTA NETPAY");
-  error_log( print_r($resp,true) );
-
   ob_start();
     $resp = array(
       "code"=>"00",
       "message"=>$message_
     );
   ob_flush();
+  error_log("RESPUESTA NETPAY");
+  error_log( print_r($resp,true) );
+
   return json_encode( $resp );
   
   
