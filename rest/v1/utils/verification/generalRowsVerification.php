@@ -173,9 +173,6 @@
         }
 
         public function RowsValidation( $rows, $table_name, $logger_id = false ){
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Comprobación" . PHP_EOL);
-fclose($file);
             $log_steep_id = null;
             $resp = array();
             $resp['ok_rows'] = "";
@@ -197,24 +194,15 @@ fclose($file);
 				$condition = str_replace( ")'", ")", $condition );
 				switch ( $row['action_type'] ) {
 					case 'insert' :
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Cae en caso de insercion" . PHP_EOL);
-fclose($file);
                     //verifica si existe el registro
                         $verification_sql = "SELECT {$row['primary_key']} FROM {$row['table_name']} {$condition}";//die( $verification_sql );
                         $verification_stm   = $this->link->query( $verification_sql );
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Verificacion insercion  : {$verification_sql}" . PHP_EOL);
-fclose($file);
                             if( $logger_id ){
                                 $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "(INSERT); Verifica si existe el registro en tabla {$row['table_name']} : ", $verification_sql );
                             }
                             if( $this->link->error ){
                                 $ok = false;
                                 if( $logger_id ){
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Error en INSERT al verificar si existe el registro en tabla {$row['table_name']}" . PHP_EOL);
-fclose($file);
                                     $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error en INSERT al verificar si existe el registro en tabla {$row['table_name']}", "{$row['table_name']}", $verification_sql, $this->link->error );
                                 }
                                 die( "Error en INSERT al verificar si existe el registro en tabla {$row['table_name']} : {$this->link->error} : {$verification_sql}" );
@@ -240,14 +228,8 @@ fclose($file);
                                 $sql = "UPDATE {$row['table_name']} SET sincronizar = 0 {$condition}";
                                 array_push( $queries, array( "query"=>$sql, "row_id"=>"n/a") );
                             }
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Registro no existe y lo inserta  : {$verification_sql}" . PHP_EOL);
-fclose($file);
                         }else{//si el registro ya existe en el destino
                             $resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row_['synchronization_row_id']}'";
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Registro si existe : {$verification_sql}" . PHP_EOL);
-fclose($file);
                         }
 /*Implementacion Oscar 2024-02-12 para crear carpetas mediante la sincronizacion*/
 						if( $row['table_name'] == 'sys_carpetas' ){
@@ -263,9 +245,6 @@ fclose($file);
 /*fin de cambio Oscar 2024-02-12*/
 					break;
 					case 'update' :
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Cae en caso de actualizacion" . PHP_EOL);
-fclose($file);
 						$sql = "UPDATE {$row['table_name']} SET ";
 						$fields = "";
 						foreach ($row as $key2 => $value) {
@@ -287,9 +266,6 @@ fclose($file);
 					    array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id'] ) );
 					break;
 					case 'delete' :
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Cae en caso de eliminacion" . PHP_EOL);
-fclose($file);
                     //verifica si existe el registro
                         $verification_sql = "SELECT {$row['primary_key']} FROM {$row['table_name']} {$condition}";
                         $verification_stm = $this->link->query( $verification_sql );
@@ -309,9 +285,6 @@ fclose($file);
 					break;
 
 					case 'sql_instruction' : 
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Cae en caso de instruccion SQL" . PHP_EOL);
-fclose($file);
 						$sql = $row['sql'];
 						//$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
 					    array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id'] ) );//se manda ejecutar de nuevo al ser una consulta dinamica
@@ -330,16 +303,10 @@ fclose($file);
                     $query = str_replace( "'(", "(", $query_['query'] );
                     $query = str_replace( ")'", ")", $query );
                     $stm = $this->link->query( $query );// 
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Ejecuta instruccion SQL : {$query}" . PHP_EOL);
-fclose($file);
                         if( $logger_id ){
                             $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Ejecuta consulta SQL : ", $query );
                         }
                         if( $this->link->error ){
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Error al ejecutar instruccion SQL : {$query}" . PHP_EOL);
-fclose($file);
                             $ok = false;
                             if( $logger_id ){
                                 $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al ejecutar consulta ", "$table_name", $query, $this->link->error );
@@ -347,15 +314,9 @@ fclose($file);
                             die( "Error : {$query} : {$this->link->error}" );
                         }
                     if( $ok == true && $query_['row_id'] != 'n/a' ){
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Entra en registro exitoso : {$query}" . PHP_EOL);
-fclose($file);
 						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
 						$this->link->commit();
                     }else if( $ok == false  && $query_['row_id'] != 'n/a' ){
-$file = fopen("comprobacionRows.txt", "a");
-fwrite($file, "Entra en registro erroneo : {$query}" . PHP_EOL);
-fclose($file);
 						$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
 						$this->link->rollback();
                     }
