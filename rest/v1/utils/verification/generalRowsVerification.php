@@ -1,6 +1,7 @@
 <?php
 /*
      * Version 1.1 donde se corrige error de comprobación que tomaba comprobaciones de registros otras sucursales
+     * Version Oscar 2024-11-18 Para corregir error en ciclos de comprobacion de registros generales
 */
     class generalRowsVerification{
         private $link;
@@ -268,7 +269,7 @@
                     //verifica si existe el registro
                         $verification_sql = "SELECT {$row['primary_key']} FROM {$row['table_name']} {$condition}";
                         $verification_stm = $this->link->query( $verification_sql );
-                        if( $verification_stm->num_rows > 0) {//si el registro no existe
+                        if( $verification_stm->num_rows > 0) {//si el registro existe
                             $sql = "DELETE FROM {$row['table_name']} {$condition}";
 						    if( $row['table_name'] == 'ec_movimiento_detalle' ){
                             //procedure aqui
@@ -293,14 +294,15 @@
 						//var_dump($row);
 						//die( "JSON incorrecto : {$row['action_type']}" );
 					break;
-				}
+				}    
+			}
             //ejecuta instrucciones sql
                 foreach ($queries as $key2 => $query_) {
                     $ok = true;
                     $this->link->autocommit(false);
                     $query = str_replace( "'(", "(", $query_['query'] );
                     $query = str_replace( ")'", ")", $query );
-                    $stm = $this->link->query( $query );//
+                    $stm = $this->link->query( $query );// 
                         if( $logger_id ){
                             $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Ejecuta consulta SQL : ", $query );
                         }
@@ -309,7 +311,7 @@
                             if( $logger_id ){
                                 $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al ejecutar consulta ", "$table_name", $query, $this->link->error );
                             }
-                            die( "Error : {$sql} : {$this->link->error}" );
+                            die( "Error : {$query} : {$this->link->error}" );
                         }
                     if( $ok == true && $query_['row_id'] != 'n/a' ){
 						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
@@ -318,8 +320,7 @@
 						$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
 						$this->link->rollback();
                     }
-                }    
-			}
+                }
             return $resp;
         }
 
