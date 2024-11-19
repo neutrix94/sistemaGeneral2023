@@ -219,7 +219,7 @@ $indiceSurtir = 0;
                 ); 
                 return;
             }
-            if(listaSurtir[indiceSurtir].codigos_barras.split(",").includes(codigoProducto)){
+            if(listaSurtir[indiceSurtir].codigos_barras.split(",").includes(codigoProducto.split(" ").join(""))){
                 document.getElementById('surtidoGroup').style.display = 'block';
                 document.getElementById('cantidadSurtida').value = '';//Number(listaSurtir[indiceSurtir].cantidad_solicitada);
                 document.getElementById('cantidadSurtida').focus();
@@ -407,6 +407,7 @@ $indiceSurtir = 0;
             document.getElementById('cantidad').textContent = listaSurtir[indiceSurtir].cantidad_solicitada;
             document.getElementById('index').textContent = Number(indiceSurtir)+1 +' de '+ Number(listaSurtir.length);  
             document.getElementById('codigos_barras').textContent = '**(Sólo habilitado para pruebas) Códigos de barras permitidos: '+ listaSurtir[indiceSurtir].codigos_barras ;
+            $('#codigos_barras').hide();
             
             if(listaSurtir[indiceSurtir].claves_proveedor !== undefined && listaSurtir[indiceSurtir].claves_proveedor !== null){
               var htmlClaves = '';

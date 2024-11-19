@@ -1773,17 +1773,20 @@ var hay_paquete=0;
 
         var orderList = tds[0].innerHTML;
         var esSolicitado = tds[17].innerHTML;
+        var cantidadEliminada = tds[2].innerHTML;
         
         if( sessionStorage.getItem('ARRAY_ELIMINADOS') != null && sessionStorage.getItem('ARRAY_ELIMINADOS') != '' ){
             var array_eliminados = JSON.parse(sessionStorage.getItem('ARRAY_ELIMINADOS'));
-            array_eliminados.push(orderList);
+            var itemElimado = {'id': orderList, "cantidadEliminada": cantidadEliminada };
+            array_eliminados.push(itemElimado);
 
             sessionStorage.setItem('ARRAY_ELIMINADOS', JSON.stringify(array_eliminados));
         }else{
             var array_eliminados = [];
             //Solo se agrega al arreglo en caso de que 
             if( esSolicitado == '1' ){
-                array_eliminados.push(orderList);
+                var itemElimado = {'id': orderList, "cantidadEliminada": cantidadEliminada };
+                array_eliminados.push(itemElimado);
                 sessionStorage.setItem('ARRAY_ELIMINADOS', JSON.stringify(array_eliminados));
             }else{
                 console.log("NO SE AGREGA A LA ELIMINACIÓN PARA SURTIMIENTO");
@@ -1959,13 +1962,18 @@ var hay_paquete=0;
         //var apiUrl = baseUrl + '/' + nombreAmbiente + '/rest/v1/surte/Pedido';
         var apiUrl = parts_url[0] + '/rest/v1/surte/Pedido';
 
-        var productosPedido = getProductosPedido();
         var productosEliminados = getProductosEliminados();
+        var productosPedido = getProductosPedido( productosEliminados );
         //var productosEliminados = [];
 
+        //Limpieza de body para productos eliminados y prodcutos en el pedido
+        var newEliminados = setProductosPeticionSurtimiento( productosEliminados, productosPedido );
+
+        var newProductosPedido = setNewProductosParaPedido( productosEliminados, productosPedido );
+
         var dataSurtePedido = {
-                "productosEliminados": productosEliminados,
-                "productos": productosPedido,
+                "productosEliminados": newEliminados,
+                "productos": newProductosPedido,
                 "vendedor": <?php echo $user_id; ?>,
                 "sucursal": <?php echo $sucursal_id;?>,
                 "pedido": genIdPedido( <?php echo $user_id; ?> ),
@@ -2013,7 +2021,7 @@ var hay_paquete=0;
         }
     }
 
-    function getProductosPedido(){
+    function getProductosPedido(eliminados){
     
         var seleccionados = [];
         var filas = $('#listaProductos tr.move');
@@ -2062,6 +2070,9 @@ var hay_paquete=0;
                 
             });
         }
+
+        //Si el mismo producto existe en eliminados y en productos a enviar, quitamos del arreglo de eliminados
+
         return seleccionados;
     }
 
@@ -2074,6 +2085,47 @@ var hay_paquete=0;
 
         return array_eliminados;
 
+    }
+
+
+    function setProductosPeticionSurtimiento( eliminados, productosPedido ){
+
+        var newEliminados =eliminados.filter(eliminado => 
+            !productosPedido.some(producto => producto.id === eliminado.id)
+        );
+
+        return newEliminados;
+    }
+
+    function setNewProductosParaPedido( eliminados, productosPedido ){
+
+        //Obtener la diferencia en caso de que un producto se haya eliminado y se hayan agregado menos piezas
+        return productosPedido.reduce((nuevoArreglo, producto) => {
+            // Buscar si el producto está en el arreglo de eliminados
+            const eliminado = eliminados.find(e => e.id === producto.id);
+
+            if (eliminado) {
+                // Calcular la diferencia entre cantidad y cantidadEliminada
+                const diferencia = parseInt(producto.cantidad) - parseInt(eliminado.cantidadEliminada);
+
+                // Si la diferencia es mayor a 0, agregar al nuevo arreglo
+                if (diferencia > 0) {
+                    nuevoArreglo.push({
+                        id: producto.id,
+                        cantidad: diferencia.toString()
+                    });
+                }
+            } else {
+                // Si no está eliminado, agregar el producto con su cantidad original
+                nuevoArreglo.push({
+                    id: producto.id,
+                    cantidad: producto.cantidad
+                });
+            }
+
+            return nuevoArreglo;
+        }, []);
+    
     }
 
     function genIdPedido( id_user ) {
@@ -2125,7 +2177,51 @@ var hay_paquete=0;
         obj.value = obj.value.toUpperCase();
     }
 
-/*implementacion Oscar 2023 para imprimir, visualizar cotizacion*/
+    function writeLog( tipo_operacion,mensaje, callback ){
+        var currentUrl = window.location.href;
+        var msjTipo = (tipo_operacion == '1') ? "Acción al Enviar Pedido" : "Acción al Cerrar Venta" 
+        var parts_url = currentUrl.split('/touch_desarrollo');
+        const url = parts_url[0] + `/touch/ajax/writeLog.php?mssgLog=${encodeURIComponent( msjTipo + "\n" + mensaje)}`;
+        fetch(url).then(response => {
+            if (!response.ok) {
+                throw new Error("Error en la solicitud");
+            }
+            return response.text(); // Puedes cambiar a .json() si el PHP devuelve JSON
+        })
+        .then(data => {
+            console.log("Respuesta del servidor:", data);
+            callback();
+        })
+        .catch(error => {
+            console.error("Hubo un error:", error);
+        });
+    }
+
+    function setProductosEnVenta(){
+
+        var products_array = sessionStorage.getItem('SALE_PRODUCTS_LIST');
+        //var products_array = localStorage.getItem('SALE_PRODUCTS_LIST');
+        products_array = JSON.parse( products_array );
+        console.log( products_array );
+
+        var strProductos = "\nDetalle de productos:\n";
+        for( var i = 0; i < products_array.length; i ++ ){
+
+            var id = products_array[i][0];
+            var nombre = products_array[i][1];
+            var piezas = products_array[i][2];
+            var precio = products_array[i][3];
+            var monto = products_array[i][5];
+            
+            strProductos += id + " - " + nombre + " - # Piezas: " + piezas + " - Precio: " + precio + " - Monto : " + monto + "\n";
+        }
+
+        return strProductos;
+
+    }
+
+
+    /*implementacion Oscar 2023 para imprimir, visualizar cotizacion*/
     function quotationEmergent( sale_id ){
         var quotation_content = `<div class="row text-center" id="quotation_container" style="background-color : white;">
                 <h2>Escribe "ES COTIZACION" para continuar</h2>
@@ -2344,61 +2440,72 @@ var hay_paquete=0;
                      }
                      else
                      {
+                        var folioVenta = $("#id_pedido").val();
+                        var subTotal = "0";
+                        var total = $("#total").val();
+                        var mensaje = "Folio Venta: " + folioVenta + "\nSubtotal: " + subTotal + "\nTotal: "+ total;
+
+                        var mensajeProductos = setProductosEnVenta();
+
+                        mensaje = ( mensajeProductos !== "\nDetalle de productos:\n" ) ? mensaje + mensajeProductos : mensaje;
                         selfElement = this;
-                        surtePedido(function(){
 
-                            if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
-                                 $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href").replace (/&idp=\d+/i, "&idp=" + $("#id_pedido").val ()));
-                             }
-                             else {
-                            // modificacion de Oscar(05-11-2017)
-                                var ventaTipo=document.getElementById('tipo_venta').value;//sacamos el tipo de venta
-                            //implementacion de Oscar 24-12-2017
-                                var sFa='';
-                                if(document.getElementById('saldoAFavor')){
-                                    sFa="&sald_fav="+document.getElementById('saldoAFavor').value;
+                        writeLog('1', mensaje , function(){
+                            surtePedido(function(){
+    
+                                if ($("#menu_cerrar").attr ("href").match (/&idp=\d+/i)) {
+                                     $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href").replace (/&idp=\d+/i, "&idp=" + $("#id_pedido").val ()));
+                                 }
+                                 else {
+                                    // modificacion de Oscar(05-11-2017)
+                                    var ventaTipo=document.getElementById('tipo_venta').value;//sacamos el tipo de venta
+                                    //implementacion de Oscar 24-12-2017
+                                    var sFa='';
+                                    if(document.getElementById('saldoAFavor')){
+                                        sFa="&sald_fav="+document.getElementById('saldoAFavor').value;
+                                    }
+                                
+                                    /*implementación de Oscar 04.09.2018 para cambio de apartados*/
+                                    var es_apartado=$("#id_de_apartado").val();
+                                    var aprt='';
+                                    if(es_apartado!=''&& es_apartado!=null){
+                                        aprt="&id_aprt="+es_apartado;
+                                    }
+                                    var abono='';
+                                    if($("#monto_abonado").val()){
+                                        abono="&abonado="+$("#monto_abonado").val();
+                                    }
+                                    /*fin de cambio 04.09.2018*/
+    
+                                    /*Cambio Oscar 13.11.2018 para enviar el temporal de la venta antes de que fuera modificada*
+                                    var prods_antes="";
+                                    if($("#detalle_nota_tmp").val()){
+                                        prods_antes="&prods_ant="+$("#detalle_nota_tmp").val();
+                                    }
+                                    /*Fin de cambio Oscar 13.11.2018*/
+    
+                                    /*implementacion Oscar 25.06.2019 para arrastrar los ids de devolucion a la pantalla de cerrar venta*/
+                                    var ids_dvs="";
+                                    if(document.getElementById('id_de_devoluciones')){
+                                        ids_dvs+="&ids_devoluciones="+$("#id_de_devoluciones").val();
+                                    } 
+                                    /*Fin de cambio Oscar 25.06.2019*/
+    
+                                    /**/
+                                    $("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href") + "&idp=" + $("#id_pedido").val ()+'&tv='+ventaTipo+sFa+aprt+abono+"&id_pedido_original="+$("#id_de_pedido_original").val()+ids_dvs);//
+                                 
+                                    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores}*/
+    
+                                    if ($(selfElement).attr ("id").match (/^cerrar$/i))
+                                        location.href = $("#menu_cerrar").attr ("href");
+                                 
+                                 return true;
+                                
                                 }
-                            
-                            /*implementación de Oscar 04.09.2018 para cambio de apartados*/
-                                var es_apartado=$("#id_de_apartado").val();
-                                var aprt='';
-                                if(es_apartado!=''&& es_apartado!=null){
-                                    aprt="&id_aprt="+es_apartado;
-                                }
-                                var abono='';
-                                if($("#monto_abonado").val()){
-                                    abono="&abonado="+$("#monto_abonado").val();
-                                }
-                            /*fin de cambio 04.09.2018*/
-
-                        /*Cambio Oscar 13.11.2018 para enviar el temporal de la venta antes de que fuera modificada*
-                            	var prods_antes="";
-                                if($("#detalle_nota_tmp").val()){
-                                    prods_antes="&prods_ant="+$("#detalle_nota_tmp").val();
-                                }
-                        /*Fin de cambio Oscar 13.11.2018*/
-
-                        /*implementacion Oscar 25.06.2019 para arrastrar los ids de devolucion a la pantalla de cerrar venta*/
-                            var ids_dvs="";
-                            if(document.getElementById('id_de_devoluciones')){
-                                ids_dvs+="&ids_devoluciones="+$("#id_de_devoluciones").val();
-                            } 
-                        /*Fin de cambio Oscar 25.06.2019*/
-
-                        /**/
-							$("#menu_cerrar").attr ("href", $("#menu_cerrar").attr ("href") + "&idp=" + $("#id_pedido").val ()+'&tv='+ventaTipo+sFa+aprt+abono+"&id_pedido_original="+$("#id_de_pedido_original").val()+ids_dvs);//
-                             
-    /*deshabilitado por Oscar 09.11.2018 Revisado con Pedro para corregir errores}*/
-
-                             if ($(selfElement).attr ("id").match (/^cerrar$/i))
-                                 location.href = $("#menu_cerrar").attr ("href");
-                             
-                             return true;
-                            
-                         }
-
+    
+                            });
                         });
-                        
+
                      }
                  }
              });
