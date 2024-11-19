@@ -1,6 +1,7 @@
 <?php
 /*
      * Version 1.1 donde se corrige error de comprobación que tomaba comprobaciones de registros otras sucursales
+     * Version Oscar 2024-11-18 Para corregir error en ciclos de comprobacion de registros generales
 */
     class generalRowsVerification{
         private $link;
@@ -292,7 +293,7 @@ fclose($file);
                     //verifica si existe el registro
                         $verification_sql = "SELECT {$row['primary_key']} FROM {$row['table_name']} {$condition}";
                         $verification_stm = $this->link->query( $verification_sql );
-                        if( $verification_stm->num_rows > 0) {//si el registro no existe
+                        if( $verification_stm->num_rows > 0) {//si el registro existe
                             $sql = "DELETE FROM {$row['table_name']} {$condition}";
 						    if( $row['table_name'] == 'ec_movimiento_detalle' ){
                             //procedure aqui
@@ -320,7 +321,8 @@ fclose($file);
 						//var_dump($row);
 						//die( "JSON incorrecto : {$row['action_type']}" );
 					break;
-				}
+				}    
+			}
             //ejecuta instrucciones sql
                 foreach ($queries as $key2 => $query_) {
                     $ok = true;
@@ -357,8 +359,7 @@ fclose($file);
 						$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
 						$this->link->rollback();
                     }
-                }    
-			}
+                }
             return $resp;
         }
 
