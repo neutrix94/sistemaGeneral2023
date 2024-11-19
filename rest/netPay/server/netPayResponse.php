@@ -21,7 +21,7 @@ $app->post('/', function (Request $request, Response $response){
   if( ! include( '../../code/especiales/tesoreria/cobrosSmartAccounts/ajax/Logger.php' ) ){/*Logger*/
     die( "Error al incluir libreria de Logs!" );
   }
-	$Logger = null;
+  $Logger = null;
   $log_id = null;
   $steep_log_id = 0;
 
@@ -34,9 +34,9 @@ $app->post('/', function (Request $request, Response $response){
       return json_encode( $resp );
   }
 
-	$sql = "SELECT log_habilitado AS log_enabled FROM sys_configuraciones_logs WHERE id_configuracion_log = '2'";
-	$stm = $link->query( $sql ) or die( "Error al consultar si el log de cobros esta habilitado : {$sql} : {$link->error}" );
-	$log = $stm->fetch_assoc();
+  $sql = "SELECT log_habilitado AS log_enabled FROM sys_configuraciones_logs WHERE id_configuracion_log = '2'";
+  $stm = $link->query( $sql ) or die( "Error al consultar si el log de cobros esta habilitado : {$sql} : {$link->error}" );
+  $log = $stm->fetch_assoc();
   if( $log['log_enabled'] == 1 ){
     $Logger = new Logger( $link );//instancia clase de log
   }
@@ -123,112 +123,147 @@ $app->post('/', function (Request $request, Response $response){
       $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Respuesta ( JSON ) que llega a NetPay : ", $body );
     }
   }
-  //traceability
- // $traceability['']
-//consulta el tipo de sistema en relacion al campo de acceso
-  /*$sql_store = "SELECT id_sucursal AS store_id FROM sys_sucursales WHERE acceso = 1";
-  $stm_store = $link->query( $sql_store ) or die( "Error al consultar el tipo de sistema  : {$link->error} : {$sql}" );
-  $store_row = $stm_store->fetch_assoc();
-  $system_type = $store_row['store_id'];*/
-//$file = fopen("archivo.txt", "w");
-  $link->autocommit( false );
-//actualiza la respuesta de la transaccion
-  $sql = "UPDATE vf_transacciones_netpay SET 
-            /*2*/affiliation = '{$affiliation}',
-            /*3*/applicationLabel = '{$applicationLabel}',
-            /*4*/arqc = '{$arqc}',
-            /*5*/aid = '{$aid}',
-            /*6*/amount = '{$amount}',
-            /*7*/authCode = '{$authCode}',
-            /*8*/bin = '{$bin}',
-            /*9*/bankName = '{$bankName}',
-            /*10*/cardExpDate = '{$cardExpDate}',
-            /*11*/cardType = '{$cardType}',
-            /*12*/cardTypeName = '{$cardTypeName}',
-            /*13*/cityName = '{$cityName}',
-            /*14*/responseCode = '{$responseCode}',
-            /*15*/folioNumber = '{$folioNumber}',
-            /*16*/hasPin = '{$hasPin}',
-            /*17*/hexSign = '{$hexSign}',
-            /*18*/isQps = '{$isQps}',
-            /*19*/message = '{$message_}',
-            /*20*/isRePrint = '{$isRePrint}',
-            /*21*/moduleCharge = '{$moduleCharge}',
-            /*22*/moduleLote = '{$moduleLote}',
-            /*23*/customerName = '{$customerName}',
-            /*24*/terminalId = '{$terminalId}',
-            /*25*/orderId = '{$orderId}',
-            /*26*/preAuth = '{$preAuth}',
-            /*27*/preStatus = '{$preStatus}',
-            /*28*/promotion = '{$promotion}',
-            /*29*/rePrintDate = '{$rePrintDate}',
-            /*30*/rePrintMark = '{$rePrintMark}',
-            /*31*/reprintModule = '{$reprintModule}',
-            /*32*/cardNumber = '{$cardNumber}',
-            /*33*/storeName = '{$storeName}',
-            /*34*/streetName = '{$streetName}',
-            /*35*/ticketDate = '{$ticketDate}',
-            /*36*/tipAmount = '{$tipAmount}',
-            /*37*/tipLessAmount = '{$tipLessAmount}',
-            /*38*/transDate = '{$transDate}',
-            /*39*/transType = '{$transType}',
-            /*40*/transactionCertificate = '{$transactionCertificate}',
-            /*41*/transactionId = '{$transactionId}',
-            /*42*/id_sucursal = '{$traceability['id_sucursal']}', 
-            /*43*/id_cajero = '{$traceability['id_cajero']}', 
-            /*44*/folio_venta = '{$traceability['folio_venta']}',
-            /*44*/id_sesion_cajero = '{$traceability['id_sesion_cajero']}',
-            /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
-          WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
-  $stm = $link->query( $sql );
-/*Logger*/
-  if( $log_id != null ){
-    $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el registro de transaccion en Webhook", $sql );
-  }
-  if( $link->error ){
-    if( $log_id != null ){
-      $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', $traceability['folio_unico_transaccion'], $sql, $link->error );
-    }
-    die( "Error al actualizar el registro de transaccion en Webhook : {$link->error}" );
-  }
-  
-  /*if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
-    require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago
-    $link->autocommit( true );
-  }else{//peticion desde local
-    $link->autocommit( true );
-    require_once( './utils/conexion_con_websocket.php' );//consume websocket
-  }*/
 
-  if( isset( $traceability['tipo_sistema'] ) ){
-    if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
-    /*Logger*/
+  error_log("OBTENEMOS REGISTROS DE TRANSACCIONES PARA VALIDAR EXISTENCIAS");
+  
+  if( !empty( $orderId ) ){
+
+    //Antes de insertar, validamos que la transacción con el orderId no exista para evitar duplicidad en la tabla de vf_transacciones_netpay
+    $sqlValidateOrderId = "SELECT * FROM vf_transacciones_netpay WHERE orderId = '{$orderId}'";
+    $stmOrderId = $link->query( $sqlValidateOrderId ) or die( "Error al consultar si orderId existe en vf_transacciones_netpay : {$sqlValidateOrderId} : {$link->error}" );
+    $recordsEncontrados = $stmOrderId->num_rows;
+    error_log($sqlValidateOrderId);
+    error_log("SE ENCONTRARON {$recordsEncontrados} registros");
+  
+    if( $recordsEncontrados == 0 ){
+      error_log("SE PROCEDE CON FLUJO NORMAL");
+      //Al no tener resultados, se asume que el oderId no existe, por lo tanto, se procede a seguir con el flujo normal
+      //traceability
+      // $traceability['']
+      //consulta el tipo de sistema en relacion al campo de acceso
+      /*$sql_store = "SELECT id_sucursal AS store_id FROM sys_sucursales WHERE acceso = 1";
+      $stm_store = $link->query( $sql_store ) or die( "Error al consultar el tipo de sistema  : {$link->error} : {$sql}" );
+      $store_row = $stm_store->fetch_assoc();
+      $system_type = $store_row['store_id'];*/
+      //$file = fopen("archivo.txt", "w");
+      $link->autocommit( false );
+      //actualiza la respuesta de la transaccion
+      $sql = "UPDATE vf_transacciones_netpay SET 
+                /*2*/affiliation = '{$affiliation}',
+                /*3*/applicationLabel = '{$applicationLabel}',
+                /*4*/arqc = '{$arqc}',
+                /*5*/aid = '{$aid}',
+                /*6*/amount = '{$amount}',
+                /*7*/authCode = '{$authCode}',
+                /*8*/bin = '{$bin}',
+                /*9*/bankName = '{$bankName}',
+                /*10*/cardExpDate = '{$cardExpDate}',
+                /*11*/cardType = '{$cardType}',
+                /*12*/cardTypeName = '{$cardTypeName}',
+                /*13*/cityName = '{$cityName}',
+                /*14*/responseCode = '{$responseCode}',
+                /*15*/folioNumber = '{$folioNumber}',
+                /*16*/hasPin = '{$hasPin}',
+                /*17*/hexSign = '{$hexSign}',
+                /*18*/isQps = '{$isQps}',
+                /*19*/message = '{$message_}',
+                /*20*/isRePrint = '{$isRePrint}',
+                /*21*/moduleCharge = '{$moduleCharge}',
+                /*22*/moduleLote = '{$moduleLote}',
+                /*23*/customerName = '{$customerName}',
+                /*24*/terminalId = '{$terminalId}',
+                /*25*/orderId = '{$orderId}',
+                /*26*/preAuth = '{$preAuth}',
+                /*27*/preStatus = '{$preStatus}',
+                /*28*/promotion = '{$promotion}',
+                /*29*/rePrintDate = '{$rePrintDate}',
+                /*30*/rePrintMark = '{$rePrintMark}',
+                /*31*/reprintModule = '{$reprintModule}',
+                /*32*/cardNumber = '{$cardNumber}',
+                /*33*/storeName = '{$storeName}',
+                /*34*/streetName = '{$streetName}',
+                /*35*/ticketDate = '{$ticketDate}',
+                /*36*/tipAmount = '{$tipAmount}',
+                /*37*/tipLessAmount = '{$tipLessAmount}',
+                /*38*/transDate = '{$transDate}',
+                /*39*/transType = '{$transType}',
+                /*40*/transactionCertificate = '{$transactionCertificate}',
+                /*41*/transactionId = '{$transactionId}',
+                /*42*/id_sucursal = '{$traceability['id_sucursal']}', 
+                /*43*/id_cajero = '{$traceability['id_cajero']}', 
+                /*44*/folio_venta = '{$traceability['folio_venta']}',
+                /*44*/id_sesion_cajero = '{$traceability['id_sesion_cajero']}',
+                /*45*/store_id_netpay = '{$traceability['store_id_netpay']}'
+              WHERE folio_unico = '{$transaction_unique_folio}'";//$folioNumber
+      $stm = $link->query( $sql );
+      /*Logger*/
       if( $log_id != null ){
-        $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Entra en proceso de peticion desde linea", "" );
+        $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el registro de transaccion en Webhook", $sql );
       }
-      require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago
-      $link->autocommit( true );
-      $urlWebsocket = 'wss://websocketserverlocal-sqk76fij5a-uc.a.run.app/';
-    }else{//peticion desde local
-    /*Logger*/
+      if( $link->error ){
+        if( $log_id != null ){
+          $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', $traceability['folio_unico_transaccion'], $sql, $link->error );
+        }
+        die( "Error al actualizar el registro de transaccion en Webhook : {$link->error}" );
+      }
+      
+      /*if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
+        require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago
+        $link->autocommit( true );
+      }else{//peticion desde local
+        $link->autocommit( true );
+        require_once( './utils/conexion_con_websocket.php' );//consume websocket
+      }*/
+    
+      if( isset( $traceability['tipo_sistema'] ) ){
+        if( $traceability['tipo_sistema'] == -1 ){//peticion desde linea
+        /*Logger*/
+          if( $log_id != null ){
+            $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Entra en proceso de peticion desde linea", "" );
+          }
+          require_once( './utils/inserta_pago_con_tarjeta.php' );//inserta pago
+          $link->autocommit( true );
+          $urlWebsocket = 'wss://websocketserverlocal-sqk76fij5a-uc.a.run.app/';
+        }else{//peticion desde local
+        /*Logger*/
+          if( $log_id != null ){
+            $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Entra en proceso de peticion desde local", "" );
+          }
+          $link->autocommit( true );
+          $urlWebsocket = 'wss://websocketserver-sqk76fij5a-uc.a.run.app/';
+        }
+        require_once( './utils/conexion_con_websocket.php' );//consume websocket
+      }else{
+        return json_encode( array( "code"=>"00", "message"=>"falta el parametro tracebility->tipo_sistema" ) );
+      }
+      //die('');
+    }else{
+      error_log("SE ENCONTRÓ EXCEPCIÓN, NO SE ACTUALIZA REGISTRO");
+      //Regresamos respuesta indicando que el orderId no actualizó el movimiento ya que el registro existe
+      /*Logger*/
       if( $log_id != null ){
-        $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Entra en proceso de peticion desde local", "" );
+        $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "No actualiza registro de transacción en Webhook debido a que el valor orderId {$orderId} ya existe", $sqlValidateOrderId );
       }
-      $link->autocommit( true );
-      $urlWebsocket = 'wss://websocketserver-sqk76fij5a-uc.a.run.app/';
+      if( $link->error ){
+        if( $log_id != null ){
+          $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', $traceability['folio_unico_transaccion'], $sqlValidateOrderId, $link->error );
+        }
+        die( "Error al obtener registro de transacción en Webhook : {$link->error}" );
+      }
     }
-    require_once( './utils/conexion_con_websocket.php' );//consume websocket
-  }else{
-    return json_encode( array( "code"=>"00", "message"=>"falta el parametro tracebility->tipo_sistema" ) );
   }
+
+  error_log("RESPUESTA NETPAY");
+  error_log( print_r($resp,true) );
 
   ob_start();
-  $resp = array(
-    "code"=>"00",
-    "message"=>$message_
-  );
+    $resp = array(
+      "code"=>"00",
+      "message"=>$message_
+    );
   ob_flush();
   return json_encode( $resp );
-  //die('');
+  
+  
 });
 ?>
