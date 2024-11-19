@@ -172,6 +172,7 @@
         }
 
         public function RowsValidation( $rows, $table_name, $logger_id = false ){
+error_log( "Comprobación" );
             $log_steep_id = null;
             $resp = array();
             $resp['ok_rows'] = "";
@@ -193,6 +194,7 @@
 				$condition = str_replace( ")'", ")", $condition );
 				switch ( $row['action_type'] ) {
 					case 'insert' :
+error_log( "Cae en caso de insercion" );
                     //verifica si existe el registro
                         $verification_sql = "SELECT {$row['primary_key']} FROM {$row['table_name']} {$condition}";//die( $verification_sql );
                         $verification_stm   = $this->link->query( $verification_sql );
@@ -203,6 +205,7 @@ error_log( "Verificacion insercion  : {$verification_sql}" );
                             if( $this->link->error ){
                                 $ok = false;
                                 if( $logger_id ){
+error_log( "Error en INSERT al verificar si existe el registro en tabla {$row['table_name']}", "{$row['table_name']}" );
                                     $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error en INSERT al verificar si existe el registro en tabla {$row['table_name']}", "{$row['table_name']}", $verification_sql, $this->link->error );
                                 }
                                 die( "Error en INSERT al verificar si existe el registro en tabla {$row['table_name']} : {$this->link->error} : {$verification_sql}" );
@@ -231,6 +234,7 @@ error_log( "Verificacion insercion  : {$verification_sql}" );
 error_log( "Registro no existe y lo inserta  : {$verification_sql}" );
                         }else{//si el registro ya existe en el destino
                             $resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row_['synchronization_row_id']}'";
+error_log( "Registro si existe : {$verification_sql}" );
                         }
 /*Implementacion Oscar 2024-02-12 para crear carpetas mediante la sincronizacion*/
 						if( $row['table_name'] == 'sys_carpetas' ){
@@ -246,6 +250,7 @@ error_log( "Registro no existe y lo inserta  : {$verification_sql}" );
 /*fin de cambio Oscar 2024-02-12*/
 					break;
 					case 'update' :
+error_log( "Cae en caso de actualizacion" );
 						$sql = "UPDATE {$row['table_name']} SET ";
 						$fields = "";
 						foreach ($row as $key2 => $value) {
@@ -267,6 +272,7 @@ error_log( "Registro no existe y lo inserta  : {$verification_sql}" );
 					    array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id'] ) );
 					break;
 					case 'delete' :
+error_log( "Cae en caso de eliminacion" );
                     //verifica si existe el registro
                         $verification_sql = "SELECT {$row['primary_key']} FROM {$row['table_name']} {$condition}";
                         $verification_stm = $this->link->query( $verification_sql );
@@ -286,6 +292,7 @@ error_log( "Registro no existe y lo inserta  : {$verification_sql}" );
 					break;
 
 					case 'sql_instruction' : 
+error_log( "Cae en caso de instruccion SQL" );
 						$sql = $row['sql'];
 						//$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$row['synchronization_row_id']}'";
 					    array_push( $queries, array( "query"=>$sql, "row_id"=>$row_['synchronization_row_id'] ) );//se manda ejecutar de nuevo al ser una consulta dinamica
@@ -303,10 +310,12 @@ error_log( "Registro no existe y lo inserta  : {$verification_sql}" );
                     $query = str_replace( "'(", "(", $query_['query'] );
                     $query = str_replace( ")'", ")", $query );
                     $stm = $this->link->query( $query );//
+error_log( "Ejecuta instruccion SQL : {$query}" );
                         if( $logger_id ){
                             $log_steep_id = $this->LOGGER->insertLoggerSteepRow( $logger_id, "Ejecuta consulta SQL : ", $query );
                         }
                         if( $this->link->error ){
+error_log( "Error al ejecutar instruccion SQL : {$query}" );
                             $ok = false;
                             if( $logger_id ){
                                 $this->LOGGER->insertErrorSteepRow( $log_steep_id, "Error al ejecutar consulta ", "$table_name", $query, $this->link->error );
@@ -314,9 +323,11 @@ error_log( "Registro no existe y lo inserta  : {$verification_sql}" );
                             die( "Error : {$query} : {$this->link->error}" );
                         }
                     if( $ok == true && $query_['row_id'] != 'n/a' ){
+error_log( "Entra en registro exitoso : {$query}" );
 						$resp["ok_rows"] .= ( $resp["ok_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
 						$this->link->commit();
                     }else if( $ok == false  && $query_['row_id'] != 'n/a' ){
+error_log( "Entra en registro erroneo : {$query}" );
 						$resp["error_rows"] .= ( $resp["error_rows"] == '' ? '' : ',' ) . "'{$query_['row_id']}'";
 						$this->link->rollback();
                     }
