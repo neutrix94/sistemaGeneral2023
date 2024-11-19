@@ -1,4 +1,7 @@
 <?php
+/*
+	*Version Oscar 2024-11-18 para corregir checkbox cuando se cambia de sucursal en transferencias rapidas 
+*/
 	include( '../../../../conectMin.php' );
 	include( '../../../../conexionMysqli.php' );
 //verifica el permiso de transferencias locales

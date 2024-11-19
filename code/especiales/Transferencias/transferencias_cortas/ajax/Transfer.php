@@ -1,4 +1,7 @@
 <?php
+/*
+	*Version Oscar 2024-11-18 para corregir checkbox cuando se cambia de sucursal en transferencias rapidas 
+*/
 	if( isset( $_GET['fl_transfer'] ) || isset( $_POST['fl_transfer'] ) ){
 		include( '../../../../../config.inc.php' );
 		include( '../../../../../conect.php' );
@@ -640,7 +643,10 @@
 		}
 
 		public function getWarehouses( $type, $store_id = null, $warehouse_id = null ){
-			$resp = "<select id=\"transfer_warehouse_{$type}\" class=\"combo\">";
+			$resp = "";
+			if( $store_id == null ){
+				$resp .= "<select id=\"transfer_warehouse_{$type}\" class=\"combo\">";
+			}
 			$resp .= "<option value=\"\">-- Selecionar -- </option>";
 			$sql = "SELECT 
 						id_almacen AS warehouse_id,
@@ -653,7 +659,9 @@
 			while ( $row = $stm->fetch_assoc() ) {
 				$resp .= "<option value=\"{$row['warehouse_id']}\">{$row['warehouse_name']}</option>";
 			}
-			$resp .= "</select>";
+			if( $store_id == null ){
+				$resp .= "</select>";
+			}
 			return $resp;
 		}
 
