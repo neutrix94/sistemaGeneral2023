@@ -120,8 +120,7 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 				SUM( IF( id_tipo_pago = 1 OR id_tipo_pago = 2, monto, 0 ) ) AS ingreso_efectivo,
 				SUM( IF( id_tipo_pago = 7, monto, 0 ) ) AS ingreso_tarjetas
 			FROM ec_cajero_cobros
-			WHERE id_cajero = {$user_id}
-			AND id_sesion_caja = {$teller_session_id}";
+			WHERE id_sesion_caja = {$teller_session_id}";
 	$eje = mysql_query($sql ) or die( "Error al consultar ingresos cobrados : {$sql} " . mysql_error() );
 	$cajero_cobros = mysql_fetch_assoc($eje );
 	$entrada = $cajero_cobros['ingreso_total'];
