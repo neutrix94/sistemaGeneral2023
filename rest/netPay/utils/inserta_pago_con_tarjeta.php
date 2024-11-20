@@ -73,7 +73,7 @@
               die( "Error al consultar porcentajes de pagos : {$sql} {$link->error}" );
             }
           /*</Logger>*/
-      //die( "here 1.5" );
+        //die( "here 1.5" );
             $payment_row = $stm->fetch_assoc();//pagos de saldo a favor Oscar 2024-02-15
         
             $Payments = new Payments( $link, $traceability['id_sucursal'], $Logger );
@@ -158,115 +158,127 @@
             id_nota_credito, id_cxc, es_externo )
             VALUES( {$row['sale_id']}, 7, NOW(), NOW(), {$amount}, '', 1, 1, -1, -1, 0 )";
             $stm = $link->query( $sql ) or die( "Error al insertar el cobro del pedido : {$link->error}" );*/
-      //
+        //
           $id_forma_pago = ( $cardType == 'C' ? 11 : ( $cardType == 'D' ? 14 : -1 ) );
-      //inserta el cobro del cajero si el cobro fue exitoso
-          $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, id_sucursal, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_terminal, 
-          /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar, /*11*/id_sesion_caja, /*12*/id_tipo_pago, /*13*/id_forma_pago ) 
-          VALUES ( /*1*/NULL, '{$traceability['id_sucursal']}', /*2*/'{$row['sale_id']}', /*3*/'{$traceability['id_cajero']}', /*4*/'{$row['affiliation_id']}', 
-          /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1, 
-          /*11*/{$traceability['id_sesion_cajero']}, /*12*/7, /*13*/{$id_forma_pago} )";
-      //    error_log( $sql );
-          $stm = $link->query( $sql );
-        /*<Logger>*/
-          if( $log_id != null ){
-            $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Insertar el cobro del cajero", $sql );
-          }
-          if( $link->error ){
-            if( $log_id != null ){
-              $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'ec_cajero_cobros', 'N/A', $sql, $link->error );
-            }
-            die( "Error al insertar el cobro del cajero : {$link->error}" );
-          }
-        /*</Logger>*/
-          $sql = "SELECT MAX( id_cajero_cobro ) AS last_id FROM ec_cajero_cobros LIMIT 1";
-          $last_id_stm = $link->query( $sql );
-          $last_id_row = $last_id_stm->fetch_assoc();
-          $payment_id = $last_id_row['last_id'];//$link->insert_id;
-      //actualiza el id de sesion de caja del pedido 
-          $sql = "UPDATE ec_pedidos SET id_cajero = {$traceability['id_cajero']}, id_sesion_caja = {$traceability['id_sesion_cajero']} WHERE id_pedido = {$row['sale_id']}";
-          $stm_pedido = $link->query( $sql );
-          /*<Logger>*/
-            if( $log_id != null ){
-              $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza ids de cajero y sesion de caja desde Webhook", $sql );
-            }
-            if( $link->error ){
+
+            //Antes de insertar, validamos que el registro de orderId no exista
+            $sqlValidateOrderId = "SELECT * FROM `ec_cajero_cobros` WHERE observaciones = '{$orderId}'";
+            $stmOrderId = $link->query( $sqlValidateOrderId ) or die( "Error al consultar si orderId existe en vf_transacciones_netpay : {$sqlValidateOrderId} : {$link->error}" );
+            $recordsEncontrados = $stmOrderId->num_rows;
+
+            if( $recordsEncontrados == 0 ){
+              error_log("NO HAY DUPLICADOS, SE CONTINPUA CON FLUJO NORMAL");
+              //inserta el cobro del cajero si el cobro fue exitoso
+              $sql = "INSERT INTO ec_cajero_cobros( /*1*/id_cajero_cobro, id_sucursal, /*2*/id_pedido, /*3*/id_cajero, /*4*/id_terminal, 
+              /*5*/id_banco, /*6*/monto, /*7*/fecha, /*8*/hora, /*9*/observaciones, /*10*/sincronizar, /*11*/id_sesion_caja, /*12*/id_tipo_pago, /*13*/id_forma_pago ) 
+              VALUES ( /*1*/NULL, '{$traceability['id_sucursal']}', /*2*/'{$row['sale_id']}', /*3*/'{$traceability['id_cajero']}', /*4*/'{$row['affiliation_id']}', 
+              /*5*/'{$row['bank_id']}', /*6*/'{$amount}', /*7*/NOW(), /*8*/NOW(), /*9*/'{$orderId}', /*10*/1, 
+              /*11*/{$traceability['id_sesion_cajero']}, /*12*/7, /*13*/{$id_forma_pago} )";
+              //    error_log( $sql );
+              $stm = $link->query( $sql );
+              /*<Logger>*/
               if( $log_id != null ){
-                $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'ec_cajero_cobros', 'N/A', $sql, $link->error );
+                $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Insertar el cobro del cajero", $sql );
               }
-              die( "Error al actualizar ids de cajero y sesion de caja desde Webhook : {$link->error}" );
-            }
-      //actualiza el cajero de los cobros
-      //actualiza el id de cajero cobro en la transaccion
-            $sql = "UPDATE vf_transacciones_netpay 
-                      SET id_cajero_cobro = '{$payment_id}'
-                    WHERE id_transaccion_netpay = '{$folioNumber}'";
-            $stm = $link->query( $sql );
-          /*<Logger>*/
-            if( $log_id != null ){
-              $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el cobro del cajero en registro de peticion", $sql );
-            }
-            if( $link->error ){
-              if( $log_id != null ){
-                $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', 'N/A', $sql, $link->error );
+              if( $link->error ){
+                if( $log_id != null ){
+                  $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'ec_cajero_cobros', 'N/A', $sql, $link->error );
+                }
+                die( "Error al insertar el cobro del cajero : {$link->error}" );
               }
-              die( "Error al actualizar el cobro del cajero en el registro de peticion : {$link->error}" );
-            }
-          /*</Logger>*/
-        //actualiza en la venta el id de cajero que cobro el pago*/
-          if( $row['sale_id'] != null && $row['sale_id'] != '' ){
-            $sql="UPDATE ec_pedidos 
-                    SET id_cajero = '{$traceability['id_cajero']}' 
-                    WHERE id_pedido = {$row['sale_id']}";
-            $stm = $link->query( $sql );
-          /*<Logger>*/
-            if( $log_id != null ){
-              $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el pedido para el cajero", $sql );
-            }
-            if( $link->error ){
-              if( $log_id != null ){
-                $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos', 'N/A', $sql, $link->error );
+              /*</Logger>*/
+              $sql = "SELECT MAX( id_cajero_cobro ) AS last_id FROM ec_cajero_cobros LIMIT 1";
+              $last_id_stm = $link->query( $sql );
+              $last_id_row = $last_id_stm->fetch_assoc();
+              $payment_id = $last_id_row['last_id'];//$link->insert_id;
+              //actualiza el id de sesion de caja del pedido 
+              $sql = "UPDATE ec_pedidos SET id_cajero = {$traceability['id_cajero']}, id_sesion_caja = {$traceability['id_sesion_cajero']} WHERE id_pedido = {$row['sale_id']}";
+              $stm_pedido = $link->query( $sql );
+              /*<Logger>*/
+                if( $log_id != null ){
+                  $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza ids de cajero y sesion de caja desde Webhook", $sql );
+                }
+                if( $link->error ){
+                  if( $log_id != null ){
+                    $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'ec_cajero_cobros', 'N/A', $sql, $link->error );
+                  }
+                  die( "Error al actualizar ids de cajero y sesion de caja desde Webhook : {$link->error}" );
+                }
+              //actualiza el cajero de los cobros
+               //actualiza el id de cajero cobro en la transaccion
+                $sql = "UPDATE vf_transacciones_netpay 
+                          SET id_cajero_cobro = '{$payment_id}'
+                        WHERE id_transaccion_netpay = '{$folioNumber}'";
+                $stm = $link->query( $sql );
+              /*<Logger>*/
+                if( $log_id != null ){
+                  $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el cobro del cajero en registro de peticion", $sql );
+                }
+                if( $link->error ){
+                  if( $log_id != null ){
+                    $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'vf_transacciones_netpay', 'N/A', $sql, $link->error );
+                  }
+                  die( "Error al actualizar el cobro del cajero en el registro de peticion : {$link->error}" );
+                }
+              /*</Logger>*/
+              //actualiza en la venta el id de cajero que cobro el pago*/
+              if( $row['sale_id'] != null && $row['sale_id'] != '' ){
+                $sql="UPDATE ec_pedidos 
+                        SET id_cajero = '{$traceability['id_cajero']}' 
+                        WHERE id_pedido = {$row['sale_id']}";
+                $stm = $link->query( $sql );
+                /*<Logger>*/
+                if( $log_id != null ){
+                  $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el pedido para el cajero", $sql );
+                }
+                if( $link->error ){
+                  if( $log_id != null ){
+                    $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedidos', 'N/A', $sql, $link->error );
+                  }
+                  die( "Error al actualizar el pedido para el cajero : {$link->error}" );
+                }
+                /*</Logger>*/
+                //actualiza en el pago el id de cajero que cobro el pago Oscar 2023-01-10*/
+                //if( $row['sale_id'] != null && $row['sale_id'] != '' ){
+                $sql="UPDATE ec_pedido_pagos 
+                        SET id_cajero_cobro = '{$payment_id}' 
+                        WHERE id_pedido_pago IN( {$internal_payment_id}, {$external_payment_id} )";
+                $stm = $link->query( $sql );
+                /*<Logger>*/
+                if( $log_id != null ){
+                  $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el cobro con el cajero", $sql );
+                }
+                if( $link->error ){
+                  if( $log_id != null ){
+                    $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $link->error );
+                  }
+                  die( "Error al actualizar el cobro con el cajero : {$link->error}" );
+                }
+                /*</Logger>*/
+                //actualiza el id de cajero que cobro el pago*/
+                $sql="UPDATE ec_pedido_pagos 
+                        SET id_cajero = '{$traceability['id_cajero']}',
+                        fecha = now(),
+                        hora = now() 
+                        WHERE id_pedido = {$row['sale_id']}
+                        AND id_cajero=0";
+                $stm = $link->query( $sql );
+                /*<Logger>*/
+                if( $log_id != null ){
+                  $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el pago con el cajero", $sql );
+                }
+                if( $link->error ){
+                  if( $log_id != null ){
+                    $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $link->error );
+                  }
+                  die( "Error al actualizar el pago con el cajero : {$link->error}" );
+                }
+                /*</Logger>*/
               }
-              die( "Error al actualizar el pedido para el cajero : {$link->error}" );
+            }else{
+              error_log("HAY DUPLICADOS, NO SE INSERTA TRANSACCIÓN");
             }
-          /*</Logger>*/
-        //actualiza en el pago el id de cajero que cobro el pago Oscar 2023-01-10*/
-          //if( $row['sale_id'] != null && $row['sale_id'] != '' ){
-            $sql="UPDATE ec_pedido_pagos 
-                    SET id_cajero_cobro = '{$payment_id}' 
-                    WHERE id_pedido_pago IN( {$internal_payment_id}, {$external_payment_id} )";
-            $stm = $link->query( $sql );
-          /*<Logger>*/
-            if( $log_id != null ){
-              $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el cobro con el cajero", $sql );
-            }
-            if( $link->error ){
-              if( $log_id != null ){
-                $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $link->error );
-              }
-              die( "Error al actualizar el cobro con el cajero : {$link->error}" );
-            }
-          /*</Logger>*/
-          //actualiza el id de cajero que cobro el pago*/
-            $sql="UPDATE ec_pedido_pagos 
-                    SET id_cajero = '{$traceability['id_cajero']}',
-                    fecha = now(),
-                    hora = now() 
-                    WHERE id_pedido = {$row['sale_id']}
-                    AND id_cajero=0";
-            $stm = $link->query( $sql );
-          /*<Logger>*/
-            if( $log_id != null ){
-              $steep_log_id = $Logger->insertLoggerSteepRow( $log_id, "Actualiza el pago con el cajero", $sql );
-            }
-            if( $link->error ){
-              if( $log_id != null ){
-                $steep_log_error = $Logger->insertErrorSteepRow( $steep_log_id, 'ec_pedido_pagos', 'N/A', $sql, $link->error );
-              }
-              die( "Error al actualizar el pago con el cajero : {$link->error}" );
-            }
-          /*</Logger>*/
-          }
+
       /*$fp = fopen('data.txt', 'w');
       fwrite($fp, $sql );
       fclose($fp);*/
