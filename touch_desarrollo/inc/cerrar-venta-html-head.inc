@@ -418,7 +418,7 @@ var regresar_efectivo_devolucion = 0;
                     writeLog('2', mensaje );
 
 					$("#cont_emergente").css({ "text-align":"center","display":"flex","align-items":"center","justify-content":"center"});
-                    $("#cont_emergente").html( "<div style='text-align:center'>EXISTEN INCONSISTENCIA EN LOS DATOS DE LA VENTA<br>Total y Subtotal no coinciden.<br>Favor de verificar y regresar a la venta actual</div>" );
+                    $("#cont_emergente").html( "<div style='text-align:center'>DIFERENCIA EN TOTALES<br>REGRESA A LA VENTA ACTUAL Y <br>DA CLICK EN EL BOTÓN DE ENVIAR PEDIDO</div>" );
                     $("#emergente_cerrar").css("display","block");//hacemos visible la emergente
 					//Deshabilitamos los botones
 					$(".row.footer").children().eq(0).find('button').attr('disabled',"disabled");
