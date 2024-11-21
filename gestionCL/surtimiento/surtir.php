@@ -219,7 +219,11 @@ $indiceSurtir = 0;
                 ); 
                 return;
             }
-            if(listaSurtir[indiceSurtir].codigos_barras.split(",").includes(codigoProducto.split(" ").join(""))){
+            //Toma únicamente los primeros digitos para omitir los últimos dígitos, correspondientes al identificador único
+            const codigoBase = codigoProducto.split(" ").slice(0, -1).join("");
+
+            if(listaSurtir[indiceSurtir].codigos_barras.split(",").includes(codigoBase)){
+
                 document.getElementById('surtidoGroup').style.display = 'block';
                 document.getElementById('cantidadSurtida').value = '';//Number(listaSurtir[indiceSurtir].cantidad_solicitada);
                 document.getElementById('cantidadSurtida').focus();
