@@ -1,4 +1,7 @@
 <?php
+/* 
+    * Version Oscar 2024-11-20 para eliminar gastos repetidos
+*/
     include( '../../../conexionMysqli.php' );
     $archivo = "log_eliminacion_cobros_pagos.txt";
 
@@ -86,8 +89,6 @@
         } else {
             die( "No se pudo abrir el archivo." );
         }
-        
-        $link->autocommit(false);
 
         while( $row = $stm->fetch_assoc() ){
             $sql = "SELECT id_pedido_pago FROM ec_pedido_pagos WHERE folio_unico = '{$row['folio_unico']}'";
@@ -141,21 +142,79 @@
         echo "Consulta los pedidos pagos repetidos por folio unico : <br>{$sql}<br>";
         $archivoAbierto = fopen($archivo, "a");
         if ($archivoAbierto) {
-        fwrite($archivoAbierto, "Consulta pagos repetidos :\n{$sql}\n");
-        fclose($archivoAbierto);
+            fwrite($archivoAbierto, "Consulta pagos repetidos :\n{$sql}\n");
+            fclose($archivoAbierto);
         } else {
-        die( "No se pudo abrir el archivo." );
+            die( "No se pudo abrir el archivo." );
         }
 
-        $link->autocommit(false);
-
         while( $row = $stm->fetch_assoc() ){
-        $sql = "SELECT id_devolucion_pago FROM ec_devolucion_pagos WHERE folio_unico = '{$row['folio_unico']}'";
+            $sql = "SELECT id_devolucion_pago FROM ec_devolucion_pagos WHERE folio_unico = '{$row['folio_unico']}'";
+            $stm2 = $link->query( $sql ) or die( "Error al consultar los registros por eliminar : {$sql} : {$link->error}" );
+            echo "Consulta pagos devolucion repetidos independientemente. : <br>{$sql}<br>";
+            $archivoAbierto = fopen($archivo, "a");
+            if ($archivoAbierto) {
+                fwrite($archivoAbierto, "Consulta pagos devolucion repetidos independientemente {$sql}.\n");
+                fclose($archivoAbierto);
+            } else {
+                die( "No se pudo abrir el archivo." );
+            }
+            $row_counter = 0;
+            while( $row2 = $stm2->fetch_assoc() ){
+                if( $row_counter > 0 ){
+                    $sql = "DELETE FROM ec_devolucion_pagos WHERE id_devolucion_pago = {$row2['id_devolucion_pago']}";
+                    $stm3 = $link->query( $sql ) or die( "Error al eliminar registro de cobro : {$sql} : {$link->error}" );
+                    echo "Elimina pago repetido independientemente : <br>{$sql}<br>";
+                    $archivoAbierto = fopen($archivo, "a");
+                    if ($archivoAbierto) {
+                        fwrite($archivoAbierto, "Elimina devolucion Pago ({$row2['id_devolucion_pago']}).\n");
+                        fclose($archivoAbierto);
+                    } else {
+                        die( "No se pudo abrir el archivo." );
+                    }
+                }else{
+                    echo "No elimina devolucion pago repetido ({$row2['id_devolucion_pago']})<br>";
+                    $archivoAbierto = fopen($archivo, "a");
+                    if ($archivoAbierto) {
+                        fwrite($archivoAbierto, "El pago devolucion no se elimina ({$row2['id_devolucion_pago']}).\n");
+                        fclose($archivoAbierto);
+                    } else {
+                        die( "No se pudo abrir el archivo." );
+                    }
+                }
+                $row_counter ++;
+            }
+        }
+
+        
+    //consulta los gastos repetidos por folio unico
+    $sql="SELECT 
+        folio_unico
+    FROM ec_gastos
+    WHERE folio_unico IS NOT NULL
+    AND folio_unico != ''
+    AND folio_unico != 'AGRUPACION'
+    GROUP BY folio_unico
+    HAVING COUNT(*) > 1";
+    //$eje=mysql_query($sql)or die("Error al consultar las afiliaciones para este cajero!!!<br>".mysql_error());
+    $stm = $link->query( $sql ) or die( "Error al consultar los gastos repetidos : {$sql} : {$link->error}" );
+    echo "Consulta los gastos repetidos por folio unico : <br>{$sql}<br>";
+    $archivoAbierto = fopen($archivo, "a");
+    if ($archivoAbierto) {
+        fwrite($archivoAbierto, "Consulta gastos repetidos :\n{$sql}\n");
+        fclose($archivoAbierto);
+    } else {
+        die( "No se pudo abrir el archivo." );
+    }
+
+
+    while( $row = $stm->fetch_assoc() ){
+        $sql = "SELECT id_gastos FROM ec_gastos WHERE folio_unico = '{$row['folio_unico']}'";
         $stm2 = $link->query( $sql ) or die( "Error al consultar los registros por eliminar : {$sql} : {$link->error}" );
-        echo "Consulta pagos devolucion repetidos independientemente. : <br>{$sql}<br>";
+        echo "Consulta gastos independientemente. : <br>{$sql}<br>";
         $archivoAbierto = fopen($archivo, "a");
         if ($archivoAbierto) {
-            fwrite($archivoAbierto, "Consulta pagos devolucion repetidos independientemente {$sql}.\n");
+            fwrite($archivoAbierto, "Consulta gastos independientemente {$sql}.\n");
             fclose($archivoAbierto);
         } else {
             die( "No se pudo abrir el archivo." );
@@ -163,21 +222,21 @@
         $row_counter = 0;
         while( $row2 = $stm2->fetch_assoc() ){
             if( $row_counter > 0 ){
-                $sql = "DELETE FROM ec_devolucion_pagos WHERE id_devolucion_pago = {$row2['id_devolucion_pago']}";
-                $stm3 = $link->query( $sql ) or die( "Error al eliminar registro de cobro : {$sql} : {$link->error}" );
-                echo "Elimina pago repetido independientemente : <br>{$sql}<br>";
+                $sql = "DELETE FROM ec_gastos WHERE id_gastos = {$row2['id_gastos']}";
+                $stm3 = $link->query( $sql ) or die( "Error al eliminar registro de gasto : {$sql} : {$link->error}" );
+                echo "Elimina gasto repetido independientemente : <br>{$sql}<br>";
                 $archivoAbierto = fopen($archivo, "a");
                 if ($archivoAbierto) {
-                    fwrite($archivoAbierto, "Elimina devolucion Pago ({$row2['id_devolucion_pago']}).\n");
+                    fwrite($archivoAbierto, "Elimina Gasto ({$row2['id_gastos']}).\n");
                     fclose($archivoAbierto);
                 } else {
                     die( "No se pudo abrir el archivo." );
                 }
             }else{
-                echo "No elimina devolucion pago repetido ({$row2['id_devolucion_pago']})<br>";
+                echo "No elimina gasto repetido ({$row2['id_devolucion_pago']})<br>";
                 $archivoAbierto = fopen($archivo, "a");
                 if ($archivoAbierto) {
-                    fwrite($archivoAbierto, "El pago devolucion no se elimina ({$row2['id_devolucion_pago']}).\n");
+                    fwrite($archivoAbierto, "El gasto no se elimina ({$row2['id_devolucion_pago']}).\n");
                     fclose($archivoAbierto);
                 } else {
                     die( "No se pudo abrir el archivo." );
@@ -185,7 +244,7 @@
             }
             $row_counter ++;
         }
-        }
+    }
 
     //consulta pagos repetidos de NetPay
         $sql = "SELECT observaciones FROM ec_cajero_cobros WHERE id_terminal > 0 GROUP BY observaciones HAVING COUNT(*) > 1";
