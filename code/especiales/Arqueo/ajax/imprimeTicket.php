@@ -1,5 +1,8 @@
 <?php
-/*version casa 1.1*/
+/*
+	* Version casa 1.1
+	* Version Oscar 2024-11-21 para crear ticket de corte de caja en laro de hoja carta
+*/
 	define('FPDF_FONTPATH','../../../../include/fpdf153/font/');
 	include("../../../../include/fpdf153/fpdf.php");
 	include("../../../../conect.php");
@@ -289,8 +292,8 @@
 		}
 	}
 	//120+
-	//aqui cambia largo Oscar 26-11-2017
-	$ticket = new TicketPDF("P", "mm", array(80, 50 + ($sales_number * 11 ) + ($resAprox*9)+5+$contador_ingresos+$tam_gastos+$tam_descuentos) , "{$sucursal}", "{$folio}", 10);
+	//aqui cambia largo Oscar 26-11-201750 + ($sales_number * 11 ) + ($resAprox*9)+5+$contador_ingresos+$tam_gastos+$tam_descuentos
+	$ticket = new TicketPDF("P", "mm", array(80,282) , "{$sucursal}", "{$folio}", 10);
 	//echo 'res:'.$resAprox;
 	$ticket->AliasNbPages();
 	$ticket->AddPage();
