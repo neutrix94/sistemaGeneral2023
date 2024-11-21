@@ -223,6 +223,7 @@ $indiceSurtir = 0;
             const codigoBase = codigoProducto.split(" ").slice(0, -1).join("");
 
             if(listaSurtir[indiceSurtir].codigos_barras.split(",").includes(codigoBase)){
+
                 document.getElementById('surtidoGroup').style.display = 'block';
                 document.getElementById('cantidadSurtida').value = '';//Number(listaSurtir[indiceSurtir].cantidad_solicitada);
                 document.getElementById('cantidadSurtida').focus();
