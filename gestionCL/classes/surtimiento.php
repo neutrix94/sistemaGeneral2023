@@ -389,9 +389,10 @@ class SurtimientoCRUD {
         AND sd.id_asignado = '{$idUsuario}'
     ORDER BY ub.numero_ubicacion_desde, p.orden_lista desc ;";
 
-            //error_log("EL QUERY");
-            //error_log($qSelect);
-
+        //error_log("EL QUERY");
+        //error_log($qSelect);
+        //Antes de ejecutar query, establecemos codificación para que json:_
+        $this->conn->query("SET NAMES 'utf8'");
         $result = $this->conn->query($qSelect);
         
         return $result->fetch_all(MYSQLI_ASSOC);
