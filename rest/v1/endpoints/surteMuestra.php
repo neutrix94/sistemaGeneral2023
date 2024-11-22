@@ -80,6 +80,7 @@ $app->post('/surte/Muestra', function (Request $request, Response $response){
           and sp.id_sucursal='{$sucursal}'
           and surtir=1";
       //error_log('query:'.$sqlConsultaProds);
+      $db->query("SET NAMES 'utf8'");
       foreach ($db->query($sqlConsultaProds) as $row) {
         $productosSurtir[]=$row['orden_lista'];
       }
@@ -112,7 +113,7 @@ $app->post('/surte/Muestra', function (Request $request, Response $response){
                 AND s.tipo ='1'
                 AND sd.estado IN (1,2)
                 AND s.estado IN (1,2);";
-                
+      $db->query("SET NAMES 'utf8'");
       foreach ($db->query($sqlConsultaSol) as $row) {
           $solicitudActual['id_surtimiento'] = $row['id_surtimiento'];
           $solicitudActual['lineas'][$row['orden_lista']] = [];
