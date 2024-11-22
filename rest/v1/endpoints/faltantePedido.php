@@ -62,6 +62,7 @@ $app->post('/surte/Faltante', function (Request $request, Response $response){
       and (ifnull(sd.cantidad_solicitada,0) - ifnull(sd.cantidad_surtida,0)) > 0
       and sd.id_asignado = '{$user_id}';";
 
+      $db->query("SET NAMES 'utf8'");
       $resultQuery = $db->query($sqlConsultaSol);
       $num_filas = $resultQuery->rowCount();
       error_log( "FALTANTE, SE ENCONTRARON : " .$num_filas );
@@ -95,7 +96,8 @@ $app->post('/surte/Faltante', function (Request $request, Response $response){
         where 
         s.id='{$pedido}'
         and sd.id_asignado = '{$user_id}';";
-  
+
+        $db->query("SET NAMES 'utf8'");
         $resultQueryCompleto = $db->query($sqlConsultaSolCompleto);
 
         foreach ($resultQueryCompleto as $row) {
