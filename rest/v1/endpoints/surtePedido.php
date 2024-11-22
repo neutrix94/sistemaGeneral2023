@@ -82,6 +82,7 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
           where p.orden_lista in (".$idProductos.")
           and sp.id_sucursal='{$sucursal}'
           and surtir=1";
+      $db->query("SET NAMES 'utf8'");
       foreach ($db->query($sqlConsultaProds) as $row) {
         $productosSurtir[]=$row['orden_lista'];
         $productosSurtirResponse[]= array( "orden_lista" => $row['orden_lista'], "nombre_producto" => $row['nombre_producto'] );
@@ -94,7 +95,7 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
           and sp.id_sucursal='{$sucursal}'
           and orden_lista != 0
           and surtir=0";
-
+      $db->query("SET NAMES 'utf8'");
       foreach ($db->query($sqlConsultaProdsNoSurtir) as $row) {
         
         $productosNoSurtir[] =  array( "orden_lista" => $row['orden_lista'], "nombre_producto" => $row['nombre_producto'] );
@@ -126,7 +127,7 @@ $app->post('/surte/Pedido', function (Request $request, Response $response){
                 AND s.tipo ='2'
                 AND sd.estado IN (1,2)
                 AND s.estado IN (1,2);";
-                
+      $db->query("SET NAMES 'utf8'");
       foreach ($db->query($sqlConsultaSol) as $row) {
           $solicitudActual['id_surtimiento'] = $row['id_surtimiento'];
           $solicitudActual['lineas'][$row['orden_lista']] = [];
