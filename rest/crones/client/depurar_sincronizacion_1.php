@@ -8,7 +8,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Método: POST
 * Descripción: Depura registros de sincronizacion ( tablas de sincronizacion )
   * Version 1.2 Se corrige depuracion de regitros Proveedor Producto ( 2024-08-27 )
-  * Version Oscar 2024-11-08para deshabilit ar el consumo de depuracion de registros de sincronizacion al servidor en linea
+  * Version Oscar 2024-11-08 para deshabilit ar el consumo de depuracion de registros de sincronizacion al servidor en linea
+  * Version Oscar 2024-11-20 para quitar transaccion en la depuracion de reistros e implemntar la eliminacion de la tabla 
 */
 $app->post('/depurar_sincronizacion', function (Request $request, Response $response){//die("here");
 
@@ -56,7 +57,7 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
   $fecha_antiguedad = $row['fecha_hora_modificada'];
   $peticiones_pendientes = "";
 
-  $link->autocommit( false );//inicio de trasaccion
+//$link->autocommit( false );//inicio de trasaccion
 //elimina registros de sincronizacion
     $sql = "DELETE FROM sys_sincronizacion_registros WHERE status_sincronizacion = 3 AND fecha <= '{$fecha_antiguedad}'";  //AND fecha <= '{$limit_date} 23:59:59'
     $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_registros : {$link->error}" );
@@ -226,8 +227,11 @@ $app->post('/depurar_sincronizacion', function (Request $request, Response $resp
     $link->query( $sql ) or die( "Error al eliminar en LOG_sincronizacion_pasos : {$link->error}" );
     $sql = "DELETE FROM LOG_sincronizacion_pasos_errores WHERE fecha_alta <= '{$fecha_antiguedad}'";
     $link->query( $sql ) or die( "Error al eliminar en LOG_sincronizacion_pasos_errores : {$link->error}" );
+
 /**/
-  $link->autocommit( true );//autoriza transaccion
+    $sql = "DELETE FROM sys_sincronizacion_comprobaciones_log";
+    $link->query( $sql ) or die( "Error al eliminar en sys_sincronizacion_comprobaciones_log: {$link->error}" );
+//$link->autocommit( true );//autoriza transaccion
 //cierra conexion Mysql
   $link->close();
 /*Deshabilitado por Oscar 2024-11-08 para deshabilitar el consumo de depuracion de registros de sincronizacion al servidor en linea
