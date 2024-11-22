@@ -1,4 +1,6 @@
-
+/* 
+	* Version Oscar 2024-11-22 para no permitir parentesis en observaciones de esclusion de transferencias
+*/
 //cerrar emergente
 	function emergente_close(){
 		$( '.emergente' ).css('display', 'none');
@@ -205,7 +207,7 @@ var auxiliar='',ocupado=0;
 		}
 	//obtenemos el dato anterior
 		auxiliar=$("#4_"+num).html();//sacamos el valor del registro
-		var cda_tmp='<input type="text" id="celda_tmp" value="'+auxiliar+'" style="width:99%;height:35px;" onkeyup="valida_tca(event,'+num+');" ';
+		var cda_tmp='<input type="text" id="celda_tmp" value="'+auxiliar+'" style="width:99%;height:35px;" onkeyup="valida_tca(event,'+num+');valida_caracteres( this );" ';
 		cda_tmp+='onblur="desedita_celda('+num+');">';
 		$("#4_"+num).html(cda_tmp);
 		$("#celda_tmp").select();
@@ -235,6 +237,12 @@ var auxiliar='',ocupado=0;
 		//setTimeout(,500);
 		ocupado=0;
 	}
+
+	function valida_caracteres( obj ){
+		$(obj).val( $(obj).val().replaceAll( '(', '' ) );
+		$(obj).val( $(obj).val().replaceAll( ')', '' ) );
+	}
+
 /*implementacion Oscar 2021 para exportar a Excel*/
 	function exportarExcel(){
 		var data = "Id Producto,Orden de lista,Producto,Inv Matriz,Observaciones,Fecha\n";
