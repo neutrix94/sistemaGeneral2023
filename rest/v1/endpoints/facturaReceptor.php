@@ -40,7 +40,7 @@ $app->post('/facturaReceptor', function (Request $request, Response $response){
       
       //Recuperar parámetros de entrada
       $rfc = htmlspecialchars($request->getParam('rfc'));
-      $nombre = $request->getParam('nombre');//htmlspecialchars($request->getParam('nombre'));
+      $nombre = htmlspecialchars($request->getParam('nombre'));//$request->getParam('nombre');//htmlspecialchars($request->getParam('nombre'));
     //  $nombre = str_replace( '"', '\\"', $nombre );
 
       $nombre = str_replace( '"', '\"', $nombre );
