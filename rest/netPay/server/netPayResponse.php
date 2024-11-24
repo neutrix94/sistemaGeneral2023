@@ -239,6 +239,7 @@ $app->post('/', function (Request $request, Response $response){
       //die('');
     }else{
       error_log("SE ENCONTRÓ EXCEPCIÓN, NO SE ACTUALIZA REGISTRO");
+      $message_ = "Transacción no exitosa";
       //Regresamos respuesta indicando que el orderId no actualizó el movimiento ya que el registro existe
       /*Logger*/
       if( $log_id != null ){
