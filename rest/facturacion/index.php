@@ -17,6 +17,7 @@ $app = new \Slim\App;
 require 'client/envia_cliente.php';
 require 'client/envia_cliente_facturacion.php';
 require 'client/descarga_clientes.php';
+require 'client/barre_y_envia_clientes_a_administracion_facturacion.php';//barrido y envio de ventas a administracion facturacion
 
 //server
 require 'server/inserta_cliente.php';
