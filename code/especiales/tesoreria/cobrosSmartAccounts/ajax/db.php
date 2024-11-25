@@ -2,6 +2,7 @@
 /*version 1.2 2024-07-04 Hacer configurable el tiempo de espera de respuesta del websocket 1.1*/
 /*Version 2024-10-19 Para reimprimir ticket de netPay manualmente cuando la venta no llego al servidor*/
 /*Version 2024-11-07 Para regresar la version de 50 centavos por error de devolucion (no actualizaba pedidos referencia devolucion porque no entraba en impresion de ticket)*/
+/*Version Oscar 2024-11-25 para no permitir eliminar cobros de saldo a favor*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
@@ -816,6 +817,11 @@ $terminal_id = $_GET['terminal_serie_id'];
 						$disabled = "disabled";
 					}
 					$onclick = "delete_payment_saved( {$row['payment_id']}, {$sale_id} );";
+/*Implementacion Oscar 2024-11-25 para no permitir eliminar cobros de saldo a favor*/
+					if( $row['id_tipo_pago'] == 2 || $row['id_tipo_pago'] == 3 ){
+						$onclick = "alert( 'Este tipo de pago no puede ser elimindado' );return false;";
+					}
+/*Fin de cambio Oscar 2024-11-25*/
 					if( $sale_row['cobro_finalizado'] == 1 || $sale_row['cobro_finalizado'] == '1' ){
 						$onclick = "alert( 'El cobro ya fue finalizado y no es posible eliminar pagos.' );return false;";
 					}
