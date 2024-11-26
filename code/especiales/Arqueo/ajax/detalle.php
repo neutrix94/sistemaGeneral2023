@@ -3,7 +3,7 @@
 	* Version 2.0 2024-06-21
 	* Version Oscar 2024-11-12 para tomar los cobros de la tabla de cajeros cobros en validacion de arqueo de caja
 	* Version Oscar 2024-11-16 Se modifican las consultas de validacion de arqueo de caja para mostrar aquellas terminales en las que hubo cobros y se cambia vista previa de corte de caja
-	* Version Oscar 2024-11-18 Se agrega que para pago en efectivo tome pagos tipo 1 y 2 en corte de caja
+	* Version Oscar 2024-11-18 Se agrega que para pago en efectivo tome pagos tipo 1,2,3 en corte de caja
 */
 	require('../../../../conect.php');
 
@@ -194,8 +194,10 @@
 //echo 'devoluciones $ '.$sql."<br><br>";
 $sql = "SELECT
 				SUM( monto ) AS ingreso_total,
-				SUM( IF( id_tipo_pago = 1 OR id_tipo_pago = 2, monto, 0 ) ) AS ingreso_efectivo,
-				SUM( IF( id_tipo_pago = 7, monto, 0 ) ) AS ingreso_tarjetas
+				SUM( IF( id_tipo_pago = 1 OR id_tipo_pago = 2 OR id_tipo_pago = 3, monto, 0 ) ) AS ingreso_efectivo,
+				SUM( IF( id_tipo_pago = 7, monto, 0 ) ) AS ingreso_tarjetas,
+				SUM( IF( id_tipo_pago = 8, monto, 0 ) ) AS ingreso_transferencias,
+				SUM( IF( id_tipo_pago = 9, monto, 0 ) ) AS ingreso_cheques
 			FROM ec_cajero_cobros
 			WHERE id_cajero = {$user_id}
 			AND id_sesion_caja = {$teller_session_id}";
@@ -204,6 +206,8 @@ $sql = "SELECT
 	$entrada = $cajero_cobros['ingreso_total'];
 	$entrada_efectivo = $cajero_cobros['ingreso_efectivo'];
 	$entrada_tarjeta = $cajero_cobros['ingreso_tarjetas'];
+	$entrada_transferencia = $cajero_cobros['ingreso_transferencias'];
+	$entrada_cheque = $cajero_cobros['ingreso_cheques'];
 	$entrada_externa = 0;
 //sacamos Gastos
 	$sql="SELECT g.id_usuario,g.fecha,g.hora,cg.nombre,g.observaciones,g.monto
@@ -335,7 +339,7 @@ $sql = "SELECT
 					echo '<td align="right" id="ta'.($cont_tar).'">'.$aux[1].'</td>';
 				echo '</tr>';
 			}*/
-		/**/
+		/*
 			$cheques=explode("°",$cheq_trans);
 			$cont_cheq=0;
 			$suma_cheques=0;
@@ -348,6 +352,17 @@ $sql = "SELECT
 					echo '<td align="right">'.$aux[1].'</td>';
 				echo '</tr>';
 			}
+		*/
+			echo "<tr class=\"text-warning\">
+					<td></td>
+					<td>Transferencias</td>
+					<td>{$entrada_transferencia}</td>
+				</tr>
+				<tr class=\"text-info\">
+					<td></td>
+					<td>Cheques</td>
+					<td>{$entrada_cheque}</td>
+				</tr>";
 		
 		?>
 
