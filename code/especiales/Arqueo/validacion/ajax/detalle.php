@@ -3,7 +3,7 @@
 	* Version 2.0 2024-06-21
 	* Version Oscar 2024-11-12 para tomar los cobros de la tabla de cajeros cobros en validacion de arqueo de caja
 	* Version Oscar 2024-11-16 Se modifican las consultas de validacion de arqueo de caja para mostrar aquellas terminales en las que hubo cobros y se cambia vista previa de validacion de corte de caja
-	* Version Oscar 2024-11-18 Se agrega que para pago en efectivo tome pagos tipo 1 y 2 en validacion de corte de caja
+	* Version Oscar 2024-11-18 Se agrega que para pago en efectivo tome pagos tipo 1, 2 y 3 en validacion de corte de caja
 */
 	require('../../../../../conect.php');
 //consultamos las tarjetas
@@ -117,8 +117,10 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 	*/
 	$sql = "SELECT
 				SUM( monto ) AS ingreso_total,
-				SUM( IF( id_tipo_pago = 1 OR id_tipo_pago = 2, monto, 0 ) ) AS ingreso_efectivo,
-				SUM( IF( id_tipo_pago = 7, monto, 0 ) ) AS ingreso_tarjetas
+				SUM( IF( id_tipo_pago = 1 OR id_tipo_pago = 2 OR id_tipo_pago = 3, monto, 0 ) ) AS ingreso_efectivo,
+				SUM( IF( id_tipo_pago = 7, monto, 0 ) ) AS ingreso_tarjetas,
+				SUM( IF( id_tipo_pago = 8, monto, 0 ) ) AS ingreso_transferencias,
+				SUM( IF( id_tipo_pago = 9, monto, 0 ) ) AS ingreso_cheques
 			FROM ec_cajero_cobros
 			WHERE id_sesion_caja = {$teller_session_id}";
 	$eje = mysql_query($sql ) or die( "Error al consultar ingresos cobrados : {$sql} " . mysql_error() );
@@ -126,6 +128,8 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 	$entrada = $cajero_cobros['ingreso_total'];
 	$entrada_efectivo = $cajero_cobros['ingreso_efectivo'];
 	$entrada_tarjeta = $cajero_cobros['ingreso_tarjetas'];
+	$entrada_transferencia = $cajero_cobros['ingreso_transferencias'];
+	$entrada_cheque = $cajero_cobros['ingreso_cheques'];
 	$entrada_externa = 0;
 
 //sacamos Gastos
@@ -276,6 +280,16 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 		//sumamos el efectivo al total ingresos
 			//$ingreso_efect = ( $ingreso_efect  );//- $suma_cheques
 			//$total_montos_entregados+=$ingreso_efect;
+			echo "<tr class=\"text-warning\">
+					<td></td>
+					<td>Transferencias</td>
+					<td>{$entrada_transferencia}</td>
+				</tr>
+				<tr class=\"text-info\">
+					<td></td>
+					<td>Cheques</td>
+					<td>{$entrada_cheque}</td>
+				</tr>";
 			$total_montos_entregados+=$ingreso_efect;
 		?>
 
