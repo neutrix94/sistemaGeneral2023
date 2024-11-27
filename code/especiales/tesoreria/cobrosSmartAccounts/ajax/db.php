@@ -3,6 +3,7 @@
 /*Version 2024-10-19 Para reimprimir ticket de netPay manualmente cuando la venta no llego al servidor*/
 /*Version 2024-11-07 Para regresar la version de 50 centavos por error de devolucion (no actualizaba pedidos referencia devolucion porque no entraba en impresion de ticket)*/
 /*Version Oscar 2024-11-25 para no permitir eliminar cobros de saldo a favor*/
+/*Version Oscar 2024-11-26 Modificacion para que no se sumen los pedidos pagos sin cajero cobro en pantalla de cobros*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
@@ -2281,7 +2282,7 @@ $terminal_id = $_GET['terminal_serie_id'];
 					p.folio_nv AS folio_venta,
 					IF( p.pagado = 0 AND pp.id_pedido_pago IS NULL, p.monto_pago_inicial, p.total ) AS pagos_pendientes,
 					REPLACE( p.id_devoluciones, '~', ',' ) AS devoluciones_relacionadas,
-					SUM( IF( pp.id_pedido_pago IS NULL , 0, pp.monto ) ) AS pagos_registrados,
+					SUM( IF( pp.id_pedido_pago IS NULL OR pp.id_cajero_cobro = 0, 0, pp.monto ) ) AS pagos_registrados,
 					p.total AS total_nota
 				FROM ec_pedidos p
 				LEFT JOIN ec_pedido_pagos pp 
