@@ -2281,7 +2281,7 @@ $terminal_id = $_GET['terminal_serie_id'];
 					p.folio_nv AS folio_venta,
 					IF( p.pagado = 0 AND pp.id_pedido_pago IS NULL, p.monto_pago_inicial, p.total ) AS pagos_pendientes,
 					REPLACE( p.id_devoluciones, '~', ',' ) AS devoluciones_relacionadas,
-					SUM( IF( pp.id_pedido_pago IS NULL , 0, pp.monto ) ) AS pagos_registrados,
+					SUM( IF( pp.id_pedido_pago IS NULL OR pp.id_cajero_cobro = 0, 0, pp.monto ) ) AS pagos_registrados,
 					p.total AS total_nota
 				FROM ec_pedidos p
 				LEFT JOIN ec_pedido_pagos pp 
