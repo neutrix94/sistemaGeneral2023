@@ -3,6 +3,7 @@
 /*Version 2024-10-19 Para reimprimir ticket de netPay manualmente cuando la venta no llego al servidor*/
 /*Version 2024-11-07 Para regresar la version de 50 centavos por error de devolucion (no actualizaba pedidos referencia devolucion porque no entraba en impresion de ticket)*/
 /*Version Oscar 2024-11-25 para no permitir eliminar cobros de saldo a favor*/
+/*Version Oscar 2024-11-26 Modificacion para que no se sumen los pedidos pagos sin cajero cobro en pantalla de cobros*/
 	if( isset( $_GET['fl'] ) || isset( $_POST['fl'] ) ){
 		include( '../../../../../conect.php' );
 		include( '../../../../../conexionMysqli.php' );
