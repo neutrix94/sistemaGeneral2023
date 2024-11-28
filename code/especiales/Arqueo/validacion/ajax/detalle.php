@@ -323,7 +323,7 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 			$total_montos_entregados += $entrada_efectivo;
 			$total_montos_entregados += $entrada_transferencia;
 			$total_montos_entregados += $entrada_cheque;
-			$total_montos_entregados -= $gastoTotal;
+			//$total_montos_entregados -= $gastoTotal;
 		?>
 
 				<tr><td><br></td></tr>
@@ -374,7 +374,7 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 				</tr>
 				<tr>
 					<td align="right" colspan="4" style="color:red;font-size:28px;"><b>Diferencia:</b></td>
-					<td align="right" style="color:red;font-size:28px;"><b><?php echo round($total_montos_entregados-(($entrada+$entrada_externa)-$gastoTotal),2);?></b></td>
+					<td align="right" style="color:red;font-size:28px;"><b><?php echo round($total_montos_entregados-(($entrada-$gastoTotal)),2);?></b></td><!--$gastoTotal-->
 				</tr>
 				<tr>
 					<td colspan="2">Monto de cambio Inicial en caja : $ <b><?php echo $cambio_inicial;?></b></td>
