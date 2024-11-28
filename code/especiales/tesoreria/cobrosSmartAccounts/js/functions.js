@@ -1,4 +1,7 @@
-/*version 1.2 2024-08-08 ( Se modifica mensaje ambiguo cuando el pago  con inbursa es mayor al monto restante por cobrar )*/
+/*
+	* Version 1.2 2024-08-08 ( Se modifica mensaje ambiguo cuando el pago  con inbursa es mayor al monto restante por cobrar )
+	* Version Oscar 2024-11-22 para permitir alfanumericos en numero de autorizaciond inburda (pantalla de cobros)
+*/
 var total_cobros=0,monto_real=0;
 var respuesta = null;
 var debug_json = "";
@@ -816,7 +819,7 @@ var cont_cheques_transferencia=0;
 			<div>
 			<br>
 				Número de autorización :
-				<input type="text" class="form-control" id="authorization_input_tmp" onkeyup="validateNumberInput( this );">
+				<input type="text" class="form-control" id="authorization_input_tmp"><!--onkeyup="validateNumberInput( this );"-->
 				<p class="text-start text-danger hidden" id="authorization_input_tmp_alerta">Campo numérico*</p>
 			</div>
 			<div>

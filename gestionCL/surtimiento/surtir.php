@@ -219,7 +219,11 @@ $indiceSurtir = 0;
                 ); 
                 return;
             }
-            if(listaSurtir[indiceSurtir].codigos_barras.split(",").includes(codigoProducto)){
+            //Toma únicamente los primeros digitos para omitir los últimos dígitos, correspondientes al identificador único
+            //const codigoBase = codigoProducto.split(" ").slice(0, -1).join("");
+
+            //if(listaSurtir[indiceSurtir].codigos_barras.split(",").includes(codigoProducto.split(" ").join(""))){
+              if( validarCodigoProducto(codigoProducto, listaSurtir[indiceSurtir].codigos_barras) ){
                 document.getElementById('surtidoGroup').style.display = 'block';
                 document.getElementById('cantidadSurtida').value = '';//Number(listaSurtir[indiceSurtir].cantidad_solicitada);
                 document.getElementById('cantidadSurtida').focus();
@@ -235,6 +239,37 @@ $indiceSurtir = 0;
             }
 
 
+        }
+
+        function validarCodigoProducto(codigoProducto, codigos_barras) {
+          // Eliminar espacios del código del producto
+          codigoProducto = codigoProducto.replace( '  ', ' ' )
+          const codigoLimpio = codigoProducto.split(" ").join("");
+
+          // Dividir la lista de códigos de barras en un arreglo
+          const listaCodigos = codigos_barras.split(",");
+
+          // Verificar si es un paquete o caja (contiene 'PQ' o 'CJ')
+          const esPaqueteOCaja = codigoProducto.includes("PQ") || codigoProducto.includes("CJ");
+
+          if (esPaqueteOCaja) {
+
+              if( codigoProducto.includes("PQ") ){
+
+                // Validar solo los dígitos iniciales sin el identificador único (últimos 5 caracteres)
+                const baseCodigo = codigoLimpio.slice(0, -5); // Remover el identificador único
+                return listaCodigos.some(codigo => codigo.startsWith(baseCodigo));
+              }else{
+
+                // Validar solo los dígitos iniciales sin el identificador único (últimos 4 caracteres)
+                const baseCodigo = codigoLimpio.slice(0, -4); // Remover el identificador único
+                return listaCodigos.some(codigo => codigo.startsWith(baseCodigo));
+
+              }
+          } else {
+              // Validar coincidencia exacta
+              return listaCodigos.includes(codigoLimpio);
+          }
         }
 
         function noHayExistencia() {
@@ -407,6 +442,7 @@ $indiceSurtir = 0;
             document.getElementById('cantidad').textContent = listaSurtir[indiceSurtir].cantidad_solicitada;
             document.getElementById('index').textContent = Number(indiceSurtir)+1 +' de '+ Number(listaSurtir.length);  
             document.getElementById('codigos_barras').textContent = '**(Sólo habilitado para pruebas) Códigos de barras permitidos: '+ listaSurtir[indiceSurtir].codigos_barras ;
+            $('#codigos_barras').hide();
             
             if(listaSurtir[indiceSurtir].claves_proveedor !== undefined && listaSurtir[indiceSurtir].claves_proveedor !== null){
               var htmlClaves = '';

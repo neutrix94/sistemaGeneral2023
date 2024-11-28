@@ -109,6 +109,9 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
                     <th>Asignar</th>
                 <?php endif; ?>
                 <th>Surtir</th>
+                <?php if ($perfil == 2): ?>
+                    <th>Cancelar</th>
+                <?php endif; ?>
             </tr>
         </thead>
         <tbody>
@@ -167,6 +170,11 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
                         <!-- <a href="surtir.php?id=<?php echo $surtimiento['id']; ?>" class="btn btn-success">Surtir</a> -->
                         <a href="#" data-id="<?php echo $surtimiento['id']; ?>" class="btn btn-success surtir-row <?php echo ($surtimiento['estado_id'] == '5' || $surtimiento['estado_id'] == '3') ? 'disabled':''; ?>">Surtir</a>
                     </td>
+                    <?php if ($perfil == 2): ?>
+                        <td>
+                        <button class="btn btn-danger" onclick="encargadoCancelarSurtimiento('<?php echo $surtimiento['id']; ?>')">Cancelar</button>
+                        </td>
+                    <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
         <?php endif; ?>
@@ -201,6 +209,27 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
       </div>
     </div>
   </div>
+</div>
+
+<!-- Modal: Alertas -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alertModalLabel">Título de la Alerta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="alertModalContent">Contenido de la alerta...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="alertModalCancelButton" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="alertModalAcceptButton">Aceptar</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -293,6 +322,59 @@ $surtimientos = $surtimientoCRUD->listaSurtir($perfil,$idUsuario,$sucursal_id,$f
   function openCancelModal() {
       $('#cierreSolicitudesModal').modal('show');
   }
+
+  function encargadoCancelarSurtimiento( idSurtimiento ) {
+    showAlertModal(
+          'Confirmar cancelación',
+          '¿Estás seguro de cancelar el surtimiento?',
+          true,
+          'Cancelar',
+          true,
+          'Aceptar'
+        );
+        // Establecer la función de callback para el botón de aceptar
+        $('#alertModalAcceptButton').off('click').on('click', function() {
+            $.ajax({
+                url: '../classes/surtimiento.php',
+                type: 'POST',
+                data: {
+                    action: 'cancelarSurtimiento',
+                    id: idSurtimiento
+                },
+                success: function(response) {
+                    alert("El registro se ha cancelado correctamente");
+                    window.location.reload();
+
+                },
+                error: function(xhr, status, error) {
+                    alert('Hubo un error al cancelar la asignación: ' + error);
+                }
+            });
+            $('#alertModal').modal('hide');  
+        });
+  }
+
+  function showAlertModal(title, content, showCancel, titleCancel, showAccept, titleAccept) {
+        //Establece título y contenido
+        document.getElementById('alertModalLabel').innerText = title;
+        document.getElementById('alertModalContent').innerText = content;
+        //Habilita botón cancelar
+        if(showCancel){
+          $('#alertModalCancelButton').show();
+          $('#alertModalCancelButton').text(titleCancel);
+
+        }else{
+          $('#alertModalCancelButton').hide();
+        }
+        //Habilita botón aceptar
+        if(showAccept){
+          $('#alertModalAcceptButton').show();
+          $('#alertModalAcceptButton').text(titleAccept);
+        }else{
+          $('#alertModalAcceptButton').hide();
+        }
+        $('#alertModal').modal('show');
+    }
 </script>
 
 </body>

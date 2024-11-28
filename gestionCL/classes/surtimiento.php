@@ -333,60 +333,67 @@ class SurtimientoCRUD {
     public function listaDetalleSurtimiento($id=null,$sucursal=null, $idUsuario=null) {
         $ubicacionSel = ($sucursal == 1) ? " ifnull(ub.numero_ubicacion_desde, 'ND') numero_ubicacion_desde, ifnull(ub.altura_desde,'ND') altura_desde," : " ifnull(ub.numero_ubicacion_desde, 'ND') numero_ubicacion_desde, ifnull(ub.altura_desde,'ND') altura_desde,";
         $ubicacionJoin = ($sucursal == 1) ? " LEFT JOIN ec_proveedor_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto and ub.habilitado = 1  and ub.es_principal = 1 ":" LEFT JOIN ec_sucursal_producto_ubicacion_almacen ub ON ub.id_producto = sd.id_producto AND ub.id_sucursal = '{$sucursal}' and ub.habilitado = 1  and ub.es_principal = 1 ";
-        $result = $this->conn->query("SELECT 
-                sd.id,
-                sd.id_producto,
-                sd.id_asignado,
-                sd.id_surtimiento,
-                p.nombre,
-                p.clave,
-                p.codigo_barras_4,
-                p.orden_lista,
-                {$ubicacionSel}
-                sd.cantidad_solicitada,
-                sd.cantidad_surtida,
-                sd.estado,
-                sd.sin_inventario,
-                s.no_pedido,
-                s.estado estado_gral,
-                s.id_vendedor,
-                concat(u.nombre, ' ', u.apellido_paterno) AS nombre_vendedor,
-                pp_data.claves_proveedor,
-                pp_data.codigos_barras,
-                pp_data.max_prioridad_surtimiento,
-                pp_data.clave_prioridad_maxima
-            FROM ec_surtimiento_detalle sd
-            LEFT JOIN ec_productos p ON p.id_productos = sd.id_producto
-            {$ubicacionJoin}
-            INNER JOIN ec_surtimiento s ON s.id = sd.id_surtimiento
-            LEFT JOIN sys_users u ON u.id_usuario = s.id_vendedor
-            LEFT JOIN 
-                (
-                    SELECT distinct
-                        pp.id_producto,
-                        group_concat(pp.clave_proveedor ORDER BY pp.prioridad_surtimiento DESC) AS claves_proveedor,
-                        replace(group_concat(concat_ws(',',pp.codigo_barras_pieza_1, pp.codigo_barras_pieza_2, pp.codigo_barras_pieza_3) SEPARATOR ','),' ','') AS codigos_barras,
-                        max(pp.prioridad_surtimiento) AS max_prioridad_surtimiento,
-                        (SELECT pp2.clave_proveedor 
-                         FROM ec_proveedor_producto pp2 
-                         WHERE pp2.id_producto = pp.id_producto 
-                         AND pp2.habilitado = 1 
-                         ORDER BY pp2.prioridad_surtimiento DESC 
-                         LIMIT 1) AS clave_prioridad_maxima
-                    FROM 
-                        ec_proveedor_producto pp
-                    WHERE 
-                        pp.habilitado = 1
-                    GROUP BY 
-                        pp.id_producto
-                ) AS pp_data ON pp_data.id_producto = sd.id_producto
-            WHERE  
-                sd.id_surtimiento = '{$id}'
-                -- and sd.id_asignado='104'
-                AND sd.estado IN (1,2)
-                AND s.estado NOT IN (3,5)
-                AND sd.id_asignado = '{$idUsuario}'
-            ORDER BY ub.numero_ubicacion_desde, p.orden_lista desc ;");
+
+        $qSelect ="SELECT 
+        sd.id,
+        sd.id_producto,
+        sd.id_asignado,
+        sd.id_surtimiento,
+        p.nombre,
+        p.clave,
+        p.codigo_barras_4,
+        p.orden_lista,
+        {$ubicacionSel}
+        sd.cantidad_solicitada,
+        sd.cantidad_surtida,
+        sd.estado,
+        sd.sin_inventario,
+        s.no_pedido,
+        s.estado estado_gral,
+        s.id_vendedor,
+        concat(u.nombre, ' ', u.apellido_paterno) AS nombre_vendedor,
+        pp_data.claves_proveedor,
+        pp_data.codigos_barras,
+        pp_data.max_prioridad_surtimiento,
+        pp_data.clave_prioridad_maxima
+    FROM ec_surtimiento_detalle sd
+    LEFT JOIN ec_productos p ON p.id_productos = sd.id_producto
+    {$ubicacionJoin}
+    INNER JOIN ec_surtimiento s ON s.id = sd.id_surtimiento
+    LEFT JOIN sys_users u ON u.id_usuario = s.id_vendedor
+    LEFT JOIN 
+        (
+            SELECT distinct
+                pp.id_producto,
+                group_concat(pp.clave_proveedor ORDER BY pp.prioridad_surtimiento DESC) AS claves_proveedor,
+                replace(group_concat(concat_ws(',',pp.codigo_barras_pieza_1, pp.codigo_barras_pieza_2, pp.codigo_barras_pieza_3, pp.codigo_barras_presentacion_cluces_1, pp.codigo_barras_presentacion_cluces_2, pp.codigo_barras_caja_1,pp.codigo_barras_caja_2) SEPARATOR ','),' ','') AS codigos_barras,
+                max(pp.prioridad_surtimiento) AS max_prioridad_surtimiento,
+                (SELECT pp2.clave_proveedor 
+                 FROM ec_proveedor_producto pp2 
+                 WHERE pp2.id_producto = pp.id_producto 
+                 AND pp2.habilitado = 1 
+                 ORDER BY pp2.prioridad_surtimiento DESC 
+                 LIMIT 1) AS clave_prioridad_maxima
+            FROM 
+                ec_proveedor_producto pp
+            WHERE 
+                pp.habilitado = 1
+            GROUP BY 
+                pp.id_producto
+        ) AS pp_data ON pp_data.id_producto = sd.id_producto
+    WHERE  
+        sd.id_surtimiento = '{$id}'
+        -- and sd.id_asignado='104'
+        AND sd.estado IN (1,2)
+        AND s.estado NOT IN (3,5)
+        AND sd.id_asignado = '{$idUsuario}'
+    ORDER BY ub.numero_ubicacion_desde, p.orden_lista desc ;";
+
+        //error_log("EL QUERY");
+        //error_log($qSelect);
+        //Antes de ejecutar query, establecemos codificación para que json:_
+        $this->conn->query("SET NAMES 'utf8'");
+        $result = $this->conn->query($qSelect);
         
         return $result->fetch_all(MYSQLI_ASSOC);
     }

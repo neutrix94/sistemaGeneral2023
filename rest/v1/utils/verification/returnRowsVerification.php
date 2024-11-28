@@ -1,6 +1,7 @@
 <?php
 /*
      * Version 1.1 donde se corrige error de comprobación que tomaba comprobaciones de registros otras sucursales
+     * Version Oscar 2024-11-21 para corregir error de comprobacion de devoluciones cuando hay cabeceras de peticiones en NULL
 */
     class returnRowsVerification{
         private $link;
@@ -41,6 +42,7 @@
                     OR sp.hora_llegada_respuesta IS NULL
                     OR sp.hora_finalizacion IS NULL 
                     OR sd.id_status_sincronizacion = 2 )
+                    AND sp.folio_unico IS NOT NULL
                     GROUP BY sp.id_peticion";
             $stm = $this->link->query( $sql );
                 if( $logger_id ){
