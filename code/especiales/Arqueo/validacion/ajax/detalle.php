@@ -3,7 +3,8 @@
 	* Version 2.0 2024-06-21
 	* Version Oscar 2024-11-12 para tomar los cobros de la tabla de cajeros cobros en validacion de arqueo de caja
 	* Version Oscar 2024-11-16 Se modifican las consultas de validacion de arqueo de caja para mostrar aquellas terminales en las que hubo cobros y se cambia vista previa de validacion de corte de caja
-	* Version Oscar 2024-11-18 Se agrega que para pago en efectivo tome pagos tipo 1 y 2 en validacion de corte de caja
+	* Version Oscar 2024-11-18 Se agrega que para pago en efectivo tome pagos tipo 1, 2 y 3 en validacion de corte de caja
+	* Version Oscar 2024-11-27 Se agrega descuento por anulacion de cobros en corte de caja y se agregan transferencias y cheques a montos entregados
 */
 	require('../../../../../conect.php');
 //consultamos las tarjetas
@@ -118,15 +119,48 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 	$sql = "SELECT
 				SUM( monto ) AS ingreso_total,
 				SUM( IF( id_tipo_pago = 1 OR id_tipo_pago = 2, monto, 0 ) ) AS ingreso_efectivo,
-				SUM( IF( id_tipo_pago = 7, monto, 0 ) ) AS ingreso_tarjetas
+				SUM( IF( id_tipo_pago = 7, monto, 0 ) ) AS ingreso_tarjetas,
+				SUM( IF( id_tipo_pago = 8, monto, 0 ) ) AS ingreso_transferencias,
+				SUM( IF( id_tipo_pago = 9, monto, 0 ) ) AS ingreso_cheques
 			FROM ec_cajero_cobros
-			WHERE id_sesion_caja = {$teller_session_id}";
+			WHERE id_sesion_caja = {$teller_session_id}
+			AND cobro_cancelado = 0";
 	$eje = mysql_query($sql ) or die( "Error al consultar ingresos cobrados : {$sql} " . mysql_error() );
 	$cajero_cobros = mysql_fetch_assoc($eje );
 	$entrada = $cajero_cobros['ingreso_total'];
 	$entrada_efectivo = $cajero_cobros['ingreso_efectivo'];
 	$entrada_tarjeta = $cajero_cobros['ingreso_tarjetas'];
-	$entrada_externa = 0;
+	$entrada_transferencia = $cajero_cobros['ingreso_transferencias'];
+	$entrada_cheque = $cajero_cobros['ingreso_cheques'];
+/*anulaciones
+	$sql = "SELECT SUM( monto ) AS monto_anulacion FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
+	AND observaciones LIKE '%-Efectivo-%'";
+	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en Efectivo : {$sql} : " . mysql_error() );
+	if( mysql_num_rows($stm) > 0 ){
+		$row = mysql_fetch_assoc($stm);
+		$entrada_efectivo -= $row['monto_anulacion'];
+	}
+	$sql = "SELECT SUM( monto ) FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
+	AND observaciones LIKE '%-Tarjeta-%'";
+	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en tarjeta : {$sql} : " . mysql_error() );
+	if( mysql_num_rows($stm) > 0 ){
+		$row = mysql_fetch_assoc( $stm );
+		$entrada_tarjeta -= $row['monto_anulacion'];
+	}
+	$sql = "SELECT SUM( monto ) FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
+	AND observaciones LIKE '%-Cheque-%'";
+	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en cheque : {$sql} : " . mysql_error() );
+	if( mysql_num_rows($stm) > 0 ){
+		$row = mysql_fetch_assoc($stm);
+		$entrada_cheque -= $row['monto_anulacion'];
+	}
+	$sql = "SELECT SUM( monto ) FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
+	AND observaciones LIKE '%-Transferencia-%'";
+	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en transferencia : {$sql} : " . mysql_error() );
+	if( mysql_num_rows($stm) > 0 ){
+		$row = mysql_fetch_assoc($sql);
+		$entrada_transferencia -= $row['monto_anulacion'];
+	}*/
 
 //sacamos Gastos
 	$sql="SELECT g.id_usuario,g.fecha,g.hora,cg.nombre,g.observaciones,g.monto
@@ -276,7 +310,20 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 		//sumamos el efectivo al total ingresos
 			//$ingreso_efect = ( $ingreso_efect  );//- $suma_cheques
 			//$total_montos_entregados+=$ingreso_efect;
-			$total_montos_entregados+=$ingreso_efect;
+			echo "<tr class=\"text-warning\">
+					<td></td>
+					<td>Transferencias</td>
+					<td>{$entrada_transferencia}</td>
+				</tr>
+				<tr class=\"text-info\">
+					<td></td>
+					<td>Cheques</td>
+					<td>{$entrada_cheque}</td>
+				</tr>";
+			$total_montos_entregados += $entrada_efectivo;
+			$total_montos_entregados += $entrada_transferencia;
+			$total_montos_entregados += $entrada_cheque;
+			$total_montos_entregados += $gastoTotal;
 		?>
 
 				<tr><td><br></td></tr>
@@ -327,7 +374,7 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 				</tr>
 				<tr>
 					<td align="right" colspan="4" style="color:red;font-size:28px;"><b>Diferencia:</b></td>
-					<td align="right" style="color:red;font-size:28px;"><b><?php echo round($total_montos_entregados-(($entrada+$entrada_externa)-$gastoTotal),2);?></b></td>
+					<td align="right" style="color:red;font-size:28px;"><b><?php echo round($total_montos_entregados-(($entrada)),2);?></b></td><!--$gastoTotal-->
 				</tr>
 				<tr>
 					<td colspan="2">Monto de cambio Inicial en caja : $ <b><?php echo $cambio_inicial;?></b></td>
