@@ -2,6 +2,7 @@
 /*
 	*Version 2024-10-31 Para dar margen de 50 centavos en cobros
 	*Version Oscar 2024-11-06 para implememntar contrasena en busqueda por nombre en validacion de ventas
+	* Version Oscar 2024-11-28 para no tomar en cuenta pedidos pagos que no tienen cajero cobro en validacion de notas de venta
 */
 if( isset( $_GET['fl'] ) ){
 		include( '../../../config.inc.php' );
@@ -612,7 +613,7 @@ $this->insertMovementProviderProduct( $ticket_id, $sucursal, $r['validation_id']
 				$row = $stm->fetch_assoc();
 			//consulta si el pedido tiene pagos
 				$sql = "SELECT 
-							SUM( IF( pp.id_pedido_pago IS NULL, 0, pp.monto ) ) AS payments_total
+							SUM( IF( pp.id_pedido_pago IS NULL OR pp.id_cajero_cobro = 0, 0, pp.monto ) ) AS payments_total
 						FROM ec_pedido_pagos pp
 						WHERE pp.id_pedido = {$row['row_id']}";
 				$stm_aux = $this->link->query( $sql ) or die( "Error al consultar los pagos del pedido : {$this->link->error}" );
