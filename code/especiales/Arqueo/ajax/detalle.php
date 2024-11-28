@@ -195,13 +195,14 @@
 //echo 'devoluciones $ '.$sql."<br><br>";
 $sql = "SELECT
 				SUM( monto ) AS ingreso_total,
-				SUM( IF( id_tipo_pago = 1 OR id_tipo_pago = 2 OR id_tipo_pago = 3, monto, 0 ) ) AS ingreso_efectivo,
+				SUM( IF( id_tipo_pago = 1 OR id_tipo_pago = 2, monto, 0 ) ) AS ingreso_efectivo,
 				SUM( IF( id_tipo_pago = 7, monto, 0 ) ) AS ingreso_tarjetas,
 				SUM( IF( id_tipo_pago = 8, monto, 0 ) ) AS ingreso_transferencias,
 				SUM( IF( id_tipo_pago = 9, monto, 0 ) ) AS ingreso_cheques
 			FROM ec_cajero_cobros
 			WHERE id_cajero = {$user_id}
-			AND id_sesion_caja = {$teller_session_id}";
+			AND id_sesion_caja = {$teller_session_id}
+			AND cobro_cancelado = 0";
 	$eje = mysql_query($sql ) or die( "Error al consultar ingresos cobrados : {$sql} " . mysql_error() );
 	$cajero_cobros = mysql_fetch_assoc($eje );
 	$entrada = $cajero_cobros['ingreso_total'];
@@ -210,7 +211,7 @@ $sql = "SELECT
 	$entrada_transferencia = $cajero_cobros['ingreso_transferencias'];
 	$entrada_cheque = $cajero_cobros['ingreso_cheques'];
 	$entrada_externa = 0;
-//anulaciones
+/*anulaciones
 	$sql = "SELECT SUM( monto ) AS monto_anulacion FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
 	AND observaciones LIKE '%-Efectivo-%'";
 	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en Efectivo : {$sql} : " . mysql_error() );
@@ -238,7 +239,7 @@ $sql = "SELECT
 	if( mysql_num_rows($stm) > 0 ){
 		$row = mysql_fetch_assoc($sql);
 		$entrada_transferencia -= $row['monto_anulacion'];
-	}
+	}*/
 
 //sacamos Gastos
 	$sql="SELECT g.id_usuario,g.fecha,g.hora,cg.nombre,g.observaciones,g.monto
