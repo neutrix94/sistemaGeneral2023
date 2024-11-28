@@ -305,7 +305,9 @@ email : email,*/
 			}, 100 );
 			return false;
 		}
-
+		/*setTimeout( function(){
+			$( "#save_costumer_btn" ).css( "display", "none" );
+		}, 300 );*/
 		$( '.emergent_content' ).html( "<br><br><br><br><h2 class=\"text-center fs-1\">Guardando...</h2>" );
 		$( '.emergent' ).css( "display", "none" );
 		$.ajax({
@@ -448,6 +450,10 @@ email : email,*/
 				getDataSat( rfc_url );
 			}
 		}
+	//bloquea buscador, coluta boton busqueda, muestra boton resetear
+		$( '#rfc_seeker_btn' ).css( 'display', "none" );
+		$( '#rfc_seeker_btn_refresh' ).css( 'display', "" );
+		$( '#rfc_seeker' ).attr( 'disabled', true );
 	}
 
 	function getCostumerDB( costumer ){
