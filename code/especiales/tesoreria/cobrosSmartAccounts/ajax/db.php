@@ -516,7 +516,7 @@ $terminal_id = $_GET['terminal_serie_id'];
 		//busqueda por id
 			$sql = "SELECT
 						p.total AS sale_total,
-						SUM( pp.monto ) AS payments_total,
+						ROUND( SUM( IF( pp.id_pedido_pago IS NULL OR pp.id_cajero_cobro = 0, 0, pp.monto ) ), 2 ) AS payments_total,
 						p.pagado AS was_payed
 					FROM ec_pedidos p
 					LEFT JOIN ec_pedido_pagos pp
@@ -539,7 +539,7 @@ $terminal_id = $_GET['terminal_serie_id'];
 			
 				$sql = "SELECT
 						ROUND( p.total, 2 ) AS sale_total,
-						ROUND( SUM( pp.monto ), 2 ) AS payments_total,
+						ROUND( SUM( IF( pp.id_pedido_pago IS NULL OR pp.id_cajero_cobro = 0, 0, pp.monto ) ), 2 ) AS payments_total,
 						p.pagado AS was_payed
 					FROM ec_pedidos p
 					LEFT JOIN ec_pedido_pagos pp
