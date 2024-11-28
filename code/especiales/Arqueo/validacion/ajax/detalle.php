@@ -320,6 +320,7 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 					<td>Cheques</td>
 					<td>{$entrada_cheque}</td>
 				</tr>";
+			$total_montos_entregados += $entrada_efectivo;
 			$total_montos_entregados += $entrada_transferencia;
 			$total_montos_entregados += $entrada_cheque;
 		?>
