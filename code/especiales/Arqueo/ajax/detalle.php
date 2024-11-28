@@ -4,6 +4,7 @@
 	* Version Oscar 2024-11-12 para tomar los cobros de la tabla de cajeros cobros en validacion de arqueo de caja
 	* Version Oscar 2024-11-16 Se modifican las consultas de validacion de arqueo de caja para mostrar aquellas terminales en las que hubo cobros y se cambia vista previa de corte de caja
 	* Version Oscar 2024-11-18 Se agrega que para pago en efectivo tome pagos tipo 1,2,3 en corte de caja
+	* Version Oscar 2024-11-27 Se agrega descuento por anulacion de cobros en corte de caja
 */
 	require('../../../../conect.php');
 
@@ -209,6 +210,36 @@ $sql = "SELECT
 	$entrada_transferencia = $cajero_cobros['ingreso_transferencias'];
 	$entrada_cheque = $cajero_cobros['ingreso_cheques'];
 	$entrada_externa = 0;
+//anulaciones
+	$sql = "SELECT SUM( monto ) AS monto_anulacion FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
+	AND observaciones LIKE '%-Efectivo-%'";
+	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en Efectivo : {$sql} : " . mysql_error() );
+	if( mysql_num_rows($stm) > 0 ){
+		$row = mysql_fetch_assoc($stm);
+		$entrada_efectivo -= $row['monto_anulacion'];
+	}
+	$sql = "SELECT SUM( monto ) FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
+	AND observaciones LIKE '%-Tarjeta-%'";
+	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en tarjeta : {$sql} : " . mysql_error() );
+	if( mysql_num_rows($stm) > 0 ){
+		$row = mysql_fetch_assoc( $stm );
+		$entrada_tarjeta -= $row['monto_anulacion'];
+	}
+	$sql = "SELECT SUM( monto ) FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
+	AND observaciones LIKE '%-Cheque-%'";
+	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en cheque : {$sql} : " . mysql_error() );
+	if( mysql_num_rows($stm) > 0 ){
+		$row = mysql_fetch_assoc($stm);
+		$entrada_cheque -= $row['monto_anulacion'];
+	}
+	$sql = "SELECT SUM( monto ) FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
+	AND observaciones LIKE '%-Transferencia-%'";
+	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en transferencia : {$sql} : " . mysql_error() );
+	if( mysql_num_rows($stm) > 0 ){
+		$row = mysql_fetch_assoc($sql);
+		$entrada_transferencia -= $row['monto_anulacion'];
+	}
+
 //sacamos Gastos
 	$sql="SELECT g.id_usuario,g.fecha,g.hora,cg.nombre,g.observaciones,g.monto
 			FROM ec_gastos g 
