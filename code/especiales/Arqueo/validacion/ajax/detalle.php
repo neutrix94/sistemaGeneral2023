@@ -4,7 +4,7 @@
 	* Version Oscar 2024-11-12 para tomar los cobros de la tabla de cajeros cobros en validacion de arqueo de caja
 	* Version Oscar 2024-11-16 Se modifican las consultas de validacion de arqueo de caja para mostrar aquellas terminales en las que hubo cobros y se cambia vista previa de validacion de corte de caja
 	* Version Oscar 2024-11-18 Se agrega que para pago en efectivo tome pagos tipo 1, 2 y 3 en validacion de corte de caja
-	* Version Oscar 2024-11-27 Se agrega descuento por anulacion de cobros en corte de caja
+	* Version Oscar 2024-11-27 Se agrega descuento por anulacion de cobros en corte de caja y se agregan transferencias y cheques a montos entregados
 */
 	require('../../../../../conect.php');
 //consultamos las tarjetas
@@ -320,7 +320,8 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 					<td>Cheques</td>
 					<td>{$entrada_cheque}</td>
 				</tr>";
-			$total_montos_entregados+=$ingreso_efect;
+			$total_montos_entregados += $entrada_transferencia;
+			$total_montos_entregados += $entrada_cheque;
 		?>
 
 				<tr><td><br></td></tr>
