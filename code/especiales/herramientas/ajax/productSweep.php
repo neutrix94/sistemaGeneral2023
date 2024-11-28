@@ -25,7 +25,7 @@
 						id_productos AS product_id,
 						nombre AS name
 					FROM ec_productos 
-					WHERE id_productos > 0";
+					WHERE id_productos > 3500";
 			$sql .= ( $family != null ? " AND id_categoria = '{$family}'" : "" );
 			$sql .= ( $family != null ? " AND id_subcategoria = '{$type}'" : "" );
 			$sql .= ( $family != null ? " AND id_subtipo = '{$subtype}'" : "" );
