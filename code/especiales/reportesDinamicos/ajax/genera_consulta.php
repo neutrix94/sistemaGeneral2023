@@ -104,6 +104,8 @@
 	    	$username = "";
 	    	$first_date = "";
 	    	$last_date = "";
+			$total_ventas = 0;
+			$total_horas = 0;
 
 			$info_campo = $stm->fetch_fields();
 
@@ -129,14 +131,18 @@
 					if( $current_user != $r[0] ){//si es un usuario diferente
 						if( $current_user != 0 ){
 							$resp .= "<tr>
-								<td></td><td></td>
-								<td class=\"text-success\">Total {$username}</td>
-								<td class=\"text-success\">{$first_date}</td>
-								<td class=\"text-success\">{$last_date}</td>
-								<td class=\"text-success\">{$hours_sum}</td>
-								<td class=\"text-success\">{$products_sum}</td>
-								<td class=\"text-success\">{$sales_sum}</td>
-							</tr>";
+										<td></td>
+										<td></td>
+										<td class=\"text-success\">Total {$username}</td>
+										<td class=\"text-success\">{$first_date}</td>
+										<td class=\"text-success\">{$last_date}</td>
+										<td class=\"text-success\">{$hours_sum}</td>
+										<td class=\"text-success\">{$products_sum}</td>
+										<td class=\"text-success\">{$sales_sum}</td>
+										<td class=\"text-success\"></td>
+										<td class=\"text-success\">{$total_horas}</td>
+										<td class=\"text-success\">-</td>
+									</tr>";
 						}
 						$current_user = $r[0];
 						
@@ -152,6 +158,8 @@
 						$products_sum += $r[6];
 						$sales_sum += $r[7];
 						$last_date = $r[4];
+						$total_ventas += $r[8];
+						$total_horas += strtotime($r[9]);
 
 					//}
 				}
