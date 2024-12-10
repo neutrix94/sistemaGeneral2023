@@ -166,6 +166,7 @@
 							/*15*/regimen_fiscal = '{$costumer->regimen_fiscal}', 
 							/*16*/productos_especificos = '{$costumer->productos_especificos}', 
 							/*17*/fecha_alta = '{$costumer->fecha_alta}', 
+							/*17*/datos_alta = CONCAT( datos_alta, ' : {$costumer->fecha_alta}' ), 
 							/*18*/sincronizar = '1'
 							WHERE folio_unico = '{$costumer_row['folio_unico']}'";
 					$stm = $this->link->query( $sql ) or die( "Error al actualizar cliente de facturacion en local : {$sql} {$this->link->error}" );
