@@ -105,11 +105,13 @@
 			$rows = array();
 			$this->link->autocommit( false );
 			foreach ( $costumers as $key => $costumer ) {
-				$insert = $this->insertLineCostumer( $costumer );
-				if( $insert != "ok" ){
-					die( "Error en objeto insertCostumers : {$insert}" );
+				if( $costumer != null && $costumer != '' ){
+					$insert = $this->insertLineCostumer( $costumer );
+					if( $insert != "ok" ){
+						die( "Error en objeto insertCostumers : {$insert}" );
+					}
+					array_push( $rows, $costumer['detail'][0]['synchronization_row_id'] );
 				}
-				array_push( $rows, $costumer['detail'][0]['synchronization_row_id'] );
 			}
 			$this->link->autocommit( true );//autoriza transaccion
 			//die( "Rows : {$rows}" );
@@ -120,13 +122,15 @@
 			$rows = "";
 			$this->link->autocommit( false );
 			foreach ( $costumers as $key => $costumer ) {
-				//var_dump( $costumer['id_cliente_facturacion_tmp'] );
-				$insert = $this->insertLocalCostumer( $costumer );
-				if( $insert != "ok" ){
-					die( "Error en objeto insertCostumers : {$insert}" );
+				if( $costumer != null && $costumer != '' ){
+					//var_dump( $costumer['id_cliente_facturacion_tmp'] );
+					$insert = $this->insertLocalCostumer( $costumer );
+					if( $insert != "ok" ){
+						die( "Error en objeto insertCostumers : {$insert}" );
+					}
+					$rows .= ( $rows == "" ? "" : "," );
+					$rows .= $costumer['detail'][0]['synchronization_row_id'];
 				}
-				$rows .= ( $rows == "" ? "" : "," );
-				$rows .= $costumer['detail'][0]['synchronization_row_id'];
 			}
 		//autoriza transaccion
 			$this->link->autocommit( true );
