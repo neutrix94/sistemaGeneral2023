@@ -106,6 +106,7 @@
 	    	$last_date = "";
 			$total_ventas = 0;
 			$total_horas = 0;
+			$total_seconds = 0;
 
 			$info_campo = $stm->fetch_fields();
 
@@ -130,6 +131,13 @@
 				  //  die( 'here' );
 					if( $current_user != $r[0] ){//si es un usuario diferente
 						if( $current_user != 0 ){
+						// Convertir los segundos totales de vuelta a horas, minutos y segundos
+							$hours = floor($totalSeconds / 3600);
+							$minutes = floor(($totalSeconds % 3600) / 60);
+							$seconds = $totalSeconds % 60;
+							$total_horas = str_pad($hours, 2, "0", STR_PAD_LEFT) . ":" . 
+										str_pad($minutes, 2, "0", STR_PAD_LEFT) . ":" . 
+										str_pad($seconds, 2, "0", STR_PAD_LEFT);
 							$resp .= "<tr>
 										<td></td>
 										<td></td>
@@ -159,7 +167,10 @@
 						$sales_sum += $r[7];
 						$last_date = $r[4];
 						$total_ventas += $r[8];
-						$total_horas += strtotime($r[9]);
+						
+						list($h1, $m1, $s1) = explode(":", $r[9]);// Convertir los tiempos a segundos desde la medianoche
+						$seconds1 = $h1 * 3600 + $m1 * 60 + $s1;// Calcular el total en segundos
+						$totalSeconds += $seconds1;// Sumar los segundos
 
 					//}
 				}

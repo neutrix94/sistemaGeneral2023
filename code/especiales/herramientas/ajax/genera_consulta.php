@@ -68,6 +68,19 @@
 			$suma_montos = 0;
 		/*fin de cambio Oscar 2021*/
 		$c=0;
+/*implementacion Oscar 2024-12-10 para sumar en consulta de validadores*/
+	//consulta de tiempo validadores
+		$hours_sum = 0;
+		$sales_sum = 0;
+		$products_sum = 0;
+		$current_user = 0;
+		$username = "";
+		$first_date = "";
+		$last_date = "";
+		$total_ventas = 0;
+		$total_horas = 0;
+		$total_seconds = 0;
+/*Fin de cambio Oscar 2024-12-10*/
 		while( $r = $eje->fetch_row() ){
 			if($c==0){
 				echo '<thead class="header_sticky">';
@@ -86,6 +99,63 @@
 				echo '</thead>';
 				echo '<tbody id="rows_list">';
 			}
+/*implementacion Oscar 2024-12-10 para sumar en consulta de validadores*/
+			if( $id_herr == 89 ){
+			  //  die( 'here' );
+				if( $current_user != $r[0] ){//si es un usuario diferente
+					if( $current_user != 0 ){
+					// Convertir los segundos totales de vuelta a horas, minutos y segundos
+						$hours = floor($totalSeconds / 3600);
+						$minutes = floor(($totalSeconds % 3600) / 60);
+						$seconds = $totalSeconds % 60;
+						$total_horas = str_pad($hours, 2, "0", STR_PAD_LEFT) . ":" . 
+									str_pad($minutes, 2, "0", STR_PAD_LEFT) . ":" . 
+									str_pad($seconds, 2, "0", STR_PAD_LEFT);
+						echo "<tr>
+									<td></td>
+									<td></td>
+									<td class=\"text-success\">Total {$username}</td>
+									<td class=\"text-success\">{$first_date}</td>
+									<td class=\"text-success\">{$last_date}</td>
+									<td class=\"text-success\">{$hours_sum}</td>
+									<td class=\"text-success\">{$products_sum}</td>
+									<td class=\"text-success\">{$sales_sum}</td>
+									<td class=\"text-success\"></td>
+									<td class=\"text-success\">{$total_horas}</td>
+									<td class=\"text-success\">-</td>
+								</tr>";
+						$hours_sum = 0;
+						$sales_sum = 0;
+						$products_sum = 0;
+						$totalSeconds = 0;
+						$total_horas = 0;
+					}
+					$current_user = $r[0];
+					
+					$hours_sum = 0;
+					$sales_sum = 0;
+					$products_sum = 0;
+					//$current_user = 0;
+					$first_date = $r[3];
+					$total_horas = 0;
+					//$last_date = "";
+				}//else{
+					$username = $r[2];
+					$hours_sum += $r[5];
+					$products_sum += $r[6];
+					$sales_sum += $r[7];
+					$last_date = $r[4];
+					$total_ventas += $r[8];
+					
+					list($h1, $m1, $s1) = explode(":", $r[9]);// Convertir los tiempos a segundos desde la medianoche
+					$seconds1 = $h1 * 3600 + $m1 * 60 + $s1;// Calcular el total en segundos
+					$totalSeconds += $seconds1;// Sumar los segundos
+					//$total_horas += strtotime($r[9]);
+
+				//}
+			}
+/*Fin de cambio Oscar 2024-12-10*/
+/*implementacion Oscar 2024-12-10 para sumar en consulta de validadores*/
 			echo '<tr>';
 			if( $id_herr != 47 ){
 				for($i=0;$i<sizeof($r);$i++){
