@@ -9,9 +9,13 @@
 	$id_pedido = isset($_GET["idp"]) ? $_GET["idp"] : "0";
 
 /*Implementacion Oscar 2024-10-19 para validar si la venta temporal existe*/
-	$sql = "SELECT id_pedido FROM ec_pedidos_detalle_back WHERE id_pedido = {$id_pedido}";
-	$stm = mysql_query( $sql ) or die( "Error al consultar si la venta temporal existe : {$sql} : " . mysql_error() );
-	if( mysql_num_rows($stm) <= 0 ){
+	//$sql = "SELECT id_pedido FROM ec_pedidos_detalle_back WHERE id_pedido = {$id_pedido}";
+	//$stm = mysql_query( $sql ) or die( "Error al consultar si la venta temporal existe : {$sql} : " . mysql_error() );
+	$sql = "SELECT venta_cerrada FROM ec_pedidos_back WHERE id_pedido = {$id_pedido}";
+	$stm = mysql_query( $sql ) or die( "Error al consultar si la venta ya habia sido cerrada : {$sql} : " . mysql_error() );
+	$sale_counter = mysql_num_rows( $stm );
+	$verification_tmp_row = mysql_fetch_assoc($stm);
+	if( $verification_tmp_row['venta_cerrada'] == 1 || $sale_counter == 0 ){
 		die( json_encode( array( "status"=>201, 
 		"message"=>"<br><br><h3 class=\"text-light\" style=\"font-size:150% !important;text-align:justify; padding:10px;\">Esta venta ya habia sido cerrada, Verifica si tu ticket ya fue impreso, 
 		de lo contrario, Reimprime el ticket de cobro desde el punto de venta</h3>
@@ -811,12 +815,14 @@
 		}
     
     /*Implementacion Oscar 2024-10-19 para eliminar venta temporal cuando se cierra la nota de venta*/
-	  $sql = "DELETE FROM ec_pedidos_detalle_back WHERE id_pedido = {$id_pedido}";
-    $stm = mysql_query( $sql ) or die( "Error al eliminar detalle temporal de venta en detalle pedidos back : {$sql} : " . mysql_error() );
-    $sql = "DELETE FROM ec_pedidos_back WHERE id_pedido = {$id_pedido}";
-  	$stm = mysql_query( $sql ) or die( "Error al eliminar venta temporal en pedidos back : {$sql} : " . mysql_error() );
+	//  $sql = "DELETE FROM ec_pedidos_detalle_back WHERE id_pedido = {$id_pedido}";
+    //$stm = mysql_query( $sql ) or die( "Error al eliminar detalle temporal de venta en detalle pedidos back : {$sql} : " . mysql_error() );
+    //$sql = "DELETE FROM ec_pedidos_back WHERE id_pedido = {$id_pedido}";
+  	//$stm = mysql_query( $sql ) or die( "Error al eliminar venta temporal en pedidos back : {$sql} : " . mysql_error() );
     /*Fin de cambio Oscar 2024-10-19*/
 		/*Fin de cambio Oscar 25.06.2019*/
+		$sql = "UPDATE ec_pedidos_back set venta_cerrada = '1' WHERE id_pedido = {$id_pedido}";
+  		$stm = mysql_query( $sql ) or die( "Error al actualizar status de venta temporal en pedidos back : {$sql} : " . mysql_error() );
 		mysql_query("commit");
 		echo 'ok|'.$id_pedido_r."|";
 		echo '|'.$folio;//
