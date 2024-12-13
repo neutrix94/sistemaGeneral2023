@@ -115,10 +115,21 @@
 		<div class="input-group">
 			<input type="text" id="rfc_seeker" onkeyup="check_if_exists_costumer( event );" class="form-control">
 			<button
+				type="button"
+				id="rfc_seeker_btn"
 				class="btn btn-primary"
 				onclick="check_if_exists_costumer( 'intro' );"
 			>
 				<i class="icon-search"></i>
+			</button>
+			<button
+				type="button"
+				id="rfc_seeker_btn_refresh"
+				class="btn btn-danger"
+				style="display:none;"
+				onclick="location.reload();"
+			>
+				<i class="icon-spin3"></i>
 			</button>
 		</div>
 		<div id="social_reason_container" class="row"></div>
@@ -289,6 +300,7 @@
 				type="button"
 				class="btn btn-success form-control"
 				onclick="save_costumer();"
+				id="save_costumer_btn"
 			>
 				<i class="icon-floppy">Guardar</i>
 			</button>

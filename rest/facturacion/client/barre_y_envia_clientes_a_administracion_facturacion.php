@@ -10,11 +10,17 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 * Descripción: Insercion de devoluciones
 */
 
-$app->post('/barre_y_envia_clientes_a_administracion_facturacion', function (Request $request, Response $response){
+$app->post('/barre_y_envia_ventas_a_administracion_facturacion', function (Request $request, Response $response){
 //libreria de conexion
 	if ( ! include( '../../conexionMysqli.php' ) ){
     	die( 'No se incluyó libreria conexionMysqli.php' );
   	}
+  	$link->set_charset("utf8mb4");
+    if( ! include( 'utils/SynchronizationManagmentLog.php' ) ){
+        die( "No se incluyó : SynchronizationManagmentLog.php" );
+    }
+    $SynchronizationManagmentLog = new SynchronizationManagmentLog( $link );//instancia clase de Peticiones Log
+//echo 'pasa_1';
   	$link->set_charset("utf8mb4");
     //consulta cabecera de venta
 	$sql = "SELECT 
@@ -72,7 +78,7 @@ $app->post('/barre_y_envia_clientes_a_administracion_facturacion', function (Req
         return json_encode( array( "status"=>400, "message"=>"Error al consultar las cabeceras de notas de venta pendientes de subir a administracion facturacion : {$sql} : {$link->error}" ) );
     }
     $sales_array = array();
-    while( $sale_header = $stm->fetch_assoc() ){echo "here";
+    while( $sale_header = $stm->fetch_assoc() ){//echo "here";
         //consigue la razon social de la nota de venta
         $sale_header['id_razon_social'] = getSaleSocialReason( $sale_header['id_pedido'], $store_id, $link );
         //consulta detalle de la venta
@@ -168,21 +174,28 @@ $app->post('/barre_y_envia_clientes_a_administracion_facturacion', function (Req
         array_push( $sales_array, array( "venta"=>$sale_header, "venta_detalle"=>$sale_detail, "cobros"=>$sale_payments, "pagos"=>$sale_payments_detail  ) );
         //$post_data = json_encode( array( "venta"=>$sale_header, "venta_detalle"=>$sale_detail, "cobros"=>$sale_payments, "pagos"=>$sale_payments_detail  ) );
     }
+//echo "pasa_2";
     $post_data = json_encode( array( "sales"=>$sales_array ) );
-    return $post_data;
+    //return $post_data;
 //consulta el path de API Facturacion 
     $sql = "SELECT `value` AS api_path FROM api_config WHERE `name` = 'path_facturacion'";
-    $stm = $this->link->query( $sql ) or die( "Error al consultar el path del API de Facturación : {$sql} : {$link->error}" );
+    $stm = $link->query( $sql ) or die( "Error al consultar el path del API de Facturación : {$sql} : {$link->error}" );
     $row = $stm->fetch_assoc();
     $url = "{$row['api_path']}/rest/inserta_venta_facturacion";
+//// echo $url;
     //envia peticion
-    $petition = $this->sendPetition( $url, $post_data, '' );
-    //die( $petition );
+    $petition = $SynchronizationManagmentLog->sendPetition( $url, $post_data, '' );
+    //die( "respuesta : " . $petition );
     $response = json_decode( $petition );
     if( $response->status == 200 ){
-        $sql = "UPDATE ec_pedidos SET id_status_facturacion = 3 WHERE id_pedido = {$sale_header['id_pedido']}";
-        $stm = $link->query( $sql ) or die( "Error al actualizar status de facturacion de la venta : {$sql} : {$link->error}" );
+        foreach ($response->exitosos as $key => $folio) {
+            $sql = "UPDATE ec_pedidos SET id_status_facturacion = 3 WHERE folio_nv = '{$response->exitosos[$key]}'";//echo $sql;
+            $stm = $link->query( $sql ) or die( "Error al actualizar status de facturacion de la venta : {$sql} : {$link->error}" );
+        }
+    }else{
+        return json_encode( array( "status"=>400, "message"=>"Error al recibir respuesta", "message_detail"=>$petition) );
     }
+    return json_encode( array( "status"=>200, "message"=>"Barrido exitoso." ) );
 });
 
 
