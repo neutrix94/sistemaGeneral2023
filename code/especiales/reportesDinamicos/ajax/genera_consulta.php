@@ -94,8 +94,8 @@
 
 		public function buildReportFrontEnd( $stm, $report_id ){
 	    	$resp = "";
-	    	$names;
-
+	    	$names = array();
+			$total_counter = $stm->num_rows;
 	    //consulta de tiempo validadores
 	    	$hours_sum = 0;
 	    	$sales_sum = 0;
@@ -130,7 +130,7 @@
 				if( $report_id == 2 ){
 				  //  die( 'here' );
 					if( $current_user != $r[0] ){//si es un usuario diferente
-						if( $current_user != 0 ){
+						if( $current_user != 0  ){
 						// Convertir los segundos totales de vuelta a horas, minutos y segundos
 							$hours = floor($totalSeconds / 3600);
 							$minutes = floor(($totalSeconds % 3600) / 60);
@@ -151,6 +151,11 @@
 										<td class=\"text-success\">{$total_horas}</td>
 										<td class=\"text-success\">-</td>
 									</tr>";
+									$hours_sum = 0;
+									$sales_sum = 0;
+									$products_sum = 0;
+									$totalSeconds = 0;
+									$total_horas = 0;
 						}
 						$current_user = $r[0];
 						
@@ -182,6 +187,30 @@
 				$resp .= '</tr>';
 				$c++;
 			}
+
+/*Implementacion Oscar 2024-12-11 para sumar el ultimo registro en reporte de validadores y vendedores*/
+			if( $report_id == 2 ){
+				$hours = floor($totalSeconds / 3600);
+				$minutes = floor(($totalSeconds % 3600) / 60);
+				$seconds = $totalSeconds % 60;
+				$total_horas = str_pad($hours, 2, "0", STR_PAD_LEFT) . ":" . 
+							str_pad($minutes, 2, "0", STR_PAD_LEFT) . ":" . 
+							str_pad($seconds, 2, "0", STR_PAD_LEFT);
+				$resp .= "<tr>
+							<td></td>
+							<td></td>
+							<td class=\"text-success\">Total {$username}</td>
+							<td class=\"text-success\">{$first_date}</td>
+							<td class=\"text-success\">{$last_date}</td>
+							<td class=\"text-success\">{$hours_sum}</td>
+							<td class=\"text-success\">{$products_sum}</td>
+							<td class=\"text-success\">{$sales_sum}</td>
+							<td class=\"text-success\"></td>
+							<td class=\"text-success\">{$total_horas}</td>
+							<td class=\"text-success\">-</td>
+						</tr>";
+			}		
+/*Fin de cambio Oscar 2024-12-11*/
 
 				$resp .= '</tbody>';
 			$resp .= '</table>';
