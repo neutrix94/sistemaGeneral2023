@@ -36,6 +36,7 @@ BEGIN
                 '"no_cuenta" : "', new.no_cuenta, '",',
                 '"clave_interna" : "', new.clave_interna, '",',
                 '"banco" : "', new.banco, '",',
+                '"id_razon_social" : "', new.id_razon_social, '",',
                 '"activo" : "', new.activo, '",',
                 '"observaciones" : "', new.observaciones, '",',
                 '"fecha_alta" : "', new.fecha_alta, '",',
