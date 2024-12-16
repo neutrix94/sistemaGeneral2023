@@ -330,6 +330,12 @@ $sql = "SELECT
 					<td class="text-secondary">Inbursa</td>
 			</tr>';
 			while( $row = mysql_fetch_assoc($stm) ){
+			//actualiza monto de afiliaciones de la sesion de caja Oscar 2024-12-16
+				$sql = "UPDATE ec_sesion_caja_afiliaciones 
+							SET monto_corte_caja = {$row['ammount_sum']} 
+						WHERE id_sesion_caja = {$teller_session_id}
+						AND id_afiliacion = {$row['id_afiliacion']}";
+				$stm_update = mysql_query( $sql ) or die( "Error al actualizar los montos : {$sql} : " . mysql_error() );
 				$cont_tar++;
 				echo '<tr>';
 					echo '<td align="right" class="text-secondary">'.$row['no_afiliacion'].'</td>';//Tarjeta
@@ -353,6 +359,12 @@ $sql = "SELECT
 					<td class="text-primary">NetPay</td>
 			</tr>';
 			while( $row = mysql_fetch_assoc($stm) ){
+			//actualiza monto de terminales de la sesion de caja Oscar 2024-12-16
+				$sql = "UPDATE ec_sesion_caja_terminales 
+							SET monto_corte_caja = {$row['ammount_sum']} 
+						WHERE id_sesion_caja = {$teller_session_id}
+						AND id_terminal = {$row['id_terminal_integracion']}";
+				$stm_update = mysql_query( $sql ) or die( "Error al actualizar los montos : {$sql} : " . mysql_error() );
 				$cont_tar++;
 				echo '<tr>';
 					echo '<td align="right" class="text-primary">'.$row['nombre_terminal'].'</td>';//Tarjeta

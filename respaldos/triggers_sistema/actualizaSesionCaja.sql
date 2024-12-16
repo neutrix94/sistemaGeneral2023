@@ -10,11 +10,14 @@ BEGIN
 
 	IF(new.verificado=1 AND  new.verificado!=old.verificado)
 	THEN
-		INSERT INTO ec_movimiento_banco
+/*Inserta movimeinto de efectivo*/
+		INSERT INTO ec_movimiento_banco ( id_movimiento_banco, id_caja, id_afiliacion, id_terminal, id_concepto, id_usuario, monto, folio, fecha, id_ingreso_corte_caja, id_traspaso_banco, id_pago_recepcion_oc, 
+        observaciones, id_usuario_modifica )
 			SELECT
 				null,
 				id_banco,
 				id_afiliacion,
+                -1,
 				1,
 				new.id_usuario_verifica,
 				monto_validacion,
@@ -24,11 +27,57 @@ BEGIN
 				-1,
 				-1,
 				observaciones,
-				-1,
-				0,
-				1
+				-1
 			FROM ec_sesion_caja_detalle 
 			WHERE id_corte_caja=new.id_sesion_caja;
+/*inserta movimientos de terminales INBURSA*/
+		INSERT INTO ec_movimiento_banco ( id_movimiento_banco, id_caja, id_afiliacion, id_terminal, id_concepto, id_usuario, monto, folio, fecha, id_ingreso_corte_caja, id_traspaso_banco, id_pago_recepcion_oc, 
+        observaciones, id_usuario_modifica )
+			SELECT
+				null,
+				cc.id_caja_cuenta,
+				sca.id_afiliacion,
+                -1,
+				1,
+				new.id_usuario_verifica,
+				sca.monto_validacion,
+				'folio',
+				now(),
+				sca.id_sesion_caja_afiliaciones,
+				-1,
+				-1,
+				'CORTE DE INBURSA',
+				-1
+			FROM ec_sesion_caja_afiliaciones sca
+            LEFT JOIN ec_afiliaciones a
+            ON a.id_afiliacion = sca.id_afiliacion
+            LEFT JOIN ec_caja_o_cuenta cc
+            ON cc.id_caja_cuenta = a.id_banco
+			WHERE sca.id_sesion_caja = new.id_sesion_caja;
+/*inserta movimientos de terminales NETPAY*/
+		INSERT INTO ec_movimiento_banco ( id_movimiento_banco, id_caja, id_afiliacion, id_terminal, id_concepto, id_usuario, monto, folio, fecha, id_ingreso_corte_caja, id_traspaso_banco, id_pago_recepcion_oc, 
+        observaciones, id_usuario_modifica )
+			SELECT
+				null,
+				cc.id_caja_cuenta,
+                -1,
+				sct.id_terminal,
+				1,
+				new.id_usuario_verifica,
+				sct.monto_validacion,
+				'folio',
+				now(),
+				sct.id_sesion_caja_terminales,
+				-1,
+				-1,
+				'CORTE DE NETPAY',
+				-1
+			FROM ec_sesion_caja_terminales sct
+            LEFT JOIN ec_terminales_integracion_smartaccounts ti
+            ON sct.id_terminal = ti.id_terminal_integracion
+            LEFT JOIN ec_caja_o_cuenta cc
+            ON cc.id_caja_cuenta = ti.id_caja_cuenta
+			WHERE sct.id_sesion_caja = new.id_sesion_caja;
 	END IF;
 
 

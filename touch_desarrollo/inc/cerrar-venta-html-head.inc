@@ -438,6 +438,9 @@ var regresar_efectivo_devolucion = 0;
 					/*Fin de cambio Oscar 30.11.2018*/
 					//alert(data);
 					retval = ax[0].match (/^ok$/i);
+					if(retval == null){
+						retval = data;
+					}
 					pedidor=ax[1];
 					/**/
 					emrge_aviso=ax[2];

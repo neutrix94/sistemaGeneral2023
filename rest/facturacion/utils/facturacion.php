@@ -2,6 +2,7 @@
 /*
 	* Version Oscar 2024-11-07 Para mandar ids de clientes procesados exitosamente en la respuesta del servicio hacia administracion de facturacion
 	* Version Oscar 2024-11-07 Para corregir error al insertar cliente en sistema General linea ( se comparaba contra el id que ya estaba llegando desde el json de administracion de facturacion )
+	* Version Oscar 2024-12-09 para enviar informacion desde donde fue dado de alta el cliente facturacion.
 */
 	class Bill
 	{
@@ -35,7 +36,8 @@
 						pais,
 						regimen_fiscal,
 						productos_especificos,
-						id_cliente_facturacion
+						id_cliente_facturacion,
+						datos_alta
 	          FROM vf_clientes_razones_sociales_tmp
 	          WHERE folio_unico IS NULL 
 	          OR folio_unico = ''";
@@ -105,11 +107,13 @@
 			$rows = array();
 			$this->link->autocommit( false );
 			foreach ( $costumers as $key => $costumer ) {
-				$insert = $this->insertLineCostumer( $costumer );
-				if( $insert != "ok" ){
-					die( "Error en objeto insertCostumers : {$insert}" );
+				if( $costumer != null && $costumer != '' ){
+					$insert = $this->insertLineCostumer( $costumer );
+					if( $insert != "ok" ){
+						die( "Error en objeto insertCostumers : {$insert}" );
+					}
+					array_push( $rows, $costumer['detail'][0]['synchronization_row_id'] );
 				}
-				array_push( $rows, $costumer['detail'][0]['synchronization_row_id'] );
 			}
 			$this->link->autocommit( true );//autoriza transaccion
 			//die( "Rows : {$rows}" );
@@ -120,13 +124,15 @@
 			$rows = "";
 			$this->link->autocommit( false );
 			foreach ( $costumers as $key => $costumer ) {
-				//var_dump( $costumer['id_cliente_facturacion_tmp'] );
-				$insert = $this->insertLocalCostumer( $costumer );
-				if( $insert != "ok" ){
-					die( "Error en objeto insertCostumers : {$insert}" );
+				if( $costumer != null && $costumer != '' ){
+					//var_dump( $costumer['id_cliente_facturacion_tmp'] );
+					$insert = $this->insertLocalCostumer( $costumer );
+					if( $insert != "ok" ){
+						die( "Error en objeto insertCostumers : {$insert}" );
+					}
+					$rows .= ( $rows == "" ? "" : "," );
+					$rows .= $costumer['detail'][0]['synchronization_row_id'];
 				}
-				$rows .= ( $rows == "" ? "" : "," );
-				$rows .= $costumer['detail'][0]['synchronization_row_id'];
 			}
 		//autoriza transaccion
 			$this->link->autocommit( true );
@@ -160,6 +166,7 @@
 							/*15*/regimen_fiscal = '{$costumer->regimen_fiscal}', 
 							/*16*/productos_especificos = '{$costumer->productos_especificos}', 
 							/*17*/fecha_alta = '{$costumer->fecha_alta}', 
+							/*17*/datos_alta = CONCAT( datos_alta, ' : {$costumer->fecha_alta}' ), 
 							/*18*/sincronizar = '1'
 							WHERE folio_unico = '{$costumer_row['folio_unico']}'";
 					$stm = $this->link->query( $sql ) or die( "Error al actualizar cliente de facturacion en local : {$sql} {$this->link->error}" );
@@ -167,12 +174,12 @@
 				//inserta cabecera 
 					$sql = "INSERT INTO vf_clientes_razones_sociales ( /*1*/id_cliente_facturacion, /*2*/rfc, /*3*/razon_social, /*4*/id_tipo_persona,
 							/*5*/entrega_cedula_fiscal, /*6*/url_cedula_fiscal, /*7*/calle, /*8*/no_int, /*9*/no_ext, /*10*/colonia, /*11*/del_municipio, 
-							/*12*/cp, /*13*/estado, /*14*/pais, /*15*/regimen_fiscal, /*16*/productos_especificos, /*17*/fecha_alta, /*18*/sincronizar, folio_unico )
+							/*12*/cp, /*13*/estado, /*14*/pais, /*15*/regimen_fiscal, /*16*/productos_especificos, /*17*/fecha_alta, /*18*/sincronizar, datos_alta, folio_unico )
 							VALUES( /*1*/{$costumer->id_cliente_facturacion}, /*2*/'{$costumer->rfc}', /*3*/'{$costumer->razon_social}', 
 							/*4*/'{$costumer->id_tipo_persona}', /*5*/'{$costumer->entrega_cedula_fiscal}', /*6*/'{$costumer->url_cedula_fiscal}',
 							/*7*/'{$costumer->calle}', /*8*/'{$costumer->no_int}', /*9*/'{$costumer->no_ext}', /*10*/'{$costumer->colonia}', 
 							/*11*/'{$costumer->del_municipio}', /*12*/'{$costumer->cp}', /*13*/'{$costumer->estado}', /*14*/'{$costumer->pais}', 
-							/*15*/'{$costumer->regimen_fiscal}', /*16*/'{$costumer->productos_especificos}', /*17*/NOW(), /*18*/1, '{$costumer->folio_unico}' )";
+							/*15*/'{$costumer->regimen_fiscal}', /*16*/'{$costumer->productos_especificos}', /*17*/NOW(), /*18*/1, '{$costumer->datos_alta}', '{$costumer->folio_unico}' )";
 					$stm = $this->link->query( $sql ) or die( "Error al insertar cliente de facturacion en local : {$sql} {$this->link->error}" );
 				}
 				$costumer_id = $this->link->insert_id;//obtiene el id insertado
@@ -244,6 +251,7 @@
 						productos_especificos = '{$costumer['productos_especificos']}', 
 						fecha_alta = NOW(), 
 						folio_unico = '{$costumer['folio_unico']}',
+						datos_alta = '{$costumer['datos_alta']}',
 						sincronizar = 1";
 			if ( $cliente_existe == false ){//$costumer['id_cliente_facturacion'] == "" || $costumer['id_cliente_facturacion'] == 0
 				$action = "INSERTAR";
@@ -316,6 +324,7 @@
 						regimen_fiscal = '{$costumer['regimen_fiscal']}', 
 						productos_especificos = '{$costumer['productos_especificos']}', 
 						fecha_alta = NOW(), 
+						datos_alta = '{$costumer['datos_alta']}',
 						folio_unico = '{$costumer['folio_unico']}',
 						sincronizar = 1";
 			//die( $sql );
