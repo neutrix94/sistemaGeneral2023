@@ -34,6 +34,8 @@ BEGIN
                 '"id_afiliacion" : "', sca.id_afiliacion, '",\n',
                 '"habilitado" : "', sca.habilitado, '",\n',
 				'"insertada_por_error_en_cobro" : "', sca.insertada_por_error_en_cobro, '",\n',
+				'"monto_corte_caja" : "', sca.monto_corte_caja, '",\n',
+				'"monto_validacion" : "', sca.monto_validacion, '",\n',
 				'"sincronizar" : "0"',
 			'}'
 		),

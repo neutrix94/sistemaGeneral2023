@@ -34,6 +34,8 @@ BEGIN
                 '"id_terminal" : "', sct.id_terminal, '",\n',
                 '"habilitado" : "', sct.habilitado, '",\n',
 				'"insertada_por_error_en_cobro" : "', sct.insertada_por_error_en_cobro, '",\n',
+				'"monto_corte_caja" : "', sct.monto_corte_caja, '",\n',
+				'"monto_validacion" : "', sct.monto_validacion, '",\n',
 				'"sincronizar" : "0"',
 			'}'
 		),
