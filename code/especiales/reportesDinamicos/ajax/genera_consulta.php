@@ -94,8 +94,8 @@
 
 		public function buildReportFrontEnd( $stm, $report_id ){
 	    	$resp = "";
-	    	$names;
-
+	    	$names = array();
+			$total_counter = $stm->num_rows;
 	    //consulta de tiempo validadores
 	    	$hours_sum = 0;
 	    	$sales_sum = 0;
@@ -104,6 +104,9 @@
 	    	$username = "";
 	    	$first_date = "";
 	    	$last_date = "";
+			$total_ventas = 0;
+			$total_horas = 0;
+			$total_seconds = 0;
 
 			$info_campo = $stm->fetch_fields();
 
@@ -127,16 +130,32 @@
 				if( $report_id == 2 ){
 				  //  die( 'here' );
 					if( $current_user != $r[0] ){//si es un usuario diferente
-						if( $current_user != 0 ){
+						if( $current_user != 0  ){
+						// Convertir los segundos totales de vuelta a horas, minutos y segundos
+							$hours = floor($totalSeconds / 3600);
+							$minutes = floor(($totalSeconds % 3600) / 60);
+							$seconds = $totalSeconds % 60;
+							$total_horas = str_pad($hours, 2, "0", STR_PAD_LEFT) . ":" . 
+										str_pad($minutes, 2, "0", STR_PAD_LEFT) . ":" . 
+										str_pad($seconds, 2, "0", STR_PAD_LEFT);
 							$resp .= "<tr>
-								<td></td><td></td>
-								<td class=\"text-success\">Total {$username}</td>
-								<td class=\"text-success\">{$first_date}</td>
-								<td class=\"text-success\">{$last_date}</td>
-								<td class=\"text-success\">{$hours_sum}</td>
-								<td class=\"text-success\">{$products_sum}</td>
-								<td class=\"text-success\">{$sales_sum}</td>
-							</tr>";
+										<td></td>
+										<td></td>
+										<td class=\"text-success\">Total {$username}</td>
+										<td class=\"text-success\">{$first_date}</td>
+										<td class=\"text-success\">{$last_date}</td>
+										<td class=\"text-success\">{$hours_sum}</td>
+										<td class=\"text-success\">{$products_sum}</td>
+										<td class=\"text-success\">{$sales_sum}</td>
+										<td class=\"text-success\"></td>
+										<td class=\"text-success\">{$total_horas}</td>
+										<td class=\"text-success\">-</td>
+									</tr>";
+									$hours_sum = 0;
+									$sales_sum = 0;
+									$products_sum = 0;
+									$totalSeconds = 0;
+									$total_horas = 0;
 						}
 						$current_user = $r[0];
 						
@@ -152,6 +171,11 @@
 						$products_sum += $r[6];
 						$sales_sum += $r[7];
 						$last_date = $r[4];
+						$total_ventas += $r[8];
+						
+						list($h1, $m1, $s1) = explode(":", $r[9]);// Convertir los tiempos a segundos desde la medianoche
+						$seconds1 = $h1 * 3600 + $m1 * 60 + $s1;// Calcular el total en segundos
+						$totalSeconds += $seconds1;// Sumar los segundos
 
 					//}
 				}
@@ -163,6 +187,30 @@
 				$resp .= '</tr>';
 				$c++;
 			}
+
+/*Implementacion Oscar 2024-12-11 para sumar el ultimo registro en reporte de validadores y vendedores*/
+			if( $report_id == 2 ){
+				$hours = floor($totalSeconds / 3600);
+				$minutes = floor(($totalSeconds % 3600) / 60);
+				$seconds = $totalSeconds % 60;
+				$total_horas = str_pad($hours, 2, "0", STR_PAD_LEFT) . ":" . 
+							str_pad($minutes, 2, "0", STR_PAD_LEFT) . ":" . 
+							str_pad($seconds, 2, "0", STR_PAD_LEFT);
+				$resp .= "<tr>
+							<td></td>
+							<td></td>
+							<td class=\"text-success\">Total {$username}</td>
+							<td class=\"text-success\">{$first_date}</td>
+							<td class=\"text-success\">{$last_date}</td>
+							<td class=\"text-success\">{$hours_sum}</td>
+							<td class=\"text-success\">{$products_sum}</td>
+							<td class=\"text-success\">{$sales_sum}</td>
+							<td class=\"text-success\"></td>
+							<td class=\"text-success\">{$total_horas}</td>
+							<td class=\"text-success\">-</td>
+						</tr>";
+			}		
+/*Fin de cambio Oscar 2024-12-11*/
 
 				$resp .= '</tbody>';
 			$resp .= '</table>';

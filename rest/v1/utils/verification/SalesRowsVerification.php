@@ -50,7 +50,7 @@
                     FROM sys_sincronizacion_peticion sp
                     LEFT JOIN sys_sincronizacion_ventas sma
                     ON sma.folio_unico_peticion = sp.folio_unico
-                    WHERE sp.tabla = 'ec_pedidos'
+                    WHERE sp.tabla = 'sys_sincronizacion_ventas'
                     AND sp.id_sucursal_origen = {$origin_store_id}
                     AND sp.id_sucursal_destino = {$destinity_store_id}
                     AND sp.hora_envio IS NOT NULL
