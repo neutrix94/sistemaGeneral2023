@@ -12,7 +12,9 @@ BEGIN
             SET monto=new.monto_validacion,
             id_caja=new.id_banco 
         WHERE id_ingreso_corte_caja!=-1 
-        AND id_ingreso_corte_caja=new.id_sesion_caja_detalle;
+        AND id_ingreso_corte_caja = new.id_sesion_caja_detalle
+        AND id_afiliacion = -1
+        AND id_terminal = -1;
     END IF;
 
     SELECT id_sucursal INTO store_id FROM sys_sucursales WHERE acceso=1;

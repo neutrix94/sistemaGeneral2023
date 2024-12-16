@@ -1,4 +1,4 @@
-DROP TRIGGER IF EXISTS actualizaSesionCajaAfiliaciones;
+DROP TRIGGER IF EXISTS actualizaSesionCajaAfiliaciones|
 DELIMITER $$
 CREATE TRIGGER actualizaSesionCajaAfiliaciones
 BEFORE UPDATE ON ec_sesion_caja_afiliaciones
