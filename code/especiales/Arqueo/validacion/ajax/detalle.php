@@ -201,7 +201,7 @@
 					AND id_afiliacion = {$row['id_afiliacion']}";
 			$stm_update = mysql_query( $sql ) or die( "Error al actualizar los montos : {$sql} : " . mysql_error() );
 			
-			$sql = "CALL SincronizacionSesionCajaAfiliaciones(  'insert', {$row['id_afiliacion']} );";
+			$sql = "CALL SincronizacionSesionCajaAfiliaciones(  'update', {$row['id_afiliacion']} );";
 			$stm_update = mysql_query( $sql ) or die( "Error al ejecutar procedure para sincronizar actualizacion de afiliacion en sesion de caja : " . mysql_error() );
 			
 			$cont_tar++;
