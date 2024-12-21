@@ -336,6 +336,10 @@ $sql = "SELECT
 						WHERE id_sesion_caja = {$teller_session_id}
 						AND id_afiliacion = {$row['id_afiliacion']}";
 				$stm_update = mysql_query( $sql ) or die( "Error al actualizar los montos : {$sql} : " . mysql_error() );
+				
+				$sql = "CALL SincronizacionSesionCajaAfiliaciones(  'insert', {$row['id_afiliacion']} );";
+				$stm_update = mysql_query( $sql ) or die( "Error al ejecutar procedure para sincronizar actualizacion de afiliacion en sesion de caja : " . mysql_error() );
+				
 				$cont_tar++;
 				echo '<tr>';
 					echo '<td align="right" class="text-secondary">'.$row['no_afiliacion'].'</td>';//Tarjeta
@@ -364,7 +368,11 @@ $sql = "SELECT
 							SET monto_corte_caja = {$row['ammount_sum']} 
 						WHERE id_sesion_caja = {$teller_session_id}
 						AND id_terminal = {$row['id_terminal_integracion']}";
-				$stm_update = mysql_query( $sql ) or die( "Error al actualizar los montos : {$sql} : " . mysql_error() );
+				$stm_update = mysql_query( $sql ) or die( "Error al actualizar los montos : {$sql} : " . mysql_error() );	
+
+				$sql = "CALL SincronizacionSesionCajaTerminales(  'update', {$row['id_terminal_integracion']} );";
+				$stm_update = mysql_query( $sql ) or die( "Error al ejecutar procedure para sincronizar actualizacion de terminal en sesion de caja : " . mysql_error() );
+				
 				$cont_tar++;
 				echo '<tr>';
 					echo '<td align="right" class="text-primary">'.$row['nombre_terminal'].'</td>';//Tarjeta
