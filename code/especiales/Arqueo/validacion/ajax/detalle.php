@@ -81,41 +81,6 @@
 	$condicion1=" WHERE pp.fecha='$fcha_corte' AND (pp.hora BETWEEN '$h1' AND '$h2')";/*AND p.id_sucursal='".$user_sucursal."'*/
 	$condicion2=" WHERE dp.fecha='$fcha_corte' AND (dp.hora BETWEEN '$h1' AND '$h2')";/*AND d.id_sucursal='".$user_sucursal."'*/
 	
-/*
-Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devoluciones
-//sacamos total de pagos
-	$sql="SELECT 
-			SUM(IF(pp.es_externo=0,pp.monto,0)) as pagosPedro,
-			SUM(IF(pp.es_externo=1,pp.monto,0)) as pagosExternos
-			FROM ec_pedido_pagos pp
-			JOIN ec_pedidos p on pp.id_pedido=p.id_pedido
-			{$condicion1}
-			AND pp.id_cajero = {$cajero[0]}
-			AND pp.id_sesion_caja = {$teller_session_id}";
-//echo $sql.'<br>';	
-	$eje=mysql_query($sql) or die("Error1!!!\n".mysql_error().$sql);
-	$rw=mysql_fetch_row($eje);
-//guardamos las cantidades de pagos
-	$entrada=round($rw[0],2);
-	$entrada_externa=round($rw[1],2);//implementado por Oscar 15.08.2018 para guardar monto de productos externos
- //echo 'enttradas $ '.$sql."<br><br>";
-
-	$sql="SELECT 
-			SUM(IF(dp.es_externo=0,dp.monto,0)) as devolucionesPedro,
-			SUM(IF(dp.es_externo=1,dp.monto,0)) as devolucionesExternas
-			FROM ec_devolucion_pagos dp
-			JOIN ec_devolucion d ON dp.id_devolucion=d.id_devolucion
-			{$condicion2}
-			AND dp.id_cajero = {$cajero[0]}
-			AND dp.id_sesion_caja = {$teller_session_id}";
-//echo '<br>'.$sql;	
-	$eje=mysql_query($sql) or die("Error1!!!\n".mysql_error());
-	$rw=mysql_fetch_row($eje);
-//restamos las devoluciones
-	$entrada-=round($rw[0],2);
-	$entrada_externa-=round($rw[1],2);//implementado por Oscar 15.08.2018 para guardar monto de productos externos
-//echo 'devoluciones $ '.$sql."<br><br>";
-	*/
 	$sql = "SELECT
 				SUM( monto ) AS ingreso_total,
 				SUM( IF( id_tipo_pago = 1 OR id_tipo_pago = 2, monto, 0 ) ) AS ingreso_efectivo,
@@ -132,36 +97,6 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 	$entrada_tarjeta = $cajero_cobros['ingreso_tarjetas'];
 	$entrada_transferencia = $cajero_cobros['ingreso_transferencias'];
 	$entrada_cheque = $cajero_cobros['ingreso_cheques'];
-/*anulaciones
-	$sql = "SELECT SUM( monto ) AS monto_anulacion FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
-	AND observaciones LIKE '%-Efectivo-%'";
-	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en Efectivo : {$sql} : " . mysql_error() );
-	if( mysql_num_rows($stm) > 0 ){
-		$row = mysql_fetch_assoc($stm);
-		$entrada_efectivo -= $row['monto_anulacion'];
-	}
-	$sql = "SELECT SUM( monto ) FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
-	AND observaciones LIKE '%-Tarjeta-%'";
-	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en tarjeta : {$sql} : " . mysql_error() );
-	if( mysql_num_rows($stm) > 0 ){
-		$row = mysql_fetch_assoc( $stm );
-		$entrada_tarjeta -= $row['monto_anulacion'];
-	}
-	$sql = "SELECT SUM( monto ) FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
-	AND observaciones LIKE '%-Cheque-%'";
-	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en cheque : {$sql} : " . mysql_error() );
-	if( mysql_num_rows($stm) > 0 ){
-		$row = mysql_fetch_assoc($stm);
-		$entrada_cheque -= $row['monto_anulacion'];
-	}
-	$sql = "SELECT SUM( monto ) FROM ec_cajero_cobros WHERE id_sesion_caja = '{$teller_session_id}' AND id_tipo_pago = 3
-	AND observaciones LIKE '%-Transferencia-%'";
-	$stm = mysql_query( $sql ) or die( "Error al consultar anulaciones en transferencia : {$sql} : " . mysql_error() );
-	if( mysql_num_rows($stm) > 0 ){
-		$row = mysql_fetch_assoc($sql);
-		$entrada_transferencia -= $row['monto_anulacion'];
-	}*/
-
 //sacamos Gastos
 	$sql="SELECT g.id_usuario,g.fecha,g.hora,cg.nombre,g.observaciones,g.monto
 			FROM ec_gastos g 
@@ -292,7 +227,7 @@ Deshabilitado por Oscar 2024-11-12 por error de consulta en cortes con devolucio
 		while( $row = mysql_fetch_assoc($stm) ){
 		//actualiza monto de terminales de la sesion de caja Oscar 2024-12-16
 			$sql = "UPDATE ec_sesion_caja_terminales 
-						SET monto_corte_caja = {$row['ammount_sum']} 
+						SET monto_validacion = {$row['ammount_sum']} 
 					WHERE id_sesion_caja = {$teller_session_id}
 					AND id_terminal = {$row['id_terminal_integracion']}";
 			$stm_update = mysql_query( $sql ) or die( "Error al actualizar los montos : {$sql} : " . mysql_error() );
