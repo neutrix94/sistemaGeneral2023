@@ -1,8 +1,21 @@
 <?php
-/*version 2.0 2024-06-21*/
+/*
+	* Version 2.0 2024-06-21
+	* Version Oscar 2024-12-21 para implementar el objeto de consulta de validacion de corte de caja
+*/
+
 	define('FPDF_FONTPATH','../../../../../include/fpdf153/font/');
 	include("../../../../../include/fpdf153/fpdf.php");
 	include("../../../../../conectMin.php");
+/*implementacion Oscar 2024-12-21 para utilizar objeto de validacion*/
+	include("../../../../../conexionMysqli.php");
+	if( ! include( "./Validation.php" ) ){
+		die( "Error al incluir objeto de validacion de corte de caja en la ruta : ./Validation.php" );
+	}
+	$Validation = new Validation( $link );
+	$validation_data = $Validation->getValidationAmmounts( $_POST['corte'] );
+/*Fin de cambio Oscar 2024-12-21*/
+
 /*implementación Oscar 18.06.2019 para guardar el detalle de la sesion de caja*/
 	//tar:tarjetas,cheq_trans:cheques,fecha:fF,hrs:horas,corte:id_corte,pss:password,fcha_corte:fecha_ultimo_corte
 	$id_sesion_cajero=$_POST['corte'];
@@ -114,7 +127,7 @@
 	if(!$eje){
 		$error=mysql_error();
 		mysql_query("ROLLBACK");//cancelamos la transacción
-		die("Error al cerrar las sesión de caja!!!\n".$error);
+		die("Error al cerrar las sesión de caja : {$sql} : {$error}");
 	}
 	mysql_query("COMMIT");//autorizamos la transacción
 /*implementación Oscar 25.01.2019 para sacar rutas de tickets*/
@@ -289,23 +302,50 @@ class TicketPDF extends FPDF {
 
 /*separación de ingresos (implementado por Oscar 15.08.2018)*/	
 	$ticket->SetXY(10, $ticket->GetY()+5);
-	$ticket->Cell(60, 6, utf8_decode("Ingreso Interno: $ ".round($arr_ingresos[0])), "" ,0, "R");//-$dat[6])
+	$ticket->Cell(60, 6, utf8_decode("Ingreso Interno: $ ".round($validation_data['entrada'])), "" ,0, "R");//-$dat[6])
 	$ticket->SetFont('Arial','',$bF);
 	//echo $arr_ingresos[0];
 
-	if($arr_ingresos[1]>0){
-		$ticket->SetXY(10, $ticket->GetY()+5);
-		$ticket->Cell(60, 6, utf8_decode("Ingreso Externo: $ ".round($arr_ingresos[1])), "" ,0, "R");
-		//$ticket->SetFont('Arial','',$bF);
-	//echo $arr_ingresos[1];
-	}
+/*Deshabilitado por Oscar 2024-12-21
+if($arr_ingresos[1]>0){
+	$ticket->SetXY(10, $ticket->GetY()+5);
+	$ticket->Cell(60, 6, utf8_decode("Ingreso Externo: $ ".round($arr_ingresos[1])), "" ,0, "R");
+	//$ticket->SetFont('Arial','',$bF);
+//echo $arr_ingresos[1];
+}*/
 /*Fin de cambio*/
 
 	$ticket->SetFont('Arial','B',$bF);
 	$ticket->SetXY(10, $ticket->GetY()+5);
-	$ticket->Cell(60, 6, utf8_decode("Total de Ingresos: ".$monto_total_ingreso), "" ,0, "R");
+	$ticket->Cell(60, 6, utf8_decode("Total de Ingresos: ".round($validation_data['entrada'])), "" ,0, "R");
 	
-//tarjetas
+//tarjetas de inbursa
+	if( sizeof( $validation_data['afiliations'] ) > 0 ){$ticket->SetFont('Arial','',$bF);
+		$ticket->SetXY(10, $ticket->GetY()+5);
+		$ticket->Cell(60, 6, utf8_decode("INBURSA"), "" ,0, "C");
+		foreach ( $validation_data['afiliations'] as $key => $afiliation ) {
+			$ticket->SetFont('Arial','',$bF);
+			$ticket->SetXY(10, $ticket->GetY()+5);
+			$ticket->Cell(60, 6, utf8_decode("{$afiliation['afiliation_name']} : {$afiliation['ammount_sum']}"), "" ,0, "R");
+		}
+	}
+//tarjetas de NetPay
+if( sizeof( $validation_data['terminals'] ) > 0 ){$ticket->SetFont('Arial','',$bF);
+	$ticket->SetXY(10, $ticket->GetY()+5);
+	$ticket->Cell(60, 6, utf8_decode("NETPAY"), "" ,0, "C");
+	foreach ( $validation_data['terminals'] as $key => $terminal ) {
+		$ticket->SetFont('Arial','',$bF);
+		$ticket->SetXY(10, $ticket->GetY()+5);
+		$ticket->Cell(60, 6, utf8_decode("{$terminal['terminal_name']} : {$terminal['ammount_sum']}"), "" ,0, "R");
+	}
+}
+//transferencias
+	$ticket->SetXY(10, $ticket->GetY()+5);
+	$ticket->Cell(60, 6, utf8_decode("Transferencias : {$validation_data['entrada_transferencia']}"), "" ,0, "R");
+//cheques
+	$ticket->SetXY(10, $ticket->GetY()+5);
+	$ticket->Cell(60, 6, utf8_decode("Cheques : {$validation_data['entrada_cheque']}"), "" ,0, "R");
+/*tarjetas
 	for($i=0;$i<sizeof($arr_tarjetas)-1;$i++){//insertamos las tarjetas
 		$arr=explode("~", $arr_tarjetas[$i]);
 		$sql="SELECT no_afiliacion FROM ec_afiliaciones WHERE id_afiliacion IN(SELECT id_afiliacion FROM ec_sesion_caja_detalle WHERE id_sesion_caja_detalle=$arr[0])";
@@ -315,22 +355,22 @@ class TicketPDF extends FPDF {
 		$ticket->SetFont('Arial','',$bF);
 		$ticket->SetXY(10, $ticket->GetY()+5);
 		$ticket->Cell(60, 6, utf8_decode($r[0].": ".$arr[1]), "" ,0, "R");
-	}
+	}*/
 
-//cheques/transferencias
+/*cheques/transferencias
 	for($i=0;$i<sizeof($arr_cheques)-1;$i++){//insertamos las tarjetas
 		$arr=explode("~", $arr_cheques[$i]);
 		$ticket->SetFont('Arial','',$bF);
 		$ticket->SetXY(10, $ticket->GetY()+5);
 		$ticket->Cell(60, 6, utf8_decode($arr[2].": ".$arr[1]), "" ,0, "R");
 	}
-	
+*/
 //efectivo
 	$efect=explode("~", $monto_en_efectivo);
 	
 	$ticket->SetFont('Arial','B',$bF);
 	$ticket->SetXY(10, $ticket->GetY()+5);
-	$ticket->Cell(60, 6, utf8_decode("Ingreso en Efectivo: ".$ingreso_subtotal_efe), "" ,0, "R");
+	$ticket->Cell(60, 6, utf8_decode("Ingreso en Efectivo: {$validation_data['entrada_efectivo']}"), "" ,0, "R");
 	$ticket->SetFont('Arial','',$bF);
 
 //gastos
@@ -468,27 +508,5 @@ class TicketPDF extends FPDF {
 	}else{//impresion por red local
 		$enviar_por_red = $SysArchivosDescarga->crea_registros_sincronizacion_archivo_por_red_local( 10, 'pdf', $nombre_ticket, '', $ruta_salida, $user_sucursal, $user_id, $carpeta_path );
 	}
-
-/*implementación Oscar 25.01.2019 para la sincronización de tickets
-    if($user_tipo_sistema=='linea'){
-		$sql_arch="INSERT INTO sys_archivos_descarga SET 
-					id_archivo=null,
-					tipo_archivo='pdf',
-					nombre_archivo='$nombre_ticket',
-					ruta_origen='$ruta_or',
-					ruta_destino='$ruta_des',
-      			/*Modificación Oscar 03.03.2019 para tomar el destino local de impresión de ticket configurado en la sucursal
-          			id_sucursal=(SELECT sucursal_impresion_local FROM ec_configuracion_sucursal WHERE IF('$user_sucursal'='-1',id_sucursal='1',id_sucursal='$user_sucursal')),
-        		/*Fin de Cambio Oscar 03.03.2019
-					id_usuario='$user_id',
-					observaciones=''";
-		$inserta_reg_arch=mysql_query($sql_arch)or die("Error al guardar el registro de sincronización del ticket de reimpresión!!!\n\n".mysql_error()."\n\n".$sql_arch);
-
-    }
-    $ticket->Output("../../../../../cache/ticket/".$nombre_ticket, "F");
-    /*fin de cambio Oscar 25.01.2019*/
-
-   //$ticket->Output($nombre_tkt, "F");
     echo "ok|../../../../{$ruta_salida}/{$nombre_ticket}";
-/*Fin de cambio Oscar 18.06.2019*/
 ?>
