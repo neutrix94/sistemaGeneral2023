@@ -200,7 +200,17 @@
 					WHERE id_sesion_caja = {$teller_session_id}
 					AND id_afiliacion = {$row['id_afiliacion']}";
 			$stm_update = mysql_query( $sql ) or die( "Error al actualizar los montos : {$sql} : " . mysql_error() );
-			
+		//consulta el id de detalle de afiliacion
+			$sql = "SELECT 
+					id_sesion_caja_afiliaciones
+				FROM ec_sesion_caja_afiliaciones 
+				WHERE id_sesion_caja = {$teller_session_id}
+				AND id_afiliacion = {$row['id_afiliacion']}";
+			$stm_aux = mysql_query( $sql ) or die( "Error al consultar el id de afiliacion por sesion de caja : {$sql} : " . mysql_error() );
+			$row_aux = mysql_fetch_assoc( $stm_aux );
+			$sql = "CALL SincronizacionSesionCajaAfiliaciones(  'update', {$row_aux['id_sesion_caja_afiliaciones']} );";
+			$stm_update = mysql_query( $sql ) or die( "Error al ejecutar procedure para sincronizar actualizacion de afiliacion en sesion de caja : " . mysql_error() );
+
 			$sql = "CALL SincronizacionSesionCajaAfiliaciones(  'update', {$row['id_afiliacion']} );";
 			$stm_update = mysql_query( $sql ) or die( "Error al ejecutar procedure para sincronizar actualizacion de afiliacion en sesion de caja : " . mysql_error() );
 			
@@ -235,8 +245,15 @@
 					WHERE id_sesion_caja = {$teller_session_id}
 					AND id_terminal = {$row['id_terminal_integracion']}";
 			$stm_update = mysql_query( $sql ) or die( "Error al actualizar los montos : {$sql} : " . mysql_error() );
-			
-			$sql = "CALL SincronizacionSesionCajaTerminales(  'update', {$row['id_terminal_integracion']} );";
+		//consulta el id de detalle de terminales
+			$sql = "SELECT 
+						id_sesion_caja_terminales
+					FROM ec_sesion_caja_terminales 
+					WHERE id_sesion_caja = {$teller_session_id}
+					AND id_terminal = {$row['id_terminal_integracion']}";
+			$stm_aux = mysql_query( $sql ) or die( "Error al consultar el id de terminal por sesion de caja : {$sql} : " . mysql_error() );
+			$row_aux = mysql_fetch_assoc( $stm_aux );
+			$sql = "CALL SincronizacionSesionCajaTerminales(  'update', {$row_aux['id_sesion_caja_terminales']} );";
 			$stm_update = mysql_query( $sql ) or die( "Error al ejecutar procedure para sincronizar actualizacion de terminal en sesion de caja : " . mysql_error() );
 			
 			$cont_tar++;
