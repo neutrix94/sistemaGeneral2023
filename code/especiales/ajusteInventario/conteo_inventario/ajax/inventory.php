@@ -207,10 +207,7 @@
 					ON p.id_productos = cit.id_producto
 					LEFT JOIN ec_proveedor_producto_ubicacion_almacen ppua
 					ON ppua.id_proveedor_producto = cit.id_proveedor_producto
-					/*WHERE ( ( CONCAT( ppua.letra_ubicacion_desde, ppua.numero_ubicacion_desde ) BETWEEN '{$range_since}' AND '{$range_to}')
-					OR ( CONCAT( ppua.letra_ubicacion_hasta, ppua.numero_ubicacion_hasta ) BETWEEN '{$range_since}' AND '{$range_to}') )*/
-					WHERE (  ppua.numero_ubicacion_desde BETWEEN '{$range_number_since}' AND '{$range_number_to}' )     
-					AND (  ppua.letra_ubicacion_desde BETWEEN '{$range_letter_since}' AND '{$range_letter_to}' )	
+					WHERE (  ppua.letra_ubicacion_desde BETWEEN '{$range_letter_since}' AND '{$range_letter_to}' )	
 					AND cit.ya_fue_contado = '0'
 					AND cit.pospuesto = '0'
 					AND ppua.es_principal = '1'
@@ -221,6 +218,7 @@
 					ORDER BY ppua.letra_ubicacion_desde,ppua.numero_ubicacion_desde, 
 					ppua.pasillo_desde, ppua.altura_desde, p.orden_lista ASC
 					LIMIT 1";
+				error_log($sql);
 			//die( $sql );
 			$stm = $this->link->query( $sql ) or die( "Error al consultar el producto que sigue de acuerdo al rango de ubicaciones : {$this->link->error}" ); 
 			if( $stm->num_rows == 0 ){
